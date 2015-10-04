@@ -45,8 +45,7 @@ import java.util.List;
 
 public class X509ChangeCAEntry
 extends ChangeCAEntry
-implements Serializable
-{
+implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private List<String> crlUris;
@@ -61,107 +60,88 @@ implements Serializable
 
     public X509ChangeCAEntry(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         super(name);
     }
 
-    public List<String> getCrlUris()
-    {
+    public List<String> getCrlUris() {
         return crlUris;
     }
 
     public void setCrlUris(
-            final List<String> crlUris)
-    {
+            final List<String> crlUris) {
         this.crlUris = crlUris;
     }
 
-    public List<String> getDeltaCrlUris()
-    {
+    public List<String> getDeltaCrlUris() {
         return deltaCrlUris;
     }
 
     public void setDeltaCrlUris(
-            final List<String> deltaCrlUris)
-    {
+            final List<String> deltaCrlUris) {
         this.deltaCrlUris = deltaCrlUris;
     }
 
-    public List<String> getOcspUris()
-    {
+    public List<String> getOcspUris() {
         return ocspUris;
     }
 
     public void setOcspUris(
-            final List<String> ocspUris)
-    {
+            final List<String> ocspUris) {
         this.ocspUris = ocspUris;
     }
 
-    public List<String> getCaCertUris()
-    {
+    public List<String> getCaCertUris() {
         return caCertUris;
     }
 
     public void setCacertUris(
-            final List<String> caCertUris)
-    {
+            final List<String> caCertUris) {
         this.caCertUris = caCertUris;
     }
 
-    public X509Certificate getCert()
-    {
+    public X509Certificate getCert() {
         return cert;
     }
 
     public void setCert(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         this.cert = cert;
     }
 
-    public String getCrlSignerName()
-    {
+    public String getCrlSignerName() {
         return crlSignerName;
     }
 
     public void setCrlSignerName(
-            final String crlSignerName)
-    {
+            final String crlSignerName) {
         this.crlSignerName = crlSignerName;
     }
 
-    public Integer getNumCrls()
-    {
+    public Integer getNumCrls() {
         return numCrls;
     }
 
     public void setNumCrls(
-            final Integer numCrls)
-    {
+            final Integer numCrls) {
         this.numCrls = numCrls;
     }
 
-    public String getExtraControl()
-    {
+    public String getExtraControl() {
         return extraControl;
     }
 
     public void setExtraControl(
-            final String extraControl)
-    {
+            final String extraControl) {
         this.extraControl = extraControl;
     }
 
-    public DuplicationMode getDuplicateCNMode()
-    {
+    public DuplicationMode getDuplicateCNMode() {
         return duplicateCNMode;
     }
 
     public void setDuplicateCNMode(
-            final DuplicationMode duplicateCNMode)
-    {
+            final DuplicationMode duplicateCNMode) {
         this.duplicateCNMode = duplicateCNMode;
     }
 

@@ -48,16 +48,14 @@ package org.xipki.datasource.api.exception;
  * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public class QueryTimeoutException extends TransientDataAccessException
-{
+public class QueryTimeoutException extends TransientDataAccessException {
 
     /**
      * Constructor for QueryTimeoutException.
      * @param msg the detail message
      */
     public QueryTimeoutException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -68,8 +66,7 @@ public class QueryTimeoutException extends TransientDataAccessException
      */
     public QueryTimeoutException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

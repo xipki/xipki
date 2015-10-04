@@ -42,12 +42,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class ProfileNameAndAllCompleter extends MgmtNameCompleter
-{
+public class ProfileNameAndAllCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getCertprofileNames());
         ret.add("all");
         return ret;

@@ -47,27 +47,22 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class P11ModuleNameCompleter extends DynamicEnumCompleter
-{
+public class P11ModuleNameCompleter extends DynamicEnumCompleter {
     private SecurityFactory securityFactory;
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> names = securityFactory.getPkcs11ModuleNames();
-        if (CollectionUtil.isEmpty(names))
-        {
+        if (CollectionUtil.isEmpty(names)) {
             return Collections.emptySet();
         }
         Set<String> ret = new HashSet<>(names);
-        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME))
-        {
+        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
             ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
         }
         return ret;

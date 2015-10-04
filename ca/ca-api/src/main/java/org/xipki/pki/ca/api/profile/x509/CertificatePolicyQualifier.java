@@ -41,40 +41,34 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertificatePolicyQualifier
-{
+public class CertificatePolicyQualifier {
     private final String cpsUri;
     private final String userNotice;
 
     private CertificatePolicyQualifier(
             final String cpsUri,
-            final String userNotice)
-    {
+            final String userNotice) {
         this.cpsUri = cpsUri;
         this.userNotice = userNotice;
     }
 
     public static CertificatePolicyQualifier getInstanceForUserNotice(
-            final String userNotice)
-    {
+            final String userNotice) {
         ParamUtil.assertNotBlank("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
     public static CertificatePolicyQualifier getInstanceForCpsUri(
-            final String cpsUri)
-    {
+            final String cpsUri) {
         ParamUtil.assertNotBlank("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
     }
 
-    public String getCpsUri()
-    {
+    public String getCpsUri() {
         return cpsUri;
     }
 
-    public String getUserNotice()
-    {
+    public String getUserNotice() {
         return userNotice;
     }
 

@@ -42,34 +42,27 @@ import org.bouncycastle.util.encoders.Hex;
  */
 
 @SuppressWarnings("serial")
-public class OCSPNonceUnmatchedException extends OCSPResponseException
-{
+public class OCSPNonceUnmatchedException extends OCSPResponseException {
     public OCSPNonceUnmatchedException(
             final byte[] expected,
-            final byte[] is)
-    {
+            final byte[] is) {
         super(buildMessage(expected, is));
     }
 
     private static String buildMessage(
             final byte[] expected,
-            final byte[] is)
-    {
+            final byte[] is) {
         StringBuilder sb = new StringBuilder(100);
         sb.append("nonce unmatch (received ");
-        if (is == null || is.length == 0)
-        {
+        if (is == null || is.length == 0) {
             sb.append("none");
-        } else
-        {
+        } else {
             sb.append(Hex.toHexString(is));
         }
         sb.append(", but expected ");
-        if (expected == null || expected.length == 0)
-        {
+        if (expected == null || expected.length == 0) {
             sb.append("nonce");
-        } else
-        {
+        } else {
             sb.append(Hex.toHexString(expected));
         }
         sb.append(")");

@@ -53,33 +53,28 @@ import org.xipki.common.util.ParamUtil;
 *
 */
 
-class CACertRespBytes
-{
+class CACertRespBytes {
     private final byte[] bytes;
 
     CACertRespBytes(
             final X509Certificate cACert,
             final X509Certificate responderCert)
-    throws CMSException, CertificateException
-    {
+    throws CMSException, CertificateException {
         ParamUtil.assertNotNull("cACert", cACert);
         ParamUtil.assertNotNull("responderCert", responderCert);
 
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-        try
-        {
+        try {
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
             CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             bytes = degenerateSignedData.getEncoded();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new CMSException("could not build CMS SignedDta");
         }
     }
 
-    byte[] getBytes()
-    {
+    byte[] getBytes() {
         return Arrays.clone(bytes);
     }
 

@@ -47,8 +47,7 @@ import org.xipki.password.OBFPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "deobfuscate",
         description = "deobfuscate password")
-public class DeobfuscateCmd extends SecurityCmd
-{
+public class DeobfuscateCmd extends SecurityCmd {
     @Option(name = "--password",
             required = true,
             description = "obfuscated password, starts with OBF:\n"
@@ -57,10 +56,8 @@ public class DeobfuscateCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:"))
-        {
+    throws Exception {
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with OBF:");
         }

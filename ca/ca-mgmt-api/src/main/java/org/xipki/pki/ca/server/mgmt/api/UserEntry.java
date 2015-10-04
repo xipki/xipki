@@ -44,8 +44,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class UserEntry
-implements Serializable
-{
+implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -56,8 +55,7 @@ implements Serializable
             final String name,
             final String hashedPassword,
             final String cnRegex)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         ParamUtil.assertNotBlank("name", name);
 
         this.name = name;
@@ -65,24 +63,20 @@ implements Serializable
         this.cnRegex = cnRegex;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getHashedPassword()
-    {
+    public String getHashedPassword() {
         return hashedPassword;
     }
 
-    public String getCnRegex()
-    {
+    public String getCnRegex() {
         return cnRegex;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("hashed password: ").append(hashedPassword).append("\n");

@@ -47,8 +47,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-ec-gen",
         description = "performance test of PKCS#11 EC key generation")
-public class SpeedP11ECKeyGenCmd extends SpeedP11Cmd
-{
+public class SpeedP11ECKeyGenCmd extends SpeedP11Cmd {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name\n"
@@ -57,8 +56,7 @@ public class SpeedP11ECKeyGenCmd extends SpeedP11Cmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         return new P11ECKeyGenLoadTest(slot, curveName);
     }

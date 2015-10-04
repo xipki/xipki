@@ -45,16 +45,14 @@ package org.xipki.datasource.api.exception;
  * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public class DataAccessResourceFailureException extends NonTransientDataAccessResourceException
-{
+public class DataAccessResourceFailureException extends NonTransientDataAccessResourceException {
 
     /**
      * Constructor for DataAccessResourceFailureException.
      * @param msg the detail message
      */
     public DataAccessResourceFailureException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -65,8 +63,7 @@ public class DataAccessResourceFailureException extends NonTransientDataAccessRe
      */
     public DataAccessResourceFailureException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

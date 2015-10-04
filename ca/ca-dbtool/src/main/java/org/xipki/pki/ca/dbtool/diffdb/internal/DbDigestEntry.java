@@ -46,8 +46,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class DbDigestEntry
-{
+public class DbDigestEntry {
     private final long serialNumber;
     private final boolean revoked;
     private final Integer revReason;
@@ -61,22 +60,17 @@ public class DbDigestEntry
             final Integer revReason,
             final Long revTime,
             final Long revInvTime,
-            final String sha1Fp)
-    {
+            final String sha1Fp) {
         ParamUtil.assertNotBlank("sha1Fp", sha1Fp);
 
-        if (sha1Fp.length() == 28)
-        {
+        if (sha1Fp.length() == 28) {
             this.base64Sha1 = sha1Fp;
-        } else if (sha1Fp.length() == 40)
-        {
+        } else if (sha1Fp.length() == 40) {
             this.base64Sha1 = Base64.toBase64String(Hex.decode(sha1Fp));
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
         }
-        if (revoked)
-        {
+        if (revoked) {
             ParamUtil.assertNotNull("revReason", revReason);
             ParamUtil.assertNotNull("revTime", revTime);
         }
@@ -89,11 +83,9 @@ public class DbDigestEntry
     }
 
     public static DbDigestEntry decode(
-            final String encoded)
-    {
+            final String encoded) {
         List<Integer> indexes = getIndexes(encoded);
-        if (indexes.size() != 5)
-        {
+        if (indexes.size() != 5) {
             throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
         }
 
@@ -110,8 +102,7 @@ public class DbDigestEntry
         Integer revReason = null;
         Long revTime = null;
         Long revInvTime = null;
-        if (revoked)
-        {
+        if (revoked) {
             i++;
             s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
             revReason = Integer.parseInt(s);
@@ -122,8 +113,7 @@ public class DbDigestEntry
 
             i++;
             s = encoded.substring(indexes.get(i) + 1);
-            if (s.length() != 0)
-            {
+            if (s.length() != 0) {
                 revInvTime = Long.parseLong(s);
             }
         }
@@ -131,58 +121,47 @@ public class DbDigestEntry
         return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
     }
 
-    public long getSerialNumber()
-    {
+    public long getSerialNumber() {
         return serialNumber;
     }
 
-    public boolean isRevoked()
-    {
+    public boolean isRevoked() {
         return revoked;
     }
 
-    public int getRevReason()
-    {
+    public int getRevReason() {
         return revReason;
     }
 
-    public Long getRevTime()
-    {
+    public Long getRevTime() {
         return revTime;
     }
 
-    public Long getRevInvTime()
-    {
+    public Long getRevInvTime() {
         return revInvTime;
     }
 
-    public String getBase64Sha1()
-    {
+    public String getBase64Sha1() {
         return base64Sha1;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getEncoded();
     }
 
-    public String getEncodedOmitSeriaNumber()
-    {
+    public String getEncodedOmitSeriaNumber() {
         return getEncoded(false);
     }
 
-    public String getEncoded()
-    {
+    public String getEncoded() {
         return getEncoded(true);
     }
 
     private String getEncoded(
-            final boolean withSerialNumber)
-    {
+            final boolean withSerialNumber) {
         StringBuilder sb = new StringBuilder();
-        if (withSerialNumber)
-        {
+        if (withSerialNumber) {
             sb.append(serialNumber).append(";");
         }
         sb.append(base64Sha1).append(";");
@@ -190,20 +169,17 @@ public class DbDigestEntry
                 ? "1"
                 : "0").append(";");
 
-        if (revReason != null)
-        {
+        if (revReason != null) {
             sb.append(revReason);
         }
         sb.append(";");
 
-        if (revTime != null)
-        {
+        if (revTime != null) {
             sb.append(revTime);
         }
         sb.append(";");
 
-        if (revInvTime != null)
-        {
+        if (revInvTime != null) {
             sb.append(revInvTime);
         }
 
@@ -211,40 +187,32 @@ public class DbDigestEntry
     }
 
     public boolean contentEquals(
-            final DbDigestEntry b)
-    {
-        if (b == null)
-        {
+            final DbDigestEntry b) {
+        if (b == null) {
             return false;
         }
 
-        if (serialNumber != b.serialNumber)
-        {
+        if (serialNumber != b.serialNumber) {
             return false;
         }
 
-        if (revoked != b.revoked)
-        {
+        if (revoked != b.revoked) {
             return false;
         }
 
-        if (!equals(revReason, b.revReason))
-        {
+        if (!equals(revReason, b.revReason)) {
             return false;
         }
 
-        if (!equals(revTime, b.revTime))
-        {
+        if (!equals(revTime, b.revTime)) {
             return false;
         }
 
-        if (!equals(revInvTime, b.revInvTime))
-        {
+        if (!equals(revInvTime, b.revInvTime)) {
             return false;
         }
 
-        if (!equals(base64Sha1, b.base64Sha1))
-        {
+        if (!equals(base64Sha1, b.base64Sha1)) {
             return false;
         }
 
@@ -252,13 +220,10 @@ public class DbDigestEntry
     }
 
     private static List<Integer> getIndexes(
-            final String encoded)
-    {
+            final String encoded) {
         List<Integer> ret = new ArrayList<>(6);
-        for (int i = 0; i < encoded.length(); i++)
-        {
-            if (encoded.charAt(i) == ';')
-            {
+        for (int i = 0; i < encoded.length(); i++) {
+            if (encoded.charAt(i) == ';') {
                 ret.add(i);
             }
         }
@@ -267,13 +232,10 @@ public class DbDigestEntry
 
     private static boolean equals(
             final Object a,
-            final Object b)
-    {
-        if (a == null)
-        {
+            final Object b) {
+        if (a == null) {
             return b == null;
-        } else
-        {
+        } else {
             return a.equals(b);
         }
     }

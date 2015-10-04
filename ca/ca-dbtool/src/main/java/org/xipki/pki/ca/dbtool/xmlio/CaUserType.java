@@ -41,8 +41,7 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class CaUserType extends DbDataObject
-{
+public class CaUserType extends DbDataObject {
     public static final String TAG_ROOT = "user";
 
     public static final String TAG_id = "id";
@@ -57,54 +56,45 @@ public class CaUserType extends DbDataObject
     public static final String TAG_cnRegex = "cnRegex";
     private String cnRegex;
 
-    public Integer getId()
-    {
+    public Integer getId() {
         return id;
     }
 
     public void setId(
-            final int id)
-    {
+            final int id) {
         this.id = id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     public void setName(
-            final String name)
-    {
+            final String name) {
         this.name = name;
     }
 
-    public String getPassword()
-    {
+    public String getPassword() {
         return password;
     }
 
     public void setPassword(
-            final String password)
-    {
+            final String password) {
         this.password = password;
     }
 
-    public String getCnRegex()
-    {
+    public String getCnRegex() {
         return cnRegex;
     }
 
     public void setCnRegex(
-            final String cnRegex)
-    {
+            final String cnRegex) {
         this.cnRegex = cnRegex;
     }
 
     @Override
     public void validate()
-    throws InvalidDataObjectException
-    {
+    throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotBlank("name", name);
         assertNotBlank("password", password);
@@ -114,8 +104,7 @@ public class CaUserType extends DbDataObject
     @Override
     public void writeTo(
             final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

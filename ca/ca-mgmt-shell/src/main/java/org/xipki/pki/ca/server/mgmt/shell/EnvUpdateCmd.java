@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "env-up",
         description = "update CA environment parameter")
-public class EnvUpdateCmd extends CaCmd
-{
+public class EnvUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -61,8 +60,7 @@ public class EnvUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.changeEnvParam(name, value);
         output(b, "updated", "could not update",
                 "the environment " + name + "=" + getRealString(value));

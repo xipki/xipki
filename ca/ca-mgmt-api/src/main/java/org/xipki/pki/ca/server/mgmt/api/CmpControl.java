@@ -52,8 +52,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-public class CmpControl
-{
+public class CmpControl {
     public static final String ALGO_DELIMITER = ":";
 
     public static final String KEY_CONFIRM_CERT = "confirm.cert";
@@ -78,15 +77,13 @@ public class CmpControl
     private final int confirmWaitTime;
     private final Set<String> sigAlgos;
 
-    public boolean isMessageTimeRequired()
-    {
+    public boolean isMessageTimeRequired() {
         return messageTimeRequired;
     }
 
     public CmpControl(
             final CmpControlEntry dbEntry)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotNull("dbEntry", dbEntry);
 
         ConfPairs pairs = new ConfPairs(dbEntry.getConf());
@@ -98,15 +95,12 @@ public class CmpControl
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_confirmWaitTime);
         String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
 
-        if (s == null)
-        {
+        if (s == null) {
             this.sigAlgos = null;
-        } else
-        {
+        } else {
             Set<String> set = StringUtil.splitAsSet(s, ALGO_DELIMITER);
             this.sigAlgos = canonicalizeAlgos(set);
-            if (CollectionUtil.isNotEmpty(this.sigAlgos))
-            {
+            if (CollectionUtil.isNotEmpty(this.sigAlgos)) {
                 pairs.putPair(KEY_PROTECTION_SIGALGO,
                         StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
             }
@@ -124,8 +118,7 @@ public class CmpControl
             final Integer messageTimeBias,
             final Integer confirmWaitTime,
             final Set<String> sigAlgos)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotBlank("name", name);
         ConfPairs pairs = new ConfPairs();
 
@@ -159,11 +152,9 @@ public class CmpControl
                 : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
-        if (CollectionUtil.isEmpty(sigAlgos))
-        {
+        if (CollectionUtil.isEmpty(sigAlgos)) {
             this.sigAlgos = null;
-        } else
-        {
+        } else {
             this.sigAlgos = canonicalizeAlgos(sigAlgos);
             pairs.putPair(KEY_PROTECTION_SIGALGO,
                     StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
@@ -174,16 +165,12 @@ public class CmpControl
 
     private static Set<String> canonicalizeAlgos(
             final Set<String> algos)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         Set<String> ret = new HashSet<String>();
-        for (String m : algos)
-        {
-            try
-            {
+        for (String m : algos) {
+            try {
                 ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
-            } catch (NoSuchAlgorithmException e)
-            {
+            } catch (NoSuchAlgorithmException e) {
                 throw new InvalidConfException(e.getMessage(), e);
             }
         }
@@ -193,8 +180,7 @@ public class CmpControl
     private static boolean getBoolean(
             final ConfPairs pairs,
             final String key,
-            final boolean defaultValue)
-    {
+            final boolean defaultValue) {
         String s = pairs.getValue(key);
         boolean ret = StringUtil.isBlank(s)
                 ? defaultValue
@@ -206,8 +192,7 @@ public class CmpControl
     private static int getInt(
             final ConfPairs pairs,
             final String key,
-            final int defaultValue)
-    {
+            final int defaultValue) {
         String s = pairs.getValue(key);
         int ret = StringUtil.isBlank(s)
                 ? defaultValue
@@ -216,64 +201,52 @@ public class CmpControl
         return ret;
     }
 
-    public boolean isConfirmCert()
-    {
+    public boolean isConfirmCert() {
         return confirmCert;
     }
 
-    public int getMessageTimeBias()
-    {
+    public int getMessageTimeBias() {
         return messageTimeBias;
     }
 
-    public int getConfirmWaitTime()
-    {
+    public int getConfirmWaitTime() {
         return confirmWaitTime;
     }
 
-    public boolean isSendCaCert()
-    {
+    public boolean isSendCaCert() {
         return sendCaCert;
     }
 
-    public boolean isSendResponderCert()
-    {
+    public boolean isSendResponderCert() {
         return sendResponderCert;
     }
 
-    public Set<String> getSigAlgos()
-    {
+    public Set<String> getSigAlgos() {
         return sigAlgos;
     }
 
     public boolean isSigAlgoPermitted(
-            final AlgorithmIdentifier algId)
-    {
-        if (sigAlgos == null)
-        {
+            final AlgorithmIdentifier algId) {
+        if (sigAlgos == null) {
             return true;
         }
 
         String name;
-        try
-        {
+        try {
             name = AlgorithmUtil.getSignatureAlgoName(algId);
-        } catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             return false;
         }
 
         return sigAlgos.contains(name);
     }
 
-    public CmpControlEntry getDbEntry()
-    {
+    public CmpControlEntry getDbEntry() {
         return dbEntry;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("               name: ").append(dbEntry.getName()).append('\n');
         sb.append("        confirmCert: ").append(getYesNo(confirmCert)).append('\n');
@@ -289,8 +262,7 @@ public class CmpControl
         return sb.toString();
     }
 
-    private static String getYesNo(boolean b)
-    {
+    private static String getYesNo(boolean b) {
         return b
                 ? "yes"
                 : "no";

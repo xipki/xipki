@@ -39,31 +39,26 @@ package org.xipki.security.api;
  * @author Lijun Liao
  */
 
-public class BadASN1ObjectException extends Exception
-{
+public class BadASN1ObjectException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public BadASN1ObjectException()
-    {
+    public BadASN1ObjectException() {
     }
 
     public BadASN1ObjectException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public BadASN1ObjectException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public BadASN1ObjectException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
@@ -71,8 +66,7 @@ public class BadASN1ObjectException extends Exception
             final String message,
             final Throwable cause,
             final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
+            final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

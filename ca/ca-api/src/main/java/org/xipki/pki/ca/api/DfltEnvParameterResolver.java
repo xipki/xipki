@@ -43,48 +43,40 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Lijun Liao
  */
 
-public class DfltEnvParameterResolver implements EnvParameterResolver
-{
+public class DfltEnvParameterResolver implements EnvParameterResolver {
     private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
-    public DfltEnvParameterResolver()
-    {
+    public DfltEnvParameterResolver() {
     }
 
     @Override
     public String getParameterValue(
-            final String parameterName)
-    {
+            final String parameterName) {
         return envParameters.get(parameterName);
     }
 
     @Override
-    public Set<String> getAllParameterNames()
-    {
+    public Set<String> getAllParameterNames() {
         return envParameters.keySet();
     }
 
     public String getEnvParam(
-            final String name)
-    {
+            final String name) {
         return envParameters.get(name);
     }
 
     public void addEnvParam(
             final String name,
-            final String value)
-    {
+            final String value) {
         envParameters.put(name, value);
     }
 
-    public void clear()
-    {
+    public void clear() {
         envParameters.clear();
     }
 
     public String removeEnvParam(
-            final String name)
-    {
+            final String name) {
         return envParameters.remove(name);
     }
 

@@ -47,8 +47,7 @@ import org.xipki.datasource.api.DatabaseType;
  *
  * @author Lijun Liao
  */
-public class SQLErrorCodes
-{
+public class SQLErrorCodes {
 
     protected boolean useSqlStateForTranslation = false;
 
@@ -64,11 +63,9 @@ public class SQLErrorCodes
     protected Set<String> cannotSerializeTransactionCodes;
 
     public static SQLErrorCodes newInstance(
-            final DatabaseType dbType)
-    {
+            final DatabaseType dbType) {
         ParamUtil.assertNotNull("dbType", dbType);
-        switch (dbType)
-        {
+        switch (dbType) {
         case DB2:
             return new DB2();
         case H2:
@@ -88,8 +85,7 @@ public class SQLErrorCodes
         }
     }
 
-    private SQLErrorCodes()
-    {
+    private SQLErrorCodes() {
         badSqlGrammarCodes = Collections.emptySet();
         invalidResultSetAccessCodes = Collections.emptySet();
         duplicateKeyCodes = Collections.emptySet();
@@ -102,65 +98,52 @@ public class SQLErrorCodes
         cannotSerializeTransactionCodes = Collections.emptySet();
     }
 
-    public boolean isUseSqlStateForTranslation()
-    {
+    public boolean isUseSqlStateForTranslation() {
         return useSqlStateForTranslation;
     }
 
-    public Set<String> getBadSqlGrammarCodes()
-    {
+    public Set<String> getBadSqlGrammarCodes() {
         return badSqlGrammarCodes;
     }
 
-    public Set<String> getInvalidResultSetAccessCodes()
-    {
+    public Set<String> getInvalidResultSetAccessCodes() {
         return invalidResultSetAccessCodes;
     }
 
-    public Set<String> getDuplicateKeyCodes()
-    {
+    public Set<String> getDuplicateKeyCodes() {
         return duplicateKeyCodes;
     }
 
-    public Set<String> getDataIntegrityViolationCodes()
-    {
+    public Set<String> getDataIntegrityViolationCodes() {
         return dataIntegrityViolationCodes;
     }
 
-    public Set<String> getPermissionDeniedCodes()
-    {
+    public Set<String> getPermissionDeniedCodes() {
         return permissionDeniedCodes;
     }
 
-    public Set<String> getDataAccessResourceFailureCodes()
-    {
+    public Set<String> getDataAccessResourceFailureCodes() {
         return dataAccessResourceFailureCodes;
     }
 
-    public Set<String> getTransientDataAccessResourceCodes()
-    {
+    public Set<String> getTransientDataAccessResourceCodes() {
         return transientDataAccessResourceCodes;
     }
 
-    public Set<String> getCannotAcquireLockCodes()
-    {
+    public Set<String> getCannotAcquireLockCodes() {
         return cannotAcquireLockCodes;
     }
 
-    public Set<String> getDeadlockLoserCodes()
-    {
+    public Set<String> getDeadlockLoserCodes() {
         return deadlockLoserCodes;
     }
 
-    public Set<String> getCannotSerializeTransactionCodes()
-    {
+    public Set<String> getCannotSerializeTransactionCodes() {
         return cannotSerializeTransactionCodes;
     }
 
-    private static class DB2 extends SQLErrorCodes
-    {
-        DB2()
-        {
+    private static class DB2 extends SQLErrorCodes {
+        DB2() {
             super();
             badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115, -128, -199, -204, -206, -301,
                     -408, -441, -491);
@@ -173,10 +156,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static class H2 extends SQLErrorCodes
-    {
-        H2()
-        {
+    private static class H2 extends SQLErrorCodes {
+        H2() {
             super();
             badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111, 42112, 42121, 42122,
                     42132);
@@ -188,10 +169,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static class HSQL extends SQLErrorCodes
-    {
-        HSQL()
-        {
+    private static class HSQL extends SQLErrorCodes {
+        HSQL() {
             super();
             badSqlGrammarCodes = toSet(-22, -28);
             duplicateKeyCodes = toSet(-104);
@@ -200,10 +179,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static class MySQL extends SQLErrorCodes
-    {
-        MySQL()
-        {
+    private static class MySQL extends SQLErrorCodes {
+        MySQL() {
             super();
             badSqlGrammarCodes = toSet(1054, 1064, 1146);
             duplicateKeyCodes = toSet(1062);
@@ -215,10 +192,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static class Oracle extends SQLErrorCodes
-    {
-        Oracle()
-        {
+    private static class Oracle extends SQLErrorCodes {
+        Oracle() {
             super();
             badSqlGrammarCodes = toSet(900, 903, 904, 917, 936, 942, 17006, 6550);
             invalidResultSetAccessCodes = toSet(17003);
@@ -231,10 +206,8 @@ public class SQLErrorCodes
         }
     }
 
-    private static class PostgreSQL extends SQLErrorCodes
-    {
-        PostgreSQL()
-        {
+    private static class PostgreSQL extends SQLErrorCodes {
+        PostgreSQL() {
             super();
             useSqlStateForTranslation = true;
             badSqlGrammarCodes = toSet("03000", "42000", "42601", "42602", "42622", "42804",
@@ -249,32 +222,26 @@ public class SQLErrorCodes
     }
 
     private static Set<String> toSet(
-            final String... strs)
-    {
-        if (strs == null || strs.length == 0)
-        {
+            final String... strs) {
+        if (strs == null || strs.length == 0) {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for (String str : strs)
-        {
+        for (String str : strs) {
             set.add(str);
         }
         return Collections.unmodifiableSet(set);
     }
 
     private static Set<String> toSet(
-            final int... ints)
-    {
-        if (ints == null || ints.length == 0)
-        {
+            final int... ints) {
+        if (ints == null || ints.length == 0) {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for (int i : ints)
-        {
+        for (int i : ints) {
             set.add(Integer.toString(i));
         }
         return Collections.unmodifiableSet(set);

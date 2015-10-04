@@ -42,14 +42,11 @@ import org.xipki.pki.ocsp.qa.api.Occurrence;
  * @author Lijun Liao
  */
 
-public class OccurrenceCompleter extends EnumCompleter
-{
-    public OccurrenceCompleter()
-    {
+public class OccurrenceCompleter extends EnumCompleter {
+    public OccurrenceCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (Occurrence entry : Occurrence.values())
-        {
+        for (Occurrence entry : Occurrence.values()) {
             enums.append(entry.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

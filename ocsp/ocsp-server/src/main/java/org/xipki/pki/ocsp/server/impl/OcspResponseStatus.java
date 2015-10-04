@@ -39,8 +39,7 @@ package org.xipki.pki.ocsp.server.impl;
  * @author Lijun Liao
  */
 
-public enum OcspResponseStatus
-{
+public enum OcspResponseStatus {
     successful(0),
     malformedRequest(1),
     internalError(2),
@@ -50,18 +49,14 @@ public enum OcspResponseStatus
 
     private final int status;
     private OcspResponseStatus(
-            final int status)
-    {
+            final int status) {
         this.status = status;
     }
 
     public static OcspResponseStatus getOCSPResponseStatus(
-            final int status)
-    {
-        for (OcspResponseStatus entry : values())
-        {
-            if (entry.status == status)
-            {
+            final int status) {
+        for (OcspResponseStatus entry : values()) {
+            if (entry.status == status) {
                 return entry;
             }
         }
@@ -69,8 +64,7 @@ public enum OcspResponseStatus
         return null;
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return status;
     }
 }

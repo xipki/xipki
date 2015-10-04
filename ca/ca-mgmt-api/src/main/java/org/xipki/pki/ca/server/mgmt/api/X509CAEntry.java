@@ -55,8 +55,7 @@ import org.xipki.security.api.util.X509Util;
 
 public class X509CAEntry
 extends CAEntry
-implements Serializable
-{
+implements Serializable {
     private static final long serialVersionUID = 1L;
     private List<String> crlUris;
     private List<String> deltaCrlUris;
@@ -84,8 +83,7 @@ implements Serializable
             final List<String> deltaCrlUris,
             final int numCrls,
             final int expirationPeriod)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
         init(nextSerial, nextCRLNumber, cacertUris, ocspUris, crlUris, deltaCrlUris, numCrls);
     }
@@ -98,22 +96,18 @@ implements Serializable
             final List<String> crlUris,
             final List<String> deltaCrlUris,
             final int numCrls)
-    throws CAMgmtException
-    {
-        if (nextSerial < 0)
-        {
+    throws CAMgmtException {
+        if (nextSerial < 0) {
             throw new IllegalArgumentException("nextSerial is negative (" + nextSerial + " < 0)");
         }
 
-        if (nextCRLNumber <= 0)
-        {
+        if (nextCRLNumber <= 0) {
             throw new IllegalArgumentException(
 
                     "nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
         }
 
-        if (numCrls < 0)
-        {
+        if (numCrls < 0) {
             throw new IllegalArgumentException("numCrls could not be negative");
         }
         this.numCrls = numCrls;
@@ -130,16 +124,12 @@ implements Serializable
 
     public void setCertificate(
             final X509Certificate cert)
-    throws CAMgmtException
-    {
-        if (cert == null)
-        {
+    throws CAMgmtException {
+        if (cert == null) {
             this.cert = null;
             this.subject = null;
-        } else
-        {
-            if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign))
-            {
+        } else {
+            if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign)) {
                 throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
             }
             this.cert = cert;
@@ -147,97 +137,79 @@ implements Serializable
         }
     }
 
-    public long getNextSerial()
-    {
+    public long getNextSerial() {
         return nextSerial;
     }
 
     public void setNextSerial(
-            final long nextSerial)
-    {
+            final long nextSerial) {
         this.nextSerial = nextSerial;
     }
 
-    public int getNextCRLNumber()
-    {
+    public int getNextCRLNumber() {
         return nextCRLNumber;
     }
 
     public void setNextCRLNumber(
-            final int crlNumber)
-    {
+            final int crlNumber) {
         this.nextCRLNumber = crlNumber;
     }
 
-    public List<String> getCrlUris()
-    {
+    public List<String> getCrlUris() {
         return crlUris;
     }
 
-    public String getCrlUrisAsString()
-    {
+    public String getCrlUrisAsString() {
         return toString(crlUris);
     }
 
-    public List<String> getDeltaCrlUris()
-    {
+    public List<String> getDeltaCrlUris() {
         return deltaCrlUris;
     }
 
-    public String getDeltaCrlUrisAsString()
-    {
+    public String getDeltaCrlUrisAsString() {
         return toString(deltaCrlUris);
     }
 
-    public List<String> getOcspUris()
-    {
+    public List<String> getOcspUris() {
         return ocspUris;
     }
 
-    public String getOcspUrisAsString()
-    {
+    public String getOcspUrisAsString() {
         return toString(ocspUris);
     }
 
-    public List<String> getCacertUris()
-    {
+    public List<String> getCacertUris() {
         return cacertUris;
     }
 
-    public String getCacertUrisAsString()
-    {
+    public String getCacertUrisAsString() {
         return toString(cacertUris);
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return cert;
     }
 
-    public int getNumCrls()
-    {
+    public int getNumCrls() {
         return numCrls;
     }
 
-    public String getCrlSignerName()
-    {
+    public String getCrlSignerName() {
         return crlSignerName;
     }
 
     public void setCrlSignerName(
-            final String crlSignerName)
-    {
+            final String crlSignerName) {
         this.crlSignerName = crlSignerName;
     }
 
     public String toString(
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
+            final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
-        if (sb.charAt(sb.length() - 1) != '\n')
-        {
+        if (sb.charAt(sb.length() - 1) != '\n') {
             sb.append('\n');
         }
         sb.append("duplicateCN: ");
@@ -253,25 +225,20 @@ implements Serializable
         sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
         sb.append("caCertUris: ").append(getCacertUrisAsString()).append('\n');
         sb.append("cert: ").append("\n");
-        if (cert == null)
-        {
+        if (cert == null) {
             sb.append("\tnull").append("\n");
-        } else
-        {
+        } else {
             sb.append("\tissuer: ").append(
                     X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(subject).append("\n");
             sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
             sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");
-            if (verbose)
-            {
+            if (verbose) {
                 String b64EncodedCert = null;
-                try
-                {
+                try {
                     b64EncodedCert = Base64.toBase64String(cert.getEncoded());
-                } catch (CertificateEncodingException e)
-                {
+                } catch (CertificateEncodingException e) {
                     b64EncodedCert = "ERROR, could not encode the certificate";
                 }
                 sb.append("\tEncoded: ").append(b64EncodedCert).append("\n");
@@ -285,8 +252,7 @@ implements Serializable
                         ? "not revoked"
                         : "revoked");
         sb.append("\n");
-        if (revocationInfo != null)
-        {
+        if (revocationInfo != null) {
             sb.append("\treason: ")
                 .append(revocationInfo.getReason().getDescription())
                 .append("\n");
@@ -298,42 +264,35 @@ implements Serializable
         return sb.toString();
     }
 
-    public CertRevocationInfo getRevocationInfo()
-    {
+    public CertRevocationInfo getRevocationInfo() {
         return revocationInfo;
     }
 
     public void setRevocationInfo(
-            final CertRevocationInfo revocationInfo)
-    {
+            final CertRevocationInfo revocationInfo) {
         this.revocationInfo = revocationInfo;
     }
 
-    public Date getCrlBaseTime()
-    {
+    public Date getCrlBaseTime() {
         return (cert == null)
                 ? null
                 : cert.getNotBefore();
     }
 
-    public String getSubject()
-    {
+    public String getSubject() {
         return subject;
     }
 
-    public String getSerialSeqName()
-    {
+    public String getSerialSeqName() {
         return serialSeqName;
     }
 
-    public DuplicationMode getDuplicateCNMode()
-    {
+    public DuplicationMode getDuplicateCNMode() {
         return duplicateCNMode;
     }
 
     public void setDuplicateCNMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         ParamUtil.assertNotNull("mode", mode);
         this.duplicateCNMode = mode;
     }

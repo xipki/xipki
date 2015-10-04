@@ -51,8 +51,7 @@ import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
  * @author Lijun Liao
  */
 
-public class DbDigestReporter
-{
+public class DbDigestReporter {
     private final String reportDirname;
     private final BufferedWriter missingWriter;
     private final BufferedWriter diffWriter;
@@ -68,8 +67,7 @@ public class DbDigestReporter
     public DbDigestReporter(
             final String reportDirname,
             final byte[] caCertBytes)
-    throws IOException
-    {
+    throws IOException {
         ParamUtil.assertNotBlank("reportDirname", reportDirname);
         this.reportDirname = reportDirname;
         File dir = new File(reportDirname);
@@ -89,28 +87,24 @@ public class DbDigestReporter
         start();
     }
 
-    public void start()
-    {
+    public void start() {
         startTime = new Date();
     }
 
-    public String getReportDirname()
-    {
+    public String getReportDirname() {
         return reportDirname;
     }
 
     public void addMissing(
             final long serialNumber)
-    throws IOException
-    {
+    throws IOException {
         numMissing++;
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
     public void addGood(
             final long serialNumber)
-    throws IOException
-    {
+    throws IOException {
         numGood++;
         writeSerialNumberLine(goodWriter, serialNumber);
     }
@@ -118,10 +112,8 @@ public class DbDigestReporter
     public void addDiff(
             final DbDigestEntry refCert,
             final DbDigestEntry targetCert)
-    throws IOException
-    {
-        if (refCert.getSerialNumber() != targetCert.getSerialNumber())
-        {
+    throws IOException {
+        if (refCert.getSerialNumber() != targetCert.getSerialNumber()) {
             throw new IllegalArgumentException(
                     "refCert and targetCert do not have the same serialNumber");
         }
@@ -137,16 +129,14 @@ public class DbDigestReporter
 
     public void addError(
             final String errorMessage)
-    throws IOException
-    {
+    throws IOException {
         numError++;
         errorWriter.write(errorMessage);
         errorWriter.write('\n');
     }
 
     public void addNoCAMatch()
-    throws IOException
-    {
+    throws IOException {
         errorWriter.write("Cound not find corresponding CA in target to diff");
         errorWriter.write('\n');
     }
@@ -154,14 +144,12 @@ public class DbDigestReporter
     private static void writeSerialNumberLine(
             final BufferedWriter writer,
             final long serialNumber)
-    throws IOException
-    {
+    throws IOException {
         writer.write(Long.toString(serialNumber));
         writer.write('\n');
     }
 
-    public void close()
-    {
+    public void close() {
         close(missingWriter);
         close(diffWriter);
         close(goodWriter);
@@ -181,22 +169,18 @@ public class DbDigestReporter
         sb.append("start time: ").append(startTime).append("\n");
         sb.append("end time:   ").append(now).append("\n");
         sb.append("speed:      ");
-        if (durationSec > 0)
-        {
+        if (durationSec > 0) {
             sb.append(
                 StringUtil.formatAccount(sum / durationSec, false)).append(" /s");
-        } else
-        {
+        } else {
             sb.append("--");
         }
         sb.append("\n");
 
-        try
-        {
+        try {
             IoUtil.save(reportDirname + File.separator + "overview.txt",
                     sb.toString().getBytes());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("Could not write overview.txt with following content\n"
                     + sb.toString());
         }
@@ -204,13 +188,10 @@ public class DbDigestReporter
     }
 
     private static void close(
-            final Writer writer)
-    {
-        try
-        {
+            final Writer writer) {
+        try {
             writer.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
         }
     }
 

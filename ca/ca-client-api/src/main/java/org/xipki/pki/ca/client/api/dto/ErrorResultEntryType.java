@@ -42,14 +42,12 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ErrorResultEntryType extends ResultEntryType
-{
+public class ErrorResultEntryType extends ResultEntryType {
     private final PKIStatusInfo statusInfo;
 
     public ErrorResultEntryType(
             final String id,
-            final PKIStatusInfo statusInfo)
-    {
+            final PKIStatusInfo statusInfo) {
         super(id);
         ParamUtil.assertNotNull("statusInfo", statusInfo);
         this.statusInfo = statusInfo;
@@ -59,22 +57,19 @@ public class ErrorResultEntryType extends ResultEntryType
             final String id,
             final int status,
             final int pkiFailureInfo,
-            final String statusMessage)
-    {
+            final String statusMessage) {
         super(id);
         this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
     public ErrorResultEntryType(
             final String id,
-            final int status)
-    {
+            final int status) {
         super(id);
         this.statusInfo = new PKIStatusInfo(status);
     }
 
-    public PKIStatusInfo getStatusInfo()
-    {
+    public PKIStatusInfo getStatusInfo() {
         return statusInfo;
     }
 }

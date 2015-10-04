@@ -47,43 +47,36 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-ca", name = "restart",
         description = "restart CA system")
-public class CaSystemRestartCmd extends CaCmd
-{
+public class CaSystemRestartCmd extends CaCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean successful = caManager.restartCaSystem();
-        if (!successful)
-        {
+        if (!successful) {
             throw new CmdFailure("could not restart CA system");
         }
 
         StringBuilder sb = new StringBuilder("restarted CA system");
         Set<String> names = new HashSet<>(caManager.getCaNames());
 
-        if (names.size() > 0)
-        {
+        if (names.size() > 0) {
             sb.append(" with following CAs: ");
             Set<String> caAliasNames = caManager.getCaAliasNames();
-            for (String aliasName : caAliasNames)
-            {
+            for (String aliasName : caAliasNames) {
                 String name = caManager.getCaNameForAlias(aliasName);
                 names.remove(name);
 
                 sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
             }
 
-            for (String name : names)
-            {
+            for (String name : names) {
                 sb.append(name).append(", ");
             }
 
             int len = sb.length();
             sb.delete(len - 2, len);
-        } else
-        {
+        } else {
             sb.append(": no CA is configured");
         }
 

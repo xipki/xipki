@@ -51,44 +51,36 @@ import org.xipki.security.p11.keystore.KeystoreP11ModulePool;
  * @author Lijun Liao
  */
 
-public abstract class SecurityCmd extends XipkiOsgiCommandSupport
-{
+public abstract class SecurityCmd extends XipkiOsgiCommandSupport {
 
     protected SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory()
-    {
+    public SecurityFactory getSecurityFactory() {
         return securityFactory;
     }
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
     protected P11Module getP11Module(
             final String moduleName)
-    throws Exception
-    {
+    throws Exception {
         // this call initialization method
         P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
-        if (p11CryptService == null)
-        {
+        if (p11CryptService == null) {
             throw new SignerException("could not initialize P11CryptService " + moduleName);
         }
 
         P11Module module;
         String pkcs11Provider = securityFactory.getPkcs11Provider();
-        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
-        {
+        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
             // the returned object could not be null
             module = IaikP11ModulePool.getInstance().getModule(moduleName);
-        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
-        {
+        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
             module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
-        } else
-        {
+        } else {
             throw new SignerException("PKCS11 provider " + pkcs11Provider + " is not accepted");
         }
 
@@ -99,17 +91,14 @@ public abstract class SecurityCmd extends XipkiOsgiCommandSupport
     protected P11WritableSlot getP11WritablSlot(
             final String moduleName,
             final int slotIndex)
-    throws Exception
-    {
+    throws Exception {
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
         P11Module module = getP11Module(moduleName);
-        if (module == null)
-        {
+        if (module == null) {
             throw new SignerException("module " + moduleName + " does not exist");
         }
         P11WritableSlot slot = module.getSlot(slotId);
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not get slot " + slotIndex + " of module "
                     + moduleName);
         }

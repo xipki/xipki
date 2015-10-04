@@ -63,8 +63,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
  * @author Lijun Liao
  */
 
-public class CaDbExportWorker extends DbPortWorker
-{
+public class CaDbExportWorker extends DbPortWorker {
     private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
 
     private final DataSourceWrapper dataSource;
@@ -85,8 +84,7 @@ public class CaDbExportWorker extends DbPortWorker
             final int numCertsInBundle,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException
-    {
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.assertNotBlank("destFolder", destFolder);
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
@@ -109,16 +107,14 @@ public class CaDbExportWorker extends DbPortWorker
             final int numCertsInBundle,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException
-    {
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         this(dataSourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
                     numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
 
     private static Marshaller getMarshaller()
-    throws JAXBException
-    {
+    throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -127,8 +123,7 @@ public class CaDbExportWorker extends DbPortWorker
     }
 
     private static Unmarshaller getUnmarshaller()
-    throws JAXBException
-    {
+    throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
@@ -136,37 +131,28 @@ public class CaDbExportWorker extends DbPortWorker
     }
 
     private void checkDestFolder()
-    throws IOException
-    {
+    throws IOException {
         File f = new File(destFolder);
-        if (!f.exists())
-        {
+        if (!f.exists()) {
             f.mkdirs();
-        } else
-        {
-            if (!f.isDirectory())
-            {
+        } else {
+            if (!f.isDirectory()) {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (!f.canWrite())
-            {
+            if (!f.canWrite()) {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
         File processLogFile = new File(destFolder, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
-        if (resume)
-        {
-            if (!processLogFile.exists())
-            {
+        if (resume) {
+            if (!processLogFile.exists()) {
                 throw new IOException("could not process with '--resume' option");
             }
-        } else
-        {
+        } else {
             String[] children = f.list();
-            if (children != null && children.length > 0)
-            {
+            if (children != null && children.length > 0) {
                 throw new IOException(destFolder + " is not empty");
             }
         }
@@ -175,13 +161,10 @@ public class CaDbExportWorker extends DbPortWorker
     @Override
     public void doRun(
             final AtomicBoolean stopMe)
-    throws Exception
-    {
+    throws Exception {
         long start = System.currentTimeMillis();
-        try
-        {
-            if (!resume)
-            {
+        try {
+            if (!resume) {
                 // CAConfiguration
                 CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
                         dataSource, marshaller, destFolder, stopMe, evaluateOnly);
@@ -195,13 +178,10 @@ public class CaDbExportWorker extends DbPortWorker
                     numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 dataSource.shutdown();
-            } catch (Throwable e)
-            {
+            } catch (Throwable e) {
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();

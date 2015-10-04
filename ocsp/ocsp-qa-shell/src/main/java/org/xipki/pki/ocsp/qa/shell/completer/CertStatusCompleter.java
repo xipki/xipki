@@ -42,14 +42,11 @@ import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
  * @author Lijun Liao
  */
 
-public class CertStatusCompleter extends EnumCompleter
-{
-    public CertStatusCompleter()
-    {
+public class CertStatusCompleter extends EnumCompleter {
+    public CertStatusCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (OcspCertStatus entry : OcspCertStatus.values())
-        {
+        for (OcspCertStatus entry : OcspCertStatus.values()) {
             enums.append(entry.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

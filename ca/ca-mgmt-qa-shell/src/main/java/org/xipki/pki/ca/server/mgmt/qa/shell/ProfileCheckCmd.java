@@ -47,33 +47,27 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "profile-check",
         description = "check information of profiles (QA)")
-public class ProfileCheckCmd extends ProfileUpdateCmd
-{
+public class ProfileCheckCmd extends ProfileUpdateCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking profile " + name);
 
-        if (type == null && conf == null && confFile == null)
-        {
+        if (type == null && conf == null && confFile == null) {
             System.out.println("nothing to update");
             return null;
         }
 
-        if (conf == null && confFile != null)
-        {
+        if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }
 
         CertprofileEntry cp = caManager.getCertprofile(name);
-        if (cp == null)
-        {
+        if (cp == null) {
             throw new CmdFailure("certificate profile named '" + name + "' is not configured");
         }
 
-        if (cp.getType() != null)
-        {
+        if (cp.getType() != null) {
             String ex = type;
             String is = cp.getType();
             MgmtQAShellUtil.assertEquals("type", ex, is);

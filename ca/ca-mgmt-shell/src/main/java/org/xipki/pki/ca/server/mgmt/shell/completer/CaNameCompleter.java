@@ -41,12 +41,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends MgmtNameCompleter
-{
+public class CaNameCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return caManager.getCaNames();
     }
 

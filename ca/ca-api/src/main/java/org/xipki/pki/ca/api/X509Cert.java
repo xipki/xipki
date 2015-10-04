@@ -49,8 +49,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class X509Cert
-{
+public class X509Cert {
     private final X509Certificate cert;
     private final String subject;
     private final byte[] encodedCert;
@@ -58,72 +57,58 @@ public class X509Cert
     private final X500Name subjectAsX500Name;
 
     public X509Cert(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         this(cert, null);
     }
 
     public X509Cert(
             final X509Certificate cert,
-            final byte[] encodedCert)
-    {
+            final byte[] encodedCert) {
         ParamUtil.assertNotNull("cert", cert);
 
         this.cert = cert;
         X500Principal x500Subject = cert.getSubjectX500Principal();
         this.subject = X509Util.getRFC4519Name(x500Subject);
         this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
-        try
-        {
+        try {
             this.subjectKeyIdentifer = X509Util.extractSKI(cert);
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
         }
 
-        if (encodedCert == null)
-        {
-            try
-            {
+        if (encodedCert == null) {
+            try {
                 this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e)
-            {
+            } catch (CertificateEncodingException e) {
                 throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
             }
-        } else
-        {
+        } else {
             this.encodedCert = encodedCert;
         }
     }
 
-    public X509Certificate getCert()
-    {
+    public X509Certificate getCert() {
         return cert;
     }
 
-    public byte[] getEncodedCert()
-    {
+    public byte[] getEncodedCert() {
         return encodedCert;
     }
 
-    public String getSubject()
-    {
+    public String getSubject() {
         return subject;
     }
 
-    public X500Name getSubjectAsX500Name()
-    {
+    public X500Name getSubjectAsX500Name() {
         return subjectAsX500Name;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return cert.toString();
     }
 
-    public byte[] getSubjectKeyIdentifier()
-    {
+    public byte[] getSubjectKeyIdentifier() {
         return Arrays.clone(subjectKeyIdentifer);
     }
 

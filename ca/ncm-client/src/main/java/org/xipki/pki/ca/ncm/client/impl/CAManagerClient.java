@@ -76,8 +76,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
  * @author Lijun Liao
  */
 
-public class CAManagerClient implements CAManager
-{
+public class CAManagerClient implements CAManager {
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
     private HessianCAManager client;
@@ -85,15 +84,12 @@ public class CAManagerClient implements CAManager
 
     private String serverURL;
 
-    public CAManagerClient()
-    {
+    public CAManagerClient() {
     }
 
     public void init()
-    throws Exception
-    {
-        if (serverURL == null)
-        {
+    throws Exception {
+        if (serverURL == null) {
             throw new IllegalStateException("serverURL is not set");
         }
         HessianProxyFactory factory = new HessianProxyFactory(getClass().getClassLoader());
@@ -106,29 +102,22 @@ public class CAManagerClient implements CAManager
     }
 
     public void shutdown()
-    throws Exception
-    {
+    throws Exception {
     }
 
     public void setServerURL(
-            final String serverURL)
-    {
+            final String serverURL) {
         this.serverURL = serverURL;
     }
 
-    private void determineServerVersion()
-    {
+    private void determineServerVersion() {
         String versionS = client.getAttribute("version");
-        if (versionS == null)
-        {
+        if (versionS == null) {
             version = 0;
-        } else
-        {
-            try
-            {
+        } else {
+            try {
                 version = Integer.parseInt(versionS);
-            } catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 LOG.info("invalid version {}, reset it to 0", versionS);
             }
         }
@@ -136,14 +125,12 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public CASystemStatus getCASystemStatus()
-    {
+    public CASystemStatus getCASystemStatus() {
         return client.getCASystemStatus();
     }
 
     @Override
-    public boolean unlockCA()
-    {
+    public boolean unlockCA() {
         return client.unlockCA();
     }
 
@@ -151,8 +138,7 @@ public class CAManagerClient implements CAManager
     public boolean publishRootCA(
             final String caName,
             final String certprofile)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.publishRootCA(caName, certprofile);
     }
 
@@ -160,8 +146,7 @@ public class CAManagerClient implements CAManager
     public boolean republishCertificates(
             final String caName,
             final List<String> publisherNames)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.republishCertificates(caName, publisherNames);
     }
 
@@ -169,29 +154,25 @@ public class CAManagerClient implements CAManager
     public boolean clearPublishQueue(
             final String caName,
             final List<String> publisherNames)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.clearPublishQueue(caName, publisherNames);
     }
 
     @Override
     public boolean removeCA(
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCA(caName);
     }
 
     @Override
-    public boolean restartCaSystem()
-    {
+    public boolean restartCaSystem() {
         return client.restartCaSystem();
     }
 
     @Override
     public boolean notifyCAChange()
-    throws HessianCAMgmtException
-    {
+    throws HessianCAMgmtException {
         return client.notifyCAChange();
     }
 
@@ -199,101 +180,86 @@ public class CAManagerClient implements CAManager
     public boolean addCaAlias(
             final String aliasName,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCaAlias(aliasName, caName);
     }
 
     @Override
     public boolean removeCaAlias(
             final String aliasName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCaAlias(aliasName);
     }
 
     @Override
     public Set<String> getAliasesForCA(
-            final String caName)
-    {
+            final String caName) {
         return client.getAliasesForCA(caName);
     }
 
     @Override
     public String getCaNameForAlias(
-            final String aliasName)
-    {
+            final String aliasName) {
         return client.getCaName(aliasName);
     }
 
     @Override
-    public Set<String> getCaAliasNames()
-    {
+    public Set<String> getCaAliasNames() {
         return client.getCaAliasNames();
     }
 
     @Override
-    public Set<String> getCertprofileNames()
-    {
+    public Set<String> getCertprofileNames() {
         return client.getCertprofileNames();
     }
 
     @Override
-    public Set<String> getPublisherNames()
-    {
+    public Set<String> getPublisherNames() {
         return client.getPublisherNames();
     }
 
     @Override
-    public Set<String> getCmpRequestorNames()
-    {
+    public Set<String> getCmpRequestorNames() {
         return client.getCmpRequestorNames();
     }
 
     @Override
-    public Set<String> getCmpResponderNames()
-    {
+    public Set<String> getCmpResponderNames() {
         return client.getCmpResponderNames();
     }
 
     @Override
-    public Set<String> getCrlSignerNames()
-    {
+    public Set<String> getCrlSignerNames() {
         return client.getCrlSignerNames();
     }
 
     @Override
-    public Set<String> getCmpControlNames()
-    {
+    public Set<String> getCmpControlNames() {
         return client.getCmpControlNames();
     }
 
     @Override
-    public Set<String> getCaNames()
-    {
+    public Set<String> getCaNames() {
         return client.getCaNames();
     }
 
     @Override
     public boolean addCA(
             final CAEntry newCaDbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCA(newCaDbEntry);
     }
 
     @Override
     public CAEntry getCA(
-            final String caName)
-    {
+            final String caName) {
         return client.getCA(caName);
     }
 
     @Override
     public boolean changeCA(
             final ChangeCAEntry changeCAentry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCA(changeCAentry);
     }
 
@@ -301,8 +267,7 @@ public class CAManagerClient implements CAManager
     public boolean removeCertprofileFromCA(
             final String profileName,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCertprofileFromCA(profileName, caName);
     }
 
@@ -311,8 +276,7 @@ public class CAManagerClient implements CAManager
             final String profileName,
             final String profileLocalname,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCertprofileToCA(profileName, profileLocalname, caName);
     }
 
@@ -320,8 +284,7 @@ public class CAManagerClient implements CAManager
     public boolean removePublisherFromCA(
             final String publisherName,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removePublisherFromCA(publisherName, caName);
     }
 
@@ -329,45 +292,39 @@ public class CAManagerClient implements CAManager
     public boolean addPublisherToCA(
             final String publisherName,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addPublisherToCA(publisherName, caName);
     }
 
     @Override
     public Map<String, String> getCertprofilesForCA(
-            final String caName)
-    {
+            final String caName) {
         return client.getCertprofilesForCA(caName);
     }
 
     @Override
     public Set<CAHasRequestorEntry> getCmpRequestorsForCA(
-            final String caName)
-    {
+            final String caName) {
         return client.getCmpRequestorsForCA(caName);
     }
 
     @Override
     public CmpRequestorEntry getCmpRequestor(
-            final String name)
-    {
+            final String name) {
         return client.getCmpRequestor(name);
     }
 
     @Override
     public boolean addCmpRequestor(
             final CmpRequestorEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCmpRequestor(dbEntry);
     }
 
     @Override
     public boolean removeCmpRequestor(
             final String requestorName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCmpRequestor(requestorName);
     }
 
@@ -375,8 +332,7 @@ public class CAManagerClient implements CAManager
     public boolean changeCmpRequestor(
             final String name,
             final String base64Cert)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCmpRequestor(name, base64Cert);
     }
 
@@ -384,8 +340,7 @@ public class CAManagerClient implements CAManager
     public boolean removeCmpRequestorFromCA(
             final String requestorName,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCmpRequestorFromCA(requestorName, caName);
     }
 
@@ -393,23 +348,20 @@ public class CAManagerClient implements CAManager
     public boolean addCmpRequestorToCA(
             final CAHasRequestorEntry requestor,
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCmpRequestorToCA(requestor, caName);
     }
 
     @Override
     public CertprofileEntry getCertprofile(
-            final String profileName)
-    {
+            final String profileName) {
         return client.getCertprofile(profileName);
     }
 
     @Override
     public boolean removeCertprofile(
             final String profileName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCertprofile(profileName);
     }
 
@@ -418,32 +370,28 @@ public class CAManagerClient implements CAManager
             final String name,
             final String type,
             final String conf)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCertprofile(name, type, conf);
     }
 
     @Override
     public boolean addCertprofile(
             final CertprofileEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCertprofile(dbEntry);
     }
 
     @Override
     public boolean addCmpResponder(
             final CmpResponderEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCmpResponder(dbEntry);
     }
 
     @Override
     public boolean removeCmpResponder(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCmpResponder(name);
     }
 
@@ -453,76 +401,66 @@ public class CAManagerClient implements CAManager
             final String type,
             final String conf,
             final String base64Cert)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCmpResponder(name, type, conf, base64Cert);
     }
 
     @Override
     public CmpResponderEntry getCmpResponder(
-            final String name)
-    {
+            final String name) {
         return client.getCmpResponder(name);
     }
 
     @Override
     public boolean addCrlSigner(
             final X509CrlSignerEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCrlSigner(dbEntry);
     }
 
     @Override
     public boolean removeCrlSigner(
             final String crlSignerName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCrlSigner(crlSignerName);
     }
 
     @Override
     public boolean changeCrlSigner(
             final X509ChangeCrlSignerEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCrlSigner(dbEntry);
     }
 
     @Override
     public X509CrlSignerEntry getCrlSigner(
-            final String name)
-    {
+            final String name) {
         return client.getCrlSigner(name);
     }
 
     @Override
     public boolean addPublisher(
             final PublisherEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addPublisher(dbEntry);
     }
 
     @Override
     public List<PublisherEntry> getPublishersForCA(
-            final String caName)
-    {
+            final String caName) {
         return client.getPublishersForCA(caName);
     }
 
     @Override
     public PublisherEntry getPublisher(
-            final String publisherName)
-    {
+            final String publisherName) {
         return client.getPublisher(publisherName);
     }
 
     @Override
     public boolean removePublisher(
             final String publisherName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removePublisher(publisherName);
     }
 
@@ -531,31 +469,27 @@ public class CAManagerClient implements CAManager
             final String name,
             final String type,
             final String conf)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changePublisher(name, type, conf);
     }
 
     @Override
     public CmpControlEntry getCmpControl(
-            final String name)
-    {
+            final String name) {
         return client.getCmpControl(name);
     }
 
     @Override
     public boolean addCmpControl(
             final CmpControlEntry dbEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addCmpControl(dbEntry);
     }
 
     @Override
     public boolean removeCmpControl(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCmpControl(name);
     }
 
@@ -563,21 +497,18 @@ public class CAManagerClient implements CAManager
     public boolean changeCmpControl(
             final String name,
             final String conf)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeCmpControl(name, conf);
     }
 
     @Override
-    public Set<String> getEnvParamNames()
-    {
+    public Set<String> getEnvParamNames() {
         return client.getEnvParamNames();
     }
 
     @Override
     public String getEnvParam(
-            final String name)
-    {
+            final String name) {
         return client.getEnvParam(name);
     }
 
@@ -585,16 +516,14 @@ public class CAManagerClient implements CAManager
     public boolean addEnvParam(
             final String name,
             final String value)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addEnvParam(name, value);
     }
 
     @Override
     public boolean removeEnvParam(
             final String envParamName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeEnvParam(envParamName);
     }
 
@@ -602,8 +531,7 @@ public class CAManagerClient implements CAManager
     public boolean changeEnvParam(
             final String name,
             final String value)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeEnvParam(name, value);
     }
 
@@ -611,16 +539,14 @@ public class CAManagerClient implements CAManager
     public boolean revokeCa(
             final String caName,
             final CertRevocationInfo revocationInfo)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.revokeCa(caName, revocationInfo);
     }
 
     @Override
     public boolean unrevokeCa(
             final String caName)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.unrevokeCa(caName);
     }
 
@@ -630,8 +556,7 @@ public class CAManagerClient implements CAManager
             final BigInteger serialNumber,
             final CRLReason reason,
             final Date invalidityTime)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.revokeCertificate(caName, serialNumber, reason, invalidityTime);
     }
 
@@ -639,8 +564,7 @@ public class CAManagerClient implements CAManager
     public boolean unrevokeCertificate(
             final String caName,
             final BigInteger serialNumber)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.unrevokeCertificate(caName, serialNumber);
     }
 
@@ -648,8 +572,7 @@ public class CAManagerClient implements CAManager
     public boolean removeCertificate(
             final String caName,
             final BigInteger serialNumber)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeCertificate(caName, serialNumber);
     }
 
@@ -659,15 +582,12 @@ public class CAManagerClient implements CAManager
             final String profileName,
             final String user,
             final byte[] encodedPkcs10Request)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         byte[] encodedCert = client.generateCertificate(caName, profileName, user,
                 encodedPkcs10Request);
-        try
-        {
+        try {
             return X509Util.parseCert(encodedCert);
-        } catch (CertificateException | IOException e)
-        {
+        } catch (CertificateException | IOException e) {
             throw new CAMgmtException("could not parse the certificate: " + e.getMessage(), e);
         }
     }
@@ -677,16 +597,14 @@ public class CAManagerClient implements CAManager
             final X509CAEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.generateSelfSignedCA(caEntry, certprofileName, p10Req);
     }
 
     @Override
     public boolean addUser(
             final AddUserEntry userEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addUser(userEntry);
     }
 
@@ -695,70 +613,60 @@ public class CAManagerClient implements CAManager
             final String username,
             final String password,
             final String cnRegex)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeUser(username, password, cnRegex);
     }
 
     @Override
     public boolean removeUser(
             final String username)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeUser(username);
     }
 
     @Override
     public UserEntry getUser(
             final String username)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.getUser(username);
     }
 
     @Override
     public boolean addScep(
             final ScepEntry scepEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.addScep(scepEntry);
     }
 
     @Override
     public boolean removeScep(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.removeScep(name);
     }
 
     @Override
     public boolean changeScep(
             final ChangeScepEntry scepEntry)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.changeScep(scepEntry);
     }
 
     @Override
-    public Set<String> getScepNames()
-    {
+    public Set<String> getScepNames() {
         return client.getScepNames();
     }
 
     @Override
     public ScepEntry getScepEntry(
             final String name)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         return client.getScepEntry(name);
     }
 
     public static void main(
-            final String[] args)
-    {
-        try
-        {
+            final String[] args) {
+        try {
             CAManagerClient c = new CAManagerClient();
             c.setServerURL("http://localhost:8080/pkiconsole/hessian");
             c.init();
@@ -767,8 +675,7 @@ public class CAManagerClient implements CAManager
 
             CAEntry caEntry = c.getCA("RCA1");
             System.out.println(caEntry);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

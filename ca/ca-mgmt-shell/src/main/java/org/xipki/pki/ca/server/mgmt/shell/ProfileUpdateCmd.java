@@ -46,8 +46,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "profile-up",
         description = "update certificate profile")
-public class ProfileUpdateCmd extends CaCmd
-{
+public class ProfileUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -69,15 +68,12 @@ public class ProfileUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (type == null && conf == null && confFile == null)
-        {
+    throws Exception {
+        if (type == null && conf == null && confFile == null) {
             throw new IllegalCmdParamException("nothing to update");
         }
 
-        if (conf == null && confFile != null)
-        {
+        if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }
 

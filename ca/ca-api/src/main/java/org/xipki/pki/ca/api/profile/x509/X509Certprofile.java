@@ -58,33 +58,27 @@ import org.xipki.pki.ca.api.profile.GeneralNameMode;
  * @author Lijun Liao
  */
 
-public abstract class X509Certprofile
-{
+public abstract class X509Certprofile {
     public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
 
     private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
-    public boolean isOnlyForRA()
-    {
+    public boolean isOnlyForRA() {
         return false;
     }
 
-    public void shutdown()
-    {
+    public void shutdown() {
     }
 
-    public X509CertVersion getVersion()
-    {
+    public X509CertVersion getVersion() {
         return X509CertVersion.V3;
     }
 
-    public List<String> getSignatureAlgorithms()
-    {
+    public List<String> getSignatureAlgorithms() {
         return null;
     }
 
-    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior()
-    {
+    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
         return null;
     }
 
@@ -93,78 +87,64 @@ public abstract class X509Certprofile
      * AuthorityKeyIdentifier extension.
      * @return
      */
-    public boolean includeIssuerAndSerialInAKI()
-    {
+    public boolean includeIssuerAndSerialInAKI() {
         return false;
     }
 
-    public AuthorityInfoAccessControl getAIAControl()
-    {
+    public AuthorityInfoAccessControl getAIAControl() {
         return null;
     }
 
     public String incSerialNumber(
             final String currentSerialNumber)
-    throws BadFormatException
-    {
-        try
-        {
+    throws BadFormatException {
+        try {
             int currentSN = (currentSerialNumber == null)
                     ? 0
                     : Integer.parseInt(currentSerialNumber.trim());
             return Integer.toString(currentSN + 1);
-        } catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             throw new BadFormatException("invalid serialNumber attribute " + currentSerialNumber);
         }
     }
 
-    public boolean isDuplicateKeyPermitted()
-    {
+    public boolean isDuplicateKeyPermitted() {
         return true;
     }
 
-    public boolean isDuplicateSubjectPermitted()
-    {
+    public boolean isDuplicateSubjectPermitted() {
         return true;
     }
 
-    public boolean isDuplicateCNPermitted()
-    {
+    public boolean isDuplicateCNPermitted() {
         return true;
     }
 
     /**
      * Whether the subject attribute serialNumber in request is permitted
      */
-    public boolean isSerialNumberInReqPermitted()
-    {
+    public boolean isSerialNumberInReqPermitted() {
         return true;
     }
 
     public String getParameter(
-            final String paramName)
-    {
+            final String paramName) {
         return null;
     }
 
-    public boolean hasMidnightNotBefore()
-    {
+    public boolean hasMidnightNotBefore() {
         return false;
     }
 
-    public TimeZone getTimezone()
-    {
+    public TimeZone getTimezone() {
         return timeZone;
     }
 
-    public Set<ExtKeyUsageControl> getExtendedKeyUsages()
-    {
+    public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
         return null;
     }
 
-    public Set<GeneralNameMode> getSubjectAltNameModes()
-    {
+    public Set<GeneralNameMode> getSubjectAltNameModes() {
         return null;
     }
 
@@ -172,8 +152,7 @@ public abstract class X509Certprofile
      * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
      * @return
      */
-    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes()
-    {
+    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
         return null;
     }
 

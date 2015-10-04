@@ -59,16 +59,14 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
-{
+public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport {
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
     private static final List<String> yesNo = new ArrayList<>(2);
 
     private PasswordResolver passwordResolver;
 
-    static
-    {
+    static {
         yesNo.add("yes");
         yesNo.add("no");
     }
@@ -92,37 +90,30 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     protected void resetAndInit(
             final LiquibaseDatabaseConf dbConf,
             final String schemaFile)
-    throws Exception
-    {
+    throws Exception {
         printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet)
-        {
-            if (!confirm("reset and initialize"))
-            {
+        if (!quiet) {
+            if (!confirm("reset and initialize")) {
                 out("cancelled");
                 return;
             }
         }
 
         LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-        try
-        {
+        try {
             liquibase.init(logLevel, logFile);
             liquibase.releaseLocks();
 
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel))
-            {
+            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
                 liquibase.init("severe", logFile);
             }
             liquibase.dropAll();
 
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel))
-            {
+            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
                 liquibase.init(logLevel, logFile);
             }
             liquibase.update();
-        } finally
-        {
+        } finally {
             liquibase.shutdown();
         }
 
@@ -131,25 +122,20 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     protected void update(
             final LiquibaseDatabaseConf dbConf,
             final String schemaFile)
-    throws Exception
-    {
+    throws Exception {
         printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet)
-        {
-            if (!confirm("update"))
-            {
+        if (!quiet) {
+            if (!confirm("update")) {
                 out("cancelled");
                 return;
             }
         }
 
         LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-        try
-        {
+        try {
             liquibase.init(logLevel, logFile);
             liquibase.update();
-        } finally
-        {
+        } finally {
             liquibase.shutdown();
         }
 
@@ -157,23 +143,19 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
 
     private static Properties getDbConfPoperties(
             final String dbconfFile)
-    throws FileNotFoundException, IOException
-    {
+    throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
         return props;
     }
 
     protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
-    throws FileNotFoundException, IOException, PasswordResolverException
-    {
+    throws FileNotFoundException, IOException, PasswordResolverException {
         Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
         Properties props = getPropertiesFromFile(caconfFile);
-        for (Object objKey : props.keySet())
-        {
+        for (Object objKey : props.keySet()) {
             String key = (String) objKey;
-            if (key.startsWith("datasource."))
-            {
+            if (key.startsWith("datasource.")) {
                 String datasourceFile = props.getProperty(key);
                 String datasourceName = key.substring("datasource.".length());
                 Properties dbConf = getDbConfPoperties(datasourceFile);
@@ -188,8 +170,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
 
     private static Properties getPropertiesFromFile(
             final String propFile)
-    throws FileNotFoundException, IOException
-    {
+    throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
         return props;
@@ -197,15 +178,13 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
 
     private void printDatabaseInfo(
             final LiquibaseDatabaseConf dbParams,
-            final String schemaFile)
-    {
+            final String schemaFile) {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
         msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
         msg.append("user        = ").append(dbParams.getUsername()).append("\n");
         msg.append("url         = ").append(dbParams.getUrl()).append("\n");
-        if (dbParams.getSchema() != null)
-        {
+        if (dbParams.getSchema() != null) {
             msg.append("schema      = ").append(dbParams.getSchema()).append("\n");
         }
         msg.append("schema file = ").append(schemaFile).append("\n");
@@ -215,8 +194,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
 
     private boolean confirm(
             final String command)
-    throws IOException
-    {
+    throws IOException {
         String text = read("\nDo you wish to " + command + " the database", yesNo);
         return "yes".equalsIgnoreCase(text);
     }
@@ -224,25 +202,20 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     private String read(
             String prompt,
             List<String> validValues)
-    throws IOException
-    {
-        if (validValues == null)
-        {
+    throws IOException {
+        if (validValues == null) {
             validValues = Collections.emptyList();
         }
 
-        if (prompt == null)
-        {
+        if (prompt == null) {
             prompt = "Please enter";
         }
 
-        if (isNotEmpty(validValues))
-        {
+        if (isNotEmpty(validValues)) {
             StringBuilder promptBuilder = new StringBuilder(prompt);
             promptBuilder.append(" [");
 
-            for (String validValue : validValues)
-            {
+            for (String validValue : validValues) {
                 promptBuilder.append(validValue).append("/");
             }
             promptBuilder.deleteCharAt(promptBuilder.length() - 1);
@@ -254,22 +227,17 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
         out(prompt);
-        while (true)
-        {
+        while (true) {
             String answer = reader.readLine();
-            if (answer == null)
-            {
+            if (answer == null) {
                 throw new IOException("interrupted");
             }
 
-            if (isEmpty(validValues) || validValues.contains(answer))
-            {
+            if (isEmpty(validValues) || validValues.contains(answer)) {
                 return answer;
-            } else
-            {
+            } else {
                 StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for (String validValue : validValues)
-                {
+                for (String validValue : validValues) {
                     retryPromptBuilder.append(validValue).append("/");
                 }
                 retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
@@ -279,8 +247,7 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 }

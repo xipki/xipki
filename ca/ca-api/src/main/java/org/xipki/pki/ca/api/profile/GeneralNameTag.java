@@ -39,8 +39,7 @@ package org.xipki.pki.ca.api.profile;
  * @author Lijun Liao
  */
 
-public enum GeneralNameTag
-{
+public enum GeneralNameTag {
     otherName(0),
     rfc822Name(1),
     dNSName(2),
@@ -54,13 +53,11 @@ public enum GeneralNameTag
     private final int tag;
 
     private GeneralNameTag(
-            final int tag)
-    {
+            final int tag) {
         this.tag = tag;
     }
 
-    public int getTag()
-    {
+    public int getTag() {
         return tag;
     }
 }

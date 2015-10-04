@@ -39,19 +39,15 @@ package org.xipki.pki.ocsp.qa.api;
  * @author Lijun Liao
  */
 
-public enum Occurrence
-{
+public enum Occurrence {
     required,
     optional,
     forbidden;
 
     public static Occurrence getInstance(
-            final String name)
-    {
-        for (Occurrence entry : values())
-        {
-            if (entry.name().equals(name))
-            {
+            final String name) {
+        for (Occurrence entry : values()) {
+            if (entry.name().equals(name)) {
                 return entry;
             }
         }

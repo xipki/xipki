@@ -61,8 +61,7 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
  * @author Lijun Liao
  */
 
-public class DbDigestExportWorker extends DbPortWorker
-{
+public class DbDigestExportWorker extends DbPortWorker {
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
     private final DataSourceWrapper dataSource;
     private final String destFolder;
@@ -76,28 +75,22 @@ public class DbDigestExportWorker extends DbPortWorker
             final String destFolder,
             final int numCertsPerSelect,
             final int numThreads)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException
-    {
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         File f = new File(destFolder);
-        if (!f.exists())
-        {
+        if (!f.exists()) {
             f.mkdirs();
-        } else
-        {
-            if (!f.isDirectory())
-            {
+        } else {
+            if (!f.isDirectory()) {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (!f.canWrite())
-            {
+            if (!f.canWrite()) {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
         String[] children = f.list();
-        if (children != null && children.length > 0)
-        {
+        if (children != null && children.length > 0) {
             throw new IOException(destFolder + " is not empty");
         }
 
@@ -112,32 +105,25 @@ public class DbDigestExportWorker extends DbPortWorker
     @Override
     public void doRun(
             final AtomicBoolean stopMe)
-    throws Exception
-    {
+    throws Exception {
         long start = System.currentTimeMillis();
 
-        try
-        {
+        try {
             DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
             System.out.println("database schema: " + dbSchemaType);
             DbDigestExporter digester;
-            if (dbSchemaType == DbSchemaType.EJBCA_CA_v3)
-            {
+            if (dbSchemaType == DbSchemaType.EJBCA_CA_v3) {
                 digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
                         numCertsPerSelect, dbSchemaType, numThreads);
-            } else
-            {
+            } else {
                 digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
                         numCertsPerSelect, dbSchemaType, numThreads);
             }
             digester.digest();
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 dataSource.shutdown();
-            } catch (Throwable e)
-            {
+            } catch (Throwable e) {
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();
@@ -147,37 +133,28 @@ public class DbDigestExportWorker extends DbPortWorker
 
     public static DbSchemaType detectDbSchemaType(
             final DataSourceWrapper dataSource)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         Connection conn = dataSource.getConnection();
-        try
-        {
+        try {
             if (dataSource.tableExists(conn, "CAINFO")
-                    && dataSource.tableExists(conn, "RAWCERT"))
-            {
+                    && dataSource.tableExists(conn, "RAWCERT")) {
                 return DbSchemaType.XIPKI_CA_v1;
             } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CERTHASH"))
-            {
+                    && dataSource.tableExists(conn, "CERTHASH")) {
                 return DbSchemaType.XIPKI_OCSP_v1;
             } else if (dataSource.tableExists(conn, "CS_CA")
-                    && dataSource.tableExists(conn, "CRAW"))
-            {
+                    && dataSource.tableExists(conn, "CRAW")) {
                 return DbSchemaType.XIPKI_CA_v2;
             } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CHASH"))
-            {
+                    && dataSource.tableExists(conn, "CHASH")) {
                 return DbSchemaType.XIPKI_OCSP_v2;
             } else if (dataSource.tableExists(conn, "CAData")
-                    && dataSource.tableExists(conn, "CertificateData"))
-            {
+                    && dataSource.tableExists(conn, "CertificateData")) {
                 return DbSchemaType.EJBCA_CA_v3;
-            } else
-            {
+            } else {
                 throw new IllegalArgumentException("unknown database schema");
             }
-        } finally
-        {
+        } finally {
             dataSource.returnConnection(conn);
         }
     }

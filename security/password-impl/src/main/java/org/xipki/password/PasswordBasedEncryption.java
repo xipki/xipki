@@ -51,27 +51,21 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * @author Lijun Liao
  */
 
-public class PasswordBasedEncryption
-{
+public class PasswordBasedEncryption {
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
     private static AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private PasswordBasedEncryption()
-    {
+    private PasswordBasedEncryption() {
     }
 
-    private static void init()
-    {
-        synchronized (initialized)
-        {
-            if (initialized.get())
-            {
+    private static void init() {
+        synchronized (initialized) {
+            if (initialized.get()) {
                 return;
             }
 
-            if (Security.getProperty("BC") == null)
-            {
+            if (Security.getProperty("BC") == null) {
                 Security.addProvider(new BouncyCastleProvider());
             }
 
@@ -84,8 +78,7 @@ public class PasswordBasedEncryption
             final char[] password,
             final int iterationCount,
             final byte[] salt)
-    throws GeneralSecurityException
-    {
+    throws GeneralSecurityException {
         init();
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
 
@@ -105,8 +98,7 @@ public class PasswordBasedEncryption
             final char[] password,
             final int iterationCount,
             byte[] salt)
-    throws GeneralSecurityException
-    {
+    throws GeneralSecurityException {
         init();
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 

@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "careq-rm",
         description = "remove requestor from CA")
-public class CaRequestorRemoveCmd extends CaCmd
-{
+public class CaRequestorRemoveCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -60,8 +59,7 @@ public class CaRequestorRemoveCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
         output(b, "removed", "could not remove",
                 "requestor " + requestorName + " from CA " + caName);

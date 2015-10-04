@@ -43,12 +43,10 @@ import org.xipki.console.karaf.FilePathCompleter;
 
 public class FilePathCompleterImpl
 extends PathCompleter
-implements FilePathCompleter
-{
+implements FilePathCompleter {
 
     @Override
-    protected boolean isDirOnly()
-    {
+    protected boolean isDirOnly() {
         return false;
     }
 

@@ -43,19 +43,16 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class CaUsersWriter extends DbiXmlWriter
-{
+public class CaUsersWriter extends DbiXmlWriter {
 
     public CaUsersWriter()
-    throws IOException, XMLStreamException
-    {
+    throws IOException, XMLStreamException {
         super("users", "1");
     }
 
     public void add(
             final CaUserType user)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         user.validate();
         user.writeTo(this);
     }

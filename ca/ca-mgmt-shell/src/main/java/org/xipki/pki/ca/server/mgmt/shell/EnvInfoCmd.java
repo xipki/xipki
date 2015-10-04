@@ -50,48 +50,39 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "env-info",
         description = "show information of CA environment parameter")
-public class EnvInfoCmd extends CaCmd
-{
+public class EnvInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "environment parameter name")
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         StringBuilder sb = new StringBuilder();
 
-        if (name == null)
-        {
+        if (name == null) {
             Set<String> paramNames = caManager.getEnvParamNames();
             int n = paramNames.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" environment parameter is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" enviroment paramters are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(paramNames);
             Collections.sort(sorted);
 
-            for (String paramName : sorted)
-            {
+            for (String paramName : sorted) {
                 sb.append("\t").append(paramName).append("\n");
             }
-        } else
-        {
+        } else {
             String paramValue = caManager.getEnvParam(name);
-            if (paramValue == null)
-            {
+            if (paramValue == null) {
                 throw new UnexpectedException("\tno environment named '" + name + " is configured");
-            } else
-            {
+            } else {
                 sb.append(name).append("\n\t").append(paramValue);
             }
         }

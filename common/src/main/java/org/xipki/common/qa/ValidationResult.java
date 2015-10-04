@@ -46,32 +46,26 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ValidationResult
-{
+public class ValidationResult {
     private final List<ValidationIssue> validationIssues;
     private final List<ValidationIssue> failedValidationIssues;
     private final List<ValidationIssue> successfulValidationIssues;
 
     public ValidationResult(
-            final ValidationIssue validationIssues)
-    {
+            final ValidationIssue validationIssues) {
         this(Arrays.asList(validationIssues));
     }
 
     public ValidationResult(
-            final List<ValidationIssue> validationIssues)
-    {
+            final List<ValidationIssue> validationIssues) {
         ParamUtil.assertNotEmpty("validationIssues", validationIssues);
 
         List<ValidationIssue> failedIssues = new LinkedList<>();
         List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for (ValidationIssue issue : validationIssues)
-        {
-            if (issue.isFailed())
-            {
+        for (ValidationIssue issue : validationIssues) {
+            if (issue.isFailed()) {
                 failedIssues.add(issue);
-            } else
-            {
+            } else {
                 successfulIssues.add(issue);
             }
         }
@@ -81,23 +75,19 @@ public class ValidationResult
         this.successfulValidationIssues = successfulIssues;
     }
 
-    public boolean isAllSuccessful()
-    {
+    public boolean isAllSuccessful() {
         return CollectionUtil.isEmpty(failedValidationIssues);
     }
 
-    public List<ValidationIssue> getValidationIssues()
-    {
+    public List<ValidationIssue> getValidationIssues() {
         return validationIssues;
     }
 
-    public List<ValidationIssue> getFailedValidationIssues()
-    {
+    public List<ValidationIssue> getFailedValidationIssues() {
         return failedValidationIssues;
     }
 
-    public List<ValidationIssue> getSuccessfulValidationIssues()
-    {
+    public List<ValidationIssue> getSuccessfulValidationIssues() {
         return successfulValidationIssues;
     }
 

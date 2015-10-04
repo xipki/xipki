@@ -46,8 +46,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "requestor-add",
         description = "add requestor")
-public class RequestorAddCmd extends CaCmd
-{
+public class RequestorAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"
@@ -62,17 +61,14 @@ public class RequestorAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
         CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
 
         boolean b;
-        if (entry.getCert() == null)
-        {
+        if (entry.getCert() == null) {
             b = false;
-        } else
-        {
+        } else {
             b = caManager.addCmpRequestor(entry);
         }
         output(b, "added", "could not add", "CMP requestor " + name);

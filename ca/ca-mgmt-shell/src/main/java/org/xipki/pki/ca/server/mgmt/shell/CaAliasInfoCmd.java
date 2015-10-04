@@ -50,49 +50,40 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "caalias-info",
         description = "show information of CA alias")
-public class CaAliasInfoCmd extends CaCmd
-{
+public class CaAliasInfoCmd extends CaCmd {
     @Argument(index = 0, name = "alias", description = "CA alias")
     private String caAlias;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Set<String> aliasNames = caManager.getCaAliasNames();
 
         StringBuilder sb = new StringBuilder();
 
-        if (caAlias == null)
-        {
+        if (caAlias == null) {
             int n = aliasNames.size();
 
-            if (n == 0 || n == 1)
-            {
+            if (n == 0 || n == 1) {
                 sb.append((n == 0)
                         ? "no"
                         : "1");
                 sb.append(" CA alias is configured\n");
-            } else
-            {
+            } else {
                 sb.append(n).append(" CA aliases are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(aliasNames);
             Collections.sort(sorted);
 
-            for (String aliasName : sorted)
-            {
+            for (String aliasName : sorted) {
                 sb.append("\t").append(aliasName).append("\n");
             }
-        } else
-        {
-            if (aliasNames.contains(caAlias))
-            {
+        } else {
+            if (aliasNames.contains(caAlias)) {
                 String paramValue = caManager.getCaNameForAlias(caAlias);
                 sb.append(caAlias).append("\n\t").append(paramValue);
-            } else
-            {
+            } else {
                 throw new UnexpectedException("could not find CA alias '" + caAlias + "'");
             }
         }

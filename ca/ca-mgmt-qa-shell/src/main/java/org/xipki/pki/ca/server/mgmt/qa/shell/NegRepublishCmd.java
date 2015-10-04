@@ -45,19 +45,15 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-republish",
         description = "republish certificates (negative, QA)")
-public class NegRepublishCmd extends RepublishCmd
-{
+public class NegRepublishCmd extends RepublishCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-republish");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

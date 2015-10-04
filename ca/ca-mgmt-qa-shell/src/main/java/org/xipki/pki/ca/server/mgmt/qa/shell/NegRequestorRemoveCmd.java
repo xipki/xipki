@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-requestor-rm",
         description = "remove requestor (negative, QA)")
-public class NegRequestorRemoveCmd extends RequestorRemoveCmd
-{
+public class NegRequestorRemoveCmd extends RequestorRemoveCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-requestor-rm");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

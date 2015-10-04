@@ -43,8 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
  * @author Lijun Liao
  */
 
-class CertBasedIdentityEntry
-{
+class CertBasedIdentityEntry {
     private final int id;
     private final String subject;
     private final byte[] sha1Fp;
@@ -54,8 +53,7 @@ class CertBasedIdentityEntry
             final int id,
             final String subject,
             final String b64Sha1Fp,
-            final String b64Cert)
-    {
+            final String b64Cert) {
         super();
         this.id = id;
         this.subject = subject;
@@ -63,25 +61,21 @@ class CertBasedIdentityEntry
         this.cert = Base64.decode(b64Cert);
     }
 
-    int getId()
-    {
+    int getId() {
         return id;
     }
 
-    String getSubject()
-    {
+    String getSubject() {
         return subject;
     }
 
     boolean matchSha1Fp(
-            final byte[] sha1Fp)
-    {
+            final byte[] sha1Fp) {
         return Arrays.equals(this.sha1Fp, sha1Fp);
     }
 
     boolean matchCert(
-            final byte[] encodedCert)
-    {
+            final byte[] encodedCert) {
         return Arrays.equals(this.cert, encodedCert);
     }
 }

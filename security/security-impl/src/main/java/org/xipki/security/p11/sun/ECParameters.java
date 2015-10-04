@@ -94,21 +94,17 @@ import org.bouncycastle.math.ec.ECCurve;
  * @author Lijun Liao
  */
 
-public final class ECParameters extends AlgorithmParametersSpi
-{
+public final class ECParameters extends AlgorithmParametersSpi {
 
     // used by ECPublicKeyImpl and ECPrivateKeyImpl
     static AlgorithmParameters getAlgorithmParameters(
             final ECParameterSpec spec)
-    throws InvalidKeyException
-    {
-        try
-        {
+    throws InvalidKeyException {
+        try {
             AlgorithmParameters params = AlgorithmParameters.getInstance("EC", "BC");
             params.init(spec);
             return params;
-        } catch (GeneralSecurityException e)
-        {
+        } catch (GeneralSecurityException e) {
             throw new InvalidKeyException("EC parameters error", e);
         }
     }
@@ -120,8 +116,7 @@ public final class ECParameters extends AlgorithmParametersSpi
     private ECParameterSpec namedCurve;
 
     // A public constructor is required by AlgorithmParameters class.
-    public ECParameters()
-    {
+    public ECParameters() {
         // empty
     }
 
@@ -129,58 +124,46 @@ public final class ECParameters extends AlgorithmParametersSpi
 
     protected void engineInit(
             final AlgorithmParameterSpec paramSpec)
-    throws InvalidParameterSpecException
-    {
-        if (paramSpec == null)
-        {
+    throws InvalidParameterSpecException {
+        if (paramSpec == null) {
             throw new InvalidParameterSpecException("paramSpec must not be null");
         }
 
-        if (paramSpec.getClass().getName().equals("sun.security.ec.NamedCurve"))
-        {
+        if (paramSpec.getClass().getName().equals("sun.security.ec.NamedCurve")) {
             namedCurve = (ECParameterSpec) paramSpec;
             return;
         }
 
-        if (paramSpec instanceof ECParameterSpec)
-        {
+        if (paramSpec instanceof ECParameterSpec) {
             namedCurve = SunNamedCurveExtender.lookupCurve((ECParameterSpec) paramSpec);
-        } else if (paramSpec instanceof ECGenParameterSpec)
-        {
+        } else if (paramSpec instanceof ECGenParameterSpec) {
             String name = ((ECGenParameterSpec) paramSpec).getName();
             namedCurve = SunNamedCurveExtender.lookupCurve(name);
-        } else
-        {
+        } else {
             throw new InvalidParameterSpecException(
                     "only ECParameterSpec and ECGenParameterSpec supported");
         }
 
-        if (namedCurve == null)
-        {
+        if (namedCurve == null) {
             throw new InvalidParameterSpecException("not a supported curve: " + paramSpec);
         }
     }
 
     protected void engineInit(
             final byte[] params)
-    throws IOException
-    {
-        if (params.length < 30)
-        {
-            try
-            {
+    throws IOException {
+        if (params.length < 30) {
+            try {
                 ASN1ObjectIdentifier oid =
                         (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(params);
                 ECParameterSpec spec = SunNamedCurveExtender.lookupCurve(oid.getId());
-                if (spec == null)
-                {
+                if (spec == null) {
                     throw new IOException("unknown named curve: " + oid);
                 }
 
                 namedCurve = spec;
                 return;
-            } catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
             }
         }
 
@@ -197,11 +180,9 @@ public final class ECParameters extends AlgorithmParametersSpi
                 ecNamedCurveSpec.getGenerator(),
                 ecNamedCurveSpec.getOrder(),
                 ecNamedCurveSpec.getCofactor());
-        try
-        {
+        try {
             engineInit(spec);
-        } catch (InvalidParameterSpecException e)
-        {
+        } catch (InvalidParameterSpecException e) {
             throw new IOException("InvalidParameterSpecException: " + e.getMessage(), e);
         }
     }
@@ -209,23 +190,19 @@ public final class ECParameters extends AlgorithmParametersSpi
     protected void engineInit(
             final byte[] params,
             final String decodingMethod)
-    throws IOException
-    {
+    throws IOException {
         engineInit(params);
     }
 
     protected <T extends AlgorithmParameterSpec> T engineGetParameterSpec(
             final Class<T> spec)
-    throws InvalidParameterSpecException
-    {
+    throws InvalidParameterSpecException {
 
-        if (spec.isAssignableFrom(ECParameterSpec.class))
-        {
+        if (spec.isAssignableFrom(ECParameterSpec.class)) {
             return spec.cast(namedCurve);
         }
 
-        if (spec.isAssignableFrom(ECGenParameterSpec.class))
-        {
+        if (spec.isAssignableFrom(ECGenParameterSpec.class)) {
             // Ensure the name is the Object ID
             String name = SunNamedCurveExtender.getNamedCurveObjectId(namedCurve);
             return spec.cast(new ECGenParameterSpec(name));
@@ -236,22 +213,18 @@ public final class ECParameters extends AlgorithmParametersSpi
     }
 
     protected byte[] engineGetEncoded()
-    throws IOException
-    {
+    throws IOException {
         return SunNamedCurveExtender.getNamedCurveEncoded(namedCurve);
     }
 
     protected byte[] engineGetEncoded(
             final String encodingMethod)
-    throws IOException
-    {
+    throws IOException {
         return engineGetEncoded();
     }
 
-    protected String engineToString()
-    {
-        if (namedCurve == null)
-        {
+    protected String engineToString() {
+        if (namedCurve == null) {
             return "not initialized";
         }
 

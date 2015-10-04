@@ -39,31 +39,25 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum CAStatus
-{
+public enum CAStatus {
     ACTIVE ("active"),
     INACTIVE ("inactive");
 
     private String status;
 
     private CAStatus(
-            final String status)
-    {
+            final String status) {
         this.status = status;
     }
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
     public static CAStatus getCAStatus(
-            final String status)
-    {
-        for (CAStatus value : values())
-        {
-            if (value.status.equalsIgnoreCase(status))
-            {
+            final String status) {
+        for (CAStatus value : values()) {
+            if (value.status.equalsIgnoreCase(status)) {
                 return value;
             }
         }

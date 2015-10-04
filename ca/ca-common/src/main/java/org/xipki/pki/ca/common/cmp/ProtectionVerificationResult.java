@@ -41,28 +41,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ProtectionVerificationResult
-{
+public class ProtectionVerificationResult {
     private final Object requestor;
     private final ProtectionResult protectionResult;
 
     public ProtectionVerificationResult(
             final Object requestor,
-            final ProtectionResult protectionResult)
-    {
+            final ProtectionResult protectionResult) {
         ParamUtil.assertNotNull("protectionResult", protectionResult);
 
         this.requestor = requestor;
         this.protectionResult = protectionResult;
     }
 
-    public Object getRequestor()
-    {
+    public Object getRequestor() {
         return requestor;
     }
 
-    public ProtectionResult getProtectionResult()
-    {
+    public ProtectionResult getProtectionResult() {
         return protectionResult;
     }
 

@@ -44,8 +44,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ChangeScepEntry implements Serializable
-{
+public class ChangeScepEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String caName;
@@ -56,58 +55,48 @@ public class ChangeScepEntry implements Serializable
 
     public ChangeScepEntry(
             final String caName)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotBlank("caName", caName);
         this.caName = caName.toUpperCase();
     }
 
-    public String getCaName()
-    {
+    public String getCaName() {
         return caName;
     }
 
-    public String getResponderType()
-    {
+    public String getResponderType() {
         return responderType;
     }
 
     public void setResponderType(
-            final String responderType)
-    {
+            final String responderType) {
         this.responderType = responderType;
     }
 
-    public String getResponderConf()
-    {
+    public String getResponderConf() {
         return responderConf;
     }
 
     public void setResponderConf(
-            final String responderConf)
-    {
+            final String responderConf) {
         this.responderConf = responderConf;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
     public void setBase64Cert(
-            final String base64Cert)
-    {
+            final String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
-    public String getControl()
-    {
+    public String getControl() {
         return control;
     }
 
     public void setControl(
-            final String control)
-    {
+            final String control) {
         this.control = control;
     }
 

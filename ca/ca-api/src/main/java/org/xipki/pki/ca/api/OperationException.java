@@ -39,10 +39,8 @@ package org.xipki.pki.ca.api;
  * @author Lijun Liao
  */
 
-public class OperationException extends Exception
-{
-    public static enum ErrorCode
-    {
+public class OperationException extends Exception {
+    public static enum ErrorCode {
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,
         BAD_REQUEST,
@@ -65,8 +63,7 @@ public class OperationException extends Exception
     private final String errorMessage;
 
     public OperationException(
-            final ErrorCode errorCode)
-    {
+            final ErrorCode errorCode) {
         super("error code: " + errorCode);
         this.errorCode = errorCode;
         this.errorMessage = null;
@@ -74,20 +71,17 @@ public class OperationException extends Exception
 
     public OperationException(
             final ErrorCode errorCode,
-            final String errorMessage)
-    {
+            final String errorMessage) {
         super("error code: " + errorCode + ", error message: " + errorMessage);
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
 
-    public ErrorCode getErrorCode()
-    {
+    public ErrorCode getErrorCode() {
         return errorCode;
     }
 
-    public String getErrorMessage()
-    {
+    public String getErrorMessage() {
         return errorMessage;
     }
 

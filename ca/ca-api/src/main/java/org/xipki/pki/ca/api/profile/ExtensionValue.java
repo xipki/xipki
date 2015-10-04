@@ -42,28 +42,24 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class ExtensionValue
-{
+public class ExtensionValue {
     private final boolean critical;
     private final ASN1Encodable value;
 
     public ExtensionValue(
             final boolean critical,
-            final ASN1Encodable value)
-    {
+            final ASN1Encodable value) {
         ParamUtil.assertNotNull("value", value);
 
         this.critical = critical;
         this.value = value;
     }
 
-    public boolean isCritical()
-    {
+    public boolean isCritical() {
         return critical;
     }
 
-    public ASN1Encodable getValue()
-    {
+    public ASN1Encodable getValue() {
         return value;
     }
 

@@ -51,16 +51,14 @@ package org.xipki.datasource.api.exception;
  * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")
-public class ConcurrencyFailureException extends TransientDataAccessException
-{
+public class ConcurrencyFailureException extends TransientDataAccessException {
 
     /**
      * Constructor for ConcurrencyFailureException.
      * @param msg the detail message
      */
     public ConcurrencyFailureException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -71,8 +69,7 @@ public class ConcurrencyFailureException extends TransientDataAccessException
      */
     public ConcurrencyFailureException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

@@ -39,31 +39,25 @@ package org.xipki.pki.ca.api;
  * @author Lijun Liao
  */
 
-public enum RequestType
-{
+public enum RequestType {
     CA(1),
     CMP(2),
     SCEP(3);
 
     private final int code;
     private RequestType(
-            final int code)
-    {
+            final int code) {
         this.code = code;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
     public static RequestType getInstance(
-            final int code)
-    {
-        for (RequestType value : values())
-        {
-            if (code == value.code)
-            {
+            final int code) {
+        for (RequestType value : values()) {
+            if (code == value.code) {
                 return value;
             }
         }

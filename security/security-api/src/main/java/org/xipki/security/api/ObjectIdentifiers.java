@@ -53,11 +53,9 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class ObjectIdentifiers
-{
+public class ObjectIdentifiers {
 
-    private ObjectIdentifiers()
-    {
+    private ObjectIdentifiers() {
     }
 
     /**
@@ -371,8 +369,7 @@ public class ObjectIdentifiers
     private static final List<ASN1ObjectIdentifier> backwardDNs;
     private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
-    static
-    {
+    static {
         List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
 
         _forwardDNs.add(DN_C);
@@ -404,8 +401,7 @@ public class ObjectIdentifiers
 
         List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
         int size = _forwardDNs.size();
-        for (int i = size - 1; i >= 0; i--)
-        {
+        for (int i = size - 1; i >= 0; i--) {
             _backwardDNs.add(_forwardDNs.get(i));
         }
 
@@ -487,8 +483,7 @@ public class ObjectIdentifiers
     }
 
     public static String oidToDisplayName(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         String name = getName(type);
         return name == null
                 ? type.getId()
@@ -496,49 +491,38 @@ public class ObjectIdentifiers
     }
 
     public static String getName(
-            final ASN1ObjectIdentifier type)
-    {
+            final ASN1ObjectIdentifier type) {
         String name = oidNameMap.get(type);
 
-        if (StringUtil.isBlank(name))
-        {
-            try
-            {
+        if (StringUtil.isBlank(name)) {
+            try {
                 name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-            } catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
             }
         }
         return name;
     }
 
     public static ASN1ObjectIdentifier nameToOID(
-            final String name)
-    {
-        for (ASN1ObjectIdentifier oid : oidNameMap.keySet())
-        {
-            if (oidNameMap.get(oid).equalsIgnoreCase(name))
-            {
+            final String name) {
+        for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
+            if (oidNameMap.get(oid).equalsIgnoreCase(name)) {
                 return oid;
             }
         }
 
-        try
-        {
+        try {
             return RFC4519Style.INSTANCE.attrNameToOID(name);
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }
 
-    public static List<ASN1ObjectIdentifier> getForwardDNs()
-    {
+    public static List<ASN1ObjectIdentifier> getForwardDNs() {
         return forwardDNs;
     }
 
-    public static List<ASN1ObjectIdentifier> getBackwardDNs()
-    {
+    public static List<ASN1ObjectIdentifier> getBackwardDNs() {
         return backwardDNs;
     }
 

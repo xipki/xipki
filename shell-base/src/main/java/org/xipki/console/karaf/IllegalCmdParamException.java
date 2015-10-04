@@ -39,31 +39,26 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public class IllegalCmdParamException extends Exception
-{
+public class IllegalCmdParamException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public IllegalCmdParamException()
-    {
+    public IllegalCmdParamException() {
     }
 
     public IllegalCmdParamException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public IllegalCmdParamException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public IllegalCmdParamException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

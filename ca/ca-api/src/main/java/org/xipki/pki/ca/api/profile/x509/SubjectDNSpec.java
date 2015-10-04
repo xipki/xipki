@@ -53,8 +53,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  * @author Lijun Liao
  */
 
-public class SubjectDNSpec
-{
+public class SubjectDNSpec {
     /**
      * ranges
      */
@@ -93,8 +92,7 @@ public class SubjectDNSpec
     private static final Map<ASN1ObjectIdentifier, Set<StringType>> stringTypeSets =
             new HashMap<>();
 
-    static
-    {
+    static {
         ASN1ObjectIdentifier id;
 
         Set<ASN1ObjectIdentifier> ids = new HashSet<>();
@@ -318,12 +316,10 @@ public class SubjectDNSpec
         stringTypeSets.put(id, directoryStrings);
         defaultStringTypes.put(id, StringType.utf8String);
 
-        for (ASN1ObjectIdentifier type : ids)
-        {
+        for (ASN1ObjectIdentifier type : ids) {
             Pattern pattern = patterns.get(type);
             StringType stringType = defaultStringTypes.get(type);
-            if (stringType == null)
-            {
+            if (stringType == null) {
                 stringType = StringType.utf8String;
             }
             RDNControl control = new RDNControl(type,
@@ -332,42 +328,35 @@ public class SubjectDNSpec
                     );
             control.setStringType(stringType);
             control.setStringLengthRange(ranges.get(type));
-            if (pattern != null)
-            {
+            if (pattern != null) {
                 control.setPatterns(Arrays.asList(pattern));
             }
             controls.put(type, control);
         }
     }
 
-    private SubjectDNSpec()
-    {
+    private SubjectDNSpec() {
     }
 
     public static Range getStringLengthRange(
-            final ASN1ObjectIdentifier rdnType)
-    {
+            final ASN1ObjectIdentifier rdnType) {
         return ranges.get(rdnType);
     }
 
     public static Pattern getPattern(
-            final ASN1ObjectIdentifier rdnType)
-    {
+            final ASN1ObjectIdentifier rdnType) {
         return patterns.get(rdnType);
     }
 
     public static StringType getStringType(
-            final ASN1ObjectIdentifier rdnType)
-    {
+            final ASN1ObjectIdentifier rdnType) {
         return defaultStringTypes.get(rdnType);
     }
 
     public static RDNControl getRDNControl(
-            final ASN1ObjectIdentifier rdnType)
-    {
+            final ASN1ObjectIdentifier rdnType) {
         RDNControl control = controls.get(rdnType);
-        if (control == null)
-        {
+        if (control == null) {
             control = new RDNControl(rdnType,
                     0, // minOccurs
                     9 // maxOccurs
@@ -379,69 +368,55 @@ public class SubjectDNSpec
 
     public static void fixRDNControl(
             final RDNControl control)
-    throws CertprofileException
-    {
+    throws CertprofileException {
         ASN1ObjectIdentifier type = control.getType();
 
         StringType stringType = control.getStringType();
-        if (stringType != null)
-        {
+        if (stringType != null) {
             if (stringTypeSets.containsKey(type)
-                    && !stringTypeSets.get(type).contains(stringType))
-            {
+                    && !stringTypeSets.get(type).contains(stringType)) {
                 throw new CertprofileException(stringType.name() + " is not allowed "
                         + type.getId());
             }
-        } else
-        {
+        } else {
             StringType specStrType = defaultStringTypes.get(type);
-            if (specStrType != null)
-            {
+            if (specStrType != null) {
                 control.setStringType(specStrType);
             }
         }
 
-        if (control.getPatterns() == null && patterns.containsKey(type))
-        {
+        if (control.getPatterns() == null && patterns.containsKey(type)) {
             control.setPatterns(Arrays.asList(patterns.get(type)));
         }
 
         Range specRange = ranges.get(type);
-        if (specRange != null)
-        {
+        if (specRange != null) {
             Range isRange = control.getStringLengthRange();
-            if (isRange == null)
-            {
+            if (isRange == null) {
                 control.setStringLengthRange(specRange);
-            } else
-            {
+            } else {
                 boolean changed = false;
                 Integer specMin = specRange.getMin();
                 Integer min = isRange.getMin();
-                if (min == null)
-                {
+                if (min == null) {
                     changed = true;
                     min = specMin;
-                } else if (specMin != null && specMin > min)
-                {
+                } else if (specMin != null && specMin > min) {
                     changed = true;
                     min = specMin;
                 }
 
                 Integer specMax = specRange.getMax();
                 Integer max = isRange.getMax();
-                if (max == null)
-                {
+                if (max == null) {
                     changed = true;
                     max = specMax;
-                } else if (specMax != null && specMax < max)
-                {
+                } else if (specMax != null && specMax < max) {
                     changed = true;
                     max = specMax;
                 }
 
-                if (changed)
-                {
+                if (changed) {
                     isRange.setRange(min, max);
                 }
             } // isRange

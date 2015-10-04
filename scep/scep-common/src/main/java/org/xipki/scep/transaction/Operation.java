@@ -39,8 +39,7 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public enum Operation
-{
+public enum Operation {
     GetCACaps("GetCACaps"),
     PKIOperation("PKIOperation"),
     GetCACert("GetCACert"),
@@ -49,23 +48,18 @@ public enum Operation
     private final String code;
 
     private Operation(
-            final String code)
-    {
+            final String code) {
         this.code = code;
     }
 
-    public String getCode()
-    {
+    public String getCode() {
         return code;
     }
 
     public static Operation valueForCode(
-            final String code)
-    {
-        for (Operation m : values())
-        {
-            if (code.equalsIgnoreCase(m.code))
-            {
+            final String code) {
+        for (Operation m : values()) {
+            if (code.equalsIgnoreCase(m.code)) {
                 return m;
             }
         }

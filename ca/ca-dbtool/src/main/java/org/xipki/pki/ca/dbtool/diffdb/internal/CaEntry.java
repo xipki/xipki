@@ -49,8 +49,7 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
  * @author Lijun Liao
  */
 
-public class CaEntry
-{
+public class CaEntry {
     public static final String FILENAME_OVERVIEW = "overview.properties";
     public static final String PROPKEY_ACCOUNT = "account";
     public static final String PROPKEY_ACCOUNT_REVOKED = "account-revoked";
@@ -76,8 +75,7 @@ public class CaEntry
     public CaEntry(
             final int caId,
             final String caDir)
-    throws IOException
-    {
+    throws IOException {
         ParamUtil.assertNotNull("caDir", caDir);
 
         this.caId = caId;
@@ -91,29 +89,23 @@ public class CaEntry
         createNewCsvFile();
     }
 
-    public int getCaId()
-    {
+    public int getCaId() {
         return caId;
     }
 
     public void addDigestEntry(
             final int id,
             final DbDigestEntry reportEntry)
-    throws IOException, InvalidDataObjectException
-    {
-        if (minIdInCsvFile == 0)
-        {
+    throws IOException, InvalidDataObjectException {
+        if (minIdInCsvFile == 0) {
             minIdInCsvFile = id;
-        } else if (minIdInCsvFile > id)
-        {
+        } else if (minIdInCsvFile > id) {
             minIdInCsvFile = id;
         }
 
-        if (maxIdInCsvFile == 0)
-        {
+        if (maxIdInCsvFile == 0) {
             maxIdInCsvFile = id;
-        } else if (maxIdInCsvFile < id)
-        {
+        } else if (maxIdInCsvFile < id) {
             maxIdInCsvFile = id;
         }
         numInCsvFile++;
@@ -121,8 +113,7 @@ public class CaEntry
         csvOutputStream.write(reportEntry.getEncoded().getBytes());
         csvOutputStream.write('\n');
 
-        if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE)
-        {
+        if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE) {
             closeCurrentCsvFile();
             numInCsvFile = 0;
             minIdInCsvFile = 0;
@@ -130,15 +121,13 @@ public class CaEntry
             createNewCsvFile();
         }
         numProcessed++;
-        if (reportEntry.isRevoked())
-        {
+        if (reportEntry.isRevoked()) {
             numProcessedRevoked++;
         }
     }
 
     public void close()
-    throws IOException
-    {
+    throws IOException {
         // write the account
         StringBuilder sb = new StringBuilder(50);
         sb.append(PROPKEY_ACCOUNT)
@@ -153,8 +142,7 @@ public class CaEntry
     }
 
     private void closeCurrentCsvFile()
-    throws IOException
-    {
+    throws IOException {
         csvOutputStream.close();
 
         String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile,
@@ -165,8 +153,7 @@ public class CaEntry
     }
 
     private void createNewCsvFile()
-    throws IOException
-    {
+    throws IOException {
         this.csvFile = new File(caDir.getParentFile(),
                 "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
         csvOutputStream = new BufferedOutputStream(

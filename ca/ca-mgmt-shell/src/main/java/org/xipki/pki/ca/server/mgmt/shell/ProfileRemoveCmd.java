@@ -44,15 +44,13 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "profile-rm",
         description = "remove certifiate profile")
-public class ProfileRemoveCmd extends CaCmd
-{
+public class ProfileRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeCertprofile(name);
         output(b, "removed", "could not remove", "certificate profile " + name);
         return null;

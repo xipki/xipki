@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "caprofile-rm",
         description = "remove certificate profile from CA")
-public class CaProfileRemoveCmd extends CaCmd
-{
+public class CaProfileRemoveCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -59,8 +58,7 @@ public class CaProfileRemoveCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeCertprofileFromCA(profileLocalname, caName);
         output(b, "removed", "could not remove",
                 "certificate with localname " + profileLocalname + " from CA " + caName);

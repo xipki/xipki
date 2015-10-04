@@ -50,8 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "capub-check",
         description = "check information of publishers in given CA (QA)")
-public class CaPublisherCheckCmd extends CaCmd
-{
+public class CaPublisherCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -66,20 +65,16 @@ public class CaPublisherCheckCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking CA publisher CA='" + caName +  "', publisher='" + publisherName + "'");
 
-        if (caManager.getCA(caName) == null)
-        {
+        if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
-        for (PublisherEntry m : entries)
-        {
-            if (m.getName().equals(publisherName))
-            {
+        for (PublisherEntry m : entries) {
+            if (m.getName().equals(publisherName)) {
                 out(" checked CA publisher CA='" + caName
                         + "', publisher='" + publisherName + "'");
                 return null;

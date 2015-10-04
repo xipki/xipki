@@ -43,14 +43,12 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertIdOrError
-{
+public class CertIdOrError {
     private final CertId certId;
     private final PKIStatusInfo error;
 
     public CertIdOrError(
-            final CertId certId)
-    {
+            final CertId certId) {
         ParamUtil.assertNotNull("certId", certId);
 
         this.certId = certId;
@@ -58,21 +56,18 @@ public class CertIdOrError
     }
 
     public CertIdOrError(
-            final PKIStatusInfo error)
-    {
+            final PKIStatusInfo error) {
         ParamUtil.assertNotNull("error", error);
 
         this.certId = null;
         this.error = error;
     }
 
-    public CertId getCertId()
-    {
+    public CertId getCertId() {
         return certId;
     }
 
-    public PKIStatusInfo getError()
-    {
+    public PKIStatusInfo getError() {
         return error;
     }
 

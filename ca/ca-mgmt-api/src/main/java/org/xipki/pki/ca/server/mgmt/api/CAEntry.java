@@ -47,8 +47,7 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class CAEntry
-{
+public class CAEntry {
     private String name;
     private CAStatus status;
     private CertValidity maxValidity;
@@ -69,13 +68,11 @@ public class CAEntry
             final String signerType,
             final String signerConf,
             final int expirationPeriod)
-    throws CAMgmtException
-    {
+    throws CAMgmtException {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("signerType", signerType);
 
-        if (expirationPeriod < 0)
-        {
+        if (expirationPeriod < 0) {
             throw new IllegalArgumentException(
                     "expirationPeriod is negative (" + expirationPeriod + " < 0)");
         }
@@ -86,159 +83,131 @@ public class CAEntry
         this.signerConf = signerConf;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public CertValidity getMaxValidity()
-    {
+    public CertValidity getMaxValidity() {
         return maxValidity;
     }
 
     public void setMaxValidity(
-            final CertValidity maxValidity)
-    {
+            final CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
-    public int getKeepExpiredCertInDays()
-    {
+    public int getKeepExpiredCertInDays() {
         return keepExpiredCertInDays;
     }
 
     public void setKeepExpiredCertInDays(
-            final int days)
-    {
+            final int days) {
         this.keepExpiredCertInDays = days;
     }
 
-    public String getSignerConf()
-    {
+    public String getSignerConf() {
         return signerConf;
     }
 
-    public CAStatus getStatus()
-    {
+    public CAStatus getStatus() {
         return status;
     }
     public void setStatus(
-            final CAStatus status)
-    {
+            final CAStatus status) {
         this.status = status;
     }
 
-    public String getSignerType()
-    {
+    public String getSignerType() {
         return signerType;
     }
 
     public void setCmpControlName(
-            final String name)
-    {
+            final String name) {
         this.cmpControlName = name;
     }
 
-    public String getCmpControlName()
-    {
+    public String getCmpControlName() {
         return cmpControlName;
     }
 
-    public String getResponderName()
-    {
+    public String getResponderName() {
         return responderName;
     }
 
     public void setResponderName(
-            final String responderName)
-    {
+            final String responderName) {
         this.responderName = responderName;
     }
 
-    public DuplicationMode getDuplicateKeyMode()
-    {
+    public DuplicationMode getDuplicateKeyMode() {
         return duplicateKeyMode;
     }
 
     public void setDuplicateKeyMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         ParamUtil.assertNotNull("mode", mode);
         this.duplicateKeyMode = mode;
     }
 
-    public DuplicationMode getDuplicateSubjectMode()
-    {
+    public DuplicationMode getDuplicateSubjectMode() {
         return duplicateSubjectMode;
     }
 
     public void setDuplicateSubjectMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         ParamUtil.assertNotNull("mode", mode);
         this.duplicateSubjectMode = mode;
     }
 
-    public ValidityMode getValidityMode()
-    {
+    public ValidityMode getValidityMode() {
         return validityMode;
     }
 
     public void setValidityMode(
-            final ValidityMode mode)
-    {
+            final ValidityMode mode) {
         ParamUtil.assertNotNull("mode", mode);
         this.validityMode = mode;
     }
 
-    public Set<Permission> getPermissions()
-    {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
-    public String getPermissionsAsText()
-    {
+    public String getPermissionsAsText() {
         return toString(permissions);
     }
 
     public void setPermissions(
-            final Set<Permission> permissions)
-    {
+            final Set<Permission> permissions) {
         this.permissions = CollectionUtil.unmodifiableSet(permissions);
     }
 
-    public int getExpirationPeriod()
-    {
+    public int getExpirationPeriod() {
         return expirationPeriod;
     }
 
-    public String getExtraControl()
-    {
+    public String getExtraControl() {
         return extraControl;
     }
 
     public void setExtraControl(
-            final String extraControl)
-    {
+            final String extraControl) {
         this.extraControl = extraControl;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         return toString(verbose, true);
     }
 
     public String toString(
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
+            final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("status: ");
@@ -251,11 +220,9 @@ public class CAEntry
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signerType: ").append(signerType).append('\n');
         sb.append("signerConf: ");
-        if (signerConf == null)
-        {
+        if (signerConf == null) {
             sb.append("null");
-        } else
-        {
+        } else {
             sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
@@ -276,11 +243,9 @@ public class CAEntry
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
         sb.append("keepExpiredCerts: ");
-        if (keepExpiredCertInDays < 0)
-        {
+        if (keepExpiredCertInDays < 0) {
             sb.append("forever");
-        } else
-        {
+        } else {
             sb.append(keepExpiredCertInDays).append(" days");
         }
         sb.append("\n");
@@ -290,10 +255,8 @@ public class CAEntry
     }
 
     protected static String toString(
-            final Collection<? extends Object> tokens)
-    {
-        if (CollectionUtil.isEmpty(tokens))
-        {
+            final Collection<? extends Object> tokens) {
+        if (CollectionUtil.isEmpty(tokens)) {
             return null;
         }
 
@@ -301,11 +264,9 @@ public class CAEntry
 
         int size = tokens.size();
         int idx = 0;
-        for (Object token : tokens)
-        {
+        for (Object token : tokens) {
             sb.append(token);
-            if (idx++ < size - 1)
-            {
+            if (idx++ < size - 1) {
                 sb.append(", ");
             }
         }

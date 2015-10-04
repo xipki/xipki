@@ -57,8 +57,7 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class DbPorter extends DbToolBase
-{
+public class DbPorter extends DbToolBase {
     public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
     public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
     public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
@@ -89,8 +88,7 @@ public class DbPorter extends DbToolBase
             final String baseDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         super(dataSource, baseDir, stopMe);
 
         this.evaulateOnly = evaluateOnly;
@@ -106,16 +104,13 @@ public class DbPorter extends DbToolBase
 
     public static final Schema retrieveSchema(
             final String schemaPath)
-    throws JAXBException
-    {
+    throws JAXBException {
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
         final SchemaFactory schemaFact = SchemaFactory.newInstance(
                 javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try
-        {
+        try {
             return schemaFact.newSchema(schemaUrl);
-        } catch (SAXException e)
-        {
+        } catch (SAXException e) {
             throw new JAXBException(
                     "error while loading schemas for the specified classes\nDetails:\n"
                     + e.getMessage());
@@ -125,17 +120,13 @@ public class DbPorter extends DbToolBase
     public static void echoToFile(
             final String content,
             final File file)
-    throws IOException
-    {
+    throws IOException {
         FileOutputStream out = null;
-        try
-        {
+        try {
             out = new FileOutputStream(file);
             out.write(content.getBytes());
-        } finally
-        {
-            if (out != null)
-            {
+        } finally {
+            if (out != null) {
                 out.flush();
                 out.close();
             }
@@ -145,24 +136,20 @@ public class DbPorter extends DbToolBase
     protected FileOrValueType buildFileOrValue(
             final String content,
             final String fileName)
-    throws IOException
-    {
-        if (content == null)
-        {
+    throws IOException {
+        if (content == null) {
             return null;
         }
 
         FileOrValueType ret = new FileOrValueType();
-        if (content.length() < 256)
-        {
+        if (content.length() < 256) {
             ret.setValue(content);
             return ret;
         }
 
         File file = new File(baseDir, fileName);
         File parent = file.getParentFile();
-        if (parent != null && !parent.exists())
-        {
+        if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
@@ -174,15 +161,12 @@ public class DbPorter extends DbToolBase
 
     protected String getValue(
             final FileOrValueType fileOrValue)
-    throws IOException
-    {
-        if (fileOrValue == null)
-        {
+    throws IOException {
+        if (fileOrValue == null) {
             return null;
         }
 
-        if (fileOrValue.getValue() != null)
-        {
+        if (fileOrValue.getValue() != null) {
             return fileOrValue.getValue();
         }
 
@@ -190,29 +174,25 @@ public class DbPorter extends DbToolBase
         return new String(IoUtil.read(file), "UTF-8");
     }
 
-    protected String getImportingText()
-    {
+    protected String getImportingText() {
         return evaulateOnly
                 ? "evaluating import "
                 : "importing ";
     }
 
-    protected String getImportedText()
-    {
+    protected String getImportedText() {
         return evaulateOnly
                 ? " evaluated import "
                 : " imported ";
     }
 
-    protected String getExportingText()
-    {
+    protected String getExportingText() {
         return evaulateOnly
                 ? "evaluating export "
                 : "exporting ";
     }
 
-    protected String getExportedText()
-    {
+    protected String getExportedText() {
         return evaulateOnly
                 ? " evaluated export "
                 : " exported ";

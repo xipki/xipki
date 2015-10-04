@@ -47,8 +47,7 @@ import org.xipki.datasource.api.DatabaseType;
  *
  * @author Lijun Liao
  */
-public class SQLStateCodes
-{
+public class SQLStateCodes {
     // bad grammar error
     private static final String bge_dynamic_SQL_error = "07";
     private static final String bge_cardinality_violation = "21";
@@ -79,11 +78,9 @@ public class SQLStateCodes
     protected Set<String> transientDataAccessResourceCodes;
     protected Set<String> concurrencyFailureCodes;
 
-    public static SQLStateCodes newInstance(DatabaseType dbType)
-    {
+    public static SQLStateCodes newInstance(DatabaseType dbType) {
         ParamUtil.assertNotNull("dbType", dbType);
-        switch (dbType)
-        {
+        switch (dbType) {
         case DB2:
             return new DB2();
         case H2:
@@ -103,8 +100,7 @@ public class SQLStateCodes
         }
     }
 
-    private SQLStateCodes()
-    {
+    private SQLStateCodes() {
         badSQLGrammarCodes = toSet(bge_dynamic_SQL_error, bge_cardinality_violation,
                 bge_syntax_error_directSQL, bge_syntax_error_dynamicSQL,
                 bge_general_SQL_syntax_error);
@@ -116,35 +112,28 @@ public class SQLStateCodes
         concurrencyFailureCodes = toSet(cf_transaction_rollback);
     }
 
-    public Set<String> getBadSQLGrammarCodes()
-    {
+    public Set<String> getBadSQLGrammarCodes() {
         return badSQLGrammarCodes;
     }
 
-    public Set<String> getDataIntegrityViolationCodes()
-    {
+    public Set<String> getDataIntegrityViolationCodes() {
         return dataIntegrityViolationCodes;
     }
 
-    public Set<String> getDataAccessResourceFailureCodes()
-    {
+    public Set<String> getDataAccessResourceFailureCodes() {
         return dataAccessResourceFailureCodes;
     }
 
-    public Set<String> getTransientDataAccessResourceCodes()
-    {
+    public Set<String> getTransientDataAccessResourceCodes() {
         return transientDataAccessResourceCodes;
     }
 
-    public Set<String> getConcurrencyFailureCodes()
-    {
+    public Set<String> getConcurrencyFailureCodes() {
         return concurrencyFailureCodes;
     }
 
-    private static class DB2 extends SQLStateCodes
-    {
-        DB2()
-        {
+    private static class DB2 extends SQLStateCodes {
+        DB2() {
             super();
             // 57: out-of-memory exception / database not started
             // 58: unexpected system error
@@ -155,34 +144,26 @@ public class SQLStateCodes
         }
     }
 
-    private static class H2 extends SQLStateCodes
-    {
-        H2()
-        {
+    private static class H2 extends SQLStateCodes {
+        H2() {
             super();
         }
     }
 
-    private static class HSQL extends SQLStateCodes
-    {
-        HSQL()
-        {
+    private static class HSQL extends SQLStateCodes {
+        HSQL() {
             super();
         }
     }
 
-    private static class MySQL extends SQLStateCodes
-    {
-        MySQL()
-        {
+    private static class MySQL extends SQLStateCodes {
+        MySQL() {
             super();
         }
     }
 
-    private static class Oracle extends SQLStateCodes
-    {
-        Oracle()
-        {
+    private static class Oracle extends SQLStateCodes {
+        Oracle() {
             super();
             // 65: unknown identifier
             badSQLGrammarCodes = addToSet(badSQLGrammarCodes, "65");
@@ -191,10 +172,8 @@ public class SQLStateCodes
         }
     }
 
-    private static class PostgreSQL extends SQLStateCodes
-    {
-        PostgreSQL()
-        {
+    private static class PostgreSQL extends SQLStateCodes {
+        PostgreSQL() {
             super();
             // 53: insufficient resources (e.g. disk full)
             // 54: program limit exceeded (e.g. statement too complex)
@@ -203,16 +182,13 @@ public class SQLStateCodes
     }
 
     private static Set<String> toSet(
-            final String... strs)
-    {
-        if (strs == null || strs.length == 0)
-        {
+            final String... strs) {
+        if (strs == null || strs.length == 0) {
             return Collections.emptySet();
         }
 
         Set<String> set = new HashSet<String>();
-        for (String str : strs)
-        {
+        for (String str : strs) {
             set.add(str);
         }
         return Collections.unmodifiableSet(set);
@@ -220,16 +196,13 @@ public class SQLStateCodes
 
     private static Set<String> addToSet(
             final Set<String> baseSet,
-            final String... strs)
-    {
-        if (strs == null || strs.length == 0)
-        {
+            final String... strs) {
+        if (strs == null || strs.length == 0) {
             return baseSet;
         }
         Set<String> newSet = new HashSet<String>(baseSet.size() + strs.length);
         newSet.addAll(baseSet);
-        for (String str : strs)
-        {
+        for (String str : strs) {
             newSet.add(str);
         }
         return Collections.unmodifiableSet(newSet);

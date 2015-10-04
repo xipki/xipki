@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-up",
         description = "update publisher (negative, QA)")
-public class NegPublisherUpdateCmd extends PublisherUpdateCmd
-{
+public class NegPublisherUpdateCmd extends PublisherUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-publisher-up");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

@@ -43,8 +43,7 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public enum Permission
-{
+public enum Permission {
     ENROLL_CERT ("enroll"),
     REVOKE_CERT ("revoke"),
     UNREVOKE_CERT ("unrevoke"),
@@ -58,23 +57,18 @@ public enum Permission
     private String permission;
 
     private Permission(
-            final String permission)
-    {
+            final String permission) {
         this.permission = permission;
     }
 
-    public String getPermission()
-    {
+    public String getPermission() {
         return permission;
     }
 
     public static Permission getPermission(
-            final String permission)
-    {
-        for (Permission p : values())
-        {
-            if (p.permission.equalsIgnoreCase(permission))
-            {
+            final String permission) {
+        for (Permission p : values()) {
+            if (p.permission.equalsIgnoreCase(permission)) {
                 return p;
             }
         }
@@ -83,16 +77,13 @@ public enum Permission
     }
 
     public static String toString(
-            final Set<Permission> permissions)
-    {
-        if (CollectionUtil.isEmpty(permissions))
-        {
+            final Set<Permission> permissions) {
+        if (CollectionUtil.isEmpty(permissions)) {
             return null;
         }
 
         StringBuilder sb = new StringBuilder();
-        for (Permission p : permissions)
-        {
+        for (Permission p : permissions) {
             sb.append(",");
             sb.append(p.getPermission());
         }

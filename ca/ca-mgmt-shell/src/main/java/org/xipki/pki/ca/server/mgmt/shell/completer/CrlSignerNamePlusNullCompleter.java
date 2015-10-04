@@ -42,12 +42,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class CrlSignerNamePlusNullCompleter extends MgmtNameCompleter
-{
+public class CrlSignerNamePlusNullCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
         ret.addAll(caManager.getCrlSignerNames());
         ret.add("NULL");

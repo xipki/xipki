@@ -52,8 +52,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req-p12",
         description = "generate PKCS#10 request with PKCS#12 keystore")
-public class P12CertRequestGenCmd extends CertRequestGenCmd
-{
+public class P12CertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
@@ -64,31 +63,25 @@ public class P12CertRequestGenCmd extends CertRequestGenCmd
             description = "password of the PKCS#12 file")
     private String password;
 
-    private char[] getPassword()
-    {
+    private char[] getPassword() {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null)
-        {
+        if (pwdInChar != null) {
             password = new String(pwdInChar);
         }
         return pwdInChar;
     }
 
     public KeyStore getKeyStore()
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks;
 
         FileInputStream fIn = null;
-        try
-        {
+        try {
             fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
-        } finally
-        {
-            if (fIn != null)
-            {
+        } finally {
+            if (fIn != null) {
                 fIn.close();
             }
         }
@@ -100,8 +93,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCmd
     protected ConcurrentContentSigner getSigner(
             final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
-    throws Exception
-    {
+    throws Exception {
         char[] pwd = getPassword();
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(

@@ -46,8 +46,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class AuditEvent
-{
+public class AuditEvent {
 
     /**
      * The name of the application the event belongs to.
@@ -81,146 +80,119 @@ public class AuditEvent
     private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
     public AuditEvent(
-            final Date timestamp)
-    {
+            final Date timestamp) {
         this.timestamp = (timestamp == null)
                 ? new Date()
                 : timestamp;
         this.level = AuditLevel.INFO;
     }
 
-    public AuditLevel getLevel()
-    {
+    public AuditLevel getLevel() {
         return level;
     }
 
     public void setLevel(
-            final AuditLevel level)
-    {
+            final AuditLevel level) {
         this.level = level;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     public void setName(
-            final String name)
-    {
+            final String name) {
         this.name = name;
     }
 
-    public String getApplicationName()
-    {
+    public String getApplicationName() {
         return applicationName;
     }
 
     public void setApplicationName(
-            final String applicationName)
-    {
+            final String applicationName) {
         this.applicationName = applicationName;
     }
 
-    public Date getTimestamp()
-    {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public List<AuditEventData> getEventDatas()
-    {
+    public List<AuditEventData> getEventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
     public AuditEventData addEventData(
-            final AuditEventData eventData)
-    {
+            final AuditEventData eventData) {
         int idx = -1;
-        for (int i = 0; i < eventDatas.size(); i++)
-        {
+        for (int i = 0; i < eventDatas.size(); i++) {
             AuditEventData ed = eventDatas.get(i);
-            if (ed.getName().equals(eventData.getName()))
-            {
+            if (ed.getName().equals(eventData.getName())) {
                 idx = i;
                 break;
             }
         }
 
         AuditEventData ret = null;
-        if (idx != -1)
-        {
+        if (idx != -1) {
             ret = eventDatas.get(idx);
         }
         eventDatas.add(eventData);
 
-        for (AuditChildEvent cae : childAuditEvents)
-        {
+        for (AuditChildEvent cae : childAuditEvents) {
             cae.removeEventData(eventData.getName());
         }
 
         return ret;
     }
 
-    public AuditStatus getStatus()
-    {
+    public AuditStatus getStatus() {
         return status;
     }
 
     public void setStatus(
-            final AuditStatus status)
-    {
+            final AuditStatus status) {
         this.status = status;
     }
 
     public void addChildAuditEvent(
-            final AuditChildEvent childAuditEvent)
-    {
+            final AuditChildEvent childAuditEvent) {
         childAuditEvents.add(childAuditEvent);
     }
 
-    public boolean containsChildAuditEvents()
-    {
+    public boolean containsChildAuditEvents() {
         return !childAuditEvents.isEmpty();
     }
 
-    public List<AuditEvent> expandAuditEvents()
-    {
+    public List<AuditEvent> expandAuditEvents() {
         int size = childAuditEvents.size();
-        if (size == 0)
-        {
+        if (size == 0) {
             return Arrays.asList(this);
         }
 
         List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for (AuditChildEvent child : childAuditEvents)
-        {
+        for (AuditChildEvent child : childAuditEvents) {
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);
 
-            if (child.getLevel() != null)
-            {
+            if (child.getLevel() != null) {
                 event.setLevel(child.getLevel());
-            } else
-            {
+            } else {
                 event.setLevel(level);
             }
 
-            if (child.getStatus() != null)
-            {
+            if (child.getStatus() != null) {
                 event.setStatus(child.getStatus());
-            } else
-            {
+            } else {
                 event.setStatus(status);
             }
 
-            for (AuditEventData eventData : eventDatas)
-            {
+            for (AuditEventData eventData : eventDatas) {
                 event.addEventData(eventData);
             }
 
-            for (AuditEventData eventData : child.getEventDatas())
-            {
+            for (AuditEventData eventData : child.getEventDatas()) {
                 event.addEventData(eventData);
             }
 
@@ -232,14 +204,12 @@ public class AuditEvent
         return expandedEvents;
     }
 
-    public long getDuration()
-    {
+    public long getDuration() {
         return duration;
     }
 
     public void setDuration(
-            final long duration)
-    {
+            final long duration) {
         this.duration = duration;
     }
 }

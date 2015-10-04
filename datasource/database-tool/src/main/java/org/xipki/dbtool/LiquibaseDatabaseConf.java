@@ -44,8 +44,7 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class LiquibaseDatabaseConf
-{
+public class LiquibaseDatabaseConf {
     private final String driver;
     private final String username;
     private final String password;
@@ -55,8 +54,7 @@ public class LiquibaseDatabaseConf
     public static LiquibaseDatabaseConf getInstance(
             final Properties dbProps,
             final PasswordResolver passwordResolver)
-    throws PasswordResolverException
-    {
+    throws PasswordResolverException {
         String driverClassName;
         String url;
         String schema = null;
@@ -64,20 +62,17 @@ public class LiquibaseDatabaseConf
         String password;
 
         String dataSourceClassName = dbProps.getProperty("dataSourceClassName");
-        if (dataSourceClassName != null)
-        {
+        if (dataSourceClassName != null) {
             user = dbProps.getProperty("dataSource.user");
             password = dbProps.getProperty("dataSource.password");
 
             StringBuilder urlBuilder = new StringBuilder();
 
             dataSourceClassName = dataSourceClassName.toLowerCase();
-            if (dataSourceClassName.contains("org.h2."))
-            {
+            if (dataSourceClassName.contains("org.h2.")) {
                 driverClassName = "org.h2.Driver";
                 urlBuilder.append(dbProps.getProperty("dataSource.url"));
-            } else if (dataSourceClassName.contains("mysql."))
-            {
+            } else if (dataSourceClassName.contains("mysql.")) {
                 driverClassName = "com.mysql.jdbc.Driver";
                 urlBuilder.append("jdbc:mysql://");
                 urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
@@ -85,15 +80,12 @@ public class LiquibaseDatabaseConf
                 urlBuilder.append(dbProps.getProperty("dataSource.port"));
                 urlBuilder.append("/");
                 urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
-            } else if (dataSourceClassName.contains("oracle."))
-            {
+            } else if (dataSourceClassName.contains("oracle.")) {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
                 String s = dbProps.getProperty("dataSource.URL");
-                if (MyStringUtil.isNotBlank(s))
-                {
+                if (MyStringUtil.isNotBlank(s)) {
                     urlBuilder.append(s);
-                } else
-                {
+                } else {
                     urlBuilder.append("jdbc:oracle:thin:@");
                     urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
                     urlBuilder.append(":");
@@ -101,8 +93,7 @@ public class LiquibaseDatabaseConf
                     urlBuilder.append(":");
                     urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
                 }
-            } else if (dataSourceClassName.contains("com.ibm.db2."))
-            {
+            } else if (dataSourceClassName.contains("com.ibm.db2.")) {
                 driverClassName = "com.ibm.db2.jcc.DB2Driver";
                 schema = dbProps.getProperty("dataSource.currentSchema");
 
@@ -113,18 +104,15 @@ public class LiquibaseDatabaseConf
                 urlBuilder.append("/");
                 urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
             } else if (dataSourceClassName.contains("postgresql.")
-                    || dataSourceClassName.contains("impossibl.postgres."))
-            {
+                    || dataSourceClassName.contains("impossibl.postgres.")) {
                 String serverName;
                 String portNumber;
                 String databaseName;
-                if (dataSourceClassName.contains("postgresql."))
-                {
+                if (dataSourceClassName.contains("postgresql.")) {
                     serverName = dbProps.getProperty("dataSource.serverName");
                     portNumber = dbProps.getProperty("dataSource.portNumber");
                     databaseName = dbProps.getProperty("dataSource.databaseName");
-                } else
-                {
+                } else {
                     serverName = dbProps.getProperty("dataSource.host");
                     portNumber = dbProps.getProperty("dataSource.port");
                     databaseName = dbProps.getProperty("dataSource.database");
@@ -136,56 +124,46 @@ public class LiquibaseDatabaseConf
                     .append(portNumber)
                     .append("/")
                     .append(databaseName);
-            } else if (dataSourceClassName.contains("hsqldb."))
-            {
+            } else if (dataSourceClassName.contains("hsqldb.")) {
                 driverClassName = "org.hsqldb.jdbc.JDBCDriver";
                 urlBuilder.append(dbProps.getProperty("dataSource.url"));
-            } else
-            {
+            } else {
                 throw new IllegalArgumentException(
                         "unsupported datasbase type " + dataSourceClassName);
             }
 
             url = urlBuilder.toString();
         } else if (dbProps.containsKey("driverClassName")
-                || dbProps.containsKey("db.driverClassName"))
-        {
-            if (dbProps.containsKey("driverClassName"))
-            {
+                || dbProps.containsKey("db.driverClassName")) {
+            if (dbProps.containsKey("driverClassName")) {
                 driverClassName = dbProps.getProperty("driverClassName");
                 user = dbProps.getProperty("username");
                 password = dbProps.getProperty("password");
                 url = dbProps.getProperty("jdbcUrl");
-            } else
-            {
+            } else {
                 driverClassName = dbProps.getProperty("db.driverClassName");
                 user = dbProps.getProperty("db.username");
                 password = dbProps.getProperty("db.password");
                 url = dbProps.getProperty("db.url");
             }
 
-            if (MyStringUtil.startsWithIgnoreCase(url, "jdbc:db2:"))
-            {
+            if (MyStringUtil.startsWithIgnoreCase(url, "jdbc:db2:")) {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);
-                if (idx != 1)
-                {
+                if (idx != 1) {
                     schema = url.substring(idx + sep.length());
-                    if (schema.endsWith(";"))
-                    {
+                    if (schema.endsWith(";")) {
                         schema = schema.substring(0, schema.length() - 1);
                     }
                     schema = schema.toUpperCase();
                     url = url.substring(0, idx);
                 }
             }
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("unsupported configuration");
         }
 
-        if (passwordResolver != null && MyStringUtil.isNotBlank(password))
-        {
+        if (passwordResolver != null && MyStringUtil.isNotBlank(password)) {
             password = new String(passwordResolver.resolvePassword(password));
         }
 
@@ -197,8 +175,7 @@ public class LiquibaseDatabaseConf
             final String username,
             final String password,
             final String url,
-            final String schema)
-    {
+            final String schema) {
         this.driver = driver;
         this.username = username;
         this.password = password;
@@ -206,28 +183,23 @@ public class LiquibaseDatabaseConf
         this.schema = schema;
     }
 
-    public String getDriver()
-    {
+    public String getDriver() {
         return driver;
     }
 
-    public String getUsername()
-    {
+    public String getUsername() {
         return username;
     }
 
-    public String getPassword()
-    {
+    public String getPassword() {
         return password;
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return url;
     }
 
-    public String getSchema()
-    {
+    public String getSchema() {
         return schema;
     }
 

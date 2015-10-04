@@ -54,37 +54,30 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class Pkcs12_RSA_Test
-{
+public abstract class Pkcs12_RSA_Test {
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
 
-    protected Pkcs12_RSA_Test()
-    {
-        if (Security.getProvider("BC") == null)
-        {
+    protected Pkcs12_RSA_Test() {
+        if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
     }
 
-    protected String getPkcs12File()
-    {
+    protected String getPkcs12File() {
         return "src/test/resources/C.TSL.SIG1.p12";
     }
 
-    protected String getCertificateFile()
-    {
+    protected String getCertificateFile() {
         return "src/test/resources/C.TSL.SIG1.der";
     }
 
-    protected String getPassword()
-    {
+    protected String getPassword() {
         return "1234";
     }
 
-    private String getSignerConf()
-    {
+    private String getSignerConf() {
         ConfPairs conf = new ConfPairs("password", getPassword());
         conf.putPair("algo", getSignatureAlgorithm().getId());
         conf.putPair("keystore", "file:" + getPkcs12File());
@@ -94,10 +87,8 @@ public abstract class Pkcs12_RSA_Test
     private ConcurrentContentSigner signer;
 
     private ConcurrentContentSigner getSigner()
-    throws Exception
-    {
-        if (signer == null)
-        {
+    throws Exception {
+        if (signer == null) {
             String certFile = getCertificateFile();
             X509Certificate cert = X509Util.parseCert(certFile);
 
@@ -109,11 +100,9 @@ public abstract class Pkcs12_RSA_Test
 
     @Test
     public void testSignAndVerify()
-    throws Exception
-    {
+    throws Exception {
         byte[] data = new byte[1234];
-        for (int i = 0; i < data.length; i++)
-        {
+        for (int i = 0; i < data.length; i++) {
             data[i] = (byte) (i & 0xFF);
         }
 
@@ -123,17 +112,14 @@ public abstract class Pkcs12_RSA_Test
     }
 
     protected byte[] sign(byte[] data)
-    throws Exception
-    {
+    throws Exception {
         ConcurrentContentSigner signer = getSigner();
         ContentSigner cSigner = signer.borrowContentSigner();
-        try
-        {
+        try {
             OutputStream signatureStream = cSigner.getOutputStream();
             signatureStream.write(data);
             return cSigner.getSignature();
-        } finally
-        {
+        } finally {
             signer.returnContentSigner(cSigner);
         }
     }
@@ -142,8 +128,7 @@ public abstract class Pkcs12_RSA_Test
             final byte[] data,
             final byte[] signatureValue,
             final X509Certificate cert)
-    throws Exception
-    {
+    throws Exception {
         Signature signature = Signature.getInstance(getSignatureAlgorithm().getId());
         signature.initVerify(cert.getPublicKey());
         signature.update(data);

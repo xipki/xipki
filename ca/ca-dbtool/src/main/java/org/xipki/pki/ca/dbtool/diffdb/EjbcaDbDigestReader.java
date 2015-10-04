@@ -59,41 +59,32 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class EjbcaDbDigestReader extends DbDigestReader
-{
+public class EjbcaDbDigestReader extends DbDigestReader {
     private class EjbcaDbRetriever
-    implements Retriever
-    {
+    implements Retriever {
         private Connection conn;
         private PreparedStatement selectCertStmt;
         private PreparedStatement selectBase64CertStmt;
 
         public EjbcaDbRetriever()
-        throws DataAccessException
-        {
+        throws DataAccessException {
             Connection conn = datasource.getConnection();
-            try
-            {
+            try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
                 selectBase64CertStmt = datasource.prepareStatement(conn, selectBase64CertSql);
-            } catch (DataAccessException e)
-            {
+            } catch (DataAccessException e) {
                 datasource.returnConnection(conn);
                 throw e;
             }
         }
 
         @Override
-        public void run()
-        {
-            while (!stop.get())
-            {
-                try
-                {
+        public void run() {
+            while (!stop.get()) {
+                try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                 }
             }
 
@@ -106,56 +97,46 @@ public class EjbcaDbDigestReader extends DbDigestReader
 
         @SuppressWarnings("resource")
         private void query(
-                final IDRange idRange)
-        {
+                final IDRange idRange) {
             DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
-            try
-            {
+            try {
                 selectCertStmt.setInt(1, idRange.getFrom());
                 selectCertStmt.setInt(2, idRange.getTo() + 1);
 
                 rs = selectCertStmt.executeQuery();
 
-                while (rs.next())
-                {
+                while (rs.next()) {
                     int id = rs.getInt("id");
                     String caHash = rs.getString("cAFingerprint");
                     String hash = rs.getString("fingerprint");
 
                     boolean ofThisCA = caFingerprint.equals(caHash);
-                    if (!ofThisCA && caHash.equals(hash))
-                    {
+                    if (!ofThisCA && caHash.equals(hash)) {
                         // special case
-                        try
-                        {
+                        try {
                             selectBase64CertStmt.setInt(1, id);
                             ResultSet base64Rs = selectBase64CertStmt.executeQuery();
                             base64Rs.next();
                             String b64Cert = base64Rs.getString("base64Cert");
                             base64Rs.close();
                             X509Certificate jceCert;
-                            try
-                            {
+                            try {
                                 jceCert = X509Util.parseBase64EncodedCert(b64Cert);
-                            } catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 throw new DataAccessException("IOException", e);
                             }
                             if (jceCert.getIssuerX500Principal()
-                                    .equals(caCert.getSubjectX500Principal()))
-                            {
+                                    .equals(caCert.getSubjectX500Principal())) {
                                 ofThisCA = true;
                             }
-                        } catch (SQLException e)
-                        {
+                        } catch (SQLException e) {
                             throw datasource.translate(selectBase64CertSql, e);
                         }
                     }
 
-                    if (!ofThisCA)
-                    {
+                    if (!ofThisCA) {
                         continue;
                     }
 
@@ -167,8 +148,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         revReason = rs.getInt("revocationReason");
                         long rev_timeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
@@ -179,16 +159,13 @@ public class EjbcaDbDigestReader extends DbDigestReader
                             revInvTime, hash);
                     result.addEntry(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch (Exception e)
-            {
-                if (e instanceof SQLException)
-                {
+            } catch (Exception e) {
+                if (e instanceof SQLException) {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
             }
-            finally
-            {
+            finally {
                 releaseResources(null, rs);
             }
 
@@ -209,8 +186,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
             final boolean dbContainsOtherCA,
             final boolean revokedOnly,
             final int numThreads)
-    throws Exception
-    {
+    throws Exception {
         ParamUtil.assertNotNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();
@@ -224,14 +200,12 @@ public class EjbcaDbDigestReader extends DbDigestReader
         int minId;
         int maxId;
 
-        try
-        {
+        try {
             stmt = datasource.createStatement(conn);
 
             sql = "SELECT data FROM CAData WHERE cAId=" + caId;
             rs = stmt.executeQuery(sql);
-            if (!rs.next())
-            {
+            if (!rs.next()) {
                 throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
             }
 
@@ -240,15 +214,12 @@ public class EjbcaDbDigestReader extends DbDigestReader
 
             caCert = EjbcaCACertExtractor.extractCACert(caData);
             // account
-            if (dbContainsOtherCA)
-            {
+            if (dbContainsOtherCA) {
                 // ignore it due to performance
                 totalAccount = -1;
-            } else
-            {
+            } else {
                 sql = "SELECT COUNT(*) FROM CertificateData";
-                if (revokedOnly)
-                {
+                if (revokedOnly) {
                     sql += " WHERE status=40";
                 }
                 rs = stmt.executeQuery(sql);
@@ -260,8 +231,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
 
             // maxId
             sql = "SELECT MAX(id) FROM CertificateData";
-            if (revokedOnly)
-            {
+            if (revokedOnly) {
                 sql += " WHERE status=40";
             }
             rs = stmt.executeQuery(sql);
@@ -271,8 +241,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
             rs.close();
 
             sql = "SELECT MIN(id) FROM CertificateData";
-            if (revokedOnly)
-            {
+            if (revokedOnly) {
                 sql += " WHERE status=40";
             }
             rs = stmt.executeQuery(sql);
@@ -280,11 +249,9 @@ public class EjbcaDbDigestReader extends DbDigestReader
                     ? rs.getInt(1)
                     : 1;
 
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw datasource.translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(stmt, rs);
             datasource.returnConnection(conn);
         }
@@ -304,8 +271,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
             final DbSchemaType dbSchemaType,
             final int caId,
             final boolean dbContainsOtherCA)
-    throws Exception
-    {
+    throws Exception {
         super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads);
         ParamUtil.assertNotNull("datasource", datasource);
 
@@ -319,26 +285,22 @@ public class EjbcaDbDigestReader extends DbDigestReader
         sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
         sb.append(",status,revocationDate,revocationReason");
         sb.append(" FROM CertificateData WHERE id>=? AND id<?");
-        if (revokedOnly)
-        {
+        if (revokedOnly) {
             sb.append(" AND status=40");
         }
         this.selectCertSql = sb.toString();
-        if (!init())
-        {
+        if (!init()) {
             throw new Exception("could not initialize the EjbcaDigestReader");
         }
     }
 
-    public int getCaId()
-    {
+    public int getCaId() {
         return caId;
     }
 
     @Override
     protected Retriever getRetriever()
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return new EjbcaDbRetriever();
     }
 
@@ -347,8 +309,7 @@ public class EjbcaDbDigestReader extends DbDigestReader
             final int fromId,
             final int toId,
             final int numCerts)
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return 0;
     }
 

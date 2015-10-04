@@ -54,11 +54,9 @@ import org.xipki.security.api.CertRevocationInfo;
 
 @Command(scope = "xipki-ca", name = "ca-revoke",
         description = "revoke CA")
-public class CaRevokeCmd extends CaCmd
-{
+public class CaRevokeCmd extends CaCmd {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
-            Arrays.asList(new CRLReason[]
-            {
+            Arrays.asList(new CRLReason[] {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
                 CRLReason.CESSATION_OF_OPERATION,
@@ -84,36 +82,29 @@ public class CaRevokeCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CRLReason crlReason = CRLReason.getInstance(reason);
-        if (crlReason == null)
-        {
+        if (crlReason == null) {
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if (!permitted_reasons.contains(crlReason))
-        {
+        if (!permitted_reasons.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
-        if (!caManager.getCaNames().contains(caName))
-        {
+        if (!caManager.getCaNames().contains(caName)) {
             throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         Date revocationDate = null;
-        if (isNotBlank(revocationDateS))
-        {
+        if (isNotBlank(revocationDateS)) {
             revocationDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(revocationDateS);
-        } else
-        {
+        } else {
             revocationDate = new Date();
         }
 
         Date invalidityDate = null;
-        if (isNotBlank(invalidityDateS))
-        {
+        if (isNotBlank(invalidityDateS)) {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }
 

@@ -45,30 +45,23 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
  * @author Lijun Liao
  */
 
-public class OCSPUtils
-{
-    private OCSPUtils()
-    {
+public class OCSPUtils {
+    private OCSPUtils() {
     }
 
     public static BasicOCSPResp extractBasicOCSPResp(
             final OCSPResp response)
-    throws OCSPResponseException
-    {
+    throws OCSPResponseException {
         int status = response.getStatus();
-        if (status == 0)
-        {
+        if (status == 0) {
             BasicOCSPResp basicOCSPResp;
-            try
-            {
+            try {
                 basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException e)
-            {
+            } catch (OCSPException e) {
                 throw new InvalidOCSPResponseException(e.getMessage(), e);
             }
             return basicOCSPResp;
-        } else
-        {
+        } else {
             throw new OCSPResponseUnsuccessfulException(status);
         }
     }

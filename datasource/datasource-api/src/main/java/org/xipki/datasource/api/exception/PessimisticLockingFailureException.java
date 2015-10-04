@@ -51,16 +51,14 @@ package org.xipki.datasource.api.exception;
  * @see OptimisticLockingFailureException
  */
 @SuppressWarnings("serial")
-public class PessimisticLockingFailureException extends ConcurrencyFailureException
-{
+public class PessimisticLockingFailureException extends ConcurrencyFailureException {
 
     /**
      * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      */
     public PessimisticLockingFailureException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -71,8 +69,7 @@ public class PessimisticLockingFailureException extends ConcurrencyFailureExcept
      */
     public PessimisticLockingFailureException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

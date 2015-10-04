@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-cmpcontrol-up",
         description = "update CMP control (negative, QA)")
-public class NegCmpControlUpdateCmd extends CmpControlUpdateCmd
-{
+public class NegCmpControlUpdateCmd extends CmpControlUpdateCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-cmpcontrol-up");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

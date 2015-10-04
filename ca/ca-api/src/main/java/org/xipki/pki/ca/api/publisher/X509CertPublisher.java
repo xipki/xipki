@@ -51,16 +51,14 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public abstract class X509CertPublisher
-{
+public abstract class X509CertPublisher {
     public abstract void initialize(
             String conf,
             PasswordResolver passwordResolver,
             Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException;
 
-    public void shutdown()
-    {
+    public void shutdown() {
     }
 
     public abstract boolean publishsGoodCert();

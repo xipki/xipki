@@ -44,8 +44,7 @@ package org.xipki.datasource.api.exception;
  * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class PermissionDeniedDataAccessException extends NonTransientDataAccessException
-{
+public class PermissionDeniedDataAccessException extends NonTransientDataAccessException {
 
     /**
      * Constructor for PermissionDeniedDataAccessException.
@@ -55,8 +54,7 @@ public class PermissionDeniedDataAccessException extends NonTransientDataAccessE
      */
     public PermissionDeniedDataAccessException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

@@ -47,8 +47,7 @@ import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen-p12",
         description = "performance test of PKCS#12 DSA key generation")
-public class SpeedP12DSAKeyGenCmd extends SingleSpeedCmd
-{
+public class SpeedP12DSAKeyGenCmd extends SingleSpeedCmd {
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;
@@ -59,15 +58,11 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedCmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
-        if (qLen == null)
-        {
-            if (pLen >= 2048)
-            {
+    throws Exception {
+        if (qLen == null) {
+            if (pLen >= 2048) {
                 qLen = 256;
-            } else
-            {
+            } else {
                 qLen = 160;
             }
         }

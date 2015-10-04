@@ -46,31 +46,27 @@ import org.eclipse.jetty.servlet.ServletHolder;
  * @author Lijun Liao
  */
 
-public class ScepServerContainer
-{
+public class ScepServerContainer {
     private Server server;
 
     public ScepServerContainer(
             final int port,
             final ScepServer scepServer)
-    throws Exception
-    {
+    throws Exception {
         this(port, Arrays.asList(scepServer));
     }
 
     public ScepServerContainer(
             final int port,
             final List<ScepServer> scepServers)
-    throws Exception
-    {
+    throws Exception {
         Server server = new Server(port);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
 
-        for (ScepServer m : scepServers)
-        {
+        for (ScepServer m : scepServers) {
             String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
             ScepServlet servlet = m.getServlet();
             context.addServlet(new ServletHolder(servlet), servletPattern);
@@ -80,21 +76,17 @@ public class ScepServerContainer
     }
 
     public void start()
-    throws Exception
-    {
-        try
-        {
+    throws Exception {
+        try {
             server.start();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             server.stop();
             throw e;
         }
     }
 
     public void stop()
-    throws Exception
-    {
+    throws Exception {
         server.stop();
     }
 }

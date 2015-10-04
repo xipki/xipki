@@ -43,15 +43,13 @@ import org.xipki.password.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class P11NullPasswordRetriever implements P11PasswordRetriever
-{
+public class P11NullPasswordRetriever implements P11PasswordRetriever {
     public static final P11NullPasswordRetriever INSTANCE = new P11NullPasswordRetriever();
 
     @Override
     public List<char[]> getPassword(
             final P11SlotIdentifier slotId)
-    throws PasswordResolverException
-    {
+    throws PasswordResolverException {
         return null;
     }
 }

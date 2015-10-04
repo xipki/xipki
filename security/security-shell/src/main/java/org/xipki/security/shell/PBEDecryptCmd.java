@@ -47,8 +47,7 @@ import org.xipki.password.PBEPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "pbe-dec",
         description = "decrypt password with master password")
-public class PBEDecryptCmd extends SecurityCmd
-{
+public class PBEDecryptCmd extends SecurityCmd {
     @Option(name = "--password",
             required = true,
             description = "encrypted password, starts with PBE:\n"
@@ -57,10 +56,8 @@ public class PBEDecryptCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:"))
-        {
+    throws Exception {
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with PBE:");
         }

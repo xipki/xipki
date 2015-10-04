@@ -43,12 +43,10 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "unrevoke-cert",
         description = "unrevoke certificate")
-public class UnrevokeCertCmd extends UnRevRemoveCertCmd
-{
+public class UnrevokeCertCmd extends UnRevRemoveCertCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
         output(successful, "unrevoked", "could not unrevoke", "certificate");
 

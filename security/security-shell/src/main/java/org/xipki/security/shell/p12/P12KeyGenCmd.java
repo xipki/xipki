@@ -46,8 +46,7 @@ import org.xipki.security.shell.KeyGenCmd;
  * @author Lijun Liao
  */
 
-public abstract class P12KeyGenCmd extends KeyGenCmd
-{
+public abstract class P12KeyGenCmd extends KeyGenCmd {
     @Option(name = "--subject", aliases = "-s",
             required = true,
             description = "subject in the self-signed certificate\n"
@@ -70,23 +69,19 @@ public abstract class P12KeyGenCmd extends KeyGenCmd
 
     protected void saveKeyAndCert(
             final P12KeypairGenerationResult keyAndCert)
-    throws IOException
-    {
+    throws IOException {
         File p12File = new File(keyOutFile);
         saveVerbose("saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
-        if (certOutFile != null)
-        {
+        if (certOutFile != null) {
             File certFile = new File(certOutFile);
             saveVerbose("saved self-signed certificate to file", certFile,
                     keyAndCert.getCertificate().getEncoded());
         }
     }
 
-    protected char[] getPassword()
-    {
+    protected char[] getPassword() {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null)
-        {
+        if (pwdInChar != null) {
             password = new String(pwdInChar);
         }
         return pwdInChar;

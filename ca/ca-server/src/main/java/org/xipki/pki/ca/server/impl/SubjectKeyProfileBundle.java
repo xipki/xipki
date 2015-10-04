@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.impl;
  * @author Lijun Liao
  */
 
-public class SubjectKeyProfileBundle
-{
+public class SubjectKeyProfileBundle {
     private final int certId;
     private final long subjectFp;
     private final long keyFp;
@@ -52,8 +51,7 @@ public class SubjectKeyProfileBundle
             final long subjectFp,
             final long keyFp,
             final String profile,
-            final boolean revoked)
-    {
+            final boolean revoked) {
         super();
         this.certId = certId;
         this.subjectFp = subjectFp;
@@ -62,28 +60,23 @@ public class SubjectKeyProfileBundle
         this.revoked = revoked;
     }
 
-    public int getCertId()
-    {
+    public int getCertId() {
         return certId;
     }
 
-    public long getSubjectFp()
-    {
+    public long getSubjectFp() {
         return subjectFp;
     }
 
-    public long getKeyFp()
-    {
+    public long getKeyFp() {
         return keyFp;
     }
 
-    public String getProfile()
-    {
+    public String getProfile() {
         return profile;
     }
 
-    public boolean isRevoked()
-    {
+    public boolean isRevoked() {
         return revoked;
     }
 }

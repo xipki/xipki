@@ -39,31 +39,26 @@ package org.xipki.security.api;
  * @author Lijun Liao
  */
 
-public class NoIdleSignerException extends Exception
-{
+public class NoIdleSignerException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public NoIdleSignerException()
-    {
+    public NoIdleSignerException() {
     }
 
     public NoIdleSignerException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public NoIdleSignerException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public NoIdleSignerException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 }

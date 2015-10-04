@@ -48,23 +48,18 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public class CollectionCertificateValidator
-implements CertificateValidator
-{
+implements CertificateValidator {
     private final Collection<String> certHashes;
 
     public CollectionCertificateValidator(
-            final Collection<X509Certificate> certs)
-    {
+            final Collection<X509Certificate> certs) {
         ParamUtil.assertNotEmpty("certs", certs);
         certHashes = new HashSet<String>(certs.size());
-        for (X509Certificate cert : certs)
-        {
+        for (X509Certificate cert : certs) {
             String hash;
-            try
-            {
+            try {
                 hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-            } catch (CertificateEncodingException e)
-            {
+            } catch (CertificateEncodingException e) {
                 throw new IllegalArgumentException(
                         "could not encode certificate: " + e.getMessage(), e);
             }
@@ -73,17 +68,14 @@ implements CertificateValidator
     }
 
     public CollectionCertificateValidator(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         ParamUtil.assertNotNull("cert", cert);
 
         certHashes = new HashSet<String>(1);
         String hash;
-        try
-        {
+        try {
             hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new IllegalArgumentException(
                     "could not encode certificate: " + e.getMessage(), e);
         }
@@ -93,16 +85,13 @@ implements CertificateValidator
     @Override
     public boolean trustCertificate(
             final X509Certificate signerCert,
-            final X509Certificate[] signerCaCerts)
-    {
+            final X509Certificate[] signerCaCerts) {
         ParamUtil.assertNotNull("signerCert", signerCert);
 
         String hash;
-        try
-        {
+        try {
             hash = HashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new IllegalArgumentException(
                     "could not encode certificate: " + e.getMessage(), e);
         }

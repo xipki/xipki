@@ -51,34 +51,28 @@ import org.xipki.console.karaf.ECCurveNameCompleter;
  */
 
 public class ECCurveNameCompleterImpl extends DynamicEnumCompleter
-implements ECCurveNameCompleter
-{
+implements ECCurveNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> curveNames = new HashSet<>();
         Enumeration<?> names = X962NamedCurves.getNames();
-        while (names.hasMoreElements())
-        {
+        while (names.hasMoreElements()) {
             curveNames.add((String) names.nextElement());
         }
 
         names = SECNamedCurves.getNames();
-        while (names.hasMoreElements())
-        {
+        while (names.hasMoreElements()) {
             curveNames.add((String) names.nextElement());
         }
 
         names = TeleTrusTNamedCurves.getNames();
-        while (names.hasMoreElements())
-        {
+        while (names.hasMoreElements()) {
             curveNames.add((String) names.nextElement());
         }
 
         names = NISTNamedCurves.getNames();
-        while (names.hasMoreElements())
-        {
+        while (names.hasMoreElements()) {
             curveNames.add((String) names.nextElement());
         }
 

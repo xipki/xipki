@@ -52,8 +52,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class ScepEntry
-implements Serializable
-{
+implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
     private static final long serialVersionUID = 1L;
 
@@ -74,8 +73,7 @@ implements Serializable
             final String responderConf,
             final String base64Cert,
             final String control)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotBlank("caName", caName);
         ParamUtil.assertNotBlank("responderType", responderType);
         ParamUtil.assertNotNull("responderConf", responderConf);
@@ -87,13 +85,10 @@ implements Serializable
         this.responderConf = responderConf;
         this.control = control;
 
-        if (this.base64Cert != null)
-        {
-            try
-            {
+        if (this.base64Cert != null) {
+            try {
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.debug("could not parse the certificate of SCEP responder for CA '"
                         + caName + "'");
                 certFaulty = true;
@@ -101,89 +96,73 @@ implements Serializable
         }
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return cert;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
-    public String getControl()
-    {
+    public String getControl() {
         return control;
     }
 
-    public String getResponderType()
-    {
+    public String getResponderType() {
         return responderType;
     }
 
-    public String getResponderConf()
-    {
+    public String getResponderConf() {
         return responderConf;
     }
 
-    public boolean isFaulty()
-    {
+    public boolean isFaulty() {
         return certFaulty || confFaulty;
     }
 
     public void setConfFaulty(
-            boolean faulty)
-    {
+            boolean faulty) {
         this.confFaulty = faulty;
     }
 
-    public String getCaName()
-    {
+    public String getCaName() {
         return caName;
     }
 
     public void setCertificate(
-            final X509Certificate cert)
-    {
-        if (base64Cert != null)
-        {
+            final X509Certificate cert) {
+        if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
         this.cert = cert;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         return toString(verbose, true);
     }
 
     public String toString(
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
+            final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("caName: ").append(caName).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');
         sb.append("responderConf: ");
-        if (responderConf == null)
-        {
+        if (responderConf == null) {
             sb.append("null");
-        } else
-        {
+        } else {
             sb.append(SecurityUtil.signerConfToString(responderConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("control: ").append(control).append("\n");
-        if (cert != null)
-        {
+        if (cert != null) {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
                     X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
@@ -191,19 +170,15 @@ implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if (verbose)
-            {
+            if (verbose) {
                 sb.append("\tencoded: ");
-                try
-                {
+                try {
                     sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e)
-                {
+                } catch (CertificateEncodingException e) {
                     sb.append("ERROR");
                 }
             }
-        } else
-        {
+        } else {
             sb.append("cert: null\n");
         }
 

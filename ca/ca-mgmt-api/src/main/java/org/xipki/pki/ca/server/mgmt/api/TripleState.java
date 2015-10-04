@@ -39,30 +39,24 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @author Lijun Liao
  */
 
-public enum TripleState
-{
+public enum TripleState {
 
     REQUIRED("required"),
     OPTIONAL("optional"),
     FORBIDDEN("forbidden");
     private final String value;
 
-    TripleState(String v)
-    {
+    TripleState(String v) {
         value = v;
     }
 
-    public String value()
-    {
+    public String value() {
         return value;
     }
 
-    public static TripleState fromValue(String v)
-    {
-        for (TripleState c: TripleState.values())
-        {
-            if (c.value.equalsIgnoreCase(v))
-            {
+    public static TripleState fromValue(String v) {
+        for (TripleState c: TripleState.values()) {
+            if (c.value.equalsIgnoreCase(v)) {
                 return c;
             }
         }

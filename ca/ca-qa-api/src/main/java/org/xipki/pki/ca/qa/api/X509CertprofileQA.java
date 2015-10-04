@@ -44,8 +44,7 @@ import org.xipki.common.qa.ValidationResult;
  * @author Lijun Liao
  */
 
-public interface X509CertprofileQA
-{
+public interface X509CertprofileQA {
     ValidationResult checkCert(
             byte[] certBytes,
             X509IssuerInfo issuerInfo,

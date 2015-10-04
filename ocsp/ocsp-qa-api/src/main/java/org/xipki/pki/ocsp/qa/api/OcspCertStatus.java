@@ -39,8 +39,7 @@ package org.xipki.pki.ocsp.qa.api;
  * @author Lijun Liao
  */
 
-public enum OcspCertStatus
-{
+public enum OcspCertStatus {
     issuerUnknown,
     unknown,
     good,
@@ -62,12 +61,9 @@ public enum OcspCertStatus
     unauthorized;
 
     public static OcspCertStatus getInstance(
-            final String name)
-    {
-        for (OcspCertStatus entry : values())
-        {
-            if (entry.name().equals(name))
-            {
+            final String name) {
+        for (OcspCertStatus entry : values()) {
+            if (entry.name().equals(name)) {
                 return entry;
             }
         }

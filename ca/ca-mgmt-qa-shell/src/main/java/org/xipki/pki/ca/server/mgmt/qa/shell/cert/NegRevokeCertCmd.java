@@ -45,20 +45,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-revoke-cert",
         description = "revoke certificate (negative, QA)")
-public class NegRevokeCertCmd extends RevokeCertCmd
-{
+public class NegRevokeCertCmd extends RevokeCertCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("neg-remove-cert");
 
-        try
-        {
+        try {
             super._doExecute();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
 

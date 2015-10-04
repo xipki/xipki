@@ -43,8 +43,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CmpControlEntry implements Serializable
-{
+public class CmpControlEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -53,38 +52,32 @@ public class CmpControlEntry implements Serializable
 
     public CmpControlEntry(
             final String name,
-            final String conf)
-    {
+            final String conf) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("conf", conf);
         this.name = name;
         this.conf = conf;
     }
 
-    public boolean isFaulty()
-    {
+    public boolean isFaulty() {
         return faulty;
     }
 
     public void setFaulty(
-            final boolean faulty)
-    {
+            final boolean faulty) {
         this.faulty = faulty;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         return conf;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("  name: ").append(name).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');

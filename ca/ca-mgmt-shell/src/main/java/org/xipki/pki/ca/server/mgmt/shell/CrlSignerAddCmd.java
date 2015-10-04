@@ -48,8 +48,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "crlsigner-add",
         description = "add CRL signer")
-public class CrlSignerAddCmd extends CaCmd
-{
+public class CrlSignerAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"
@@ -79,29 +78,23 @@ public class CrlSignerAddCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String base64Cert = null;
-        if (!"CA".equalsIgnoreCase(signerType))
-        {
-            if (signerCertFile != null)
-            {
+        if (!"CA".equalsIgnoreCase(signerType)) {
+            if (signerCertFile != null) {
                 byte[] encodedCert = IoUtil.read(signerCertFile);
                 base64Cert = IoUtil.base64Encode(encodedCert, false);
                 X509Util.parseCert(encodedCert);
             }
 
-            if (signerConf != null)
-            {
-                if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-                {
+            if (signerConf != null) {
+                if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
                             signerConf, passwordResolver);
                 }

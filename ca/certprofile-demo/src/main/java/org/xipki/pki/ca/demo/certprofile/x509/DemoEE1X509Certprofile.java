@@ -64,15 +64,13 @@ import org.xipki.security.api.ObjectIdentifiers;
  * @author Lijun Liao
  */
 
-public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
-{
+public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile {
     private final CertValidity validity;
     private final Set<KeyUsageControl> keyUsage;
     private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
     private final SubjectControl subjectControl;
 
-    public DemoEE1X509Certprofile()
-    {
+    public DemoEE1X509Certprofile() {
         validity = new CertValidity(10, Unit.YEAR);
 
         Set<KeyUsageControl> _keyUsage = new HashSet<>();
@@ -115,20 +113,17 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
     }
 
     @Override
-    public Set<KeyUsageControl> getKeyUsage()
-    {
+    public Set<KeyUsageControl> getKeyUsage() {
         return keyUsage;
     }
 
     @Override
-    public CertValidity getValidity()
-    {
+    public CertValidity getValidity() {
         return validity;
     }
 
     @Override
-    public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls()
-    {
+    public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
         return extensionControls;
     }
 
@@ -139,20 +134,17 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile
             final Extensions requestedExtensions,
             final Date notBefore,
             final Date notAfter)
-    throws CertprofileException, BadCertTemplateException
-    {
+    throws CertprofileException, BadCertTemplateException {
         return null;
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms()
-    {
+    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
         return null;
     }
 
     @Override
-    protected SubjectControl getSubjectControl()
-    {
+    protected SubjectControl getSubjectControl() {
         return subjectControl;
     }
 

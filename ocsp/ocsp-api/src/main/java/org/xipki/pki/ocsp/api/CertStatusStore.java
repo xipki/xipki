@@ -49,8 +49,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-public abstract class CertStatusStore
-{
+public abstract class CertStatusStore {
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(
@@ -94,71 +93,59 @@ public abstract class CertStatusStore
     private AuditServiceRegister auditServiceRegister;
 
     protected CertStatusStore(
-            final String name)
-    {
+            final String name) {
         ParamUtil.assertNotBlank("name", name);
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister)
-    {
+            final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    public AuditService getAuditService()
-    {
+    public AuditService getAuditService() {
         return (auditServiceRegister == null)
                 ? null
                 : auditServiceRegister.getAuditService();
     }
 
-    public boolean isUnknownSerialAsGood()
-    {
+    public boolean isUnknownSerialAsGood() {
         return unknownSerialAsGood;
     }
 
     public void setUnknownSerialAsGood(
-            final boolean unknownSerialAsGood)
-    {
+            final boolean unknownSerialAsGood) {
         this.unknownSerialAsGood = unknownSerialAsGood;
     }
 
-    public boolean isIncludeArchiveCutoff()
-    {
+    public boolean isIncludeArchiveCutoff() {
         return includeArchiveCutoff;
     }
 
     public void setIncludeArchiveCutoff(
-            final boolean includeArchiveCutoff)
-    {
+            final boolean includeArchiveCutoff) {
         this.includeArchiveCutoff = includeArchiveCutoff;
     }
 
-    public int getRetentionInterval()
-    {
+    public int getRetentionInterval() {
         return retentionInterval;
     }
 
     public void setRetentionInterval(
-            final int retentionInterval)
-    {
+            final int retentionInterval) {
         this.retentionInterval = retentionInterval;
     }
 
-    public boolean isIncludeCrlID()
-    {
+    public boolean isIncludeCrlID() {
         return includeCrlID;
     }
 
     public void setIncludeCrlID(
-            final boolean includeCrlID)
-    {
+            final boolean includeCrlID) {
         this.includeCrlID = includeCrlID;
     }
 

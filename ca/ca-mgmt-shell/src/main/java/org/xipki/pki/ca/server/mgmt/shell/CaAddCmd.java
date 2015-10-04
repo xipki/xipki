@@ -48,19 +48,16 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "ca-add",
         description = "add CA")
-public class CaAddCmd extends CaAddOrGenCmd
-{
+public class CaAddCmd extends CaAddOrGenCmd {
     @Option(name = "--cert",
             description = "CA certificate file")
     private String certFile;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         X509CAEntry caEntry = getCAEntry();
-        if (certFile != null)
-        {
+        if (certFile != null) {
             X509Certificate caCert = X509Util.parseCert(certFile);
             caEntry.setCertificate(caCert);
         }

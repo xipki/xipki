@@ -42,12 +42,10 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public class PublisherNamePlusAllCompleter extends MgmtNameCompleter
-{
+public class PublisherNamePlusAllCompleter extends MgmtNameCompleter {
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getPublisherNames());
         ret.add("all");
         return ret;

@@ -69,8 +69,7 @@ import org.xipki.security.api.HashCalculator;
  * @author Lijun Liao
  */
 
-public class HttpOcspServlet extends HttpServlet
-{
+public class HttpOcspServlet extends HttpServlet {
     private final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -82,13 +81,11 @@ public class HttpOcspServlet extends HttpServlet
 
     private OcspServer server;
 
-    public HttpOcspServlet()
-    {
+    public HttpOcspServlet() {
     }
 
     public void setServer(
-            final OcspServer server)
-    {
+            final OcspServer server) {
         this.server = server;
     }
 
@@ -96,21 +93,17 @@ public class HttpOcspServlet extends HttpServlet
     protected void doGet(
             final HttpServletRequest request,
             final HttpServletResponse response)
-    throws ServletException, IOException
-    {
+    throws ServletException, IOException {
         ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-        if (r == null)
-        {
+        if (r == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
         Responder responder = r.getResponder();
-        if (responder.getRequestOption().supportsHttpGet())
-        {
+        if (responder.getRequestOption().supportsHttpGet()) {
             processRequest(request, response, r, true);
-        } else
-        {
+        } else {
             super.doGet(request, response);
         }
     }
@@ -119,17 +112,14 @@ public class HttpOcspServlet extends HttpServlet
     protected void doPost(
             final HttpServletRequest request,
             final HttpServletResponse response)
-    throws ServletException, IOException
-    {
+    throws ServletException, IOException {
         ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-        if (r == null)
-        {
+        if (r == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        if (StringUtil.isNotBlank(r.getRelativeUri()))
-        {
+        if (StringUtil.isNotBlank(r.getRelativeUri())) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -142,8 +132,7 @@ public class HttpOcspServlet extends HttpServlet
             final HttpServletResponse response,
             final ResponderAndRelativeUri r,
             final boolean getMethod)
-    throws ServletException, IOException
-    {
+    throws ServletException, IOException {
         Responder responder = r.getResponder();
         AuditEvent auditEvent = null;
 
@@ -157,18 +146,15 @@ public class HttpOcspServlet extends HttpServlet
                 ? null
                 : auditServiceRegister.getAuditService();
 
-        if (auditService != null && responder.getAuditOption() != null)
-        {
+        if (auditService != null && responder.getAuditOption() != null) {
             start = System.currentTimeMillis();
             auditEvent = new AuditEvent(new Date());
             auditEvent.setApplicationName("OCSP");
             auditEvent.setName("PERF");
         }
 
-        try
-        {
-            if (server == null)
-            {
+        try {
+            if (server == null) {
                 String message = "responder in servlet not configured";
                 LOG.error(message);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -181,14 +167,12 @@ public class HttpOcspServlet extends HttpServlet
             }
 
             InputStream requestStream;
-            if (getMethod)
-            {
+            if (getMethod) {
                 String relativeUri = r.getRelativeUri();
 
                 // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
                 // POST, we support GET for longer requests anyway.
-                if (relativeUri.length() > responder.getRequestOption().getMaxRequestSize())
-                {
+                if (relativeUri.length() > responder.getRequestOption().getMaxRequestSize()) {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
 
@@ -198,11 +182,9 @@ public class HttpOcspServlet extends HttpServlet
                 }
 
                 requestStream = new ByteArrayInputStream(Base64.decode(relativeUri));
-            } else
-            {
+            } else {
                 // accept only "application/ocsp-request" as content type
-                if (!CT_REQUEST.equalsIgnoreCase(request.getContentType()))
-                {
+                if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
@@ -212,8 +194,7 @@ public class HttpOcspServlet extends HttpServlet
                 }
 
                 // request too long
-                if (request.getContentLength() > responder.getRequestOption().getMaxRequestSize())
-                {
+                if (request.getContentLength() > responder.getRequestOption().getMaxRequestSize()) {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
 
@@ -226,12 +207,10 @@ public class HttpOcspServlet extends HttpServlet
             } // end if (getMethod)
 
             OCSPRequest ocspRequest;
-            try
-            {
+            try {
                 ASN1StreamParser parser = new ASN1StreamParser(requestStream);
                 ocspRequest = OCSPRequest.getInstance(parser.readObject());
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
@@ -239,8 +218,7 @@ public class HttpOcspServlet extends HttpServlet
                 auditMessage = "bad request";
 
                 final String message = "could not parse the request (OCSPRequest)";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
                 }
@@ -255,8 +233,7 @@ public class HttpOcspServlet extends HttpServlet
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
                     server.answer(responder, ocspReq, auditEvent, getMethod);
-            if (ocspRespWithCacheInfo == null)
-            {
+            if (ocspRespWithCacheInfo == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -264,16 +241,14 @@ public class HttpOcspServlet extends HttpServlet
 
                 auditLevel = AuditLevel.ERROR;
                 auditStatus = AuditStatus.FAILED;
-            } else
-            {
+            } else {
                 OCSPResp resp = ocspRespWithCacheInfo.getResponse();
                 byte[] encodedOcspResp = resp.getEncoded();
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentLength(encodedOcspResp.length);
 
                 ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
-                if (getMethod && cacheInfo != null)
-                {
+                if (getMethod && cacheInfo != null) {
                     long now = System.currentTimeMillis();
                     // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
                     // the HTTP response.
@@ -285,8 +260,7 @@ public class HttpOcspServlet extends HttpServlet
                     // nextUpdate time-stamp in the OCSP
                     // response itself.
                     // This is overridden by max-age on HTTP/1.1 compatible components
-                    if (cacheInfo.getNextUpdate() != null)
-                    {
+                    if (cacheInfo.getNextUpdate() != null) {
                         response.setDateHeader("Expires", cacheInfo.getNextUpdate());
                     }
                     // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
@@ -296,16 +270,13 @@ public class HttpOcspServlet extends HttpServlet
 
                     // Max age must be in seconds in the cache-control header
                     long maxAge;
-                    if (responder.getResponseOption().getCacheMaxAge() != null)
-                    {
+                    if (responder.getResponseOption().getCacheMaxAge() != null) {
                         maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
-                    } else
-                    {
+                    } else {
                         maxAge = OcspServer.defaultCacheMaxAge;
                     }
 
-                    if (cacheInfo.getNextUpdate() != null)
-                    {
+                    if (cacheInfo.getNextUpdate() != null) {
                         maxAge = Math.min(maxAge,
                                 (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
                     }
@@ -315,11 +286,9 @@ public class HttpOcspServlet extends HttpServlet
                 } // end if (getMethod && cacheInfo != null)
                 response.getOutputStream().write(encodedOcspResp);
             } // end if (ocspRespWithCacheInfo)
-        } catch (EOFException e)
-        {
+        } catch (EOFException e) {
             final String message = "Connection reset by peer";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -327,8 +296,7 @@ public class HttpOcspServlet extends HttpServlet
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             final String message = "Throwable thrown, this should not happen!";
             LOG.error(message, t);
 
@@ -339,40 +307,30 @@ public class HttpOcspServlet extends HttpServlet
             auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
         }
-        finally
-        {
-            try
-            {
+        finally {
+            try {
                 response.flushBuffer();
-            } finally
-            {
-                if (auditEvent != null)
-                {
-                    if (auditLevel != null)
-                    {
+            } finally {
+                if (auditEvent != null) {
+                    if (auditLevel != null) {
                         auditEvent.setLevel(auditLevel);
                     }
 
-                    if (auditStatus != null)
-                    {
+                    if (auditStatus != null) {
                         auditEvent.setStatus(auditStatus);
                     }
 
-                    if (auditMessage != null)
-                    {
+                    if (auditMessage != null) {
                         auditEvent.addEventData(new AuditEventData("message", auditMessage));
                     }
 
                     auditEvent.setDuration(System.currentTimeMillis() - start);
 
-                    if (!auditEvent.containsChildAuditEvents())
-                    {
+                    if (!auditEvent.containsChildAuditEvents()) {
                         auditService.logEvent(auditEvent);
-                    } else
-                    {
+                    } else {
                         List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-                        for (AuditEvent event : expandedAuditEvents)
-                        {
+                        for (AuditEvent event : expandedAuditEvents) {
                             auditService.logEvent(event);
                         }
                     }
@@ -382,8 +340,7 @@ public class HttpOcspServlet extends HttpServlet
     }
 
     public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister)
-    {
+            final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 

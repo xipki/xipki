@@ -49,8 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "caprofile-check",
         description = "check information of certificate profiles in given CA (QA)")
-public class CaProfileCheckCmd extends CaCmd
-{
+public class CaProfileCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -70,28 +69,23 @@ public class CaProfileCheckCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking CA profile CA='" + caName +  "', profile='" + profileName + "'");
 
-        if (caManager.getCA(caName) == null)
-        {
+        if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        if (profileLocalname == null)
-        {
+        if (profileLocalname == null) {
             profileLocalname = profileName;
         }
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if (!entries.containsKey(profileLocalname))
-        {
+        if (!entries.containsKey(profileLocalname)) {
             throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
         }
 
         String name = entries.get(profileLocalname);
-        if (!profileName.equals(name))
-        {
+        if (!profileName.equals(name)) {
             throw new CmdFailure(
                     "Profile name is '" + name + "', but expected '" + profileName + "'");
         }

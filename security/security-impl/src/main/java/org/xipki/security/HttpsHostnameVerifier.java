@@ -55,8 +55,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class HttpsHostnameVerifier implements HostnameVerifier
-{
+public class HttpsHostnameVerifier implements HostnameVerifier {
     private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
 
     private boolean enabled = false;
@@ -66,12 +65,10 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     private HostnameVerifier oldHostnameVerifier = null;
     private boolean meAsDefaultHostnameVerifier = false;
 
-    public void init()
-    {
+    public void init() {
         LOG.info("enabled: {}", enabled);
         LOG.info("trustAll: {}", trustAll);
-        if (enabled)
-        {
+        if (enabled) {
             oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
             LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
                     oldHostnameVerifier);
@@ -80,10 +77,8 @@ public class HttpsHostnameVerifier implements HostnameVerifier
         }
     }
 
-    public void shutdown()
-    {
-        if (meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this)
-        {
+    public void shutdown() {
+        if (meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this) {
             LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
                     oldHostnameVerifier);
             HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
@@ -102,26 +97,21 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     @Override
     public boolean verify(
             final String hostname,
-            final SSLSession session)
-    {
-        if (trustAll)
-        {
+            final SSLSession session) {
+        if (trustAll) {
             return true;
         }
 
         LOG.info("hostname: {}", hostname);
         String commonName = null;
-        try
-        {
+        try {
             Principal peerPrincipal = session.getPeerPrincipal();
-            if (peerPrincipal == null)
-            {
+            if (peerPrincipal == null) {
                 return false;
             }
             commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
             LOG.info("commonName: {}", commonName);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.error("Error: {}", e.getMessage());
             return false;
         }
@@ -133,43 +123,36 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     }
 
     public void setCommonnameHostMap(
-            final String commonnameHostMap)
-    {
+            final String commonnameHostMap) {
         hostnameMap.clear();
-        if (StringUtil.isBlank(commonnameHostMap))
-        {
+        if (StringUtil.isBlank(commonnameHostMap)) {
             return;
         }
 
         ConfPairs pairs = new ConfPairs(commonnameHostMap);
         Set<String> commonNames = pairs.getNames();
-        for (String commonName :commonNames)
-        {
+        for (String commonName :commonNames) {
             String v = pairs.getValue(commonName);
             Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");
             hostnameMap.put(commonName, hosts);
         }
     }
 
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(
-            final boolean enabled)
-    {
+            final boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isTrustAll()
-    {
+    public boolean isTrustAll() {
         return trustAll;
     }
 
     public void setTrustAll(
-            final boolean trustAll)
-    {
+            final boolean trustAll) {
         this.trustAll = trustAll;
     }
 

@@ -51,8 +51,7 @@ import org.jscep.transaction.TransactionException;
 
 @Command(scope = "jscep", name = "enroll",
         description = "enroll certificate via automic selected messageType")
-public class EnrollCertCmd extends AbstractEnrollCertCmd
-{
+public class EnrollCertCmd extends AbstractEnrollCertCmd {
 
     @Override
     protected EnrollmentResponse requestCertificate(
@@ -60,8 +59,7 @@ public class EnrollCertCmd extends AbstractEnrollCertCmd
             final PKCS10CertificationRequest csr,
             final PrivateKey identityKey,
             final X509Certificate identityCert)
-    throws ClientException, TransactionException
-    {
+    throws ClientException, TransactionException {
         return client.enrol(identityCert, identityKey, csr);
     }
 

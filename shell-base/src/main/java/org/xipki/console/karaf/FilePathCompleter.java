@@ -39,7 +39,6 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface FilePathCompleter extends XipkiCompleter
-{
+public interface FilePathCompleter extends XipkiCompleter {
 
 }

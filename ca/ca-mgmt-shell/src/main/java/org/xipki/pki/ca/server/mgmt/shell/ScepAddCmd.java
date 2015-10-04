@@ -48,8 +48,7 @@ import org.xipki.password.api.PasswordResolver;
 
 @Command(scope = "xipki-ca", name = "scep-add",
         description = "add SCEP")
-public class ScepAddCmd extends CaCmd
-{
+public class ScepAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -80,31 +79,26 @@ public class ScepAddCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         String base64Cert = null;
-        if (certFile != null)
-        {
+        if (certFile != null) {
             base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
         }
 
-        if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType))
-        {
+        if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
             responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
                     passwordResolver);
         }
 
         ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
                 scepControl);
-        if (entry.isFaulty())
-        {
+        if (entry.isFaulty()) {
             throw new InvalidConfException("certificate is invalid");
         }
 

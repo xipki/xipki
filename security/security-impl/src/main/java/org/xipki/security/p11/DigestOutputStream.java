@@ -44,18 +44,15 @@ import org.bouncycastle.crypto.Digest;
  * @author Lijun Liao
  */
 
-public class DigestOutputStream extends OutputStream
-{
+public class DigestOutputStream extends OutputStream {
     private Digest digest;
 
     public DigestOutputStream(
-            final Digest digest)
-    {
+            final Digest digest) {
         this.digest = digest;
     }
 
-    public void reset()
-    {
+    public void reset() {
         digest.reset();
     }
 
@@ -64,29 +61,25 @@ public class DigestOutputStream extends OutputStream
             final byte[] bytes,
             final int off,
             final int len)
-    throws IOException
-    {
+    throws IOException {
         digest.update(bytes, off, len);
     }
 
     @Override
     public void write(
             final byte[] bytes)
-    throws IOException
-    {
+    throws IOException {
         digest.update(bytes, 0, bytes.length);
     }
 
     @Override
     public void write(
             final int b)
-    throws IOException
-    {
+    throws IOException {
         digest.update((byte) b);
     }
 
-    public byte[] digest()
-    {
+    public byte[] digest() {
         byte[] result = new byte[digest.getDigestSize()];
         digest.doFinal(result, 0);
         reset();

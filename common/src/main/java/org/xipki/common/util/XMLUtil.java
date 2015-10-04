@@ -68,40 +68,32 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class XMLUtil
-{
+public class XMLUtil {
     static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static Document document;
     private static DocumentBuilder builder;
 
-    static
-    {
-        try
-        {
+    static {
+        try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e)
-        {
+        } catch (ParserConfigurationException e) {
             System.err.println("could not initialize the XMLDocumentBuilder. Message: "
                     + e.getMessage());
             System.err.println("could not initialize the XMLDocumentBuilder" + e.getMessage());
         }
-        if (builder != null)
-        {
+        if (builder != null) {
             document = builder.newDocument();
         }
     }
 
-    private XMLUtil()
-    {
+    private XMLUtil() {
     }
 
     public static Element createElement(
             final String namespace,
             final String localPart,
-            final String value)
-    {
-        if (document == null)
-        {
+            final String value) {
+        if (document == null) {
             throw new RuntimeException("XMLDocumentBuilder could not be initialized");
         }
 
@@ -112,17 +104,14 @@ public class XMLUtil
 
     public static Element getDocumentElment(
             final byte[] xmlFragement)
-    throws IOException, SAXException
-    {
+    throws IOException, SAXException {
         Document doc = builder.parse(new ByteArrayInputStream(xmlFragement));
         return doc.getDocumentElement();
     }
 
     public static Calendar getCalendar(
-            final Date dateAndTime)
-    {
-        if (null == dateAndTime)
-        {
+            final Date dateAndTime) {
+        if (null == dateAndTime) {
             return null;
         }
         Calendar cal = (Calendar) Calendar.getInstance(UTC).clone();
@@ -130,50 +119,41 @@ public class XMLUtil
         return cal;
     }
 
-    public static XMLGregorianCalendar currentXMLDate()
-    {
+    public static XMLGregorianCalendar currentXMLDate() {
         return getXMLDate(new Date());
     }
 
     public static XMLGregorianCalendar getXMLDate(
-            final Calendar calendar)
-    {
+            final Calendar calendar) {
         GregorianCalendar c;
-        if (calendar instanceof GregorianCalendar)
-        {
+        if (calendar instanceof GregorianCalendar) {
             c = (GregorianCalendar) calendar;
-        } else
-        {
+        } else {
             c = new GregorianCalendar();
             c.setTimeZone(UTC);
             c.setTime(calendar.getTime());
         }
 
-        try
-        {
+        try {
             XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
-        } catch (DatatypeConfigurationException e)
-        {
+        } catch (DatatypeConfigurationException e) {
             return null;
         }
     }
 
     public static XMLGregorianCalendar getXMLDate(
-            final Date dateAndTime)
-    {
+            final Date dateAndTime) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTimeZone(UTC);
         c.setTime(dateAndTime);
 
-        try
-        {
+        try {
             XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
-        } catch (DatatypeConfigurationException e)
-        {
+        } catch (DatatypeConfigurationException e) {
             return null;
         }
     }
@@ -181,8 +161,7 @@ public class XMLUtil
     public static String getValueOfFirstElementChild(
             final Element element,
             final String namespace,
-            final String localname)
-    {
+            final String localname) {
         Node node = getFirstElementChild(element, namespace, localname);
         return (node == null)
                 ? null
@@ -190,17 +169,12 @@ public class XMLUtil
     }
 
     public static String getNodeValue(
-            final Node node)
-    {
-        if (node.getNodeType() == Node.ELEMENT_NODE)
-        {
+            final Node node) {
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
             Node n = node.getFirstChild();
-            if (n != null)
-            {
-                do
-                {
-                    if (n.getNodeType() == Node.TEXT_NODE)
-                    {
+            if (n != null) {
+                do {
+                    if (n.getNodeType() == Node.TEXT_NODE) {
                         return n.getNodeValue();
                     }
                 } while ((n = n.getNextSibling()) != null);
@@ -213,18 +187,14 @@ public class XMLUtil
     public static Element getFirstElementChild(
             final Element element,
             final String namespace,
-            final String localname)
-    {
+            final String localname) {
         Node node = element.getFirstChild();
-        if (node == null)
-        {
+        if (node == null) {
             return null;
         }
 
-        do
-        {
-            if (match(node, namespace, localname))
-            {
+        do {
+            if (match(node, namespace, localname)) {
                 return (Element) node;
             }
         } while ((node = node.getNextSibling()) != null);
@@ -243,16 +213,13 @@ public class XMLUtil
     public static List<Element> getElementChilden(
             final Element element,
             final String namespace,
-            final String localname)
-    {
+            final String localname) {
         List<Element> rv = new LinkedList<Element>();
 
         NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++)
-        {
+        for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (match(child, namespace, localname))
-            {
+            if (match(child, namespace, localname)) {
                 rv.add((Element) child);
             }
         }
@@ -262,20 +229,16 @@ public class XMLUtil
 
     public static List<Element> getAllElementsWithAttrId(
             final Element element,
-            final String namespace)
-    {
+            final String namespace) {
         List<Element> list = new LinkedList<Element>();
-        if (elementHasId(element, namespace))
-        {
+        if (elementHasId(element, namespace)) {
             list.add(element);
         }
 
         NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++)
-        {
+        for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (!(child instanceof Element))
-            {
+            if (!(child instanceof Element)) {
                 continue;
             }
 
@@ -288,25 +251,20 @@ public class XMLUtil
     private static void addAllElementsWithAttrId(
             final List<Element> list,
             final Element element,
-            final String namespace)
-    {
-        if (elementHasId(element, namespace))
-        {
+            final String namespace) {
+        if (elementHasId(element, namespace)) {
             list.add(element);
         }
 
         NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++)
-        {
+        for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (!(child instanceof Element))
-            {
+            if (!(child instanceof Element)) {
                 continue;
             }
 
             Element childElement = (Element) child;
-            if (elementHasId(childElement, namespace))
-            {
+            if (elementHasId(childElement, namespace)) {
                 list.add(childElement);
             }
 
@@ -316,28 +274,22 @@ public class XMLUtil
 
     private static boolean elementHasId(
             final Element element,
-            final String namespace)
-    {
+            final String namespace) {
         return element.hasAttributeNS(namespace, "Id");
     }
 
     private static boolean match(
             final Node node,
             final String namespace,
-            final String localname)
-    {
-        if (node instanceof Element)
-        {
+            final String localname) {
+        if (node instanceof Element) {
             Element element = (Element) node;
             String ln = element.getLocalName();
-            if (ln == null)
-            {
+            if (ln == null) {
                 ln = element.getTagName();
             }
-            if (ln.equals(localname))
-            {
-                if (namespace == null || namespace.equals(element.getNamespaceURI()))
-                {
+            if (ln.equals(localname)) {
+                if (namespace == null || namespace.equals(element.getNamespaceURI())) {
                     return true;
                 }
             }
@@ -349,8 +301,7 @@ public class XMLUtil
     public static String getValueOfFirstMatch(
             final Element contextNode,
             final String relativeXpath,
-            final Map<String, String> nsPrefixURIMap)
-    {
+            final Map<String, String> nsPrefixURIMap) {
         Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixURIMap);
         return (node == null)
                 ? null
@@ -360,8 +311,7 @@ public class XMLUtil
     public static Node getFirstMatch(
             final Element contextNode,
             final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap)
-    {
+            final Map<String, String> nsPrefixURIMap) {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, true);
         return CollectionUtil.isEmpty(nodes)
                 ? null
@@ -371,8 +321,7 @@ public class XMLUtil
     public static List<Node> getMatch(
             final Element contextNode,
             final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap)
-    {
+            final Map<String, String> nsPrefixURIMap) {
         return getMatch(contextNode, relativeXPath, nsPrefixURIMap, false);
     }
 
@@ -380,27 +329,20 @@ public class XMLUtil
             final Element contextNode,
             final String relativeXPath,
             final Map<String, String> nsPrefixURIMap,
-            final boolean onlyFirstMatch)
-    {
-        try
-        {
+            final boolean onlyFirstMatch) {
+        try {
             SimpleXPath sXPath = new SimpleXPath(relativeXPath, nsPrefixURIMap);
-            if (onlyFirstMatch)
-            {
+            if (onlyFirstMatch) {
                 Node node = sXPath.selectFirstMatch(contextNode);
-                if (node == null)
-                {
+                if (node == null) {
                     return Collections.emptyList();
-                } else
-                {
+                } else {
                     return Arrays.asList(node);
                 }
-            } else
-            {
+            } else {
                 return sXPath.select(contextNode);
             }
-        } catch (XPathExpressionException e)
-        {
+        } catch (XPathExpressionException e) {
             System.err.println("invalid xpath {}" + relativeXPath);
             return Collections.emptyList();
         }
@@ -409,14 +351,11 @@ public class XMLUtil
     public static List<Element> getElementMatch(
             final Element contextNode,
             final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap)
-    {
+            final Map<String, String> nsPrefixURIMap) {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, false);
         List<Element> elements = new ArrayList<Element>(nodes.size());
-        for (Node node : nodes)
-        {
-            if (node instanceof Element)
-            {
+        for (Node node : nodes) {
+            if (node instanceof Element) {
                 elements.add((Element) node);
             }
         }
@@ -424,19 +363,16 @@ public class XMLUtil
     }
 
     public static String getMessage(
-            final JAXBException e)
-    {
+            final JAXBException e) {
         String ret = e.getMessage();
-        if (ret == null && e.getLinkedException() != null)
-        {
+        if (ret == null && e.getLinkedException() != null) {
             ret = e.getLinkedException().getMessage();
         }
         return ret;
     }
 
     public static JAXBException convert(
-            final JAXBException e)
-    {
+            final JAXBException e) {
         return new JAXBException(getMessage(e), e.getLinkedException());
     }
 

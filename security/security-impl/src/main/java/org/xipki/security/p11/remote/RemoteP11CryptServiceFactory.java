@@ -53,16 +53,14 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
-{
+public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptServiceFactory.class);
 
     private P11Control p11Control;
 
     @Override
     public void init(
-            final P11Control p11Control)
-    {
+            final P11Control p11Control) {
         ParamUtil.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
     }
@@ -72,38 +70,30 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     @Override
     public P11CryptService createP11CryptService(
             String moduleName)
-    throws SignerException
-    {
+    throws SignerException {
         ParamUtil.assertNotNull("moduleName", moduleName);
-        if (p11Control == null)
-        {
+        if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
             moduleName = p11Control.getDefaultModuleName();
         }
 
         P11ModuleConf moduleConf = p11Control.getModuleConf(moduleName);
-        if (moduleConf == null)
-        {
+        if (moduleConf == null) {
             throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
         }
 
-        synchronized (services)
-        {
+        synchronized (services) {
             RemoteP11CryptService service = services.get(moduleName);
-            if (service == null)
-            {
-                try
-                {
+            if (service == null) {
+                try {
                     service = new DefaultRemoteP11CryptService(moduleConf);
                     String url = ((DefaultRemoteP11CryptService) service).getServerUrl();
                     logServiceInfo(url, service);
                     services.put(moduleConf.getName(), service);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     LOG.error("could not createP11CryptService: {}", e.getMessage());
                     LOG.debug("could not createP11CryptService", e);
                     throw new SignerException(e.getMessage(), e);
@@ -116,17 +106,14 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 
     private static void logServiceInfo(
             final String url,
-            final RemoteP11CryptService service)
-    {
+            final RemoteP11CryptService service) {
         StringBuilder sb = new StringBuilder();
         sb.append("initialized RemoteP11CryptService (url=").append(url).append(")\n");
 
         P11SlotIdentifier[] slotIds;
-        try
-        {
+        try {
             slotIds = service.getSlotIdentifiers();
-        } catch (SignerException e)
-        {
+        } catch (SignerException e) {
             LOG.warn("RemoteP11CryptService.getSlotIdentifiers(); SignerException: "
                     + "url={}, message={}",
                     url, e.getMessage());
@@ -134,21 +121,17 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             return;
         }
 
-        if (slotIds == null || slotIds.length == 0)
-        {
+        if (slotIds == null || slotIds.length == 0) {
             sb.append("\tno slot is available");
             LOG.warn("{}", sb);
             return;
         }
 
-        for (P11SlotIdentifier slotId : slotIds)
-        {
+        for (P11SlotIdentifier slotId : slotIds) {
             String[] keyLabels;
-            try
-            {
+            try {
                 keyLabels = service.getKeyLabels(slotId);
-            } catch (SignerException e)
-            {
+            } catch (SignerException e) {
                 LOG.warn("RemoteP11CryptService.getKeyLabels(); SignerException: "
                         + "url={}, slot={}, message={}",
                         new Object[]{url, slotId, e.getMessage()});
@@ -156,10 +139,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
                 continue;
             }
 
-            if (keyLabels != null && keyLabels.length > 0)
-            {
-                for (String keyLabel : keyLabels)
-                {
+            if (keyLabels != null && keyLabels.length > 0) {
+                for (String keyLabel : keyLabels) {
                     sb.append("\t(slot ").append(slotId);
                     sb.append(", label=").append(keyLabel).append(")\n");
                 }

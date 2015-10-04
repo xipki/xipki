@@ -49,8 +49,7 @@ import org.xipki.security.api.CRLReason;
 
 @Command(scope = "xipki-ca", name = "revoke-cert",
         description = "revoke certificate")
-public class RevokeCertCmd extends UnRevRemoveCertCmd
-{
+public class RevokeCertCmd extends UnRevRemoveCertCmd {
     @Option(name = "--reason", aliases = "-r",
             required = true,
             description = "CRL reason\n"
@@ -63,22 +62,18 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CRLReason crlReason = CRLReason.getInstance(reason);
-        if (crlReason == null)
-        {
+        if (crlReason == null) {
             throw new InvalidConfException("invalid reason " + reason);
         }
 
-        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason))
-        {
+        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new InvalidConfException("reason " + reason + " is not permitted");
         }
 
         Date invalidityDate = null;
-        if (isNotBlank(invalidityDateS))
-        {
+        if (isNotBlank(invalidityDateS)) {
             invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
         }
 

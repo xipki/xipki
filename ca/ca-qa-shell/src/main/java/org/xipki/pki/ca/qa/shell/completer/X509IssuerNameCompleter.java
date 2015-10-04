@@ -44,20 +44,17 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
  * @author Lijun Liao
  */
 
-public class X509IssuerNameCompleter extends DynamicEnumCompleter
-{
+public class X509IssuerNameCompleter extends DynamicEnumCompleter {
 
     protected QASystemManager qaSystemManager;
 
     public void setQaSystemManager(
-            final QASystemManager qaSystemManager)
-    {
+            final QASystemManager qaSystemManager) {
         this.qaSystemManager = qaSystemManager;
     }
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return qaSystemManager.getIssuerNames();
     }
 

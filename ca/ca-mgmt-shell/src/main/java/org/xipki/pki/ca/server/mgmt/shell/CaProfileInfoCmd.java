@@ -48,8 +48,7 @@ import org.xipki.common.util.CollectionUtil;
 
 @Command(scope = "xipki-ca", name = "caprofile-info",
         description = "show information of certificate profile in given CA")
-public class CaProfileInfoCmd extends CaCmd
-{
+public class CaProfileInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -58,32 +57,26 @@ public class CaProfileInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (caManager.getCA(caName) == null)
-        {
+    throws Exception {
+        if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
         Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if (CollectionUtil.isNotEmpty(entries))
-        {
+        if (CollectionUtil.isNotEmpty(entries)) {
             sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
-            for (String localname  : entries.keySet())
-            {
+            for (String localname  : entries.keySet()) {
                 String name = entries.get(localname);
                 sb.append("\t");
                 sb.append(name);
-                if (!name.equals(localname))
-                {
+                if (!name.equals(localname)) {
                     sb.append(" (localname ").append(localname).append(")");
                 }
                 sb.append("\n");
             }
-        } else
-        {
+        } else {
             sb.append("\tno profile for CA " + caName + " is configured");
         }
 

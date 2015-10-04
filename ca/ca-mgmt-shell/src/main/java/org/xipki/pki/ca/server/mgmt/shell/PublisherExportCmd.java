@@ -49,8 +49,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "publisher-export",
         description = "export publisher configuration")
-public class PublisherExportCmd extends CaCmd
-{
+public class PublisherExportCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "publisher name\n"
@@ -65,19 +64,15 @@ public class PublisherExportCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         PublisherEntry entry = caManager.getPublisher(name);
-        if (entry == null)
-        {
+        if (entry == null) {
             throw new IllegalCmdParamException("no publisher named " + name + " is defined");
         }
 
-        if (StringUtil.isBlank(entry.getConf()))
-        {
+        if (StringUtil.isBlank(entry.getConf())) {
             out("publisher does not have conf");
-        } else
-        {
+        } else {
             saveVerbose("saved publisher configuration to", new File(confFile),
                     entry.getConf().getBytes("UTF-8"));
         }

@@ -50,8 +50,7 @@ import org.xipki.security.api.HashAlgoType;
  * @author Lijun Liao
  */
 
-public class IssuerEntry
-{
+public class IssuerEntry {
     private final int id;
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
     private final Date notBefore;
@@ -61,8 +60,7 @@ public class IssuerEntry
     public IssuerEntry(
             final int id,
             final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
-            final Date caNotBefore)
-    {
+            final Date caNotBefore) {
         ParamUtil.assertNotEmpty("issuerHashMap", issuerHashMap);
         ParamUtil.assertNotNull("caNotBefore", caNotBefore);
 
@@ -71,16 +69,14 @@ public class IssuerEntry
         this.notBefore = caNotBefore;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
     public boolean matchHash(
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
-            final byte[] issuerKeyHash)
-    {
+            final byte[] issuerKeyHash) {
         IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
         return (issuerHash == null)
                 ? false
@@ -88,24 +84,20 @@ public class IssuerEntry
     }
 
     public void setRevocationInfo(
-            final Date revocationTime)
-    {
+            final Date revocationTime) {
         ParamUtil.assertNotNull("revocationTime", revocationTime);
         this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
     }
 
-    public CertRevocationInfo getRevocationInfo()
-    {
+    public CertRevocationInfo getRevocationInfo() {
         return revocationInfo;
     }
 
-    public Date getNotBefore()
-    {
+    public Date getNotBefore() {
         return notBefore;
     }
 
-    Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
-    {
+    Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
         return Collections.unmodifiableCollection(issuerHashMap.values());
     }
 }

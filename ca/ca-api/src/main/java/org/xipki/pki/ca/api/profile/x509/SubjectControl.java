@@ -53,8 +53,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  * @author Lijun Liao
  */
 
-public class SubjectControl
-{
+public class SubjectControl {
     private final Map<ASN1ObjectIdentifier, RDNControl> controls;
     private final Map<ASN1ObjectIdentifier, String> typeGroups;
     private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
@@ -63,31 +62,24 @@ public class SubjectControl
 
     public SubjectControl(
             final boolean backwardsSubject,
-            final Map<ASN1ObjectIdentifier, RDNControl> pControls)
-    {
+            final Map<ASN1ObjectIdentifier, RDNControl> pControls) {
         ParamUtil.assertNotEmpty("pControls", pControls);
 
         this.controls = pControls;
-        this.typeGroups = new HashMap<>();
-
-        {
+        this.typeGroups = new HashMap<>(); {
             Set<ASN1ObjectIdentifier> oids = controls.keySet();
             List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
             List<ASN1ObjectIdentifier> _oids = backwardsSubject
                     ? ObjectIdentifiers.getBackwardDNs()
                     : ObjectIdentifiers.getForwardDNs();
-            for (ASN1ObjectIdentifier oid : _oids)
-            {
-                if (oids.contains(oid))
-                {
+            for (ASN1ObjectIdentifier oid : _oids) {
+                if (oids.contains(oid)) {
                     sortedOids.add(oid);
                 }
             }
 
-            for (ASN1ObjectIdentifier oid : oids)
-            {
-                if (!sortedOids.contains(oid))
-                {
+            for (ASN1ObjectIdentifier oid : oids) {
+                if (!sortedOids.contains(oid)) {
                     sortedOids.add(oid);
                 }
             }
@@ -98,19 +90,16 @@ public class SubjectControl
         Set<String> groups = new HashSet<>();
         this.groupTypes = new HashMap<>();
 
-        for (ASN1ObjectIdentifier type : controls.keySet())
-        {
+        for (ASN1ObjectIdentifier type : controls.keySet()) {
             String group = controls.get(type).getGroup();
-            if (StringUtil.isBlank(group))
-            {
+            if (StringUtil.isBlank(group)) {
                 continue;
             }
 
             groups.add(group);
             typeGroups.put(type, group);
             Set<ASN1ObjectIdentifier> types = groupTypes.get(group);
-            if (types == null)
-            {
+            if (types == null) {
                 types = new HashSet<>();
                 groupTypes.put(group, types);
             }
@@ -120,30 +109,25 @@ public class SubjectControl
         this.groups = Collections.unmodifiableSet(groups);
     }
 
-    public RDNControl getControl(ASN1ObjectIdentifier type)
-    {
+    public RDNControl getControl(ASN1ObjectIdentifier type) {
         return controls.isEmpty()
                 ? SubjectDNSpec.getRDNControl(type)
                 : controls.get(type);
     }
 
-    public String getGroup(ASN1ObjectIdentifier type)
-    {
+    public String getGroup(ASN1ObjectIdentifier type) {
         return typeGroups.get(type);
     }
 
-    public Set<ASN1ObjectIdentifier> getTypesForGroup(String group)
-    {
+    public Set<ASN1ObjectIdentifier> getTypesForGroup(String group) {
         return groupTypes.get(group);
     }
 
-    public Set<String> getGroups()
-    {
+    public Set<String> getGroups() {
         return groups;
     }
 
-    public List<ASN1ObjectIdentifier> getTypes()
-    {
+    public List<ASN1ObjectIdentifier> getTypes() {
         return types;
     }
 

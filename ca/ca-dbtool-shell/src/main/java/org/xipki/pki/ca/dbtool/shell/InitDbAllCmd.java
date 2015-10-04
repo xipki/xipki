@@ -46,24 +46,20 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 @Command(scope = "xipki-db", name = "initdb",
         description = "reset and initialize the CA and OCSP databases")
-public class InitDbAllCmd extends LiquibaseCmd
-{
+public class InitDbAllCmd extends LiquibaseCmd {
     private static final String ca_schemaFile = "xipki/sql/ca-init.xml";
     private static final String ocsp_schemaFile = "xipki/sql/ocsp-init.xml";
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
         resetAndInit(dbConf, ca_schemaFile);
 
-        for (String dbName : dbConfs.keySet())
-        {
-            if (!dbName.toLowerCase().contains("ocsp"))
-            {
+        for (String dbName : dbConfs.keySet()) {
+            if (!dbName.toLowerCase().contains("ocsp")) {
                 continue;
             }
 

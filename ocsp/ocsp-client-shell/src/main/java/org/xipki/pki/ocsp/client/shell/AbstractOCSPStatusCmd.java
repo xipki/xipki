@@ -48,8 +48,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport
-{
+public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport {
     @Option(name = "--issuer", aliases = "-i",
             required = true,
             description = "issuer certificate file\n"
@@ -85,34 +84,29 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport
     protected OCSPRequestor requestor;
 
     protected RequestOptions getRequestOptions()
-    throws Exception
-    {
+    throws Exception {
         ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
         RequestOptions options = new RequestOptions();
         options.setUseNonce(usenonce.booleanValue());
-        if (nonceLen != null)
-        {
+        if (nonceLen != null) {
             options.setNonceLen(nonceLen);
         }
         options.setHashAlgorithmId(hashAlgoOid);
         options.setSignRequest(signRequest.booleanValue());
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
-        if (isNotEmpty(prefSigAlgs))
-        {
+        if (isNotEmpty(prefSigAlgs)) {
             options.setPreferredSignatureAlgorithms2(prefSigAlgs);
         }
         return options;
     }
 
-    public OCSPRequestor getRequestor()
-    {
+    public OCSPRequestor getRequestor() {
         return requestor;
     }
 
     public void setRequestor(
-            final OCSPRequestor requestor)
-    {
+            final OCSPRequestor requestor) {
         this.requestor = requestor;
     }
 }

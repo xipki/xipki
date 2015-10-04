@@ -46,8 +46,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "profile-add",
         description = "add certificate profile")
-public class ProfileAddCmd extends CaCmd
-{
+public class ProfileAddCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -71,10 +70,8 @@ public class ProfileAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (conf == null && confFile != null)
-        {
+    throws Exception {
+        if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }
 

@@ -45,17 +45,14 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "env-check",
         description = "check information of CA environment parameters (QA)")
-public class EnvCheckCmd extends EnvUpdateCmd
-{
+public class EnvCheckCmd extends EnvUpdateCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking environment " + name);
 
         String is = caManager.getEnvParam(name);
-        if (!value.equals(is))
-        {
+        if (!value.equals(is)) {
             throw new CmdFailure("Environment parameter '" + name + "': is '" + is
                     + "', but expected '" + value + "'");
         }

@@ -48,20 +48,16 @@ import org.xipki.common.RequestResponseDebug;
 
 @Command(scope = "xipki-qa", name = "neg-getcrl",
         description = "download CRL (negative, for QA)")
-public class NegGetCRLCmd extends NegCRLCmd
-{
+public class NegGetCRLCmd extends NegCRLCmd {
 
     @Override
     protected X509CRL retrieveCRL(
             final String caName)
-    throws CAClientException, PKIErrorException
-    {
+    throws CAClientException, PKIErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
+        try {
             return caClient.downloadCRL(caName, debug);
-        } finally
-        {
+        } finally {
             saveRequestResponse(debug);
         }
     }

@@ -56,8 +56,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-tk", name = "update-cert-p12",
         description = "update certificate in PKCS#12 keystore")
-public class P12CertUpdateCmd extends P12SecurityCmd
-{
+public class P12CertUpdateCmd extends P12SecurityCmd {
     @Option(name = "--cert",
             required = true,
             description = "certificate file\n"
@@ -72,8 +71,7 @@ public class P12CertUpdateCmd extends P12SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks = getKeyStore();
 
         char[] pwd = getPassword();
@@ -83,27 +81,22 @@ public class P12CertUpdateCmd extends P12SecurityCmd
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements())
-        {
+        while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias))
-            {
+            if (ks.isKeyEntry(alias)) {
                 keyname = alias;
                 break;
             }
         }
 
-        if (keyname == null)
-        {
+        if (keyname == null) {
             throw new SignerException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, pwd);
         Set<X509Certificate> caCerts = new HashSet<>();
-        if (isNotEmpty(caCertFiles))
-        {
-            for (String caCertFile : caCertFiles)
-            {
+        if (isNotEmpty(caCertFiles)) {
+            for (String caCertFile : caCertFiles) {
                 caCerts.add(X509Util.parseCert(caCertFile));
             }
         }
@@ -112,16 +105,13 @@ public class P12CertUpdateCmd extends P12SecurityCmd
         ks.setKeyEntry(keyname, key, pwd, certChain);
 
         FileOutputStream fOut = null;
-        try
-        {
+        try {
             fOut = new FileOutputStream(p12File);
             ks.store(fOut, pwd);
             out("updated certificate");
             return null;
-        } finally
-        {
-            if (fOut != null)
-            {
+        } finally {
+            if (fOut != null) {
                 fOut.close();
             }
         }
@@ -130,11 +120,9 @@ public class P12CertUpdateCmd extends P12SecurityCmd
     private void assertMatch(
             final X509Certificate cert,
             final String password)
-    throws SignerException, PasswordResolverException
-    {
+    throws SignerException, PasswordResolverException {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
-        if (password != null)
-        {
+        if (password != null) {
             pairs.putPair("password", new String(password));
         }
 

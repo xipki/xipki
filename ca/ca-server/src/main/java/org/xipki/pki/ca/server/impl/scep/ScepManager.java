@@ -39,8 +39,7 @@ package org.xipki.pki.ca.server.impl.scep;
  * @author Lijun Liao
  */
 
-public interface ScepManager
-{
+public interface ScepManager {
     Scep getScep(
             String name);
 }

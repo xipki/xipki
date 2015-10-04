@@ -59,8 +59,7 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class XMLDocumentReader
-{
+public class XMLDocumentReader {
 
     private final Document doc;
 
@@ -69,8 +68,7 @@ public class XMLDocumentReader
     public XMLDocumentReader(
             final InputStream xmlStream,
             final boolean namespaceAware)
-    throws ParserConfigurationException, SAXException, IOException
-    {
+    throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(namespaceAware);
         DocumentBuilder newDocumentBuilder = builderFactory.newDocumentBuilder();
@@ -81,16 +79,13 @@ public class XMLDocumentReader
     }
 
     private static void disableDtdValidation(
-            final DocumentBuilder db)
-    {
-        db.setEntityResolver(new EntityResolver()
-        {
+            final DocumentBuilder db) {
+        db.setEntityResolver(new EntityResolver() {
         @Override
         public InputSource resolveEntity(
                 final String publicId,
                 final String systemId)
-        throws SAXException, IOException
-        {
+        throws SAXException, IOException {
             return new InputSource(new StringReader(""));
         }
         });
@@ -98,8 +93,7 @@ public class XMLDocumentReader
 
     public String getValue(
             final String xpathExpression)
-    throws XPathExpressionException
-    {
+    throws XPathExpressionException {
         Node n = getNode(xpathExpression);
         return (n != null)
                 ? n.getFirstChild().getTextContent()
@@ -108,13 +102,11 @@ public class XMLDocumentReader
 
     private Node getNode(
             final String xpathExpression)
-    throws XPathExpressionException
-    {
+    throws XPathExpressionException {
         XPath xpath = xpathfactory.newXPath();
         XPathExpression xpathE = xpath.compile(xpathExpression);
         NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
-        if (nl != null && nl.getLength() > 0)
-        {
+        if (nl != null && nl.getLength() > 0) {
             return nl.item(0);
         }
 

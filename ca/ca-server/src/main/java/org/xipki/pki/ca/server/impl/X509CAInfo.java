@@ -70,8 +70,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class X509CAInfo
-{
+public class X509CAInfo {
     private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 
     private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
@@ -95,8 +94,7 @@ public class X509CAInfo
     public X509CAInfo(
             final X509CAEntry caEntry,
             final CertificateStore certStore)
-    throws OperationException
-    {
+    throws OperationException {
         ParamUtil.assertNotNull("caEntry", caEntry);
         ParamUtil.assertNotNull("certStore", certStore);
         this.caEntry = caEntry;
@@ -109,12 +107,10 @@ public class X509CAInfo
         this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
 
         Certificate bcCert;
-        try
-        {
+        try {
             byte[] encodedCert = cert.getEncoded();
             bcCert = Certificate.getInstance(encodedCert);
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not encode the CA certificate");
         }
@@ -130,8 +126,7 @@ public class X509CAInfo
                 this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
         this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
-        if (this.useRandomSerialNumber)
-        {
+        if (this.useRandomSerialNumber) {
             randomSNGenerator = RandomSerialNumberGenerator.getInstance();
             return;
         }
@@ -139,303 +134,246 @@ public class X509CAInfo
         Long greatestSerialNumber = certStore.getGreatestSerialNumber(
                 this.publicCAInfo.getCaCertificate());
 
-        if (greatestSerialNumber == null)
-        {
+        if (greatestSerialNumber == null) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not retrieve the greatest serial number for ca " + caEntry.getName());
         }
 
         long nextSerial = greatestSerialNumber + 1;
-        if (nextSerial < 2)
-        {
+        if (nextSerial < 2) {
             nextSerial = 2;
         }
 
-        if (caEntry.getNextSerial() < nextSerial)
-        {
+        if (caEntry.getNextSerial() < nextSerial) {
             LOG.info("corrected the next_serial of {} from {} to {}",
                     new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
             caEntry.setNextSerial(nextSerial);
             certStore.commitNextSerialIfLess(getName(), nextSerial);
-        } else
-        {
+        } else {
             nextSerial = caEntry.getNextSerial();
         }
     }
 
     public void commitNextSerial()
-    throws OperationException
-    {
-        if (!useRandomSerialNumber)
-        {
+    throws OperationException {
+        if (!useRandomSerialNumber) {
             certStore.commitNextSerialIfLess(caEntry.getName(), caEntry.getNextSerial());
         }
     }
 
     public void commitNextCrlNo()
-    throws OperationException
-    {
+    throws OperationException {
         certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCRLNumber());
     }
 
-    public PublicCAInfo getPublicCAInfo()
-    {
+    public PublicCAInfo getPublicCAInfo() {
         return publicCAInfo;
     }
 
-    public String getSubject()
-    {
+    public String getSubject() {
         return caEntry.getSubject();
     }
 
-    public Date getNotBefore()
-    {
+    public Date getNotBefore() {
         return notBefore;
     }
 
-    public Date getNotAfter()
-    {
+    public Date getNotAfter() {
         return notAfter;
     }
 
-    public BigInteger getSerialNumber()
-    {
+    public BigInteger getSerialNumber() {
         return serialNumber;
     }
 
-    public boolean isSelfSigned()
-    {
+    public boolean isSelfSigned() {
         return selfSigned;
     }
 
-    public CMPCertificate getCertInCMPFormat()
-    {
+    public CMPCertificate getCertInCMPFormat() {
         return certInCMPFormat;
     }
 
-    public long getNoNewCertificateAfter()
-    {
+    public long getNoNewCertificateAfter() {
         return noNewCertificateAfter;
     }
 
-    public X509CAEntry getCaEntry()
-    {
+    public X509CAEntry getCaEntry() {
         return caEntry;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return caEntry.getName();
     }
 
-    public List<String> getCrlUris()
-    {
+    public List<String> getCrlUris() {
         return caEntry.getCrlUris();
     }
 
-    public String getCrlUrisAsString()
-    {
+    public String getCrlUrisAsString() {
         return caEntry.getCrlUrisAsString();
     }
 
-    public List<String> getDeltaCrlUris()
-    {
+    public List<String> getDeltaCrlUris() {
         return caEntry.getDeltaCrlUris();
     }
 
-    public String getDeltaCrlUrisAsString()
-    {
+    public String getDeltaCrlUrisAsString() {
         return caEntry.getDeltaCrlUrisAsString();
     }
 
-    public List<String> getOcspUris()
-    {
+    public List<String> getOcspUris() {
         return caEntry.getOcspUris();
     }
 
-    public String getOcspUrisAsString()
-    {
+    public String getOcspUrisAsString() {
         return caEntry.getOcspUrisAsString();
     }
 
-    public CertValidity getMaxValidity()
-    {
+    public CertValidity getMaxValidity() {
         return caEntry.getMaxValidity();
     }
 
     public void setMaxValidity(
-            final CertValidity maxValidity)
-    {
+            final CertValidity maxValidity) {
         caEntry.setMaxValidity(maxValidity);
     }
 
-    public X509Cert getCertificate()
-    {
+    public X509Cert getCertificate() {
         return publicCAInfo.getCaCertificate();
     }
 
-    public String getSignerConf()
-    {
+    public String getSignerConf() {
         return caEntry.getSignerConf();
     }
 
-    public String getCrlSignerName()
-    {
+    public String getCrlSignerName() {
         return caEntry.getCrlSignerName();
     }
 
     public void setCrlSignerName(
-            final String crlSignerName)
-    {
+            final String crlSignerName) {
         caEntry.setCrlSignerName(crlSignerName);
     }
 
-    public String getCmpControlName()
-    {
+    public String getCmpControlName() {
         return caEntry.getCmpControlName();
     }
 
     public void setCmpControlName(
-            final String name)
-    {
+            final String name) {
         caEntry.setCmpControlName(name);
     }
 
-    public String getResponderName()
-    {
+    public String getResponderName() {
         return caEntry.getResponderName();
     }
 
     public void setResponderName(
-            final String name)
-    {
+            final String name) {
         caEntry.setResponderName(name);
     }
 
-    public int getNumCrls()
-    {
+    public int getNumCrls() {
         return caEntry.getNumCrls();
     }
 
-    public CAStatus getStatus()
-    {
+    public CAStatus getStatus() {
         return caEntry.getStatus();
     }
 
     public void setStatus(
-            final CAStatus status)
-    {
+            final CAStatus status) {
         caEntry.setStatus(status);
     }
 
-    public String getSignerType()
-    {
+    public String getSignerType() {
         return caEntry.getSignerType();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return caEntry.toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         return caEntry.toString(verbose);
     }
 
-    public DuplicationMode getDuplicateKeyMode()
-    {
+    public DuplicationMode getDuplicateKeyMode() {
         return caEntry.getDuplicateKeyMode();
     }
 
     public void setDuplicateKeyMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         caEntry.setDuplicateKeyMode(mode);
     }
 
-    public DuplicationMode getDuplicateSubjectMode()
-    {
+    public DuplicationMode getDuplicateSubjectMode() {
         return caEntry.getDuplicateSubjectMode();
     }
 
-    public DuplicationMode getDuplicateCNMode()
-    {
+    public DuplicationMode getDuplicateCNMode() {
         return caEntry.getDuplicateCNMode();
     }
 
     public void setDuplicateCNMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         caEntry.setDuplicateCNMode(mode);
     }
 
     public void setDuplicateSubjectMode(
-            final DuplicationMode mode)
-    {
+            final DuplicationMode mode) {
         caEntry.setDuplicateSubjectMode(mode);
     }
 
-    public ValidityMode getValidityMode()
-    {
+    public ValidityMode getValidityMode() {
         return caEntry.getValidityMode();
     }
 
     public void setValidityMode(
-            final ValidityMode mode)
-    {
+            final ValidityMode mode) {
         caEntry.setValidityMode(mode);
     }
 
-    public Set<Permission> getPermissions()
-    {
+    public Set<Permission> getPermissions() {
         return caEntry.getPermissions();
     }
 
     public void setPermissions(
-            final Set<Permission> permissions)
-    {
+            final Set<Permission> permissions) {
         caEntry.setPermissions(permissions);
     }
 
-    public CertRevocationInfo getRevocationInfo()
-    {
+    public CertRevocationInfo getRevocationInfo() {
         return caEntry.getRevocationInfo();
     }
 
     public void setRevocationInfo(
-            final CertRevocationInfo revocationInfo)
-    {
+            final CertRevocationInfo revocationInfo) {
         caEntry.setRevocationInfo(revocationInfo);
     }
 
-    public int getExpirationPeriod()
-    {
+    public int getExpirationPeriod() {
         return caEntry.getExpirationPeriod();
     }
 
-    public void setKeepExpiredCertInDays(int days)
-    {
+    public void setKeepExpiredCertInDays(int days) {
         caEntry.setKeepExpiredCertInDays(days);
     }
 
-    public int getKeepExpiredCertInDays()
-    {
+    public int getKeepExpiredCertInDays() {
         return caEntry.getKeepExpiredCertInDays();
     }
 
-    public Date getCrlBaseTime()
-    {
+    public Date getCrlBaseTime() {
         return caEntry.getCrlBaseTime();
     }
 
     public BigInteger nextSerial()
-    throws OperationException
-    {
-        if (useRandomSerialNumber)
-        {
+    throws OperationException {
+        if (useRandomSerialNumber) {
             return randomSNGenerator.getSerialNumber();
         }
 
@@ -445,44 +383,35 @@ public class X509CAInfo
     }
 
     public void markMaxSerial()
-    throws OperationException
-    {
-        if (!useRandomSerialNumber)
-        {
+    throws OperationException {
+        if (!useRandomSerialNumber) {
             certStore.markMaxSerial(getCertificate(), caEntry.getSerialSeqName());
         }
     }
 
     public BigInteger nextCRLNumber()
-    throws OperationException
-    {
+    throws OperationException {
         int crlNo = caEntry.getNextCRLNumber();
         int currentMaxNo = certStore.getMaxCRLNumber(getCertificate());
-        if (crlNo <= currentMaxNo)
-        {
+        if (crlNo <= currentMaxNo) {
             crlNo = currentMaxNo + 1;
         }
         caEntry.setNextCRLNumber(crlNo + 1);
         return BigInteger.valueOf(crlNo);
     }
 
-    public boolean useRandomSerialNumber()
-    {
+    public boolean useRandomSerialNumber() {
         return useRandomSerialNumber;
     }
 
     public ConcurrentContentSigner getSigner(
-            final List<String> algoNames)
-    {
-        if (CollectionUtil.isEmpty(algoNames))
-        {
+            final List<String> algoNames) {
+        if (CollectionUtil.isEmpty(algoNames)) {
             return dfltSigner;
         }
 
-        for (String name : algoNames)
-        {
-            if (signers.containsKey(name))
-            {
+        for (String name : algoNames) {
+            if (signers.containsKey(name)) {
                 return signers.get(name);
             }
         }
@@ -492,10 +421,8 @@ public class X509CAInfo
 
     public boolean initSigner(
             final SecurityFactory securityFactory)
-    throws SignerException
-    {
-        if (signers != null)
-        {
+    throws SignerException {
+        if (signers != null) {
             return true;
         }
         dfltSigner = null;
@@ -503,24 +430,19 @@ public class X509CAInfo
         List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(caEntry.getSignerConf());
 
         Map<String, ConcurrentContentSigner> tSigners = new HashMap<>();
-        for (String[] m : signerConfs)
-        {
+        for (String[] m : signerConfs) {
             String algo = m[0];
             String signerConf = m[1];
             ConcurrentContentSigner signer;
-            try
-            {
+            try {
                 signer = securityFactory.createSigner(
                     caEntry.getSignerType(), signerConf, caEntry.getCertificate());
-                if (dfltSigner == null)
-                {
+                if (dfltSigner == null) {
                     dfltSigner = signer;
                 }
                 tSigners.put(algo, signer);
-            } catch (Throwable t)
-            {
-                for (ConcurrentContentSigner tSigner : tSigners.values())
-                {
+            } catch (Throwable t) {
+                for (ConcurrentContentSigner tSigner : tSigners.values()) {
                     tSigner.shutdown();
                 }
                 tSigners.clear();
@@ -532,19 +454,15 @@ public class X509CAInfo
         return true;
     }
 
-    public boolean isSignerRequired()
-    {
+    public boolean isSignerRequired() {
         Set<Permission> permissions = caEntry.getPermissions();
-        if (permissions == null)
-        {
+        if (permissions == null) {
             return true;
         }
 
         boolean signerRequired = false;
-        for (Permission permission : permissions)
-        {
-            switch (permission)
-            {
+        for (Permission permission : permissions) {
+            switch (permission) {
             case REMOVE_CERT:
             case UNREVOKE_CERT:
             case REVOKE_CERT:
@@ -554,8 +472,7 @@ public class X509CAInfo
                 break;
             } // end switch (permission)
 
-            if (signerRequired)
-            {
+            if (signerRequired) {
                 break;
             }
         }

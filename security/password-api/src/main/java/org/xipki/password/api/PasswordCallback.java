@@ -39,8 +39,7 @@ package org.xipki.password.api;
  * @author Lijun Liao
  */
 
-public interface PasswordCallback
-{
+public interface PasswordCallback {
     void init(
             String conf)
     throws PasswordResolverException;

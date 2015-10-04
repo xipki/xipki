@@ -45,8 +45,7 @@ import org.xipki.common.util.StringUtil;
 
 @Command(scope = "xipki-ca", name = "caprofile-add",
         description = "add certificate profile to CA")
-public class CaProfileAddCmd extends CaCmd
-{
+public class CaProfileAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -66,18 +65,15 @@ public class CaProfileAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (StringUtil.isBlank(profileLocalname))
-        {
+    throws Exception {
+        if (StringUtil.isBlank(profileLocalname)) {
             profileLocalname = profileName;
         }
 
         boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
         StringBuilder sb = new StringBuilder();
         sb.append("certificate profile ").append(profileName);
-        if (!profileLocalname.equals(profileName))
-        {
+        if (!profileLocalname.equals(profileName)) {
             sb.append(" (localname ").append(profileLocalname).append(")");
         }
         sb.append(" to CA ").append(caName);

@@ -47,8 +47,7 @@ import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 
 @Command(scope = "xipki-ca", name = "scep-info",
         description = "show information of SCEP")
-public class ScepInfoCmd extends CaCmd
-{
+public class ScepInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "SCEP CA name\n"
@@ -57,11 +56,9 @@ public class ScepInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ScepEntry scep = caManager.getScepEntry(name);
-        if (scep == null)
-        {
+        if (scep == null) {
             throw new UnexpectedException("could not find SCEP '" + name + "'");
         }
 

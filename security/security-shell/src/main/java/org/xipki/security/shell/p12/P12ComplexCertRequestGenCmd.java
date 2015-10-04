@@ -64,8 +64,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",
         description = "generate complex PKCS#10 request with PKCS#12 keystore")
-public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
-{
+public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
@@ -76,31 +75,25 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
             description = "password of the PKCS#12 file")
     private String password;
 
-    private char[] getPassword()
-    {
+    private char[] getPassword() {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null)
-        {
+        if (pwdInChar != null) {
             password = new String(pwdInChar);
         }
         return pwdInChar;
     }
 
     public KeyStore getKeyStore()
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks;
 
         FileInputStream fIn = null;
-        try
-        {
+        try {
             fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
-        } finally
-        {
-            if (fIn != null)
-            {
+        } finally {
+            if (fIn != null) {
                 fIn.close();
             }
         }
@@ -112,8 +105,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
     protected ConcurrentContentSigner getSigner(
             final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
-    throws Exception
-    {
+    throws Exception {
         char[] pwd = getPassword();
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
@@ -124,13 +116,11 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
 
     @Override
     protected X500Name getSubject(
-            final String subject)
-    {
+            final String subject) {
         X500Name name = new X500Name(subject);
         List<RDN> l = new LinkedList<>();
         RDN[] rs = name.getRDNs();
-        for (RDN m : rs)
-        {
+        for (RDN m : rs) {
             l.add(m);
         }
 
@@ -140,8 +130,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
         RDN[] rdns = name.getRDNs(id);
 
-        if (rdns == null || rdns.length == 0)
-        {
+        if (rdns == null || rdns.length == 0) {
             ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
             RDN rdn = new RDN(id, atvValue);
             l.add(rdn);
@@ -151,8 +140,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
         rdns = name.getRDNs(id);
 
-        if (rdns == null || rdns.length == 0)
-        {
+        if (rdns == null || rdns.length == 0) {
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERUTF8String("my street 1"));
             v.add(new DERUTF8String("12345 Germany"));
@@ -166,8 +154,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd
         id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
         rdns = name.getRDNs(id);
 
-        if (rdns == null || rdns.length == 0)
-        {
+        if (rdns == null || rdns.length == 0) {
             DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
             RDN rdn = new RDN(id, atvValue);
             l.add(rdn);

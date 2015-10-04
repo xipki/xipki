@@ -57,8 +57,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class ClientCmd extends XipkiOsgiCommandSupport
-{
+public abstract class ClientCmd extends XipkiOsgiCommandSupport {
     @Option(name = "--url",
             required = true,
             description = "URL of the SCEP server\n"
@@ -90,10 +89,8 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     private X509Certificate identityCert;
 
     protected Client getScepClient()
-    throws CertificateException, IOException
-    {
-        if (scepClient == null)
-        {
+    throws CertificateException, IOException {
+        if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
             URL _url = new URL(url);
             scepClient = new Client(_url, new PreProvisionedCertificateVerifier(caCert));
@@ -102,20 +99,16 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     }
 
     protected PrivateKey getIdentityKey()
-    throws Exception
-    {
-        if (identityKey == null)
-        {
+    throws Exception {
+        if (identityKey == null) {
             readIdentity();
         }
         return identityKey;
     }
 
     protected X509Certificate getIdentityCert()
-    throws Exception
-    {
-        if (identityCert == null)
-        {
+    throws Exception {
+        if (identityCert == null) {
             readIdentity();
         }
 
@@ -123,8 +116,7 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
     }
 
     private void readIdentity()
-    throws Exception
-    {
+    throws Exception {
         char[] pwd = readPasswordIfNotSet(password);
 
         KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
@@ -132,18 +124,15 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements())
-        {
+        while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias))
-            {
+            if (ks.isKeyEntry(alias)) {
                 keyname = alias;
                 break;
             }
         }
 
-        if (keyname == null)
-        {
+        if (keyname == null) {
             throw new Exception("no key entry is contained in the keystore");
         }
 
@@ -153,14 +142,11 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport
 
     protected X509Certificate extractEECerts(
             final CertStore certstore)
-    throws CertStoreException
-    {
+    throws CertStoreException {
         Iterator<?> it = certstore.getCertificates(null).iterator();
-        while (it.hasNext())
-        {
+        while (it.hasNext()) {
             X509Certificate m = (X509Certificate) it.next();
-            if (-1 == m.getBasicConstraints())
-            {
+            if (-1 == m.getBasicConstraints()) {
                 return m;
             }
         }

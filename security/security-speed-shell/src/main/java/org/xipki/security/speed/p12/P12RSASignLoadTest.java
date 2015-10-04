@@ -44,16 +44,14 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class P12RSASignLoadTest extends P12SignLoadTest
-{
+public class P12RSASignLoadTest extends P12SignLoadTest {
 
     public P12RSASignLoadTest(
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(keysize, publicExponent),
                 "PKCS#12 RSA signature creation\n"
@@ -64,11 +62,9 @@ public class P12RSASignLoadTest extends P12SignLoadTest
     private static byte[] generateKeystore(
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
-        if (keystoreBytes == null)
-        {
+        if (keystoreBytes == null) {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
                     keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null);
             keystoreBytes = kpGen.generateIdentity().getKeystore();

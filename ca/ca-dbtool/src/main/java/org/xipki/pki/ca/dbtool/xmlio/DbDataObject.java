@@ -41,20 +41,16 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public abstract class DbDataObject
-{
+public abstract class DbDataObject {
 
-    protected DbDataObject()
-    {
+    protected DbDataObject() {
     }
 
     protected void assertNotBlank(
             final String name,
             final String value)
-    throws InvalidDataObjectException
-    {
-        if (value == null || value.isEmpty())
-        {
+    throws InvalidDataObjectException {
+        if (value == null || value.isEmpty()) {
             throw new InvalidDataObjectException(name + " could not be blank");
         }
     }
@@ -62,10 +58,8 @@ public abstract class DbDataObject
     protected void assertNotNull(
             final String name,
             final Object value)
-    throws InvalidDataObjectException
-    {
-        if (value == null)
-        {
+    throws InvalidDataObjectException {
+        if (value == null) {
             throw new InvalidDataObjectException(name + " could not be null");
         }
     }
@@ -74,25 +68,19 @@ public abstract class DbDataObject
             final DbiXmlWriter writer,
             final String tag,
             final Object value)
-    throws XMLStreamException, InvalidDataObjectException
-    {
-        if (value == null)
-        {
+    throws XMLStreamException, InvalidDataObjectException {
+        if (value == null) {
             return;
         }
 
         String valueS;
-        if (value instanceof String)
-        {
+        if (value instanceof String) {
             valueS = (String) value;
-        } else if (value instanceof Number)
-        {
+        } else if (value instanceof Number) {
             valueS = value.toString();
-        } else if (value instanceof Boolean)
-        {
+        } else if (value instanceof Boolean) {
             valueS = value.toString();
-        } else
-        {
+        } else {
             throw new InvalidDataObjectException("value is not a String or Number ");
         }
 

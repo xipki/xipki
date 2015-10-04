@@ -43,19 +43,16 @@ import javax.xml.stream.XMLStreamException;
  * @author Lijun Liao
  */
 
-public class OcspCertsWriter extends DbiXmlWriter
-{
+public class OcspCertsWriter extends DbiXmlWriter {
 
     public OcspCertsWriter()
-    throws IOException, XMLStreamException
-    {
+    throws IOException, XMLStreamException {
         super("certs", "1");
     }
 
     public void add(
             final OcspCertType cert)
-    throws InvalidDataObjectException, XMLStreamException
-    {
+    throws InvalidDataObjectException, XMLStreamException {
         cert.validate();
         cert.writeTo(this);
     }

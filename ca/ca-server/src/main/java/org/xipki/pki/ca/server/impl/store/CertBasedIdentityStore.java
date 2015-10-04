@@ -44,33 +44,27 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-class CertBasedIdentityStore
-{
+class CertBasedIdentityStore {
     private final String table;
     private final List<CertBasedIdentityEntry> entries;
 
     CertBasedIdentityStore(
             final String table,
-            final List<CertBasedIdentityEntry> entries)
-    {
+            final List<CertBasedIdentityEntry> entries) {
         this.table = table;
         this.entries = new ArrayList<>(entries.size());
 
-        for (CertBasedIdentityEntry entry : entries)
-        {
+        for (CertBasedIdentityEntry entry : entries) {
             addIdentityEntry(entry);
         }
     }
 
     void addIdentityEntry(
-            final CertBasedIdentityEntry entry)
-    {
+            final CertBasedIdentityEntry entry) {
         ParamUtil.assertNotNull("entry", entry);
 
-        for (CertBasedIdentityEntry existingEntry : entries)
-        {
-            if (existingEntry.getId() == entry.getId())
-            {
+        for (CertBasedIdentityEntry existingEntry : entries) {
+            if (existingEntry.getId() == entry.getId()) {
                 throw new IllegalArgumentException(
                         table + " with the same id " + entry.getId() + " already available");
             }
@@ -80,12 +74,9 @@ class CertBasedIdentityStore
     }
 
     Integer getCaIdForSubject(
-            final String subject)
-    {
-        for (CertBasedIdentityEntry entry : entries)
-        {
-            if (entry.getSubject().equals(subject))
-            {
+            final String subject) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.getSubject().equals(subject)) {
                 return entry.getId();
             }
         }
@@ -94,12 +85,9 @@ class CertBasedIdentityStore
     }
 
     Integer getCaIdForSha1Fp(
-            final byte[] sha1Fp_cert)
-    {
-        for (CertBasedIdentityEntry entry : entries)
-        {
-            if (entry.matchSha1Fp(sha1Fp_cert))
-            {
+            final byte[] sha1Fp_cert) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.matchSha1Fp(sha1Fp_cert)) {
                 return entry.getId();
             }
         }
@@ -108,12 +96,9 @@ class CertBasedIdentityStore
     }
 
     Integer getCaIdForCert(
-            final byte[] encodedCert)
-    {
-        for (CertBasedIdentityEntry entry : entries)
-        {
-            if (entry.matchCert(encodedCert))
-            {
+            final byte[] encodedCert) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.matchCert(encodedCert)) {
                 return entry.getId();
             }
         }
@@ -121,8 +106,7 @@ class CertBasedIdentityStore
         return null;
     }
 
-    String getTable()
-    {
+    String getTable() {
         return table;
     }
 }

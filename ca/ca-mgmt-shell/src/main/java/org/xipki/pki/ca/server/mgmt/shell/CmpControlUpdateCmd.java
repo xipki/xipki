@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-up",
         description = "update CMP control")
-public class CmpControlUpdateCmd extends CaCmd
-{
+public class CmpControlUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CMP control name\n"
@@ -60,8 +59,7 @@ public class CmpControlUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.changeCmpControl(name, conf);
         output(b, "updated", "could not update", "CMP control " + name);
         return null;

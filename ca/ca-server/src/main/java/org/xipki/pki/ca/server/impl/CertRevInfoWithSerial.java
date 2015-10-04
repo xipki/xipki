@@ -45,8 +45,7 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public class CertRevInfoWithSerial extends CertRevocationInfo
-{
+public class CertRevInfoWithSerial extends CertRevocationInfo {
     private static final long serialVersionUID = 1L;
     private BigInteger serial;
 
@@ -54,8 +53,7 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
             final BigInteger serial,
             final CRLReason reason,
             final Date revocationTime,
-            final Date invalidityTime)
-    {
+            final Date invalidityTime) {
         super(reason, revocationTime, invalidityTime);
         this.serial = serial;
     }
@@ -64,14 +62,12 @@ public class CertRevInfoWithSerial extends CertRevocationInfo
             final BigInteger serial,
             final int reasonCode,
             final Date revocationTime,
-            final Date invalidityTime)
-    {
+            final Date invalidityTime) {
         super(reasonCode, revocationTime, invalidityTime);
         this.serial = serial;
     }
 
-    public BigInteger getSerial()
-    {
+    public BigInteger getSerial() {
         return serial;
     }
 

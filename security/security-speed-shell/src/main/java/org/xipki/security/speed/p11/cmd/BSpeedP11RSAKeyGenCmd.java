@@ -50,20 +50,17 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
         description = "performance test of PKCS#11 RSA key generation (batch)")
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Cmd
-{
+public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Cmd {
 
     @Override
     protected List<LoadExecutor> getTesters()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (int keysize : keysizes)
-        {
+        for (int keysize : keysizes) {
             ret.add(
                     new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
         }

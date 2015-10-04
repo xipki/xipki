@@ -44,34 +44,29 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class GeneralNameMode
-{
+public class GeneralNameMode {
     private final GeneralNameTag tag;
     // not applied to all tags, currently only for tag otherName
     private final Set<ASN1ObjectIdentifier> allowedTypes;
 
     public GeneralNameMode(
-            final GeneralNameTag tag)
-    {
+            final GeneralNameTag tag) {
         this.tag = tag;
         this.allowedTypes = null;
     }
 
     public GeneralNameMode(
             final GeneralNameTag tag,
-            final Set<ASN1ObjectIdentifier> allowedTypes)
-    {
+            final Set<ASN1ObjectIdentifier> allowedTypes) {
         this.tag = tag;
         this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
     }
 
-    public GeneralNameTag getTag()
-    {
+    public GeneralNameTag getTag() {
         return tag;
     }
 
-    public Set<ASN1ObjectIdentifier> getAllowedTypes()
-    {
+    public Set<ASN1ObjectIdentifier> getAllowedTypes() {
         return allowedTypes;
     }
 

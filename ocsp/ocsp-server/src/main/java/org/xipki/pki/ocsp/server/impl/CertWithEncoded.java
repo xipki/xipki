@@ -45,49 +45,39 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CertWithEncoded
-{
+public class CertWithEncoded {
     private final X509Certificate certificate;
     private final String className;
     private final byte[] encoded;
 
     public CertWithEncoded(
             final X509Certificate cert)
-    throws CertificateEncodingException
-    {
+    throws CertificateEncodingException {
         ParamUtil.assertNotNull("cert", cert);
         this.certificate = cert;
         this.className = cert.getClass().getName();
         this.encoded = cert.getEncoded();
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return certificate;
     }
 
     public boolean equalsCert(
-            final X509Certificate cert)
-    {
-        if (certificate == cert)
-        {
+            final X509Certificate cert) {
+        if (certificate == cert) {
             return true;
         }
 
-        if (className.equals(cert.getClass().getName()))
-        {
+        if (className.equals(cert.getClass().getName())) {
             return certificate.equals(cert);
-        } else if (certificate.equals(cert))
-        {
+        } else if (certificate.equals(cert)) {
             return true;
-        } else
-        {
+        } else {
             byte[] encodedCert;
-            try
-            {
+            try {
                 encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e)
-            {
+            } catch (CertificateEncodingException e) {
                 return false;
             }
             return Arrays.equals(encoded, encodedCert);

@@ -46,8 +46,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "publisher-add",
         description = "add publisher")
-public class PublisherAddCmd extends CaCmd
-{
+public class PublisherAddCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -71,10 +70,8 @@ public class PublisherAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (conf == null && confFile != null)
-        {
+    throws Exception {
+        if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }
 

@@ -77,15 +77,13 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ocsp", name = "status",
         description = "request certificate status")
-public class OCSPStatusCmd extends BaseOCSPStatusCmd
-{
+public class OCSPStatusCmd extends BaseOCSPStatusCmd {
     @Override
     protected void checkParameters(
             final X509Certificate respIssuer,
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception
-    {
+    throws Exception {
     }
 
     @Override
@@ -95,8 +93,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
             final X509Certificate issuer,
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception
-    {
+    throws Exception {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         boolean extendedRevoke =
@@ -107,97 +104,78 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
         int n = (singleResponses == null)
                 ? 0
                 : singleResponses.length;
-        if (n == 0)
-        {
+        if (n == 0) {
             throw new CmdFailure("received no status from server");
         }
 
-        if (n != serialNumbers.size())
-        {
+        if (n != serialNumbers.size()) {
             throw new CmdFailure("received status with " + n
                     + " single responses from server, but " + serialNumbers.size()
                     + " were requested");
         }
 
         Date[] thisUpdates = new Date[n];
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             thisUpdates[i] = singleResponses[i].getThisUpdate();
         }
 
         // check the signature if available
-        if (null == basicResp.getSignature())
-        {
+        if (null == basicResp.getSignature()) {
             out("response is not signed");
-        } else
-        {
+        } else {
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
-            if (responderCerts == null || responderCerts.length < 1)
-            {
+            if (responderCerts == null || responderCerts.length < 1) {
                 throw new CmdFailure("no responder certificate is contained in the response");
             }
 
             X509CertificateHolder respSigner = responderCerts[0];
             boolean validOn = true;
-            for (Date thisUpdate : thisUpdates)
-            {
+            for (Date thisUpdate : thisUpdates) {
                 validOn = respSigner.isValidOn(thisUpdate);
-                if (!validOn)
-                {
+                if (!validOn) {
                     throw new CmdFailure("responder certificate is not valid on " + thisUpdate);
                 }
             }
 
-            if (validOn)
-            {
+            if (validOn) {
                 PublicKey responderPubKey = KeyUtil.generatePublicKey(
                         respSigner.getSubjectPublicKeyInfo());
                 ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
                 boolean sigValid = basicResp.isSignatureValid(cvp);
 
-                if (!sigValid)
-                {
+                if (!sigValid) {
                     throw new CmdFailure("response is equipped with invalid signature");
                 }
 
                 // verify the OCSPResponse signer
-                if (respIssuer != null)
-                {
+                if (respIssuer != null) {
                     boolean certValid = true;
                     X509Certificate jceRespSigner = new X509CertificateObject(
                             respSigner.toASN1Structure());
-                    if (X509Util.issues(respIssuer, jceRespSigner))
-                    {
-                        try
-                        {
+                    if (X509Util.issues(respIssuer, jceRespSigner)) {
+                        try {
                             jceRespSigner.verify(respIssuer.getPublicKey());
-                        } catch (SignatureException e)
-                        {
+                        } catch (SignatureException e) {
                             certValid = false;
                         }
                     }
 
-                    if (!certValid)
-                    {
+                    if (!certValid) {
                         throw new CmdFailure("response is equipped with valid signature but the"
                                 + " OCSP signer is not trusted");
                     }
-                } else
-                {
+                } else {
                     out("response is equipped with valid signature");
                 }
             }
 
-            if (verbose.booleanValue())
-            {
+            if (verbose.booleanValue()) {
                 out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
             }
         }
 
-        for (int i = 0; i < n; i++)
-        {
-            if (n > 1)
-            {
+        for (int i = 0; i < n; i++) {
+            if (n > 1) {
                 out("---------------------------- " + i + "----------------------------");
             }
             SingleResp singleResp = singleResponses[i];
@@ -206,50 +184,40 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
             String status;
-            if (singleCertStatus == null)
-            {
+            if (singleCertStatus == null) {
                 status = "good";
-            } else if (singleCertStatus instanceof RevokedStatus)
-            {
+            } else if (singleCertStatus instanceof RevokedStatus) {
                 RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                 Date revTime = revStatus.getRevocationTime();
                 Date invTime = null;
                 Extension ext = singleResp.getExtension(Extension.invalidityDate);
-                if (ext != null)
-                {
+                if (ext != null) {
                     invTime = ASN1GeneralizedTime.getInstance(ext.getParsedValue()).getDate();
                 }
 
-                if (revStatus.hasRevocationReason())
-                {
+                if (revStatus.hasRevocationReason()) {
                     int reason = revStatus.getRevocationReason();
                     if (extendedRevoke
                             && reason == CRLReason.CERTIFICATE_HOLD.getCode()
-                            && revTime.getTime() == 0)
-                    {
+                            && revTime.getTime() == 0) {
                         status = "unknown (RFC6960)";
-                    } else
-                    {
+                    } else {
                         StringBuilder sb = new StringBuilder("revoked, reason = ");
                         sb.append(CRLReason.forReasonCode(reason).getDescription());
                         sb.append(", revocationTime = ");
                         sb.append(revTime);
-                        if (invTime != null)
-                        {
+                        if (invTime != null) {
                             sb.append(", invalidityTime = ");
                             sb.append(invTime);
                         }
                         status = sb.toString();
                     }
-                } else
-                {
+                } else {
                     status = "revoked, no reason, revocationTime = " + revTime;
                 }
-            } else if (singleCertStatus instanceof UnknownStatus)
-            {
+            } else if (singleCertStatus instanceof UnknownStatus) {
                 status = "unknown (RFC2560)";
-            } else
-            {
+            } else {
                 status = "ERROR";
             }
 
@@ -257,15 +225,13 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
             msg.append("serialNumber: ").append(serialNumber);
             msg.append("\nCertificate status: ").append(status);
 
-            if (verbose.booleanValue())
-            {
+            if (verbose.booleanValue()) {
                 msg.append("\nthisUpdate: " + singleResp.getThisUpdate());
                 msg.append("\nnextUpdate: " + singleResp.getNextUpdate());
 
                 Extension extension = singleResp.getExtension(
                         ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-                if (extension != null)
-                {
+                if (extension != null) {
                     msg.append("\nCertHash is provided:\n");
                     ASN1Encodable extensionValue = extension.getParsedValue();
                     CertHash certHash = CertHash.getInstance(extensionValue);
@@ -275,16 +241,13 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                     msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
                     msg.append("\tHash value: ").append(Hex.toHexString(hashValue)).append("\n");
 
-                    if (encodedCerts != null)
-                    {
+                    if (encodedCerts != null) {
                         byte[] encodedCert = encodedCerts.get(serialNumber);
                         MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
                         byte[] expectedHashValue = md.digest(encodedCert);
-                        if (Arrays.equals(expectedHashValue, hashValue))
-                        {
+                        if (Arrays.equals(expectedHashValue, hashValue)) {
                             msg.append("\tThis matches the requested certificate");
-                        } else
-                        {
+                        } else {
                             msg.append("\tThis differs from the requested certificate");
                         }
                     }
@@ -292,8 +255,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
 
                 extension = singleResp.getExtension(
                         OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
-                if (extension != null)
-                {
+                if (extension != null) {
                     ASN1Encodable extensionValue = extension.getParsedValue();
                     ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
                     msg.append("\nArchive-CutOff: ");
@@ -301,14 +263,11 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 }
 
                 AlgorithmIdentifier sigAlg = basicResp.getSignatureAlgorithmID();
-                if (sigAlg == null)
-                {
+                if (sigAlg == null) {
                     msg.append(("\nresponse is not signed"));
-                } else
-                {
+                } else {
                     String sigAlgName = AlgorithmUtil.getSignatureAlgoName(sigAlg);
-                    if (sigAlgName == null)
-                    {
+                    if (sigAlgName == null) {
                         sigAlgName = "unknown";
                     }
                     msg.append("\nresponse is signed with ").append(sigAlgName);
@@ -318,26 +277,20 @@ public class OCSPStatusCmd extends BaseOCSPStatusCmd
                 msg.append("\nExtensions: ");
 
                 List<?> extensionOIDs = basicResp.getExtensionOIDs();
-                if (extensionOIDs == null || extensionOIDs.size() == 0)
-                {
+                if (extensionOIDs == null || extensionOIDs.size() == 0) {
                     msg.append("-");
-                } else
-                {
+                } else {
                     int size = extensionOIDs.size();
-                    for (int j = 0; j < size; j++)
-                    {
+                    for (int j = 0; j < size; j++) {
                         ASN1ObjectIdentifier extensionOID =
                                 (ASN1ObjectIdentifier) extensionOIDs.get(j);
                         String name = extensionOidNameMap.get(extensionOID);
-                        if (name == null)
-                        {
+                        if (name == null) {
                             msg.append(extensionOID.getId());
-                        } else
-                        {
+                        } else {
                             msg.append(name);
                         }
-                        if (j != size - 1)
-                        {
+                        if (j != size - 1) {
                             msg.append(", ");
                         }
                     }

@@ -55,8 +55,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req",
         description = "generate PKCS#10 request with PKCS#11 device")
-public class P11CertRequestGenCmd extends CertRequestGenCmd
-{
+public class P11CertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"
@@ -78,17 +77,13 @@ public class P11CertRequestGenCmd extends CertRequestGenCmd
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     private P11KeyIdentifier getKeyIdentifier()
-    throws Exception
-    {
+    throws Exception {
         P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null)
-        {
+        if (keyId != null && keyLabel == null) {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null)
-        {
+        } else if (keyId == null && keyLabel != null) {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else
-        {
+        } else {
             throw new IllegalCmdParamException(
                     "exactly one of keyId or keyLabel should be specified");
         }
@@ -99,8 +94,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCmd
     protected ConcurrentContentSigner getSigner(
             final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
-    throws Exception
-    {
+    throws Exception {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 

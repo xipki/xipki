@@ -85,54 +85,43 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class CALoadTestTemplateEnroll extends LoadExecutor
-{
-    private final static class CertRequestWithProfile
-    {
+public class CALoadTestTemplateEnroll extends LoadExecutor {
+    private final static class CertRequestWithProfile {
         private final String certprofile;
         private final CertRequest certRequest;
 
         public CertRequestWithProfile(
                 final String certprofile,
-                final CertRequest certRequest)
-        {
+                final CertRequest certRequest) {
             this.certprofile = certprofile;
             this.certRequest = certRequest;
         }
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
 
         @Override
-        public void run()
-        {
-            while (!stop() && getErrorAccout() < 1)
-            {
+        public void run() {
+            while (!stop() && getErrorAccout() < 1) {
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
-                if (certReqs != null)
-                {
+                if (certReqs != null) {
                     boolean successful = testNext(certReqs);
                     int numFailed = successful
                             ? 0
                             : 1;
                     account(1, numFailed);
-                } else
-                {
+                } else {
                     account(1, 1);
                 }
             }
         }
 
         private boolean testNext(
-                final Map<Integer, CertRequestWithProfile> certRequests)
-        {
+                final Map<Integer, CertRequestWithProfile> certRequests) {
             EnrollCertResult result;
-            try
-            {
+            try {
                 EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
-                for (Integer certId : certRequests.keySet())
-                {
+                for (Integer certId : certRequests.keySet()) {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
                             "id-" + certId,
@@ -145,34 +134,28 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
 
                 result = caClient.requestCerts(request, null,
                         userPrefix + System.currentTimeMillis(), null);
-            } catch (CAClientException | PKIErrorException e)
-            {
+            } catch (CAClientException | PKIErrorException e) {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
                 return false;
             }
 
-            if (result == null)
-            {
+            if (result == null) {
                 return false;
             }
 
             Set<String> ids = result.getAllIds();
-            if (ids.size() < certRequests.size())
-            {
+            if (ids.size() < certRequests.size()) {
                 return false;
             }
 
-            for (String id : ids)
-            {
+            for (String id : ids) {
                 CertOrError certOrError = result.getCertificateOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
-                if (cert == null)
-                {
+                if (cert == null) {
                     return false;
                 }
             }
@@ -198,8 +181,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
             final CAClient caClient,
             final EnrollTemplateType template,
             final String description)
-    throws Exception
-    {
+    throws Exception {
         super(description);
 
         ParamUtil.assertNotNull("caClient", caClient);
@@ -217,27 +199,21 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
         List<EnrollCertType> list = template.getEnrollCert();
         loadtestEntries = new ArrayList<>(list.size());
 
-        for (EnrollCertType entry : list)
-        {
+        for (EnrollCertType entry : list) {
             KeyEntry keyEntry;
-            if (entry.getEcKey() != null)
-            {
+            if (entry.getEcKey() != null) {
                 keyEntry = new ECKeyEntry(entry.getEcKey().getCurve());
-            } else if (entry.getRsaKey() != null)
-            {
+            } else if (entry.getRsaKey() != null) {
                 keyEntry = new RSAKeyEntry(entry.getRsaKey().getModulusLength());
-            } else if (entry.getDsaKey() != null)
-            {
+            } else if (entry.getDsaKey() != null) {
                 keyEntry = new DSAKeyEntry(entry.getDsaKey().getPLength());
-            } else
-            {
+            } else {
                 throw new RuntimeException("should not reach here, unknown child of KeyEntry");
             }
 
             String randomDNStr = entry.getRandomDN();
             RandomDN randomDN = RandomDN.getInstance(randomDNStr);
-            if (randomDN == null)
-            {
+            if (randomDN == null) {
                 throw new InvalidConfException("invalid randomDN " + randomDNStr);
             }
 
@@ -249,22 +225,18 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
-    public int getNumberOfCertsInOneRequest()
-    {
+    public int getNumberOfCertsInOneRequest() {
         return loadtestEntries.size();
     }
 
-    private Map<Integer, CertRequestWithProfile> nextCertRequests()
-    {
+    private Map<Integer, CertRequestWithProfile> nextCertRequests() {
         Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
         final int n = loadtestEntries.size();
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             LoadTestEntry loadtestEntry = loadtestEntries.get(i);
             final int certId = i + 1;
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
@@ -273,8 +245,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
             certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
             SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null)
-            {
+            if (spki == null) {
                 return null;
             }
 
@@ -291,15 +262,11 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
 
     public static EnrollTemplateType parse(
             final InputStream configStream)
-    throws InvalidConfException
-    {
-        synchronized (jaxbUnmarshallerLock)
-        {
+    throws InvalidConfException {
+        synchronized (jaxbUnmarshallerLock) {
             Object root;
-            try
-            {
-                if (jaxbUnmarshaller == null)
-                {
+            try {
+                if (jaxbUnmarshaller == null) {
                     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
                     jaxbUnmarshaller = context.createUnmarshaller();
 
@@ -311,23 +278,19 @@ public class CALoadTestTemplateEnroll extends LoadExecutor
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
             }
-            catch (SAXException e)
-            {
+            catch (SAXException e) {
                 throw new InvalidConfException(
                         "parse profile failed, message: " + e.getMessage(),
                         e);
-            } catch (JAXBException e)
-            {
+            } catch (JAXBException e) {
                 throw new InvalidConfException(
                         "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
                         e);
             }
 
-            if (root instanceof JAXBElement)
-            {
+            if (root instanceof JAXBElement) {
                 return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
-            } else
-            {
+            } else {
                 throw new InvalidConfException("invalid root element type");
             }
         }

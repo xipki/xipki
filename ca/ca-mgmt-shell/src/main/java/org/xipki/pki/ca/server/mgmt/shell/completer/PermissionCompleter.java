@@ -41,11 +41,9 @@ import org.xipki.console.karaf.EnumCompleter;
  * @author Lijun Liao
  */
 
-public class PermissionCompleter extends EnumCompleter
-{
+public class PermissionCompleter extends EnumCompleter {
 
-    public PermissionCompleter()
-    {
+    public PermissionCompleter() {
         setTokens(
             "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
     }

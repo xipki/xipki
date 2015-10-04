@@ -45,8 +45,7 @@ import org.xipki.pki.ocsp.api.CertprofileOption;
  * @author Lijun Liao
  */
 
-class Responder
-{
+class Responder {
     private final ResponderOption responderOption;
     private final RequestOption requestOption;
     private final ResponseOption responseOption;
@@ -62,8 +61,7 @@ class Responder
             final AuditOption auditOption,
             final CertprofileOption certprofileOption,
             final ResponderSigner signer,
-            final List<CertStatusStore> stores)
-    {
+            final List<CertStatusStore> stores) {
         ParamUtil.assertNotNull("responderOption", responderOption);
         ParamUtil.assertNotNull("requestOption", requestOption);
         ParamUtil.assertNotNull("responseOption", responseOption);
@@ -79,38 +77,31 @@ class Responder
         this.stores = stores;
     }
 
-    public ResponderOption getResponderOption()
-    {
+    public ResponderOption getResponderOption() {
         return responderOption;
     }
 
-    public RequestOption getRequestOption()
-    {
+    public RequestOption getRequestOption() {
         return requestOption;
     }
 
-    public ResponseOption getResponseOption()
-    {
+    public ResponseOption getResponseOption() {
         return responseOption;
     }
 
-    public AuditOption getAuditOption()
-    {
+    public AuditOption getAuditOption() {
         return auditOption;
     }
 
-    public CertprofileOption getCertprofileOption()
-    {
+    public CertprofileOption getCertprofileOption() {
         return certprofileOption;
     }
 
-    public ResponderSigner getSigner()
-    {
+    public ResponderSigner getSigner() {
         return signer;
     }
 
-    public List<CertStatusStore> getStores()
-    {
+    public List<CertStatusStore> getStores() {
         return stores;
     }
 

@@ -45,8 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 
 @Command(scope = "xipki-ca", name = "user-add",
         description = "add user")
-public class UserAddCmd extends CaCmd
-{
+public class UserAddCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -65,10 +64,8 @@ public class UserAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (password == null)
-        {
+    throws Exception {
+        if (password == null) {
             password = new String(readPassword());
         }
         AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);

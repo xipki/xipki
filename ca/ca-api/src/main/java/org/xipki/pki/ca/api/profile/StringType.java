@@ -46,8 +46,7 @@ import org.bouncycastle.asn1.DERUTF8String;
  * @author Lijun Liao
  */
 
-public enum StringType
-{
+public enum StringType {
     teletexString,
     printableString,
     utf8String,
@@ -55,25 +54,18 @@ public enum StringType
     ia5String;
 
     public ASN1Encodable createString(
-            final String text)
-    {
-        if (teletexString == this)
-        {
+            final String text) {
+        if (teletexString == this) {
             return new DERT61String(text);
-        } else if (printableString == this)
-        {
+        } else if (printableString == this) {
             return new DERPrintableString(text);
-        } else if (utf8String == this)
-        {
+        } else if (utf8String == this) {
             return new DERUTF8String(text);
-        } else if (bmpString == this)
-        {
+        } else if (bmpString == this) {
             return new DERBMPString(text);
-        } else if (ia5String == this)
-        {
+        } else if (ia5String == this) {
             return new DERIA5String(text, true);
-        } else
-        {
+        } else {
             throw new RuntimeException("should not reach here, unkown StringType '" + text + "'");
         }
     }

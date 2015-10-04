@@ -49,8 +49,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
  * @author Lijun Liao
  */
 
-public abstract class NegCRLCmd extends ClientCmd
-{
+public abstract class NegCRLCmd extends ClientCmd {
 
     @Option(name = "--ca",
             description = "CA name\n"
@@ -63,42 +62,33 @@ public abstract class NegCRLCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Set<String> caNames = caClient.getCaNames();
-        if (isEmpty(caNames))
-        {
+        if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if (caName != null && !caNames.contains(caName))
-        {
+        if (caName != null && !caNames.contains(caName)) {
             throw new IllegalCmdParamException("CA " + caName
                     + " is not within the configured CAs " + caNames);
         }
 
-        if (caName == null)
-        {
-            if (caNames.size() == 1)
-            {
+        if (caName == null) {
+            if (caNames.size() == 1) {
                 caName = caNames.iterator().next();
-            } else
-            {
+            } else {
                 throw new IllegalCmdParamException("no caname is specified, one of "
                         + caNames + " is required");
             }
         }
 
         X509CRL crl = null;
-        try
-        {
+        try {
             crl = retrieveCRL(caName);
-        } catch (PKIErrorException e)
-        {
+        } catch (PKIErrorException e) {
         }
 
-        if (crl != null)
-        {
+        if (crl != null) {
             throw new CmdFailure("no CRL is expected, but received one");
         }
 

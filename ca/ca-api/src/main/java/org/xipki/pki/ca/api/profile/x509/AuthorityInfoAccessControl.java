@@ -39,26 +39,22 @@ package org.xipki.pki.ca.api.profile.x509;
  * @author Lijun Liao
  */
 
-public class AuthorityInfoAccessControl
-{
+public class AuthorityInfoAccessControl {
     private final boolean includesCaIssuers;
     private final boolean includesOcsp;
 
     public AuthorityInfoAccessControl(
             final boolean includesCaIssuers,
-            final boolean includesOcsp)
-    {
+            final boolean includesOcsp) {
         this.includesCaIssuers = includesCaIssuers;
         this.includesOcsp = includesOcsp;
     }
 
-    public boolean includesCaIssuers()
-    {
+    public boolean includesCaIssuers() {
         return includesCaIssuers;
     }
 
-    public boolean includesOcsp()
-    {
+    public boolean includesOcsp() {
         return includesOcsp;
     }
 

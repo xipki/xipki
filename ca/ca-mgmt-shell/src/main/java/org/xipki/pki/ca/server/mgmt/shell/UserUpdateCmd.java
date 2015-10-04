@@ -44,8 +44,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "user-up",
         description = "update user")
-public class UserUpdateCmd extends CaCmd
-{
+public class UserUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -63,10 +62,8 @@ public class UserUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if ("CONSOLE".equalsIgnoreCase(password))
-        {
+    throws Exception {
+        if ("CONSOLE".equalsIgnoreCase(password)) {
             password = new String(readPassword());
         }
         boolean b = caManager.changeUser(name, password, cnRegex);

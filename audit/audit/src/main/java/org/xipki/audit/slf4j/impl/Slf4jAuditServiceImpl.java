@@ -51,30 +51,23 @@ import org.xipki.audit.api.PCIAuditEvent;
  * @author Lijun Liao
  */
 
-public class Slf4jAuditServiceImpl implements AuditService
-{
+public class Slf4jAuditServiceImpl implements AuditService {
     private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
 
-    public Slf4jAuditServiceImpl()
-    {
+    public Slf4jAuditServiceImpl() {
     }
 
     @Override
     public void logEvent(
-            final AuditEvent event)
-    {
-        if (event == null)
-        {
+            final AuditEvent event) {
+        if (event == null) {
             return;
         }
 
-        try
-        {
-            switch (event.getLevel())
-            {
+        try {
+            switch (event.getLevel()) {
             case DEBUG:
-                if (LOG.isDebugEnabled())
-                {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("{}", createMessage(event));
                 }
                 break;
@@ -82,54 +75,45 @@ public class Slf4jAuditServiceImpl implements AuditService
                 LOG.info("{}", createMessage(event));
                 break;
             } // end switch
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
                     AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
 
     private static String createMessage(
-            final AuditEvent event)
-    {
+            final AuditEvent event) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(event.getLevel().getAlignedText()).append(" | ");
 
         String applicationName = event.getApplicationName();
-        if (applicationName == null)
-        {
+        if (applicationName == null) {
             applicationName = "undefined";
         }
 
         String name = event.getName();
-        if (name == null)
-        {
+        if (name == null) {
             name = "undefined";
         }
 
         sb.append(applicationName).append(" - ").append(name);
 
         AuditStatus status = event.getStatus();
-        if (status == null)
-        {
+        if (status == null) {
             status = AuditStatus.UNDEFINED;
         }
         sb.append(":\tstatus: ").append(status.name());
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
         long duration = event.getDuration();
-        if (duration >= 0)
-        {
+        if (duration >= 0) {
             sb.append("\tduration: ").append(duration);
         }
 
-        if ((eventDataArray != null) && (eventDataArray.size() > 0))
-        {
-            for (AuditEventData m : eventDataArray)
-            {
-                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName()))
-                {
+        if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
+            for (AuditEventData m : eventDataArray) {
+                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
                     continue;
                 }
 
@@ -142,22 +126,17 @@ public class Slf4jAuditServiceImpl implements AuditService
 
     @Override
     public void logEvent(
-            final PCIAuditEvent event)
-    {
-        if (event == null)
-        {
+            final PCIAuditEvent event) {
+        if (event == null) {
             return;
         }
 
-        try
-        {
+        try {
             CharArrayWriter msg = event.toCharArrayWriter("");
             AuditLevel al = event.getLevel();
-            switch (al)
-            {
+            switch (al) {
             case DEBUG:
-                if (LOG.isDebugEnabled())
-                {
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("{} | {}", al.getAlignedText(), msg);
                 }
                 break;
@@ -165,8 +144,7 @@ public class Slf4jAuditServiceImpl implements AuditService
                 LOG.info("{} | {}", al.getAlignedText(), msg);
                 break;
             } // end switch
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
                     AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }

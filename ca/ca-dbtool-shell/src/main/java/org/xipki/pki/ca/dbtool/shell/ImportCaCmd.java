@@ -48,8 +48,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 @Command(scope = "xipki-db", name = "import-ca",
         description = "import CA database")
-public class ImportCaCmd extends DbPortCmd
-{
+public class ImportCaCmd extends DbPortCmd {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
     @Option(name = "--db-conf",
@@ -78,21 +77,18 @@ public class ImportCaCmd extends DbPortCmd
 
     @Override
     protected DbPortWorker getDbPortWorker()
-    throws Exception
-    {
+    throws Exception {
         return new CaDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
                 indir, numCertsPerCommit.intValue(), testOnly);
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory)
-    {
+            final DataSourceFactory dataSourceFactory) {
         this.dataSourceFactory = dataSourceFactory;
     }
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 }

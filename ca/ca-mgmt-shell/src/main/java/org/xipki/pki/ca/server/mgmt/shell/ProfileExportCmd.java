@@ -49,8 +49,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "profile-export",
         description = "export certificate profile configuration")
-public class ProfileExportCmd extends CaCmd
-{
+public class ProfileExportCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "profile name\n"
@@ -65,19 +64,15 @@ public class ProfileExportCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CertprofileEntry entry = caManager.getCertprofile(name);
-        if (entry == null)
-        {
+        if (entry == null) {
             throw new IllegalCmdParamException("no cert profile named " + name + " is defined");
         }
 
-        if (StringUtil.isBlank(entry.getConf()))
-        {
+        if (StringUtil.isBlank(entry.getConf())) {
             out("cert profile does not have conf");
-        } else
-        {
+        } else {
             saveVerbose("saved cert profile configuration to", new File(confFile),
                     entry.getConf().getBytes("UTF-8"));
         }

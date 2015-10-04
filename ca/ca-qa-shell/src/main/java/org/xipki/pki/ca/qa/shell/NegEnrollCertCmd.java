@@ -62,8 +62,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public abstract class NegEnrollCertCmd extends ClientCmd
-{
+public abstract class NegEnrollCertCmd extends ClientCmd {
     @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested.\n"
                     + "default is the subject of self-signed certifite.")
@@ -101,8 +100,7 @@ public abstract class NegEnrollCertCmd extends ClientCmd
     protected SecurityFactory securityFactory;
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
@@ -113,8 +111,7 @@ public abstract class NegEnrollCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         EnrollCertRequestType request = new EnrollCertRequestType(
                 EnrollCertRequestType.Type.CERT_REQ);
 
@@ -134,11 +131,9 @@ public abstract class NegEnrollCertCmd extends ClientCmd
                 new ProofOfPossessionSigningKeyBuilder(certReq);
         ContentSigner contentSigner = signer.borrowContentSigner();
         POPOSigningKey popoSk;
-        try
-        {
+        try {
             popoSk = popoBuilder.build(contentSigner);
-        } finally
-        {
+        } finally {
             signer.returnContentSigner(contentSigner);
         }
 
@@ -150,24 +145,20 @@ public abstract class NegEnrollCertCmd extends ClientCmd
 
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
+        try {
             result = caClient.requestCerts(request, caName, user, debug);
-        } finally
-        {
+        } finally {
             saveRequestResponse(debug);
         }
 
         X509Certificate cert = null;
-        if (result != null)
-        {
+        if (result != null) {
             String id = result.getAllIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if (cert != null)
-        {
+        if (cert != null) {
             throw new CmdFailure("no certificate is excepted, but received one");
         }
 

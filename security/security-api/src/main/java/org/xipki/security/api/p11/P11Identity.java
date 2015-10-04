@@ -47,8 +47,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class P11Identity implements Comparable<P11Identity>
-{
+public class P11Identity implements Comparable<P11Identity> {
     protected final P11SlotIdentifier slotId;
     protected final P11KeyIdentifier keyId;
 
@@ -60,14 +59,12 @@ public class P11Identity implements Comparable<P11Identity>
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain,
-            final PublicKey publicKey)
-    {
+            final PublicKey publicKey) {
         ParamUtil.assertNotNull("slotId", slotId);
         ParamUtil.assertNotNull("keyId", keyId);
 
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-                && publicKey == null)
-        {
+                && publicKey == null) {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
@@ -82,18 +79,14 @@ public class P11Identity implements Comparable<P11Identity>
                 ? certificateChain[0].getPublicKey()
                 : publicKey;
 
-        if (this.publicKey instanceof RSAPublicKey)
-        {
+        if (this.publicKey instanceof RSAPublicKey) {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-        } else if (this.publicKey instanceof ECPublicKey)
-        {
+        } else if (this.publicKey instanceof ECPublicKey) {
             signatureKeyBitLength = ((ECPublicKey) this.publicKey)
                     .getParams().getCurve().getField().getFieldSize();
-        } else if (this.publicKey instanceof DSAPublicKey)
-        {
+        } else if (this.publicKey instanceof DSAPublicKey) {
             signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
-        } else
-        {
+        } else {
             throw new IllegalArgumentException(
                     "currently only RSA, DSA and EC public key are supported, but not "
                     + this.publicKey.getAlgorithm()
@@ -101,43 +94,36 @@ public class P11Identity implements Comparable<P11Identity>
         }
     }
 
-    public P11KeyIdentifier getKeyId()
-    {
+    public P11KeyIdentifier getKeyId() {
         return keyId;
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return (certificateChain != null && certificateChain.length > 0)
                 ? certificateChain[0]
                 : null;
     }
 
-    public X509Certificate[] getCertificateChain()
-    {
+    public X509Certificate[] getCertificateChain() {
         return (certificateChain == null)
                 ? null
                 : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
     }
 
-    public PublicKey getPublicKey()
-    {
+    public PublicKey getPublicKey() {
         return (publicKey == null)
                 ? certificateChain[0].getPublicKey()
                 : publicKey;
     }
 
-    public P11SlotIdentifier getSlotId()
-    {
+    public P11SlotIdentifier getSlotId() {
         return slotId;
     }
 
     public boolean match(
             final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    {
-        if (!this.slotId.equals(slotId))
-        {
+            final P11KeyIdentifier keyId) {
+        if (!this.slotId.equals(slotId)) {
             return false;
         }
 
@@ -146,24 +132,20 @@ public class P11Identity implements Comparable<P11Identity>
 
     public boolean match(
             final P11SlotIdentifier slotId,
-            final String keyLabel)
-    {
-        if (keyLabel == null)
-        {
+            final String keyLabel) {
+        if (keyLabel == null) {
             return false;
         }
 
         return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
     }
 
-    public int getSignatureKeyBitLength()
-    {
+    public int getSignatureKeyBitLength() {
         return signatureKeyBitLength;
     }
 
     @Override
-    public int compareTo(P11Identity o)
-    {
+    public int compareTo(P11Identity o) {
         return keyId.compareTo(o.keyId);
     }
 

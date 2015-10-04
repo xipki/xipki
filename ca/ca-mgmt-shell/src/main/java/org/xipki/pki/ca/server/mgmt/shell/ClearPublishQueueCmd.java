@@ -46,8 +46,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "clear-publishqueue",
         description = "clear publish queue")
-public class ClearPublishQueueCmd extends CaCmd
-{
+public class ClearPublishQueueCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"
@@ -62,25 +61,20 @@ public class ClearPublishQueueCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean allPublishers = false;
-        for (String publisherName : publisherNames)
-        {
-            if ("all".equalsIgnoreCase(publisherName))
-            {
+        for (String publisherName : publisherNames) {
+            if ("all".equalsIgnoreCase(publisherName)) {
                 allPublishers = true;
                 break;
             }
         }
 
-        if (allPublishers)
-        {
+        if (allPublishers) {
             publisherNames = null;
         }
 
-        if ("all".equalsIgnoreCase(caName))
-        {
+        if ("all".equalsIgnoreCase(caName)) {
             caName = null;
         }
 

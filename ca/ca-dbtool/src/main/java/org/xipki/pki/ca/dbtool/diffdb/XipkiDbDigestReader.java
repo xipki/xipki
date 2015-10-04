@@ -57,23 +57,18 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class XipkiDbDigestReader extends DbDigestReader
-{
+public class XipkiDbDigestReader extends DbDigestReader {
     private class XipkiDbRetriever
-    implements Retriever
-    {
+    implements Retriever {
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
         public XipkiDbRetriever()
-        throws DataAccessException
-        {
+        throws DataAccessException {
             this.conn = datasource.getConnection();
-            try
-            {
+            try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-            } catch (DataAccessException e)
-            {
+            } catch (DataAccessException e) {
                 datasource.returnConnection(conn);
                 throw e;
             }
@@ -81,16 +76,12 @@ public class XipkiDbDigestReader extends DbDigestReader
         }
 
         @Override
-        public void run()
-        {
-            while (!stop.get())
-            {
-                try
-                {
+        public void run() {
+            while (!stop.get()) {
+                try {
                     IDRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                 }
             }
 
@@ -100,20 +91,17 @@ public class XipkiDbDigestReader extends DbDigestReader
         }
 
         private void query(
-                final IDRange idRange)
-        {
+                final IDRange idRange) {
             DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
-            try
-            {
+            try {
                 selectCertStmt.setInt(1, idRange.getFrom());
                 selectCertStmt.setInt(2, idRange.getTo() + 1);
 
                 rs = selectCertStmt.executeQuery();
 
-                while (rs.next())
-                {
+                while (rs.next()) {
                     String hash = rs.getString(dbControl.getColCerthash());
                     long serial = rs.getLong(dbControl.getColSerialNumber());
                     boolean revoked = rs.getBoolean(dbControl.getColRevoked());
@@ -122,13 +110,11 @@ public class XipkiDbDigestReader extends DbDigestReader
                     Long revTime = null;
                     Long revInvTime = null;
 
-                    if (revoked)
-                    {
+                    if (revoked) {
                         revReason = rs.getInt(dbControl.getColRevReason());
                         revTime = rs.getLong(dbControl.getColRevTime());
                         revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if (revInvTime == 0)
-                        {
+                        if (revInvTime == 0) {
                             revInvTime = null;
                         }
                     }
@@ -138,16 +124,13 @@ public class XipkiDbDigestReader extends DbDigestReader
                     int id = rs.getInt("ID");
                     result.addEntry(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch (Exception e)
-            {
-                if (e instanceof SQLException)
-                {
+            } catch (Exception e) {
+                if (e instanceof SQLException) {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
             }
-            finally
-            {
+            finally {
                 releaseResources(null, rs);
             }
 
@@ -168,8 +151,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             final int caId,
             final boolean revokedOnly,
             final int numThreads)
-    throws Exception
-    {
+    throws Exception {
         ParamUtil.assertNotNull("datasource", datasource);
         Connection conn = datasource.getConnection();
 
@@ -184,14 +166,12 @@ public class XipkiDbDigestReader extends DbDigestReader
         int minId;
         int maxId;
 
-        try
-        {
+        try {
             stmt = datasource.createStatement(conn);
 
             sql = "SELECT CERT FROM " + dbControl.getTblCa() + " WHERE ID=" + caId;
             rs = stmt.executeQuery(sql);
-            if (!rs.next())
-            {
+            if (!rs.next()) {
                 throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
             }
 
@@ -199,8 +179,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             rs.close();
 
             sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly)
-            {
+            if (revokedOnly) {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
             rs = stmt.executeQuery(sql);
@@ -211,8 +190,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly)
-            {
+            if (revokedOnly) {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
 
@@ -223,8 +201,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly)
-            {
+            if (revokedOnly) {
                 sql += " AND " + dbControl.getColRevoked() + "=1";
             }
 
@@ -235,11 +212,9 @@ public class XipkiDbDigestReader extends DbDigestReader
 
             return new XipkiDbDigestReader(datasource, caCert, revokedOnly,
                     totalAccount, minId, maxId, numThreads, dbSchemaType, caId);
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw datasource.translate(sql, e);
-        } finally
-        {
+        } finally {
             releaseResources(stmt, rs);
         }
     }
@@ -254,8 +229,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             final int numThreads,
             final DbSchemaType dbSchemaType,
             final int caId)
-    throws Exception
-    {
+    throws Exception {
         super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads);
 
         this.caId = caId;
@@ -277,8 +251,7 @@ public class XipkiDbDigestReader extends DbDigestReader
             .append("=").append(caId);
         sb.append(" AND CERT.ID>=? AND CERT.ID<?");
 
-        if (revokedOnly)
-        {
+        if (revokedOnly) {
             sb.append(" AND CERT.")
                 .append(dbControl.getColRevoked()).
                 append("=1");
@@ -296,8 +269,7 @@ public class XipkiDbDigestReader extends DbDigestReader
 
         this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
 
-        if (!init())
-        {
+        if (!init()) {
             throw new Exception("could not initialize the EjbcaDigestReader");
         }
     }
@@ -307,16 +279,13 @@ public class XipkiDbDigestReader extends DbDigestReader
             final int fromId,
             final int toId,
             final int numCerts)
-    throws DataAccessException
-    {
-        if (fromId > toId)
-        {
+    throws DataAccessException {
+        if (fromId > toId) {
             return 0;
         }
 
         ResultSet rs = null;
-        try
-        {
+        try {
             numCertStmt.setInt(1, fromId);
             numCertStmt.setInt(2, toId);
             rs = numCertStmt.executeQuery();
@@ -326,33 +295,28 @@ public class XipkiDbDigestReader extends DbDigestReader
             return (n < numCerts)
                     ? n - numCerts
                     : 0;
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw datasource.translate(numCertSql, e);
-        } finally
-        {
+        } finally {
             releaseResources(null, rs);
         }
 
     }
 
-    public void close()
-    {
+    public void close() {
         super.close();
 
         releaseResources(numCertStmt, null);
         datasource.returnConnection(conn);
     }
 
-    public int getCaId()
-    {
+    public int getCaId() {
         return caId;
     }
 
     @Override
     protected Retriever getRetriever()
-    throws DataAccessException
-    {
+    throws DataAccessException {
         return new XipkiDbRetriever();
     }
 }

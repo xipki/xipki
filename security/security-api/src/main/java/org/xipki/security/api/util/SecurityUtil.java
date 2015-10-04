@@ -65,11 +65,9 @@ import org.xipki.security.api.ObjectIdentifiers;
  * @author Lijun Liao
  */
 
-public class SecurityUtil
-{
+public class SecurityUtil {
     public static final Map<Integer, String> statusTextMap = new HashMap<>();
-    public static final String[] failureInfoTexts = new String[]
-    {
+    public static final String[] failureInfoTexts = new String[] {
         // 0 - 3
         "incorrectData", "wrongAuthority", "badDataFormat", "badCertId",
         // 4 - 7
@@ -87,8 +85,7 @@ public class SecurityUtil
         // 28 - 31
         "-", "duplicateCertReq", "systemFailure", "systemUnavail"};
 
-    static
-    {
+    static {
         statusTextMap.put(-2, "xipki_noAnswer");
         statusTextMap.put(-1, "xipki_responseError");
         statusTextMap.put(PKIStatus.GRANTED, "accepted");
@@ -100,8 +97,7 @@ public class SecurityUtil
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
     }
 
-    private SecurityUtil()
-    {
+    private SecurityUtil() {
     }
 
     public static byte[] extractMinimalKeyStore(
@@ -109,8 +105,7 @@ public class SecurityUtil
             final byte[] keystoreBytes,
             final String keyname,
             final char[] password)
-    throws Exception
-    {
+    throws Exception {
         return extractMinimalKeyStore(keystoreType, keystoreBytes, keyname, password, null);
     }
 
@@ -120,67 +115,53 @@ public class SecurityUtil
             String keyname,
             final char[] password,
             final X509Certificate[] newCertChain)
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks;
-        if ("JKS".equalsIgnoreCase(keystoreType))
-        {
+        if ("JKS".equalsIgnoreCase(keystoreType)) {
             ks = KeyStore.getInstance(keystoreType);
-        } else
-        {
+        } else {
             ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
-        if (keyname == null)
-        {
+        if (keyname == null) {
             Enumeration<String> aliases = ks.aliases();
-            while (aliases.hasMoreElements())
-            {
+            while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                if (ks.isKeyEntry(alias))
-                {
+                if (ks.isKeyEntry(alias)) {
                     keyname = alias;
                     break;
                 }
             }
-        } else
-        {
-            if (!ks.isKeyEntry(keyname))
-            {
+        } else {
+            if (!ks.isKeyEntry(keyname)) {
                 throw new KeyStoreException("unknown key named " + keyname);
             }
         }
 
         Enumeration<String> aliases = ks.aliases();
         int numAliases = 0;
-        while (aliases.hasMoreElements())
-        {
+        while (aliases.hasMoreElements()) {
             aliases.nextElement();
             numAliases++;
         }
 
         Certificate[] certs;
-        if (newCertChain == null || newCertChain.length < 1)
-        {
-            if (numAliases == 1)
-            {
+        if (newCertChain == null || newCertChain.length < 1) {
+            if (numAliases == 1) {
                 return keystoreBytes;
             }
             certs = ks.getCertificateChain(keyname);
-        } else
-        {
+        } else {
             certs = newCertChain;
         }
 
         PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
         ks = null;
 
-        if ("JKS".equalsIgnoreCase(keystoreType))
-        {
+        if ("JKS".equalsIgnoreCase(keystoreType)) {
             ks = KeyStore.getInstance(keystoreType);
-        } else
-        {
+        } else {
             ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(null, password);
@@ -193,8 +174,7 @@ public class SecurityUtil
     }
 
     public static String formatPKIStatusInfo(
-            final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
-    {
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
         PKIFreeText text = pkiStatusInfo.getStatusString();
@@ -208,8 +188,7 @@ public class SecurityUtil
     public static String formatPKIStatusInfo(
             final int status,
             final int failureInfo,
-            final String statusMessage)
-    {
+            final String statusMessage) {
         StringBuilder sb = new StringBuilder("PKIStatusInfo {");
         sb.append("status = ");
         sb.append(status);
@@ -222,16 +201,13 @@ public class SecurityUtil
     }
 
     public static String getFailureInfoText(
-            final int failureInfo)
-    {
+            final int failureInfo) {
         BigInteger b = BigInteger.valueOf(failureInfo);
         final int n = Math.min(b.bitLength(), failureInfoTexts.length);
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++)
-        {
-            if (b.testBit(i))
-            {
+        for (int i = 0; i < n; i++) {
+            if (b.testBit(i)) {
                 sb.append(", ").append(failureInfoTexts[i]);
             }
         }
@@ -243,24 +219,21 @@ public class SecurityUtil
 
     public static byte[] leftmost(
             final byte[] bytes,
-            final int bitCount)
-    {
+            final int bitCount) {
         int byteLenKey = (bitCount + 7) / 8;
 
-        if (bitCount >= (bytes.length << 3))
-        {
+        if (bitCount >= (bytes.length << 3)) {
             return bytes;
         }
 
         byte[] truncatedBytes = new byte[byteLenKey];
         System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
 
-        if (bitCount % 8 > 0) // shift the bits to the right
-        {
+        // shift the bits to the right
+        if (bitCount % 8 > 0)  {
             int shiftBits = 8 - (bitCount % 8);
 
-            for (int i = byteLenKey - 1; i > 0; i--)
-            {
+            for (int i = byteLenKey - 1; i > 0; i--) {
                 truncatedBytes[i] = (byte)
                         ((byte2int(truncatedBytes[i]) >>> shiftBits)
                         | ((byte2int(truncatedBytes[i - 1]) << (8 - shiftBits)) & 0xFF));
@@ -272,30 +245,25 @@ public class SecurityUtil
     }
 
     private static int byte2int(
-            final byte b)
-    {
+            final byte b) {
         return (b >= 0)
                 ? b
                 : 256 + b;
     }
 
     public static String getCurveName(
-            final ASN1ObjectIdentifier curveId)
-    {
+            final ASN1ObjectIdentifier curveId) {
         String curveName = X962NamedCurves.getName(curveId);
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = SECNamedCurves.getName(curveId);
         }
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = TeleTrusTNamedCurves.getName(curveId);
         }
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = NISTNamedCurves.getName(curveId);
         }
 
@@ -304,24 +272,19 @@ public class SecurityUtil
 
     public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
             final List<String> oidTexts)
-    throws InvalidOIDorNameException
-    {
-        if (oidTexts == null)
-        {
+    throws InvalidOIDorNameException {
+        if (oidTexts == null) {
             return null;
         }
 
         List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
-        for (String oidText : oidTexts)
-        {
-            if (oidText.isEmpty())
-            {
+        for (String oidText : oidTexts) {
+            if (oidText.isEmpty()) {
                 continue;
             }
 
             ASN1ObjectIdentifier oid = toOID(oidText);
-            if (!ret.contains(oid))
-            {
+            if (!ret.contains(oid)) {
                 ret.add(oid);
             }
         }
@@ -330,32 +293,25 @@ public class SecurityUtil
 
     private static ASN1ObjectIdentifier toOID(
             final String s)
-    throws InvalidOIDorNameException
-    {
+    throws InvalidOIDorNameException {
         final int n = s.length();
         boolean isName = false;
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             char c = s.charAt(i);
-            if (!((c >= '0' && c <= '1') || c == '.'))
-            {
+            if (!((c >= '0' && c <= '1') || c == '.')) {
                 isName = true;
             }
         }
 
-        if (!isName)
-        {
-            try
-            {
+        if (!isName) {
+            try {
                 return new ASN1ObjectIdentifier(s);
-            } catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
             }
         }
 
         ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOID(s);
-        if (oid == null)
-        {
+        if (oid == null) {
             throw new InvalidOIDorNameException(s);
         }
         return oid;
@@ -364,41 +320,32 @@ public class SecurityUtil
     public static String signerConfToString(
             String signerConf,
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
-        if (ignoreSensitiveInfo)
-        {
+            final boolean ignoreSensitiveInfo) {
+        if (ignoreSensitiveInfo) {
             signerConf = SecurityUtil.eraseSensitiveData(signerConf);
         }
 
-        if (verbose || signerConf.length() < 101)
-        {
+        if (verbose || signerConf.length() < 101) {
             return signerConf;
-        } else
-        {
+        } else {
             return new StringBuilder().append(signerConf.substring(0, 97)).append("...").toString();
         }
     }
 
     private static String eraseSensitiveData(
-            final String conf)
-    {
-        if (conf == null || !conf.contains("password?"))
-        {
+            final String conf) {
+        if (conf == null || !conf.contains("password?")) {
             return conf;
         }
 
-        try
-        {
+        try {
             ConfPairs pairs = new ConfPairs(conf);
             String value = pairs.getValue("password");
-            if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:"))
-            {
+            if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
                 pairs.putPair("password", "<sensitve>");
             }
             return pairs.getEncoded();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return conf;
         }
     }

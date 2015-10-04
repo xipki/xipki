@@ -46,8 +46,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CAHasRequestorEntry implements Serializable
-{
+public class CAHasRequestorEntry implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String requestorName;
@@ -56,59 +55,48 @@ public class CAHasRequestorEntry implements Serializable
     private Set<String> profiles;
 
     public CAHasRequestorEntry(
-            final String requestorName)
-    {
+            final String requestorName) {
         ParamUtil.assertNotBlank("requestorName", requestorName);
         this.requestorName = requestorName;
     }
 
-    public boolean isRa()
-    {
+    public boolean isRa() {
         return ra;
     }
 
     public void setRa(
-            final boolean ra)
-    {
+            final boolean ra) {
         this.ra = ra;
     }
 
-    public Set<Permission> getPermissions()
-    {
+    public Set<Permission> getPermissions() {
         return permissions;
     }
 
     public void setPermissions(
-            final Set<Permission> permissions)
-    {
+            final Set<Permission> permissions) {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
-    public String getRequestorName()
-    {
+    public String getRequestorName() {
         return requestorName;
     }
 
     public void setProfiles(
-            final Set<String> profiles)
-    {
-        if (profiles == null)
-        {
+            final Set<String> profiles) {
+        if (profiles == null) {
             this.profiles = Collections.emptySet();
-        } else
-        {
+        } else {
             this.profiles = CollectionUtil.unmodifiableSet(profiles);
         }
     }
 
-    public Set<String> getProfiles()
-    {
+    public Set<String> getProfiles() {
         return profiles;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("requestor: ").append(requestorName).append(", ");
         sb.append("ra: ").append(ra).append(", ");

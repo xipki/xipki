@@ -48,8 +48,7 @@ import jline.console.ConsoleReader;
 
 @Command(scope = "xipki-cmd", name = "confirm",
         description = "prompt")
-public class ConfirmCmd extends XipkiOsgiCommandSupport
-{
+public class ConfirmCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "message",
             required = true,
             description = "prompt message\n"
@@ -58,14 +57,12 @@ public class ConfirmCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
         boolean toContinue = FileUtils.confirm(reader,
                 prompt + "\nDo you want to contine [yes/no]?");
-        if (!toContinue)
-        {
+        if (!toContinue) {
             throw new CmdFailure("User cancelled");
         }
 

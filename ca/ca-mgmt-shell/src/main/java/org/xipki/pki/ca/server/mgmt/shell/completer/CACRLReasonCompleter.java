@@ -43,14 +43,11 @@ import org.xipki.security.api.CRLReason;
  * @author Lijun Liao
  */
 
-public class CACRLReasonCompleter extends EnumCompleter
-{
-    public CACRLReasonCompleter()
-    {
+public class CACRLReasonCompleter extends EnumCompleter {
+    public CACRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (CRLReason reason : CaRevokeCmd.permitted_reasons)
-        {
+        for (CRLReason reason : CaRevokeCmd.permitted_reasons) {
             enums.append(reason.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

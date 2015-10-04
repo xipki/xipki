@@ -48,40 +48,34 @@ import org.bouncycastle.crypto.Digest;
  * @author Lijun Liao
  */
 
-abstract class AbstractECDSASignatureSpi extends SignatureSpi
-{
+abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     private Digest digest;
     private P11PrivateKey signingKey;
     private boolean x962;
 
     AbstractECDSASignatureSpi(
             final Digest digest,
-            final boolean x962)
-    {
+            final boolean x962) {
         this.digest = digest;
         this.x962 = x962;
     }
 
     protected void engineInitVerify(
             final PublicKey publicKey)
-    throws InvalidKeyException
-    {
+    throws InvalidKeyException {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
             final PrivateKey privateKey)
-    throws InvalidKeyException
-    {
-        if (!(privateKey instanceof P11PrivateKey))
-        {
+    throws InvalidKeyException {
+        if (!(privateKey instanceof P11PrivateKey)) {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
         }
 
         String algo = privateKey.getAlgorithm();
-        if (!("EC".equals(algo) || "ECDSA".equals(algo)))
-        {
+        if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
             throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
         }
 
@@ -91,8 +85,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
 
     protected void engineUpdate(
             final byte b)
-    throws SignatureException
-    {
+    throws SignatureException {
         digest.update(b);
     }
 
@@ -100,41 +93,33 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
             final byte[]  b,
             final int off,
             final int len)
-    throws SignatureException
-    {
+    throws SignatureException {
         digest.update(b, off, len);
     }
 
     protected byte[] engineSign()
-    throws SignatureException
-    {
+    throws SignatureException {
         byte[]  hash = new byte[digest.getDigestSize()];
 
         digest.doFinal(hash, 0);
 
-        try
-        {
-            if (x962)
-            {
+        try {
+            if (x962) {
                 return signingKey.CKM_ECDSA_X962(hash);
-            } else
-            {
+            } else {
                 return signingKey.CKM_ECDSA_Plain(hash);
             }
         }
-        catch (SignatureException e)
-        {
+        catch (SignatureException e) {
             throw e;
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             throw new SignatureException(e.getMessage(), e);
         }
     }
 
     protected void engineSetParameter(
-            final AlgorithmParameterSpec params)
-    {
+            final AlgorithmParameterSpec params) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
@@ -144,8 +129,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
      */
     protected void engineSetParameter(
             final String  param,
-            final Object  value)
-    {
+            final Object  value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
@@ -153,15 +137,13 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi
      * @deprecated
      */
     protected Object engineGetParameter(
-            final String param)
-    {
+            final String param) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     protected boolean engineVerify(
             final byte[] sigBytes)
-    throws SignatureException
-    {
+    throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 }

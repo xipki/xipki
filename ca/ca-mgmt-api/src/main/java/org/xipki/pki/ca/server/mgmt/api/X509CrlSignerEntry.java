@@ -51,8 +51,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class X509CrlSignerEntry implements Serializable
-{
+public class X509CrlSignerEntry implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
 
     private static final long serialVersionUID = 1L;
@@ -73,17 +72,14 @@ public class X509CrlSignerEntry implements Serializable
             final String signerConf,
             final String base64Cert,
             final String crlControl)
-    throws InvalidConfException
-    {
+    throws InvalidConfException {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("type", signerType);
         ParamUtil.assertNotNull("crlControl", crlControl);
 
-        if ("CA".equalsIgnoreCase(name))
-        {
+        if ("CA".equalsIgnoreCase(name)) {
             this.base64Cert = null;
-        } else
-        {
+        } else {
             this.base64Cert = base64Cert;
         }
 
@@ -92,102 +88,83 @@ public class X509CrlSignerEntry implements Serializable
         this.signerConf = signerConf;
         this.crlControl = crlControl;
 
-        if (this.base64Cert != null)
-        {
-            try
-            {
+        if (this.base64Cert != null) {
+            try {
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
                 certFaulty = true;
             }
         }
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     public void setConfFaulty(
-            final boolean faulty)
-    {
+            final boolean faulty) {
         this.confFaulty = faulty;
     }
 
-    public boolean isFaulty()
-    {
+    public boolean isFaulty() {
         return certFaulty || confFaulty;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return signerType;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         return signerConf;
     }
 
-    public String getBase64Cert()
-    {
+    public String getBase64Cert() {
         return base64Cert;
     }
 
-    public X509Certificate getCertificate()
-    {
+    public X509Certificate getCertificate() {
         return cert;
     }
 
     public void setCertificate(
-            final X509Certificate cert)
-    {
-        if (base64Cert != null)
-        {
+            final X509Certificate cert) {
+        if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
         this.cert = cert;
     }
 
-    public String getCrlControl()
-    {
+    public String getCrlControl() {
         return crlControl;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return toString(false);
     }
 
     public String toString(
-            final boolean verbose)
-    {
+            final boolean verbose) {
         return toString(verbose, true);
     }
 
     public String toString(
             final boolean verbose,
-            final boolean ignoreSensitiveInfo)
-    {
+            final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');
         sb.append("signerConf: ");
-        if (signerConf == null)
-        {
+        if (signerConf == null) {
             sb.append("null");
-        } else
-        {
+        } else {
             sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("crlControl: ").append(crlControl).append("\n");
-        if (cert != null)
-        {
+        if (cert != null) {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
                     X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
@@ -195,19 +172,15 @@ public class X509CrlSignerEntry implements Serializable
             sb.append("\tsubject: ").append(
                     X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
 
-            if (verbose)
-            {
+            if (verbose) {
                 sb.append("\tencoded: ");
-                try
-                {
+                try {
                     sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e)
-                {
+                } catch (CertificateEncodingException e) {
                     sb.append("ERROR");
                 }
             }
-        } else
-        {
+        } else {
             sb.append("cert: null\n");
         }
 

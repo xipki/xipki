@@ -44,15 +44,13 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "ca-rm",
         description = "remove CA")
-public class CaRemoveCmd extends CaCmd
-{
+public class CaRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String name;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.removeCA(name);
         output(b, "removed", "could not remove", "CA " + name);
         return null;

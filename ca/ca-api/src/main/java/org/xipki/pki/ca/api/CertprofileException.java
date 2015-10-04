@@ -39,31 +39,26 @@ package org.xipki.pki.ca.api;
  * @author Lijun Liao
  */
 
-public class CertprofileException extends Exception
-{
+public class CertprofileException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public CertprofileException()
-    {
+    public CertprofileException() {
     }
 
     public CertprofileException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public CertprofileException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public CertprofileException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 

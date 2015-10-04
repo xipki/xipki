@@ -62,15 +62,12 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class SlotIdentifier extends ASN1Object
-{
+public class SlotIdentifier extends ASN1Object {
     private P11SlotIdentifier slotId;
 
     public SlotIdentifier(
-            final P11SlotIdentifier slotId)
-    {
-        if (slotId == null)
-        {
+            final P11SlotIdentifier slotId) {
+        if (slotId == null) {
             throw new IllegalArgumentException("slotId could not be null");
         }
 
@@ -79,79 +76,63 @@ public class SlotIdentifier extends ASN1Object
 
     private SlotIdentifier(
             final ASN1Sequence seq)
-    throws BadASN1ObjectException
-    {
+    throws BadASN1ObjectException {
         int size = seq.size();
-        if (size < 1)
-        {
+        if (size < 1) {
             throw new BadASN1ObjectException("wrong number of elements in sequence");
         }
 
-        try
-        {
+        try {
             Integer slotIndex = null;
 
             ASN1Encodable slotIdASN1Obj = null;
             ASN1Encodable obj = seq.getObjectAt(0);
-            if (obj instanceof ASN1Integer)
-            {
+            if (obj instanceof ASN1Integer) {
                 slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
-                if (size > 1)
-                {
+                if (size > 1) {
                     slotIdASN1Obj = seq.getObjectAt(1);
                 }
-            } else
-            {
+            } else {
                 slotIdASN1Obj = obj;
             }
 
             Long slotId = null;
 
-            if (slotIdASN1Obj instanceof ASN1TaggedObject)
-            {
+            if (slotIdASN1Obj instanceof ASN1TaggedObject) {
                 ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
 
                 int tagNo = tagObj.getTagNo();
-                if (tagNo == 1)
-                {
+                if (tagNo == 1) {
                     ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
                     slotId = i.getPositiveValue().longValue();
-                } else
-                {
+                } else {
                     throw new BadASN1ObjectException("unknown tag " + tagNo);
                 }
             }
 
             this.slotId = new P11SlotIdentifier(slotIndex, slotId);
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             throw new BadASN1ObjectException(e.getMessage(), e);
         }
     }
 
     public static SlotIdentifier getInstance(
             final Object obj)
-    throws BadASN1ObjectException
-    {
-        if (obj == null || obj instanceof SlotIdentifier)
-        {
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof SlotIdentifier) {
             return (SlotIdentifier) obj;
         }
 
-        try
-        {
-            if (obj instanceof ASN1Sequence)
-            {
+        try {
+            if (obj instanceof ASN1Sequence) {
                 return new SlotIdentifier((ASN1Sequence) obj);
             }
 
-            if (obj instanceof byte[])
-            {
+            if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
-        catch (IOException | IllegalArgumentException e)
-        {
+        catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
         }
 
@@ -160,16 +141,13 @@ public class SlotIdentifier extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        if (slotId.getSlotIndex() != null)
-        {
+        if (slotId.getSlotIndex() != null) {
             vector.add(new ASN1Integer(slotId.getSlotIndex()));
         }
 
-        if (slotId.getSlotId() != null)
-        {
+        if (slotId.getSlotId() != null) {
             DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
                     new ASN1Integer(slotId.getSlotId()));
             vector.add(taggedObj);
@@ -178,8 +156,7 @@ public class SlotIdentifier extends ASN1Object
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId()
-    {
+    public P11SlotIdentifier getSlotId() {
         return slotId;
     }
 

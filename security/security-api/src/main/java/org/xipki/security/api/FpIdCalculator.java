@@ -50,20 +50,16 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class FpIdCalculator
-{
+public class FpIdCalculator {
     private final static int parallelism = 50;
     private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
 
-    private FpIdCalculator()
-    {
+    private FpIdCalculator() {
     }
 
-    private static BlockingDeque<Digest> getMD5MessageDigests()
-    {
+    private static BlockingDeque<Digest> getMD5MessageDigests() {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for (int i = 0; i < parallelism; i++)
-        {
+        for (int i = 0; i < parallelism; i++) {
             Digest md = new SHA1Digest();
             mds.addLast(md);
         }
@@ -74,15 +70,12 @@ public class FpIdCalculator
      * @return long represented of the first 8 bytes
      */
     public static long hash(
-            final String data)
-    {
+            final String data) {
         ParamUtil.assertNotNull("data", data);
         byte[] encoded;
-        try
-        {
+        try {
             encoded = data.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             encoded = data.getBytes();
         }
         return hash(encoded);
@@ -92,43 +85,35 @@ public class FpIdCalculator
      * @return long represented of the first 8 bytes
      */
     public static long hash(
-            final byte[] data)
-    {
+            final byte[] data) {
         ParamUtil.assertNotNull("data", data);
 
         Digest md = null;
-        for (int i = 0; i < 3; i++)
-        {
-            try
-            {
+        for (int i = 0; i < 3; i++) {
+            try {
                 md = mds.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
             }
         }
 
-        if (md == null)
-        {
+        if (md == null) {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }
 
-        try
-        {
+        try {
             md.reset();
             md.update(data, 0, data.length);
             byte[] b = new byte[md.getDigestSize()];
             md.doFinal(b, 0);
 
             return bytesToLong(b);
-        } finally
-        {
+        } finally {
             mds.addLast(md);
         }
     }
 
-    private static long bytesToLong(byte[] bytes)
-    {
+    private static long bytesToLong(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(bytes, 0, 8);
         buffer.flip(); //need flip

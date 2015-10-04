@@ -50,8 +50,7 @@ import org.xipki.scep.client.exception.ScepClientException;
 
 @Command(scope = "scep", name = "renewal-req",
         description = "enroll certificate via messageType RenewalReq")
-public class RenewalReqCmd extends AbstractEnrollCertCmd
-{
+public class RenewalReqCmd extends AbstractEnrollCertCmd {
 
     @Override
     protected EnrolmentResponse requestCertificate(
@@ -59,8 +58,7 @@ public class RenewalReqCmd extends AbstractEnrollCertCmd
             final CertificationRequest csr,
             final PrivateKey identityKey,
             final X509Certificate identityCert)
-    throws ScepClientException
-    {
+    throws ScepClientException {
         return client.scepRenewalReq(csr, identityKey, identityCert);
     }
 

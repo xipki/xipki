@@ -51,8 +51,7 @@ import org.xipki.scep.client.exception.ScepClientException;
  * @author Lijun Liao
  */
 
-public abstract class AbstractEnrollCertCmd extends ClientCmd
-{
+public abstract class AbstractEnrollCertCmd extends ClientCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
@@ -74,20 +73,17 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ScepClient client = getScepClient();
 
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
         EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());
-        if (resp.isFailure())
-        {
+        if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if (resp.isPending())
-        {
+        if (resp.isPending()) {
             throw new CmdFailure("server returned 'pending'");
         }
 

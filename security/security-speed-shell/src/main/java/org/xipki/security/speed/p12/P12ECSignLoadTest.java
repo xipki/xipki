@@ -42,15 +42,13 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class P12ECSignLoadTest extends P12SignLoadTest
-{
+public class P12ECSignLoadTest extends P12SignLoadTest {
 
     public P12ECSignLoadTest(
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final String curveNameOrOid)
-    throws Exception
-    {
+    throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(curveNameOrOid),
                 "PKCS#12 EC signature creation\n"
@@ -59,11 +57,9 @@ public class P12ECSignLoadTest extends P12SignLoadTest
 
     private static byte[] generateKeystore(
             final String curveNameOrOid)
-    throws Exception
-    {
+    throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-        if (keystoreBytes == null)
-        {
+        if (keystoreBytes == null) {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveNameOrOid, password.toCharArray(), "CN=dummy", null, null);
             keystoreBytes = kpGen.generateIdentity().getKeystore();

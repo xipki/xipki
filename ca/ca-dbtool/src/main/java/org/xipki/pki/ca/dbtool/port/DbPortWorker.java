@@ -44,36 +44,29 @@ import org.slf4j.LoggerFactory;
  * @author Lijun Liao
  */
 
-public abstract class DbPortWorker implements Runnable
-{
+public abstract class DbPortWorker implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
 
     private Exception exception;
     private final AtomicBoolean stopMe = new AtomicBoolean(false);
 
-    public DbPortWorker()
-    {
+    public DbPortWorker() {
     }
 
-    public final Exception getException()
-    {
+    public final Exception getException() {
         return exception;
     }
 
     public void setStopMe(
-            final boolean b)
-    {
+            final boolean b) {
         this.stopMe.set(b);
     }
 
     @Override
-    public void run()
-    {
-        try
-        {
+    public void run() {
+        try {
             doRun(stopMe);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.error("exception thrown", e);
             exception = e;
         }

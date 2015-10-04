@@ -47,35 +47,28 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QaCertificatePolicies extends QaExtension
-{
+public class QaCertificatePolicies extends QaExtension {
     private final List<QaCertificatePolicyInformation> policyInformations;
 
     public QaCertificatePolicies(
-            final CertificatePolicies jaxb)
-    {
+            final CertificatePolicies jaxb) {
         List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
         List<QaCertificatePolicyInformation> list = new LinkedList<>();
-        for (CertificatePolicyInformationType type : types)
-        {
+        for (CertificatePolicyInformationType type : types) {
             list.add(new QaCertificatePolicyInformation(type));
         }
 
         this.policyInformations = Collections.unmodifiableList(list);
     }
 
-    public List<QaCertificatePolicyInformation> getPolicyInformations()
-    {
+    public List<QaCertificatePolicyInformation> getPolicyInformations() {
         return policyInformations;
     }
 
     public QaCertificatePolicyInformation getPolicyInformation(
-            final String policyId)
-    {
-        for (QaCertificatePolicyInformation entry : policyInformations)
-        {
-            if (entry.getPolicyId().equals(policyId))
-            {
+            final String policyId) {
+        for (QaCertificatePolicyInformation entry : policyInformations) {
+            if (entry.getPolicyId().equals(policyId)) {
                 return entry;
             }
         }
@@ -83,32 +76,26 @@ public class QaCertificatePolicies extends QaExtension
         return null;
     }
 
-    public static class QaCertificatePolicyInformation
-    {
+    public static class QaCertificatePolicyInformation {
         private final String policyId;
         private final QaPolicyQualifiers policyQualifiers;
 
         public QaCertificatePolicyInformation(
-                final CertificatePolicyInformationType jaxb)
-        {
+                final CertificatePolicyInformationType jaxb) {
             ParamUtil.assertNotNull("jaxb", jaxb);
             this.policyId = jaxb.getPolicyIdentifier().getValue();
-            if (jaxb.getPolicyQualifiers() == null)
-            {
+            if (jaxb.getPolicyQualifiers() == null) {
                 this.policyQualifiers = null;
-            } else
-            {
+            } else {
                 this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
             }
         }
 
-        public String getPolicyId()
-        {
+        public String getPolicyId() {
             return policyId;
         }
 
-        public QaPolicyQualifiers getPolicyQualifiers()
-        {
+        public QaPolicyQualifiers getPolicyQualifiers() {
             return policyQualifiers;
         }
     }

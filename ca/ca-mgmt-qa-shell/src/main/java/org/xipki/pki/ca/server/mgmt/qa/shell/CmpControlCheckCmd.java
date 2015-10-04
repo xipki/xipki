@@ -47,17 +47,14 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "cmpcontrol-check",
         description = "show information of CMP control (QA)")
-public class CmpControlCheckCmd extends CmpControlUpdateCmd
-{
+public class CmpControlCheckCmd extends CmpControlUpdateCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         out("checking CMP control " + name);
 
         CmpControlEntry c = caManager.getCmpControl(name);
-        if (c == null)
-        {
+        if (c == null) {
             throw new CmdFailure("no CMP control named '" + name + "' is configured");
         }
 

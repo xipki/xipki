@@ -51,8 +51,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "enroll-cert",
         description = "enroll certificate")
-public class EnrollCertCmd extends CaCmd
-{
+public class EnrollCertCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -83,11 +82,9 @@ public class EnrollCertCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CAEntry ca = caManager.getCA(caName);
-        if (ca == null)
-        {
+        if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 

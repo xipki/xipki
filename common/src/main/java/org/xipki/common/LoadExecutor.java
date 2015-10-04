@@ -50,8 +50,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public abstract class LoadExecutor
-{
+public abstract class LoadExecutor {
     private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
     private boolean interrupted = false;
@@ -61,8 +60,7 @@ public abstract class LoadExecutor
     private final ProcessLog processLog;
 
     public LoadExecutor(
-            final String description)
-    {
+            final String description) {
         ParamUtil.assertNotNull("description", description);
         this.description = description;
         this.processLog = new ProcessLog(0);
@@ -71,18 +69,14 @@ public abstract class LoadExecutor
     protected abstract Runnable getTestor()
     throws Exception;
 
-    public void test()
-    {
+    public void test() {
         System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
         List<Runnable> runnables = new ArrayList<>(threads);
-        for (int i = 0; i < threads; i++)
-        {
+        for (int i = 0; i < threads; i++) {
             Runnable runnable;
-            try
-            {
+            try {
                 runnable = getTestor();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("could not initialize Testor\nError message: " + e.getMessage());
                 return;
             }
@@ -91,12 +85,10 @@ public abstract class LoadExecutor
         }
 
         StringBuilder sb = new StringBuilder();
-        if (StringUtil.isNotBlank(description))
-        {
+        if (StringUtil.isNotBlank(description)) {
             sb.append(description);
             char c = description.charAt(description.length() - 1);
-            if (c != '\n')
-            {
+            if (c != '\n') {
                 sb.append('\n');
             }
         }
@@ -107,25 +99,20 @@ public abstract class LoadExecutor
         resetStartTime();
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        for (Runnable runnable : runnables)
-        {
+        for (Runnable runnable : runnables) {
             executor.execute(runnable);
         }
 
         executor.shutdown();
         printHeader();
-        while (true)
-        {
+        while (true) {
             printStatus();
-            try
-            {
+            try {
                 boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if (terminated)
-                {
+                if (terminated) {
                     break;
                 }
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 interrupted = true;
             }
         }
@@ -136,18 +123,15 @@ public abstract class LoadExecutor
         System.getProperties().remove(PROPKEY_LOADTEST);
     }
 
-    public boolean isInterrupted()
-    {
+    public boolean isInterrupted() {
         return interrupted;
     }
 
     private static int DEFAULT_DURATION = 30; // 30 seconds
     private int duration = DEFAULT_DURATION; // in seconds
     public void setDuration(
-            final int duration)
-    {
-        if (duration > 0)
-        {
+            final int duration) {
+        if (duration > 0) {
             this.duration = duration;
         }
     }
@@ -155,76 +139,62 @@ public abstract class LoadExecutor
     private static int DEFAULT_THREADS = 25;
     private int threads = DEFAULT_THREADS;
     public void setThreads(
-            final int threads)
-    {
-        if (threads > 0)
-        {
+            final int threads) {
+        if (threads > 0) {
             this.threads = threads;
         }
     }
 
     private AtomicLong errorAccount = new AtomicLong(0);
 
-    public long getErrorAccout()
-    {
+    public long getErrorAccout() {
         return errorAccount.get();
     }
 
     protected void account(
             final int all,
-            final int failed)
-    {
+            final int failed) {
         processLog.addNumProcessed(all);
         errorAccount.addAndGet(failed);
     }
 
-    protected void resetStartTime()
-    {
+    protected void resetStartTime() {
         processLog.reset();
     }
 
-    protected boolean stop()
-    {
+    protected boolean stop() {
         return interrupted
                 || errorAccount.get() > 0
                 || System.currentTimeMillis() - processLog.getStartTime() >= duration * 1000L;
     }
 
-    protected void printHeader()
-    {
+    protected void printHeader() {
         processLog.printHeader();
     }
 
-    protected void printStatus()
-    {
+    protected void printStatus() {
         processLog.printStatus();
     }
 
     private String unit = "";
     public void setUnit(
-            final String unit)
-    {
-        if (unit != null)
-        {
+            final String unit) {
+        if (unit != null) {
             this.unit = unit;
         }
     }
 
-    protected static long getSecureIndex()
-    {
+    protected static long getSecureIndex() {
         SecureRandom random = new SecureRandom();
-        while (true)
-        {
+        while (true) {
             long l = random.nextLong();
-            if (l > 0)
-            {
+            if (l > 0) {
                 return l;
             }
         }
     }
 
-    protected void printSummary()
-    {
+    protected void printSummary() {
         processLog.printTrailer();
 
         final long account = processLog.getNumProcessed();

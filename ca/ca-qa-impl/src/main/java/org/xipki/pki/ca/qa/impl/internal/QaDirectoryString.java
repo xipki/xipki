@@ -42,15 +42,13 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QaDirectoryString
-{
+public class QaDirectoryString {
     private final DirectoryStringType type;
     private final String text;
 
     public QaDirectoryString(
             final DirectoryStringType type,
-            final String text)
-    {
+            final String text) {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotBlank("text", text);
 
@@ -58,13 +56,11 @@ public class QaDirectoryString
         this.text = text;
     }
 
-    public DirectoryStringType getType()
-    {
+    public DirectoryStringType getType() {
         return type;
     }
 
-    public String getText()
-    {
+    public String getText() {
         return text;
     }
 

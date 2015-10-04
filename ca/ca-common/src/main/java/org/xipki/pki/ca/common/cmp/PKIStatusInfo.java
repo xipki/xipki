@@ -42,8 +42,7 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class PKIStatusInfo
-{
+public class PKIStatusInfo {
     private final int status;
     private final int pkiFailureInfo;
     private final String statusMessage;
@@ -51,30 +50,25 @@ public class PKIStatusInfo
     public PKIStatusInfo(
             final int status,
             final int pkiFailureInfo,
-            final String statusMessage)
-    {
+            final String statusMessage) {
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
     }
 
     public PKIStatusInfo(
-            final int status)
-    {
+            final int status) {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
     }
 
     public PKIStatusInfo(
-            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
-    {
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
         this.status = bcPKIStatusInfo.getStatus().intValue();
-        if (bcPKIStatusInfo.getFailInfo() != null)
-        {
+        if (bcPKIStatusInfo.getFailInfo() != null) {
             this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
-        } else
-        {
+        } else {
             this.pkiFailureInfo = 0;
         }
         PKIFreeText text = bcPKIStatusInfo.getStatusString();
@@ -83,24 +77,20 @@ public class PKIStatusInfo
                 : text.getStringAt(0).getString();
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return status;
     }
 
-    public int getPkiFailureInfo()
-    {
+    public int getPkiFailureInfo() {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage()
-    {
+    public String getStatusMessage() {
         return statusMessage;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 

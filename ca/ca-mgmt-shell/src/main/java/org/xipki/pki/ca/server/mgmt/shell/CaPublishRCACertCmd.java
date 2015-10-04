@@ -45,8 +45,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "publish-self",
         description = "publish the certificate of root CA")
-public class CaPublishRCACertCmd extends CaCmd
-{
+public class CaPublishRCACertCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String caName;
 
@@ -58,8 +57,7 @@ public class CaPublishRCACertCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.publishRootCA(caName, certprofile);
         output(b, "published", "could not publish", "CA certificate of root CA " + caName);
         return null;

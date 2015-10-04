@@ -49,8 +49,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class DbiXmlWriter
-{
+public class DbiXmlWriter {
     private final static XMLOutputFactory factory = XMLOutputFactory.newFactory();
 
     private final String rootElementName;
@@ -61,15 +60,13 @@ public class DbiXmlWriter
     public DbiXmlWriter(
             final String rootElementName,
             final String version)
-    throws XMLStreamException
-    {
+    throws XMLStreamException {
         ParamUtil.assertNotBlank("rootElementName", rootElementName);
         ParamUtil.assertNotBlank("version", version);
         this.rootElementName = rootElementName;
         stream = new ByteArrayOutputStream();
 
-        synchronized (factory)
-        {
+        synchronized (factory) {
             writer = factory.createXMLStreamWriter(stream);
         }
         writer.writeStartDocument("UTF-8", "1.0");
@@ -79,45 +76,38 @@ public class DbiXmlWriter
         writeNewline();
     }
 
-    public String getRootElementName()
-    {
+    public String getRootElementName() {
         return rootElementName;
     }
 
     public void writeStartElement(
             final String localName)
-    throws XMLStreamException
-    {
+    throws XMLStreamException {
         writer.writeStartElement(localName);
     }
 
     public void writeEndElement()
-    throws XMLStreamException
-    {
+    throws XMLStreamException {
         writer.writeEndElement();
     }
 
     public void writeElement(
             final String localName,
             final String value)
-    throws XMLStreamException
-    {
+    throws XMLStreamException {
         writer.writeStartElement(localName);
         writer.writeCharacters(value);
         writer.writeEndElement();
     }
 
     public void writeNewline()
-    throws XMLStreamException
-    {
+    throws XMLStreamException {
         writer.writeCharacters("\n");
     }
 
     public void flush()
-    throws IOException, XMLStreamException
-    {
-        if (flushed)
-        {
+    throws IOException, XMLStreamException {
+        if (flushed) {
             return;
         }
 
@@ -130,8 +120,7 @@ public class DbiXmlWriter
 
     public void rewriteToZipStream(
             final ZipOutputStream zipStream)
-    throws IOException, XMLStreamException
-    {
+    throws IOException, XMLStreamException {
         flush();
         zipStream.write(stream.toByteArray());
     }

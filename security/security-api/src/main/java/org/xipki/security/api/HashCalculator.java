@@ -55,14 +55,12 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class HashCalculator
-{
+public class HashCalculator {
     private final static int parallelism = 50;
     private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
             new ConcurrentHashMap<>();
 
-    static
-    {
+    static {
         mdsMap.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
         mdsMap.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
         mdsMap.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
@@ -70,19 +68,15 @@ public class HashCalculator
         mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
     }
 
-    private HashCalculator()
-    {
+    private HashCalculator() {
     }
 
     private static BlockingDeque<Digest> getMessageDigests(
-            final HashAlgoType hashAlgo)
-    {
+            final HashAlgoType hashAlgo) {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for (int i = 0; i < parallelism; i++)
-        {
+        for (int i = 0; i < parallelism; i++) {
             Digest md;
-            switch (hashAlgo)
-            {
+            switch (hashAlgo) {
                 case SHA1:
                     md = new SHA1Digest();
                     break;
@@ -108,46 +102,39 @@ public class HashCalculator
     }
 
     public static String base64Sha1(
-            final byte[] data)
-    {
+            final byte[] data) {
         return base64Hash(HashAlgoType.SHA1, data);
     }
 
     public static String hexSha1(
-            final byte[] data)
-    {
+            final byte[] data) {
         return hexHash(HashAlgoType.SHA1, data);
     }
 
     public static byte[] sha1(
-            final byte[] data)
-    {
+            final byte[] data) {
         return hash(HashAlgoType.SHA1, data);
     }
 
     public static String base64Sha256(
-            final byte[] data)
-    {
+            final byte[] data) {
         return base64Hash(HashAlgoType.SHA256, data);
     }
 
     public static String hexSha256(
-            final byte[] data)
-    {
+            final byte[] data) {
         return hexHash(HashAlgoType.SHA256, data);
     }
 
     public static byte[] sha256(
             final HashAlgoType hashAlgoType,
-            final byte[] data)
-    {
+            final byte[] data) {
         return hash(HashAlgoType.SHA256, data);
     }
 
     public static String hexHash(
             final HashAlgoType hashAlgoType,
-            final byte[] data)
-    {
+            final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
         return (bytes == null)
                 ? null
@@ -156,8 +143,7 @@ public class HashCalculator
 
     public static String base64Hash(
             final HashAlgoType hashAlgoType,
-            final byte[] data)
-    {
+            final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
         return (bytes == null)
                 ? null
@@ -166,43 +152,35 @@ public class HashCalculator
 
     public static byte[] hash(
             final HashAlgoType hashAlgoType,
-            final byte[] data)
-    {
+            final byte[] data) {
         ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
         ParamUtil.assertNotNull("data", data);
-        if (!mdsMap.containsKey(hashAlgoType))
-        {
+        if (!mdsMap.containsKey(hashAlgoType)) {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }
 
         BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
 
         Digest md = null;
-        for (int i = 0; i < 3; i++)
-        {
-            try
-            {
+        for (int i = 0; i < 3; i++) {
+            try {
                 md = mds.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
             }
         }
 
-        if (md == null)
-        {
+        if (md == null) {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }
 
-        try
-        {
+        try {
             md.reset();
             md.update(data, 0, data.length);
             byte[] b = new byte[md.getDigestSize()];
             md.doFinal(b, 0);
             return b;
-        } finally
-        {
+        } finally {
             mds.addLast(md);
         }
     }

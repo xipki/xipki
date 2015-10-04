@@ -47,45 +47,36 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
  * @author Lijun Liao
  */
 
-public abstract class DbPortCmd extends XipkiOsgiCommandSupport
-{
+public abstract class DbPortCmd extends XipkiOsgiCommandSupport {
 
-    public DbPortCmd()
-    {
+    public DbPortCmd() {
     }
 
     protected abstract DbPortWorker getDbPortWorker()
     throws Exception;
 
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         DbPortWorker myRun = getDbPortWorker();
         executor.execute(myRun);
 
         executor.shutdown();
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if (terminated)
-                {
+                if (terminated) {
                     break;
                 }
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 myRun.setStopMe(true);
             }
         }
 
         Exception e = myRun.getException();
-        if (e != null)
-        {
+        if (e != null) {
             String errMsg = e.getMessage();
-            if (StringUtil.isBlank(errMsg))
-            {
+            if (StringUtil.isBlank(errMsg)) {
                 errMsg = "ERROR";
             }
 

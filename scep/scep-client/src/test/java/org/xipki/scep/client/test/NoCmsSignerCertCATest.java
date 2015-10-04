@@ -41,17 +41,14 @@ import org.xipki.scep.transaction.CACapability;
  * @author Lijun Liao
  */
 
-public class NoCmsSignerCertCATest extends AbstractCATest
-{
+public class NoCmsSignerCertCATest extends AbstractCATest {
     @Override
-    protected boolean sendSignerCert()
-    {
+    protected boolean sendSignerCert() {
         return false;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps()
-    {
+    protected CACapability[] getExcludedCACaps() {
         return null;
     }
 

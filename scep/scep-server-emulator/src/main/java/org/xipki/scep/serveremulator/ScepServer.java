@@ -62,8 +62,7 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public class ScepServer
-{
+public class ScepServer {
     private final String name;
     private final CACaps caCaps;
     private final boolean withRA;
@@ -84,8 +83,7 @@ public class ScepServer
             final boolean withRA,
             final boolean withNextCA,
             final boolean generateCRL,
-            final ScepControl control)
-    {
+            final ScepControl control) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotNull("caCaps", caCaps);
         ParamUtil.assertNotNull("control", control);
@@ -97,39 +95,31 @@ public class ScepServer
         this.control = control;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     public void setMaxSigningTimeBias(
-            final long ms)
-    {
+            final long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
     public ScepServlet getServlet()
-    throws Exception
-    {
-        if (servlet != null)
-        {
+    throws Exception {
+        if (servlet != null) {
             return servlet;
         }
 
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
         X500Name rCASubject;
-        PrivateKey rCAKey;
-
-        {
+        PrivateKey rCAKey; {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
             rCAKey = keypair.getPrivate();
             rCASubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
         }
 
-        CAEmulator ca;
-
-        {
+        CAEmulator ca; {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
 
@@ -146,8 +136,7 @@ public class ScepServer
         }
 
         RAEmulator ra = null;
-        if (withRA)
-        {
+        if (withRA) {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
             SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
@@ -158,8 +147,7 @@ public class ScepServer
         }
 
         NextCAandRA nextCAandRA = null;
-        if (withNextCA)
-        {
+        if (withNextCA) {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
 
@@ -176,8 +164,7 @@ public class ScepServer
                     startTime);
             CAEmulator tmpCA = new CAEmulator(keypair.getPrivate(), this.nextCACert, generateCRL);
 
-            if (withRA)
-            {
+            if (withRA) {
                 kpGen.initialize(2048);
                 keypair = kpGen.generateKeyPair();
                 pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
@@ -191,8 +178,7 @@ public class ScepServer
         }
 
         ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
-        if (maxSigningTimeBiasInMs != null)
-        {
+        if (maxSigningTimeBiasInMs != null) {
             scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
         }
 
@@ -208,8 +194,7 @@ public class ScepServer
             final X500Name subject,
             final BigInteger serialNumber,
             final Date startTime)
-    throws CertIOException, OperatorCreationException
-    {
+    throws CertIOException, OperatorCreationException {
         Date notAfter = new Date(startTime.getTime() + CAEmulator.DAY_IN_MS * 3650);
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
                 issuer,
@@ -230,38 +215,31 @@ public class ScepServer
         return certGenerator.build(contentSigner).toASN1Structure();
     }
 
-    public Certificate getCACert()
-    {
+    public Certificate getCACert() {
         return cACert;
     }
 
-    public Certificate getRACert()
-    {
+    public Certificate getRACert() {
         return rACert;
     }
 
-    public Certificate getNextCACert()
-    {
+    public Certificate getNextCACert() {
         return nextCACert;
     }
 
-    public Certificate getNextRACert()
-    {
+    public Certificate getNextRACert() {
         return nextRACert;
     }
 
-    public boolean isWithRA()
-    {
+    public boolean isWithRA() {
         return withRA;
     }
 
-    public boolean isWithNextCA()
-    {
+    public boolean isWithNextCA() {
         return withNextCA;
     }
 
-    public boolean isGenerateCRL()
-    {
+    public boolean isGenerateCRL() {
         return generateCRL;
     }
 

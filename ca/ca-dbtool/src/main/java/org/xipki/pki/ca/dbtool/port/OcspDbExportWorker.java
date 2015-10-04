@@ -62,8 +62,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
  * @author Lijun Liao
  */
 
-public class OcspDbExportWorker extends DbPortWorker
-{
+public class OcspDbExportWorker extends DbPortWorker {
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
     private final DataSourceWrapper dataSource;
     private final Marshaller marshaller;
@@ -83,8 +82,7 @@ public class OcspDbExportWorker extends DbPortWorker
             final int numCertsInBundle,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException
-    {
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
@@ -101,27 +99,21 @@ public class OcspDbExportWorker extends DbPortWorker
         this.evaluateOnly = evaluateOnly;
 
         File f = new File(destFolder);
-        if (!f.exists())
-        {
+        if (!f.exists()) {
             f.mkdirs();
-        } else
-        {
-            if (!f.isDirectory())
-            {
+        } else {
+            if (!f.isDirectory()) {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (!f.canWrite())
-            {
+            if (!f.canWrite()) {
                 throw new IOException(destFolder + " is not writable");
             }
         }
 
-        if (!resume)
-        {
+        if (!resume) {
             String[] children = f.list();
-            if (children != null && children.length > 0)
-            {
+            if (children != null && children.length > 0) {
                 throw new IOException(destFolder + " is not empty");
             }
         }
@@ -134,24 +126,19 @@ public class OcspDbExportWorker extends DbPortWorker
     @Override
     public void doRun(
             final AtomicBoolean stopMe)
-    throws Exception
-    {
+    throws Exception {
         long start = System.currentTimeMillis();
-        try
-        {
+        try {
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
                     dataSource, marshaller, unmarshaller, destFolder,
                     numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 dataSource.shutdown();
-            } catch (Throwable e)
-            {
+            } catch (Throwable e) {
                 LOG.error("dataSource.shutdown()", e);
             }
             long end = System.currentTimeMillis();

@@ -45,16 +45,14 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException
-{
+public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException {
 
     /**
      * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
      */
     public InvalidDataAccessResourceUsageException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -65,8 +63,7 @@ public class InvalidDataAccessResourceUsageException extends NonTransientDataAcc
      */
     public InvalidDataAccessResourceUsageException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

@@ -46,16 +46,14 @@ import org.bouncycastle.operator.ContentVerifierProvider;
  * @author Lijun Liao
  */
 
-public abstract class AbstractSecurityFactory implements SecurityFactory
-{
+public abstract class AbstractSecurityFactory implements SecurityFactory {
 
     @Override
     public ConcurrentContentSigner createSigner(
             final String type,
             final String conf,
             final X509Certificate cert)
-    throws SignerException
-    {
+    throws SignerException {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert};
@@ -69,8 +67,7 @@ public abstract class AbstractSecurityFactory implements SecurityFactory
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate cert)
-    throws SignerException
-    {
+    throws SignerException {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert};
@@ -80,16 +77,14 @@ public abstract class AbstractSecurityFactory implements SecurityFactory
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
             final X509Certificate cert)
-    throws InvalidKeyException
-    {
+    throws InvalidKeyException {
         return getContentVerifierProvider(cert.getPublicKey());
     }
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
             final X509CertificateHolder cert)
-    throws InvalidKeyException
-    {
+    throws InvalidKeyException {
         PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
         return getContentVerifierProvider(publicKey);
     }

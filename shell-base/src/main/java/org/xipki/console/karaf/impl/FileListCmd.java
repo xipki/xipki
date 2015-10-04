@@ -53,8 +53,7 @@ import jline.console.ConsoleReader;
 
 @Command(scope = "xipki-cmd", name = "ls",
         description = "list directory contents")
-public class FileListCmd extends XipkiOsgiCommandSupport
-{
+public class FileListCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "file",
             required = true,
             description = "file or directory\n"
@@ -63,17 +62,14 @@ public class FileListCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         File target = new File(expandFilepath(targetPath));
-        if (!target.exists())
-        {
+        if (!target.exists()) {
             throw new IllegalCmdParamException(
                     "could not access " + targetPath + ": no such file or directory");
         }
 
-        if (!target.isDirectory())
-        {
+        if (!target.isDirectory()) {
             out(targetPath);
             return null;
         }
@@ -81,32 +77,26 @@ public class FileListCmd extends XipkiOsgiCommandSupport
         List<String> l = new LinkedList<>();
         File[] children = target.listFiles();
         int maxLen = -1;
-        for (File child : children)
-        {
+        for (File child : children) {
             String name  = child.getName();
-            if (child.isDirectory())
-            {
+            if (child.isDirectory()) {
                 name += File.separator;
             }
             l.add(name);
             maxLen = Math.max(maxLen, name.length());
         }
 
-        if (isEmpty(l))
-        {
+        if (isEmpty(l)) {
             return null;
         }
 
         Collections.sort(l);
         List<String> l2 = new LinkedList<>();
 
-        for (String s : l)
-        {
+        for (String s : l) {
             int diffLen = maxLen - s.length();
-            if (diffLen > 0)
-            {
-                for (int i = 0; i < diffLen; i++)
-                {
+            if (diffLen > 0) {
+                for (int i = 0; i < diffLen; i++) {
                     s += " ";
                 }
             }
@@ -117,19 +107,14 @@ public class FileListCmd extends XipkiOsgiCommandSupport
         int width = reader.getTerminal().getWidth();
 
         int n = width / (maxLen + 1);
-        if (n == 0)
-        {
-            for (String s :l2)
-            {
+        if (n == 0) {
+            for (String s :l2) {
                 out(s);
             }
-        } else
-        {
-            for (int i = 0; i < l2.size(); i += n)
-            {
+        } else {
+            for (int i = 0; i < l2.size(); i += n) {
                 StringBuilder sb = new StringBuilder();
-                for (int j = i; j < Math.min(l2.size(), i + n); j++)
-                {
+                for (int j = i; j < Math.min(l2.size(), i + n); j++) {
                     sb.append(l2.get(j)).append(" ");
                 }
                 out(sb.toString());

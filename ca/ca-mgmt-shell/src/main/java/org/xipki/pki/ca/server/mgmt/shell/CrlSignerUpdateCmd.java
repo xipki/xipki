@@ -54,8 +54,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "crlsigner-up",
         description = "update CRL signer")
-public class CrlSignerUpdateCmd extends CaCmd
-{
+public class CrlSignerUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"
@@ -81,33 +80,26 @@ public class CrlSignerUpdateCmd extends CaCmd
     private PasswordResolver passwordResolver;
 
     public void setPasswordResolver(
-            final PasswordResolver passwordResolver)
-    {
+            final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
     protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry()
-    throws Exception
-    {
+    throws Exception {
         String signerCertConf = null;
-        if (CAManager.NULL.equalsIgnoreCase(signerCert))
-        {
+        if (CAManager.NULL.equalsIgnoreCase(signerCert)) {
             signerCertConf = CAManager.NULL;
-        } else if (signerCert != null)
-        {
+        } else if (signerCert != null) {
             byte[] certBytes = IoUtil.read(signerCert);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        if (signerConf != null)
-        {
+        if (signerConf != null) {
             String _signerType = signerType;
-            if (_signerType == null)
-            {
+            if (_signerType == null) {
                 X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-                if (entry == null)
-                {
+                if (entry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
                 _signerType = entry.getType();
@@ -127,8 +119,7 @@ public class CrlSignerUpdateCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean b = caManager.changeCrlSigner(getCrlSignerChangeEntry());
         output(b, "updated", "could not update", "CRL signer " + name);
         return null;

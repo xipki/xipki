@@ -53,8 +53,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class UnRevRemoveCertCmd extends CaCmd
-{
+public abstract class UnRevRemoveCertCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -72,35 +71,28 @@ public abstract class UnRevRemoveCertCmd extends CaCmd
     private String serialNumberS;
 
     protected BigInteger getSerialNumber()
-    throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException
-    {
+    throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
         CAEntry ca = caManager.getCA(caName);
-        if (ca == null)
-        {
+        if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
-        if (!(ca instanceof X509CAEntry))
-        {
+        if (!(ca instanceof X509CAEntry)) {
             throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
         }
 
         BigInteger serialNumber;
-        if (serialNumberS != null)
-        {
+        if (serialNumberS != null) {
             serialNumber = toBigInt(serialNumberS);
-        } else if (certFile != null)
-        {
+        } else if (certFile != null) {
             X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
-            if (!X509Util.issues(caCert, cert))
-            {
+            if (!X509Util.issues(caCert, cert)) {
                 throw new UnexpectedException(
                         "certificate '" + certFile + "' is not issued by CA " + caName);
             }
             serialNumber = cert.getSerialNumber();
-        } else
-        {
+        } else {
             throw new IllegalCmdParamException("neither serialNumber nor certFile is specified");
         }
 

@@ -50,8 +50,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "careq-add",
         description = "add requestor to CA")
-public class CaRequestorAddCmd extends CaCmd
-{
+public class CaRequestorAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -82,19 +81,16 @@ public class CaRequestorAddCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         boolean ra = isEnabled(raS, false, "ra");
 
         CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
         entry.setRa(ra);
         entry.setProfiles(profiles);
         Set<Permission> _permissions = new HashSet<>();
-        for (String permission : permissions)
-        {
+        for (String permission : permissions) {
             Permission _permission = Permission.getPermission(permission);
-            if (_permission == null)
-            {
+            if (_permission == null) {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
             _permissions.add(_permission);

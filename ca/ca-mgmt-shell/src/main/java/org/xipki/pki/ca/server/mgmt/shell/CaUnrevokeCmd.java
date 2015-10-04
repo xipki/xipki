@@ -45,17 +45,14 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "ca-unrevoke",
         description = "unrevoke CA")
-public class CaUnrevokeCmd extends CaCmd
-{
+public class CaUnrevokeCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     private String caName;
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (!caManager.getCaNames().contains(caName))
-        {
+    throws Exception {
+        if (!caManager.getCaNames().contains(caName)) {
             throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 

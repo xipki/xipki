@@ -48,8 +48,7 @@ import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 @Command(scope = "xipki-ca", name = "careq-info",
         description = "show information of requestor in CA")
-public class CaRequestorInfoCmd extends CaCmd
-{
+public class CaRequestorInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -58,25 +57,20 @@ public class CaRequestorInfoCmd extends CaCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (caManager.getCA(caName) == null)
-        {
+    throws Exception {
+        if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
 
         Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-        if (isNotEmpty(entries))
-        {
+        if (isNotEmpty(entries)) {
             sb.append("requestors trusted by CA " + caName).append("\n");
-            for (CAHasRequestorEntry entry  : entries)
-            {
+            for (CAHasRequestorEntry entry  : entries) {
                 sb.append("\t").append(entry).append("\n");
             }
-        } else
-        {
+        } else {
             sb.append("\tno requestor for CA " + caName + " is configured");
         }
         out(sb.toString());

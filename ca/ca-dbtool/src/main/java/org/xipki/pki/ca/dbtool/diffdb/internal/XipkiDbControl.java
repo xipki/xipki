@@ -39,8 +39,7 @@ package org.xipki.pki.ca.dbtool.diffdb.internal;
  * @author Lijun Liao
  */
 
-public class XipkiDbControl
-{
+public class XipkiDbControl {
 
     private final String tblCa;
     private final String tblCerthash;
@@ -57,18 +56,14 @@ public class XipkiDbControl
     private final String certSql;
 
     public XipkiDbControl(
-            final DbSchemaType dbSchemaType)
-    {
+            final DbSchemaType dbSchemaType) {
         if (dbSchemaType == DbSchemaType.XIPKI_CA_v1
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1)
-        {
-            if (dbSchemaType == DbSchemaType.XIPKI_CA_v1)
-            { // CA
+                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1) {
+            if (dbSchemaType == DbSchemaType.XIPKI_CA_v1) { // CA
                 tblCa = "CAINFO";
                 tblCerthash = "RAWCERT";
                 colCaId = "CAINFO_ID";
-            } else
-            { // OCSP
+            } else { // OCSP
                 tblCa = "ISSUER";
                 tblCerthash = "CERTHASH";
                 colCaId = "ISSUER_ID";
@@ -82,16 +77,13 @@ public class XipkiDbControl
             colRevTime = "REV_TIME";
             colSerialNumber = "SERIAL";
         } else if (dbSchemaType == DbSchemaType.XIPKI_CA_v2
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2)
-        {
-            if (dbSchemaType == DbSchemaType.XIPKI_CA_v2)
-            { // CA
+                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2) {
+            if (dbSchemaType == DbSchemaType.XIPKI_CA_v2) { // CA
                 tblCa = "CS_CA";
                 tblCerthash = "CRAW";
                 colCaId = "CA_ID";
                 colCerthash = "SHA1";
-            } else
-            { // OCSP
+            } else { // OCSP
                 tblCa = "ISSUER";
                 tblCerthash = "CHASH";
                 colCaId = "IID";
@@ -104,8 +96,7 @@ public class XipkiDbControl
             colRevReason = "RR";
             colRevTime = "RT";
             colSerialNumber = "SN";
-        } else
-        {
+        } else {
             throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
         }
 
@@ -131,63 +122,51 @@ public class XipkiDbControl
         this.certSql = sb.toString();
     }
 
-    public String getTblCa()
-    {
+    public String getTblCa() {
         return tblCa;
     }
 
-    public String getTblCerthash()
-    {
+    public String getTblCerthash() {
         return tblCerthash;
     }
 
-    public String getColCaId()
-    {
+    public String getColCaId() {
         return colCaId;
     }
 
-    public String getColCertId()
-    {
+    public String getColCertId() {
         return colCertId;
     }
 
-    public String getColCerthash()
-    {
+    public String getColCerthash() {
         return colCerthash;
     }
 
-    public String getColRevoked()
-    {
+    public String getColRevoked() {
         return colRevoked;
     }
 
-    public String getColRevReason()
-    {
+    public String getColRevReason() {
         return colRevReason;
     }
 
-    public String getColRevTime()
-    {
+    public String getColRevTime() {
         return colRevTime;
     }
 
-    public String getColRevInvTime()
-    {
+    public String getColRevInvTime() {
         return colRevInvTime;
     }
 
-    public String getColSerialNumber()
-    {
+    public String getColSerialNumber() {
         return colSerialNumber;
     }
 
-    public String getCaSql()
-    {
+    public String getCaSql() {
         return caSql;
     }
 
-    public String getCertSql()
-    {
+    public String getCertSql() {
         return certSql;
     }
 

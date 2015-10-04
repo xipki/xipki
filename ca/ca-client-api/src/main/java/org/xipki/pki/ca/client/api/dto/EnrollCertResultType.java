@@ -45,52 +45,43 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class EnrollCertResultType
-{
+public class EnrollCertResultType {
     private List<CMPCertificate> cACertificates;
     private List<ResultEntryType> resultEntries;
 
-    public EnrollCertResultType()
-    {
+    public EnrollCertResultType() {
     }
 
     public void addCACertificate(
-            final CMPCertificate cACertificate)
-    {
-        if (cACertificates == null)
-        {
+            final CMPCertificate cACertificate) {
+        if (cACertificates == null) {
             cACertificates = new ArrayList<>(1);
         }
         cACertificates.add(cACertificate);
     }
 
     public void addResultEntry(
-            final ResultEntryType resultEntry)
-    {
+            final ResultEntryType resultEntry) {
         ParamUtil.assertNotNull("resultEntry", resultEntry);
 
         if (!(resultEntry instanceof EnrollCertResultEntryType
-                || resultEntry instanceof ErrorResultEntryType))
-        {
+                || resultEntry instanceof ErrorResultEntryType)) {
             throw new IllegalArgumentException(
                     "Unaccepted parameter of class " + resultEntry.getClass().getName());
         }
 
-        if (resultEntries == null)
-        {
+        if (resultEntries == null) {
             resultEntries = new ArrayList<>(1);
         }
 
         resultEntries.add(resultEntry);
     }
 
-    public List<CMPCertificate> getCACertificates()
-    {
+    public List<CMPCertificate> getCACertificates() {
         return cACertificates;
     }
 
-    public List<ResultEntryType> getResultEntries()
-    {
+    public List<ResultEntryType> getResultEntries() {
         return resultEntries;
     }
 
