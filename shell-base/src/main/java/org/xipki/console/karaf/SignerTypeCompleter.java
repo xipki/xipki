@@ -39,6 +39,5 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface SignerTypeCompleter extends XipkiCompleter
-{
+public interface SignerTypeCompleter extends XipkiCompleter {
 }

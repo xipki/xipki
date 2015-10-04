@@ -48,21 +48,17 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public final class PreprovisionedCACertValidator
-implements CACertValidator
-{
+implements CACertValidator {
     private final Set<String> fpOfCerts;
 
     public PreprovisionedCACertValidator(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         ParamUtil.assertNotNull("cert", cert);
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
-        try
-        {
+        try {
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new IllegalArgumentException(
                     "at least one of the certificate could not be encoded");
         }
@@ -70,18 +66,14 @@ implements CACertValidator
     }
 
     public PreprovisionedCACertValidator(
-            final Set<X509Certificate> certs)
-    {
+            final Set<X509Certificate> certs) {
         ParamUtil.assertNotEmpty("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
-        for (X509Certificate m : certs)
-        {
+        for (X509Certificate m : certs) {
             String hexFp;
-            try
-            {
+            try {
                 hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
-            } catch (CertificateEncodingException e)
-            {
+            } catch (CertificateEncodingException e) {
                 throw new IllegalArgumentException(
                         "at least one of the certificate could not be encoded");
             }
@@ -91,14 +83,11 @@ implements CACertValidator
 
     @Override
     public boolean isTrusted(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         String hextFp;
-        try
-        {
+        try {
             hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             return false;
         }
         return fpOfCerts.contains(hextFp);

@@ -56,23 +56,19 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
  */
 
 public class ECDSAContentVerifierProviderBuilder
-    extends BcContentVerifierProviderBuilder
-{
+    extends BcContentVerifierProviderBuilder {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public ECDSAContentVerifierProviderBuilder(
-            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder)
-    {
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
 
     protected Signer createSigner(
             final AlgorithmIdentifier sigAlgId)
-    throws OperatorCreationException
-    {
+    throws OperatorCreationException {
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-        if (digAlg == null)
-        {
+        if (digAlg == null) {
             throw new OperatorCreationException(
                     "could not retrieve digest algorithm from the signature algorithm "
                     + sigAlgId.getAlgorithm().getId());
@@ -84,8 +80,7 @@ public class ECDSAContentVerifierProviderBuilder
 
     protected AsymmetricKeyParameter extractKeyParameters(
             final SubjectPublicKeyInfo publicKeyInfo)
-    throws IOException
-    {
+    throws IOException {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }
 }

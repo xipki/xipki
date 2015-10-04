@@ -58,18 +58,15 @@ import org.xipki.security.api.BadASN1ObjectException;
  * @author Lijun Liao
  */
 
-public class PSOTemplate extends ASN1Object
-{
+public class PSOTemplate extends ASN1Object {
     private SlotAndKeyIdentifer slotAndKeyIdentifier;
     private byte[] message;
 
     private PSOTemplate(
             final ASN1Sequence seq)
-    throws BadASN1ObjectException
-    {
+    throws BadASN1ObjectException {
         final int n = seq.size();
-        if (n != 2)
-        {
+        if (n != 2) {
             StringBuilder sb = new StringBuilder(100);
             sb.append("wrong number of elements in sequence 'PSOTemplate'");
             sb.append(", is '").append(n).append("'");
@@ -85,14 +82,11 @@ public class PSOTemplate extends ASN1Object
 
     public PSOTemplate(
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
-            final byte[] message)
-    {
-        if (slotAndKeyIdentifier == null)
-        {
+            final byte[] message) {
+        if (slotAndKeyIdentifier == null) {
             throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
         }
-        if (message == null)
-        {
+        if (message == null) {
             throw new IllegalArgumentException("message could not be null");
         }
 
@@ -102,27 +96,21 @@ public class PSOTemplate extends ASN1Object
 
     public static PSOTemplate getInstance(
             final Object obj)
-    throws BadASN1ObjectException
-    {
-        if (obj == null || obj instanceof PSOTemplate)
-        {
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof PSOTemplate) {
             return (PSOTemplate) obj;
         }
 
-        try
-        {
-            if (obj instanceof ASN1Sequence)
-            {
+        try {
+            if (obj instanceof ASN1Sequence) {
                 return new PSOTemplate((ASN1Sequence) obj);
             }
 
-            if (obj instanceof byte[])
-            {
+            if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
-        catch (IOException | IllegalArgumentException e)
-        {
+        catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("unable to parse encoded PSOTemplate");
         }
 
@@ -131,21 +119,18 @@ public class PSOTemplate extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotAndKeyIdentifier.toASN1Primitive());
         vector.add(new DEROctetString(message));
         return new DERSequence(vector);
     }
 
-    public byte[] getMessage()
-    {
+    public byte[] getMessage() {
         return message;
     }
 
-    public SlotAndKeyIdentifer getSlotAndKeyIdentifer()
-    {
+    public SlotAndKeyIdentifer getSlotAndKeyIdentifer() {
         return slotAndKeyIdentifier;
     }
 

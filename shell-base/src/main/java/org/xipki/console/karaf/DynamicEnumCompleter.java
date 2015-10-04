@@ -44,20 +44,17 @@ import org.apache.karaf.shell.console.completer.StringsCompleter;
  * @author Lijun Liao
  */
 
-public abstract class DynamicEnumCompleter implements XipkiCompleter
-{
+public abstract class DynamicEnumCompleter implements XipkiCompleter {
     protected abstract Set<String> getEnums();
 
     @Override
     public int complete(
             final String buffer,
             final int cursor,
-            final List<String> candidates)
-    {
+            final List<String> candidates) {
         StringsCompleter delegate = new StringsCompleter();
 
-        for (String s : getEnums())
-        {
+        for (String s : getEnums()) {
             delegate.getStrings().add(s);
         }
 

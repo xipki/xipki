@@ -50,8 +50,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "export-cert",
         description = "export certificate from PKCS#11 device")
-public class P11CertExportCmd extends P11SecurityCmd
-{
+public class P11CertExportCmd extends P11SecurityCmd {
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -61,13 +60,11 @@ public class P11CertExportCmd extends P11SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate cert = slot.exportCert(keyIdentifier);
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new CmdFailure("could not export certificate " + keyIdentifier);
         }
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());

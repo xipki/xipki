@@ -39,34 +39,29 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public class AuditEventData
-{
+public class AuditEventData {
     private final String name;
     private final String value;
 
     public AuditEventData(
             final String name,
-            final String value)
-    {
+            final String value) {
         assertNotEmpty("name", name);
         assertNotNull("value", value);
         this.name = name;
         this.value = value;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(": ").append(value);
         return sb.toString();
@@ -74,25 +69,20 @@ public class AuditEventData
 
     private static void assertNotNull(
             final String parameterName,
-            final Object parameter)
-    {
-        if (parameter == null)
-        {
+            final Object parameter) {
+        if (parameter == null) {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
     }
 
     private static void assertNotEmpty(
             final String parameterName,
-            final String parameter)
-    {
-        if (parameter == null)
-        {
+            final String parameter) {
+        if (parameter == null) {
             throw new IllegalArgumentException(parameterName + " could not be null");
         }
 
-        if (parameter.isEmpty())
-        {
+        if (parameter.isEmpty()) {
             throw new IllegalArgumentException(parameterName + " could not be empty");
         }
     }

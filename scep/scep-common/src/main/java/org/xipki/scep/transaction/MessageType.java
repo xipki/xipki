@@ -39,8 +39,7 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public enum MessageType
-{
+public enum MessageType {
     /**
      * Response to certificate or CRL request
      */
@@ -81,23 +80,18 @@ public enum MessageType
     private final int code;
 
     private MessageType(
-            final int code)
-    {
+            final int code) {
         this.code = code;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
     public static MessageType valueForCode(
-            final int code)
-    {
-        for (MessageType m : values())
-        {
-            if (m.code == code)
-            {
+            final int code) {
+        for (MessageType m : values()) {
+            if (m.code == code) {
                 return m;
             }
         }

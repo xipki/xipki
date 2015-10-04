@@ -45,16 +45,14 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-public class P11ECSignLoadTest extends P11SignLoadTest
-{
+public class P11ECSignLoadTest extends P11SignLoadTest {
 
     public P11ECSignLoadTest(
             final SecurityFactory securityFactory,
             final P11WritableSlot slot,
             final String signatureAlgorithm,
             final String curveNameOrOid)
-    throws Exception
-    {
+    throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, curveNameOrOid),
                 "PKCS#11 EC signature creation\n"
@@ -64,8 +62,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest
     private static P11KeyIdentifier generateKey(
             final P11WritableSlot slot,
             final String curveNameOrOid)
-    throws Exception
-    {
+    throws Exception {
         ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
         P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
                 curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);

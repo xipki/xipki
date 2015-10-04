@@ -46,11 +46,9 @@ import org.xipki.security.api.ObjectIdentifiers;
  * @author Lijun Liao
  */
 
-public abstract class KeyGenCmd extends SecurityCmd
-{
+public abstract class KeyGenCmd extends SecurityCmd {
     protected Integer getKeyUsage()
-    throws Exception
-    {
+    throws Exception {
         return KeyUsage.cRLSign
                 | KeyUsage.dataEncipherment
                 | KeyUsage.digitalSignature
@@ -60,8 +58,7 @@ public abstract class KeyGenCmd extends SecurityCmd
     }
 
     protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
-    throws Exception
-    {
+    throws Exception {
         return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
                 ObjectIdentifiers.id_kp_serverAuth,
                 ObjectIdentifiers.id_kp_emailProtection,

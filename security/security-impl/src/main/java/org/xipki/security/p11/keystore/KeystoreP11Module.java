@@ -58,8 +58,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class KeystoreP11Module implements P11Module
-{
+public class KeystoreP11Module implements P11Module {
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
     private P11ModuleConf moduleConf;
@@ -68,8 +67,7 @@ public class KeystoreP11Module implements P11Module
     private List<P11SlotIdentifier> slotIds;
 
     public KeystoreP11Module(
-            final P11ModuleConf moduleConf)
-    {
+            final P11ModuleConf moduleConf) {
         ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
 
@@ -78,8 +76,7 @@ public class KeystoreP11Module implements P11Module
         File baseDir = new File(IoUtil.expandFilepath(nativeLib));
         File[] children = baseDir.listFiles();
 
-        if (children == null || children.length == 0)
-        {
+        if (children == null || children.length == 0) {
             LOG.error("found no slots");
             this.slotIds = Collections.emptyList();
             return;
@@ -90,10 +87,8 @@ public class KeystoreP11Module implements P11Module
 
         List<P11SlotIdentifier> allSlotIds = new LinkedList<>();
 
-        for (File child : children)
-        {
-            if ((child.isDirectory() && child.canRead() && !child.exists()))
-            {
+        for (File child : children) {
+            if ((child.isDirectory() && child.canRead() && !child.exists())) {
                 LOG.warn("ignore path {}, it does not point to a readable exist directory",
                         child.getPath());
                 continue;
@@ -101,32 +96,27 @@ public class KeystoreP11Module implements P11Module
 
             String filename = child.getName();
             String[] tokens = filename.split("-");
-            if (tokens == null || tokens.length != 2)
-            {
+            if (tokens == null || tokens.length != 2) {
                 LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
                 continue;
             }
 
             int slotIndex;
             long slotId;
-            try
-            {
+            try {
                 slotIndex = Integer.parseInt(tokens[0]);
                 slotId = Long.parseLong(tokens[1]);
-            } catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
                 continue;
             }
 
-            if (allSlotIndexes.contains(slotIndex))
-            {
+            if (allSlotIndexes.contains(slotIndex)) {
                 LOG.error("ignore slot dir, the same slot index has been assigned", filename);
                 continue;
             }
 
-            if (allSlotIdentifiers.contains(slotId))
-            {
+            if (allSlotIdentifiers.contains(slotId)) {
                 LOG.error("ignore slot dir, the same slot identifier has been assigned", filename);
                 continue;
             }
@@ -138,10 +128,8 @@ public class KeystoreP11Module implements P11Module
         }
 
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
-        for (P11SlotIdentifier slotId : allSlotIds)
-        {
-            if (moduleConf.isSlotIncluded(slotId))
-            {
+        for (P11SlotIdentifier slotId : allSlotIds) {
+            if (moduleConf.isSlotIncluded(slotId)) {
                 tmpSlotIds.add(slotId);
             }
         }
@@ -152,35 +140,28 @@ public class KeystoreP11Module implements P11Module
     @Override
     public KeystoreP11Slot getSlot(
             final P11SlotIdentifier slotId)
-    throws SignerException
-    {
+    throws SignerException {
         KeystoreP11Slot extSlot = slots.get(slotId);
-        if (extSlot != null)
-        {
+        if (extSlot != null) {
             return extSlot;
         }
 
         P11SlotIdentifier _slotId = null;
-        for (P11SlotIdentifier s : slotIds)
-        {
-            if (s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId())
-            {
+        for (P11SlotIdentifier s : slotIds) {
+            if (s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId()) {
                 _slotId = s;
                 break;
             }
         }
 
-        if (_slotId == null)
-        {
+        if (_slotId == null) {
             throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;
-        try
-        {
+        try {
             pwd = moduleConf.getPasswordRetriever().getPassword(_slotId);
-        } catch (PasswordResolverException e)
-        {
+        } catch (PasswordResolverException e) {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
 
@@ -194,20 +175,17 @@ public class KeystoreP11Module implements P11Module
     }
 
     public void destroySlot(
-            final long slotId)
-    {
+            final long slotId) {
         slots.remove(slotId);
     }
 
-    public void close()
-    {
+    public void close() {
         slots.clear();
         LOG.info("close", "close pkcs11 module: {}", moduleConf.getName());
     }
 
     @Override
-    public List<P11SlotIdentifier> getSlotIdentifiers()
-    {
+    public List<P11SlotIdentifier> getSlotIdentifiers() {
         return slotIds;
     }
 

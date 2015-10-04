@@ -50,8 +50,7 @@ import jline.console.ConsoleReader;
 
 @Command(scope = "xipki-cmd", name = "copy-file",
         description = "copy file")
-public class CopyFileCmd extends XipkiOsgiCommandSupport
-{
+public class CopyFileCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "source file",
             required = true,
             description = "file to be copied\n"
@@ -70,41 +69,32 @@ public class CopyFileCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         File sourceFile = new File(expandFilepath(source));
-        if (!sourceFile.exists())
-        {
+        if (!sourceFile.exists()) {
             System.err.println(source + " does not exist");
             return null;
         }
 
-        if (!sourceFile.isFile())
-        {
+        if (!sourceFile.isFile()) {
             System.err.println(source + " is not a file");
             return null;
         }
 
         File destFile = new File(dest);
-        if (destFile.exists())
-        {
-            if (!destFile.isFile())
-            {
+        if (destFile.exists()) {
+            if (!destFile.isFile()) {
                 System.err.println("cannot override an existing directory by a file");
                 return null;
-            } else
-            {
+            } else {
                 ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-                if (false == FileUtils.confirm(reader, "Do you want to override the file " + dest))
-                {
+                if (false == FileUtils.confirm(reader, "Do you want to override the file " + dest)) {
                     return null;
                 }
             }
-        } else
-        {
+        } else {
             File parent = destFile.getParentFile();
-            if (parent != null)
-            {
+            if (parent != null) {
                 parent.mkdirs();
             }
         }

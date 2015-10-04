@@ -46,8 +46,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-public class P11RSASignLoadTest extends P11SignLoadTest
-{
+public class P11RSASignLoadTest extends P11SignLoadTest {
 
     public P11RSASignLoadTest(
             final SecurityFactory securityFactory,
@@ -55,8 +54,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest
             final String signatureAlgorithm,
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, keysize, publicExponent),
                 "PKCS#11 RSA signature creation\n"
@@ -68,8 +66,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest
             final P11WritableSlot slot,
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
                 keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
                 null, null, null);

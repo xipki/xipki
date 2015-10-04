@@ -41,8 +41,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-public abstract class BSpeedP11SignCmd extends BSpeedP11Cmd
-{
+public abstract class BSpeedP11SignCmd extends BSpeedP11Cmd {
     @Option(name = "--sig-algo",
             required = true,
             description = "signature algorithm\n"

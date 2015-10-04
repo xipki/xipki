@@ -48,73 +48,57 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  * @author Lijun Liao
  */
 
-class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi
-{
+class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
     PlainECDSASignatureSpi(
-            final Digest digest)
-    {
+            final Digest digest) {
         super(digest, false);
     }
 
     static public class SHA1
-        extends PlainECDSASignatureSpi
-    {
-        public SHA1()
-        {
+        extends PlainECDSASignatureSpi {
+        public SHA1() {
             super(new SHA1Digest());
         }
     }
 
     static public class NONE
-        extends PlainECDSASignatureSpi
-    {
-        public NONE()
-        {
+        extends PlainECDSASignatureSpi {
+        public NONE() {
             super(new NullDigest());
         }
     }
 
     static public class SHA224
-        extends PlainECDSASignatureSpi
-    {
-        public SHA224()
-        {
+        extends PlainECDSASignatureSpi {
+        public SHA224() {
             super(new SHA224Digest());
         }
     }
 
     static public class SHA256
-        extends PlainECDSASignatureSpi
-    {
-        public SHA256()
-        {
+        extends PlainECDSASignatureSpi {
+        public SHA256() {
             super(new SHA256Digest());
         }
     }
 
     static public class SHA384
-        extends PlainECDSASignatureSpi
-    {
-        public SHA384()
-        {
+        extends PlainECDSASignatureSpi {
+        public SHA384() {
             super(new SHA384Digest());
         }
     }
 
     static public class SHA512
-        extends PlainECDSASignatureSpi
-    {
-        public SHA512()
-        {
+        extends PlainECDSASignatureSpi {
+        public SHA512() {
             super(new SHA512Digest());
         }
     }
 
     static public class RIPEMD160
-        extends PlainECDSASignatureSpi
-    {
-        public RIPEMD160()
-        {
+        extends PlainECDSASignatureSpi {
+        public RIPEMD160() {
             super(new RIPEMD160Digest());
         }
     }

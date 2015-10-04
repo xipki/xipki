@@ -39,8 +39,7 @@ package org.xipki.password.api;
  * @author Lijun Liao
  */
 
-public interface SinglePasswordResolver
-{
+public interface SinglePasswordResolver {
     boolean canResolveProtocol(
             String protocol);
 

@@ -42,19 +42,16 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class P11DSAPlainSigner extends AbstractP11DSASigner
-{
+public class P11DSAPlainSigner extends AbstractP11DSASigner {
     public P11DSAPlainSigner(
-            final Digest digest)
-    {
+            final Digest digest) {
         super(digest);
     }
 
     @Override
     protected byte[] sign(
             final byte[] hashValue)
-    throws SignerException
-    {
+    throws SignerException {
         return param.getP11CryptService().CKM_DSA_Plain(hashValue, param.getSlot(),
                 param.getKeyId());
     }

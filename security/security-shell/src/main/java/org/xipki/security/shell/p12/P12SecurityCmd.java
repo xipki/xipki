@@ -45,8 +45,7 @@ import org.xipki.security.shell.SecurityCmd;
  * @author Lijun Liao
  */
 
-public abstract class P12SecurityCmd extends SecurityCmd
-{
+public abstract class P12SecurityCmd extends SecurityCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
@@ -57,31 +56,25 @@ public abstract class P12SecurityCmd extends SecurityCmd
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected char[] getPassword()
-    {
+    protected char[] getPassword() {
         char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null)
-        {
+        if (pwdInChar != null) {
             password = new String(pwdInChar);
         }
         return pwdInChar;
     }
 
     protected KeyStore getKeyStore()
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks;
 
         FileInputStream fIn = null;
-        try
-        {
+        try {
             fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
-        } finally
-        {
-            if (fIn != null)
-            {
+        } finally {
+            if (fIn != null) {
                 fIn.close();
             }
         }

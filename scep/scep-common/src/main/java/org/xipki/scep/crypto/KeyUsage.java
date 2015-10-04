@@ -39,8 +39,7 @@ package org.xipki.scep.crypto;
  * @author Lijun Liao
  */
 
-public enum KeyUsage
-{
+public enum KeyUsage {
     digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
             "digitalSignature"),
     contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
@@ -67,27 +66,21 @@ public enum KeyUsage
     private KeyUsage(
             final int bit,
             final int bcUsage,
-            final String... names)
-    {
+            final String... names) {
         this.bit = bit;
         this.bcUsage = bcUsage;
         this.names = names;
     }
 
     public static KeyUsage getKeyUsage(
-            final String usage)
-    {
-        if (usage == null)
-        {
+            final String usage) {
+        if (usage == null) {
             return null;
         }
 
-        for (KeyUsage ku : KeyUsage.values())
-        {
-            for (String name : ku.names)
-            {
-                if (name.equals(usage))
-                {
+        for (KeyUsage ku : KeyUsage.values()) {
+            for (String name : ku.names) {
+                if (name.equals(usage)) {
                     return ku;
                 }
             }
@@ -97,12 +90,9 @@ public enum KeyUsage
     }
 
     public static KeyUsage getKeyUsage(
-            final int bit)
-    {
-        for (KeyUsage ku : KeyUsage.values())
-        {
-            if (ku.bit == bit)
-            {
+            final int bit) {
+        for (KeyUsage ku : KeyUsage.values()) {
+            if (ku.bit == bit) {
                 return ku;
             }
         }
@@ -111,12 +101,9 @@ public enum KeyUsage
     }
 
     public static KeyUsage getKeyUsageFromBcUsage(
-            final int bcUsage)
-    {
-        for (KeyUsage ku : KeyUsage.values())
-        {
-            if (ku.bcUsage == bcUsage)
-            {
+            final int bcUsage) {
+        for (KeyUsage ku : KeyUsage.values()) {
+            if (ku.bcUsage == bcUsage) {
                 return ku;
             }
         }
@@ -124,18 +111,15 @@ public enum KeyUsage
         return null;
     }
 
-    public int getBit()
-    {
+    public int getBit() {
         return bit;
     }
 
-    public int getBcUsage()
-    {
+    public int getBcUsage() {
         return bcUsage;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return names[0];
     }
 }

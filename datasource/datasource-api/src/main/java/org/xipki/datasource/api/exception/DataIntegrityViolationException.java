@@ -46,16 +46,14 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DataIntegrityViolationException extends NonTransientDataAccessException
-{
+public class DataIntegrityViolationException extends NonTransientDataAccessException {
 
     /**
      * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      */
     public DataIntegrityViolationException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -66,8 +64,7 @@ public class DataIntegrityViolationException extends NonTransientDataAccessExcep
      */
     public DataIntegrityViolationException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

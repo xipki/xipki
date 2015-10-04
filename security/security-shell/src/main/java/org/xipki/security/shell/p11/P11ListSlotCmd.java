@@ -79,8 +79,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 @Command(scope = "xipki-tk", name = "list",
         description = "list objects in PKCS#11 device")
-public class P11ListSlotCmd extends SecurityCmd
-{
+public class P11ListSlotCmd extends SecurityCmd {
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
@@ -95,42 +94,35 @@ public class P11ListSlotCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P11Module module = getP11Module(moduleName);
-        if (module == null)
-        {
+        if (module == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
 
         out("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.getSlotIdentifiers();
-        if (slotIndex == null)
-        {
+        if (slotIndex == null) {
             output(slots);
             return null;
         }
 
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
         P11WritableSlot p11slot = module.getSlot(slotId);
-        if (p11slot == null)
-        {
+        if (p11slot == null) {
             throw new IllegalCmdParamException("slot with index " + slotIndex + " does not exist");
         }
 
-        if (p11slot instanceof IaikP11Slot)
-        {
+        if (p11slot instanceof IaikP11Slot) {
             IaikP11Slot slot = (IaikP11Slot) p11slot;
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
             List<ComparableIaikPrivateKey> privateKeys = new ArrayList<>(size);
-            for (int i = 0; i < size; i++)
-            {
+            for (int i = 0; i < size; i++) {
                 PrivateKey key = allPrivateObjects.get(i);
                 byte[] id = key.getId().getByteArrayValue();
-                if (id != null)
-                {
+                if (id != null) {
                     char[] label = key.getLabel().getCharArrayValue();
                     ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label);
                     privateKeys.add(privKey);
@@ -143,8 +135,7 @@ public class P11ListSlotCmd extends SecurityCmd
             List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < size; i++)
-            {
+            for (int i = 0; i < size; i++) {
                 ComparableIaikPrivateKey privKey = privateKeys.get(i);
                 byte[] keyId = privKey.getKeyId();
                 char[] keyLabel = privKey.getKeyLabel();
@@ -164,17 +155,14 @@ public class P11ListSlotCmd extends SecurityCmd
 
                 X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId,
                         keyLabel);
-                if (cert == null)
-                {
+                if (cert == null) {
                     sb.append("\t\tCertificate: NONE\n");
-                } else
-                {
+                } else {
                     formatString(sb, cert);
                 }
             }
 
-            for (int i = 0; i < allCertObjects.size(); i++)
-            {
+            for (int i = 0; i < allCertObjects.size(); i++) {
                 X509PublicKeyCertificate certObj = allCertObjects.get(i);
                 sb.append("\tCert-")
                     .append(i + 1)
@@ -187,19 +175,16 @@ public class P11ListSlotCmd extends SecurityCmd
                 formatString(sb, certObj);
             }
 
-            if (sb.length() > 0)
-            {
+            if (sb.length() > 0) {
                 out(sb.toString());
             }
-        } else if (p11slot instanceof KeystoreP11Slot)
-        {
+        } else if (p11slot instanceof KeystoreP11Slot) {
             KeystoreP11Slot slot = (KeystoreP11Slot) p11slot;
 
             List<? extends P11Identity> identities = slot.getP11Identities();
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < identities.size(); i++)
-            {
+            for (int i = 0; i < identities.size(); i++) {
                 P11Identity identity = identities.get(i);
                 P11KeyIdentifier p11KeyId = identity.getKeyId();
 
@@ -218,12 +203,10 @@ public class P11ListSlotCmd extends SecurityCmd
                 formatString(sb, identity.getCertificate());
             }
 
-            if (sb.length() > 0)
-            {
+            if (sb.length() > 0) {
                 out(sb.toString());
             }
-        } else
-        {
+        } else {
             String clsName = (p11slot == null)
                     ? "null"
                     : p11slot.getClass().getName();
@@ -236,20 +219,16 @@ public class P11ListSlotCmd extends SecurityCmd
     private static X509PublicKeyCertificate removeCertificateObject(
             final List<X509PublicKeyCertificate> certificateObjects,
             final byte[] keyId,
-            final char[] keyLabel)
-    {
+            final char[] keyLabel) {
         X509PublicKeyCertificate cert = null;
-        for (X509PublicKeyCertificate certObj : certificateObjects)
-        {
+        for (X509PublicKeyCertificate certObj : certificateObjects) {
             if (keyId != null
-                    && !Arrays.equals(keyId, certObj.getId().getByteArrayValue()))
-            {
+                    && !Arrays.equals(keyId, certObj.getId().getByteArrayValue())) {
                 continue;
             }
 
             if (keyLabel != null
-                    && !Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()))
-            {
+                    && !Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue())) {
                 continue;
             }
 
@@ -257,8 +236,7 @@ public class P11ListSlotCmd extends SecurityCmd
             break;
         }
 
-        if (cert != null)
-        {
+        if (cert != null) {
             certificateObjects.remove(cert);
         }
 
@@ -267,21 +245,17 @@ public class P11ListSlotCmd extends SecurityCmd
 
     private void formatString(
             final StringBuilder sb,
-            final X509PublicKeyCertificate cert)
-    {
+            final X509PublicKeyCertificate cert) {
         byte[] bytes = cert.getSubject().getByteArrayValue();
         String subject;
-        try
-        {
+        try {
             X500Principal x500Prin = new X500Principal(bytes);
             subject = X509Util.getRFC4519Name(x500Prin);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             subject = new String(bytes);
         }
 
-        if (!verbose.booleanValue())
-        {
+        if (!verbose.booleanValue()) {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
         }
@@ -293,12 +267,10 @@ public class P11ListSlotCmd extends SecurityCmd
 
         bytes = cert.getIssuer().getByteArrayValue();
         String issuer;
-        try
-        {
+        try {
             X500Principal x500Prin = new X500Principal(bytes);
             issuer = X509Util.getRFC4519Name(x500Prin);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             issuer = new String(bytes);
         }
         sb.append("\t\t\tIssuer:     ")
@@ -308,11 +280,9 @@ public class P11ListSlotCmd extends SecurityCmd
         byte[] certBytes = cert.getValue().getByteArrayValue();
 
         X509Certificate x509Cert = null;
-        try
-        {
+        try {
             x509Cert = X509Util.parseCert(certBytes);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             sb.append("\t\t\tError: " + e.getMessage());
             return;
         }
@@ -333,12 +303,10 @@ public class P11ListSlotCmd extends SecurityCmd
 
     private void formatString(
             final StringBuilder sb,
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
 
-        if (!verbose.booleanValue())
-        {
+        if (!verbose.booleanValue()) {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;
         }
@@ -363,123 +331,96 @@ public class P11ListSlotCmd extends SecurityCmd
             .append(cert.getNotAfter())
             .append("\n");
         sb.append("\t\t\tSHA1 Sum:   ");
-        try
-        {
+        try {
             sb.append(HashCalculator.hexSha1(cert.getEncoded()));
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             sb.append("ERROR");
         }
         sb.append("\n");
     }
 
     private static String getKeyAlgorithm(
-            final PublicKey key)
-    {
-        if (key instanceof RSAPublicKey)
-        {
+            final PublicKey key) {
+        if (key instanceof RSAPublicKey) {
             return "RSA";
-        } else if (key instanceof ECDSAPublicKey)
-        {
+        } else if (key instanceof ECDSAPublicKey) {
             byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
-            if (paramBytes.length < 50)
-            {
-                try
-                {
+            if (paramBytes.length < 50) {
+                try {
                     ASN1ObjectIdentifier curveId =
                             (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
                     String curveName = getCurveName(curveId);
                     return "EC (named curve " + curveName + ")";
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     return "EC";
                 }
-            } else
-            {
+            } else {
                 return "EC (specified curve)";
             }
-        } else if (key instanceof DSAPublicKey)
-        {
+        } else if (key instanceof DSAPublicKey) {
             return "DSA";
-        } else
-        {
+        } else {
             return "UNKNOWN";
         }
     }
 
     private static String getCurveName(
-            final ASN1ObjectIdentifier curveId)
-    {
+            final ASN1ObjectIdentifier curveId) {
         String curveName = X962NamedCurves.getName(curveId);
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = SECNamedCurves.getName(curveId);
         }
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = TeleTrusTNamedCurves.getName(curveId);
         }
 
-        if (curveName == null)
-        {
+        if (curveName == null) {
             curveName = NISTNamedCurves.getName(curveId);
         }
 
         return curveName;
     }
 
-    private static class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey>
-    {
+    private static class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey> {
         private final byte[] keyId;
         private final char[] keyLabel;
 
         public ComparableIaikPrivateKey(
                 final byte[] keyId,
-                final char[] keyLabel)
-        {
+                final char[] keyLabel) {
             this.keyId = keyId;
             this.keyLabel = keyLabel;
         }
 
         @Override
         public int compareTo(
-                final ComparableIaikPrivateKey o)
-        {
-            if (keyLabel == null)
-            {
-                if (o.keyLabel == null)
-                {
+                final ComparableIaikPrivateKey o) {
+            if (keyLabel == null) {
+                if (o.keyLabel == null) {
                     return 0;
-                } else
-                {
+                } else {
                     return 1;
                 }
-            } else
-            {
-                if (o.keyLabel == null)
-                {
+            } else {
+                if (o.keyLabel == null) {
                     return -1;
-                } else
-                {
+                } else {
                     return new String(keyLabel).compareTo(new String(o.keyLabel));
                 }
             }
         }
 
-        public byte[] getKeyId()
-        {
+        public byte[] getKeyId() {
             return keyId;
         }
 
-        public char[] getKeyLabel()
-        {
+        public char[] getKeyLabel() {
             return keyLabel;
         }
 
-        public String getKeyLabelAsText()
-        {
+        public String getKeyLabelAsText() {
             return (keyLabel == null)
                     ? null
                     : new String(keyLabel);
@@ -487,24 +428,20 @@ public class P11ListSlotCmd extends SecurityCmd
     }
 
     private void output(
-            final List<P11SlotIdentifier> slots)
-    {
+            final List<P11SlotIdentifier> slots) {
         // list all slots
         int n = slots.size();
 
-        if (n == 0 || n == 1)
-        {
+        if (n == 0 || n == 1) {
             String numText = (n == 0)
                     ? "no"
                     : "1";
             out(numText + " slot is configured");
-        } else
-        {
+        } else {
             out(n + " slots are configured");
         }
 
-        for (P11SlotIdentifier slotId : slots)
-        {
+        for (P11SlotIdentifier slotId : slots) {
             out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
         }
     }

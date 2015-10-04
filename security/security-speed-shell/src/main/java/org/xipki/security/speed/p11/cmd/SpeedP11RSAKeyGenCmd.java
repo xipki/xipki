@@ -47,8 +47,7 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-rsa-gen",
         description = "performance test of PKCS#11 RSA key generation")
-public class SpeedP11RSAKeyGenCmd extends SpeedP11Cmd
-{
+public class SpeedP11RSAKeyGenCmd extends SpeedP11Cmd {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;
@@ -59,8 +58,7 @@ public class SpeedP11RSAKeyGenCmd extends SpeedP11Cmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         return new P11RSAKeyGenLoadTest(slot, keysize, toBigInt(publicExponent));
     }

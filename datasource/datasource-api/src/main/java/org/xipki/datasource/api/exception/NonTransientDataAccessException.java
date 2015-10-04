@@ -46,16 +46,14 @@ package org.xipki.datasource.api.exception;
  * @see java.sql.SQLNonTransientException
  */
 @SuppressWarnings("serial")
-public abstract class NonTransientDataAccessException extends DataAccessException
-{
+public abstract class NonTransientDataAccessException extends DataAccessException {
 
     /**
      * Constructor for NonTransientDataAccessException.
      * @param msg the detail message
      */
     public NonTransientDataAccessException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -67,8 +65,7 @@ public abstract class NonTransientDataAccessException extends DataAccessExceptio
      */
     public NonTransientDataAccessException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

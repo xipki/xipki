@@ -44,8 +44,7 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class AuthorityCertStore
-{
+public class AuthorityCertStore {
     private final X509Certificate cACert;
     private final X509Certificate signatureCert;
     private final X509Certificate encryptionCert;
@@ -53,8 +52,7 @@ public class AuthorityCertStore
     private AuthorityCertStore(
             final X509Certificate cACert,
             final X509Certificate signatureCert,
-            final X509Certificate encryptionCert)
-    {
+            final X509Certificate encryptionCert) {
         this.cACert = cACert;
         this.signatureCert = signatureCert;
         this.encryptionCert = encryptionCert;
@@ -62,26 +60,20 @@ public class AuthorityCertStore
 
     public static AuthorityCertStore getInstance(
             final X509Certificate cACert,
-            final X509Certificate... rACerts)
-    {
+            final X509Certificate... rACerts) {
         ParamUtil.assertNotNull("cACert", cACert);
 
         X509Certificate encryptionCert = null;
         X509Certificate signatureCert = null;
 
-        if (rACerts == null || rACerts.length == 0)
-        {
+        if (rACerts == null || rACerts.length == 0) {
             signatureCert = cACert;
             encryptionCert = cACert;
-        } else
-        {
-            for (X509Certificate cert : rACerts)
-            {
+        } else {
+            for (X509Certificate cert : rACerts) {
                 boolean[] keyusage = cert.getKeyUsage();
-                if (hasKeyusage(keyusage, KeyUsage.keyEncipherment))
-                {
-                    if (encryptionCert != null)
-                    {
+                if (hasKeyusage(keyusage, KeyUsage.keyEncipherment)) {
+                    if (encryptionCert != null) {
                         throw new IllegalArgumentException(
                                 "Could not determine RA certificate for encryption");
                     }
@@ -89,10 +81,8 @@ public class AuthorityCertStore
                 }
 
                 if (hasKeyusage(keyusage, KeyUsage.digitalSignature)
-                        || hasKeyusage(keyusage, KeyUsage.contentCommitment))
-                {
-                    if (signatureCert != null)
-                    {
+                        || hasKeyusage(keyusage, KeyUsage.contentCommitment)) {
+                    if (signatureCert != null) {
                         throw new IllegalArgumentException(
                                 "Could not determine RA certificate for signature");
                     }
@@ -100,14 +90,12 @@ public class AuthorityCertStore
                 }
             }
 
-            if (encryptionCert == null)
-            {
+            if (encryptionCert == null) {
                 throw new IllegalArgumentException(
                         "Could not determine RA certificate for encryption");
             }
 
-            if (signatureCert == null)
-            {
+            if (signatureCert == null) {
                 throw new IllegalArgumentException(
                         "Could not determine RA certificate for signature");
             }
@@ -116,27 +104,22 @@ public class AuthorityCertStore
         return new AuthorityCertStore(cACert, signatureCert, encryptionCert);
     }
 
-    public X509Certificate getSignatureCert()
-    {
+    public X509Certificate getSignatureCert() {
         return signatureCert;
     }
 
-    public X509Certificate getEncryptionCert()
-    {
+    public X509Certificate getEncryptionCert() {
         return encryptionCert;
     }
 
-    public X509Certificate getCACert()
-    {
+    public X509Certificate getCACert() {
         return cACert;
     }
 
     private static boolean hasKeyusage(
             final boolean[] keyusage,
-            final KeyUsage usage)
-    {
-        if (keyusage != null && keyusage.length > usage.getBit())
-        {
+            final KeyUsage usage) {
+        if (keyusage != null && keyusage.length > usage.getBit()) {
             return keyusage[usage.getBit()];
         }
         return false;

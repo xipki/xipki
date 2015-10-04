@@ -48,8 +48,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "rsa",
         description = "generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCmd extends P11KeyGenCmd
-{
+public class P11RSAKeyGenCmd extends P11KeyGenCmd {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;
@@ -60,21 +59,17 @@ public class P11RSAKeyGenCmd extends P11KeyGenCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (keysize % 1024 != 0)
-        {
+    throws Exception {
+        if (keysize % 1024 != 0) {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if (noCert)
-        {
+        if (noCert) {
             P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
                     label);
             finalize(keyId);
-        } else
-        {
+        } else {
             P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
                     keysize, toBigInt(publicExponent),
                     label, getSubject(),

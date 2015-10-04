@@ -39,8 +39,7 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public enum AuditLevel
-{
+public enum AuditLevel {
     ERROR    (3, "ERROR    "),
     WARN     (4, "WARN     "),
     INFO     (6, "INFO     "),
@@ -51,29 +50,23 @@ public enum AuditLevel
 
     private AuditLevel(
             final int value,
-            final String alignedText)
-    {
+            final String alignedText) {
         this.value = value;
         this.alignedText = alignedText;
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return value;
     }
 
     public static final AuditLevel forName(
-            final String name)
-    {
-        if (name == null)
-        {
+            final String name) {
+        if (name == null) {
             return null;
         }
 
-        for (AuditLevel value : values())
-        {
-            if (value.name().equals(name))
-            {
+        for (AuditLevel value : values()) {
+            if (value.name().equals(name)) {
                 return value;
             }
         }
@@ -81,20 +74,16 @@ public enum AuditLevel
     }
 
     public static final AuditLevel forValue(
-            final int value)
-    {
-        for (AuditLevel v : values())
-        {
-            if (v.getValue() == value)
-            {
+            final int value) {
+        for (AuditLevel v : values()) {
+            if (v.getValue() == value) {
                 return v;
             }
         }
         return null;
     }
 
-    public String getAlignedText()
-    {
+    public String getAlignedText() {
         return alignedText;
     }
 

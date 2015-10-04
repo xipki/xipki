@@ -39,8 +39,7 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public interface AuditServiceRegister
-{
+public interface AuditServiceRegister {
     AuditService getAuditService();
 
     boolean isAuditEnabled();

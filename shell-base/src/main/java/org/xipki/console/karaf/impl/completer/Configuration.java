@@ -44,34 +44,27 @@ import java.nio.charset.Charset;
  * @author Lijun Liao
  */
 
-public class Configuration
-{
-    private Configuration()
-    {
+public class Configuration {
+    private Configuration() {
     }
 
-    public static String getLineSeparator()
-    {
+    public static String getLineSeparator() {
         return System.getProperty("line.separator");
     }
 
-    public static File getUserHome()
-    {
+    public static File getUserHome() {
         return new File(System.getProperty("user.home"));
     }
 
-    public static String getOsName()
-    {
+    public static String getOsName() {
         return System.getProperty("os.name").toLowerCase();
     }
 
-    public static boolean isWindows()
-    {
+    public static boolean isWindows() {
         return getOsName().startsWith("windows");
     }
 
-    public static String getFileEncoding()
-    {
+    public static String getFileEncoding() {
         return System.getProperty("file.encoding");
     }
 
@@ -81,12 +74,10 @@ public class Configuration
      *
      * @return The default encoding to use when none is specified.
      */
-    public static String getEncoding()
-    {
+    public static String getEncoding() {
         // LC_CTYPE is usually in the form en_US.UTF-8
         String envEncoding = extractEncodingFromCtype(System.getenv("LC_CTYPE"));
-        if (envEncoding != null)
-        {
+        if (envEncoding != null) {
             return envEncoding;
         }
         return System.getProperty("input.encoding", Charset.defaultCharset().name());
@@ -101,16 +92,12 @@ public class Configuration
      * @return The encoding, if one was present, otherwise null
      */
     static String extractEncodingFromCtype(
-            final String ctype)
-    {
-        if (ctype != null && ctype.indexOf('.') > 0)
-        {
+            final String ctype) {
+        if (ctype != null && ctype.indexOf('.') > 0) {
             String encodingAndModifier = ctype.substring(ctype.indexOf('.') + 1);
-            if (encodingAndModifier.indexOf('@') > 0)
-            {
+            if (encodingAndModifier.indexOf('@') > 0) {
                 return encodingAndModifier.substring(0, encodingAndModifier.indexOf('@'));
-            } else
-            {
+            } else {
                 return encodingAndModifier;
             }
         }

@@ -43,20 +43,16 @@ import java.security.Provider;
  * @author Lijun Liao
  */
 
-public class XipkiSunECProvider extends Provider
-{
+public class XipkiSunECProvider extends Provider {
     private static final long serialVersionUID = 1L;
     public static final String NAME = "XiPKI-SunEC";
     public static final double VERSION = 1.0;
 
-    public XipkiSunECProvider()
-    {
+    public XipkiSunECProvider() {
         super(NAME, VERSION, NAME + " (version " + VERSION + ")");
 
-        AccessController.doPrivileged(new PrivilegedAction<Object>()
-        {
-            public Object run()
-            {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
                 put("AlgorithmParameters.EC", ECParameters.class.getName());
                 return null;
             }

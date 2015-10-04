@@ -39,24 +39,19 @@ package org.xipki.audit.api;
  * @author Lijun Liao
  */
 
-public enum AuditStatus
-{
+public enum AuditStatus {
     SUCCESSFUL,
     FAILED,
     UNDEFINED;
 
     public static final AuditStatus getAuditStatus(
-            final String name)
-    {
-        if (name == null)
-        {
+            final String name) {
+        if (name == null) {
             return null;
         }
 
-        for (AuditStatus v : values())
-        {
-            if (v.name().equals(name))
-            {
+        for (AuditStatus v : values()) {
+            if (v.name().equals(name)) {
                 return v;
             }
         }

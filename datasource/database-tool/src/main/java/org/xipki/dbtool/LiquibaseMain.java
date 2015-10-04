@@ -58,8 +58,7 @@ import liquibase.resource.ResourceAccessor;
  * @author Lijun Liao
  */
 
-public class LiquibaseMain
-{
+public class LiquibaseMain {
     private final LiquibaseDatabaseConf dbConf;
     private final String changeLogFile;
 
@@ -67,22 +66,18 @@ public class LiquibaseMain
     private Liquibase liquibase;
 
     public static boolean loglevelIsSevereOrOff(
-            final String logLevel)
-    {
+            final String logLevel) {
         return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
     }
 
     public LiquibaseMain(
             final LiquibaseDatabaseConf dbConf,
-            final String changeLogFile)
-    {
-        if (dbConf == null)
-        {
+            final String changeLogFile) {
+        if (dbConf == null) {
             throw new IllegalArgumentException("dbConf could not be null");
         }
 
-        if (MyStringUtil.isBlank(changeLogFile))
-        {
+        if (MyStringUtil.isBlank(changeLogFile)) {
             throw new IllegalArgumentException("changeLogFile could not be empty");
         }
 
@@ -92,28 +87,22 @@ public class LiquibaseMain
 
     public void changeLogLevel(
             final String logLevel, String logFile)
-    throws CommandLineParsingException
-    {
-        try
-        {
+    throws CommandLineParsingException {
+        try {
             Logger log = LogFactory.getInstance().getLog();
-            if (logFile != null && logFile.length() > 0)
-            {
+            if (logFile != null && logFile.length() > 0) {
                 log.setLogLevel(logLevel, logFile);
-            } else
-            {
+            } else {
                 log.setLogLevel(logLevel);
             }
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             throw new CommandLineParsingException(e.getMessage(), e);
         }
     }
 
     public void init(
             final String logLevel, String logFile)
-    throws Exception
-    {
+    throws Exception {
         changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
@@ -138,8 +127,7 @@ public class LiquibaseMain
             (String) null, // liquibaseSchemaName
             (String) null, // databaseChangeLogTableName
             (String) null); // databaseChangeLogLockTableName
-        try
-        {
+        try {
             CompositeResourceAccessor fileOpener =
                     new CompositeResourceAccessor(fsOpener, clOpener);
 
@@ -150,28 +138,23 @@ public class LiquibaseMain
                     new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
 
             CompareControl.SchemaComparison[] finalSchemaComparisons;
-            finalSchemaComparisons = new CompareControl.SchemaComparison[]
-                    {
+            finalSchemaComparisons = new CompareControl.SchemaComparison[] {
                         new CompareControl.SchemaComparison(
                             new CatalogAndSchema(null, defaultSchemaName),
                             new CatalogAndSchema(null, defaultSchemaName))
                     };
 
-            for (CompareControl.SchemaComparison schema : finalSchemaComparisons)
-            {
+            for (CompareControl.SchemaComparison schema : finalSchemaComparisons) {
                 diffOutputControl.addIncludedSchema(schema.getReferenceSchema());
                 diffOutputControl.addIncludedSchema(schema.getComparisonSchema());
             }
 
             this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
-        } catch (Exception e)
-        {
-            try
-            {
+        } catch (Exception e) {
+            try {
                 database.rollback();
                 database.close();
-            } catch (Exception e2)
-            {
+            } catch (Exception e2) {
                 LogFactory.getInstance().getLog().warning("problem closing connection", e);
             }
             throw e;
@@ -180,41 +163,33 @@ public class LiquibaseMain
     }
 
     public void releaseLocks()
-    throws Exception
-    {
+    throws Exception {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
         System.out.println("successfully released the database");
     }
 
     public void dropAll()
-    throws Exception
-    {
+    throws Exception {
         liquibase.dropAll();
         System.out.println("successfully  dropped the database");
     }
 
     public void update()
-    throws Exception
-    {
+    throws Exception {
         liquibase.update((String) null);
         System.out.println("successfully  updated the database");
     }
 
-    public void shutdown()
-    {
-        try
-        {
-            if (database != null)
-            {
+    public void shutdown() {
+        try {
+            if (database != null) {
                 database.rollback();
                 database.close();
             }
-        } catch (DatabaseException e)
-        {
+        } catch (DatabaseException e) {
             LogFactory.getInstance().getLog().warning("problem closing connection", e);
-        } finally
-        {
+        } finally {
             database = null;
             liquibase = null;
         }

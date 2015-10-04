@@ -40,12 +40,10 @@ package org.xipki.security.api;
  */
 
 @SuppressWarnings("serial")
-public class InvalidOIDorNameException extends Exception
-{
+public class InvalidOIDorNameException extends Exception {
 
     public InvalidOIDorNameException(
-            final String declaredOidOrName)
-    {
+            final String declaredOidOrName) {
         super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }
 

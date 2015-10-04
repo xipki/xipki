@@ -49,20 +49,17 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public final class EnvelopedDataDecryptor
-{
+public final class EnvelopedDataDecryptor {
     private final List<EnvelopedDataDecryptorInstance> decryptors;
 
     public EnvelopedDataDecryptor(
-            final List<EnvelopedDataDecryptorInstance> decryptors)
-    {
+            final List<EnvelopedDataDecryptorInstance> decryptors) {
         ParamUtil.assertNotEmpty("decryptors", decryptors);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
     public EnvelopedDataDecryptor(
-            final EnvelopedDataDecryptorInstance decryptor)
-    {
+            final EnvelopedDataDecryptorInstance decryptor) {
         ParamUtil.assertNotNull("decryptor", decryptor);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
         this.decryptors.add(decryptor);
@@ -70,32 +67,26 @@ public final class EnvelopedDataDecryptor
 
     public byte[] decrypt(
             final CMSEnvelopedData envData)
-    throws MessageDecodingException
-    {
+    throws MessageDecodingException {
         final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
         RecipientInformation recipientInfo = null;
         EnvelopedDataDecryptorInstance decryptor = null;
-        for (EnvelopedDataDecryptorInstance m : decryptors)
-        {
+        for (EnvelopedDataDecryptorInstance m : decryptors) {
             recipientInfo = recipientInfos.get(m.getRecipientId());
-            if (recipientInfo != null)
-            {
+            if (recipientInfo != null) {
                 decryptor = m;
                 break;
             }
         }
 
-        if (recipientInfo == null)
-        {
+        if (recipientInfo == null) {
             throw new MessageDecodingException(
                     "missing expected key transfer recipient");
         }
 
-        try
-        {
+        try {
             return recipientInfo.getContent(decryptor.getRecipient());
-        } catch (CMSException e)
-        {
+        } catch (CMSException e) {
             throw new MessageDecodingException("could not decrypt the envelopedData");
         }
     }

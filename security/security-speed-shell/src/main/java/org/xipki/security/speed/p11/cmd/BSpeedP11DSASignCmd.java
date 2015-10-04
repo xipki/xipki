@@ -49,24 +49,20 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
         description = "performance test of PKCS#11 DSA signature creation (batch)")
-public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd
-{
+public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd {
 
     @Override
     protected List<LoadExecutor> getTesters()
-    throws Exception
-    {
+    throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (int i = 0; i < pqLens.length; i += 2)
-        {
+        for (int i = 0; i < pqLens.length; i += 2) {
             int pLen = pqLens[i];
             int qLen = pqLens[i + 1];
-            if (pLen == 1024)
-            {
+            if (pLen == 1024) {
                 sigAlgo = "SHA1withDSA";
             }
 

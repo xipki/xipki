@@ -55,64 +55,49 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class IoUtil
-{
-    private IoUtil()
-    {
+public class IoUtil {
+    private IoUtil() {
     }
 
     public static void closeStream(
-            final OutputStream stream)
-    {
-        if (stream == null)
-        {
+            final OutputStream stream) {
+        if (stream == null) {
             return;
         }
-        try
-        {
+        try {
             stream.close();
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
         }
     }
     public static byte[] read(
             final String fileName)
-    throws IOException
-    {
+    throws IOException {
         return read(new File(expandFilepath(fileName)));
     }
 
     public static byte[] read(
             final File file)
-    throws IOException
-    {
+    throws IOException {
         return read(new FileInputStream(expandFilepath(file)));
     }
 
     public static byte[] read(
             final InputStream in)
-    throws IOException
-    {
-        try
-        {
+    throws IOException {
+        try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
             byte[] buffer = new byte[2048];
-            while ((readed = in.read(buffer)) != -1)
-            {
+            while ((readed = in.read(buffer)) != -1) {
                 bout.write(buffer, 0, readed);
             }
 
             return bout.toByteArray();
-        } finally
-        {
-            if (in != null)
-            {
-                try
-                {
+        } finally {
+            if (in != null) {
+                try {
                     in.close();
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                 }
             }
         }
@@ -121,54 +106,46 @@ public class IoUtil
     public static void save(
             final String fileName,
             final byte[] encoded)
-    throws IOException
-    {
+    throws IOException {
         save(new File(expandFilepath(fileName)), encoded);
     }
 
     public static void save(
             final File pFile,
             final byte[] content)
-    throws IOException
-    {
+    throws IOException {
         File file = expandFilepath(pFile);
 
         File parent = file.getParentFile();
-        if (parent != null && !parent.exists())
-        {
+        if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
         FileOutputStream out = new FileOutputStream(file);
-        try
-        {
+        try {
             out.write(content);
-        } finally
-        {
+        } finally {
             out.close();
         }
     }
 
     public static byte[] leftmost(
             final byte[] bytes,
-            final int bitCount)
-    {
+            final int bitCount) {
         int byteLenKey = (bitCount + 7) / 8;
 
-        if (bitCount >= (bytes.length << 3))
-        {
+        if (bitCount >= (bytes.length << 3)) {
             return bytes;
         }
 
         byte[] truncatedBytes = new byte[byteLenKey];
         System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
 
-        if (bitCount % 8 > 0) // shift the bits to the right
-        {
+        // shift the bits to the right
+        if (bitCount % 8 > 0) {
             int shiftBits = 8 - (bitCount % 8);
 
-            for (int i = byteLenKey - 1; i > 0; i--)
-            {
+            for (int i = byteLenKey - 1; i > 0; i--) {
                 truncatedBytes[i] = (byte) (
                         (byte2int(truncatedBytes[i]) >>> shiftBits)
                         | ((byte2int(truncatedBytes[i - 1]) << (8 - shiftBits)) & 0xFF));
@@ -180,103 +157,80 @@ public class IoUtil
     }
 
     private static int byte2int(
-            final byte b)
-    {
+            final byte b) {
         return (b >= 0)
                 ? b
                 : 256 + b;
     }
 
     public static String getHostAddress()
-    throws SocketException
-    {
+    throws SocketException {
         List<String> addresses = new LinkedList<>();
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements())
-        {
+        while (interfaces.hasMoreElements()) {
             NetworkInterface n = (NetworkInterface) interfaces.nextElement();
             Enumeration<InetAddress> ee = n.getInetAddresses();
-            while (ee.hasMoreElements())
-            {
+            while (ee.hasMoreElements()) {
                 InetAddress i = (InetAddress) ee.nextElement();
-                if (i instanceof Inet4Address)
-                {
+                if (i instanceof Inet4Address) {
                     addresses.add(((Inet4Address) i).getHostAddress());
                 }
             }
         }
 
-        for (String addr : addresses)
-        {
-            if (!addr.startsWith("192.") && !addr.startsWith("127."))
-            {
+        for (String addr : addresses) {
+            if (!addr.startsWith("192.") && !addr.startsWith("127.")) {
                 return addr;
             }
         }
 
-        for (String addr : addresses)
-        {
-            if (!addr.startsWith("127."))
-            {
+        for (String addr : addresses) {
+            if (!addr.startsWith("127.")) {
                 return addr;
             }
         }
 
-        if (addresses.size() > 0)
-        {
+        if (addresses.size() > 0) {
             return addresses.get(0);
-        } else
-        {
-            try
-            {
+        } else {
+            try {
                 return InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 return "UNKNOWN";
             }
         }
     }
 
     public static String expandFilepath(
-            final String path)
-    {
-        if (path.startsWith("~" + File.separator))
-        {
+            final String path) {
+        if (path.startsWith("~" + File.separator)) {
             return System.getProperty("user.home") + path.substring(1);
-        } else
-        {
+        } else {
             return path;
         }
     }
 
     public static File expandFilepath(
-            final File file)
-    {
+            final File file) {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
-        if (path.equals(expandedPath))
-        {
+        if (path.equals(expandedPath)) {
             return file;
-        } else
-        {
+        } else {
             return new File(expandedPath);
         }
     }
 
     public static String convertSequenceName(
-            final String sequenceName)
-    {
+            final String sequenceName) {
         StringBuilder sb = new StringBuilder();
         int n = sequenceName.length();
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             char c = sequenceName.charAt(i);
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
-            {
+            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
                 sb.append(c);
-            } else
-            {
+            } else {
                 sb.append("_");
             }
         }
@@ -285,17 +239,14 @@ public class IoUtil
 
     public static String base64Encode(
             final byte[] data,
-            final boolean withLineBreak)
-    {
+            final boolean withLineBreak) {
 
         String b64Str = Base64.encodeToString(data, Base64.NO_WRAP);
-        if (!withLineBreak)
-        {
+        if (!withLineBreak) {
             return b64Str;
         }
 
-        if (b64Str.length() < 64)
-        {
+        if (b64Str.length() < 64) {
             return b64Str;
         }
 
@@ -305,14 +256,12 @@ public class IoUtil
 
         final int nFullBlock = size / blockSize;
 
-        for (int i = 0; i < nFullBlock; i++)
-        {
+        for (int i = 0; i < nFullBlock; i++) {
             int offset = i * blockSize;
             sb.append(b64Str.subSequence(offset, offset + blockSize)).append("\n");
         }
 
-        if (size % blockSize != 0)
-        {
+        if (size % blockSize != 0) {
             sb.append(b64Str.substring(nFullBlock * blockSize)).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);

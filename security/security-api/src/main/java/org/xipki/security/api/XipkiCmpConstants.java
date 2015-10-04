@@ -41,8 +41,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
  * @author Lijun Liao
  */
 
-public class XipkiCmpConstants
-{
+public class XipkiCmpConstants {
     public static final int CRL_REASON_REMOVE = -1;
 
     public static final GeneralName remoteP11_cmp_server =
@@ -68,8 +67,7 @@ public class XipkiCmpConstants
     public static final int ACTION_RP11_PSO_DSA_PLAIN    = 94;
     public static final int ACTION_RP11_PSO_DSA_X962     = 95;
 
-    private XipkiCmpConstants()
-    {
+    private XipkiCmpConstants() {
     }
 
 }

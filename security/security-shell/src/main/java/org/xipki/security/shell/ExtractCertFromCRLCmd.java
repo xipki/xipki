@@ -61,8 +61,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-tk", name = "extract-cert",
         description = "extract certificates from CRL")
-public class ExtractCertFromCRLCmd extends SecurityCmd
-{
+public class ExtractCertFromCRLCmd extends SecurityCmd {
 
     @Option(name = "--crl",
             required = true,
@@ -78,37 +77,31 @@ public class ExtractCertFromCRLCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         X509CRL crl = X509Util.parseCRL(crlFile);
         String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
-        if (extnValue == null)
-        {
+        if (extnValue == null) {
             throw new IllegalCmdParamException("no certificate is contained in " + crlFile);
         }
 
         extnValue = removingTagAndLenFromExtensionValue(extnValue);
         ASN1Set asn1Set = DERSet.getInstance(extnValue);
         int n = asn1Set.size();
-        if (n == 0)
-        {
+        if (n == 0) {
             throw new CmdFailure("no certificate is contained in " + crlFile);
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ZipOutputStream zip = new ZipOutputStream(out);
 
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             ASN1Encodable asn1 = asn1Set.getObjectAt(i);
             Certificate cert;
-            try
-            {
+            try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
                 cert = Certificate.getInstance(seq.getObjectAt(0));
-            } catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 // backwards compatibility
                 cert = Certificate.getInstance(asn1);
             }
@@ -118,11 +111,9 @@ public class ExtractCertFromCRLCmd extends SecurityCmd
 
             ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
             zip.putNextEntry(certZipEntry);
-            try
-            {
+            try {
                 zip.write(certBytes);
-            } finally
-            {
+            } finally {
                 zip.closeEntry();
             }
         }
@@ -135,8 +126,7 @@ public class ExtractCertFromCRLCmd extends SecurityCmd
     }
 
     private static byte[] removingTagAndLenFromExtensionValue(
-            final byte[] encodedExtensionValue)
-    {
+            final byte[] encodedExtensionValue) {
         DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(
                 encodedExtensionValue);
         return derOctet.getOctets();

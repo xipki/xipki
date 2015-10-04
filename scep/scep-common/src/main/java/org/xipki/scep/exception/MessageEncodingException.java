@@ -39,26 +39,22 @@ package org.xipki.scep.exception;
  * @author Lijun Liao
  */
 
-public class MessageEncodingException extends Exception
-{
+public class MessageEncodingException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
     public MessageEncodingException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
     public MessageEncodingException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
     public MessageEncodingException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause.getMessage(), cause);
     }
 

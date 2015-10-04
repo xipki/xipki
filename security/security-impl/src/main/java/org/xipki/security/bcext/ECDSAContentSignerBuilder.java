@@ -50,20 +50,17 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
  */
 
 public class ECDSAContentSignerBuilder
-    extends BcContentSignerBuilder
-{
+    extends BcContentSignerBuilder {
     public ECDSAContentSignerBuilder(
             final AlgorithmIdentifier sigAlgId,
-            final AlgorithmIdentifier digAlgId)
-    {
+            final AlgorithmIdentifier digAlgId) {
         super(sigAlgId, digAlgId);
     }
 
     protected Signer createSigner(
             final AlgorithmIdentifier sigAlgId,
             final AlgorithmIdentifier digAlgId)
-    throws OperatorCreationException
-    {
+    throws OperatorCreationException {
         Digest dig = digestProvider.get(digAlgId);
 
         return new DSADigestSigner(new ECDSASigner(), dig);

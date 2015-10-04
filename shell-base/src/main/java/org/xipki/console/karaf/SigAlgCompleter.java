@@ -39,6 +39,5 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface SigAlgCompleter extends XipkiCompleter
-{
+public interface SigAlgCompleter extends XipkiCompleter {
 }

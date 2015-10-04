@@ -39,32 +39,27 @@ package org.xipki.security.api;
  * @author Lijun Liao
  */
 
-public class SignatureAlgoControl
-{
+public class SignatureAlgoControl {
     private final boolean rsaMgf1;
     private final boolean dsaPlain;
 
-    public SignatureAlgoControl()
-    {
+    public SignatureAlgoControl() {
         this.rsaMgf1 = false;
         this.dsaPlain = false;
     }
 
     public SignatureAlgoControl(
             final boolean rsaMgf1,
-            final boolean dsaPlain)
-    {
+            final boolean dsaPlain) {
         this.rsaMgf1 = rsaMgf1;
         this.dsaPlain = dsaPlain;
     }
 
-    public boolean isRsaMgf1()
-    {
+    public boolean isRsaMgf1() {
         return rsaMgf1;
     }
 
-    public boolean isDsaPlain()
-    {
+    public boolean isDsaPlain() {
         return dsaPlain;
     }
 

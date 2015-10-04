@@ -39,30 +39,25 @@ package org.xipki.common;
  * @author Lijun Liao
  */
 
-public class RequestResponsePair
-{
+public class RequestResponsePair {
     private byte[] request;
     private byte[] response;
 
-    public byte[] getRequest()
-    {
+    public byte[] getRequest() {
         return request;
     }
 
     public void setRequest(
-            final byte[] request)
-    {
+            final byte[] request) {
         this.request = request;
     }
 
-    public byte[] getResponse()
-    {
+    public byte[] getResponse() {
         return response;
     }
 
     public void setResponse(
-            final byte[] response)
-    {
+            final byte[] response) {
         this.response = response;
     }
 

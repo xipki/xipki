@@ -46,8 +46,7 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-tk", name = "validate-req",
         description = "Validate PKCS#10 request")
-public class CertRequestValidateCmd extends SecurityCmd
-{
+public class CertRequestValidateCmd extends SecurityCmd {
 
     @Option(name = "--p10",
             required = true,
@@ -57,8 +56,7 @@ public class CertRequestValidateCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
         boolean b = securityFactory.verifyPOPO(p10Req);

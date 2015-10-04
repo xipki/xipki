@@ -44,8 +44,7 @@ import org.xipki.security.speed.cmd.SingleSpeedCmd;
  * @author Lijun Liao
  */
 
-public abstract class SpeedP11Cmd extends SingleSpeedCmd
-{
+public abstract class SpeedP11Cmd extends SingleSpeedCmd {
 
     @Option(name = "--slot",
             required = true,
@@ -57,8 +56,7 @@ public abstract class SpeedP11Cmd extends SingleSpeedCmd
             description = "Name of the PKCS#11 module.")
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11SlotIdentifier getSlotId()
-    {
+    protected P11SlotIdentifier getSlotId() {
         return new P11SlotIdentifier(slotIndex, null);
     }
 

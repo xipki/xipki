@@ -47,8 +47,7 @@ import java.sql.SQLException;
  * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class UncategorizedSQLException extends UncategorizedDataAccessException
-{
+public class UncategorizedSQLException extends UncategorizedDataAccessException {
 
     /** SQL that led to the problem */
     private final String sql;
@@ -61,8 +60,7 @@ public class UncategorizedSQLException extends UncategorizedDataAccessException
      */
     public UncategorizedSQLException(
             final String sql,
-            final SQLException ex)
-    {
+            final SQLException ex) {
         super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
                 + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
                 + ex.getMessage(), ex);
@@ -72,16 +70,14 @@ public class UncategorizedSQLException extends UncategorizedDataAccessException
     /**
      * Return the underlying SQLException.
      */
-    public SQLException getSQLException()
-    {
+    public SQLException getSQLException() {
         return (SQLException) getCause();
     }
 
     /**
      * Return the SQL that led to the problem.
      */
-    public String getSql()
-    {
+    public String getSql() {
         return this.sql;
     }
 

@@ -59,8 +59,7 @@ import iaik.pkcs.pkcs11.TokenException;
  * @author Lijun Liao
  */
 
-public class IaikP11Module implements P11Module
-{
+public class IaikP11Module implements P11Module {
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
     private Module module;
@@ -73,8 +72,7 @@ public class IaikP11Module implements P11Module
     public IaikP11Module(
             final Module module,
             final P11ModuleConf moduleConf)
-    throws SignerException
-    {
+    throws SignerException {
         ParamUtil.assertNotNull("module", module);
         ParamUtil.assertNotNull("moduleConf", moduleConf);
 
@@ -82,62 +80,50 @@ public class IaikP11Module implements P11Module
         this.moduleConf = moduleConf;
 
         Slot[] slotList;
-        try
-        {
+        try {
             boolean cardPresent = true;
             slotList = module.getSlotList(cardPresent);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             LOG.error("module.getSlotList(). {}: {}", t.getClass().getName(), t.getMessage());
             LOG.debug("module.getSlotList()", t);
             throw new SignerException("TokenException in module.getSlotList(): " + t.getMessage());
         }
 
-        if (slotList == null || slotList.length == 0)
-        {
+        if (slotList == null || slotList.length == 0) {
             throw new SignerException("no slot with present card could be found");
         }
 
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
-        for (int i = 0; i < slotList.length; i++)
-        {
+        for (int i = 0; i < slotList.length; i++) {
             Slot slot = slotList[i];
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             availableSlots.put(slotId, slot);
-            if (moduleConf.isSlotIncluded(slotId))
-            {
+            if (moduleConf.isSlotIncluded(slotId)) {
                 tmpSlotIds.add(slotId);
             }
         }
 
         this.slotIds = Collections.unmodifiableList(tmpSlotIds);
 
-        if (LOG.isDebugEnabled())
-        {
-            try
-            {
+        if (LOG.isDebugEnabled()) {
+            try {
                 StringBuilder msg = new StringBuilder();
-                for (int i = 0; i < slotList.length; i++)
-                {
+                for (int i = 0; i < slotList.length; i++) {
                     Slot slot = slotList[i];
                     msg.append("------------------------Slot ")
                         .append(i + 1)
                         .append("-------------------------\n");
                     msg.append(slot.getSlotID()).append("\n");
-                    try
-                    {
+                    try {
                         msg.append(slot.getSlotInfo().toString()).append("\n");
-                    } catch (TokenException e)
-                    {
+                    } catch (TokenException e) {
                         msg.append("error: " + e.getMessage());
                     }
                 }
                 LOG.debug("{}", msg);
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 final String message = "unexpected error";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
                 }
@@ -149,38 +135,31 @@ public class IaikP11Module implements P11Module
     @Override
     public IaikP11Slot getSlot(
             final P11SlotIdentifier slotId)
-    throws SignerException
-    {
+    throws SignerException {
         IaikP11Slot extSlot = slots.get(slotId);
-        if (extSlot != null)
-        {
+        if (extSlot != null) {
             return extSlot;
         }
 
         Slot slot = null;
         P11SlotIdentifier _slotId = null;
-        for (P11SlotIdentifier s : availableSlots.keySet())
-        {
+        for (P11SlotIdentifier s : availableSlots.keySet()) {
             if (s.getSlotIndex() == slotId.getSlotIndex()
-                    || s.getSlotId() == slotId.getSlotId())
-            {
+                    || s.getSlotId() == slotId.getSlotId()) {
                 _slotId = s;
                 slot = availableSlots.get(s);
                 break;
             }
         }
 
-        if (slot == null)
-        {
+        if (slot == null) {
             throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;
-        try
-        {
+        try {
             pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
-        } catch (PasswordResolverException e)
-        {
+        } catch (PasswordResolverException e) {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
         extSlot = new IaikP11Slot(_slotId, slot, pwd);
@@ -190,20 +169,15 @@ public class IaikP11Module implements P11Module
     }
 
     public void destroySlot(
-            final long slotId)
-    {
+            final long slotId) {
         slots.remove(slotId);
     }
 
-    public void close()
-    {
-        for (P11SlotIdentifier slotId : slots.keySet())
-        {
-            try
-            {
+    public void close() {
+        for (P11SlotIdentifier slotId : slots.keySet()) {
+            try {
                 slots.get(slotId).close();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
             }
 
             availableSlots.remove(slotId);
@@ -212,28 +186,22 @@ public class IaikP11Module implements P11Module
         slots.clear();
         slots = null;
 
-        for (P11SlotIdentifier slotId : availableSlots.keySet())
-        {
-            try
-            {
+        for (P11SlotIdentifier slotId : availableSlots.keySet()) {
+            try {
                 availableSlots.get(slotId).getToken().closeAllSessions();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
             }
         }
         availableSlots.clear();
         availableSlots = null;
 
         LOG.info("close", "close pkcs11 module: {}", module);
-        try
-        {
+        try {
             module.finalize(null);
         }
-        catch (Throwable t)
-        {
+        catch (Throwable t) {
             final String message = "error while module.finalize()";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }
@@ -244,8 +212,7 @@ public class IaikP11Module implements P11Module
     }
 
     @Override
-    public List<P11SlotIdentifier> getSlotIdentifiers()
-    {
+    public List<P11SlotIdentifier> getSlotIdentifiers() {
         return slotIds;
     }
 

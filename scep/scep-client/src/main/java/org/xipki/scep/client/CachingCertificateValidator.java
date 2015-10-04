@@ -46,36 +46,29 @@ import org.xipki.scep.crypto.HashAlgoType;
  */
 
 public final class CachingCertificateValidator
-implements CACertValidator
-{
+implements CACertValidator {
     private final ConcurrentHashMap<String, Boolean> cachedAnswers;
     private final CACertValidator delegate;
 
     public CachingCertificateValidator(
-            final CACertValidator delegate)
-            {
+            final CACertValidator delegate) {
         this.delegate = delegate;
         this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
     }
 
     @Override
     public boolean isTrusted(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         String hexFp;
-        try
-        {
+        try {
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             return false;
         }
 
-        if (cachedAnswers.containsKey(hexFp))
-        {
+        if (cachedAnswers.containsKey(hexFp)) {
             return cachedAnswers.get(cert);
-        } else
-        {
+        } else {
             boolean answer = delegate.isTrusted(cert);
             cachedAnswers.put(hexFp, answer);
             return answer;

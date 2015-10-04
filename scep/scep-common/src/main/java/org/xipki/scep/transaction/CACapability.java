@@ -39,8 +39,7 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public enum CACapability
-{
+public enum CACapability {
     AES ("AES"),
     DES3 ("DES3"),
     GetNextCACert ("GetNextCACert"),
@@ -53,23 +52,18 @@ public enum CACapability
 
     private String text;
     private CACapability(
-            final String text)
-    {
+            final String text) {
         this.text = text;
     }
 
-    public String getText()
-    {
+    public String getText() {
         return text;
     }
 
     public static CACapability valueForText(
-            final String text)
-    {
-        for (CACapability m : values())
-        {
-            if (m.text.equalsIgnoreCase(text))
-            {
+            final String text) {
+        for (CACapability m : values()) {
+            if (m.text.equalsIgnoreCase(text)) {
                 return m;
             }
         }

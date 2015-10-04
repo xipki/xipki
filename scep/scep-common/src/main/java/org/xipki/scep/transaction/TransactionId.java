@@ -48,37 +48,31 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class TransactionId
-{
+public class TransactionId {
     private static final SecureRandom random = new SecureRandom();
 
     private final String id;
 
     public TransactionId(
-            final String id)
-    {
+            final String id) {
         ParamUtil.assertNotBlank("id", id);
         this.id = id;
     }
 
     private TransactionId(
-            final byte[] bytes)
-    {
+            final byte[] bytes) {
         ParamUtil.assertNotNull("bytes", bytes);
-        if (bytes.length < 1)
-        {
+        if (bytes.length < 1) {
             throw new IllegalArgumentException("bytes could not be null");
         }
         this.id = Hex.toHexString(bytes);
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public static TransactionId randomTransactionId()
-    {
+    public static TransactionId randomTransactionId() {
         byte[] bytes = new byte[20];
         random.nextBytes(bytes);
         return new TransactionId(bytes);
@@ -86,15 +80,12 @@ public class TransactionId
 
     public static TransactionId sha1TransactionId(
             final SubjectPublicKeyInfo spk)
-    throws InvalidKeySpecException
-    {
+    throws InvalidKeySpecException {
         ParamUtil.assertNotNull("spk", spk);
         byte[] encoded;
-        try
-        {
+        try {
             encoded = spk.getEncoded();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new InvalidKeySpecException("IO exception while ");
         }
 
@@ -102,8 +93,7 @@ public class TransactionId
     }
 
     public static TransactionId sha1TransactionId(
-            final byte[] content)
-    {
+            final byte[] content) {
         ParamUtil.assertNotNull("content", content);
         SHA1Digest dgst = new SHA1Digest();
         dgst.update(content, 0, content.length);

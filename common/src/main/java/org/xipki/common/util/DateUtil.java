@@ -44,40 +44,32 @@ import java.util.TimeZone;
  * @author Lijun Liao
  */
 
-public class DateUtil
-{
+public class DateUtil {
     private static final SimpleDateFormat sdf;
 
-    static
-    {
+    static {
         sdf = new SimpleDateFormat("yyyyMMddHHmmss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private DateUtil()
-    {
+    private DateUtil() {
     }
 
     public static Date parseUTCTimeyyyyMMddhhmmss(
-            final String utcTime)
-    {
-        if (utcTime == null || utcTime.length() != 14)
-        {
+            final String utcTime) {
+        if (utcTime == null || utcTime.length() != 14) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
-        try
-        {
+        try {
             return sdf.parse(utcTime);
-        } catch (ParseException e)
-        {
+        } catch (ParseException e) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
                     + e.getMessage());
         }
     }
 
     public static void main(
-            final String[] args)
-    {
+            final String[] args) {
         System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
     }
 

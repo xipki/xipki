@@ -43,8 +43,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class AuditChildEvent
-{
+public class AuditChildEvent {
     /**
      * The data array belonging to the event.
      */
@@ -57,41 +56,33 @@ public class AuditChildEvent
 
     private AuditStatus status;
 
-    public AuditChildEvent()
-    {
+    public AuditChildEvent() {
         this.level = AuditLevel.INFO;
     }
 
-    public AuditLevel getLevel()
-    {
+    public AuditLevel getLevel() {
         return level;
     }
 
     public void setLevel(
-            AuditLevel level)
-    {
+            AuditLevel level) {
         this.level = level;
     }
 
-    public List<AuditEventData> getEventDatas()
-    {
+    public List<AuditEventData> getEventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
     public AuditEventData removeEventData(
-            final String eventDataName)
-    {
+            final String eventDataName) {
         AuditEventData tbr = null;
-        for (AuditEventData ed : eventDatas)
-        {
-            if (ed.getName().equals(eventDataName))
-            {
+        for (AuditEventData ed : eventDatas) {
+            if (ed.getName().equals(eventDataName)) {
                 tbr = ed;
             }
         }
 
-        if (tbr != null)
-        {
+        if (tbr != null) {
             eventDatas.remove(tbr);
         }
 
@@ -99,36 +90,30 @@ public class AuditChildEvent
     }
 
     public AuditEventData addEventData(
-            final AuditEventData eventData)
-    {
+            final AuditEventData eventData) {
         int idx = -1;
-        for (int i = 0; i < eventDatas.size(); i++)
-        {
+        for (int i = 0; i < eventDatas.size(); i++) {
             AuditEventData ed = eventDatas.get(i);
-            if (ed.getName().equals(eventData.getName()))
-            {
+            if (ed.getName().equals(eventData.getName())) {
                 idx = i;
                 break;
             }
         }
 
         AuditEventData ret = null;
-        if (idx != -1)
-        {
+        if (idx != -1) {
             ret = eventDatas.get(idx);
         }
         eventDatas.add(eventData);
         return ret;
     }
 
-    public AuditStatus getStatus()
-    {
+    public AuditStatus getStatus() {
         return status;
     }
 
     public void setStatus(
-            final AuditStatus status)
-    {
+            final AuditStatus status) {
         this.status = status;
     }
 

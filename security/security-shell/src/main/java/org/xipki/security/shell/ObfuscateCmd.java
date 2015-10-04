@@ -44,12 +44,10 @@ import org.xipki.password.OBFPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "obfuscate",
         description = "obfuscate password")
-public class ObfuscateCmd extends SecurityCmd
-{
+public class ObfuscateCmd extends SecurityCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         char[] password = readPassword("Please enter the password");
 
         String passwordHint = OBFPasswordResolver.obfuscate(new String(password));

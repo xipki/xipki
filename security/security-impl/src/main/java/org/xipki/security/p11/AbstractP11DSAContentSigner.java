@@ -58,8 +58,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-abstract class AbstractP11DSAContentSigner implements ContentSigner
-{
+abstract class AbstractP11DSAContentSigner implements ContentSigner {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);
 
     private final AlgorithmIdentifier algorithmIdentifier;
@@ -78,8 +77,7 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId,
             final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, OperatorCreationException
-    {
+    throws NoSuchAlgorithmException, OperatorCreationException {
         ParamUtil.assertNotNull("slot", slot);
         ParamUtil.assertNotNull("cryptService", cryptService);
         ParamUtil.assertNotNull("keyId", keyId);
@@ -99,35 +97,28 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier()
-    {
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algorithmIdentifier;
     }
 
     @Override
-    public OutputStream getOutputStream()
-    {
+    public OutputStream getOutputStream() {
         outputStream.reset();
         return outputStream;
     }
 
     @Override
-    public byte[] getSignature()
-    {
+    public byte[] getSignature() {
         byte[] hashValue = outputStream.digest();
-        try
-        {
+        try {
             return CKM_SIGN(hashValue);
-        } catch (SignerException e)
-        {
+        } catch (SignerException e) {
             LOG.warn("SignerException: {}", e.getMessage());
             LOG.debug("SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             final String message = "Throwable";
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }

@@ -39,17 +39,14 @@ package org.xipki.security.api.p11;
  * @author Lijun Liao
  */
 
-public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
-{
+public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     private final Integer slotIndex;
     private final Long slotId;
 
     public P11SlotIdentifier(
             final Integer slotIndex,
-            final Long slotId)
-    {
-        if (slotIndex == null && slotId == null)
-        {
+            final Long slotId) {
+        if (slotIndex == null && slotId == null) {
             throw new IllegalArgumentException(
                     "at least one of slotIndex an slotId must be non-null");
         }
@@ -57,32 +54,26 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
         this.slotId = slotId;
     }
 
-    public Integer getSlotIndex()
-    {
+    public Integer getSlotIndex() {
         return slotIndex;
     }
 
-    public Long getSlotId()
-    {
+    public Long getSlotId() {
         return slotId;
     }
 
     @Override
     public boolean equals(
-            final Object b)
-    {
-        if (this == b)
-        {
+            final Object b) {
+        if (this == b) {
             return true;
         }
 
-        if (!(b instanceof P11SlotIdentifier))
-        {
+        if (!(b instanceof P11SlotIdentifier)) {
             return false;
         }
 
-        if (this == b)
-        {
+        if (this == b) {
             return true;
         }
 
@@ -91,35 +82,28 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (slotIndex != null)
-        {
+        if (slotIndex != null) {
             sb.append("slot-index: ").append(slotIndex);
-            if (slotId != null)
-            {
+            if (slotId != null) {
                 sb.append(", ");
             }
         }
-        if (slotId != null)
-        {
+        if (slotId != null) {
             sb.append("slot-id: ").append(slotId);
         }
         return sb.toString();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hashCode = 0;
-        if (slotId != null)
-        {
+        if (slotId != null) {
             hashCode = slotId.hashCode();
         }
 
-        if (slotIndex != 0)
-        {
+        if (slotIndex != 0) {
             hashCode += 31 * slotIndex.hashCode();
         }
 
@@ -128,30 +112,22 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
 
     @Override
     public int compareTo(
-            final P11SlotIdentifier o)
-    {
-        if (this == o)
-        {
+            final P11SlotIdentifier o) {
+        if (this == o) {
             return 0;
         }
 
-        if (slotIndex != null)
-        {
-            if (o.slotIndex != null)
-            {
+        if (slotIndex != null) {
+            if (o.slotIndex != null) {
                 int sign = slotIndex - o.slotIndex;
-                if (sign > 0)
-                {
+                if (sign > 0) {
                     return 1;
-                } else if (sign < 0)
-                {
+                } else if (sign < 0) {
                     return -1;
-                } else
-                {
+                } else {
                     return 0;
                 }
-            } else
-            {
+            } else {
                 return -1;
             }
         }

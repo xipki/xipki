@@ -41,17 +41,14 @@ import org.xipki.scep.transaction.CACapability;
  * @author Lijun Liao
  */
 
-public class MD5OnlyCATest extends AbstractCATest
-{
+public class MD5OnlyCATest extends AbstractCATest {
 
-    protected boolean useInsecureAlgorithms()
-    {
+    protected boolean useInsecureAlgorithms() {
         return true;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps()
-    {
+    protected CACapability[] getExcludedCACaps() {
         return new CACapability[]{CACapability.SHA1, CACapability.SHA256, CACapability.SHA512};
     }
 

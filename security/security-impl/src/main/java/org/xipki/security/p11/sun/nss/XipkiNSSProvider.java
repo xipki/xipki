@@ -53,8 +53,7 @@ import java.util.Map;
 
 @SuppressWarnings("restriction")
 public class XipkiNSSProvider
-extends Provider
-{
+extends Provider {
     // Signature
     public static final String OID_SHA1withRSA = "1.2.840.113549.1.1.5";
     public static final String OID_SHA224withRSA = "1.2.840.113549.1.1.14";
@@ -77,27 +76,21 @@ extends Provider
 
     static Provider nssProvider;
 
-    public XipkiNSSProvider()
-    {
+    public XipkiNSSProvider() {
         super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_NAME + " v" + PROVIDER_VERSION);
 
         init();
 
         AccessController.doPrivileged(
-        new PrivilegedAction<Object>()
-        {
-            public Object run()
-            {
+        new PrivilegedAction<Object>() {
+            public Object run() {
                 Iterator<Descriptor> it = descriptors.values().iterator();
-                while (it.hasNext())
-                {
+                while (it.hasNext()) {
                     Descriptor d = it.next();
                     put(d.service.type + "." + d.algorithm, d.getClassName());
-                    if (d.aliases != null)
-                    {
+                    if (d.aliases != null) {
                         List<String> aliases = d.getAliases();
-                        for (String alias : aliases)
-                        {
+                        for (String alias : aliases) {
                             put("Alg.Alias." + d.service.type + "." + alias, d.algorithm);
                         }
                     }
@@ -108,14 +101,11 @@ extends Provider
     }
 
     private static boolean support(
-            final Descriptor d)
-    {
-        try
-        {
+            final Descriptor d) {
+        try {
             Object o = Class.forName(d.getClassName()).newInstance();
             return (o != null);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             return false;
         }
     }
@@ -124,26 +114,21 @@ extends Provider
     // is supported
     private final static Map<String, Descriptor> descriptors = new HashMap<>();
 
-    private synchronized static void init()
-    {
-        if (nssProvider != null)
-        {
+    private synchronized static void init() {
+        if (nssProvider != null) {
             return;
         }
 
-        try
-        {
+        try {
             // check whether there exists an NSS provider registered by OpenJDK
             nssProvider = Security.getProvider("SunPKCS11-NSS");
-            if (nssProvider == null)
-            {
+            if (nssProvider == null) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("name=").append(PROVIDER_NAME).append("\n");
                 sb.append("nssDbMode=noDb\n");
                 sb.append("attributes=compatibility\n");
                 String NSSLIB = System.getProperty("NSSLIB");
-                if (NSSLIB != null)
-                {
+                if (NSSLIB != null) {
                     sb.append("\nnssLibraryDirectory=").append(NSSLIB);
                 }
 
@@ -151,8 +136,7 @@ extends Provider
                         new ByteArrayInputStream(sb.toString().getBytes()));
                 Security.addProvider(nssProvider);
             }
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             throw new ProviderException("could not initialize SunPKCS11 NSS provider", t);
         }
 
@@ -177,17 +161,14 @@ extends Provider
             final String algorithm,
             final String className,
             final String oid,
-            final String... aliases)
-    {
+            final String... aliases) {
         Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
-        if (support(d))
-        {
+        if (support(d)) {
             descriptors.put(d.toString(), d);
         }
     }
 
-    public static final class Descriptor
-    {
+    public static final class Descriptor {
         private final Service service;
         private final String algorithm;
         private final String className;
@@ -199,8 +180,7 @@ extends Provider
                 final String algorithm,
                 final String classNameWithoutPackage,
                 final String oid,
-                final String... aliases)
-        {
+                final String... aliases) {
             this.service = service;
             this.algorithm = algorithm;
             this.className = classNameWithoutPackage;
@@ -209,20 +189,15 @@ extends Provider
         }
 
         private List<String> aliasesWithOid;
-        List<String> getAliases()
-        {
-            if (aliasesWithOid == null)
-            {
+        List<String> getAliases() {
+            if (aliasesWithOid == null) {
                 aliasesWithOid = new ArrayList<>();
-                if (aliases != null)
-                {
-                    for (String alias : aliases)
-                    {
+                if (aliases != null) {
+                    for (String alias : aliases) {
                         aliasesWithOid.add(alias);
                     }
                 }
-                if (oid != null)
-                {
+                if (oid != null) {
                     aliasesWithOid.add(oid);
                     aliasesWithOid.add("OID." + oid);
                 }
@@ -231,34 +206,29 @@ extends Provider
             return aliasesWithOid;
         }
 
-        public String getClassName()
-        {
+        public String getClassName() {
             return service.classPrefix + className;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return service.type + "." + algorithm;
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return toString().hashCode();
         }
     }
 
-    private static enum Service
-    {
+    private static enum Service {
         Signature("Signature", NSSSignatureSpi.class.getName() + "$");
 
         private String type;
         private String classPrefix;
         private Service(
                 final String type,
-                final String classPrefix)
-        {
+                final String classPrefix) {
             this.type = type;
             this.classPrefix = classPrefix;
         }

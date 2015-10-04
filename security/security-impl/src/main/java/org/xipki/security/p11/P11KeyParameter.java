@@ -47,8 +47,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class P11KeyParameter extends AsymmetricKeyParameter
-{
+public class P11KeyParameter extends AsymmetricKeyParameter {
     private final P11CryptService p11CryptService;
 
     private final P11SlotIdentifier slot;
@@ -57,8 +56,7 @@ public class P11KeyParameter extends AsymmetricKeyParameter
     private P11KeyParameter(
             final P11CryptService p11CryptService,
             final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId)
-    {
+            final P11KeyIdentifier keyId) {
         super(true);
 
         this.p11CryptService = p11CryptService;
@@ -70,8 +68,7 @@ public class P11KeyParameter extends AsymmetricKeyParameter
             final P11CryptService p11CryptService,
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId)
-    throws InvalidKeyException
-    {
+    throws InvalidKeyException {
         ParamUtil.assertNotNull("p11CryptService", p11CryptService);
         ParamUtil.assertNotNull("slot", slot);
         ParamUtil.assertNotNull("keyId", keyId);
@@ -79,18 +76,15 @@ public class P11KeyParameter extends AsymmetricKeyParameter
         return new P11KeyParameter(p11CryptService, slot, keyId);
     }
 
-    public P11CryptService getP11CryptService()
-    {
+    public P11CryptService getP11CryptService() {
         return p11CryptService;
     }
 
-    public P11SlotIdentifier getSlot()
-    {
+    public P11SlotIdentifier getSlot() {
         return slot;
     }
 
-    public P11KeyIdentifier getKeyId()
-    {
+    public P11KeyIdentifier getKeyId() {
         return keyId;
     }
 

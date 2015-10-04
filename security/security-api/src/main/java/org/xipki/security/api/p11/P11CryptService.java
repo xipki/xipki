@@ -44,8 +44,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public interface P11CryptService
-{
+public interface P11CryptService {
     void refresh()
     throws SignerException;
 

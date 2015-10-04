@@ -43,16 +43,14 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DataAccessException extends Exception
-{
+public class DataAccessException extends Exception {
 
     /**
      * Constructor for DataAccessException.
      * @param msg the detail message
      */
     public DataAccessException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -64,8 +62,7 @@ public class DataAccessException extends Exception
      */
     public DataAccessException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

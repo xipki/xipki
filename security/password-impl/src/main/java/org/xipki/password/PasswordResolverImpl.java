@@ -47,23 +47,19 @@ import org.xipki.password.api.SinglePasswordResolver;
  * @author Lijun Liao
  */
 
-public class PasswordResolverImpl implements PasswordResolver
-{
+public class PasswordResolverImpl implements PasswordResolver {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
     private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
             new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
-    public PasswordResolverImpl()
-    {
+    public PasswordResolverImpl() {
     }
 
     public void bindService(
-            final SinglePasswordResolver service)
-    {
+            final SinglePasswordResolver service) {
         //might be null if dependency is optional
-        if (service == null)
-        {
+        if (service == null) {
             LOG.debug("bindService invoked with null.");
             return;
         }
@@ -78,26 +74,20 @@ public class PasswordResolverImpl implements PasswordResolver
     }
 
     public void unbindService(
-            final SinglePasswordResolver service)
-    {
+            final SinglePasswordResolver service) {
         //might be null if dependency is optional
-        if (service == null)
-        {
+        if (service == null) {
             LOG.debug("unbindService invoked with null.");
             return;
         }
 
-        try
-        {
-            if (resolvers.remove(service))
-            {
+        try {
+            if (resolvers.remove(service)) {
                 LOG.debug("removed SinglePasswordResolver binding for {}", service);
-            } else
-            {
+            } else {
                 LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
         }
     }
@@ -105,20 +95,16 @@ public class PasswordResolverImpl implements PasswordResolver
     @Override
     public char[] resolvePassword(
             final String passwordHint)
-    throws PasswordResolverException
-    {
+    throws PasswordResolverException {
         int index = passwordHint.indexOf(':');
-        if (index == -1)
-        {
+        if (index == -1) {
             return passwordHint.toCharArray();
         }
 
         String protocol = passwordHint.substring(0, index);
 
-        for (SinglePasswordResolver resolver : resolvers)
-        {
-            if (resolver.canResolveProtocol(protocol))
-            {
+        for (SinglePasswordResolver resolver : resolvers) {
+            if (resolver.canResolveProtocol(protocol)) {
                 return resolver.resolvePassword(passwordHint);
             }
         }

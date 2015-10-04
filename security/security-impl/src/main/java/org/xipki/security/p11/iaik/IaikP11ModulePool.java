@@ -55,8 +55,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @author Lijun Liao
  */
 
-public class IaikP11ModulePool
-{
+public class IaikP11ModulePool {
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
     private final Map<String, IaikP11Module> modules = new HashMap<>();
@@ -65,36 +64,29 @@ public class IaikP11ModulePool
 
     private static IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
 
-    public static IaikP11ModulePool getInstance()
-    {
+    public static IaikP11ModulePool getInstance() {
         return INSTANCE;
     }
 
     public synchronized void removeModule(
-            final String moduleName)
-    {
+            final String moduleName) {
         IaikP11Module module = modules.remove(moduleName);
         if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
             module = modules.remove(defaultModuleName);
         }
 
-        if (module == null)
-        {
+        if (module == null) {
             return;
         }
 
-        try
-        {
+        try {
             LOG.info("removed module {}", moduleName);
             module.close();
             LOG.info("finalized module {}", moduleName);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             final String message = "could not finalize the module " + moduleName;
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }
@@ -104,12 +96,10 @@ public class IaikP11ModulePool
 
     public IaikP11Module getModule(
             final String moduleName)
-    throws SignerException
-    {
+    throws SignerException {
         IaikP11Module module = modules.get(moduleName);
         if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
             module = modules.get(defaultModuleName);
         }
         return module;
@@ -117,24 +107,19 @@ public class IaikP11ModulePool
 
     public synchronized IaikP11Module getModule(
             final P11ModuleConf moduleConf)
-    throws SignerException
-    {
+    throws SignerException {
         IaikP11Module extModule = modules.get(moduleConf.getName());
-        if (extModule != null)
-        {
+        if (extModule != null) {
             return extModule;
         }
 
         Module module;
 
-        try
-        {
+        try {
             module = Module.getInstance(moduleConf.getNativeLibrary());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
                         e.getMessage());
             }
@@ -142,43 +127,33 @@ public class IaikP11ModulePool
             throw new SignerException(msg);
         }
 
-        try
-        {
+        try {
             module.initialize(new DefaultInitializeArgs());
         }
-        catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception e)
-        {
-            if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED)
-            {
+        catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception e) {
+            if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
                 final String message = "PKCS11Exception";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
                 }
                 LOG.debug(message, e);
                 close(module);
                 throw new SignerException(e.getMessage());
-            } else
-            {
+            } else {
                 LOG.info("PKCS#11 module already initialized");
-                if (LOG.isInfoEnabled())
-                {
-                    try
-                    {
+                if (LOG.isInfoEnabled()) {
+                    try {
                         LOG.info("pkcs11.getInfo():\n{}", module.getInfo());
-                    } catch (TokenException e2)
-                    {
+                    } catch (TokenException e2) {
                         LOG.debug("module.getInfo()", e2);
                     }
                 }
             }
         }
-        catch (Throwable t)
-        {
+        catch (Throwable t) {
             final String message = "unexpected Exception: ";
-            if (LOG.isErrorEnabled())
-            {
+            if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                         t.getMessage());
             }
@@ -195,36 +170,28 @@ public class IaikP11ModulePool
 
     @Override
     protected void finalize()
-    throws Throwable
-    {
+    throws Throwable {
         super.finalize();
         shutdown();
     }
 
-    public synchronized void shutdown()
-    {
-        for (String pk11Lib : modules.keySet())
-        {
+    public synchronized void shutdown() {
+        for (String pk11Lib : modules.keySet()) {
             modules.get(pk11Lib).close();
         }
         modules.clear();
     }
 
     private static void close(
-            final Module module)
-    {
-        if (module != null)
-        {
+            final Module module) {
+        if (module != null) {
             LOG.info("close", "close pkcs11 module: {}", module);
-            try
-            {
+            try {
                 module.finalize(null);
             }
-            catch (Throwable t)
-            {
+            catch (Throwable t) {
                 final String message = "error while module.finalize()";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
                 }
@@ -233,14 +200,12 @@ public class IaikP11ModulePool
         }
     }
 
-    public String getDefaultModuleName()
-    {
+    public String getDefaultModuleName() {
         return defaultModuleName;
     }
 
     public void setDefaultModuleName(
-            final String defaultModuleName)
-    {
+            final String defaultModuleName) {
         this.defaultModuleName = defaultModuleName;
     }
 }

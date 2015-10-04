@@ -56,8 +56,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public abstract class P12SignLoadTest extends LoadExecutor
-{
+public abstract class P12SignLoadTest extends LoadExecutor {
     private final ConcurrentContentSigner signer;
     protected final static String password = "1234";
 
@@ -66,8 +65,7 @@ public abstract class P12SignLoadTest extends LoadExecutor
             final String signatureAlgorithm,
             final byte[] keystore,
             final String description)
-    throws Exception
-    {
+    throws Exception {
         super(description);
 
         ParamUtil.assertNotNull("securityFactory", securityFactory);
@@ -81,16 +79,14 @@ public abstract class P12SignLoadTest extends LoadExecutor
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
     protected static byte[] getPrecomputedRSAKeystore(
             final int keysize,
             final BigInteger publicExponent)
-    throws IOException
-    {
+    throws IOException {
         return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
             + ".p12");
     }
@@ -98,25 +94,20 @@ public abstract class P12SignLoadTest extends LoadExecutor
     protected static byte[] getPrecomputedDSAKeystore(
             final int pLength,
             final int qLength)
-    throws IOException
-    {
+    throws IOException {
         return getPrecomputedKeystore("dsa-" + pLength + "-" + qLength + ".p12");
     }
 
     protected static byte[] getPrecomputedECKeystore(
             final String curveNamOrOid)
-    throws IOException
-    {
+    throws IOException {
         ASN1ObjectIdentifier oid = null;
-        try
-        {
+        try {
             new ASN1ObjectIdentifier(curveNamOrOid);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             oid = KeyUtil.getCurveOID(curveNamOrOid);
         }
-        if (oid == null)
-        {
+        if (oid == null) {
             return null;
         }
 
@@ -125,38 +116,30 @@ public abstract class P12SignLoadTest extends LoadExecutor
 
     private static byte[] getPrecomputedKeystore(
             final String filename)
-    throws IOException
-    {
+    throws IOException {
         InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
         return (in == null)
                 ? null
                 : IoUtil.read(in);
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
         @Override
-        public void run()
-        {
+        public void run() {
             ContentSigner singleSigner;
-            try
-            {
+            try {
                 singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e)
-            {
+            } catch (NoIdleSignerException e) {
                 account(1, 1);
                 return;
             }
 
-            while (!stop() && getErrorAccout() < 1)
-            {
-                try
-                {
+            while (!stop() && getErrorAccout() < 1) {
+                try {
                     singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
                     singleSigner.getSignature();
                     account(1, 0);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     account(1, 1);
                 }
             }
