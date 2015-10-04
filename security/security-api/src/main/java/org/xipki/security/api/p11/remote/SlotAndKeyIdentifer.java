@@ -107,8 +107,7 @@ public class SlotAndKeyIdentifer extends ASN1Object {
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        }
-        catch (IOException | IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
         }
 

@@ -965,8 +965,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                         t.getMessage());
             }
             return false;
-        }
-        finally {
+        } finally {
             if (conn == null) {
                 releaseResources(stmt, null);
             } else {
@@ -1127,8 +1126,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
         } catch (SQLException e) {
             throw translate(sql, e);
-        }
-        finally {
+        } finally {
             releaseResources(stmt, null);
         }
 
@@ -1148,8 +1146,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
         } catch (SQLException e) {
             throw translate(sql, e);
-        }
-        finally {
+        } finally {
             releaseResources(stmt, null);
         }
     }

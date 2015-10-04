@@ -129,8 +129,7 @@ public class IaikP11ModulePool {
 
         try {
             module.initialize(new DefaultInitializeArgs());
-        }
-        catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception e) {
+        } catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception e) {
             if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
                 final String message = "PKCS11Exception";
                 if (LOG.isErrorEnabled()) {
@@ -150,8 +149,7 @@ public class IaikP11ModulePool {
                     }
                 }
             }
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             final String message = "unexpected Exception: ";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
@@ -188,8 +186,7 @@ public class IaikP11ModulePool {
             LOG.info("close", "close pkcs11 module: {}", module);
             try {
                 module.finalize(null);
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 final String message = "error while module.finalize()";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),

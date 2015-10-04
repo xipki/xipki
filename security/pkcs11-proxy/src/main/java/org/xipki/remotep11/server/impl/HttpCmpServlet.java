@@ -168,8 +168,7 @@ public class HttpCmpServlet extends HttpServlet {
             return PKIMessage.getInstance(asn1Stream.readObject());
         } catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("could not parse PKIMessage: " + e.getMessage(), e);
-        }
-        finally {
+        } finally {
             try {
                 asn1Stream.close();
             } catch (IOException e) {
