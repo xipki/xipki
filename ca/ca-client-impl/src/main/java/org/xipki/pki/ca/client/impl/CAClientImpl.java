@@ -1186,8 +1186,7 @@ public final class CAClientImpl implements CAClient {
                 }
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
-            }
-            catch (SAXException e) {
+            } catch (SAXException e) {
                 throw new InvalidConfException("parse profile failed, message: " + e.getMessage(),
                         e);
             } catch (JAXBException e) {

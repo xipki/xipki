@@ -351,8 +351,7 @@ class CertStoreQueryExecutor {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                 t.getClass().getName() + ": " + t.getMessage());
                     }
-                }
-                finally {
+                } finally {
                     conn.setAutoCommit(origAutoCommit);
                 }
 
@@ -360,8 +359,7 @@ class CertStoreQueryExecutor {
             }
         } catch (SQLException e) {
             throw dataSource.translate(null, e);
-        }
-        finally {
+        } finally {
             try {
                 for (PreparedStatement ps : pss) {
                     try {

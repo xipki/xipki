@@ -125,8 +125,7 @@ public class HealthCheckServlet extends HttpServlet {
             byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
-        }
-        catch (EOFException e) {
+        } catch (EOFException e) {
             final String message = "connection reset by peer";
             if (LOG.isErrorEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message),
@@ -136,8 +135,7 @@ public class HealthCheckServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             final String message = "Throwable thrown, this should not happen!";
             LOG.warn(message, t);
 

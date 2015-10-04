@@ -228,8 +228,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
                 | SignatureException | NoSuchProviderException e) {
             throw new SignerException(e.getMessage(), e);
-        }
-        finally {
+        } finally {
             if (csigner != null) {
                 signer.returnContentSigner(csigner);
             }

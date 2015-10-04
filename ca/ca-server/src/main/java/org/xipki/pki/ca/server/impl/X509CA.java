@@ -637,8 +637,7 @@ public class X509CA {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
-        }
-        finally {
+        } finally {
             if (!successful) {
                 LOG.info("    FAILED cleanupCRLs: ca={}", caInfo.getName());
             }
@@ -998,8 +997,7 @@ public class X509CA {
 
         try {
             return new Extension(Extension.reasonCode, false, crlReason.getEncoded());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
@@ -1009,8 +1007,7 @@ public class X509CA {
         try {
             ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(invalidityDate);
             return new Extension(Extension.invalidityDate, false, asnTime.getEncoded());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
@@ -1026,8 +1023,7 @@ public class X509CA {
             GeneralName generalName = new GeneralName(certificateIssuer);
             return new Extension(Extension.certificateIssuer, true,
                     new GeneralNames(generalName).getEncoded());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
@@ -1178,8 +1174,7 @@ public class X509CA {
                 boolean successful;
                 try {
                     successful = publisher.certificateAdded(certInfo);
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     successful = false;
                     final String message = "error while publish certificate to the publisher "
                             + publisher.getName();
@@ -1464,8 +1459,7 @@ public class X509CA {
         for (IdentifiedX509CertPublisher publisher : getPublishers()) {
             try {
                 publisher.crlAdded(caCert, crl);
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 final String message = "error while publish CRL to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {
@@ -1553,8 +1547,7 @@ public class X509CA {
             try {
                 singleSuccessful = publisher.certificateRemoved(caInfo.getCertificate(),
                         certToRemove);
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 singleSuccessful = false;
                 final String message = "error while remove certificate to the publisher "
                         + publisher.getName();
@@ -1615,8 +1608,7 @@ public class X509CA {
                     successful = publisher.certificateRevoked(caInfo.getCertificate(),
                             revokedCert.getCert(), revokedCert.getCertprofile(),
                             revokedCert.getRevInfo());
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     successful = false;
                     final String message =
                             "error while publish revocation of certificate to the publisher "
@@ -1679,8 +1671,7 @@ public class X509CA {
                 try {
                     successful = publisher.certificateUnrevoked(caInfo.getCertificate(),
                             unrevokedCert);
-                }
-                catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                     successful = false;
                     final String message =
                             "error while publish unrevocation of certificate to the publisher "
@@ -1758,8 +1749,7 @@ public class X509CA {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "publishing CA revocation failed");
                 }
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 String message = "error while publish revocation of CA to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {
@@ -1786,8 +1776,7 @@ public class X509CA {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "publishing CA revocation failed");
                 }
-            }
-            catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 String message = "error while publish revocation of CA to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {

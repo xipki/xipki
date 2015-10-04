@@ -164,8 +164,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 throw new InvalidInputException("could not continue with CertStore greater than "
                         + VERSION + ": " + certstore.getVersion());
             }
-        }
-        else {
+        } else {
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
@@ -193,16 +192,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             } catch (JAXBException e) {
                 throw XMLUtil.convert(e);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("error while exporting CA certstore from database");
             exception = e;
         }
 
         if (exception == null) {
             System.out.println(" exported CA certstore from database");
-        }
-        else {
+        } else {
             throw exception;
         }
     }
@@ -289,15 +286,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     if (minIdOfCurrentFile == -1) {
                         minIdOfCurrentFile = id;
-                    }
-                    else if (minIdOfCurrentFile > id) {
+                    } else if (minIdOfCurrentFile > id) {
                         minIdOfCurrentFile = id;
                     }
 
                     if (maxIdOfCurrentFile == -1) {
                         maxIdOfCurrentFile = id;
-                    }
-                    else if (maxIdOfCurrentFile < id) {
+                    } else if (maxIdOfCurrentFile < id) {
                         maxIdOfCurrentFile = id;
                     }
 
@@ -314,8 +309,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         LOG.debug("could not parse CRL with id " + id, e);
                         if (e instanceof CRLException) {
                             throw (CRLException) e;
-                        }
-                        else {
+                        } else {
                             throw new CRLException(e.getMessage(), e);
                         }
                     }
@@ -391,8 +385,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 processLog.addNumProcessed(numCrlsInCurrentFile);
 
                 certstore.setCountCrls(sum);
-            }
-            else {
+            } else {
                 currentCrlsZip.close();
                 currentCrlsZipFile.delete();
             }
@@ -578,15 +571,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     if (minIdOfCurrentFile == -1) {
                         minIdOfCurrentFile = id;
-                    }
-                    else if (minIdOfCurrentFile > id) {
+                    } else if (minIdOfCurrentFile > id) {
                         minIdOfCurrentFile = id;
                     }
 
                     if (maxIdOfCurrentFile == -1) {
                         maxIdOfCurrentFile = id;
-                    }
-                    else if (maxIdOfCurrentFile < id) {
+                    } else if (maxIdOfCurrentFile < id) {
                         maxIdOfCurrentFile = id;
                     }
 
@@ -782,15 +773,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     if (minIdOfCurrentFile == -1) {
                         minIdOfCurrentFile = id;
-                    }
-                    else if (minIdOfCurrentFile > id) {
+                    } else if (minIdOfCurrentFile > id) {
                         minIdOfCurrentFile = id;
                     }
 
                     if (maxIdOfCurrentFile == -1) {
                         maxIdOfCurrentFile = id;
-                    }
-                    else if (maxIdOfCurrentFile < id) {
+                    } else if (maxIdOfCurrentFile < id) {
                         maxIdOfCurrentFile = id;
                     }
 
@@ -920,8 +909,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 }
 
                 processLog.addNumProcessed(numCertsInCurrentFile);
-            }
-            else {
+            } else {
                 currentCertsZip.close();
                 currentCertsZipFile.delete();
             }

@@ -449,8 +449,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 }
             }
             return numProcessed;
-        }
-        finally {
+        } finally {
             try {
                 recoverAutoCommit();
             } catch (DataAccessException e) {
@@ -692,8 +691,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 }
             }
             return numProcessed;
-        }
-        finally {
+        } finally {
             try {
                 recoverAutoCommit();
             } catch (DataAccessException e) {
@@ -974,8 +972,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             } // end for
 
             return lastSuccessfulCertId;
-        }
-        finally {
+        } finally {
             try {
                 recoverAutoCommit();
             } catch (DataAccessException e) {

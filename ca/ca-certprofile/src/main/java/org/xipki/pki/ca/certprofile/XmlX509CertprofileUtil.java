@@ -148,8 +148,7 @@ public class XmlX509CertprofileUtil {
                     xmlConfStream.close();
                 } catch (IOException e) {
                 }
-            }
-            catch (SAXException e) {
+            } catch (SAXException e) {
                 throw new CertprofileException(
                         "parse profile failed, message: " + e.getMessage(), e);
             } catch (JAXBException e) {

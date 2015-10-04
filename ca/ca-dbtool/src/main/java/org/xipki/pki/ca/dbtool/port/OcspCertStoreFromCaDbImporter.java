@@ -644,8 +644,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             } // end for
 
             return lastSuccessfulCertId;
-        }
-        finally {
+        } finally {
             try {
                 recoverAutoCommit();
             } catch (DataAccessException e) {

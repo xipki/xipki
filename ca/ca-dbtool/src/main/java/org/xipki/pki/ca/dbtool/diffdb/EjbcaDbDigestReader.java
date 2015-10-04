@@ -164,8 +164,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
-            }
-            finally {
+            } finally {
                 releaseResources(null, rs);
             }
 

@@ -320,8 +320,7 @@ class OCSPStoreQueryExecutor {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                 t.getClass().getName() + ": " + t.getMessage());
                     }
-                }
-                finally {
+                } finally {
                     conn.setAutoCommit(origAutoCommit);
                 }
 
