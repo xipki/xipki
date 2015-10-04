@@ -39,8 +39,7 @@ package org.xipki.pki.ca.common.cmp;
  * @author Lijun Liao
  */
 
-public enum ProtectionResult
-{
+public enum ProtectionResult {
     VALID,
     INVALID,
     SIGALGO_FORBIDDEN,

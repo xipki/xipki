@@ -44,8 +44,7 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException
-{
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
 
     /**
      * Constructor for DeadlockLoserDataAccessException.
@@ -54,8 +53,7 @@ public class DeadlockLoserDataAccessException extends PessimisticLockingFailureE
      */
     public DeadlockLoserDataAccessException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

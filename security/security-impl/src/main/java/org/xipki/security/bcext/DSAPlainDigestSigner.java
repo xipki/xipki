@@ -55,8 +55,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class DSAPlainDigestSigner
-    implements Signer
-{
+    implements Signer {
     private final Digest digest;
     private final DSA dsaSigner;
     private boolean forSigning;
@@ -64,53 +63,42 @@ public class DSAPlainDigestSigner
 
     public DSAPlainDigestSigner(
             final DSA    signer,
-            final Digest digest)
-    {
+            final Digest digest) {
         this.digest = digest;
         this.dsaSigner = signer;
     }
 
     public void init(
             final boolean forSigning,
-            final CipherParameters parameters)
-    {
+            final CipherParameters parameters) {
         this.forSigning = forSigning;
 
         AsymmetricKeyParameter k;
 
-        if (parameters instanceof ParametersWithRandom)
-        {
+        if (parameters instanceof ParametersWithRandom) {
             k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
-        } else
-        {
+        } else {
             k = (AsymmetricKeyParameter) parameters;
         }
 
         ParamUtil.assertNotNull("k", k);
-        if (k instanceof ECPublicKeyParameters)
-        {
+        if (k instanceof ECPublicKeyParameters) {
             keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
-        } else if (k instanceof ECPrivateKeyParameters)
-        {
+        } else if (k instanceof ECPrivateKeyParameters) {
             keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
-        } else if (k instanceof DSAPublicKeyParameters)
-        {
+        } else if (k instanceof DSAPublicKeyParameters) {
             keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
-        } else if (k instanceof DSAPrivateKeyParameters)
-        {
+        } else if (k instanceof DSAPrivateKeyParameters) {
             keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
         }
 
-        if (forSigning && !k.isPrivate())
-        {
+        if (forSigning && !k.isPrivate()) {
             throw new IllegalArgumentException("Signing Requires Private Key.");
         }
 
-        if (!forSigning && k.isPrivate())
-        {
+        if (!forSigning && k.isPrivate()) {
             throw new IllegalArgumentException("Verification Requires Public Key.");
         }
 
@@ -123,8 +111,7 @@ public class DSAPlainDigestSigner
      * update the internal digest with the byte b
      */
     public void update(
-            final byte input)
-    {
+            final byte input) {
         digest.update(input);
     }
 
@@ -134,8 +121,7 @@ public class DSAPlainDigestSigner
     public void update(
             final byte[]  input,
             final int inOff,
-            final int length)
-    {
+            final int length) {
         digest.update(input, inOff, length);
     }
 
@@ -143,10 +129,8 @@ public class DSAPlainDigestSigner
      * Generate a signature for the message we've been loaded with using
      * the key we were initialised with.
      */
-    public byte[] generateSignature()
-    {
-        if (!forSigning)
-        {
+    public byte[] generateSignature() {
+        if (!forSigning) {
             throw new IllegalStateException(
                     "DSADigestSigner not initialised for signature generation.");
         }
@@ -156,56 +140,46 @@ public class DSAPlainDigestSigner
 
         BigInteger[] sig = dsaSigner.generateSignature(hash);
 
-        try
-        {
+        try {
             return encode(sig[0], sig[1]);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             throw new IllegalStateException("unable to encode signature");
         }
     }
 
     public boolean verifySignature(
-            final byte[] signature)
-    {
-        if (forSigning)
-        {
+            final byte[] signature) {
+        if (forSigning) {
             throw new IllegalStateException("DSADigestSigner not initialised for verification");
         }
 
         byte[] hash = new byte[digest.getDigestSize()];
         digest.doFinal(hash, 0);
 
-        try
-        {
+        try {
             BigInteger[] sig = decode(signature);
             return dsaSigner.verifySignature(hash, sig[0], sig[1]);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             return false;
         }
     }
 
-    public void reset()
-    {
+    public void reset() {
         digest.reset();
     }
 
     private byte[] encode(
             final BigInteger r,
             final BigInteger s)
-    throws IOException
-    {
+    throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
-        if ((r.bitLength() + 7) / 8 > blockSize)
-        {
+        if ((r.bitLength() + 7) / 8 > blockSize) {
             throw new IOException("r is too long");
         }
 
-        if ((s.bitLength() + 7) / 8 > blockSize)
-        {
+        if ((s.bitLength() + 7) / 8 > blockSize) {
             throw new IOException("s is too long");
         }
 
@@ -223,11 +197,9 @@ public class DSAPlainDigestSigner
 
     private BigInteger[] decode(
             final byte[] encoding)
-    throws IOException
-    {
+    throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
-        if (encoding.length != 2 * blockSize)
-        {
+        if (encoding.length != 2 * blockSize) {
             throw new IOException("invalid length of signature");
         }
 

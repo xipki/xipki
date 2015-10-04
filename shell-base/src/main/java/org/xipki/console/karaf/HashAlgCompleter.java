@@ -39,6 +39,5 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface HashAlgCompleter extends XipkiCompleter
-{
+public interface HashAlgCompleter extends XipkiCompleter {
 }

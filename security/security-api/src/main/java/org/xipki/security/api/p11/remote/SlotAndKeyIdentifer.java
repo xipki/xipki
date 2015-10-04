@@ -57,22 +57,18 @@ import org.xipki.security.api.BadASN1ObjectException;
  * @author Lijun Liao
  */
 
-public class SlotAndKeyIdentifer extends ASN1Object
-{
+public class SlotAndKeyIdentifer extends ASN1Object {
     private SlotIdentifier slotIdentifier;
     private KeyIdentifier keyIdentifier;
 
     public SlotAndKeyIdentifer(
             final SlotIdentifier slotIdentifier,
-            final KeyIdentifier keyIdentifier)
-    {
-        if (slotIdentifier == null)
-        {
+            final KeyIdentifier keyIdentifier) {
+        if (slotIdentifier == null) {
             throw new IllegalArgumentException("slotIdentifier could not be null");
         }
 
-        if (keyIdentifier == null)
-        {
+        if (keyIdentifier == null) {
             throw new IllegalArgumentException("keyIdentifier could not be null");
         }
 
@@ -82,11 +78,9 @@ public class SlotAndKeyIdentifer extends ASN1Object
 
     private SlotAndKeyIdentifer(
             final ASN1Sequence seq)
-    throws BadASN1ObjectException
-    {
+    throws BadASN1ObjectException {
         final int n = seq.size();
-        if (n != 2)
-        {
+        if (n != 2) {
             StringBuilder sb = new StringBuilder(100);
             sb.append("wrong number of elements in sequence 'SlotAndKeyIdentifier'");
             sb.append(", is '").append(n).append("'");
@@ -100,27 +94,21 @@ public class SlotAndKeyIdentifer extends ASN1Object
 
     public static SlotAndKeyIdentifer getInstance(
             final Object obj)
-    throws BadASN1ObjectException
-    {
-        if (obj == null || obj instanceof SlotAndKeyIdentifer)
-        {
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof SlotAndKeyIdentifer) {
             return (SlotAndKeyIdentifer) obj;
         }
 
-        try
-        {
-            if (obj instanceof ASN1Sequence)
-            {
+        try {
+            if (obj instanceof ASN1Sequence) {
                 return new SlotAndKeyIdentifer((ASN1Sequence) obj);
             }
 
-            if (obj instanceof byte[])
-            {
+            if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         }
-        catch (IOException | IllegalArgumentException e)
-        {
+        catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
         }
 
@@ -130,21 +118,18 @@ public class SlotAndKeyIdentifer extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotIdentifier.toASN1Primitive());
         vector.add(keyIdentifier.toASN1Primitive());
         return new DERSequence(vector);
     }
 
-    public SlotIdentifier getSlotIdentifier()
-    {
+    public SlotIdentifier getSlotIdentifier() {
         return slotIdentifier;
     }
 
-    public KeyIdentifier getKeyIdentifier()
-    {
+    public KeyIdentifier getKeyIdentifier() {
         return keyIdentifier;
     }
 

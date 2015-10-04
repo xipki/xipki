@@ -92,8 +92,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class EnrollCertCmd extends ClientCmd
-{
+public abstract class EnrollCertCmd extends ClientCmd {
     @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested\n"
                     + "(defaults to subject of self-signed certifite)")
@@ -197,8 +196,7 @@ public abstract class EnrollCertCmd extends ClientCmd
     protected SecurityFactory securityFactory;
 
     public void setSecurityFactory(
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
@@ -209,8 +207,7 @@ public abstract class EnrollCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         EnrollCertRequestType request = new EnrollCertRequestType(
                 EnrollCertRequestType.Type.CERT_REQ);
 
@@ -226,34 +223,29 @@ public abstract class EnrollCertCmd extends ClientCmd
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
-        if (needExtensionTypes == null)
-        {
+        if (needExtensionTypes == null) {
             needExtensionTypes = new LinkedList<>();
         }
 
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
-        if (isNotEmpty(subjectAltNames))
-        {
+        if (isNotEmpty(subjectAltNames)) {
             extensions.add(
                     P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
-        if (isNotEmpty(subjectInfoAccesses))
-        {
+        if (isNotEmpty(subjectInfoAccesses)) {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
                     subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
         // Keyusage
-        if (isNotEmpty(keyusages))
-        {
+        if (isNotEmpty(keyusages)) {
             Set<KeyUsage> usages = new HashSet<>();
-            for (String usage : keyusages)
-            {
+            for (String usage : keyusages) {
                 usages.add(KeyUsage.getKeyUsage(usage));
             }
             org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
@@ -263,8 +255,7 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // ExtendedKeyusage
-        if (isNotEmpty(extkeyusages))
-        {
+        if (isNotEmpty(extkeyusages)) {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(oids);
@@ -274,25 +265,20 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // QcEuLimitValue
-        if (isNotEmpty(qcEuLimits))
-        {
+        if (isNotEmpty(qcEuLimits)) {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for (String m : qcEuLimits)
-            {
+            for (String m : qcEuLimits) {
                 StringTokenizer st = new StringTokenizer(m, ":");
-                try
-                {
+                try {
                     String currencyS = st.nextToken();
                     String amountS = st.nextToken();
                     String exponentS = st.nextToken();
 
                     Iso4217CurrencyCode currency;
-                    try
-                    {
+                    try {
                         int intValue = Integer.parseInt(currencyS);
                         currency = new Iso4217CurrencyCode(intValue);
-                    } catch (NumberFormatException e)
-                    {
+                    } catch (NumberFormatException e) {
                         currency = new Iso4217CurrencyCode(currencyS);
                     }
 
@@ -303,8 +289,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
             }
@@ -316,14 +301,11 @@ public abstract class EnrollCertCmd extends ClientCmd
         }
 
         // biometricInfo
-        if (biometricType != null && biometricHashAlgo != null && biometricFile != null)
-        {
+        if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
             TypeOfBiometricData _biometricType;
-            if (StringUtil.isNumber(biometricType))
-            {
+            if (StringUtil.isNumber(biometricType)) {
                 _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
-            } else
-            {
+            } else {
                 _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
             }
 
@@ -334,8 +316,7 @@ public abstract class EnrollCertCmd extends ClientCmd
             byte[] _biometricDataHash = md.digest(biometricBytes);
 
             DERIA5String _sourceDataUri = null;
-            if (biometricUri != null)
-            {
+            if (biometricUri != null) {
                 _sourceDataUri = new DERIA5String(biometricUri);
             }
             BiometricData biometricData = new BiometricData(_biometricType,
@@ -350,17 +331,14 @@ public abstract class EnrollCertCmd extends ClientCmd
             ASN1Sequence extValue = new DERSequence(v);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
-        } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
-        {
+        } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
             // Do nothing
-        } else
-        {
+        } else {
             throw new Exception("either all of biometric triples (type, hash algo, file)"
                     + " must be set or none of them should be set");
         }
 
-        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
-        {
+        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
@@ -370,8 +348,7 @@ public abstract class EnrollCertCmd extends ClientCmd
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        if (isNotEmpty(extensions))
-        {
+        if (isNotEmpty(extensions)) {
             Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
             certTemplateBuilder.setExtensions(asn1Extensions);
         }
@@ -382,11 +359,9 @@ public abstract class EnrollCertCmd extends ClientCmd
                 = new ProofOfPossessionSigningKeyBuilder(certReq);
         ContentSigner contentSigner = signer.borrowContentSigner();
         POPOSigningKey popoSk;
-        try
-        {
+        try {
             popoSk = popoBuilder.build(contentSigner);
-        } finally
-        {
+        } finally {
             signer.returnContentSigner(contentSigner);
         }
 
@@ -398,24 +373,20 @@ public abstract class EnrollCertCmd extends ClientCmd
 
         RequestResponseDebug debug = getRequestResponseDebug();
         EnrollCertResult result;
-        try
-        {
+        try {
             result = caClient.requestCerts(request, caName, user, debug);
-        } finally
-        {
+        } finally {
             saveRequestResponse(debug);
         }
 
         X509Certificate cert = null;
-        if (result != null)
-        {
+        if (result != null) {
             String id = result.getAllIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new CmdFailure("no certificate received from the server");
         }
 
@@ -426,8 +397,7 @@ public abstract class EnrollCertCmd extends ClientCmd
     }
 
     protected X500Name getSubject(
-            final String subject)
-    {
+            final String subject) {
         return new X500Name(subject);
     }
 

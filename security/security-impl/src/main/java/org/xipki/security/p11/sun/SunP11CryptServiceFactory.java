@@ -47,14 +47,12 @@ import org.xipki.security.api.p11.P11ModuleConf;
  * @author Lijun Liao
  */
 
-public class SunP11CryptServiceFactory implements P11CryptServiceFactory
-{
+public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
     private P11Control p11Control;
 
     @Override
     public void init(
-            final P11Control p11Control)
-    {
+            final P11Control p11Control) {
         ParamUtil.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
     }
@@ -62,22 +60,18 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory
     @Override
     public P11CryptService createP11CryptService(
             String moduleName)
-    throws SignerException
-    {
+    throws SignerException {
         ParamUtil.assertNotNull("moduleName", moduleName);
-        if (p11Control == null)
-        {
+        if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
             moduleName = p11Control.getDefaultModuleName();
         }
 
         P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if (conf == null)
-        {
+        if (conf == null) {
             throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
         }
 

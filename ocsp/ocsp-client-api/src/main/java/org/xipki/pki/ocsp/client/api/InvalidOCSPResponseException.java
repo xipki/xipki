@@ -40,30 +40,25 @@ package org.xipki.pki.ocsp.client.api;
  */
 
 @SuppressWarnings("serial")
-public class InvalidOCSPResponseException extends OCSPResponseException
-{
+public class InvalidOCSPResponseException extends OCSPResponseException {
 
-    public InvalidOCSPResponseException()
-    {
+    public InvalidOCSPResponseException() {
         super();
     }
 
     public InvalidOCSPResponseException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
     public InvalidOCSPResponseException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public InvalidOCSPResponseException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 

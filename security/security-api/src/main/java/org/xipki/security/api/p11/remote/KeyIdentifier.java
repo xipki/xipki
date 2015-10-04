@@ -59,15 +59,12 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
  * @author Lijun Liao
  */
 
-public class KeyIdentifier extends ASN1Object
-{
+public class KeyIdentifier extends ASN1Object {
     private P11KeyIdentifier keyId;
 
     public KeyIdentifier(
-            final P11KeyIdentifier keyId)
-    {
-        if (keyId == null)
-        {
+            final P11KeyIdentifier keyId) {
+        if (keyId == null) {
             throw new IllegalArgumentException("keyId could not be null");
         }
 
@@ -76,33 +73,26 @@ public class KeyIdentifier extends ASN1Object
 
     public static KeyIdentifier getInstance(
             final Object obj)
-    throws BadASN1ObjectException
-    {
-        if (obj == null || obj instanceof KeyIdentifier)
-        {
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof KeyIdentifier) {
             return (KeyIdentifier) obj;
         }
 
-        try
-        {
-            if (obj instanceof ASN1OctetString)
-            {
+        try {
+            if (obj instanceof ASN1OctetString) {
                 byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
                 return new KeyIdentifier(keyIdentifier);
-            } else if (obj instanceof ASN1String)
-            {
+            } else if (obj instanceof ASN1String) {
                 String keyLabel = ((ASN1String) obj).getString();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
                 return new KeyIdentifier(keyIdentifier);
             }
 
-            if (obj instanceof byte[])
-            {
+            if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        } catch (IllegalArgumentException | IOException e)
-        {
+        } catch (IllegalArgumentException | IOException e) {
             throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
         }
 
@@ -111,19 +101,15 @@ public class KeyIdentifier extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive()
-    {
-        if (keyId.getKeyLabel() != null)
-        {
+    public ASN1Primitive toASN1Primitive() {
+        if (keyId.getKeyLabel() != null) {
             return new DERUTF8String(keyId.getKeyLabel());
-        } else
-        {
+        } else {
             return new DEROctetString(keyId.getKeyId());
         }
     }
 
-    public P11KeyIdentifier getKeyId()
-    {
+    public P11KeyIdentifier getKeyId() {
         return keyId;
     }
 

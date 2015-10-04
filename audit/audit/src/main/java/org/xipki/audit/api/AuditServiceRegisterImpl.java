@@ -45,8 +45,7 @@ import org.xipki.audit.slf4j.impl.Slf4jAuditServiceImpl;
  * @author Lijun Liao
  */
 
-public class AuditServiceRegisterImpl implements AuditServiceRegister
-{
+public class AuditServiceRegisterImpl implements AuditServiceRegister {
     private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
     private ConcurrentLinkedDeque<AuditService> services =
             new ConcurrentLinkedDeque<AuditService>();
@@ -55,25 +54,20 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
     private boolean auditEnabled;
 
     @Override
-    public AuditService getAuditService()
-    {
-        if (auditEnabled)
-        {
+    public AuditService getAuditService() {
+        if (auditEnabled) {
             return services.isEmpty()
                     ? defaultAuditService
                     : services.getLast();
-        } else
-        {
+        } else {
             return null;
         }
     }
 
     public void bindService(
-            final AuditService service)
-    {
+            final AuditService service) {
         //might be null if dependency is optional
-        if (service == null)
-        {
+        if (service == null) {
             LOG.debug("bindService invoked with null.");
             return;
         }
@@ -88,39 +82,31 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister
     }
 
     public void unbindService(
-            final AuditService service)
-    {
+            final AuditService service) {
         //might be null if dependency is optional
-        if (service == null)
-        {
+        if (service == null) {
             LOG.debug("unbindService invoked with null.");
             return;
         }
 
-        try
-        {
-            if (services.remove(service))
-            {
+        try {
+            if (services.remove(service)) {
                 LOG.debug("removed AuditService binding for {}", service);
-            } else
-            {
+            } else {
                 LOG.debug("no AuditService binding found to remove for '{}'", service);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
         }
     }
 
     public void setAuditEnabled(
-            final boolean auditEnabled)
-    {
+            final boolean auditEnabled) {
         this.auditEnabled = auditEnabled;
     }
 
     @Override
-    public boolean isAuditEnabled()
-    {
+    public boolean isAuditEnabled() {
         return auditEnabled;
     }
 }

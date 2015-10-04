@@ -42,14 +42,11 @@ import org.xipki.pki.ocsp.qa.api.OcspError;
  * @author Lijun Liao
  */
 
-public class OcspErrorCompleter extends EnumCompleter
-{
-    public OcspErrorCompleter()
-    {
+public class OcspErrorCompleter extends EnumCompleter {
+    public OcspErrorCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (OcspError entry : OcspError.values())
-        {
+        for (OcspError entry : OcspError.values()) {
             enums.append(entry.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

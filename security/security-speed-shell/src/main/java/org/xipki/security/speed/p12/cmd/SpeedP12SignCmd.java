@@ -42,8 +42,7 @@ import org.xipki.security.speed.cmd.SingleSpeedCmd;
  * @author Lijun Liao
  */
 
-public abstract class SpeedP12SignCmd extends SingleSpeedCmd
-{
+public abstract class SpeedP12SignCmd extends SingleSpeedCmd {
     @Option(name = "--sig-algo",
             required = true,
             description = "signature algorithm\n"

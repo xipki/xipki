@@ -70,8 +70,7 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class KeystoreP11Identity extends P11Identity
-{
+public class KeystoreP11Identity extends P11Identity {
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 
     private final String sha1sum;
@@ -86,80 +85,64 @@ public class KeystoreP11Identity extends P11Identity
             final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
             final int maxSessions)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
-    {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
         ParamUtil.assertNotNull("privateKey", privateKey);
         ParamUtil.assertNotBlank("sha1sum", sha1sum);
 
         if (certificateChain == null
                 || certificateChain.length < 1
-                || certificateChain[0] == null)
-        {
+                || certificateChain[0] == null) {
             throw new IllegalArgumentException("no certificate is specified");
         }
 
         this.privateKey = privateKey;
         this.sha1sum = sha1sum;
-        if (this.publicKey instanceof RSAPublicKey)
-        {
+        if (this.publicKey instanceof RSAPublicKey) {
             String providerName;
             if (Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
-                    != null)
-            {
+                    != null) {
                 providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
-            } else
-            {
+            } else {
                 providerName = "BC";
             }
 
             LOG.info("use provider {}", providerName);
 
-            for (int i = 0; i < maxSessions; i++)
-            {
+            for (int i = 0; i < maxSessions; i++) {
                 Cipher rsaCipher;
-                try
-                {
+                try {
                     final String algo = "RSA/ECB/NoPadding";
                     rsaCipher = Cipher.getInstance(algo, providerName);
                     LOG.info("use cipher algorithm {}", algo);
-                } catch (NoSuchPaddingException e)
-                {
+                } catch (NoSuchPaddingException e) {
                     throw new NoSuchAlgorithmException("NoSuchPadding", e);
-                } catch (NoSuchAlgorithmException e)
-                {
+                } catch (NoSuchAlgorithmException e) {
                     final String algo = "RSA/NONE/NoPadding";
-                    try
-                    {
+                    try {
                         rsaCipher = Cipher.getInstance(algo, providerName);
                         LOG.info("use cipher algorithm {}", algo);
-                    } catch (NoSuchPaddingException e1)
-                    {
+                    } catch (NoSuchPaddingException e1) {
                         throw new NoSuchAlgorithmException("NoSuchPadding", e);
                     }
                 }
                 rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
                 rsaCiphers.add(rsaCipher);
             }
-        } else
-        {
+        } else {
             String algorithm;
-            if (this.publicKey instanceof ECPublicKey)
-            {
+            if (this.publicKey instanceof ECPublicKey) {
                 algorithm = "NONEwithECDSA";
-            } else if (this.publicKey instanceof DSAPublicKey)
-            {
+            } else if (this.publicKey instanceof DSAPublicKey) {
                 algorithm = "NONEwithDSA";
-            } else
-            {
+            } else {
                 throw new IllegalArgumentException(
                         "Currently only RSA, DSA and EC public key are supported, but not "
                         + this.publicKey.getAlgorithm()
                         + " (class: " + this.publicKey.getClass().getName() + ")");
             }
 
-            for (int i = 0; i < maxSessions; i++)
-            {
+            for (int i = 0; i < maxSessions; i++) {
                 Signature dsaSignature = Signature.getInstance(algorithm, "BC");
                 dsaSignature.initSign(privateKey);
                 dsaSignatures.add(dsaSignature);
@@ -168,10 +151,8 @@ public class KeystoreP11Identity extends P11Identity
     }
 
     private static PublicKey getPublicKeyOfFirstCert(
-            final X509Certificate[] certificateChain)
-    {
-        if (certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-        {
+            final X509Certificate[] certificateChain) {
+        if (certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null) {
             throw new IllegalArgumentException("no certificate is specified");
         }
         return certificateChain[0].getPublicKey();
@@ -179,10 +160,8 @@ public class KeystoreP11Identity extends P11Identity
 
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
-    throws SignerException
-    {
-        if (!(publicKey instanceof RSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
@@ -194,10 +173,8 @@ public class KeystoreP11Identity extends P11Identity
 
     public byte[] CKM_RSA_X509(
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof RSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
@@ -206,36 +183,28 @@ public class KeystoreP11Identity extends P11Identity
 
     private byte[] do_rsa_sign(
             final byte[] paddedHash)
-    throws SignerException
-    {
+    throws SignerException {
         Cipher cipher;
-        try
-        {
+        try {
             cipher = rsaCiphers.takeFirst();
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             throw new SignerException(
                     "InterruptedException occurs while retrieving idle signature");
         }
 
-        try
-        {
+        try {
             return cipher.doFinal(paddedHash);
-        } catch (BadPaddingException | IllegalBlockSizeException e)
-        {
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new SignerException("SignatureException: " + e.getMessage(), e);
-        } finally
-        {
+        } finally {
             rsaCiphers.add(cipher);
         }
     }
 
     public byte[] CKM_ECDSA_X962(
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof ECPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
@@ -244,18 +213,15 @@ public class KeystoreP11Identity extends P11Identity
     }
     public byte[] CKM_ECDSA(
             final byte[] hash)
-    throws SignerException
-    {
+    throws SignerException {
         byte[] x962Signature = CKM_ECDSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
     public byte[] CKM_DSA_X962(
             final byte[] hash)
-    throws SignerException
-    {
-        if (!(publicKey instanceof DSAPublicKey))
-        {
+    throws SignerException {
+        if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
@@ -264,47 +230,38 @@ public class KeystoreP11Identity extends P11Identity
 
     public byte[] CKM_DSA(
             final byte[] hash)
-    throws SignerException
-    {
+    throws SignerException {
         byte[] x962Signature = CKM_DSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
     private byte[] do_dsa_x962_sign(
             final byte[] hash)
-    throws SignerException
-    {
+    throws SignerException {
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
         Signature sig;
-        try
-        {
+        try {
             sig = dsaSignatures.takeFirst();
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             throw new SignerException(
                     "InterruptedException occurs while retrieving idle signature");
         }
 
-        try
-        {
+        try {
             sig.update(truncatedDigest);
             return sig.sign();
-        } catch (SignatureException e)
-        {
+        } catch (SignatureException e) {
             throw new SignerException("SignatureException: " + e.getMessage(), e);
-        } finally
-        {
+        } finally {
             dsaSignatures.add(sig);
         }
     }
 
-    public String getSha1Sum()
-    {
+    public String getSha1Sum() {
         return sha1sum;
     }
 
-    public PrivateKey getPrivateKey()
-    {
+    public PrivateKey getPrivateKey() {
         return privateKey;
     }
 

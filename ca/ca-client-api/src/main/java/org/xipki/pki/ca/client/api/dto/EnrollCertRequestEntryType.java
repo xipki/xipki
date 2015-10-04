@@ -43,8 +43,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class EnrollCertRequestEntryType extends IdentifiedObject
-{
+public class EnrollCertRequestEntryType extends IdentifiedObject {
     private final String certprofile;
 
     private final CertRequest certReq;
@@ -54,8 +53,7 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
             final String id,
             final String certprofile,
             final CertRequest certReq,
-            final ProofOfPossession popo)
-    {
+            final ProofOfPossession popo) {
         super(id);
         ParamUtil.assertNotNull("certReq", certReq);
 
@@ -64,18 +62,15 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
         this.popo = popo;
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 
-    public CertRequest getCertReq()
-    {
+    public CertRequest getCertReq() {
         return certReq;
     }
 
-    public ProofOfPossession getPopo()
-    {
+    public ProofOfPossession getPopo() {
         return popo;
     }
 

@@ -39,6 +39,5 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface ClientCRLReasonCompleter extends XipkiCompleter
-{
+public interface ClientCRLReasonCompleter extends XipkiCompleter {
 }

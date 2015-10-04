@@ -71,8 +71,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class P10RequestGenerator
-{
+public class P10RequestGenerator {
 
     public PKCS10CertificationRequest generateRequest(
             final SecurityFactory securityFactory,
@@ -81,8 +80,7 @@ public class P10RequestGenerator
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final String subject,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, SignerException
-    {
+    throws PasswordResolverException, SignerException {
         X500Name subjectDN = new X500Name(subject);
         return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo,
                 subjectDN, attributes);
@@ -95,23 +93,18 @@ public class P10RequestGenerator
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, SignerException
-    {
+    throws PasswordResolverException, SignerException {
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
                 (X509Certificate[]) null);
         ContentSigner contentSigner;
-        try
-        {
+        try {
             contentSigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException e)
-        {
+        } catch (NoIdleSignerException e) {
             throw new SignerException(e.getMessage(), e);
         }
-        try
-        {
+        try {
             return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, attributes);
-        } finally
-        {
+        } finally {
             signer.returnContentSigner(contentSigner);
         }
     }
@@ -120,14 +113,11 @@ public class P10RequestGenerator
             final ContentSigner contentSigner,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    {
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-        if (CollectionUtil.isNotEmpty(attributes))
-        {
-            for (ASN1ObjectIdentifier attrType : attributes.keySet())
-            {
+        if (CollectionUtil.isNotEmpty(attributes)) {
+            for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
             }
         }
@@ -137,36 +127,29 @@ public class P10RequestGenerator
     public static Extension createExtensionSubjectAltName(
             final List<String> taggedValues,
             final boolean critical)
-    throws BadInputException
-    {
+    throws BadInputException {
         GeneralNames names = createGeneralNames(taggedValues);
-        if (names == null)
-        {
+        if (names == null) {
             return null;
         }
 
-        try
-        {
+        try {
             return new Extension(Extension.subjectAlternativeName, critical, names.getEncoded());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public static GeneralNames createGeneralNames(
             final List<String> taggedValues)
-    throws BadInputException
-    {
-        if (CollectionUtil.isEmpty(taggedValues))
-        {
+    throws BadInputException {
+        if (CollectionUtil.isEmpty(taggedValues)) {
             return null;
         }
 
         int n = taggedValues.size();
         GeneralName[] names = new GeneralName[n];
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             names[i] = createGeneralName(taggedValues.get(i));
         }
         return new GeneralNames(names);
@@ -175,45 +158,36 @@ public class P10RequestGenerator
     public static Extension createExtensionSubjectInfoAccess(
             final List<String> accessMethodAndLocations,
             final boolean critical)
-    throws BadInputException
-    {
-        if (CollectionUtil.isEmpty(accessMethodAndLocations))
-        {
+    throws BadInputException {
+        if (CollectionUtil.isEmpty(accessMethodAndLocations)) {
             return null;
         }
 
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        for (String accessMethodAndLocation : accessMethodAndLocations)
-        {
+        for (String accessMethodAndLocation : accessMethodAndLocations) {
             vector.add(createAccessDescription(accessMethodAndLocation));
         }
         ASN1Sequence seq = new DERSequence(vector);
-        try
-        {
+        try {
             return new Extension(Extension.subjectInfoAccess, critical, seq.getEncoded());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public static AccessDescription createAccessDescription(
             final String accessMethodAndLocation)
-    throws BadInputException
-    {
+    throws BadInputException {
         ConfPairs pairs;
-        try
-        {
+        try {
             pairs = new ConfPairs(accessMethodAndLocation);
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
         }
 
         Set<String> oids = pairs.getNames();
-        if (oids == null || oids.size() != 1)
-        {
+        if (oids == null || oids.size() != 1) {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
         }
@@ -236,38 +210,29 @@ public class P10RequestGenerator
      */
     public static GeneralName createGeneralName(
             final String taggedValue)
-    throws BadInputException
-    {
+    throws BadInputException {
         int tag = -1;
         String value = null;
-        if (taggedValue.charAt(0) == '[')
-        {
+        if (taggedValue.charAt(0) == '[') {
             int idx = taggedValue.indexOf(']', 1);
-            if (idx > 1 && idx < taggedValue.length() - 1)
-            {
+            if (idx > 1 && idx < taggedValue.length() - 1) {
                 String tagS = taggedValue.substring(1, idx);
-                try
-                {
+                try {
                     tag = Integer.parseInt(tagS);
                     value = taggedValue.substring(idx + 1);
-                } catch (NumberFormatException e)
-                {
+                } catch (NumberFormatException e) {
                 }
             }
         }
 
-        if (tag == -1)
-        {
+        if (tag == -1) {
             throw new BadInputException("invalid taggedValue " + taggedValue);
         }
 
-        switch (tag)
-        {
-        case GeneralName.otherName:
-        {
+        switch (tag) {
+        case GeneralName.otherName: {
             int idxSep = value.indexOf("=");
-            if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1)
-            {
+            if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid otherName " + value);
             }
             String otherTypeOid = value.substring(0, idxSep);
@@ -283,16 +248,13 @@ public class P10RequestGenerator
             return new GeneralName(tag, value);
         case GeneralName.dNSName:
             return new GeneralName(tag, value);
-        case GeneralName.directoryName:
-        {
+        case GeneralName.directoryName: {
             X500Name x500Name = X509Util.reverse(new X500Name(value));
             return new GeneralName(GeneralName.directoryName, x500Name);
         }
-        case GeneralName.ediPartyName:
-        {
+        case GeneralName.ediPartyName: {
             int idxSep = value.indexOf("=");
-            if (idxSep == -1 || idxSep == value.length() - 1)
-            {
+            if (idxSep == -1 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid ediPartyName " + value);
             }
             String nameAssigner = (idxSep == 0)
@@ -300,8 +262,7 @@ public class P10RequestGenerator
                     : value.substring(0, idxSep);
             String partyName = value.substring(idxSep + 1);
             ASN1EncodableVector vector = new ASN1EncodableVector();
-            if (nameAssigner != null)
-            {
+            if (nameAssigner != null) {
                 vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
             }
             vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));

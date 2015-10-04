@@ -44,12 +44,10 @@ import org.xipki.password.PBEPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "pbe-enc",
         description = "encrypt password with master password")
-public class PBEEncryptCmd extends SecurityCmd
-{
+public class PBEEncryptCmd extends SecurityCmd {
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         char[] masterPassword = readPassword("Please enter the master password");
         char[] password = readPassword("Please enter the password");
 

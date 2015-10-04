@@ -56,8 +56,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class HttpCmpServlet extends HttpServlet
-{
+public class HttpCmpServlet extends HttpServlet {
     private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -68,8 +67,7 @@ public class HttpCmpServlet extends HttpServlet
     private final CmpResponder responder;
     private LocalP11CryptServicePool localP11CryptServicePool;
 
-    public HttpCmpServlet()
-    {
+    public HttpCmpServlet() {
         responder = new CmpResponder();
     }
 
@@ -77,20 +75,16 @@ public class HttpCmpServlet extends HttpServlet
     public void doPost(
             final HttpServletRequest request,
             final HttpServletResponse response)
-    throws ServletException, IOException
-    {
-        try
-        {
-            if (localP11CryptServicePool == null)
-            {
+    throws ServletException, IOException {
+        try {
+            if (localP11CryptServicePool == null) {
                 LOG.error("localP11CryptService in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
                 return;
             }
 
-            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType()))
-            {
+            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                 response.flushBuffer();
@@ -98,16 +92,13 @@ public class HttpCmpServlet extends HttpServlet
             }
 
             PKIMessage pkiReq;
-            try
-            {
+            try {
                 pkiReq = generatePKIMessage(request.getInputStream());
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 final String message = "could not parse the request (PKIMessage)";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(message + ", class={}, message={}", e.getClass().getName(),
                             e.getMessage());
                 }
@@ -120,28 +111,23 @@ public class HttpCmpServlet extends HttpServlet
             String moduleName = null;
             String encodedUrl = request.getRequestURI();
             String constructedPath = null;
-            if (encodedUrl != null)
-            {
+            if (encodedUrl != null) {
                 constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
                 String servletPath = request.getServletPath();
-                if (!servletPath.endsWith("/"))
-                {
+                if (!servletPath.endsWith("/")) {
                     servletPath += "/";
-                    if (servletPath.startsWith(constructedPath))
-                    {
+                    if (servletPath.startsWith(constructedPath)) {
                         moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
                     }
                 }
 
                 int indexOf = constructedPath.indexOf(servletPath);
-                if (indexOf >= 0)
-                {
+                if (indexOf >= 0) {
                     constructedPath = constructedPath.substring(indexOf + servletPath.length());
                 }
             }
 
-            if (moduleName == null)
-            {
+            if (moduleName == null) {
                 int moduleName_end_index = constructedPath.indexOf('/');
                 moduleName = (moduleName_end_index == -1)
                         ? constructedPath
@@ -156,15 +142,13 @@ public class HttpCmpServlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentLength(pkiRespBytes.length);
             response.getOutputStream().write(pkiRespBytes);
-        } catch (EOFException e)
-        {
+        } catch (EOFException e) {
             final String message = "connection reset by peer";
             LOG.error(message + ". {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug(message, e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             LOG.error("Throwable thrown, this should not happen. {}: {}",
                     t.getClass().getName(), t.getMessage());
             LOG.debug("Throwable thrown, this should not happen.", t);
@@ -177,31 +161,24 @@ public class HttpCmpServlet extends HttpServlet
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)
-    throws BadASN1ObjectException
-    {
+    throws BadASN1ObjectException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
-        try
-        {
+        try {
             return PKIMessage.getInstance(asn1Stream.readObject());
-        } catch (IOException | IllegalArgumentException e)
-        {
+        } catch (IOException | IllegalArgumentException e) {
             throw new BadASN1ObjectException("could not parse PKIMessage: " + e.getMessage(), e);
         }
-        finally
-        {
-            try
-            {
+        finally {
+            try {
                 asn1Stream.close();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
             }
         }
     }
 
     public void setLocalP11CryptServicePool(
-            final LocalP11CryptServicePool localP11CryptServicePool)
-    {
+            final LocalP11CryptServicePool localP11CryptServicePool) {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }
 }

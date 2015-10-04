@@ -86,8 +86,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class CertRequestGenCmd extends SecurityCmd
-{
+public abstract class CertRequestGenCmd extends SecurityCmd {
     @Option(name = "--subject", aliases = "-s",
             description = "subject in the PKCS#10 request\n"
                     + "default is the subject of self-signed certifite")
@@ -183,45 +182,38 @@ public abstract class CertRequestGenCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P10RequestGenerator p10Gen = new P10RequestGenerator();
 
         hashAlgo = hashAlgo.trim().toUpperCase();
-        if (hashAlgo.indexOf('-') != -1)
-        {
+        if (hashAlgo.indexOf('-') != -1) {
             hashAlgo = hashAlgo.replaceAll("-", "");
         }
 
-        if (needExtensionTypes == null)
-        {
+        if (needExtensionTypes == null) {
             needExtensionTypes = new LinkedList<>();
         }
 
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
 
-        if (isNotEmpty(subjectAltNames))
-        {
+        if (isNotEmpty(subjectAltNames)) {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(
                     subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
-        if (isNotEmpty(subjectInfoAccesses))
-        {
+        if (isNotEmpty(subjectInfoAccesses)) {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
                     subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
         // Keyusage
-        if (isNotEmpty(keyusages))
-        {
+        if (isNotEmpty(keyusages)) {
             Set<KeyUsage> usages = new HashSet<>();
-            for (String usage : keyusages)
-            {
+            for (String usage : keyusages) {
                 usages.add(KeyUsage.getKeyUsage(usage));
             }
             org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
@@ -231,8 +223,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // ExtendedKeyusage
-        if (isNotEmpty(extkeyusages))
-        {
+        if (isNotEmpty(extkeyusages)) {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(oids);
@@ -242,25 +233,20 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // QcEuLimitValue
-        if (isNotEmpty(qcEuLimits))
-        {
+        if (isNotEmpty(qcEuLimits)) {
             ASN1EncodableVector v = new ASN1EncodableVector();
-            for (String m : qcEuLimits)
-            {
+            for (String m : qcEuLimits) {
                 StringTokenizer st = new StringTokenizer(m, ":");
-                try
-                {
+                try {
                     String currencyS = st.nextToken();
                     String amountS = st.nextToken();
                     String exponentS = st.nextToken();
 
                     Iso4217CurrencyCode currency;
-                    try
-                    {
+                    try {
                         int intValue = Integer.parseInt(currencyS);
                         currency = new Iso4217CurrencyCode(intValue);
-                    } catch (NumberFormatException e)
-                    {
+                    } catch (NumberFormatException e) {
                         currency = new Iso4217CurrencyCode(currencyS);
                     }
 
@@ -271,8 +257,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
             }
@@ -284,14 +269,11 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         }
 
         // biometricInfo
-        if (biometricType != null && biometricHashAlgo != null && biometricFile != null)
-        {
+        if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
             TypeOfBiometricData _biometricType;
-            if (StringUtil.isNumber(biometricType))
-            {
+            if (StringUtil.isNumber(biometricType)) {
                 _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
-            } else
-            {
+            } else {
                 _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
             }
 
@@ -302,8 +284,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
             byte[] _biometricDataHash = md.digest(biometricBytes);
 
             DERIA5String _sourceDataUri = null;
-            if (biometricUri != null)
-            {
+            if (biometricUri != null) {
                 _sourceDataUri = new DERIA5String(biometricUri);
             }
             BiometricData biometricData = new BiometricData(_biometricType,
@@ -318,17 +299,14 @@ public abstract class CertRequestGenCmd extends SecurityCmd
             ASN1Sequence extValue = new DERSequence(v);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
-        } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null)
-        {
+        } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
             // Do nothing
-        } else
-        {
+        } else {
             throw new Exception("either all of biometric triples (type, hash algo, file)"
                     + " must be set or none of them should be set");
         }
 
-        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
-        {
+        if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
@@ -342,23 +320,19 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
         X500Name subjectDN;
-        if (subject != null)
-        {
+        if (subject != null) {
             subjectDN = getSubject(subject);
-        } else
-        {
+        } else {
             subjectDN = cert.getSubject();
         }
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-        if (CollectionUtil.isNotEmpty(extensions))
-        {
+        if (CollectionUtil.isNotEmpty(extensions)) {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
                     new Extensions(extensions.toArray(new Extension[0])));
         }
 
-        if (StringUtil.isNotBlank(challengePassword))
-        {
+        if (StringUtil.isNotBlank(challengePassword)) {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
                     new DERPrintableString(challengePassword));
         }
@@ -367,11 +341,9 @@ public abstract class CertRequestGenCmd extends SecurityCmd
         ContentSigner signer = identifiedSigner.borrowContentSigner();
 
         PKCS10CertificationRequest p10Req;
-        try
-        {
+        try {
             p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
-        } finally
-        {
+        } finally {
             identifiedSigner.returnContentSigner(signer);
         }
 
@@ -381,8 +353,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd
     }
 
     protected X500Name getSubject(
-            final String subject)
-    {
+            final String subject) {
         return new X500Name(subject);
     }
 

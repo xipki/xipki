@@ -50,8 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-tk", name = "export-cert-p12",
         description = "export certificate from PKCS#12 keystore")
-public class P12CertExportCmd extends P12SecurityCmd
-{
+public class P12CertExportCmd extends P12SecurityCmd {
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
@@ -60,24 +59,20 @@ public class P12CertExportCmd extends P12SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         KeyStore ks = getKeyStore();
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements())
-        {
+        while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias))
-            {
+            if (ks.isKeyEntry(alias)) {
                 keyname = alias;
                 break;
             }
         }
 
-        if (keyname == null)
-        {
+        if (keyname == null) {
             throw new CmdFailure("could not find private key");
         }
 

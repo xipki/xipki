@@ -61,8 +61,7 @@ import org.xipki.pki.ocsp.client.shell.OCSPUtils;
  * @author Lijun Liao
  */
 
-public class OcspLoadTest extends LoadExecutor
-{
+public class OcspLoadTest extends LoadExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
     private final OCSPRequestor requestor;
@@ -76,8 +75,7 @@ public class OcspLoadTest extends LoadExecutor
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
@@ -87,8 +85,7 @@ public class OcspLoadTest extends LoadExecutor
             final X509Certificate caCert,
             final URL serverUrl,
             final RequestOptions options,
-            final String description)
-    {
+            final String description) {
         super(description);
         ParamUtil.assertNotNull("requestor", requestor);
         ParamUtil.assertNotEmpty("serials", serials);
@@ -106,24 +103,19 @@ public class OcspLoadTest extends LoadExecutor
         this.serialIndex = 0;
     }
 
-    private synchronized long nextSerialNumber()
-    {
+    private synchronized long nextSerialNumber() {
         serialIndex++;
-        if (serialIndex >= numSerials)
-        {
+        if (serialIndex >= numSerials) {
             serialIndex = 0;
         }
         return this.serials.get(serialIndex);
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
 
         @Override
-        public void run()
-        {
-            while (!stop() && getErrorAccout() < 10)
-            {
+        public void run() {
+            while (!stop() && getErrorAccout() < 10) {
                 long sn = nextSerialNumber();
                 int numFailed = testNext(sn)
                         ? 0
@@ -134,24 +126,19 @@ public class OcspLoadTest extends LoadExecutor
         }
 
         private boolean testNext(
-                final long sn)
-        {
+                final long sn) {
             BasicOCSPResp basicResp;
-            try
-            {
+            try {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
                         options, null);
                 basicResp = OCSPUtils.extractBasicOCSPResp(response);
-            } catch (OCSPRequestorException e)
-            {
+            } catch (OCSPRequestorException e) {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;
-            } catch (OCSPResponseException e)
-            {
+            } catch (OCSPResponseException e) {
                 LOG.warn("OCSPResponseException: {}", e.getMessage());
                 return false;
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
                 return false;
             }
@@ -162,42 +149,33 @@ public class OcspLoadTest extends LoadExecutor
                     ? 0
                     : singleResponses.length;
 
-            if (n == 0)
-            {
+            if (n == 0) {
                 LOG.warn("received no status from server");
                 return false;
-            } else if (n != 1)
-            {
+            } else if (n != 1) {
                 LOG.warn("received status with {} single responses from server, {}",
                         n, "but 1 was requested");
                 return false;
-            } else
-            {
+            } else {
                 SingleResp singleResp = singleResponses[0];
                 CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
                 String status;
-                if (singleCertStatus == null)
-                {
+                if (singleCertStatus == null) {
                     status = "good";
-                } else if (singleCertStatus instanceof RevokedStatus)
-                {
+                } else if (singleCertStatus instanceof RevokedStatus) {
                     RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                     Date revTime = revStatus.getRevocationTime();
 
-                    if (revStatus.hasRevocationReason())
-                    {
+                    if (revStatus.hasRevocationReason()) {
                         int reason = revStatus.getRevocationReason();
                         status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
-                    } else
-                    {
+                    } else {
                         status = "revoked, no reason, revocationTime = " + revTime;
                     }
-                } else if (singleCertStatus instanceof UnknownStatus)
-                {
+                } else if (singleCertStatus instanceof UnknownStatus) {
                     status = "unknown";
-                } else
-                {
+                } else {
                     LOG.warn("status: ERROR");
                     return false;
                 }

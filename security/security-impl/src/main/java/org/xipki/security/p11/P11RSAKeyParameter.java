@@ -50,8 +50,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class P11RSAKeyParameter extends RSAKeyParameters
-{
+public class P11RSAKeyParameter extends RSAKeyParameters {
     private final P11CryptService p11CryptService;
 
     private final P11SlotIdentifier slot;
@@ -64,8 +63,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId,
             final BigInteger modulus,
-            final BigInteger publicExponent)
-    {
+            final BigInteger publicExponent) {
         super(true, modulus, publicExponent);
 
         this.p11CryptService = p11CryptService;
@@ -78,18 +76,15 @@ public class P11RSAKeyParameter extends RSAKeyParameters
             final P11CryptService p11CryptService,
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId)
-    throws InvalidKeyException
-    {
+    throws InvalidKeyException {
         ParamUtil.assertNotNull("p11CryptService", p11CryptService);
         ParamUtil.assertNotNull("slot", slot);
         ParamUtil.assertNotNull("keyId", keyId);
 
         RSAPublicKey key;
-        try
-        {
+        try {
             key = (RSAPublicKey) p11CryptService.getPublicKey(slot, keyId);
-        } catch (SignerException e)
-        {
+        } catch (SignerException e) {
             throw new InvalidKeyException(e.getMessage(), e);
         }
 
@@ -98,23 +93,19 @@ public class P11RSAKeyParameter extends RSAKeyParameters
         return new P11RSAKeyParameter(p11CryptService, slot, keyId, modulus, publicExponent);
     }
 
-    public int getKeysize()
-    {
+    public int getKeysize() {
         return keysize;
     }
 
-    public P11CryptService getP11CryptService()
-    {
+    public P11CryptService getP11CryptService() {
         return p11CryptService;
     }
 
-    public P11SlotIdentifier getSlot()
-    {
+    public P11SlotIdentifier getSlot() {
         return slot;
     }
 
-    public P11KeyIdentifier getKeyId()
-    {
+    public P11KeyIdentifier getKeyId() {
         return keyId;
     }
 

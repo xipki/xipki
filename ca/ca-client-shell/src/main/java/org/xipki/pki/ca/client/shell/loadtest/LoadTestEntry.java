@@ -48,10 +48,8 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class LoadTestEntry
-{
-    public static enum RandomDN
-    {
+public class LoadTestEntry {
+    public static enum RandomDN {
         GIVENNAME,
         SURNAME,
         STREET,
@@ -61,13 +59,10 @@ public class LoadTestEntry
         CN;
 
         public static RandomDN getInstance(
-                final String text)
-        {
+                final String text) {
             ParamUtil.assertNotNull("text", text);
-            for (RandomDN value : values())
-            {
-                if (value.name().equalsIgnoreCase(text))
-                {
+            for (RandomDN value : values()) {
+                if (value.name().equalsIgnoreCase(text)) {
                     return value;
                 }
             }
@@ -75,19 +70,16 @@ public class LoadTestEntry
         }
     }
 
-    private static class IncreasableSubject
-    {
+    private static class IncreasableSubject {
         private final X500Name subjectTemplate;
         private final ASN1ObjectIdentifier subjectRDNForIncrement;
 
         private IncreasableSubject(
                 final String subjectTemplate,
-                final RandomDN randomDN)
-        {
+                final RandomDN randomDN) {
             this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
-            switch (randomDN)
-            {
+            switch (randomDN) {
                 case GIVENNAME:
                     this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
                     break;
@@ -115,29 +107,24 @@ public class LoadTestEntry
             }
 
             if (this.subjectRDNForIncrement != null
-                    && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0)
-            {
+                    && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0) {
                 throw new IllegalArgumentException("subjectTemplate does not contain DN field "
                         + ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
             }
         }
 
         private X500Name getX500Name(
-                final long index)
-        {
+                final long index) {
             RDN[] baseRDNs = subjectTemplate.getRDNs();
 
             final int n = baseRDNs.length;
             RDN[] newRDNS = new RDN[n];
 
             boolean incremented = false;
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++) {
                 RDN rdn = baseRDNs[i];
-                if (!incremented)
-                {
-                    if (rdn.getFirst().getType().equals(subjectRDNForIncrement))
-                    {
+                if (!incremented) {
+                    if (rdn.getFirst().getType().equals(subjectRDNForIncrement)) {
                         String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
                         rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
                         incremented = true;
@@ -158,8 +145,7 @@ public class LoadTestEntry
             final String certprofile,
             final KeyEntry keyEntry,
             final String subjectTemplate,
-            final RandomDN randomDN)
-    {
+            final RandomDN randomDN) {
         ParamUtil.assertNotBlank("certprofile", certprofile);
         ParamUtil.assertNotNull("keyEntry", keyEntry);
         ParamUtil.assertNotNull("subjectTemplate", subjectTemplate);
@@ -171,19 +157,16 @@ public class LoadTestEntry
     }
 
     public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-            final long index)
-    {
+            final long index) {
         return keyEntry.getSubjectPublicKeyInfo(index);
     }
 
     public X500Name getX500Name(
-            final long index)
-    {
+            final long index) {
         return subject.getX500Name(index);
     }
 
-    public String getCertprofile()
-    {
+    public String getCertprofile() {
         return certprofile;
     }
 

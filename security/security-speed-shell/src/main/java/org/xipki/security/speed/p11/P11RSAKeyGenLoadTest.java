@@ -44,8 +44,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest
-{
+public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     private final int keysize;
     private final BigInteger publicExponent;
 
@@ -53,8 +52,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest
             final P11WritableSlot slot,
             final int keysize,
             final BigInteger publicExponent)
-    throws Exception
-    {
+    throws Exception {
         super(slot,
                 "PKCS#11 RSA key generation\n"
                         + "keysize: " + keysize + "\n"
@@ -65,8 +63,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest
 
     @Override
     protected void genKeypair()
-    throws Exception
-    {
+    throws Exception {
         P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, publicExponent, getDummyLabel());
         slot.removeKey(keyId);
     }

@@ -49,24 +49,20 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public final class PreprovisionedHashCACertValidator
-implements CACertValidator
-{
+implements CACertValidator {
     private final HashAlgoType hashAlgo;
 
     private final Set<byte[]> hashValues;
 
     public PreprovisionedHashCACertValidator(
         final HashAlgoType hashAlgo,
-        final Set<byte[]> hashValues)
-    {
+        final Set<byte[]> hashValues) {
         ParamUtil.assertNotNull("hashAlgo", hashAlgo);
         ParamUtil.assertNotEmpty("hashValues", hashValues);
 
         final int hLen = hashAlgo.getLength();
-        for (byte[] m : hashValues)
-        {
-            if (m.length != hLen)
-            {
+        for (byte[] m : hashValues) {
+            if (m.length != hLen) {
                 throw new IllegalArgumentException("invalid the length of hashValue: "
                         + m.length + " != " + hLen);
             }
@@ -74,29 +70,23 @@ implements CACertValidator
 
         this.hashAlgo = hashAlgo;
         this.hashValues = new HashSet<byte[]>(hashValues.size());
-        for (byte[] m : hashValues)
-        {
+        for (byte[] m : hashValues) {
             this.hashValues.add(Arrays.copyOf(m, m.length));
         }
     }
 
     @Override
     public boolean isTrusted(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         byte[] actual;
-        try
-        {
+        try {
             actual = hashAlgo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             return false;
         }
 
-        for (byte[] m : hashValues)
-        {
-            if (Arrays.equals(actual, m))
-            {
+        for (byte[] m : hashValues) {
+            if (Arrays.equals(actual, m)) {
                 return true;
             }
         }

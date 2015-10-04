@@ -52,8 +52,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class PCIAuditEvent
-{
+public class PCIAuditEvent {
     private static final String UNDEFINED = "undefined";
 
     private static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
@@ -103,28 +102,23 @@ public class PCIAuditEvent
     private AuditLevel level;
 
     public PCIAuditEvent(
-            final Date date)
-    {
+            final Date date) {
         this.date = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(date);
         this.time = new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(date);
         this.level = AuditLevel.INFO;
     }
 
-    public AuditLevel getLevel()
-    {
+    public AuditLevel getLevel() {
         return level;
     }
 
     public void setLevel(
-            final AuditLevel level)
-    {
+            final AuditLevel level) {
         this.level = level;
     }
 
-    public String getUserId()
-    {
-        if (isBlank(this.userId))
-        {
+    public String getUserId() {
+        if (isBlank(this.userId)) {
             return UNDEFINED;
         }
 
@@ -132,15 +126,12 @@ public class PCIAuditEvent
     }
 
     public void setUserId(
-            final String userId)
-    {
+            final String userId) {
         this.userId = userId;
     }
 
-    public String getEventType()
-    {
-        if (isBlank(this.eventType))
-        {
+    public String getEventType() {
+        if (isBlank(this.eventType)) {
             return UNDEFINED;
         }
 
@@ -148,25 +139,20 @@ public class PCIAuditEvent
     }
 
     public void setEventType(
-            final String eventType)
-    {
+            final String eventType) {
         this.eventType = eventType;
     }
 
-    public String getDate()
-    {
+    public String getDate() {
         return date;
     }
 
-    public String getTime()
-    {
+    public String getTime() {
         return time;
     }
 
-    public String getStatus()
-    {
-        if (isBlank(this.status))
-        {
+    public String getStatus() {
+        if (isBlank(this.status)) {
             return UNDEFINED;
         }
 
@@ -174,15 +160,12 @@ public class PCIAuditEvent
     }
 
     public void setStatus(
-            final String status)
-    {
+            final String status) {
         this.status = status;
     }
 
-    public String getOrigination()
-    {
-        if (isBlank(origination))
-        {
+    public String getOrigination() {
+        if (isBlank(origination)) {
             origination = getHostAddress();
         }
 
@@ -190,15 +173,12 @@ public class PCIAuditEvent
     }
 
     public void setOrigination(
-            final String origination)
-    {
+            final String origination) {
         this.origination = origination;
     }
 
-    public String getAffectedResource()
-    {
-        if (isBlank(this.affectedResource))
-        {
+    public String getAffectedResource() {
+        if (isBlank(this.affectedResource)) {
             return UNDEFINED;
         }
 
@@ -206,21 +186,18 @@ public class PCIAuditEvent
     }
 
     public void setAffectedResource(
-            final String affectedResource)
-    {
+            final String affectedResource) {
         this.affectedResource = affectedResource;
     }
 
     public CharArrayWriter toCharArrayWriter(
-            final String prefix)
-    {
+            final String prefix) {
         CharArrayWriter buffer = new CharArrayWriter();
 
         final char delimiter = DEFAULT_DELIMITER;
         final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
 
-        if (prefix != null && !prefix.isEmpty())
-        {
+        if (prefix != null && !prefix.isEmpty()) {
             buffer.append(prefix);
         }
 
@@ -242,17 +219,13 @@ public class PCIAuditEvent
     }
 
     public static boolean isBlank(
-            final CharSequence cs)
-    {
+            final CharSequence cs) {
         int strLen;
-        if (cs == null || (strLen = cs.length()) == 0)
-        {
+        if (cs == null || (strLen = cs.length()) == 0) {
             return true;
         }
-        for (int i = 0; i < strLen; i++)
-        {
-            if (!Character.isWhitespace(cs.charAt(i)))
-            {
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
                 return false;
             }
         }
@@ -262,69 +235,53 @@ public class PCIAuditEvent
     private String replaceDelimiter(
             final String fieldValue,
             final char delimiter,
-            final String replaceDelimiter)
-    {
+            final String replaceDelimiter) {
         if (replaceDelimiter == null || replaceDelimiter.length() < 1
-                || fieldValue == null || fieldValue.length() < 1)
-        {
+                || fieldValue == null || fieldValue.length() < 1) {
             return fieldValue;
         }
 
         return fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
     }
 
-    private static String getHostAddress()
-    {
+    private static String getHostAddress() {
         List<String> addresses = new LinkedList<>();
 
         Enumeration<NetworkInterface> interfaces;
-        try
-        {
+        try {
             interfaces = NetworkInterface.getNetworkInterfaces();
-        } catch (SocketException e)
-        {
+        } catch (SocketException e) {
             return "UNKNOWN";
         }
-        while (interfaces.hasMoreElements())
-        {
+        while (interfaces.hasMoreElements()) {
             NetworkInterface n = (NetworkInterface) interfaces.nextElement();
             Enumeration<InetAddress> ee = n.getInetAddresses();
-            while (ee.hasMoreElements())
-            {
+            while (ee.hasMoreElements()) {
                 InetAddress i = (InetAddress) ee.nextElement();
-                if (i instanceof Inet4Address)
-                {
+                if (i instanceof Inet4Address) {
                     addresses.add(((Inet4Address) i).getHostAddress());
                 }
             }
         }
 
-        for (String addr : addresses)
-        {
-            if (!addr.startsWith("192.") && !addr.startsWith("127."))
-            {
+        for (String addr : addresses) {
+            if (!addr.startsWith("192.") && !addr.startsWith("127.")) {
                 return addr;
             }
         }
 
-        for (String addr : addresses)
-        {
-            if (!addr.startsWith("127."))
-            {
+        for (String addr : addresses) {
+            if (!addr.startsWith("127.")) {
                 return addr;
             }
         }
 
-        if (addresses.size() > 0)
-        {
+        if (addresses.size() > 0) {
             return addresses.get(0);
-        } else
-        {
-            try
-            {
+        } else {
+            try {
                 return InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 return "UNKNOWN";
             }
         }

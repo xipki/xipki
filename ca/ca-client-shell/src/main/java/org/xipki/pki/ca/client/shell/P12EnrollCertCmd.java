@@ -50,8 +50,7 @@ import org.xipki.security.api.SignerException;
 
 @Command(scope = "xipki-cli", name = "enroll-p12",
         description = "enroll certificate (PKCS#12 keystore)")
-public class P12EnrollCertCmd extends EnrollCertCmd
-{
+public class P12EnrollCertCmd extends EnrollCertCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 request file\n"
@@ -66,10 +65,8 @@ public class P12EnrollCertCmd extends EnrollCertCmd
     protected ConcurrentContentSigner getSigner(
             final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
-    throws SignerException
-    {
-        if (password == null)
-        {
+    throws SignerException {
+        if (password == null) {
             password = new String(readPassword());
         }
 

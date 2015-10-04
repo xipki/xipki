@@ -42,27 +42,23 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class NextCAandRA
-{
+public class NextCAandRA {
     private final Certificate cACert;
     private final Certificate rACert;
 
     public NextCAandRA(
             final Certificate cACert,
-            final Certificate rACert)
-    {
+            final Certificate rACert) {
         ParamUtil.assertNotNull("cACert", cACert);
         this.cACert = cACert;
         this.rACert = rACert;
     }
 
-    public Certificate getCACert()
-    {
+    public Certificate getCACert() {
         return cACert;
     }
 
-    public Certificate getRACert()
-    {
+    public Certificate getRACert() {
         return rACert;
     }
 

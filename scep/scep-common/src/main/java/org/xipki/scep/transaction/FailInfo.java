@@ -39,8 +39,7 @@ package org.xipki.scep.transaction;
  * @author Lijun Liao
  */
 
-public enum FailInfo
-{
+public enum FailInfo {
     /**
      * Unrecognized or unsupported algorithm identifier
      */
@@ -69,23 +68,18 @@ public enum FailInfo
 
     private final int code;
 
-    private FailInfo(int code)
-    {
+    private FailInfo(int code) {
         this.code = code;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
     public static FailInfo valueForCode(
-            final int code)
-    {
-        for (FailInfo m : values())
-        {
-            if (m.code == code)
-            {
+            final int code) {
+        for (FailInfo m : values()) {
+            if (m.code == code) {
                 return m;
             }
         }

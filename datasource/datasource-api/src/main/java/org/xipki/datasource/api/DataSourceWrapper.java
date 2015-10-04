@@ -47,8 +47,7 @@ import org.xipki.datasource.api.exception.DataAccessException;
  * @author Lijun Liao
  */
 
-public interface DataSourceWrapper
-{
+public interface DataSourceWrapper {
     String getDatasourceName();
 
     int getMaximumPoolSize();

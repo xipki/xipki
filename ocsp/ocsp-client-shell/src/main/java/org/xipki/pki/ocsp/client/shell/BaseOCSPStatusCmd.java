@@ -59,8 +59,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
-{
+public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
     private String respIssuerFile;
@@ -94,8 +93,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
     protected Boolean verbose = Boolean.FALSE;
 
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
-    static
-    {
+    static {
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
@@ -118,10 +116,8 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
 
     @Override
     protected final Object _doExecute()
-    throws Exception
-    {
-        if (isEmpty(serialNumbers) && isEmpty(certFiles))
-        {
+    throws Exception {
+        if (isEmpty(serialNumbers) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
 
@@ -129,34 +125,27 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
-        if (isNotEmpty(certFiles))
-        {
+        if (isNotEmpty(certFiles)) {
             encodedCerts = new HashMap<>(certFiles.size());
 
             String ocspUrl = null;
-            for (String certFile : certFiles)
-            {
+            for (String certFile : certFiles) {
                 byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = X509Util.parseCert(certFile);
 
-                if (!X509Util.issues(issuerCert, cert))
-                {
+                if (!X509Util.issues(issuerCert, cert)) {
                     throw new IllegalCmdParamException(
                             "certificate " + certFile + " is not issued by the given issuer");
                 }
 
-                if (isBlank(serverURL))
-                {
+                if (isBlank(serverURL)) {
                     List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
-                    if (ocspUrls.size() > 0)
-                    {
+                    if (ocspUrls.size() > 0) {
                         String url = ocspUrls.get(0);
-                        if (ocspUrl != null && !ocspUrl.equals(url))
-                        {
+                        if (ocspUrl != null && !ocspUrl.equals(url)) {
                             throw new IllegalCmdParamException("given certificates have different"
                                     + " OCSP responder URL in certificate");
-                        } else
-                        {
+                        } else {
                             ocspUrl = url;
                         }
                     }
@@ -167,27 +156,22 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
                 encodedCerts.put(sn, encodedCert);
             }
 
-            if (isBlank(serverURL))
-            {
+            if (isBlank(serverURL)) {
                 serverURL = ocspUrl;
             }
-        } else
-        {
-            for (String serialNumber : serialNumbers)
-            {
+        } else {
+            for (String serialNumber : serialNumbers) {
                 BigInteger sn = toBigInt(serialNumber);
                 sns.add(sn);
             }
         }
 
-        if (isBlank(serverURL))
-        {
+        if (isBlank(serverURL)) {
             throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
         X509Certificate respIssuer  = null;
-        if (respIssuerFile != null)
-        {
+        if (respIssuerFile != null) {
             respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }
 
@@ -200,35 +184,27 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         RequestResponseDebug debug = null;
-        if (saveReq || saveResp)
-        {
+        if (saveReq || saveResp) {
             debug = new RequestResponseDebug();
         }
 
         OCSPResp response;
-        try
-        {
+        try {
             response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
                 options, debug);
-        } finally
-        {
-            if (debug != null && debug.size() > 0)
-            {
+        } finally {
+            if (debug != null && debug.size() > 0) {
                 RequestResponsePair reqResp = debug.get(0);
-                if (saveReq)
-                {
+                if (saveReq) {
                     byte[] bytes = reqResp.getRequest();
-                    if (bytes != null)
-                    {
+                    if (bytes != null) {
                         IoUtil.save(reqout, bytes);
                     }
                 }
 
-                if (saveResp)
-                {
+                if (saveResp) {
                     byte[] bytes = reqResp.getResponse();
-                    if (bytes != null)
-                    {
+                    if (bytes != null) {
                         IoUtil.save(respout, bytes);
                     }
                 }

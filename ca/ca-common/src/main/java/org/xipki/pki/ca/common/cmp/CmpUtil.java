@@ -61,18 +61,15 @@ import org.xipki.security.api.NoIdleSignerException;
  * @author Lijun Liao
  */
 
-public class CmpUtil
-{
-    private CmpUtil()
-    {
+public class CmpUtil {
+    private CmpUtil() {
     }
 
     public static PKIMessage addProtection(
             final PKIMessage pkiMessage,
             final ConcurrentContentSigner signer,
             final GeneralName signerName)
-    throws CMPException, NoIdleSignerException
-    {
+    throws CMPException, NoIdleSignerException {
         return addProtection(pkiMessage, signer, signerName, true);
     }
 
@@ -81,10 +78,8 @@ public class CmpUtil
             final ConcurrentContentSigner signer,
             GeneralName signerName,
             final boolean addSignerCert)
-    throws CMPException, NoIdleSignerException
-    {
-        if (signerName == null)
-        {
+    throws CMPException, NoIdleSignerException {
+        if (signerName == null) {
             X500Name x500Name = X500Name.getInstance(
                     signer.getCertificate().getSubjectX500Principal().getEncoded());
             signerName = new GeneralName(x500Name);
@@ -93,83 +88,67 @@ public class CmpUtil
         ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
                 signerName, header.getRecipient());
         PKIFreeText freeText = header.getFreeText();
-        if (freeText != null)
-        {
+        if (freeText != null) {
             builder.setFreeText(freeText);
         }
 
         InfoTypeAndValue[] generalInfo = header.getGeneralInfo();
-        if (generalInfo != null)
-        {
-            for (InfoTypeAndValue gi : generalInfo)
-            {
+        if (generalInfo != null) {
+            for (InfoTypeAndValue gi : generalInfo) {
                 builder.addGeneralInfo(gi);
             }
         }
 
         ASN1OctetString octet = header.getRecipKID();
-        if (octet != null)
-        {
+        if (octet != null) {
             builder.setRecipKID(octet.getOctets());
         }
 
         octet = header.getRecipNonce();
-        if (octet != null)
-        {
+        if (octet != null) {
             builder.setRecipNonce(octet.getOctets());
         }
 
         octet = header.getSenderKID();
-        if (octet != null)
-        {
+        if (octet != null) {
             builder.setSenderKID(octet.getOctets());
         }
 
         octet = header.getSenderNonce();
-        if (octet != null)
-        {
+        if (octet != null) {
             builder.setSenderNonce(octet.getOctets());
         }
 
         octet = header.getTransactionID();
-        if (octet != null)
-        {
+        if (octet != null) {
             builder.setTransactionID(octet.getOctets());
         }
 
-        if (header.getMessageTime() != null)
-        {
+        if (header.getMessageTime() != null) {
             builder.setMessageTime(new Date());
         }
         builder.setBody(pkiMessage.getBody());
 
-        if (addSignerCert)
-        {
+        if (addSignerCert) {
             X509CertificateHolder signerCert = signer.getCertificateAsBCObject();
             builder.addCMPCertificate(signerCert);
         }
 
         ContentSigner realSigner = signer.borrowContentSigner();
-        try
-        {
+        try {
             ProtectedPKIMessage signedMessage = builder.build(realSigner);
             return signedMessage.toASN1Structure();
-        } finally
-        {
+        } finally {
             signer.returnContentSigner(realSigner);
         }
     }
 
     public static boolean isImplictConfirm(
-            final PKIHeader header)
-    {
+            final PKIHeader header) {
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
-        if (regInfos != null)
-        {
-            for (InfoTypeAndValue regInfo : regInfos)
-            {
-                if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType()))
-                {
+        if (regInfos != null) {
+            for (InfoTypeAndValue regInfo : regInfos) {
+                if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
                     return true;
                 }
             }
@@ -177,20 +156,15 @@ public class CmpUtil
         return false;
     }
 
-    public static InfoTypeAndValue getImplictConfirmGeneralInfo()
-    {
+    public static InfoTypeAndValue getImplictConfirmGeneralInfo() {
         return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
     }
 
     public static CmpUtf8Pairs extract(
-            final InfoTypeAndValue[] regInfos)
-    {
-        if (regInfos != null)
-        {
-            for (InfoTypeAndValue regInfo : regInfos)
-            {
-                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
-                {
+            final InfoTypeAndValue[] regInfos) {
+        if (regInfos != null) {
+            for (InfoTypeAndValue regInfo : regInfos) {
+                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
                     String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
                     return new CmpUtf8Pairs(regInfoValue);
                 }
@@ -201,17 +175,13 @@ public class CmpUtil
     }
 
     public static CmpUtf8Pairs extract(
-            final AttributeTypeAndValue[] atvs)
-    {
-        if (atvs == null)
-        {
+            final AttributeTypeAndValue[] atvs) {
+        if (atvs == null) {
             return null;
         }
 
-        for (AttributeTypeAndValue atv : atvs)
-        {
-            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType()))
-            {
+        for (AttributeTypeAndValue atv : atvs) {
+            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType())) {
                 String regInfoValue = ((ASN1String) atv.getValue()).getString();
                 return new CmpUtf8Pairs(regInfoValue);
             }
@@ -221,15 +191,13 @@ public class CmpUtil
     }
 
     public static InfoTypeAndValue buildInfoTypeAndValue(
-            final CmpUtf8Pairs utf8Pairs)
-    {
+            final CmpUtf8Pairs utf8Pairs) {
         return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }
 
     public static AttributeTypeAndValue buildAttributeTypeAndValue(
-            final CmpUtf8Pairs utf8Pairs)
-    {
+            final CmpUtf8Pairs utf8Pairs) {
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }

@@ -84,8 +84,7 @@ import org.xipki.security.bcext.ECDSAContentSignerBuilder;
  * @author Lijun Liao
  */
 
-public abstract class P12KeypairGenerator
-{
+public abstract class P12KeypairGenerator {
     private static final long MIN = 60L * 1000;
     private static final long DAY = 24L * 60 * 60 * 1000;
 
@@ -109,10 +108,8 @@ public abstract class P12KeypairGenerator
             final String subject,
             final Integer keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyUsage)
-    throws Exception
-    {
-        if (Security.getProvider("BC") == null)
-        {
+    throws Exception {
+        if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
 
@@ -123,8 +120,7 @@ public abstract class P12KeypairGenerator
     }
 
     public P12KeypairGenerationResult generateIdentity()
-    throws Exception
-    {
+    throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genKeypair();
 
         Date now = new Date();
@@ -142,25 +138,21 @@ public abstract class P12KeypairGenerator
                 subjectPublicKeyInfo);
 
         X509KeyUsage ku;
-        if (keyUsage == null)
-        {
+        if (keyUsage == null) {
             ku = new X509KeyUsage(
                     X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
                     | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-        } else
-        {
+        } else {
             ku = new X509KeyUsage(keyUsage);
         }
 
         certGenerator.addExtension(Extension.keyUsage, true, ku);
 
-        if (CollectionUtil.isNotEmpty(extendedKeyUsage))
-        {
+        if (CollectionUtil.isNotEmpty(extendedKeyUsage)) {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 
             int i = 0;
-            for (ASN1ObjectIdentifier oid : extendedKeyUsage)
-            {
+            for (ASN1ObjectIdentifier oid : extendedKeyUsage) {
                 kps[i++] = KeyPurposeId.getInstance(oid);
             }
 
@@ -178,11 +170,9 @@ public abstract class P12KeypairGenerator
                 new Certificate[]{identity.getJceCert()});
 
         ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
-        try
-        {
+        try {
             ks.store(ksStream, password);
-        } finally
-        {
+        } finally {
             ksStream.flush();
         }
 
@@ -194,49 +184,40 @@ public abstract class P12KeypairGenerator
 
     private ContentSigner getContentSigner(
             final PrivateKey key)
-    throws Exception
-    {
+    throws Exception {
         BcContentSignerBuilder builder;
 
-        if (key instanceof RSAPrivateKey)
-        {
+        if (key instanceof RSAPrivateKey) {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             ASN1ObjectIdentifier sigOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
 
             builder = new BcRSAContentSignerBuilder(
                     buildAlgId(sigOid),
                     buildAlgId(hashOid));
-        } else if (key instanceof DSAPrivateKey)
-        {
+        } else if (key instanceof DSAPrivateKey) {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             AlgorithmIdentifier sigId = new AlgorithmIdentifier(
                     X9ObjectIdentifiers.id_dsa_with_sha1);
 
             builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
-        } else if (key instanceof ECPrivateKey)
-        {
+        } else if (key instanceof ECPrivateKey) {
             ASN1ObjectIdentifier hashOid;
             ASN1ObjectIdentifier sigOid;
 
             int keySize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-            if (keySize > 384)
-            {
+            if (keySize > 384) {
                 hashOid = NISTObjectIdentifiers.id_sha512;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            } else if (keySize > 256)
-            {
+            } else if (keySize > 256) {
                 hashOid = NISTObjectIdentifiers.id_sha384;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            } else if (keySize > 224)
-            {
+            } else if (keySize > 224) {
                 hashOid = NISTObjectIdentifiers.id_sha224;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            } else if (keySize > 160)
-            {
+            } else if (keySize > 160) {
                 hashOid = NISTObjectIdentifiers.id_sha256;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            } else
-            {
+            } else {
                 hashOid = X509ObjectIdentifiers.id_SHA1;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
@@ -244,8 +225,7 @@ public abstract class P12KeypairGenerator
             builder = new ECDSAContentSignerBuilder(
                     new AlgorithmIdentifier(sigOid),
                     buildAlgId(hashOid));
-        } else
-        {
+        } else {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
         }
 
@@ -253,39 +233,33 @@ public abstract class P12KeypairGenerator
     }
 
     private static AlgorithmIdentifier buildAlgId(
-            final ASN1ObjectIdentifier identifier)
-    {
+            final ASN1ObjectIdentifier identifier) {
         return new AlgorithmIdentifier(identifier, DERNull.INSTANCE);
     }
 
-    private static class KeyPairWithSubjectPublicKeyInfo
-    {
+    private static class KeyPairWithSubjectPublicKeyInfo {
         private KeyPair keypair;
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
         public KeyPairWithSubjectPublicKeyInfo(
                 final KeyPair keypair,
                 final SubjectPublicKeyInfo subjectPublicKeyInfo)
-        throws InvalidKeySpecException
-        {
+        throws InvalidKeySpecException {
             super();
             this.keypair = keypair;
             this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
         }
 
-        public KeyPair getKeypair()
-        {
+        public KeyPair getKeypair() {
             return keypair;
         }
 
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo()
-        {
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
             return subjectPublicKeyInfo;
         }
     }
 
-    static class KeyAndCertPair
-    {
+    static class KeyAndCertPair {
         private final X509CertificateHolder cert;
         private final X509Certificate jceCert;
         private final PrivateKey key;
@@ -293,31 +267,26 @@ public abstract class P12KeypairGenerator
         KeyAndCertPair(
                 final X509CertificateHolder cert,
                 final PrivateKey key)
-        throws CertificateParsingException
-        {
+        throws CertificateParsingException {
             this.cert = cert;
             this.key = key;
             this.jceCert = new X509CertificateObject(cert.toASN1Structure());
         }
 
-        public X509CertificateHolder getCert()
-        {
+        public X509CertificateHolder getCert() {
             return cert;
         }
 
-        public Certificate getJceCert()
-        {
+        public Certificate getJceCert() {
             return jceCert;
         }
 
-        public PrivateKey getKey()
-        {
+        public PrivateKey getKey() {
             return key;
         }
     }
 
-    public static class ECDSAIdentityGenerator extends P12KeypairGenerator
-    {
+    public static class ECDSAIdentityGenerator extends P12KeypairGenerator {
         private final String curveName;
         private final ASN1ObjectIdentifier curveOid;
 
@@ -327,30 +296,24 @@ public abstract class P12KeypairGenerator
                 final String subject,
                 final Integer keyUsage,
                 final List<ASN1ObjectIdentifier> extendedKeyUsage)
-        throws Exception
-        {
+        throws Exception {
             super(password, subject, keyUsage, extendedKeyUsage);
 
             boolean isOid;
-            try
-            {
+            try {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 isOid = false;
             }
 
-            if (isOid)
-            {
+            if (isOid) {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName = KeyUtil.getCurveName(this.curveOid);
-            } else
-            {
+            } else {
                 this.curveName = curveNameOrOid;
                 this.curveOid = KeyUtil.getCurveOID(this.curveName);
-                if (this.curveOid == null)
-                {
+                if (this.curveOid == null) {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);
                 }
@@ -359,8 +322,7 @@ public abstract class P12KeypairGenerator
 
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
-        throws Exception
-        {
+        throws Exception {
             KeyPair kp = KeyUtil.generateECKeypair(this.curveOid);
 
             AlgorithmIdentifier algId = new AlgorithmIdentifier(
@@ -373,15 +335,13 @@ public abstract class P12KeypairGenerator
         }
 
         @Override
-        protected String getKeyAlgorithm()
-        {
+        protected String getKeyAlgorithm() {
             return "ECDSA";
         }
 
     }
 
-    public static class RSAIdentityGenerator extends P12KeypairGenerator
-    {
+    public static class RSAIdentityGenerator extends P12KeypairGenerator {
         private final int keysize;
         private final BigInteger publicExponent;
 
@@ -392,8 +352,7 @@ public abstract class P12KeypairGenerator
                 final String subject,
                 final Integer keyUsage,
                 final List<ASN1ObjectIdentifier> extendedKeyUsage)
-        throws Exception
-        {
+        throws Exception {
             super(password, subject, keyUsage, extendedKeyUsage);
 
             this.keysize = keysize;
@@ -402,8 +361,7 @@ public abstract class P12KeypairGenerator
 
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
-        throws Exception
-        {
+        throws Exception {
             KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent);
             java.security.interfaces.RSAPublicKey rsaPubKey =
                     (java.security.interfaces.RSAPublicKey) kp.getPublic();
@@ -415,14 +373,12 @@ public abstract class P12KeypairGenerator
         }
 
         @Override
-        protected String getKeyAlgorithm()
-        {
+        protected String getKeyAlgorithm() {
             return "RSA";
         }
     }
 
-    public static class DSAIdentityGenerator extends P12KeypairGenerator
-    {
+    public static class DSAIdentityGenerator extends P12KeypairGenerator {
         private final int pLength;
         private final int qLength;
 
@@ -433,8 +389,7 @@ public abstract class P12KeypairGenerator
                 final String subject,
                 final Integer keyUsage,
                 final List<ASN1ObjectIdentifier> extendedKeyUsage)
-        throws Exception
-        {
+        throws Exception {
             super(password, subject, keyUsage, extendedKeyUsage);
 
             this.pLength = pLength;
@@ -443,8 +398,7 @@ public abstract class P12KeypairGenerator
 
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
-        throws Exception
-        {
+        throws Exception {
             KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength);
             SubjectPublicKeyInfo spki = KeyUtil.creatDSASubjectPublicKeyInfo(
                     (DSAPublicKey) kp.getPublic());
@@ -452,8 +406,7 @@ public abstract class P12KeypairGenerator
         }
 
         @Override
-        protected String getKeyAlgorithm()
-        {
+        protected String getKeyAlgorithm() {
             return "RSA";
         }
     }

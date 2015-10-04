@@ -42,14 +42,12 @@ import org.xipki.security.P12RawKeypairGenerator.ECKeypairGenerator;
  * @author Lijun Liao
  */
 
-public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest
-{
+public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
     private final ECKeypairGenerator kpGen;
 
     public P12ECKeyGenLoadTest(
             final String curveNameOrOid)
-    throws Exception
-    {
+    throws Exception {
         super("PKCS#12 EC key generation\n"
                 + "curve: " + curveNameOrOid);
 
@@ -57,8 +55,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest
     }
 
     @Override
-    protected P12RawKeypairGenerator getKeypairGenerator()
-    {
+    protected P12RawKeypairGenerator getKeypairGenerator() {
         return kpGen;
     }
 }

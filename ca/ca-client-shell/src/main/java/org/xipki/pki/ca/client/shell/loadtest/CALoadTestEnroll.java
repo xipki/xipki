@@ -63,8 +63,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CALoadTestEnroll extends LoadExecutor
-{
+public class CALoadTestEnroll extends LoadExecutor {
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
@@ -77,8 +76,7 @@ public class CALoadTestEnroll extends LoadExecutor
 
     @Override
     protected Runnable getTestor()
-    throws Exception
-    {
+    throws Exception {
         return new Testor();
     }
 
@@ -86,13 +84,11 @@ public class CALoadTestEnroll extends LoadExecutor
             final CAClient caClient,
             final LoadTestEntry loadtestEntry,
             final int n,
-            final String description)
-    {
+            final String description) {
         super(description);
         ParamUtil.assertNotNull("caClient", caClient);
         ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
-        if (n < 1)
-        {
+        if (n < 1) {
             throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
         }
         this.n = n;
@@ -102,11 +98,9 @@ public class CALoadTestEnroll extends LoadExecutor
         this.index = new AtomicLong(getSecureIndex());
     }
 
-    private Map<Integer, CertRequest> nextCertRequests()
-    {
+    private Map<Integer, CertRequest> nextCertRequests() {
         Map<Integer, CertRequest> certRequests = new HashMap<>();
-        for (int i = 0; i < n; i++)
-        {
+        for (int i = 0; i < n; i++) {
             final int certId = i + 1;
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 
@@ -114,8 +108,7 @@ public class CALoadTestEnroll extends LoadExecutor
             certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
             SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null)
-            {
+            if (spki == null) {
                 return null;
             }
 
@@ -128,37 +121,29 @@ public class CALoadTestEnroll extends LoadExecutor
         return certRequests;
     }
 
-    class Testor implements Runnable
-    {
+    class Testor implements Runnable {
         @Override
-        public void run()
-        {
-            while (!stop() && getErrorAccout() < 1)
-            {
+        public void run() {
+            while (!stop() && getErrorAccout() < 1) {
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
-                if (certReqs != null)
-                {
+                if (certReqs != null) {
                     boolean successful = testNext(certReqs);
                     int numFailed = successful
                             ? 0
                             : 1;
                     account(1, numFailed);
-                } else
-                {
+                } else {
                     account(1, 1);
                 }
             }
         }
 
         private boolean testNext(
-                final Map<Integer, CertRequest> certRequests)
-        {
+                final Map<Integer, CertRequest> certRequests) {
             EnrollCertResult result;
-            try
-            {
+            try {
                 EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
-                for (Integer certId : certRequests.keySet())
-                {
+                for (Integer certId : certRequests.keySet()) {
                     String id = "id-" + certId;
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
                             id,
@@ -171,30 +156,25 @@ public class CALoadTestEnroll extends LoadExecutor
 
                 result = caClient.requestCerts(request, null,
                         userPrefix + System.currentTimeMillis(), null);
-            } catch (CAClientException | PKIErrorException e)
-            {
+            } catch (CAClientException | PKIErrorException e) {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
                 return false;
             }
 
-            if (result == null)
-            {
+            if (result == null) {
                 return false;
             }
 
             Set<String> ids = result.getAllIds();
             int nSuccess = 0;
-            for (String id : ids)
-            {
+            for (String id : ids) {
                 CertOrError certOrError = result.getCertificateOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
-                if (cert != null)
-                {
+                if (cert != null) {
                     nSuccess++;
                 }
             }

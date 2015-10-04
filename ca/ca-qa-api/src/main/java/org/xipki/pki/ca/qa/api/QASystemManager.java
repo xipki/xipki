@@ -41,8 +41,7 @@ import java.util.Set;
  * @author Lijun Liao
  */
 
-public interface QASystemManager
-{
+public interface QASystemManager {
     Set<String> getIssuerNames();
 
     X509IssuerInfo getIssuer(

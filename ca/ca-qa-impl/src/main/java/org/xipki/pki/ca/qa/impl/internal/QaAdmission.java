@@ -48,60 +48,49 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class QaAdmission extends QaExtension
-{
+public class QaAdmission extends QaExtension {
     private final String registrationNumber;
     private final byte[] addProfessionInfo;
     private final List<String> professionOIDs;
     private final List<String> professionItems;
 
     public QaAdmission(
-            final Admission jaxb)
-    {
+            final Admission jaxb) {
         this.registrationNumber = jaxb.getRegistrationNumber();
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
         List<String> items = jaxb.getProfessionItem();
-        if (CollectionUtil.isEmpty(items))
-        {
+        if (CollectionUtil.isEmpty(items)) {
             professionItems = null;
-        } else
-        {
+        } else {
             professionItems = Collections.unmodifiableList(items);
         }
 
         List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if (oids == null)
-        {
+        if (oids == null) {
             this.professionOIDs = null;
-        } else
-        {
+        } else {
             List<String> list = new LinkedList<>();
-            for (OidWithDescType oid : oids)
-            {
+            for (OidWithDescType oid : oids) {
                 list.add(oid.getValue());
             }
             this.professionOIDs = Collections.unmodifiableList(list);
         }
     }
 
-    public String getRegistrationNumber()
-    {
+    public String getRegistrationNumber() {
         return registrationNumber;
     }
 
-    public byte[] getAddProfessionInfo()
-    {
+    public byte[] getAddProfessionInfo() {
         return Arrays.clone(addProfessionInfo);
     }
 
-    public List<String> getProfessionOIDs()
-    {
+    public List<String> getProfessionOIDs() {
         return professionOIDs;
     }
 
-    public List<String> getProfessionItems()
-    {
+    public List<String> getProfessionItems() {
         return professionItems;
     }
 

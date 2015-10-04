@@ -50,8 +50,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-class CAConf
-{
+class CAConf {
     private final String name;
     private final String url;
     private final String healthUrl;
@@ -71,8 +70,7 @@ class CAConf
             final String url,
             final String healthUrl,
             final String requestorName,
-            final X509Certificate responder)
-    {
+            final X509Certificate responder) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("url", url);
         ParamUtil.assertNotNull("requestorName", requestorName);
@@ -82,131 +80,105 @@ class CAConf
         this.url = url;
         this.requestorName = requestorName;
         this.responder = responder;
-        if (StringUtil.isBlank(healthUrl))
-        {
+        if (StringUtil.isBlank(healthUrl)) {
             this.healthUrl = url.replace("cmp", "health");
-        } else
-        {
+        } else {
             this.healthUrl = healthUrl;
         }
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return url;
     }
 
-    public String getHealthUrl()
-    {
+    public String getHealthUrl() {
         return healthUrl;
     }
 
     public void setCert(
-            final X509Certificate cert)
-    {
+            final X509Certificate cert) {
         this.cert = cert;
-        if (cert != null)
-        {
+        if (cert != null) {
             this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        } else
-        {
+        } else {
             this.subject = null;
         }
     }
 
     public void setCertprofiles(
-            final Set<CertprofileInfo> profiles)
-    {
-        if (profiles == null)
-        {
+            final Set<CertprofileInfo> profiles) {
+        if (profiles == null) {
             this.profiles = Collections.emptyMap();
-        } else
-        {
+        } else {
             this.profiles = new HashMap<>();
-            for (CertprofileInfo m : profiles)
-            {
+            for (CertprofileInfo m : profiles) {
                 this.profiles.put(m.getName(), m);
             }
         }
     }
 
-    public X509Certificate getCert()
-    {
+    public X509Certificate getCert() {
         return cert;
     }
 
-    public X500Name getSubject()
-    {
+    public X500Name getSubject() {
         return subject;
     }
 
-    public Set<String> getProfileNames()
-    {
+    public Set<String> getProfileNames() {
         return profiles.keySet();
     }
 
     public boolean supportsProfile(
-            final String profileName)
-    {
+            final String profileName) {
         return profiles.containsKey(profileName);
     }
 
     public CertprofileInfo getProfile(
-            final String profileName)
-    {
+            final String profileName) {
         return profiles.get(profileName);
     }
 
-    public boolean isCAInfoConfigured()
-    {
+    public boolean isCAInfoConfigured() {
         return cert != null;
     }
 
-    public X509Certificate getResponder()
-    {
+    public X509Certificate getResponder() {
         return responder;
     }
 
-    public boolean isCertAutoconf()
-    {
+    public boolean isCertAutoconf() {
         return certAutoconf;
     }
 
     public void setCertAutoconf(
-            final boolean autoconf)
-    {
+            final boolean autoconf) {
         this.certAutoconf = autoconf;
     }
 
-    public boolean isCertprofilesAutoconf()
-    {
+    public boolean isCertprofilesAutoconf() {
         return certprofilesAutoconf;
     }
 
     public void setCertprofilesAutoconf(
-            final boolean autoconf)
-    {
+            final boolean autoconf) {
         this.certprofilesAutoconf = autoconf;
     }
 
     public void setRequestor(
-            final X509CmpRequestor requestor)
-    {
+            final X509CmpRequestor requestor) {
         this.requestor = requestor;
     }
 
-    public String getRequestorName()
-    {
+    public String getRequestorName() {
         return requestorName;
     }
 
-    public X509CmpRequestor getRequestor()
-    {
+    public X509CmpRequestor getRequestor() {
         return requestor;
     }
 }

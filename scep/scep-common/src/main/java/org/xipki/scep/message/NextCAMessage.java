@@ -66,39 +66,31 @@ import org.xipki.scep.util.ScepUtil;
  * @author Lijun Liao
  */
 
-public class NextCAMessage
-{
+public class NextCAMessage {
     private X509Certificate caCert;
     private List<X509Certificate> raCerts;
 
-    public NextCAMessage()
-    {
+    public NextCAMessage() {
     }
 
-    public X509Certificate getCaCert()
-    {
+    public X509Certificate getCaCert() {
         return caCert;
     }
 
     public void setCaCert(
-            final X509Certificate caCert)
-    {
+            final X509Certificate caCert) {
         this.caCert = caCert;
     }
 
-    public List<X509Certificate> getRaCerts()
-    {
+    public List<X509Certificate> getRaCerts() {
         return raCerts;
     }
 
     public void setRaCerts(
-            final List<X509Certificate> raCerts)
-    {
-        if (raCerts == null || raCerts.isEmpty())
-        {
+            final List<X509Certificate> raCerts) {
+        if (raCerts == null || raCerts.isEmpty()) {
             this.raCerts = null;
-        } else
-        {
+        } else {
             this.raCerts = Collections.unmodifiableList(
                     new ArrayList<X509Certificate>(raCerts));
         }
@@ -108,19 +100,14 @@ public class NextCAMessage
             final PrivateKey signingKey,
             final X509Certificate signerCert,
             final X509Certificate[] cmsCertSet)
-    throws MessageEncodingException
-    {
-        try
-        {
+    throws MessageEncodingException {
+        try {
             byte[] degenratedSignedDataBytes;
-            try
-            {
+            try {
                 CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
                 degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-                if (raCerts != null && !raCerts.isEmpty())
-                {
-                    for (X509Certificate m : raCerts)
-                    {
+                if (raCerts != null && !raCerts.isEmpty()) {
+                    for (X509Certificate m : raCerts) {
                         degenerateSignedData.addCertificate(
                                 new X509CertificateHolder(m.getEncoded()));
                     }
@@ -128,8 +115,7 @@ public class NextCAMessage
 
                 degenratedSignedDataBytes = degenerateSignedData.generate(
                         new CMSAbsentContent()).getEncoded();
-            } catch (CertificateEncodingException e)
-            {
+            } catch (CertificateEncodingException e) {
                 throw new MessageEncodingException(e.getMessage(), e);
             }
 
@@ -156,31 +142,24 @@ public class NextCAMessage
             // certificateSet
             ScepUtil.addCmsCertSet(generator, cmsCertSet);
             return generator.generate(cmsContent, true).toASN1Structure();
-        } catch (CMSException e)
-        {
+        } catch (CMSException e) {
             throw new MessageEncodingException(e);
-        } catch (CertificateEncodingException e)
-        {
+        } catch (CertificateEncodingException e) {
             throw new MessageEncodingException(e);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new MessageEncodingException(e);
-        } catch (OperatorCreationException e)
-        {
+        } catch (OperatorCreationException e) {
             throw new MessageEncodingException(e);
         }
     }
 
     private static String getSignatureAlgorithm(
             final PrivateKey key,
-            final HashAlgoType hashAlgo)
-    {
+            final HashAlgoType hashAlgo) {
         String algorithm = key.getAlgorithm();
-        if ("RSA".equalsIgnoreCase(algorithm))
-        {
+        if ("RSA".equalsIgnoreCase(algorithm)) {
             return hashAlgo.getName() + "withRSA";
-        } else
-        {
+        } else {
             throw new UnsupportedOperationException(
                     "getSignatureAlgorithm() for non-RSA is not supported yet.");
         }

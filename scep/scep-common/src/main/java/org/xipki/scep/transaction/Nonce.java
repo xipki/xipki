@@ -44,8 +44,7 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class Nonce
-{
+public class Nonce {
     private static final SecureRandom random = new SecureRandom();
     private static final int NONCE_LEN = 16;
 
@@ -53,11 +52,9 @@ public class Nonce
 
     private Nonce(
             final byte[] bytes,
-            final boolean cloneBytes)
-    {
+            final boolean cloneBytes) {
         ParamUtil.assertNotNull("bytes", bytes);
-        if (bytes.length != 16)
-        {
+        if (bytes.length != 16) {
             throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
         }
         this.bytes = cloneBytes
@@ -66,18 +63,15 @@ public class Nonce
     }
 
     public Nonce(
-            final byte[] bytes)
-    {
+            final byte[] bytes) {
         this(bytes, true);
     }
 
-    public byte[] getBytes()
-    {
+    public byte[] getBytes() {
         return Arrays.clone(bytes);
     }
 
-    public static Nonce randomNonce()
-    {
+    public static Nonce randomNonce() {
         byte[] bytes = new byte[NONCE_LEN];
         random.nextBytes(bytes);
         return new Nonce(bytes, false);

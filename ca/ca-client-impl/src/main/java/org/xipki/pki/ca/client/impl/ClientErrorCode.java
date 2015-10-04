@@ -39,8 +39,7 @@ package org.xipki.pki.ca.client.impl;
  * @author Lijun Liao
  */
 
-public class ClientErrorCode
-{
+public class ClientErrorCode {
     /**
      * Intern status to indicate that there are errors in the response
      */
@@ -48,7 +47,6 @@ public class ClientErrorCode
 
     static final int PKIStatus_NO_ANSWER = -2;
 
-    private ClientErrorCode()
-    {
+    private ClientErrorCode() {
     }
 }

@@ -48,8 +48,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-cli", name = "health",
         description = "check healty status of CA")
-public class HealthCmd extends ClientCmd
-{
+public class HealthCmd extends ClientCmd {
 
     @Option(name = "--ca",
             description = "CA name\n"
@@ -62,27 +61,21 @@ public class HealthCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Set<String> caNames = caClient.getCaNames();
-        if (isEmpty(caNames))
-        {
+        if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
         }
 
-        if (caName != null && !caNames.contains(caName))
-        {
+        if (caName != null && !caNames.contains(caName)) {
             throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
                     + caNames);
         }
 
-        if (caName == null)
-        {
-            if (caNames.size() == 1)
-            {
+        if (caName == null) {
+            if (caNames.size() == 1) {
                 caName = caNames.iterator().next();
-            } else
-            {
+            } else {
                 throw new IllegalCmdParamException("no caname is specified, one of " + caNames
                         + " is required");
             }
@@ -97,8 +90,7 @@ public class HealthCmd extends ClientCmd
                 ? "healthy"
                 : "not healthy";
         sb.append(healthyText);
-        if (verbose.booleanValue())
-        {
+        if (verbose.booleanValue()) {
             sb.append("\n").append(healthResult.toJsonMessage(true));
         }
         System.out.println(sb.toString());

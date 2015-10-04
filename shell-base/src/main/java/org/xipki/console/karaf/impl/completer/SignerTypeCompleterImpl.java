@@ -43,10 +43,8 @@ import org.xipki.console.karaf.SignerTypeCompleter;
  */
 
 public class SignerTypeCompleterImpl extends EnumCompleter
-implements SignerTypeCompleter
-{
-    public SignerTypeCompleterImpl()
-    {
+implements SignerTypeCompleter {
+    public SignerTypeCompleterImpl() {
         setTokens("JKS, PKCS11, PKCS12");
     }
 }

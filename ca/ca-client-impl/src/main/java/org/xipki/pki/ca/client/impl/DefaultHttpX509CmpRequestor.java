@@ -52,8 +52,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-class DefaultHttpX509CmpRequestor extends X509CmpRequestor
-{
+class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
@@ -63,16 +62,13 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final X509Certificate requestorCert,
             final X509Certificate responderCert,
             final String serverUrl,
-            final SecurityFactory securityFactory)
-    {
+            final SecurityFactory securityFactory) {
         super(requestorCert, responderCert, securityFactory);
         ParamUtil.assertNotBlank("serverUrl", serverUrl);
 
-        try
-        {
+        try {
             this.serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
             throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
@@ -82,16 +78,13 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
             final X509Certificate responderCert,
             final String serverUrl,
             final SecurityFactory securityFactory,
-            final boolean signRequest)
-    {
+            final boolean signRequest) {
         super(requestor, responderCert, securityFactory, signRequest);
         ParamUtil.assertNotBlank("serverUrl", serverUrl);
 
-        try
-        {
+        try {
             this.serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
             throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
@@ -99,8 +92,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
     @Override
     public byte[] send(
             final byte[] request)
-    throws IOException
-    {
+    throws IOException {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
@@ -115,8 +107,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
         outputstream.flush();
 
         InputStream inputStream = httpUrlConnection.getInputStream();
-        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
-        {
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
             inputStream.close();
             throw new IOException("bad response: "
                     + httpUrlConnection.getResponseCode() + "  "
@@ -124,15 +115,12 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor
         }
         String responseContentType = httpUrlConnection.getContentType();
         boolean isValidContentType = false;
-        if (responseContentType != null)
-        {
-            if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
-            {
+        if (responseContentType != null) {
+            if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
                 isValidContentType = true;
             }
         }
-        if (!isValidContentType)
-        {
+        if (!isValidContentType) {
             inputStream.close();
             throw new IOException("bad response: mime type "
                     + responseContentType

@@ -39,6 +39,5 @@ package org.xipki.console.karaf;
  * @author Lijun Liao
  */
 
-public interface ExtensionNameCompleter extends XipkiCompleter
-{
+public interface ExtensionNameCompleter extends XipkiCompleter {
 }

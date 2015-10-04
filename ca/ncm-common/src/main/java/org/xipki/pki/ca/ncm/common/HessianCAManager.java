@@ -65,8 +65,7 @@ import org.xipki.security.api.CertRevocationInfo;
  * @author Lijun Liao
  */
 
-public interface HessianCAManager
-{
+public interface HessianCAManager {
     String getAttribute(
             String attributeKey);
 

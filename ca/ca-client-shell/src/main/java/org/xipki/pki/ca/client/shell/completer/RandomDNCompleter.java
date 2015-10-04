@@ -42,15 +42,12 @@ import org.xipki.console.karaf.EnumCompleter;
  * @author Lijun Liao
  */
 
-public class RandomDNCompleter extends EnumCompleter
-{
+public class RandomDNCompleter extends EnumCompleter {
 
-    public RandomDNCompleter()
-    {
+    public RandomDNCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (RandomDN dn : RandomDN.values())
-        {
+        for (RandomDN dn : RandomDN.values()) {
             enums.append(dn.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

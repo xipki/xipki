@@ -40,29 +40,24 @@ package org.xipki.dbtool;
  */
 
 @SuppressWarnings("serial")
-public class InvalidInputException extends Exception
-{
+public class InvalidInputException extends Exception {
 
-    public InvalidInputException()
-    {
+    public InvalidInputException() {
     }
 
     public InvalidInputException(
-            final String message)
-    {
+            final String message) {
         super(message);
     }
 
     public InvalidInputException(
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(cause);
     }
 
     public InvalidInputException(
             final String message,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(message, cause);
     }
 
@@ -70,8 +65,7 @@ public class InvalidInputException extends Exception
             final String message,
             final Throwable cause,
             final boolean enableSuppression,
-            final boolean writableStackTrace)
-    {
+            final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

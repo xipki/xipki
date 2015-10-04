@@ -52,8 +52,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class UnRevRemoveCertCmd extends ClientCmd
-{
+public abstract class UnRevRemoveCertCmd extends ClientCmd {
     @Option(name = "--cert", aliases = "-c",
             description = "certificate file")
     protected String certFile;
@@ -68,12 +67,9 @@ public abstract class UnRevRemoveCertCmd extends ClientCmd
 
     private BigInteger serialNumber;
 
-    protected BigInteger getSerialNumber()
-    {
-        if (serialNumber == null)
-        {
-            if (isNotBlank(serialNumberS))
-            {
+    protected BigInteger getSerialNumber() {
+        if (serialNumber == null) {
+            if (isNotBlank(serialNumberS)) {
                 this.serialNumber = toBigInt(serialNumberS);
             }
         }
@@ -83,34 +79,27 @@ public abstract class UnRevRemoveCertCmd extends ClientCmd
     protected String checkCertificate(
             final X509Certificate cert,
             final X509Certificate caCert)
-    throws CertificateEncodingException
-    {
-        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
-        {
+    throws CertificateEncodingException {
+        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
             return "the given certificate is not issued by the given issuer";
         }
 
         byte[] caSki = X509Util.extractSKI(caCert);
         byte[] aki = X509Util.extractAKI(cert);
-        if (caSki != null && aki != null)
-        {
-            if (!Arrays.equals(aki, caSki))
-            {
+        if (caSki != null && aki != null) {
+            if (!Arrays.equals(aki, caSki)) {
                 return "the given certificate is not issued by the given issuer";
             }
         }
 
-        try
-        {
+        try {
             cert.verify(caCert.getPublicKey(), "BC");
-        } catch (SignatureException e)
-        {
+        } catch (SignatureException e) {
             return "could not verify the signaure of given certificate by the issuer";
         } catch (InvalidKeyException
                 | CertificateException
                 | NoSuchAlgorithmException
-                | NoSuchProviderException e)
-        {
+                | NoSuchProviderException e) {
             return "could not verify the signaure of given certificate by the issuer: "
                     + e.getMessage();
         }

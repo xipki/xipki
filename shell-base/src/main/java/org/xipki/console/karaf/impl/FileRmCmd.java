@@ -50,8 +50,7 @@ import jline.console.ConsoleReader;
 
 @Command(scope = "xipki-cmd", name = "rm",
         description = "remove file or directory")
-public class FileRmCmd extends XipkiOsgiCommandSupport
-{
+public class FileRmCmd extends XipkiOsgiCommandSupport {
     @Argument(index = 0, name = "file",
             required = true,
             description = "file or directory to be deleted\n"
@@ -68,35 +67,28 @@ public class FileRmCmd extends XipkiOsgiCommandSupport
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
 
         File target = new File(expandFilepath(targetPath));
-        if (!target.exists())
-        {
+        if (!target.exists()) {
             return null;
         }
 
-        if (target.isDirectory())
-        {
-            if (!recursive)
-            {
+        if (target.isDirectory()) {
+            if (!recursive) {
                 out("Please use option--recursive to delete directory");
                 return null;
             }
 
             if (force || FileUtils.confirm(reader,
-                    "Do you want to remove directory " + targetPath + " [yes/no]?"))
-            {
+                    "Do you want to remove directory " + targetPath + " [yes/no]?")) {
                 FileUtils.deleteDirectory(target);
                 out("removed directory " + targetPath);
             }
-        } else
-        {
+        } else {
             if (force || FileUtils.confirm(reader,
-                    "Do you want o remove file " + targetPath + " [yes/no]?"))
-            {
+                    "Do you want o remove file " + targetPath + " [yes/no]?")) {
                 target.delete();
                 out("removed file " + targetPath);
             }

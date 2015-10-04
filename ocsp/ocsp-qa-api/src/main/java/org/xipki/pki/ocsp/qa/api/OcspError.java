@@ -39,8 +39,7 @@ package org.xipki.pki.ocsp.qa.api;
  * @author Lijun Liao
  */
 
-public enum OcspError
-{
+public enum OcspError {
     malformedRequest(1),
     internalError(2),
     tryLater(3),
@@ -50,23 +49,18 @@ public enum OcspError
     private final int status;
 
     private OcspError(
-            final int status)
-    {
+            final int status) {
         this.status = status;
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return status;
     }
 
     public static OcspError getInstance(
-            final String name)
-    {
-        for (OcspError entry : values())
-        {
-            if (entry.name().equals(name))
-            {
+            final String name) {
+        for (OcspError entry : values()) {
+            if (entry.name().equals(name)) {
                 return entry;
             }
         }
@@ -75,12 +69,9 @@ public enum OcspError
     }
 
     public static OcspError getInstanceForCode(
-            final int status)
-    {
-        for (OcspError entry : values())
-        {
-            if (entry.status == status)
-            {
+            final int status) {
+        for (OcspError entry : values()) {
+            if (entry.status == status) {
                 return entry;
             }
         }

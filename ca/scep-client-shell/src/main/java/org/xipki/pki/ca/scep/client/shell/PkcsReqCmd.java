@@ -50,8 +50,7 @@ import org.xipki.scep.client.exception.ScepClientException;
 
 @Command(scope = "scep", name = "pkcs-req",
         description = "enroll certificate via messageType PkcsReq")
-public class PkcsReqCmd extends AbstractEnrollCertCmd
-{
+public class PkcsReqCmd extends AbstractEnrollCertCmd {
 
     @Override
     protected EnrolmentResponse requestCertificate(
@@ -59,8 +58,7 @@ public class PkcsReqCmd extends AbstractEnrollCertCmd
             final CertificationRequest csr,
             final PrivateKey identityKey,
             final X509Certificate identityCert)
-    throws ScepClientException
-    {
+    throws ScepClientException {
         return client.scepPkcsReq(csr, identityKey, identityCert);
     }
 

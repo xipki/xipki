@@ -54,8 +54,7 @@ import org.xipki.scep.client.ScepClient;
 
 @Command(scope = "scep", name = "certpoll",
         description = "poll certificate")
-public class CertPollCmd extends ClientCmd
-{
+public class CertPollCmd extends ClientCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
@@ -70,8 +69,7 @@ public class CertPollCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
 
         ScepClient client = getScepClient();
@@ -80,19 +78,16 @@ public class CertPollCmd extends ClientCmd
 
         EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
                 csr, caSubject);
-        if (resp.isFailure())
-        {
+        if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }
 
-        if (resp.isPending())
-        {
+        if (resp.isPending()) {
             throw new CmdFailure("server returned 'pending'");
         }
 
         List<X509Certificate> certs = resp.getCertificates();
-        if (certs == null || certs.isEmpty())
-        {
+        if (certs == null || certs.isEmpty()) {
             throw new CmdFailure("received no certficate from server");
         }
 

@@ -49,8 +49,7 @@ import org.xipki.security.shell.SecurityCmd;
 
 @Command(scope = "xipki-tk", name = "rm-cert",
         description = "remove certificate from PKCS#11 device")
-public class P11CertDeleteCmd extends SecurityCmd
-{
+public class P11CertDeleteCmd extends SecurityCmd {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"
@@ -69,8 +68,7 @@ public class P11CertDeleteCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);
         slot.removeCerts(keyIdentifier);

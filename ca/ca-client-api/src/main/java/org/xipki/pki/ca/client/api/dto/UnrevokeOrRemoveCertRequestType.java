@@ -43,17 +43,13 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class UnrevokeOrRemoveCertRequestType
-{
+public class UnrevokeOrRemoveCertRequestType {
     private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
 
     public boolean addRequestEntry(
-            final IssuerSerialEntryType requestEntry)
-    {
-        for (IssuerSerialEntryType re : requestEntries)
-        {
-            if (re.getId().equals(requestEntry.getId()))
-            {
+            final IssuerSerialEntryType requestEntry) {
+        for (IssuerSerialEntryType re : requestEntries) {
+            if (re.getId().equals(requestEntry.getId())) {
                 return false;
             }
         }
@@ -62,8 +58,7 @@ public class UnrevokeOrRemoveCertRequestType
         return true;
     }
 
-    public List<IssuerSerialEntryType> getRequestEntries()
-    {
+    public List<IssuerSerialEntryType> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 }

@@ -48,73 +48,57 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  * @author Lijun Liao
  */
 
-class ECDSASignatureSpi extends AbstractECDSASignatureSpi
-{
+class ECDSASignatureSpi extends AbstractECDSASignatureSpi {
     ECDSASignatureSpi(
-            final Digest digest)
-    {
+            final Digest digest) {
         super(digest, true);
     }
 
     static public class SHA1
-        extends ECDSASignatureSpi
-    {
-        public SHA1()
-        {
+        extends ECDSASignatureSpi {
+        public SHA1() {
             super(new SHA1Digest());
         }
     }
 
     static public class NONE
-        extends ECDSASignatureSpi
-    {
-        public NONE()
-        {
+        extends ECDSASignatureSpi {
+        public NONE() {
             super(new NullDigest());
         }
     }
 
     static public class SHA224
-        extends ECDSASignatureSpi
-    {
-        public SHA224()
-        {
+        extends ECDSASignatureSpi {
+        public SHA224() {
             super(new SHA224Digest());
         }
     }
 
     static public class SHA256
-        extends ECDSASignatureSpi
-    {
-        public SHA256()
-        {
+        extends ECDSASignatureSpi {
+        public SHA256() {
             super(new SHA256Digest());
         }
     }
 
     static public class SHA384
-        extends ECDSASignatureSpi
-    {
-        public SHA384()
-        {
+        extends ECDSASignatureSpi {
+        public SHA384() {
             super(new SHA384Digest());
         }
     }
 
     static public class SHA512
-        extends ECDSASignatureSpi
-    {
-        public SHA512()
-        {
+        extends ECDSASignatureSpi {
+        public SHA512() {
             super(new SHA512Digest());
         }
     }
 
     static public class RIPEMD160
-        extends ECDSASignatureSpi
-    {
-        public RIPEMD160()
-        {
+        extends ECDSASignatureSpi {
+        public RIPEMD160() {
             super(new RIPEMD160Digest());
         }
     }

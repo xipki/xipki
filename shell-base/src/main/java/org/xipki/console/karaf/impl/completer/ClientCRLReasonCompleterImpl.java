@@ -44,14 +44,11 @@ import org.xipki.security.api.CRLReason;
  */
 
 public class ClientCRLReasonCompleterImpl extends EnumCompleter
-implements ClientCRLReasonCompleter
-{
-    public ClientCRLReasonCompleterImpl()
-    {
+implements ClientCRLReasonCompleter {
+    public ClientCRLReasonCompleterImpl() {
         StringBuilder enums = new StringBuilder();
 
-        for (CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
-        {
+        for (CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS) {
             enums.append(reason.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

@@ -50,10 +50,8 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class ExtensionNameCompleterImpl extends EnumCompleter
-implements ExtensionNameCompleter
-{
-    public ExtensionNameCompleterImpl()
-    {
+implements ExtensionNameCompleter {
+    public ExtensionNameCompleterImpl() {
         List<ASN1ObjectIdentifier> oids = new LinkedList<>();
         oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
         oids.add(ObjectIdentifiers.id_extension_admission);
@@ -91,11 +89,9 @@ implements ExtensionNameCompleter
 
         StringBuilder enums = new StringBuilder();
 
-        for (ASN1ObjectIdentifier oid : oids)
-        {
+        for (ASN1ObjectIdentifier oid : oids) {
             String name = ObjectIdentifiers.getName(oid);
-            if (StringUtil.isBlank(name))
-            {
+            if (StringUtil.isBlank(name)) {
                 name = oid.getId();
             }
             enums.append(name).append(",");

@@ -52,8 +52,7 @@ import org.xipki.scep.client.ScepClient;
 
 @Command(scope = "scep", name = "getcert",
         description = "download certificate")
-public class GetCertCmd extends ClientCmd
-{
+public class GetCertCmd extends ClientCmd {
     @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
@@ -68,16 +67,14 @@ public class GetCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
         X509Certificate caCert = client.getAuthorityCertStore().getCACert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
         List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
                 caSubject, serial);
-        if (certs == null || certs.isEmpty())
-        {
+        if (certs == null || certs.isEmpty()) {
             throw new CmdFailure("received no certficate from server");
         }
 

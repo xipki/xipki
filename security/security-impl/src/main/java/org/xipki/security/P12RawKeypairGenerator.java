@@ -46,51 +46,41 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * @author Lijun Liao
  */
 
-public abstract class P12RawKeypairGenerator
-{
+public abstract class P12RawKeypairGenerator {
     public abstract KeyPair genKeypair()
     throws Exception;
 
     public P12RawKeypairGenerator()
-    throws Exception
-    {
-        if (Security.getProvider("BC") == null)
-        {
+    throws Exception {
+        if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
     }
 
-    public static class ECKeypairGenerator extends P12RawKeypairGenerator
-    {
+    public static class ECKeypairGenerator extends P12RawKeypairGenerator {
         private final String curveName;
         private final ASN1ObjectIdentifier curveOid;
 
         public ECKeypairGenerator(
                 final String curveNameOrOid)
-        throws Exception
-        {
+        throws Exception {
             super();
 
             boolean isOid;
-            try
-            {
+            try {
                 new ASN1ObjectIdentifier(curveNameOrOid);
                 isOid = true;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 isOid = false;
             }
 
-            if (isOid)
-            {
+            if (isOid) {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
                 this.curveName =  KeyUtil.getCurveName(this.curveOid);
-            } else
-            {
+            } else {
                 this.curveName = curveNameOrOid;
                 this.curveOid =  KeyUtil.getCurveOID(this.curveName);
-                if (this.curveOid == null)
-                {
+                if (this.curveOid == null) {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);
                 }
@@ -99,23 +89,20 @@ public abstract class P12RawKeypairGenerator
 
         @Override
         public KeyPair genKeypair()
-        throws Exception
-        {
+        throws Exception {
             return KeyUtil.generateECKeypair(this.curveOid);
         }
 
     }
 
-    public static class RSAKeypairGenerator extends P12RawKeypairGenerator
-    {
+    public static class RSAKeypairGenerator extends P12RawKeypairGenerator {
         private final int keysize;
         private final BigInteger publicExponent;
 
         public RSAKeypairGenerator(
                 final int keysize,
                 final BigInteger publicExponent)
-        throws Exception
-        {
+        throws Exception {
             super();
 
             this.keysize = keysize;
@@ -124,23 +111,20 @@ public abstract class P12RawKeypairGenerator
 
         @Override
         public KeyPair genKeypair()
-        throws Exception
-        {
+        throws Exception {
             return KeyUtil.generateRSAKeypair(keysize, publicExponent);
         }
 
     }
 
-    public static class DSAKeypairGenerator extends P12RawKeypairGenerator
-    {
+    public static class DSAKeypairGenerator extends P12RawKeypairGenerator {
         private final int pLength;
         private final int qLength;
 
         public DSAKeypairGenerator(
                 final int pLength,
                 final int qLength)
-        throws Exception
-        {
+        throws Exception {
             super();
 
             this.pLength = pLength;
@@ -149,8 +133,7 @@ public abstract class P12RawKeypairGenerator
 
         @Override
         public KeyPair genKeypair()
-        throws Exception
-        {
+        throws Exception {
             return KeyUtil.generateDSAKeypair(pLength, qLength);
         }
 

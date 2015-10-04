@@ -42,31 +42,25 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
  */
 
 @SuppressWarnings("serial")
-public class OCSPResponseUnsuccessfulException extends OCSPResponseException
-{
+public class OCSPResponseUnsuccessfulException extends OCSPResponseException {
     private int status;
     public OCSPResponseUnsuccessfulException(
-            final int status)
-    {
+            final int status) {
         super(getOCSPResponseStatus(status));
         this.status = status;
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return status;
     }
 
-    public String getStatusText()
-    {
+    public String getStatusText() {
         return getOCSPResponseStatus(status);
     }
 
     private static String getOCSPResponseStatus(
-            final int statusCode)
-    {
-        switch (statusCode)
-        {
+            final int statusCode) {
+        switch (statusCode) {
         case 1:
             return "malformedRequest";
         case 2:

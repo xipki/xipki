@@ -42,16 +42,14 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public class P12DSASignLoadTest extends P12SignLoadTest
-{
+public class P12DSASignLoadTest extends P12SignLoadTest {
 
     public P12DSASignLoadTest(
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final int pLength,
             final int qLength)
-    throws Exception
-    {
+    throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(pLength, qLength),
                 "PKCS#12 DSA signature creation\n"
@@ -62,11 +60,9 @@ public class P12DSASignLoadTest extends P12SignLoadTest
     private static byte[] generateKeystore(
             final int pLength,
             final int qLength)
-    throws Exception
-    {
+    throws Exception {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
-        if (keystoreBytes == null)
-        {
+        if (keystoreBytes == null) {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
                     pLength, qLength, password.toCharArray(), "CN=dummy", null, null);
             keystoreBytes = kpGen.generateIdentity().getKeystore();

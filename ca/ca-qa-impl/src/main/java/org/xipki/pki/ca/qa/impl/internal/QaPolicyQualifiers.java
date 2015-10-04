@@ -50,32 +50,26 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QaPolicyQualifiers
-{
+public class QaPolicyQualifiers {
     private final List<QaPolicyQualifierInfo> policyQualifiers;
 
     public QaPolicyQualifiers(
-            final PolicyQualifiers jaxb)
-    {
+            final PolicyQualifiers jaxb) {
         ParamUtil.assertNotNull("jaxb", jaxb);
 
         List<QaPolicyQualifierInfo> list = new LinkedList<>();
 
         List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for (JAXBElement<String> element : elements)
-        {
+        for (JAXBElement<String> element : elements) {
             String value = element.getValue();
             String localPart = element.getName().getLocalPart();
 
             QaPolicyQualifierInfo info;
-            if ("cpsUri".equals(localPart))
-            {
+            if ("cpsUri".equals(localPart)) {
                 info = new QaCPSUriPolicyQualifier(value);
-            } else if ("userNotice".equals(localPart))
-            {
+            } else if ("userNotice".equals(localPart)) {
                 info = new QaUserNoticePolicyQualifierInfo(value);
-            } else
-            {
+            } else {
                 throw new RuntimeException(
                         "should not reach here, unknown child of PolicyQualifiers " + localPart);
             }
@@ -85,8 +79,7 @@ public class QaPolicyQualifiers
         this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
-    {
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers() {
         return policyQualifiers;
     }
 

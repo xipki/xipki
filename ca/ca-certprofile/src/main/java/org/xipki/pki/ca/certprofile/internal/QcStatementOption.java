@@ -43,15 +43,13 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class QcStatementOption
-{
+public class QcStatementOption {
     private final QCStatement statement;
     private final ASN1ObjectIdentifier statementId;
     private final MonetaryValueOption monetaryValueOption;
 
     public QcStatementOption(
-            final QCStatement statement)
-    {
+            final QCStatement statement) {
         ParamUtil.assertNotNull("statement", statement);
         this.statement = statement;
         this.statementId = null;
@@ -60,8 +58,7 @@ public class QcStatementOption
 
     public QcStatementOption(
             final ASN1ObjectIdentifier statementId,
-            final MonetaryValueOption monetaryValueOption)
-    {
+            final MonetaryValueOption monetaryValueOption) {
         ParamUtil.assertNotNull("statementId", statementId);
         ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
         this.statement = null;
@@ -69,18 +66,15 @@ public class QcStatementOption
         this.monetaryValueOption = monetaryValueOption;
     }
 
-    public QCStatement getStatement()
-    {
+    public QCStatement getStatement() {
         return statement;
     }
 
-    public ASN1ObjectIdentifier getStatementId()
-    {
+    public ASN1ObjectIdentifier getStatementId() {
         return statementId;
     }
 
-    public MonetaryValueOption getMonetaryValueOption()
-    {
+    public MonetaryValueOption getMonetaryValueOption() {
         return monetaryValueOption;
     }
 

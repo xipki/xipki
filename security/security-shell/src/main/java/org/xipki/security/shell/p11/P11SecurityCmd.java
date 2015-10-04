@@ -46,8 +46,7 @@ import org.xipki.security.shell.SecurityCmd;
  * @author Lijun Liao
  */
 
-public abstract class P11SecurityCmd extends SecurityCmd
-{
+public abstract class P11SecurityCmd extends SecurityCmd {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"
@@ -69,17 +68,13 @@ public abstract class P11SecurityCmd extends SecurityCmd
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     public P11KeyIdentifier getKeyIdentifier()
-    throws IllegalCmdParamException
-    {
+    throws IllegalCmdParamException {
         P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null)
-        {
+        if (keyId != null && keyLabel == null) {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null)
-        {
+        } else if (keyId == null && keyLabel != null) {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else
-        {
+        } else {
             throw new IllegalCmdParamException(
                     "exactly one of keyId or keyLabel should be specified");
         }

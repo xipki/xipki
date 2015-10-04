@@ -53,63 +53,49 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-cli", name = "remove-cert",
         description = "remove certificate")
-public class RemoveCertCmd extends UnRevRemoveCertCmd
-{
+public class RemoveCertCmd extends UnRevRemoveCertCmd {
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
-        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null))
-        {
+    throws Exception {
+        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
         X509Certificate caCert = null;
-        if (issuerCertFile != null)
-        {
+        if (issuerCertFile != null) {
             caCert = X509Util.parseCert(issuerCertFile);
         }
 
         CertIdOrError certIdOrError;
-        if (certFile != null)
-        {
+        if (certFile != null) {
             X509Certificate cert = X509Util.parseCert(certFile);
-            if (caCert != null)
-            {
+            if (caCert != null) {
                 String errorMsg = checkCertificate(cert, caCert);
-                if (errorMsg != null)
-                {
+                if (errorMsg != null) {
                     throw new CmdFailure(errorMsg);
                 }
             }
             RequestResponseDebug debug = getRequestResponseDebug();
-            try
-            {
+            try {
                 certIdOrError = caClient.removeCert(cert, debug);
-            } finally
-            {
+            } finally {
                 saveRequestResponse(debug);
             }
-        } else
-        {
+        } else {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
-            try
-            {
+            try {
                 certIdOrError = caClient.removeCert(issuer, getSerialNumber(), debug);
-            } finally
-            {
+            } finally {
                 saveRequestResponse(debug);
             }
         }
 
-        if (certIdOrError.getError() != null)
-        {
+        if (certIdOrError.getError() != null) {
             PKIStatusInfo error = certIdOrError.getError();
             throw new UnexpectedException("removing certificate failed: " + error);
-        } else
-        {
+        } else {
             out("removed certificate");
         }
         return null;

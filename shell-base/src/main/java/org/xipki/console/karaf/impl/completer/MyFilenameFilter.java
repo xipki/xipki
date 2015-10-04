@@ -43,26 +43,20 @@ import java.util.regex.Pattern;
  * @author Lijun Liao
  */
 
-class MyFilenameFilter implements FilenameFilter
-{
+class MyFilenameFilter implements FilenameFilter {
     private static final Pattern ignorePattern;
 
-    static
-    {
+    static {
         String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
-        if (ignoreRegex == null)
-        {
-            if (!Configuration.isWindows())
-            {
+        if (ignoreRegex == null) {
+            if (!Configuration.isWindows()) {
                 ignoreRegex = "\\..*";
             }
         }
 
-        if (ignoreRegex == null || ignoreRegex.isEmpty())
-        {
+        if (ignoreRegex == null || ignoreRegex.isEmpty()) {
             ignorePattern = null;
-        } else
-        {
+        } else {
             ignorePattern = Pattern.compile(ignoreRegex);
         }
     }
@@ -70,10 +64,8 @@ class MyFilenameFilter implements FilenameFilter
     @Override
     public boolean accept(
             final File dir,
-            final String name)
-    {
-        if (ignorePattern == null)
-        {
+            final String name) {
+        if (ignorePattern == null) {
             return true;
         }
 

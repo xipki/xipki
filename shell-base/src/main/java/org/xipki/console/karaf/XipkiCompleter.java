@@ -41,6 +41,5 @@ import org.apache.karaf.shell.console.Completer;
  * @author Lijun Liao
  */
 
-public interface XipkiCompleter extends Completer
-{
+public interface XipkiCompleter extends Completer {
 }

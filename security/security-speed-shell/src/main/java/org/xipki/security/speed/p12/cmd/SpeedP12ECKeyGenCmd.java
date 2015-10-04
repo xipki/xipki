@@ -47,8 +47,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-ec-gen-p12",
         description = "performance test of PKCS#12 EC key generation")
-public class SpeedP12ECKeyGenCmd extends SingleSpeedCmd
-{
+public class SpeedP12ECKeyGenCmd extends SingleSpeedCmd {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name\n"
@@ -57,8 +56,7 @@ public class SpeedP12ECKeyGenCmd extends SingleSpeedCmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
+    throws Exception {
         return new P12ECKeyGenLoadTest(curveName);
     }
 

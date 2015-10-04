@@ -51,8 +51,7 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "jscep", name = "getcert",
         description = "download certificate")
-public class GetCertCmd extends ClientCmd
-{
+public class GetCertCmd extends ClientCmd {
     @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
@@ -67,15 +66,13 @@ public class GetCertCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Client client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
         CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
         X509Certificate cert = extractEECerts(certs);
 
-        if (cert == null)
-        {
+        if (cert == null) {
             throw new CmdFailure("received no certficate from server");
         }
 

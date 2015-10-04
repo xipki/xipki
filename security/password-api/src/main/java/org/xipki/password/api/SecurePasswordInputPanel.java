@@ -59,8 +59,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author Lijun Liao
  */
 
-public class SecurePasswordInputPanel extends Panel
-{
+public class SecurePasswordInputPanel extends Panel {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,8 +73,7 @@ public class SecurePasswordInputPanel extends Panel
     private static final Map<Integer, String[]> keysMap = new HashMap<Integer, String[]>();
     private final Set<JButton> buttons = new HashSet<JButton>();
 
-    static
-    {
+    static {
         int i = 0;
         keysMap.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
         keysMap.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
@@ -87,8 +85,7 @@ public class SecurePasswordInputPanel extends Panel
         keysMap.put(i++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
     }
 
-    private SecurePasswordInputPanel()
-    {
+    private SecurePasswordInputPanel() {
         super(new GridLayout(0, 1));
 
         this.passwordField = new JPasswordField(10);
@@ -100,11 +97,9 @@ public class SecurePasswordInputPanel extends Panel
         int n = rows.size();
 
         SecureRandom random = new SecureRandom();
-        while (!rows.isEmpty())
-        {
+        while (!rows.isEmpty()) {
             int row = random.nextInt() % n;
-            if (!rows.contains(row))
-            {
+            if (!rows.contains(row)) {
                 continue;
             }
 
@@ -112,19 +107,15 @@ public class SecurePasswordInputPanel extends Panel
             rows.remove(row);
 
             JPanel panel = new JPanel();
-            for (int column = 0; column < keys.length; column++)
-            {
+            for (int column = 0; column < keys.length; column++) {
                 String text = keys[column];
                 JButton button = new JButton(text);
                 button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
-                if (CLEAR.equalsIgnoreCase(text))
-                {
+                if (CLEAR.equalsIgnoreCase(text)) {
                     button.setBackground(Color.red);
-                } else if (CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text))
-                {
+                } else if (CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text)) {
                     button.setBackground(Color.lightGray);
-                } else
-                {
+                } else {
                     buttons.add(button);
                 }
 
@@ -138,27 +129,22 @@ public class SecurePasswordInputPanel extends Panel
         //setVisible(true);
     }
 
-    public char[] getPassword()
-    {
+    public char[] getPassword() {
         return password.toCharArray();
     }
 
     private String password = "";
     private boolean caps = false;
 
-    public class MyActionListener implements ActionListener
-    {
+    public class MyActionListener implements ActionListener {
         @Override
         public void actionPerformed(
-                final ActionEvent e)
-        {
+                final ActionEvent e) {
             JButton btn = (JButton) e.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
 
-            if (CAPS.equals(pressedKey))
-            {
-                for (JButton button : buttons)
-                {
+            if (CAPS.equals(pressedKey)) {
+                for (JButton button : buttons) {
                     String text = button.getText();
                     text = caps
                             ? text.toLowerCase()
@@ -169,17 +155,13 @@ public class SecurePasswordInputPanel extends Panel
                 return;
             }
 
-            if (BACKSPACE.equals(pressedKey))
-            {
-                if (password.length() > 0)
-                {
+            if (BACKSPACE.equals(pressedKey)) {
+                if (password.length() > 0) {
                     password = password.substring(0, password.length() - 1);
                 }
-            } else if (CLEAR.equals(pressedKey))
-            {
+            } else if (CLEAR.equals(pressedKey)) {
                 password = "";
-            } else
-            {
+            } else {
                 password += btn.getText();
             }
             passwordField.setText(password);
@@ -187,8 +169,7 @@ public class SecurePasswordInputPanel extends Panel
     }
 
     public static void main(
-            final String[] args)
-    {
+            final String[] args) {
         char[] password = readPassword("Enter password");
         System.out.println("'" + new String(password) + "'");
         char[] password2 = readPassword("Enter password");
@@ -196,23 +177,18 @@ public class SecurePasswordInputPanel extends Panel
     }
 
     public static char[] readPassword(
-            String prompt)
-    {
+            String prompt) {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
-        try
-        {
+        try {
             UIManager.setLookAndFeel(
                 UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
         }
 
-        try
-        {
+        try {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
             String[] options = new String[]{OK};
-            if (prompt == null || prompt.isEmpty())
-            {
+            if (prompt == null || prompt.isEmpty()) {
                 prompt = "Password required";
             }
 
@@ -220,20 +196,15 @@ public class SecurePasswordInputPanel extends Panel
                     JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
 
-            if (option == 0) // pressing OK button
-            {
+            if (option == 0) { // pressing OK button
                 return gui.getPassword();
-            } else
-            {
+            } else {
                 return null;
             }
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 UIManager.setLookAndFeel(currentLookAndFeel);
-            } catch (UnsupportedLookAndFeelException e)
-            {
+            } catch (UnsupportedLookAndFeelException e) {
             }
         }
     }

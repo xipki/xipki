@@ -67,8 +67,7 @@ import org.xipki.common.util.LogUtil;
  * @author Lijun Liao
  */
 
-public class SunNamedCurveExtender
-{
+public class SunNamedCurveExtender {
     private static Logger LOG = LoggerFactory.getLogger(SunNamedCurveExtender.class);
 
     private final static int P  = 1; // prime curve
@@ -87,114 +86,89 @@ public class SunNamedCurveExtender
     private static Method method_NamedCurve_getObjectId;
     private static boolean successful = true;
 
-    static
-    {
+    static {
         boolean _jdk18On;
-        try
-        {
+        try {
             class_CurveDB = Class.forName("sun.security.ec.CurveDB");
             _jdk18On = true;
-        } catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             _jdk18On = false;
         }
 
         jdk18on = _jdk18On;
 
         final String classname_NamedCurve = "sun.security.ec.NamedCurve";
-        try
-        {
+        try {
             class_NamedCurve = Class.forName(classname_NamedCurve);
-        } catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             LOG.warn("could not load class {}", classname_NamedCurve);
             LOG.debug("could not load class " + classname_NamedCurve, e);
             successful = false;
         }
 
-        if (jdk18on)
-        {
-            if (successful)
-            {
+        if (jdk18on) {
+            if (successful) {
                 method_CurveDB_lookup_name = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{String.class});
             }
-            if (method_CurveDB_lookup_name == null)
-            {
+            if (method_CurveDB_lookup_name == null) {
                 successful = false;
             }
 
-            if (successful)
-            {
+            if (successful) {
                 method_CurveDB_lookup_paramSpec = getMethod(class_CurveDB, "lookup",
                         new Class<?>[]{ECParameterSpec.class});
             }
-            if (method_CurveDB_lookup_paramSpec == null)
-            {
+            if (method_CurveDB_lookup_paramSpec == null) {
                 successful = false;
             }
 
-            if (successful)
-            {
+            if (successful) {
                 method_NamedCurve_getObjectId = getMethod(class_NamedCurve, "getObjectId", null);
             }
-            if (method_NamedCurve_getObjectId == null)
-            {
+            if (method_NamedCurve_getObjectId == null) {
                 successful = false;
             }
 
-            if (successful)
-            {
+            if (successful) {
                 method_NamedCurve_getEncoded = getMethod(class_NamedCurve, "getEncoded", null);
             }
-            if (method_NamedCurve_getEncoded == null)
-            {
+            if (method_NamedCurve_getEncoded == null) {
                 successful = false;
             }
         }
     }
 
-    private SunNamedCurveExtender()
-    {
+    private SunNamedCurveExtender() {
     }
 
     public static void main(
-            final String[] args)
-    {
+            final String[] args) {
         addNamedCurves();
     }
 
-    public static void addNamedCurves()
-    {
-        synchronized (EXECUTED)
-        {
-            if (!successful)
-            {
+    public static void addNamedCurves() {
+        synchronized (EXECUTED) {
+            if (!successful) {
                 LOG.warn("could not initialize");
                 return;
             }
 
-            if (EXECUTED)
-            {
+            if (EXECUTED) {
                 return;
             }
             EXECUTED = Boolean.TRUE;
 
-            try
-            {
-                if (jdk18on)
-                {
+            try {
+                if (jdk18on) {
                     addNamedCurves_jdk18on();
-                } else
-                {
+                } else {
                     addNamedCurves_jdk17();
                 }
 
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 final String message = "uncatched Error";
-                if (LOG.isErrorEnabled())
-                {
+                if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
                             t.getMessage());
                 }
@@ -203,42 +177,34 @@ public class SunNamedCurveExtender
         }
     }
 
-    private static void addNamedCurves_jdk17()
-    {
-        final Class<?>[] Param_NamedCurve_add = new Class[]
-        {
+    private static void addNamedCurves_jdk17() {
+        final Class<?>[] Param_NamedCurve_add = new Class[] {
             String.class, String.class, int.class, String.class,
             String.class, String.class, String.class, String.class, String.class, int.class
         };
         final Class<?>[] Param_getCurve = new Class[]{String.class};
 
         Method method_add = getMethod(class_NamedCurve, "add", Param_NamedCurve_add);
-        if (method_add == null)
-        {
+        if (method_add == null) {
             return;
         }
 
         Method method_getCurve = getMethod(class_NamedCurve, "getECParameterSpec",
                 Param_getCurve);
-        if (method_getCurve == null)
-        {
+        if (method_getCurve == null) {
             return;
         }
 
         Field field_SPLIT_PATTERN = getField(class_NamedCurve, "SPLIT_PATTERN");
-        if (field_SPLIT_PATTERN == null)
-        {
+        if (field_SPLIT_PATTERN == null) {
             return;
         }
 
-        try
-        {
+        try {
             field_SPLIT_PATTERN.set(null, SPLIT_PATTERN);
-        } catch (IllegalArgumentException | IllegalAccessException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             final String message = "could not set Field SPLIT_PATTERN";
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -250,29 +216,25 @@ public class SunNamedCurveExtender
         Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
-        while (curveNames.hasMoreElements())
-        {
+        while (curveNames.hasMoreElements()) {
             String curveName = (String) curveNames.nextElement();
             ASN1ObjectIdentifier curveId = getCurveId(curveName);
 
-            if (curveId == null)
-            {
+            if (curveId == null) {
                 LOG.info("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
             }
 
             String curveDesc = "named curve " + curveName + " (" + curveId + ")";
 
-            if (processedCurveOids.contains(curveId.getId()))
-            {
+            if (processedCurveOids.contains(curveId.getId())) {
                 LOG.debug("{} is already processed, ignore it", curveDesc);
                 continue;
             }
 
             processedCurveOids.add(curveId.getId());
 
-            if (curve_isRegistered(method_getCurve, curveId))
-            {
+            if (curve_isRegistered(method_getCurve, curveId)) {
                 LOG.debug("{} is already registered, ignore it", curveDesc);
                 continue;
             }
@@ -280,34 +242,27 @@ public class SunNamedCurveExtender
             X9ECParameters params = ECNamedCurveTable.getByOID(curveId);
             ECCurve curve = params.getCurve();
 
-            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
-            {
+            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m) {
                 CurveData c = new CurveData(params);
                 boolean added = NamedCurve_add(method_add, curveName, curveId.getId(), c.type,
                         c.sfield, c.a, c.b, c.x, c.y, c.n, c.h);
 
-                if (added)
-                {
+                if (added) {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
-                } else
-                {
+                } else {
                     LOG.warn("could not add {}", curveDesc);
                 }
-            } else
-            {
+            } else {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
         }
 
-        try
-        {
+        try {
             field_SPLIT_PATTERN.set(null, null);
-        } catch (IllegalArgumentException | IllegalAccessException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
             final String message = "could not set Field SPLIT_PATTERN";
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -318,10 +273,8 @@ public class SunNamedCurveExtender
         logAddedCurves(addedCurves);
     }
 
-    private static void addNamedCurves_jdk18on()
-    {
-        final Class<?>[] Param_CurveDB_add = new Class[]
-        {
+    private static void addNamedCurves_jdk18on() {
+        final Class<?>[] Param_CurveDB_add = new Class[] {
             String.class, String.class, int.class, String.class,
             String.class, String.class, String.class, String.class, String.class, int.class,
             Pattern.class
@@ -329,26 +282,22 @@ public class SunNamedCurveExtender
         final Class<?>[] Param_getCurve = new Class[]{String.class};
 
         Method method_add = getMethod(class_CurveDB, "add", Param_CurveDB_add);
-        if (method_add == null)
-        {
+        if (method_add == null) {
             return;
         }
 
         Method method_getCurve = getMethod(class_CurveDB, "lookup", Param_getCurve);
-        if (method_getCurve == null)
-        {
+        if (method_getCurve == null) {
             return;
         }
 
         Field field_oidMap = getField(class_CurveDB, "oidMap");
-        if (field_oidMap == null)
-        {
+        if (field_oidMap == null) {
             return;
         }
 
         Field field_specCollection = getField(class_CurveDB, "specCollection");
-        if (field_specCollection == null)
-        {
+        if (field_specCollection == null) {
             return;
         }
 
@@ -356,66 +305,55 @@ public class SunNamedCurveExtender
         Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
-        while (curveNames.hasMoreElements())
-        {
+        while (curveNames.hasMoreElements()) {
             String curveName = (String) curveNames.nextElement();
             ASN1ObjectIdentifier curveId = getCurveId(curveName);
-            if (curveId == null)
-            {
+            if (curveId == null) {
                 LOG.debug("cound not find curve OID for curve {}, ignore it", curveName);
                 continue;
             }
 
             String curveDesc = "named curve " + curveName + " (" + curveId + ")";
 
-            if (processedCurveOids.contains(curveId.getId()))
-            {
+            if (processedCurveOids.contains(curveId.getId())) {
                 LOG.debug("{} is already processed, ignore it", curveDesc);
                 continue;
             }
 
             processedCurveOids.add(curveId.getId());
 
-            if (curve_isRegistered(method_getCurve, curveId))
-            {
+            if (curve_isRegistered(method_getCurve, curveId)) {
                 LOG.info("{} is already registered, ignore it", curveDesc);
                 continue;
             }
 
             X9ECParameters params = ECNamedCurveTable.getByOID(curveId);
             ECCurve curve = params.getCurve();
-            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m)
-            {
+            if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m) {
                 CurveData c = new CurveData(params);
                 boolean added = CurveDB_add(method_add, curveName, curveId.getId(), c.type,
                         c.sfield, c.a, c.b, c.x, c.y, c.n, c.h);
 
-                if (added)
-                {
+                if (added) {
                     LOG.debug("added {}", curveDesc);
                     addedCurves.put(curveName, curveId.getId());
-                } else
-                {
+                } else {
                     LOG.warn("could not add {}", curveDesc);
                 }
-            } else
-            {
+            } else {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
         }
 
-        try
-        {
+        try {
             Map<?, ?> oidMap = (Map<?, ?>) field_oidMap.get(null);
             Collection<?> namedCurves = Collections.unmodifiableCollection(oidMap.values());
 
             field_specCollection.set(null, namedCurves);
-        } catch (IllegalArgumentException | IllegalAccessException | ClassCastException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | ClassCastException e) {
             final String message =
                     "could not update change the value of field CurveDB.specCollection.";
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -426,22 +364,18 @@ public class SunNamedCurveExtender
     }
 
     private static ASN1ObjectIdentifier getCurveId(
-            final String curveName)
-    {
+            final String curveName) {
         ASN1ObjectIdentifier curveId = X962NamedCurves.getOID(curveName);
 
-        if (curveId == null)
-        {
+        if (curveId == null) {
             curveId = SECNamedCurves.getOID(curveName);
         }
 
-        if (curveId == null)
-        {
+        if (curveId == null) {
             curveId = TeleTrusTNamedCurves.getOID(curveName);
         }
 
-        if (curveId == null)
-        {
+        if (curveId == null) {
             curveId = NISTNamedCurves.getOID(curveName);
         }
 
@@ -450,14 +384,11 @@ public class SunNamedCurveExtender
 
     private static boolean curve_isRegistered(
             final Method method_lookup,
-            final ASN1ObjectIdentifier curveId)
-    {
-        try
-        {
+            final ASN1ObjectIdentifier curveId) {
+        try {
             Object curve = method_lookup.invoke(null, new Object[]{curveId.getId()});
             return curve != null;
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
         }
 
@@ -475,14 +406,11 @@ public class SunNamedCurveExtender
             final String x,
             final String y,
             final String n,
-            final int h)
-    {
-        try
-        {
+            final int h) {
+        try {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h,
                     SPLIT_PATTERN});
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
@@ -501,13 +429,10 @@ public class SunNamedCurveExtender
             final String x,
             final String y,
             final String n,
-            final int h)
-    {
-        try
-        {
+            final int h) {
+        try {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h});
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
@@ -518,27 +443,21 @@ public class SunNamedCurveExtender
     private static Method getMethod(
             final Class<?> clz,
             final String methodName,
-            final Class<?>[] params)
-    {
+            final Class<?>[] params) {
         Method serviceMethod = null;
         final String desc = "method " + clz.getName() + "." + methodName;
 
-        try
-        {
-            if (params == null)
-            {
+        try {
+            if (params == null) {
                 serviceMethod = clz.getDeclaredMethod(methodName);
-            } else
-            {
+            } else {
                 serviceMethod = clz.getDeclaredMethod(methodName, params);
             }
             serviceMethod.setAccessible(true);
             return serviceMethod;
-        } catch (SecurityException | NoSuchMethodException e)
-        {
+        } catch (SecurityException | NoSuchMethodException e) {
             final String message = "could not get " + desc;
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -550,19 +469,15 @@ public class SunNamedCurveExtender
 
     private static Field getField(
             final Class<?> clazz,
-            final String fieldName)
-    {
+            final String fieldName) {
         String desc = "Field " + fieldName;
-        try
-        {
+        try {
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field;
-        } catch (NoSuchFieldException e)
-        {
+        } catch (NoSuchFieldException e) {
             final String message = "could not get " + desc;
-            if (LOG.isWarnEnabled())
-            {
+            if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                         e.getMessage());
             }
@@ -572,8 +487,7 @@ public class SunNamedCurveExtender
         return null;
     }
 
-    private static class CurveData
-    {
+    private static class CurveData {
         final int type;
         final String sfield;
         final String a;
@@ -584,8 +498,7 @@ public class SunNamedCurveExtender
         final int h;
 
         CurveData(
-                final X9ECParameters params)
-        {
+                final X9ECParameters params) {
             ECCurve curve = params.getCurve();
 
             this.a = curve.getA().toBigInteger().toString(16);
@@ -595,14 +508,12 @@ public class SunNamedCurveExtender
             this.n = params.getN().toString(16);
             this.h = params.getH().intValue();
 
-            if (curve instanceof ECCurve.Fp)
-            {
+            if (curve instanceof ECCurve.Fp) {
                 this.type = P;
 
                 ECCurve.Fp c = (ECCurve.Fp) curve;
                 this.sfield = c.getQ().toString(16);
-            } else // if (curve instanceof ECCurve.F2m)
-            {
+            } else { // if (curve instanceof ECCurve.F2m)
                 this.type = B;
 
                 ECCurve.F2m c = (ECCurve.F2m) curve;
@@ -613,10 +524,8 @@ public class SunNamedCurveExtender
                 BigInteger rp = BigInteger.ONE;
                 rp = rp.setBit(m);
 
-                for (int j = 0; j < ks.length; j++)
-                {
-                    if (ks[j] > 0)
-                    {
+                for (int j = 0; j < ks.length; j++) {
+                    if (ks[j] > 0) {
                         rp = rp.setBit(ks[j]);
                     }
                 }
@@ -626,8 +535,7 @@ public class SunNamedCurveExtender
     }
 
     private static void logAddedCurves(
-            final Map<String, String> addedCurves)
-    {
+            final Map<String, String> addedCurves) {
         StringBuilder sb = new StringBuilder(
                 "the following named curves are added to the SUN's list of named curves:\n");
 
@@ -635,8 +543,7 @@ public class SunNamedCurveExtender
         List<String> names = new ArrayList<>(tmp);
         Collections.sort(names);
 
-        for (String name : names)
-        {
+        for (String name : names) {
             String oid = addedCurves.get(name);
             sb.append("\t");
             sb.append(name);
@@ -649,52 +556,40 @@ public class SunNamedCurveExtender
     }
 
     static byte[] getNamedCurveEncoded(
-            final ECParameterSpec namedCurve)
-    {
-        try
-        {
+            final ECParameterSpec namedCurve) {
+        try {
             return (byte[]) method_NamedCurve_getEncoded.invoke(namedCurve, (Object) null);
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
 
     static String getNamedCurveObjectId(
-            final ECParameterSpec namedCurve)
-    {
-        try
-        {
+            final ECParameterSpec namedCurve) {
+        try {
             return (String) method_NamedCurve_getObjectId.invoke(namedCurve, (Object) null);
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
 
     static ECParameterSpec lookupCurve(
-            final String name)
-    {
-        try
-        {
+            final String name) {
+        try {
             return (ECParameterSpec) method_CurveDB_lookup_name.invoke(null, name);
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
 
     static ECParameterSpec lookupCurve(
-            final ECParameterSpec paramSpec)
-    {
-        try
-        {
+            final ECParameterSpec paramSpec) {
+        try {
             return (ECParameterSpec) method_CurveDB_lookup_paramSpec.invoke(null, paramSpec);
-        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
-        {
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
             LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }

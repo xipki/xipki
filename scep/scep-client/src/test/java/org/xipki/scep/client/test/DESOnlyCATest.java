@@ -41,16 +41,13 @@ import org.xipki.scep.transaction.CACapability;
  * @author Lijun Liao
  */
 
-public class DESOnlyCATest extends AbstractCATest
-{
-    protected boolean useInsecureAlgorithms()
-    {
+public class DESOnlyCATest extends AbstractCATest {
+    protected boolean useInsecureAlgorithms() {
         return true;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps()
-    {
+    protected CACapability[] getExcludedCACaps() {
         return new CACapability[]{CACapability.AES, CACapability.DES3};
     }
 

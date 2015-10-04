@@ -41,16 +41,13 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
  * @author Lijun Liao
  */
 
-public class QaPolicyConstraints extends QaExtension
-{
+public class QaPolicyConstraints extends QaExtension {
     private final Integer requireExplicitPolicy;
     private final Integer inhibitPolicyMapping;
 
     public QaPolicyConstraints(
-            final PolicyConstraints jaxb)
-    {
-        if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
-        {
+            final PolicyConstraints jaxb) {
+        if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
             throw new IllegalArgumentException(
                     "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
         }
@@ -59,13 +56,11 @@ public class QaPolicyConstraints extends QaExtension
         this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    public Integer getRequireExplicitPolicy()
-    {
+    public Integer getRequireExplicitPolicy() {
         return requireExplicitPolicy;
     }
 
-    public Integer getInhibitPolicyMapping()
-    {
+    public Integer getInhibitPolicyMapping() {
         return inhibitPolicyMapping;
     }
 

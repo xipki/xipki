@@ -44,16 +44,14 @@ package org.xipki.datasource.api.exception;
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class CannotSerializeTransactionException extends PessimisticLockingFailureException
-{
+public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
 
     /**
      * Constructor for could notSerializeTransactionException.
      * @param msg the detail message
      */
     public CannotSerializeTransactionException(
-            final String msg)
-    {
+            final String msg) {
         super(msg);
     }
 
@@ -64,8 +62,7 @@ public class CannotSerializeTransactionException extends PessimisticLockingFailu
      */
     public CannotSerializeTransactionException(
             final String msg,
-            final Throwable cause)
-    {
+            final Throwable cause) {
         super(msg, cause);
     }
 

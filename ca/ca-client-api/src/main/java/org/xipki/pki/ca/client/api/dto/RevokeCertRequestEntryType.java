@@ -45,8 +45,7 @@ import org.bouncycastle.asn1.x500.X500Name;
  * @author Lijun Liao
  */
 
-public class RevokeCertRequestEntryType extends IssuerSerialEntryType
-{
+public class RevokeCertRequestEntryType extends IssuerSerialEntryType {
     private final int reason;
     private final Date invalidityDate;
 
@@ -54,8 +53,7 @@ public class RevokeCertRequestEntryType extends IssuerSerialEntryType
             final String id,
             final X509Certificate cert,
             final int reason,
-            final Date invalidityDate)
-    {
+            final Date invalidityDate) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber(), reason, invalidityDate);
     }
@@ -65,12 +63,10 @@ public class RevokeCertRequestEntryType extends IssuerSerialEntryType
             final X500Name issuer,
             final BigInteger serialNumber,
             final int reason,
-            final Date invalidityDate)
-    {
+            final Date invalidityDate) {
         super(id, issuer, serialNumber);
 
-        if (!(reason >= 0 && reason <= 10 && reason != 7))
-        {
+        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
             throw new IllegalArgumentException("invalid reason: " + reason);
         }
 
@@ -78,13 +74,11 @@ public class RevokeCertRequestEntryType extends IssuerSerialEntryType
         this.invalidityDate = invalidityDate;
     }
 
-    public int getReason()
-    {
+    public int getReason() {
         return reason;
     }
 
-    public Date getInvalidityDate()
-    {
+    public Date getInvalidityDate() {
         return invalidityDate;
     }
 

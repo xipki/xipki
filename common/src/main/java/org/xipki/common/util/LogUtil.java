@@ -39,15 +39,12 @@ package org.xipki.common.util;
  * @author Lijun Liao
  */
 
-public class LogUtil
-{
-    private LogUtil()
-    {
+public class LogUtil {
+    private LogUtil() {
     }
 
     public static String buildExceptionLogFormat(
-            final String message)
-    {
+            final String message) {
         return StringUtil.isBlank(message)
                 ? "{}: {}"
                 : message + ", {}: {}";

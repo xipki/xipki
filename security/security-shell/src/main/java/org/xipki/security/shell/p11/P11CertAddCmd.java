@@ -51,8 +51,7 @@ import org.xipki.security.shell.SecurityCmd;
 
 @Command(scope = "xipki-tk", name = "add-cert",
         description = "add certificate to PKCS#11 device")
-public class P11CertAddCmd extends SecurityCmd
-{
+public class P11CertAddCmd extends SecurityCmd {
 
     @Option(name = "--slot",
             required = true,
@@ -72,8 +71,7 @@ public class P11CertAddCmd extends SecurityCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         X509Certificate cert = X509Util.parseCert(certFile);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);

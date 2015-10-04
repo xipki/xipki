@@ -50,8 +50,7 @@ import java.util.Map;
  * @author Lijun Liao
  */
 
-public enum CRLReason
-{
+public enum CRLReason {
     /**
      * This reason indicates that it is unspecified as to why the
      * certificate has been revoked.
@@ -114,8 +113,7 @@ public enum CRLReason
 
     public static List<CRLReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
         Arrays.asList(
-            new CRLReason[]
-            {
+            new CRLReason[] {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
                 CRLReason.CESSATION_OF_OPERATION,
@@ -126,46 +124,37 @@ public enum CRLReason
 
     private CRLReason(
             final int code,
-            final String description)
-    {
+            final String description) {
         this.code = code;
         this.desription = description;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return desription;
     }
 
     private static Map<Integer, CRLReason> reasons = new HashMap<>();
-    static
-    {
-        for (CRLReason value : CRLReason.values())
-        {
+    static {
+        for (CRLReason value : CRLReason.values()) {
             reasons.put(value.code, value);
         }
     }
 
     public static CRLReason forReasonCode(
-            final int reasonCode)
-    {
+            final int reasonCode) {
         return reasons.get(reasonCode);
     }
 
     public static CRLReason getInstance(
-            final String text)
-    {
-        for (CRLReason value : values())
-        {
+            final String text) {
+        for (CRLReason value : values()) {
             if (value.desription.equalsIgnoreCase(text)
                     || value.name().equalsIgnoreCase(text)
-                    || Integer.toString(value.code).equals(text))
-            {
+                    || Integer.toString(value.code).equals(text)) {
                 return value;
             }
         }

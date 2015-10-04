@@ -51,8 +51,7 @@ import org.xipki.scep.client.ScepClient;
 
 @Command(scope = "scep", name = "getcrl",
         description = "download CRL")
-public class GetCRLCmd extends ClientCmd
-{
+public class GetCRLCmd extends ClientCmd {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate\n"
@@ -67,14 +66,12 @@ public class GetCRLCmd extends ClientCmd
 
     @Override
     protected Object _doExecute()
-    throws Exception
-    {
+    throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
         ScepClient client = getScepClient();
         X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
                 cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
-        if (crl == null)
-        {
+        if (crl == null) {
             throw new CmdFailure("received no CRL from server");
         }
 

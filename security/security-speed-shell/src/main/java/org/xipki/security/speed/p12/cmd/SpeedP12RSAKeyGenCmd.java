@@ -47,8 +47,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-rsa-gen-p12",
         description = "performance test of PKCS#12 RSA key generation")
-public class SpeedP12RSAKeyGenCmd extends SingleSpeedCmd
-{
+public class SpeedP12RSAKeyGenCmd extends SingleSpeedCmd {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;
@@ -59,8 +58,7 @@ public class SpeedP12RSAKeyGenCmd extends SingleSpeedCmd
 
     @Override
     protected LoadExecutor getTester()
-    throws Exception
-    {
+    throws Exception {
         return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent));
     }
 

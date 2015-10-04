@@ -42,8 +42,7 @@ import org.xipki.common.util.StringUtil;
  * @author Lijun Liao
  */
 
-public class CertprofileInfo
-{
+public class CertprofileInfo {
     private final String name;
     private final String type;
     private final String conf;
@@ -51,39 +50,31 @@ public class CertprofileInfo
     public CertprofileInfo(
             final String name,
             final String type,
-            final String conf)
-    {
+            final String conf) {
         ParamUtil.assertNotBlank("name", name);
         this.name = name;
-        if (StringUtil.isBlank(type))
-        {
+        if (StringUtil.isBlank(type)) {
             this.type = null;
-        } else
-        {
+        } else {
             this.type = type;
         }
 
-        if (StringUtil.isBlank(conf))
-        {
+        if (StringUtil.isBlank(conf)) {
             this.conf = null;
-        } else
-        {
+        } else {
             this.conf = conf;
         }
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getConf()
-    {
+    public String getConf() {
         return conf;
     }
 

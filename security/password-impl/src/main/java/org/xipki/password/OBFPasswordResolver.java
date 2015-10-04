@@ -45,44 +45,37 @@ import org.xipki.password.api.SinglePasswordResolver;
  * @author Lijun Liao
  */
 
-public class OBFPasswordResolver  implements SinglePasswordResolver
-{
+public class OBFPasswordResolver  implements SinglePasswordResolver {
     public static final String __OBFUSCATE = "OBF:";
 
     @Override
     public boolean canResolveProtocol(
-            final String protocol)
-    {
+            final String protocol) {
         return "OBF".equalsIgnoreCase(protocol);
     }
 
     @Override
     public char[] resolvePassword(
             final String passwordHint)
-    throws PasswordResolverException
-    {
+    throws PasswordResolverException {
         return deobfuscate(passwordHint).toCharArray();
     }
 
     public static String obfuscate(
-            final String s)
-    {
+            final String s) {
         StringBuilder buf = new StringBuilder();
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
 
         buf.append(__OBFUSCATE);
-        for (int i = 0; i < b.length; i++)
-        {
+        for (int i = 0; i < b.length; i++) {
             byte b1 = b[i];
             byte b2 = b[b.length - (i + 1)];
-            if (b1 < 0 || b2 < 0)
-            {
+            if (b1 < 0 || b2 < 0) {
                 int i0 = (0xff & b1) * 256 + (0xff & b2);
                 String x = Integer.toString(i0, 36).toLowerCase();
                 buf.append("U0000", 0, 5 - x.length());
                 buf.append(x);
-            } else
-            {
+            } else {
                 int i1 = 127 + b1 + b2;
                 int i2 = 127 + b1 - b2;
                 int i0 = i1 * 256 + i2;
@@ -99,26 +92,21 @@ public class OBFPasswordResolver  implements SinglePasswordResolver
 
     /*------------------------------------------------------------ */
     public static String deobfuscate(
-            String s)
-    {
-        if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE))
-        {
+            String s) {
+        if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE)) {
             s = s.substring(4);
         }
 
         byte[] b = new byte[s.length() / 2];
         int l = 0;
-        for (int i = 0; i < s.length(); i += 4)
-        {
-            if (s.charAt(i) == 'U')
-            {
+        for (int i = 0; i < s.length(); i += 4) {
+            if (s.charAt(i) == 'U') {
                 i++;
                 String x = s.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
-            } else
-            {
+            } else {
                 String x = s.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 int i1 = (i0 / 256);

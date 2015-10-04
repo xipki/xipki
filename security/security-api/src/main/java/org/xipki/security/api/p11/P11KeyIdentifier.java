@@ -43,18 +43,15 @@ import org.bouncycastle.util.encoders.Hex;
  * @author Lijun Liao
  */
 
-public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
-{
+public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
     private final byte[] keyId;
     private final String keyIdHex;
     private final String keyLabel;
 
     public P11KeyIdentifier(
             final byte[] keyId,
-            final String keyLabel)
-    {
-        if (keyId == null && keyLabel == null)
-        {
+            final String keyLabel) {
+        if (keyId == null && keyLabel == null) {
             throw new IllegalArgumentException(
                     "at least one of keyId an keyLabel must be non-null");
         }
@@ -66,10 +63,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     }
 
     public P11KeyIdentifier(
-            final byte[] keyId)
-    {
-        if (keyId == null)
-        {
+            final byte[] keyId) {
+        if (keyId == null) {
             throw new IllegalArgumentException("keyId could not be null");
         }
         this.keyId = keyId;
@@ -78,10 +73,8 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
     }
 
     public P11KeyIdentifier(
-            final String keyLabel)
-    {
-        if (keyLabel == null)
-        {
+            final String keyLabel) {
+        if (keyLabel == null) {
             throw new IllegalArgumentException("keyLabel could not be null");
         }
         this.keyId = null;
@@ -89,51 +82,41 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
         this.keyLabel = keyLabel;
     }
 
-    public byte[] getKeyId()
-    {
+    public byte[] getKeyId() {
         return keyId;
     }
 
-    public String getKeyIdHex()
-    {
+    public String getKeyIdHex() {
         return keyIdHex;
     }
 
-    public String getKeyLabel()
-    {
+    public String getKeyLabel() {
         return keyLabel;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (keyIdHex != null)
-        {
+        if (keyIdHex != null) {
             sb.append("key-id: ").append(keyIdHex);
-            if (keyLabel != null)
-            {
+            if (keyLabel != null) {
                 sb.append(", ");
             }
         }
-        if (keyLabel != null)
-        {
+        if (keyLabel != null) {
             sb.append("key-label: ").append(keyLabel);
         }
         return sb.toString();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hashCode = 0;
-        if (keyId != null)
-        {
+        if (keyId != null) {
             hashCode = keyId.hashCode();
         }
 
-        if (keyLabel != null)
-        {
+        if (keyLabel != null) {
             hashCode += 31 * keyLabel.hashCode();
         }
 
@@ -142,25 +125,20 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
 
     @Override
     public boolean equals(
-            final Object o)
-    {
-        if (this == o)
-        {
+            final Object o) {
+        if (this == o) {
             return true;
         }
 
-        if (!(o instanceof P11KeyIdentifier))
-        {
+        if (!(o instanceof P11KeyIdentifier)) {
             return false;
         }
 
         P11KeyIdentifier o2 = (P11KeyIdentifier) o;
-        if (keyId != null && o2.keyId != null)
-        {
+        if (keyId != null && o2.keyId != null) {
             return Arrays.equals(keyId, o2.keyId);
         }
-        if (keyLabel != null && o2.keyLabel != null)
-        {
+        if (keyLabel != null && o2.keyLabel != null) {
             return keyLabel.equals(o2.keyLabel);
         }
         return false;
@@ -168,20 +146,16 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
 
     @Override
     public int compareTo(
-            final P11KeyIdentifier o)
-    {
-        if (this == o)
-        {
+            final P11KeyIdentifier o) {
+        if (this == o) {
             return 0;
         }
 
-        if (keyLabel == null)
-        {
+        if (keyLabel == null) {
             return (o.keyLabel == null)
                     ? 0
                     : 1;
-        } else
-        {
+        } else {
             return (o.keyLabel == null)
                     ? -1
                     : keyLabel.compareTo(o.keyLabel);

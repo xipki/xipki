@@ -56,12 +56,10 @@ import org.xipki.common.util.CollectionUtil;
  * @author Lijun Liao
  */
 
-public class RequestOptions
-{
+public class RequestOptions {
     private static final Map<String, AlgorithmIdentifier> sigAlgsMap = new HashMap<>();
 
-    static
-    {
+    static {
         String algoName = "SHA1withRSA";
         sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
 
@@ -107,77 +105,62 @@ public class RequestOptions
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
     private List<AlgorithmIdentifier> preferredSignatureAlgorithms;
 
-    public RequestOptions()
-    {
+    public RequestOptions() {
     }
 
-    public boolean isUseNonce()
-    {
+    public boolean isUseNonce() {
         return useNonce;
     }
 
     public void setUseNonce(
-            final boolean useNonce)
-    {
+            final boolean useNonce) {
         this.useNonce = useNonce;
     }
 
-    public int getNonceLen()
-    {
+    public int getNonceLen() {
         return nonceLen;
     }
 
     public void setNonceLen(
-            final int nonceLen)
-    {
-        if (nonceLen < 1)
-        {
+            final int nonceLen) {
+        if (nonceLen < 1) {
             throw new IllegalArgumentException("invalid nonceLen " + nonceLen);
         }
         this.nonceLen = nonceLen;
     }
 
-    public ASN1ObjectIdentifier getHashAlgorithmId()
-    {
+    public ASN1ObjectIdentifier getHashAlgorithmId() {
         return hashAlgorithmId;
     }
 
     public void setHashAlgorithmId(
-            final ASN1ObjectIdentifier hashAlgorithmId)
-    {
+            final ASN1ObjectIdentifier hashAlgorithmId) {
         this.hashAlgorithmId = hashAlgorithmId;
     }
 
-    public List<AlgorithmIdentifier> getPreferredSignatureAlgorithms()
-    {
+    public List<AlgorithmIdentifier> getPreferredSignatureAlgorithms() {
         return preferredSignatureAlgorithms;
     }
 
     public void setPreferredSignatureAlgorithms(
-            final List<AlgorithmIdentifier> preferredSignatureAlgorithms)
-    {
+            final List<AlgorithmIdentifier> preferredSignatureAlgorithms) {
         this.preferredSignatureAlgorithms = preferredSignatureAlgorithms;
     }
 
     public void setPreferredSignatureAlgorithms2(
-            final List<String> preferredSignatureAlgorithmNames)
-    {
-        if (CollectionUtil.isEmpty(preferredSignatureAlgorithmNames))
-        {
+            final List<String> preferredSignatureAlgorithmNames) {
+        if (CollectionUtil.isEmpty(preferredSignatureAlgorithmNames)) {
             this.preferredSignatureAlgorithms = null;
         }
 
-        for (String algoName : preferredSignatureAlgorithmNames)
-        {
+        for (String algoName : preferredSignatureAlgorithmNames) {
             AlgorithmIdentifier sigAlgId = sigAlgsMap.get(algoName.toUpperCase());
-            if (sigAlgId == null)
-            {
+            if (sigAlgId == null) {
                 // ignore it
                 continue;
             }
 
-            if (this.preferredSignatureAlgorithms == null)
-            {
+            if (this.preferredSignatureAlgorithms == null) {
                 this.preferredSignatureAlgorithms = new ArrayList<>(
                         preferredSignatureAlgorithmNames.size());
             }
@@ -185,76 +168,57 @@ public class RequestOptions
         }
     }
 
-    public boolean isUseHttpGetForRequest()
-    {
+    public boolean isUseHttpGetForRequest() {
         return useHttpGetForRequest;
     }
 
     public void setUseHttpGetForRequest(
-            final boolean useHttpGetForRequest)
-    {
+            final boolean useHttpGetForRequest) {
         this.useHttpGetForRequest = useHttpGetForRequest;
     }
 
     private static AlgorithmIdentifier createAlgId(
-            final String algoName)
-    {
+            final String algoName) {
         ASN1ObjectIdentifier algOid = null;
-        if ("SHA1withRSA".equalsIgnoreCase(algoName))
-        {
+        if ("SHA1withRSA".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-        } else if ("SHA256withRSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA256withRSA".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-        } else if ("SHA384withRSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA384withRSA".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-        } else if ("SHA512withRSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA512withRSA".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-        } else if ("SHA1withECDSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA1withECDSA".equalsIgnoreCase(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-        } else if ("SHA256withECDSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA256withECDSA".equalsIgnoreCase(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-        } else if ("SHA384withECDSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA384withECDSA".equalsIgnoreCase(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-        } else if ("SHA512withECDSA".equalsIgnoreCase(algoName))
-        {
+        } else if ("SHA512withECDSA".equalsIgnoreCase(algoName)) {
             algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
         } else if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)
                 || "SHA256withRSAandMGF1".equalsIgnoreCase(algoName)
                 || "SHA384withRSAandMGF1".equalsIgnoreCase(algoName)
-                || "SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
-        {
+                || "SHA512withRSAandMGF1".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.id_RSASSA_PSS;
-        } else
-        {
+        } else {
             throw new RuntimeException("Unsupported algorithm " + algoName); // should not happen
         }
 
         ASN1Encodable params;
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
-        {
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             ASN1ObjectIdentifier digestAlgOid = null;
-            if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName))
-            {
+            if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoName)) {
                 digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-            } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoName))
-            {
+            } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoName)) {
                 digestAlgOid = NISTObjectIdentifiers.id_sha256;
-            } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoName))
-            {
+            } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoName)) {
                 digestAlgOid = NISTObjectIdentifiers.id_sha384;
-            } else // if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
-            {
+            } else { // if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoName))
                 digestAlgOid = NISTObjectIdentifiers.id_sha512;
             }
             params = createPSSRSAParams(digestAlgOid);
-        } else
-        {
+        } else {
             params = DERNull.INSTANCE;
         }
 
@@ -263,26 +227,19 @@ public class RequestOptions
     }
 
     static public RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOID)
-    {
+            final ASN1ObjectIdentifier digestAlgOID) {
         int saltSize;
-        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
-        {
+        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID)) {
             saltSize = 20;
-        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
-        {
+        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID)) {
             saltSize = 28;
-        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
-        {
+        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID)) {
             saltSize = 32;
-        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
-        {
+        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID)) {
             saltSize = 48;
-        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
-        {
+        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID)) {
             saltSize = 64;
-        } else
-        {
+        } else {
             throw new RuntimeException("unknown digest algorithm " + digestAlgOID);
         }
 
@@ -294,14 +251,12 @@ public class RequestOptions
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     }
 
-    public boolean isSignRequest()
-    {
+    public boolean isSignRequest() {
         return signRequest;
     }
 
     public void setSignRequest(
-            final boolean signRequest)
-    {
+            final boolean signRequest) {
         this.signRequest = signRequest;
     }
 

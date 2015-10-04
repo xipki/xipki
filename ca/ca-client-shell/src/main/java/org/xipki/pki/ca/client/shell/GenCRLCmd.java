@@ -48,19 +48,15 @@ import org.xipki.common.RequestResponseDebug;
 
 @Command(scope = "xipki-cli", name = "gencrl",
         description = "generate CRL")
-public class GenCRLCmd extends CRLCmd
-{
+public class GenCRLCmd extends CRLCmd {
     @Override
     protected X509CRL retrieveCRL(
             final String caName)
-    throws CAClientException, PKIErrorException
-    {
+    throws CAClientException, PKIErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
+        try {
             return caClient.generateCRL(caName, debug);
-        } finally
-        {
+        } finally {
             saveRequestResponse(debug);
         }
     }

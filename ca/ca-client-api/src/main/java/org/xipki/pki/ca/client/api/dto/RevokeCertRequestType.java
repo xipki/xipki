@@ -43,17 +43,13 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class RevokeCertRequestType
-{
+public class RevokeCertRequestType {
     private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public boolean addRequestEntry(
-            final RevokeCertRequestEntryType requestEntry)
-    {
-        for (RevokeCertRequestEntryType re : requestEntries)
-        {
-            if (re.getId().equals(requestEntry.getId()))
-            {
+            final RevokeCertRequestEntryType requestEntry) {
+        for (RevokeCertRequestEntryType re : requestEntries) {
+            if (re.getId().equals(requestEntry.getId())) {
                 return false;
             }
         }
@@ -62,8 +58,7 @@ public class RevokeCertRequestType
         return true;
     }
 
-    public List<RevokeCertRequestEntryType> getRequestEntries()
-    {
+    public List<RevokeCertRequestEntryType> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 }

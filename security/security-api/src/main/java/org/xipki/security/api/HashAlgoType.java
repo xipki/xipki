@@ -39,8 +39,7 @@ package org.xipki.security.api;
  * @author Lijun Liao
  */
 
-public enum HashAlgoType
-{
+public enum HashAlgoType {
     SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
     SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
     SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
@@ -56,52 +55,42 @@ public enum HashAlgoType
             final int length,
             final String oid,
             final String name,
-            final String shortName)
-    {
+            final String shortName) {
         this.length = length;
         this.oid = oid;
         this.name = name;
         this.shortName = shortName;
     }
 
-    public int getLength()
-    {
+    public int getLength() {
         return length;
     }
 
-    public String getOid()
-    {
+    public String getOid() {
         return oid;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getShortName()
-    {
+    public String getShortName() {
         return shortName;
     }
 
     public static HashAlgoType getHashAlgoType(
-            String nameOrOid)
-    {
-        for (HashAlgoType hashAlgo : values())
-        {
-            if (hashAlgo.oid.equals(nameOrOid))
-            {
+            String nameOrOid) {
+        for (HashAlgoType hashAlgo : values()) {
+            if (hashAlgo.oid.equals(nameOrOid)) {
                 return hashAlgo;
             }
 
-            if (nameOrOid.indexOf('-') != -1)
-            {
+            if (nameOrOid.indexOf('-') != -1) {
                 nameOrOid = nameOrOid.replace("-", "");
             }
 
             if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
-                    || hashAlgo.shortName.equalsIgnoreCase(nameOrOid))
-            {
+                    || hashAlgo.shortName.equalsIgnoreCase(nameOrOid)) {
                 return hashAlgo;
             }
         }

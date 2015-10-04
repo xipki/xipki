@@ -39,12 +39,10 @@ package org.xipki.pki.ca.client.api.dto;
  * @author Lijun Liao
  */
 
-public abstract class ResultEntryType extends IdentifiedObject
-{
+public abstract class ResultEntryType extends IdentifiedObject {
 
     public ResultEntryType(
-            final String id)
-    {
+            final String id) {
         super(id);
     }
 

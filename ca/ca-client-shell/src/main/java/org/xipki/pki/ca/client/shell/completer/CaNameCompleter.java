@@ -44,20 +44,17 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends DynamicEnumCompleter
-{
+public class CaNameCompleter extends DynamicEnumCompleter {
 
     protected CAClient caClient;
 
     public final void setCaClient(
-            final CAClient caClient)
-    {
+            final CAClient caClient) {
         this.caClient = caClient;
     }
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return caClient.getCaNames();
     }
 

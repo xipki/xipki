@@ -48,23 +48,19 @@ import org.xipki.security.api.KeyUsage;
  */
 
 public class KeyusageCompleterImpl extends DynamicEnumCompleter
-implements KeyusageCompleter
-{
+implements KeyusageCompleter {
     private static final Set<String> usages;
 
-    static
-    {
+    static {
         Set<String> set = new HashSet<>();
-        for (KeyUsage usage : KeyUsage.values())
-        {
+        for (KeyUsage usage : KeyUsage.values()) {
             set.add(usage.getName());
         }
         usages = Collections.unmodifiableSet(set);
     }
 
     @Override
-    protected Set<String> getEnums()
-    {
+    protected Set<String> getEnums() {
         return usages;
     }
 
