@@ -118,7 +118,8 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             } catch (InvalidKeyException e) {
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
-        } else if (this.publicKey instanceof ECPublicKey || this.publicKey instanceof DSAPublicKey) {
+        } else if (this.publicKey instanceof ECPublicKey
+                || this.publicKey instanceof DSAPublicKey) {
             String algorithm;
             if (this.publicKey instanceof ECPublicKey) {
                 signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve()
