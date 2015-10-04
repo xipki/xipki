@@ -254,21 +254,19 @@ public class PublicKeyChecker {
 
         switch (encoded[0]) {
         case 0x02: // compressed
-        case 0x03: { // compressed
+        case 0x03: // compressed
             if (encoded.length != (expectedLength + 1)) {
                 throw new BadCertTemplateException("incorrect length for compressed encoding");
             }
             break;
-        }
         case 0x04: // uncompressed
         case 0x06: // hybrid
-        case 0x07: { // hybrid
+        case 0x07: // hybrid
             if (encoded.length != (2 * expectedLength + 1)) {
                 throw new BadCertTemplateException(
                         "incorrect length for uncompressed/hybrid encoding");
             }
             break;
-        }
         default:
             throw new BadCertTemplateException(
                     "invalid point encoding 0x" + Integer.toString(encoded[0], 16));

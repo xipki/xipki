@@ -112,36 +112,32 @@ public class ScepServer {
 
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
         X500Name rCASubject;
-        PrivateKey rCAKey; {
             kpGen.initialize(2048);
             KeyPair keypair = kpGen.generateKeyPair();
-            rCAKey = keypair.getPrivate();
+            PrivateKey rCAKey = keypair.getPrivate();
             rCASubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
-        }
 
-        CAEmulator ca; {
-            kpGen.initialize(2048);
-            KeyPair keypair = kpGen.generateKeyPair();
+        kpGen.initialize(2048);
+        keypair = kpGen.generateKeyPair();
 
-            SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-            X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
-            this.cACert = issueSubCACert(
-                    rCAKey,
-                    rCASubject,
-                    pkInfo,
-                    subject,
-                    BigInteger.valueOf(2),
-                    new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
-            ca = new CAEmulator(keypair.getPrivate(), this.cACert, generateCRL);
-        }
+        SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+        X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
+        this.cACert = issueSubCACert(
+                rCAKey,
+                rCASubject,
+                pkInfo,
+                subject,
+                BigInteger.valueOf(2),
+                new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
+        CAEmulator ca = new CAEmulator(keypair.getPrivate(), this.cACert, generateCRL);
 
         RAEmulator ra = null;
         if (withRA) {
             kpGen.initialize(2048);
-            KeyPair keypair = kpGen.generateKeyPair();
-            SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+            keypair = kpGen.generateKeyPair();
+            pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
-            X500Name subject = new X500Name("CN=RA1, OU=emulator, O=xipki.org, C=DE");
+            subject = new X500Name("CN=RA1, OU=emulator, O=xipki.org, C=DE");
             this.rACert = ca.generateCert(pkInfo, subject);
             ra = new RAEmulator(keypair.getPrivate(), this.rACert);
         }
@@ -149,10 +145,10 @@ public class ScepServer {
         NextCAandRA nextCAandRA = null;
         if (withNextCA) {
             kpGen.initialize(2048);
-            KeyPair keypair = kpGen.generateKeyPair();
+            keypair = kpGen.generateKeyPair();
 
-            SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-            X500Name subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
+            pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+            subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
 
             Date startTime = new Date(System.currentTimeMillis() + 365 * CAEmulator.DAY_IN_MS);
             this.nextCACert = issueSubCACert(
