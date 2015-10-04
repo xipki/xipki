@@ -134,11 +134,9 @@ class RSADigestSignatureSpi
             byte[]  bytes = derEncode(hash);
 
             return signingKey.CKM_RSA_PKCS(bytes);
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             throw new SignatureException("key too small for signature type");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SignatureException(e.getMessage(), e);
         }
     }

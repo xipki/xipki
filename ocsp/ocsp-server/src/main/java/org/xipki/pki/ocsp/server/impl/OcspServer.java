@@ -467,8 +467,7 @@ public class OcspServer {
                                 dsStream, securityFactory.getPasswordResolver());
                 } catch (IOException e) {
                     throw new InvalidConfException(e.getMessage(), e);
-                }
-                finally {
+                } finally {
                     close(dsStream);
                 }
                 datasources.put(name, datasource);

@@ -140,8 +140,7 @@ public class ExtensionExistence extends ASN1Object {
         if (obj instanceof byte[]) {
             try {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new IllegalArgumentException("unable to parse encoded general name");
             }
         }

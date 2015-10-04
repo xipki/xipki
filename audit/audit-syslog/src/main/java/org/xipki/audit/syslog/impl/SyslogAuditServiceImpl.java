@@ -275,8 +275,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             // after we're finished set initialized to true
             this.initialized = true;
             LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("error while configuring syslog sender: "  + e.toString());
         }
     }

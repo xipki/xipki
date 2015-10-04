@@ -142,8 +142,7 @@ public class TargetDigestRetriever {
                     certsInB = buildResult(rs, serialNumbers);
                 } catch (SQLException e) {
                     throw datasource.translate(inArrayCertsSql, e);
-                }
-                finally {
+                } finally {
                     releaseResources(null, rs);
                 }
             } else {
@@ -317,8 +316,7 @@ public class TargetDigestRetriever {
             return buildResult(rs, serialNumbers);
         } catch (SQLException e) {
             throw datasource.translate(inArrayCertsSql, e);
-        }
-        finally {
+        } finally {
             releaseResources(null, rs);
         }
     }

@@ -198,8 +198,7 @@ public class IaikP11Module implements P11Module {
         LOG.info("close", "close pkcs11 module: {}", module);
         try {
             module.finalize(null);
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             final String message = "error while module.finalize()";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),

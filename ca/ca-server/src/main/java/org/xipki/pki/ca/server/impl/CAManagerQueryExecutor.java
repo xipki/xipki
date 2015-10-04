@@ -359,8 +359,7 @@ class CAManagerQueryExecutor {
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
-        }
-        finally {
+        } finally {
             dataSource.releaseResources(stmt, rs);
         }
     }

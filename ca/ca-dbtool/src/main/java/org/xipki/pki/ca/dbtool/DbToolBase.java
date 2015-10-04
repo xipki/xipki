@@ -175,8 +175,7 @@ public class DbToolBase {
             log.error("could not delete columns from table " + tableName + " with "
                     + idColumn + " > " + id, t);
             return false;
-        }
-        finally {
+        } finally {
             releaseResources(stmt, null);
         }
 

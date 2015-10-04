@@ -186,8 +186,7 @@ public class EjbcaDigestExportReader {
                     e = datasource.translate(selectCertSql, (SQLException) e);
                 }
                 result.setException(e);
-            }
-            finally {
+            } finally {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }

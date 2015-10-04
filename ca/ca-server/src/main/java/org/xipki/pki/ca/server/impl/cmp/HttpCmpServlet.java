@@ -221,8 +221,7 @@ public class HttpCmpServlet extends HttpServlet {
             auditLevel = AuditLevel.ERROR;
             auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
-        }
-        finally {
+        } finally {
             try {
                 response.flushBuffer();
             } finally {

@@ -142,8 +142,7 @@ class OcspCertStoreDbExporter extends DbPorter {
                 throw new Exception("could not continue with CertStore greater than " + VERSION
                         + ": " + certstore.getVersion());
             }
-        }
-        else {
+        } else {
             certstore = new CertStoreType();
             certstore.setVersion(VERSION);
         }
@@ -163,8 +162,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         if (exception == null) {
             System.out.println(" exported OCSP certstore from database");
-        }
-        else {
+        } else {
             throw exception;
         }
     }
@@ -319,15 +317,13 @@ class OcspCertStoreDbExporter extends DbPorter {
 
                     if (minCertIdOfCurrentFile == -1) {
                         minCertIdOfCurrentFile = id;
-                    }
-                    else if (minCertIdOfCurrentFile > id) {
+                    } else if (minCertIdOfCurrentFile > id) {
                         minCertIdOfCurrentFile = id;
                     }
 
                     if (maxCertIdOfCurrentFile == -1) {
                         maxCertIdOfCurrentFile = id;
-                    }
-                    else if (maxCertIdOfCurrentFile < id) {
+                    } else if (maxCertIdOfCurrentFile < id) {
                         maxCertIdOfCurrentFile = id;
                     }
 
@@ -425,8 +421,7 @@ class OcspCertStoreDbExporter extends DbPorter {
                 echoToFile(Integer.toString(id), processLogFile);
 
                 processLog.addNumProcessed(numCertInCurrentFile);
-            }
-            else {
+            } else {
                 currentCertsZip.close();
                 currentCertsZipFile.delete();
             }
