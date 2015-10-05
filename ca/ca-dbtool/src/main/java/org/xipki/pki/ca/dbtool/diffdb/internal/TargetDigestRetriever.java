@@ -107,14 +107,12 @@ public class TargetDigestRetriever {
 
                     List<Long> serialNumbers = bundle.getSerialNumbers();
                     int n = serialNumbers.size();
-                    List<Long> cloneSerialNumbers = new ArrayList<>(serialNumbers);
 
-                    for (Long serialNumber : resp.keySet()) {
-                        cloneSerialNumbers.remove(serialNumber);
+                    for (Long serialNumber : serialNumbers) {
                         DbDigestEntry targetCert = resp.get(serialNumber);
-                        DbDigestEntry refCert = refCerts.get(serialNumber);
 
                         if (targetCert != null) {
+                            DbDigestEntry refCert = refCerts.get(serialNumber);
                             if (refCert.contentEquals(targetCert)) {
                                 reporter.addGood(serialNumber);
                             } else {

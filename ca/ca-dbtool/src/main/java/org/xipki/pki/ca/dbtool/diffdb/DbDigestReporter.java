@@ -41,6 +41,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -59,10 +60,10 @@ public class DbDigestReporter {
     private final BufferedWriter errorWriter;
 
     private Date startTime;
-    private int numDiff = 0;
-    private int numGood = 0;
-    private int numMissing = 0;
-    private int numError = 0;
+    private AtomicInteger numDiff = new AtomicInteger(0);
+    private AtomicInteger numGood = new AtomicInteger(0);
+    private AtomicInteger numMissing = new AtomicInteger(0);
+    private AtomicInteger numError = new AtomicInteger(0);
 
     public DbDigestReporter(
             final String reportDirname,
@@ -98,14 +99,14 @@ public class DbDigestReporter {
     public void addMissing(
             final long serialNumber)
     throws IOException {
-        numMissing++;
+        numMissing.incrementAndGet();
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
     public void addGood(
             final long serialNumber)
     throws IOException {
-        numGood++;
+        numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
@@ -118,35 +119,46 @@ public class DbDigestReporter {
                     "refCert and targetCert do not have the same serialNumber");
         }
 
-        numDiff++;
-        diffWriter.write(Long.toString(refCert.getSerialNumber()));
-        diffWriter.write('\t');
-        diffWriter.write(refCert.getEncodedOmitSeriaNumber());
-        diffWriter.write('\t');
-        diffWriter.write(targetCert.getEncodedOmitSeriaNumber());
-        diffWriter.write('\n');
+        numDiff.incrementAndGet();
+        StringBuilder sb = new StringBuilder(140);
+        sb.append(refCert.getSerialNumber()).append('\t');
+        sb.append(refCert.getEncodedOmitSeriaNumber()).append('\t');
+        sb.append(targetCert.getEncodedOmitSeriaNumber()).append('\n');
+        String msg = sb.toString();
+        synchronized (diffWriter) {
+            diffWriter.write(msg);
+        }
     }
 
     public void addError(
             final String errorMessage)
     throws IOException {
-        numError++;
-        errorWriter.write(errorMessage);
-        errorWriter.write('\n');
+        numError.incrementAndGet();
+        StringBuilder sb = new StringBuilder(errorMessage);
+        sb.append('\n');
+        String msg = sb.toString();
+        synchronized (errorWriter) {
+            errorWriter.write(msg);
+        }
     }
 
     public void addNoCAMatch()
     throws IOException {
-        errorWriter.write("Cound not find corresponding CA in target to diff");
-        errorWriter.write('\n');
+        synchronized (errorWriter) {
+            errorWriter.write("Cound not find corresponding CA in target to diff\n");
+        }
     }
 
     private static void writeSerialNumberLine(
             final BufferedWriter writer,
             final long serialNumber)
     throws IOException {
-        writer.write(Long.toString(serialNumber));
-        writer.write('\n');
+        StringBuilder sb = new StringBuilder();
+        sb.append(serialNumber).append('\n');
+        String msg = sb.toString();
+        synchronized (writer) {
+            writer.write(msg);
+        }
     }
 
     public void close() {
@@ -155,17 +167,23 @@ public class DbDigestReporter {
         close(goodWriter);
         close(errorWriter);
 
-        int sum = numGood + numDiff + numMissing + numError;
+        int sum = numGood.get() + numDiff.get() + numMissing.get() + numError.get();
         Date now = new Date();
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("sum :       ").append(StringUtil.formatAccount(sum, false)).append("\n");
-        sb.append("good:       ").append(StringUtil.formatAccount(numGood, false)).append("\n");
-        sb.append("diff:       ").append(StringUtil.formatAccount(numDiff, false)).append("\n");
-        sb.append("missing:    ").append(StringUtil.formatAccount(numMissing, false)).append("\n");
-        sb.append("error:      ").append(StringUtil.formatAccount(numError, false)).append("\n");
-        sb.append("duration:   ").append(StringUtil.formatTime(durationSec, false)).append("\n");
+        sb.append("sum :       ")
+            .append(StringUtil.formatAccount(sum, false)).append("\n");
+        sb.append("good:       ")
+            .append(StringUtil.formatAccount(numGood.get(), false)).append("\n");
+        sb.append("diff:       ")
+            .append(StringUtil.formatAccount(numDiff.get(), false)).append("\n");
+        sb.append("missing:    ")
+            .append(StringUtil.formatAccount(numMissing.get(), false)).append("\n");
+        sb.append("error:      ")
+            .append(StringUtil.formatAccount(numError.get(), false)).append("\n");
+        sb.append("duration:   ")
+            .append(StringUtil.formatTime(durationSec, false)).append("\n");
         sb.append("start time: ").append(startTime).append("\n");
         sb.append("end time:   ").append(now).append("\n");
         sb.append("speed:      ");
