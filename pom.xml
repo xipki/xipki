@@ -34,10 +34,10 @@
     </developer>
   </developers>
   <properties>
-    <karaf.version>3.0.4</karaf.version>
+    <karaf.version>3.0.5</karaf.version>
     <!-- the following OSGi version is used in the above karaf version -->
     <osgi.version>5.0.0</osgi.version>
-    <bc.version>1.52</bc.version>
+    <bc.version>1.53</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
     <jscep.version>2.3.0</jscep.version>
@@ -48,7 +48,7 @@
     <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
     <!-- required by hikaricp -->
-    <hikaricp.version>2.4.1</hikaricp.version>
+    <hikaricp.version>2.4.3</hikaricp.version>
     <syslog-java-client.version>1.0.7</syslog-java-client.version>
     <jsr305.version>3.0.0</jsr305.version>
   </properties>
