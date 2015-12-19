@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.bundles</groupId>
+    <artifactId>bundles</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>${patchTarget.groupId}.${patchTarget.artifactId}</artifactId>
+  <version>${patchTarget.version}</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <patchTarget.groupId>com.caucho</patchTarget.groupId>
+    <patchTarget.artifactId>hessian</patchTarget.artifactId>
+    <patchTarget.version>4.0.38</patchTarget.version>
+    <Export-Package>com.caucho*</Export-Package>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+

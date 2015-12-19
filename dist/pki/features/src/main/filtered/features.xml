@@ -43,7 +43,7 @@
   <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki.bundles/at.tugraz.iaik.pkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
   </feature>
@@ -163,8 +163,8 @@
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
     <feature>xipki-audit</feature>
-    <bundle><![CDATA[wrap:mvn:com.google.code.findbugs/jsr305/${jsr305.version}/$Bundle-SymbolicName=jsr305&Bundle-Version=${jsr305.version}]]></bundle>
-    <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle>mvn:org.xipki.bundles/com.cloudbees.syslog-java-client/${syslog-java-client.version}</bundle>
     <bundle>mvn:org.xipki.pki/audit-syslog/${project.version}</bundle>
   </feature>
   <feature name="xipki-ncm-server" version="${project.version}" resolver="(obr)">
