@@ -22,8 +22,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>at.tugraz.iaik</groupId>
-      <artifactId>pkcs11-wrapper</artifactId>
+      <groupId>org.xipki.bundles</groupId>
+      <artifactId>at.tugraz.iaik.pkcs11-wrapper</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

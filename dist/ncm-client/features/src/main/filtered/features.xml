@@ -10,7 +10,7 @@
     <bundle>mvn:org.xipki.pki/password-impl/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki.bundles/at.tugraz.iaik.pkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
   </feature>
@@ -25,7 +25,7 @@
     <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
+    <bundle>mvn:org.xipki.bundles/com.caucho.hessian/${hessian.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ncm-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ncm-client/${project.version}</bundle>
