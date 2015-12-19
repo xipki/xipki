@@ -50,7 +50,7 @@
     <!-- required by hikaricp -->
     <hikaricp.version>2.4.3</hikaricp.version>
     <syslog-java-client.version>1.0.7</syslog-java-client.version>
-    <jsr305.version>3.0.0</jsr305.version>
+    <jsr305.version>3.0.0_1 </jsr305.version>
   </properties>
   <modules>
     <module>shell-base</module>
@@ -75,8 +75,8 @@
         <version>${bc.version}</version>
       </dependency>
       <dependency>
-        <groupId>at.tugraz.iaik</groupId>
-        <artifactId>pkcs11-wrapper</artifactId>
+        <groupId>org.xipki.bundles</groupId>
+        <artifactId>at.tugraz.iaik.pkcs11-wrapper</artifactId>
         <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>
@@ -201,6 +201,11 @@
     </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
