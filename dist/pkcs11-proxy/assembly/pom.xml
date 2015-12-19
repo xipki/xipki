@@ -24,12 +24,6 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
-    <dependency>
-      <!-- server branding -->
-      <groupId>${project.groupId}</groupId>
-      <artifactId>branding</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -67,26 +61,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
-          <execution>
-            <id>copy</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <!-- Define here the artifacts which should be considered in the assembly -->
-              <!-- For instance, the branding jar -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>branding</artifactId>
-                  <version>${project.version}</version>
-                  <outputDirectory>target/dependencies</outputDirectory>
-                  <destFileName>pkcs11server-branding.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
           <execution>
             <!-- Uncompress the standard Karaf distribution -->
             <id>unpack</id>
