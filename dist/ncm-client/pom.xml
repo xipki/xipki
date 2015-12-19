@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>assembly</module>
-    <module>branding</module>
     <module>features</module>
   </modules>
 </project>

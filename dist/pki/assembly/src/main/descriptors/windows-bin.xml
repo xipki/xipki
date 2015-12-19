@@ -17,18 +17,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!--
-        Copy over jar files for the lib dir
-    -->
-    <fileSet>
-      <directory>${project.build.directory}/dependencies</directory>
-      <includes>
-        <include>*-branding.jar</include>
-      </includes>
-      <outputDirectory>lib/</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
     <!-- Copy over everything that needs to get unix line endings -->
     <fileSet>
       <directory>${project.build.directory}/classes/etc</directory>
