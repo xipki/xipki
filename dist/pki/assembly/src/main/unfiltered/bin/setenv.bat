@@ -81,11 +81,4 @@ SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
 SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultConnectTimeout=60000
 SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultReadTimeout=60000
 rem SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.debug=all
-
-rem PORTS configuration
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.https.port=8443
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.http.port=8080
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiServerPort=44444
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiRegistryPort=1099
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.ssh.port=8101
 SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.ignore.regex=\..*

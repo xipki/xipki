@@ -55,13 +55,5 @@ KARAF_OPTS="$KARAF_OPTS -Dorg.apache.sshd.registerBouncyCastle=false"
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
 KARAF_OPTS="$KARAF_OPTS -Dsun.net.http.errorstream.enableBuffering=true"
 #KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
-
-# PORTS configuration
-KARAF_OPTS="$KARAF_OPTS -Dmy.https.port=9443"
-KARAF_OPTS="$KARAF_OPTS -Dmy.http.port=9090"
-KARAF_OPTS="$KARAF_OPTS -Dmy.rmiServerPort=44445"
-KARAF_OPTS="$KARAF_OPTS -Dmy.rmiRegistryPort=2099"
-KARAF_OPTS="$KARAF_OPTS -Dmy.ssh.port=9101"
-
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
 export KARAF_OPTS
