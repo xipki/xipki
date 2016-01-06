@@ -1,7 +1,7 @@
 /*
  *
  * This file is part of the XiPKI project.
- * Copyright (c) 2014 - 2015 Lijun Liao
+ * Copyright (c) 2014 - 2016 Lijun Liao
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ public class CanonicalizeCode {
             "/*\n"
             + " *\n"
             + " * This file is part of the XiPKI project.\n"
-            + " * Copyright (c) 2014 - 2015 Lijun Liao\n"
+            + " * Copyright (c) 2014 - 2016 Lijun Liao\n"
             + " * Author: Lijun Liao\n"
             + " *\n"
             + " * This program is free software; you can redistribute it and/or modify\n"
