@@ -34,7 +34,9 @@
     </developer>
   </developers>
   <properties>
-    <karaf.version>3.0.5</karaf.version>
+    <karaf.version>4.0.3</karaf.version>
+    <karaf-plugin.version>4.0.4-SNAPSHOT</karaf-plugin.version>
+    <paxweb.version>4.2.5-SNAPSHOT</paxweb.version>
     <!-- the following OSGi version is used in the above karaf version -->
     <osgi.version>5.0.0</osgi.version>
     <bc.version>1.53</bc.version>
@@ -61,6 +63,7 @@
     <module>security</module>
     <module>ca</module>
     <module>ocsp</module>
+    <module>features</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
@@ -284,4 +287,72 @@
       </modules>
     </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>com.springsource.repository.bundles.release</id>
+      <name>SpringSource Enterprise Bundle Repository - Release Bundles</name>
+      <url>http://repository.springsource.com/maven/bundles/release</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>jetty-releases</id>
+      <name>Jetty Releases</name>
+      <url>https://oss.sonatype.org/content/repositories/jetty-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>apache-snapshot</id>
+      <name>Apache Snapshots</name>
+      <url>https://repository.apache.org/content/groups/snapshots-group</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/ops4j-snapshots</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>sonatype-snapshots</id>
+      <name>Sonatype Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 </project>
