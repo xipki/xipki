@@ -78,8 +78,8 @@
         <version>${bc.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.xipki.bundles</groupId>
-        <artifactId>at.tugraz.iaik.pkcs11-wrapper</artifactId>
+        <groupId>at.tugraz.iaik</groupId>
+        <artifactId>pkcs11-wrapper</artifactId>
         <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>
