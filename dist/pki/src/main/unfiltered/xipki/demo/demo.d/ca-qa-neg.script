@@ -1,0 +1,81 @@
+#################################################################
+#                                   QA                          #
+#################################################################
+feature:install xipki-security-shell
+feature:install xipki-caqa-shell
+
+# Wait one second
+sleep 1000
+
+#################################################################
+#                        NEGITIVE TESTS                         #
+#################################################################
+
+xipki-cmd:rm -r -f output/neg
+
+## Subject does not satisfy the requirement
+
+# TLS
+xipki-tk:req-p12 \
+  --p12 output/TLS-neg.p12 \
+  --password 1234 \
+  --subject "CN=TLS101,O=xipki,C=DE" \
+  --out output/neg/TLS101.p10
+
+xipki-qa:neg-p10-enroll \
+  --p10 output/neg/TLS101.p10 \
+  --profile TLS \
+  --user USER-T
+
+xipki-qa:neg-enroll-p12 \
+  --p12 output/TLS-neg.p12 \
+  --password 1234 \
+  --profile TLS \
+  --user USER-T
+
+# multipleOUs
+xipki-qa:neg-enroll-p12 \
+  --p12 output/TLS-neg.p12 \
+  --password 1234 \
+  --profile multipleOUs \
+  --subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE" \
+  --user USER-O
+
+xipki-qa:neg-enroll-p12 \
+  --p12 output/TLS-neg.p12 \
+  --password 1234 \
+  --profile multipleOUs \
+  --subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE" \
+  --user USER-O
+
+xipki-qa:neg-enroll-p12 \
+  --p12 output/TLS-neg.p12 \
+  --password 1234 \
+  --profile multipleOUs \
+  --subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE" \
+  --user USER-O
+
+## Revoke certificate that has been revoked
+
+xipki-qa:neg-revoke \
+  --cert output/TLS2.der \
+  --reason keyCompromise
+
+xipki-qa:neg-unrevoke \
+  --cert output/TLS2.der
+
+## Generate CRL
+xipki-qa:neg-gencrl \
+  --ca SubCA1
+
+## Get CRL
+xipki-qa:neg-getcrl \
+  --ca SubCA1
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-caqa-shell
+#feature:uninstall xipki-caclient-shell
+#feature:uninstall xipki-caclient
+feature:uninstall xipki-security-shell

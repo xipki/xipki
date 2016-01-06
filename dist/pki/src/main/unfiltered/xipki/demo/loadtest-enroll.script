@@ -1,0 +1,31 @@
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+feature:install xipki-caclient-shell
+
+# Wait two seconds
+sleep 2000
+
+# Loadtest Template
+echo "Template enroll load test"
+xipki-cli:loadtest-template-enroll \
+  --template xipki/demo/demo.d/loadtest-template.xml \
+  --duration 10 \
+  --thread 8
+
+# Loadtest RSA key
+echo "Enroll load test"
+xipki-cli:loadtest-enroll \
+  --key-type RSA \
+  --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
+  --profile TLS \
+  -n 4 \
+  --random-dn O \
+  --duration 10 \
+  --thread 8
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-caclient-shell
+#feature:uninstall xipki-caclient

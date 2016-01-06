@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-  Copyright (c) 2014 - 2015 Lijun Liao
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -9,21 +6,18 @@
     <artifactId>dist-group</artifactId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>pki</artifactId>
+  <artifactId>pkcs11proxy</artifactId>
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
-    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
-    <h2-jdbc.version>1.4.185</h2-jdbc.version>
-    <hsqldb.version>2.3.2</hsqldb.version>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.pki.features</groupId>
-      <artifactId>pki</artifactId>
+      <artifactId>pkcs11proxy</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -69,7 +63,7 @@
         </executions>
       </plugin>
       <plugin>
-        <!--  include additional artifacts -->
+        <!-- include additional artifacts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -118,148 +112,12 @@
               </artifactItems>
             </configuration>
           </execution>
-          <execution>
-            <!-- Extract the SQL scripts -->
-            <id>unpack-sql</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>sql/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the XSD schemas -->
-            <id>unpack-xsd</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>security-impl</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-dbtool</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-client-impl</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-client-shell</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-qa-shell</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-certprofile</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the CA-Server XSD -->
-            <id>unpack-caserver-xsd</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-jdbcs</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>target/jdbc</outputDirectory>
-              <!-- Define here the JDBC drivers -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.h2database</groupId>
-                  <artifactId>h2</artifactId>
-                  <version>${h2-jdbc.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.postgresql</groupId>
-                  <artifactId>postgresql</artifactId>
-                  <version>${postgresql.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.hsqldb</groupId>
-                  <artifactId>hsqldb</artifactId>
-                  <version>${hsqldb.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf-plugin.version}</version>
+        <version>${karaf.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -273,31 +131,17 @@
               <repository>${features.repo}</repository>
               <!--
                   Feature Descriptors (Karaf core features are available by default)
-
                   NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
                   to make them visible after deployment.
-              -->
+               -->
               <descriptors>
-                <descriptor>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.pki.features/pkcs11proxy/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>http-whiteboard</feature>
                 <!-- project-core features -->
-                <feature>xipki-caserver</feature>
-                <feature>xipki-camgmt-shell</feature>
-                <feature>xipki-caclient-shell</feature>
+                <feature>xipki-pkcs11-proxy</feature>
                 <feature>xipki-security-shell</feature>
-                <feature>xipki-ocspserver</feature>
-                <feature>xipki-ocspclient-shell</feature>
-                <!-- optional features -->
-                <feature>xipki-camgmt-qa-shell</feature>
-                <feature>xipki-caqa-shell</feature>
-                <feature>xipki-ocspqa-shell</feature>
-                <feature>xipki-database-tool</feature>
-                <feature>xipki-audit-syslog</feature>
-                <feature>xipki-ncm-server</feature>
-                <feature>xipki-scepclient-shell</feature>
-                <feature>xipki-jscepclient-shell</feature>
               </features>
             </configuration>
           </execution>
@@ -307,7 +151,7 @@
   </build>
   <profiles>
     <profile>
-      <id>unix</id>
+      <id>unix-bin</id>
       <activation>
         <os>
           <family>unix</family>
@@ -326,7 +170,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-pki-${project.version}</finalName>
+                  <finalName>xipki-pkcs11proxy-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -359,7 +203,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-pki-${project.version}</finalName>
+                  <finalName>xipki-pkcs11proxy-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>
