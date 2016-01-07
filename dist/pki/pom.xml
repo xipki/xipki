@@ -13,6 +13,7 @@
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
+    <app.name>PKI</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
