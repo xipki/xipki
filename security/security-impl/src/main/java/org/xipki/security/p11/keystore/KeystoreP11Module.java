@@ -170,7 +170,7 @@ public class KeystoreP11Module implements P11Module {
 
         extSlot = new KeystoreP11Slot(slotDir, _slotId, pwd);
 
-        slots.put(slotId, extSlot);
+        slots.put(_slotId, extSlot);
         return extSlot;
     }
 
