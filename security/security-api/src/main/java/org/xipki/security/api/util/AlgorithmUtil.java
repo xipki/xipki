@@ -400,9 +400,9 @@ public class AlgorithmUtil {
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(oid)
                 || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)) {
+                || NISTObjectIdentifiers.dsa_with_sha256.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha384.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha512.equals(oid)) {
             return true;
         }
 
