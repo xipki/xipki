@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
- Copyright (c) 2014 - 2015 Lijun Liao
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -39,7 +36,7 @@
     <paxweb.version>4.2.5-SNAPSHOT</paxweb.version>
     <!-- the following OSGi version is used in the above karaf version -->
     <osgi.version>5.0.0</osgi.version>
-    <bc.version>1.53</bc.version>
+    <bc.version>1.54</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
     <jscep.version>2.3.0</jscep.version>
