@@ -49,14 +49,12 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.ConfPairs;
 import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
-//FIXME: use different label if CA key label already exists.
 @Command(scope = "xipki-tk", name = "update-cert-p12",
         description = "update certificate in PKCS#12 keystore")
 @Service
@@ -126,7 +124,7 @@ public class P12CertUpdateCmd extends P12SecurityCmd {
     private void assertMatch(
             final X509Certificate cert,
             final String password)
-    throws SignerException, PasswordResolverException {
+    throws SignerException {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if (password != null) {
             pairs.putPair("password", new String(password));
