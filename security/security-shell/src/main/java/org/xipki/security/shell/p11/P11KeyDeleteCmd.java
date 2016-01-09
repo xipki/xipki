@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell.p11;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -45,9 +46,10 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "delete-key",
         description = "generate EC keypair in PKCS#11 device")
+@Service
 public class P11KeyDeleteCmd extends P11SecurityCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();

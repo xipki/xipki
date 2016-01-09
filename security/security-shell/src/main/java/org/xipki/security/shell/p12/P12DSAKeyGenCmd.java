@@ -35,8 +35,9 @@
 
 package org.xipki.security.shell.p12;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
@@ -47,6 +48,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 
 @Command(scope = "xipki-tk", name = "dsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
+@Service
 public class P12DSAKeyGenCmd extends P12KeyGenCmd {
     @Option(name = "--plen",
             description = "bit length of the prime")
@@ -57,7 +59,7 @@ public class P12DSAKeyGenCmd extends P12KeyGenCmd {
     private Integer qLen;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (pLen % 1024 != 0) {
             throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);

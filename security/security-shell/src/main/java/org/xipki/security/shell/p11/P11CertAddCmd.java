@@ -37,13 +37,17 @@ package org.xipki.security.shell.p11;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.api.util.X509Util;
 import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -51,6 +55,7 @@ import org.xipki.security.shell.SecurityCmd;
 
 @Command(scope = "xipki-tk", name = "add-cert",
         description = "add certificate to PKCS#11 device")
+@Service
 public class P11CertAddCmd extends SecurityCmd {
 
     @Option(name = "--slot",
@@ -63,14 +68,16 @@ public class P11CertAddCmd extends SecurityCmd {
             required = true,
             description = "certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509Certificate cert = X509Util.parseCert(certFile);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);

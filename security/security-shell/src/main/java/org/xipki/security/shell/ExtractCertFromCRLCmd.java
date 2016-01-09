@@ -41,8 +41,10 @@ import java.security.cert.X509CRL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
@@ -51,6 +53,7 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.util.X509Util;
@@ -61,22 +64,25 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-tk", name = "extract-cert",
         description = "extract certificates from CRL")
+@Service
 public class ExtractCertFromCRLCmd extends SecurityCmd {
 
     @Option(name = "--crl",
             required = true,
             description = "CRL file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String crlFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "zip file to save the extracted certificates\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509CRL crl = X509Util.parseCRL(crlFile);
         String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();

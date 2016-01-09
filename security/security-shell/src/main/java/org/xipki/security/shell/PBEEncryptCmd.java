@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.password.PBEPasswordResolver;
 
 /**
@@ -44,9 +45,10 @@ import org.xipki.password.PBEPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "pbe-enc",
         description = "encrypt password with master password")
+@Service
 public class PBEEncryptCmd extends SecurityCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         char[] masterPassword = readPassword("Please enter the master password");
         char[] password = readPassword("Please enter the password");

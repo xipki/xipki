@@ -39,8 +39,11 @@ import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignatureAlgoControl;
@@ -52,11 +55,13 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req-p12",
         description = "generate PKCS#10 request with PKCS#12 keystore")
+@Service
 public class P12CertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p12File;
 
     @Option(name = "--password",

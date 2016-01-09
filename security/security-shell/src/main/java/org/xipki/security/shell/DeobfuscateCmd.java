@@ -35,8 +35,9 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.password.OBFPasswordResolver;
@@ -47,6 +48,7 @@ import org.xipki.password.OBFPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "deobfuscate",
         description = "deobfuscate password")
+@Service
 public class DeobfuscateCmd extends SecurityCmd {
     @Option(name = "--password",
             required = true,
@@ -55,7 +57,7 @@ public class DeobfuscateCmd extends SecurityCmd {
     private String passwordHint;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint

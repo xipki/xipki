@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.password.OBFPasswordResolver;
 
 /**
@@ -44,9 +45,10 @@ import org.xipki.password.OBFPasswordResolver;
 
 @Command(scope = "xipki-tk", name = "obfuscate",
         description = "obfuscate password")
+@Service
 public class ObfuscateCmd extends SecurityCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         char[] password = readPassword("Please enter the password");
 

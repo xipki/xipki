@@ -38,9 +38,12 @@ package org.xipki.security.shell.p11;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -50,16 +53,18 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "export-cert",
         description = "export certificate from PKCS#11 device")
+@Service
 public class P11CertExportCmd extends P11SecurityCmd {
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();

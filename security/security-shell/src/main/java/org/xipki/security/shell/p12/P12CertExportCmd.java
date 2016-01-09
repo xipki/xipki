@@ -40,9 +40,12 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -50,15 +53,17 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-tk", name = "export-cert-p12",
         description = "export certificate from PKCS#12 keystore")
+@Service
 public class P12CertExportCmd extends P12SecurityCmd {
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         KeyStore ks = getKeyStore();
 

@@ -35,8 +35,9 @@
 
 package org.xipki.security.shell.p12;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
@@ -47,6 +48,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 
 @Command(scope = "xipki-tk", name = "rsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
+@Service
 public class P12RSAKeyGenCmd extends P12KeyGenCmd {
     @Option(name = "--key-size",
             description = "keysize in bit")
@@ -57,7 +59,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCmd {
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (keysize % 1024 != 0) {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
