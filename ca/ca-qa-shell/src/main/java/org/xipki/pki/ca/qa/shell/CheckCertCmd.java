@@ -37,8 +37,11 @@ package org.xipki.pki.ca.qa.shell;
 
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -47,12 +50,14 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.pki.ca.qa.api.QASystemManager;
 import org.xipki.pki.ca.qa.api.X509CertprofileQA;
 import org.xipki.pki.ca.qa.api.X509IssuerInfo;
+import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -60,38 +65,44 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 @Command(scope = "xipki-qa", name = "check-cert",
         description = "check the certificate")
-public class CheckCertCmd extends XipkiOsgiCommandSupport {
+@Service
+public class CheckCertCmd extends XipkiCommandSupport {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--issuer",
             description = "issuer name\n"
                     + "required if multiple issuers are configured")
+    @Completion(X509IssuerNameCompleter.class)
     private String issuerName;
 
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
+    @Completion(X509IssuerNameCompleter.class)
     private String profileName;
 
     @Option(name = "--verbose", aliases = "-v",
             description = "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
+    @Reference
     private QASystemManager qaSystemManager;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if (isEmpty(issuerNames)) {
@@ -153,10 +164,6 @@ public class CheckCertCmd extends XipkiOsgiCommandSupport {
             throw new CmdFailure("certificate is invalid");
         }
         return null;
-    }
-
-    public void setQaSystemManager(QASystemManager qaSystemManager) {
-        this.qaSystemManager = qaSystemManager;
     }
 
     private static void format(

@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.CaAliasRemoveCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.CaAliasRemoveCmd;
 
 /**
  * @author Lijun Liao
@@ -45,15 +46,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-caalias-rm",
         description = "remove CA alias (negative, QA)")
+@Service
 public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("neg-caalias-rm");
 
         try {
-            super._doExecute();
+            super.doExecute();
         } catch (Exception e) {
             return null;
         }

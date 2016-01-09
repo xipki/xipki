@@ -35,8 +35,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -44,12 +47,14 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-rm",
         description = "remove CMP control")
+@Service
 public class CmpControlRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CMP control name", required = true)
+    @Completion(CmpControlNameCompleter.class)
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removeCmpControl(name);
         output(b, "removed", "could not remove", "CMP control");

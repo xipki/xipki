@@ -13,6 +13,9 @@
     <bundle>mvn:org.xipki.pki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/certprofile-demo/${project.version}</bundle>
   </feature>
+  <feature name="xipki-demo" version="${project.version}" resolver="(obr)">
+    <bundle>mvn:org.xipki.pki/demo/${project.version}</bundle>
+  </feature>
   <!-- Add the custom bundles for cert publishers here -->
   <feature name="xipki-publishers" version="${project.version}" resolver="(obr)">
     <feature>xipki-ca-api</feature>
@@ -43,7 +46,8 @@
   <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>    <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">

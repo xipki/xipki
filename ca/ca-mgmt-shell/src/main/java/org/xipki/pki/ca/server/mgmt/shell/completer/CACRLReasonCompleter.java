@@ -35,14 +35,16 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.EnumCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
-import org.xipki.console.karaf.EnumCompleter;
 import org.xipki.security.api.CRLReason;
 
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class CACRLReasonCompleter extends EnumCompleter {
     public CACRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();

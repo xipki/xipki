@@ -35,9 +35,12 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -45,8 +48,10 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "publish-self",
         description = "publish the certificate of root CA")
+@Service
 public class CaPublishRCACertCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--profile",
@@ -56,7 +61,7 @@ public class CaPublishRCACertCmd extends CaCmd {
     private String certprofile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.publishRootCA(caName, certprofile);
         output(b, "published", "could not publish", "CA certificate of root CA " + caName);

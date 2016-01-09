@@ -37,13 +37,19 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.util.X509Util;
 
@@ -53,15 +59,18 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "responder-up",
         description = "update responder")
+@Service
 public class ResponderUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"
                     + "(required)")
+    @Completion(ResponderNameCompleter.class)
     protected String name;
 
     @Option(name = "--signer-type",
             description = "type of the responder signer")
+    @Completion(SignerTypeCompleter.class)
     protected String signerType;
 
     @Option(name = "--signer-conf",
@@ -70,14 +79,11 @@ public class ResponderUpdateCmd extends CaCmd {
 
     @Option(name = "--cert",
             description = "requestor certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
+    @Reference
     protected PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     protected String getSignerConf()
     throws Exception {
@@ -97,7 +103,7 @@ public class ResponderUpdateCmd extends CaCmd {
     }
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         String cert = null;
         if (CAManager.NULL.equalsIgnoreCase(certFile)) {

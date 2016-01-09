@@ -37,11 +37,14 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.File;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -49,6 +52,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "profile-export",
         description = "export certificate profile configuration")
+@Service
 public class ProfileExportCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -60,10 +64,11 @@ public class ProfileExportCmd extends CaCmd {
             required = true,
             description = "where to save the profile configuration\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String confFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CertprofileEntry entry = caManager.getCertprofile(name);
         if (entry == null) {

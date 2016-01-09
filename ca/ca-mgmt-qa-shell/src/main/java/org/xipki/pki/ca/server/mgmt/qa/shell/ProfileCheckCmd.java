@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 import org.xipki.common.util.IoUtil;
@@ -47,9 +48,10 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "profile-check",
         description = "check information of profiles (QA)")
+@Service
 public class ProfileCheckCmd extends ProfileUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking profile " + name);
 

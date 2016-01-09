@@ -45,13 +45,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
+import org.xipki.pki.ca.dbtool.shell.completer.LogLevelCompleter;
 
 import jline.console.ConsoleReader;
 
@@ -59,11 +63,12 @@ import jline.console.ConsoleReader;
  * @author Lijun Liao
  */
 
-public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport {
+public abstract class LiquibaseCmd extends XipkiCommandSupport {
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
     private static final List<String> yesNo = new ArrayList<>(2);
 
+    @Reference
     private PasswordResolver passwordResolver;
 
     static {
@@ -77,14 +82,17 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport {
 
     @Option(name = "--log-level",
             description = "log level, valid values are debug, info, warning, severe, off")
+    @Completion(LogLevelCompleter.class)
     private String logLevel = "warning";
 
     @Option(name = "--log-file",
             description = "log file")
+    @Completion(FilePathCompleter.class)
     private String logFile;
 
     @Option(name = "--ca-conf",
             description = "CA configuration file")
+    @Completion(FilePathCompleter.class)
     private String caconfFile = DFLT_CACONF_FILE;
 
     protected void resetAndInit(
@@ -246,8 +254,4 @@ public abstract class LiquibaseCmd extends XipkiOsgiCommandSupport {
         }
     }
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 }

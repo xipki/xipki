@@ -39,7 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.KeyUtil;

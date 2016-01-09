@@ -37,7 +37,8 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import java.util.Arrays;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCmd;
@@ -50,10 +51,11 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "requestor-check",
         description = "check information of requestors (QA)")
+@Service
 public class RequestorCheckCmd extends RequestorUpdateCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking requestor " + name);
 

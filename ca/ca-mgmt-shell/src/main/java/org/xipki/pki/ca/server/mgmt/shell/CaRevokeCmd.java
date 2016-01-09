@@ -40,11 +40,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CACRLReasonCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.CertRevocationInfo;
 
@@ -54,6 +58,7 @@ import org.xipki.security.api.CertRevocationInfo;
 
 @Command(scope = "xipki-ca", name = "ca-revoke",
         description = "revoke CA")
+@Service
 public class CaRevokeCmd extends CaCmd {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
             Arrays.asList(new CRLReason[] {
@@ -63,12 +68,14 @@ public class CaRevokeCmd extends CaCmd {
                 CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--reason",
             required = true,
             description = "CRL reason\n"
                     + "(required)")
+    @Completion(CACRLReasonCompleter.class)
     private String reason;
 
     @Option(name = "--rev-date",
@@ -81,7 +88,7 @@ public class CaRevokeCmd extends CaCmd {
     private String invalidityDateS;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CRLReason crlReason = CRLReason.getInstance(reason);
         if (crlReason == null) {

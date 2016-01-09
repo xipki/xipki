@@ -45,7 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -72,6 +73,11 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.completer.ExtKeyusageCompleter;
+import org.xipki.console.karaf.completer.ExtensionNameCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.HashAlgCompleter;
+import org.xipki.console.karaf.completer.KeyusageCompleter;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
@@ -94,6 +100,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
 
     @Option(name = "--hash",
             description = "hash algorithm name")
+    @Completion(HashAlgCompleter.class)
     private String hashAlgo = "SHA256";
 
     @Option(name = "--rsa-mgf1",
@@ -110,6 +117,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
             required = true,
             description = "output file name\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFilename;
 
     @Option(name = "--challenge-password", aliases = "-c",
@@ -120,12 +128,14 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
             multiValued = true,
             description = "keyusage\n"
                     + "(multi-valued)")
+    @Completion(KeyusageCompleter.class)
     private List<String> keyusages;
 
     @Option(name = "--ext-keyusage",
             multiValued = true,
             description = "extended keyusage\n"
                     + "(multi-valued)")
+    @Completion(ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
     @Option(name = "--subject-alt-name",
@@ -152,6 +162,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
 
     @Option(name = "--biometric-hash",
             description = "Biometric hash algorithm")
+    @Completion(HashAlgCompleter.class)
     private String biometricHashAlgo;
 
     @Option(name = "--biometric-file",
@@ -160,12 +171,14 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
 
     @Option(name = "--biometric-uri",
             description = "Biometric sourcedata URI")
+    @Completion(FilePathCompleter.class)
     private String biometricUri;
 
     @Option(name = "--need-extension",
             multiValued = true,
             description = "types of extension that must be contaied in the certificate\n"
                     + "(multi-valued)")
+    @Completion(ExtensionNameCompleter.class)
     private List<String> needExtensionTypes;
 
     @Option(name = "--want-extension",
@@ -173,6 +186,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
             description = "types of extension that should be contaied in the certificate if"
                     + " possible\n"
                     + "(multi-valued)")
+    @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
@@ -181,7 +195,7 @@ public abstract class CertRequestGenCmd extends SecurityCmd {
     throws Exception;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P10RequestGenerator p10Gen = new P10RequestGenerator();
 

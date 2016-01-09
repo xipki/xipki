@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
 import org.xipki.console.karaf.CmdFailure;
@@ -46,9 +47,10 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "publisher-check",
         description = "check information of publishers (QA)")
+@Service
 public class PublisherCheckCmd extends PublisherUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking publisher " + name);
 

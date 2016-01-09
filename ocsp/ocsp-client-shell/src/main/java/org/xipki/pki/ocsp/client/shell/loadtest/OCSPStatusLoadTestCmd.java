@@ -41,8 +41,9 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.AbstractOCSPStatusCmd;
@@ -54,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ocsp", name = "loadtest-status",
         description = "OCSP Load test")
+@Service
 public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd {
     @Option(name = "--serial",
             required = true,
@@ -76,7 +78,7 @@ public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd {
     private String serverURL;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         List<Long> serialNumbers = new LinkedList<>();
 

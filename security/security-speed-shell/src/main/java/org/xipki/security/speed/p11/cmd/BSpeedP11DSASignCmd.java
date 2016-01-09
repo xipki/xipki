@@ -38,7 +38,7 @@ package org.xipki.security.speed.p11.cmd;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.speed.p11.P11DSASignLoadTest;

@@ -38,7 +38,8 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -47,10 +48,11 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-ca", name = "restart",
         description = "restart CA system")
+@Service
 public class CaSystemRestartCmd extends CaCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean successful = caManager.restartCaSystem();
         if (!successful) {

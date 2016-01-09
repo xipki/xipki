@@ -41,9 +41,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -51,12 +54,14 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-info",
         description = "show information of CMP control")
+@Service
 public class CmpControlInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CMP control name")
+    @Completion(CmpControlNameCompleter.class)
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         StringBuilder sb = new StringBuilder();
 

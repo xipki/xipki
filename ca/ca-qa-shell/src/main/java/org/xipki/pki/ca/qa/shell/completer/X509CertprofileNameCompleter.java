@@ -37,21 +37,20 @@ package org.xipki.pki.ca.qa.shell.completer;
 
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.DynamicEnumCompleter;
 import org.xipki.pki.ca.qa.api.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class X509CertprofileNameCompleter extends DynamicEnumCompleter {
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(
-            final QASystemManager qaSystemManager) {
-        this.qaSystemManager = qaSystemManager;
-    }
+    @Reference
+    private QASystemManager qaSystemManager;
 
     @Override
     protected Set<String> getEnums() {

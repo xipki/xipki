@@ -37,8 +37,9 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.rmi.UnexpectedException;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -47,12 +48,13 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 @Command(scope = "xipki-ca", name = "user-info",
         description = "show information of user")
+@Service
 public class UserInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         StringBuilder sb = new StringBuilder();
 

@@ -39,11 +39,14 @@ import java.io.File;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Option;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -54,12 +57,14 @@ public abstract class CRLCmd extends ClientCmd {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if multiple CAs are configured)")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the CRL\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     protected String outFile;
 
     protected abstract X509CRL retrieveCRL(
@@ -67,7 +72,7 @@ public abstract class CRLCmd extends ClientCmd {
     throws CAClientException, PKIErrorException;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {

@@ -37,7 +37,9 @@ package org.xipki.pki.ca.qa.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
@@ -51,8 +53,10 @@ import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.shell.ClientCmd;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignatureAlgoControl;
@@ -80,6 +84,7 @@ public abstract class NegEnrollCertCmd extends ClientCmd {
 
     @Option(name = "--hash",
             description = "hash algorithm name for the POPO computation")
+    @Completion(HashAlgCompleter.class)
     private String hashAlgo = "SHA256";
 
     @Option(name = "--rsa-mgf1",
@@ -95,14 +100,11 @@ public abstract class NegEnrollCertCmd extends ClientCmd {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "required if the profile is supported by more than one CA")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
-    }
 
     protected abstract ConcurrentContentSigner getSigner(
             String hashAlgo,
@@ -110,7 +112,7 @@ public abstract class NegEnrollCertCmd extends ClientCmd {
     throws SignerException;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         EnrollCertRequestType request = new EnrollCertRequestType(
                 EnrollCertRequestType.Type.CERT_REQ);

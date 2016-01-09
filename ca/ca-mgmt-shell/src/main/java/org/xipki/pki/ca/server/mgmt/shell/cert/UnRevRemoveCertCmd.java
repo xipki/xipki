@@ -41,12 +41,15 @@ import java.rmi.UnexpectedException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -58,11 +61,13 @@ public abstract class UnRevRemoveCertCmd extends CaCmd {
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "--cert", aliases = "-c",
             description = "certificate file"
                     + "(either cert or serial must be specified)")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "--serial", aliases = "-s",

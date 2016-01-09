@@ -39,11 +39,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.IoUtil;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
@@ -53,26 +55,31 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 @Command(scope = "xipki-db", name = "diff-digest-db",
         description = "diff digest XiPKI/EJBCA database")
+@Service
 public class DiffDigestDbCmd extends DbPortCmd {
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
                     + "(one of--ref-db and--ref-dir must be specified)")
+    @Completion(FilePathCompleter.class)
     private String refDbConf;
 
     @Option(name = "--ref-dir",
             description = "directory of exported digest files of the reference system\n"
                     + "(one of--ref-db and--ref-dir must be specified)")
+    @Completion(DirPathCompleter.class)
     private String refDir;
 
     @Option(name = "--target",
             required = true,
             description = "configuration file of the target database to be evaluated")
+    @Completion(FilePathCompleter.class)
     private String dbconfFile;
 
     @Option(name = "--report-dir",
             required = true,
             description = "report directory\n"
                     + "(required)")
+    @Completion(DirPathCompleter.class)
     private String reportDir;
 
     @Option(name = "--revoked-only")
@@ -94,10 +101,8 @@ public class DiffDigestDbCmd extends DbPortCmd {
             multiValued = true,
             description = "Certificate of CAs to be considered\n"
                         + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
     private List<String> caCertFiles;
-
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
 
     protected DbPortWorker getDbPortWorker()
     throws Exception {
@@ -121,16 +126,6 @@ public class DiffDigestDbCmd extends DbPortCmd {
                 numRefThreads,
                 numTargetThreads,
                 cACerts);
-    }
-
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory) {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
     }
 
 }

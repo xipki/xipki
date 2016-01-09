@@ -35,8 +35,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -44,11 +47,13 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-up",
         description = "update CMP control")
+@Service
 public class CmpControlUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CMP control name\n"
                     + "(required)")
+    @Completion(CmpControlNameCompleter.class)
     protected String name;
 
     @Option(name = "--conf",
@@ -58,7 +63,7 @@ public class CmpControlUpdateCmd extends CaCmd {
     protected String conf;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.changeCmpControl(name, conf);
         output(b, "updated", "could not update", "CMP control " + name);

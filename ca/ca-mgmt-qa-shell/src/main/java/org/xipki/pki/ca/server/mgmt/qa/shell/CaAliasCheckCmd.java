@@ -35,10 +35,13 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -46,11 +49,13 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "caalias-check",
         description = "check CA aliases (QA)")
+@Service
 public class CaAliasCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--alias",
@@ -60,7 +65,7 @@ public class CaAliasCheckCmd extends CaCmd {
     private String aliasName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
         String _caName = caManager.getCaNameForAlias(aliasName);

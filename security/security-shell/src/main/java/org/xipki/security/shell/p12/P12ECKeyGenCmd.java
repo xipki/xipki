@@ -35,8 +35,11 @@
 
 package org.xipki.security.shell.p12;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
@@ -47,15 +50,17 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 
 @Command(scope = "xipki-tk", name = "ec-p12",
         description = "generate EC keypair in PKCS#12 keystore")
+@Service
 public class P12ECKeyGenCmd extends P12KeyGenCmd {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name or OID\n"
                     + "(required)")
+    @Completion(ECCurveNameCompleter.class)
     private String curveName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage());

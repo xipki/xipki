@@ -35,7 +35,8 @@
 
 package org.xipki.security.speed.p11.cmd;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.speed.cmd.SingleSpeedCmd;
@@ -54,6 +55,7 @@ public abstract class SpeedP11Cmd extends SingleSpeedCmd {
 
     @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11SlotIdentifier getSlotId() {

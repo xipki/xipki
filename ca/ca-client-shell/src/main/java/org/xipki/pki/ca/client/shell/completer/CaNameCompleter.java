@@ -37,21 +37,19 @@ package org.xipki.pki.ca.client.shell.completer;
 
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.DynamicEnumCompleter;
 import org.xipki.pki.ca.client.api.CAClient;
-import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class CaNameCompleter extends DynamicEnumCompleter {
-
+    @Reference
     protected CAClient caClient;
-
-    public final void setCaClient(
-            final CAClient caClient) {
-        this.caClient = caClient;
-    }
 
     @Override
     protected Set<String> getEnums() {

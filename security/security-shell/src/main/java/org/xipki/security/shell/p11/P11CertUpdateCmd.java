@@ -39,8 +39,11 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.api.util.X509Util;
@@ -51,22 +54,25 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-tk", name = "update-cert",
         description = "update certificate in PKCS#11 device")
+@Service
 public class P11CertUpdateCmd extends P11SecurityCmd {
 
     @Option(name = "--cert",
             required = true,
             description = "certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--ca-cert",
             multiValued = true,
             description = "CA Certificate files\n"
                     + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
     private Set<String> caCertFiles;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();

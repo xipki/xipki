@@ -38,14 +38,18 @@ package org.xipki.pki.ca.client.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -53,12 +57,14 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-cli", name = "p10-enroll",
         description = "enroll certificate via PKCS#10 request")
+@Service
 public class P10EnrollCertCmd extends ClientCmd {
 
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Option(name = "--profile", aliases = "-p",
@@ -71,6 +77,7 @@ public class P10EnrollCertCmd extends ClientCmd {
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Option(name = "--user",
@@ -80,10 +87,11 @@ public class P10EnrollCertCmd extends ClientCmd {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));

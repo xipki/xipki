@@ -35,9 +35,13 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.StringUtil;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -45,17 +49,20 @@ import org.xipki.common.util.StringUtil;
 
 @Command(scope = "xipki-ca", name = "caprofile-add",
         description = "add certificate profile to CA")
+@Service
 public class CaProfileAddCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--profile",
             required = true,
             description = "profile name\n"
                 + "(required)")
+    @Completion(ProfileNameCompleter.class)
     private String profileName;
 
     @Option(name = "--local-name",
@@ -64,7 +71,7 @@ public class CaProfileAddCmd extends CaCmd {
     private String profileLocalname;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (StringUtil.isBlank(profileLocalname)) {
             profileLocalname = profileName;

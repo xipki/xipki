@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 
 /**
@@ -45,6 +46,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-add",
         description = "add CMP control")
+@Service
 public class CmpControlAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -59,7 +61,7 @@ public class CmpControlAddCmd extends CaCmd {
     private String conf;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CmpControlEntry entry = new CmpControlEntry(name, conf);
         boolean b = caManager.addCmpControl(entry);

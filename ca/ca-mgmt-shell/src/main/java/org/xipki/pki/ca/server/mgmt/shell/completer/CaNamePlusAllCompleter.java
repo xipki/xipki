@@ -38,10 +38,13 @@ package org.xipki.pki.ca.server.mgmt.shell.completer;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class CaNamePlusAllCompleter extends MgmtNameCompleter {
 
     @Override

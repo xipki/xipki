@@ -35,8 +35,11 @@
 
 package org.xipki.security.shell.p11;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11WritableSlot;
@@ -47,15 +50,17 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "ec",
         description = "generate EC keypair in PKCS#11 device")
+@Service
 public class P11ECKeyGenCmd extends P11KeyGenCmd {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name\n"
                     + "(required)")
+    @Completion(ECCurveNameCompleter.class)
     private String curveName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         if (noCert) {

@@ -38,7 +38,7 @@ package org.xipki.pki.ca.qa.shell;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.shell.ClientCmd;
@@ -61,7 +61,7 @@ public abstract class NegCRLCmd extends ClientCmd {
     throws CAClientException, PKIErrorException;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {

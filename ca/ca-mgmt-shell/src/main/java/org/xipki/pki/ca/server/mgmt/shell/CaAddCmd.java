@@ -37,8 +37,11 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.security.api.util.X509Util;
 
@@ -48,13 +51,15 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "ca-add",
         description = "add CA")
+@Service
 public class CaAddCmd extends CaAddOrGenCmd {
     @Option(name = "--cert",
             description = "CA certificate file")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509CAEntry caEntry = getCAEntry();
         if (certFile != null) {

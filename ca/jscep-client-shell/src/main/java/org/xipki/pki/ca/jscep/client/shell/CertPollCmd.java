@@ -40,8 +40,10 @@ import java.security.cert.X509Certificate;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
@@ -49,6 +51,7 @@ import org.jscep.transaction.TransactionId;
 import org.jscep.util.CertificationRequestUtils;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -56,21 +59,24 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "jscep", name = "certpoll",
         description = "poll certificate")
+@Service
 public class CertPollCmd extends ClientCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 

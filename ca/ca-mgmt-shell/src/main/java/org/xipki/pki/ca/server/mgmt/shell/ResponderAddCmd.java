@@ -37,10 +37,15 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.util.X509Util;
 
@@ -50,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "responder-add",
         description = "add responder")
+@Service
 public class ResponderAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -61,6 +67,7 @@ public class ResponderAddCmd extends CaCmd {
             required = true,
             description = "type of the responder signer\n"
                     + "(required)")
+    @Completion(SignerTypeCompleter.class)
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -69,17 +76,14 @@ public class ResponderAddCmd extends CaCmd {
 
     @Option(name = "--cert",
             description = "responder certificate file")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
+    @Reference
     private PasswordResolver passwordResolver;
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
-
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         String base64Cert = null;
         X509Certificate signerCert = null;

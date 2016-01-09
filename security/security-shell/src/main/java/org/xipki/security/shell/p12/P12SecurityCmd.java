@@ -38,7 +38,9 @@ package org.xipki.security.shell.p12;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.shell.SecurityCmd;
 
 /**
@@ -50,6 +52,7 @@ public abstract class P12SecurityCmd extends SecurityCmd {
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     protected String p12File;
 
     @Option(name = "--password",

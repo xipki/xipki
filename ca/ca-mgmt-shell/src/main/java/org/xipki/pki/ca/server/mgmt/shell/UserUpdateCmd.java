@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -44,6 +45,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "user-up",
         description = "update user")
+@Service
 public class UserUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
@@ -61,7 +63,7 @@ public class UserUpdateCmd extends CaCmd {
     private String cnRegex;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if ("CONSOLE".equalsIgnoreCase(password)) {
             password = new String(readPassword());

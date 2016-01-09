@@ -43,9 +43,12 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.ConfPairs;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.util.X509Util;
@@ -53,24 +56,27 @@ import org.xipki.security.api.util.X509Util;
 /**
  * @author Lijun Liao
  */
-
+//FIXME: use different label if CA key label already exists.
 @Command(scope = "xipki-tk", name = "update-cert-p12",
         description = "update certificate in PKCS#12 keystore")
+@Service
 public class P12CertUpdateCmd extends P12SecurityCmd {
     @Option(name = "--cert",
             required = true,
             description = "certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--ca-cert",
             multiValued = true,
             description = "CA Certificate file\n"
                     + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
     private Set<String> caCertFiles;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         KeyStore ks = getKeyStore();
 

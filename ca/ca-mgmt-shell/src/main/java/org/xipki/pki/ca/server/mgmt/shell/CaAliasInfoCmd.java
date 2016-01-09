@@ -41,8 +41,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
@@ -50,12 +53,14 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "caalias-info",
         description = "show information of CA alias")
+@Service
 public class CaAliasInfoCmd extends CaCmd {
     @Argument(index = 0, name = "alias", description = "CA alias")
+    @Completion(CaAliasCompleter.class)
     private String caAlias;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> aliasNames = caManager.getCaAliasNames();
 

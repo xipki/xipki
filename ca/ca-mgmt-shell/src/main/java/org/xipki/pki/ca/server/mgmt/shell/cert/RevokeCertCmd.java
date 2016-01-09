@@ -37,10 +37,13 @@ package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.util.Date;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.DateUtil;
+import org.xipki.console.karaf.completer.ClientCRLReasonCompleter;
 import org.xipki.security.api.CRLReason;
 
 /**
@@ -49,11 +52,13 @@ import org.xipki.security.api.CRLReason;
 
 @Command(scope = "xipki-ca", name = "revoke-cert",
         description = "revoke certificate")
+@Service
 public class RevokeCertCmd extends UnRevRemoveCertCmd {
     @Option(name = "--reason", aliases = "-r",
             required = true,
             description = "CRL reason\n"
                     + "(required)")
+    @Completion(ClientCRLReasonCompleter.class)
     private String reason;
 
     @Option(name = "--inv-date",
@@ -61,7 +66,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCmd {
     private String invalidityDateS;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CRLReason crlReason = CRLReason.getInstance(reason);
         if (crlReason == null) {

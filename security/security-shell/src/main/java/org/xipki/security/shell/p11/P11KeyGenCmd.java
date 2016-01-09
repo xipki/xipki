@@ -37,13 +37,16 @@ package org.xipki.security.shell.p11;
 
 import java.io.File;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.shell.KeyGenCmd;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -74,10 +77,12 @@ public abstract class P11KeyGenCmd extends KeyGenCmd {
 
     @Option(name = "--cert-out",
             description = "where to save the self-signed certificate")
+    @Completion(FilePathCompleter.class)
     protected String outputFilename;
 
     @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected String getSubject() {

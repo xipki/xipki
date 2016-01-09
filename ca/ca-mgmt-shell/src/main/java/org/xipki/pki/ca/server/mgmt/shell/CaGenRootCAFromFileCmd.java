@@ -38,10 +38,13 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -49,11 +52,13 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "gen-rcaf",
         description = "generate selfsigned CA from configuration file")
+@Service
 public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request of the Root CA\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10ReqFile;
 
     @Option(name = "--profile",
@@ -64,10 +69,11 @@ public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd {
 
     @Option(name = "--out", aliases = "-o",
             description = "where to save the generated CA certificate")
+    @Completion(FilePathCompleter.class)
     private String rcaCertOutFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509CAEntry caEntry = getCAEntry(true);
         byte[] p10Req = IoUtil.read(p10ReqFile);

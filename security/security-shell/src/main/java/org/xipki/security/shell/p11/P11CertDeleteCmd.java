@@ -35,13 +35,16 @@
 
 package org.xipki.security.shell.p11;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -49,6 +52,7 @@ import org.xipki.security.shell.SecurityCmd;
 
 @Command(scope = "xipki-tk", name = "rm-cert",
         description = "remove certificate from PKCS#11 device")
+@Service
 public class P11CertDeleteCmd extends SecurityCmd {
     @Option(name = "--slot",
             required = true,
@@ -64,10 +68,11 @@ public class P11CertDeleteCmd extends SecurityCmd {
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);

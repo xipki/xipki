@@ -37,11 +37,15 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.File;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -49,21 +53,24 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "publisher-export",
         description = "export publisher configuration")
+@Service
 public class PublisherExportCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "publisher name\n"
                     + "(required)")
+    @Completion(PublisherNameCompleter.class)
     private String name;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the publisher configuration\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String confFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         PublisherEntry entry = caManager.getPublisher(name);
         if (entry == null) {

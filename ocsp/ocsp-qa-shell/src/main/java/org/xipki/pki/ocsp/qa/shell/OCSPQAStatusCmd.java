@@ -41,19 +41,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.HashAlgCompleter;
+import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.pki.ocsp.client.shell.BaseOCSPStatusCmd;
 import org.xipki.pki.ocsp.qa.api.Occurrence;
 import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
 import org.xipki.pki.ocsp.qa.api.OcspError;
 import org.xipki.pki.ocsp.qa.api.OcspQA;
 import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
+import org.xipki.pki.ocsp.qa.shell.completer.CertStatusCompleter;
+import org.xipki.pki.ocsp.qa.shell.completer.OccurrenceCompleter;
+import org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter;
 import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
@@ -62,48 +70,53 @@ import org.xipki.security.api.util.AlgorithmUtil;
 
 @Command(scope = "xipki-qa", name = "ocsp-status",
         description = "request certificate status (QA)")
+@Service
 public class OCSPQAStatusCmd extends BaseOCSPStatusCmd {
     @Option(name = "--exp-error",
             description = "expected error")
+    @Completion(OcspErrorCompleter.class)
     private String errorText;
 
     @Option(name = "--exp-status",
             multiValued = true,
             description = "expected status\n"
                     + "(multi-valued)")
+    @Completion(CertStatusCompleter.class)
     private List<String> statusTexts;
 
     @Option(name = "--exp-sig-alg",
             description = "expected signature algorithm")
+    @Completion(SigAlgCompleter.class)
     private String sigAlg;
 
     @Option(name = "--exp-nextupdate",
             description = "occurence of nextUpdate")
+    @Completion(OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "--exp-certhash",
             description = "occurence of certHash")
+    @Completion(OccurrenceCompleter.class)
     private String certhashOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "--exp-certhash-alg",
             description = "occurence of certHash")
+    @Completion(HashAlgCompleter.class)
     private String certhashAlg;
 
     @Option(name = "--exp-nonce",
             description = "occurence of nonce")
+    @Completion(OccurrenceCompleter.class)
     private String nonceOccurrenceText = Occurrence.optional.name();
 
+    @Reference
     private OcspQA ocspQA;
+
     private OcspError expectedOcspError;
     private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
     private Occurrence expectedNextUpdateOccurrence;
     private Occurrence expectedCerthashOccurrence;
     private Occurrence expectedNonceOccurrence;
-
-    public void setOcspQA(
-            final OcspQA ocspQA) {
-        this.ocspQA = ocspQA;
-    }
 
     @Override
     protected void checkParameters(

@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -44,6 +45,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "user-rm",
         description = "remove user")
+@Service
 public class UserRemoveCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
@@ -53,7 +55,7 @@ public class UserRemoveCmd extends CaCmd {
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removeUser(name);
         output(b, "removed", "could not remove", "user " + name);

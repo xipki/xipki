@@ -41,8 +41,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
@@ -51,8 +58,14 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.DuplicationModeCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -61,15 +74,18 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "ca-up",
         description = "update CA")
+@Service
 public class CaUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--status",
             description = "CA status")
+    @Completion(CaStatusCompleter.class)
     private String caStatus;
 
     @Option(name = "--ca-cert-uri",
@@ -100,6 +116,7 @@ public class CaUpdateCmd extends CaCmd {
             multiValued = true,
             description = "permission\n"
                     + "(multi-valued)")
+    @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
     @Option(name = "--max-validity",
@@ -116,14 +133,17 @@ public class CaUpdateCmd extends CaCmd {
 
     @Option(name = "--crl-signer",
             description = "CRL signer name or 'NULL'")
+    @Completion(CrlSignerNamePlusNullCompleter.class)
     private String crlSignerName;
 
     @Option(name = "--responder",
             description = "Responder name or 'NULL'")
+    @Completion(ResponderNamePlusNullCompleter.class)
     private String responderName;
 
     @Option(name = "--cmp-control",
             description = "CMP control name or 'NULL'")
+    @Completion(CmpControlNamePlusNullCompleter.class)
     private String cmpControlName;
 
     @Option(name = "--num-crls",
@@ -132,10 +152,12 @@ public class CaUpdateCmd extends CaCmd {
 
     @Option(name = "--cert",
             description = "CA certificate file")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--signer-type",
             description = "CA signer type")
+    @Completion(SignerTypeCompleter.class)
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -144,30 +166,30 @@ public class CaUpdateCmd extends CaCmd {
 
     @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateKeyS;
 
     @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateSubjectS;
 
     @Option(name = "--duplicate-cn",
             description = "mode of duplicate CN")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateCNS;
 
     @Option(name = "--validity-mode",
             description = "mode of valditity")
+    @Completion(ValidityModeCompleter.class)
     private String validityModeS;
 
     @Option(name = "--extra-control",
             description = "extra control")
     private String extraControl;
 
+    @Reference
     private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     protected X509ChangeCAEntry getChangeCAEntry()
     throws Exception {
@@ -282,7 +304,7 @@ public class CaUpdateCmd extends CaCmd {
     }
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.changeCA(getChangeCAEntry());
         output(b, "updated", "could not update", "CA " + caName);
