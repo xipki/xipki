@@ -100,7 +100,7 @@ public class CALoadTestRevokeCmd extends CALoadTestCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        if(dataSourceFactory == null) {
+        if (dataSourceFactory == null) {
             throw new IllegalStateException("dataSourceFactory is not available");
         }
 
