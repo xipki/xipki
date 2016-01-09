@@ -40,8 +40,10 @@ import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
@@ -50,6 +52,7 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -57,6 +60,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-cli", name = "getcrl",
         description = "download CRL")
+@Service
 public class GetCRLCmd extends CRLCmd {
     @Option(name = "--with-basecrl",
             description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
@@ -65,6 +69,7 @@ public class GetCRLCmd extends CRLCmd {
     @Option(name = "--basecrl-out",
             description = "where to save the baseCRL\n"
                     + "(defaults to <out>-baseCRL)")
+    @Completion(FilePathCompleter.class)
     private String baseCRLOut;
 
     @Override
@@ -80,7 +85,7 @@ public class GetCRLCmd extends CRLCmd {
     }
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {

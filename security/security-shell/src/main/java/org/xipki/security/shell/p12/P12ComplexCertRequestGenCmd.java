@@ -41,8 +41,10 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -52,6 +54,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ObjectIdentifiers;
@@ -64,11 +67,13 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",
         description = "generate complex PKCS#10 request with PKCS#12 keystore")
+@Service
 public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p12File;
 
     @Option(name = "--password",

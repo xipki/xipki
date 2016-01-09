@@ -39,10 +39,12 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.client.exception.ScepClientException;
@@ -56,12 +58,14 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd {
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     protected abstract EnrolmentResponse requestCertificate(
@@ -72,7 +76,7 @@ public abstract class AbstractEnrollCertCmd extends ClientCmd {
     throws ScepClientException;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         ScepClient client = getScepClient();
 

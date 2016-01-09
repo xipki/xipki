@@ -37,7 +37,8 @@ package org.xipki.pki.ca.client.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
@@ -52,9 +53,10 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-cli", name = "unrevoke",
         description = "unrevoke certificate")
+@Service
 public class UnrevokeCertCmd extends UnRevRemoveCertCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");

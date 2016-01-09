@@ -45,7 +45,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -55,10 +57,12 @@ import org.xipki.security.api.util.X509Util;
 public abstract class UnRevRemoveCertCmd extends ClientCmd {
     @Option(name = "--cert", aliases = "-c",
             description = "certificate file")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "--issuer", aliases = "-i",
             description = "issuer certificate file")
+    @Completion(FilePathCompleter.class)
     protected String issuerCertFile;
 
     @Option(name = "--serial", aliases = "-s",

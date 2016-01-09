@@ -44,7 +44,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -72,10 +74,16 @@ import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.ExtKeyusageCompleter;
+import org.xipki.console.karaf.completer.ExtensionNameCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.HashAlgCompleter;
+import org.xipki.console.karaf.completer.KeyusageCompleter;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ExtensionExistence;
@@ -108,6 +116,7 @@ public abstract class EnrollCertCmd extends ClientCmd {
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Option(name = "--user",
@@ -131,18 +140,21 @@ public abstract class EnrollCertCmd extends ClientCmd {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--keyusage",
             multiValued = true,
             description = "keyusage\n"
                     + "(multi-valued)")
+    @Completion(KeyusageCompleter.class)
     private List<String> keyusages;
 
     @Option(name = "--ext-keyusage",
             multiValued = true,
             description = "extended keyusage\n"
                     + "(multi-valued)")
+    @Completion(ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
     @Option(name = "--subject-alt-name",
@@ -169,10 +181,12 @@ public abstract class EnrollCertCmd extends ClientCmd {
 
     @Option(name = "--biometric-hash",
             description = "Biometric hash algorithm")
+    @Completion(HashAlgCompleter.class)
     private String biometricHashAlgo;
 
     @Option(name = "--biometric-file",
             description = "Biometric hash algorithm")
+    @Completion(FilePathCompleter.class)
     private String biometricFile;
 
     @Option(name = "--biometric-uri",
@@ -184,6 +198,7 @@ public abstract class EnrollCertCmd extends ClientCmd {
             description = "type (OID or name) of extension that must be contaied in the"
                     + " certificate\n"
                     + "(multi-valued)")
+    @Completion(ExtensionNameCompleter.class)
     private List<String> needExtensionTypes;
 
     @Option(name = "--want-extension",
@@ -191,14 +206,11 @@ public abstract class EnrollCertCmd extends ClientCmd {
             description = "type (OID or name) of extension that should be contaied in the"
                     + " certificate if possible\n"
                     + "(multi-valued)")
+    @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
-    }
 
     protected abstract ConcurrentContentSigner getSigner(
             String hashAlgo,
@@ -206,7 +218,7 @@ public abstract class EnrollCertCmd extends ClientCmd {
     throws SignerException;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         EnrollCertRequestType request = new EnrollCertRequestType(
                 EnrollCertRequestType.Type.CERT_REQ);

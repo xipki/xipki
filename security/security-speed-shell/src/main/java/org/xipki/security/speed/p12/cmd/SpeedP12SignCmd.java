@@ -35,7 +35,7 @@
 
 package org.xipki.security.speed.p12.cmd;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.speed.cmd.SingleSpeedCmd;
 
 /**

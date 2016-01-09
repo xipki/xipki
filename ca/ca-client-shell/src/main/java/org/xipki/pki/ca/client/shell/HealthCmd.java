@@ -37,10 +37,13 @@ package org.xipki.pki.ca.client.shell;
 
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -48,11 +51,13 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-cli", name = "health",
         description = "check healty status of CA")
+@Service
 public class HealthCmd extends ClientCmd {
 
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if multiple CAs are configured)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -60,7 +65,7 @@ public class HealthCmd extends ClientCmd {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {

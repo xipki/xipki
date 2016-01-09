@@ -35,10 +35,13 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -46,16 +49,18 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-tk", name = "validate-req",
         description = "Validate PKCS#10 request")
+@Service
 public class CertRequestValidateCmd extends SecurityCmd {
 
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));

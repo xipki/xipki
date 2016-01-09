@@ -39,10 +39,13 @@ import java.io.File;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.jscep.client.Client;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -51,21 +54,24 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "jscep", name = "getcrl",
         description = "download CRL")
+@Service
 public class GetCRLCmd extends ClientCmd {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509Certificate cert = X509Util.parseCert(new File(certFile));
         Client client = getScepClient();

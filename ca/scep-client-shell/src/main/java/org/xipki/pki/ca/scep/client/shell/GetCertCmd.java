@@ -40,10 +40,13 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.ScepClient;
 
 /**
@@ -52,6 +55,7 @@ import org.xipki.scep.client.ScepClient;
 
 @Command(scope = "scep", name = "getcert",
         description = "download certificate")
+@Service
 public class GetCertCmd extends ClientCmd {
     @Option(name = "--serial", aliases = "-s",
             required = true,
@@ -63,10 +67,11 @@ public class GetCertCmd extends ClientCmd {
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);

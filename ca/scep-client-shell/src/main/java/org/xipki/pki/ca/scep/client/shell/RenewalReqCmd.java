@@ -38,7 +38,8 @@ package org.xipki.pki.ca.scep.client.shell;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
@@ -50,6 +51,7 @@ import org.xipki.scep.client.exception.ScepClientException;
 
 @Command(scope = "scep", name = "renewal-req",
         description = "enroll certificate via messageType RenewalReq")
+@Service
 public class RenewalReqCmd extends AbstractEnrollCertCmd {
 
     @Override
