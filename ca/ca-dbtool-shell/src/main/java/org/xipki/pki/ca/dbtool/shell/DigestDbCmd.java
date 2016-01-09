@@ -35,10 +35,12 @@
 
 package org.xipki.pki.ca.dbtool.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.password.api.PasswordResolver;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
@@ -48,16 +50,19 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 @Command(scope = "xipki-db", name = "digest-db",
         description = "digest XiPKI/EJBCA database")
+@Service
 public class DigestDbCmd extends DbPortCmd {
     @Option(name = "--db-conf",
             required = true,
             description = "database configuration file")
+    @Completion(FilePathCompleter.class)
     private String dbconfFile;
 
     @Option(name = "--out-dir",
             required = true,
             description = "output directory\n"
                     + "(required)")
+    @Completion(DirPathCompleter.class)
     private String outdir;
 
     @Option(name = "-k",
@@ -67,9 +72,6 @@ public class DigestDbCmd extends DbPortCmd {
     @Option(name = "--threads",
             description = "number of threads to query the database")
     private Integer numThreads = 10;
-
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
 
     @Override
     protected DbPortWorker getDbPortWorker()
@@ -83,13 +85,4 @@ public class DigestDbCmd extends DbPortCmd {
                 numThreads);
     }
 
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory) {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 }

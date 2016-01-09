@@ -39,11 +39,16 @@ import java.io.File;
 import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -51,29 +56,34 @@ import org.xipki.common.util.IoUtil;
 
 @Command(scope = "xipki-ca", name = "enroll-cert",
         description = "enroll certificate")
+@Service
 public class EnrollCertCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p10File;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outFile;
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "profile name\n"
                     + "(required)")
+    @Completion(ProfileNameCompleter.class)
     private String profileName;
 
     @Option(name = "--user",
@@ -81,7 +91,7 @@ public class EnrollCertCmd extends CaCmd {
     private String user;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CAEntry ca = caManager.getCA(caName);
         if (ca == null) {

@@ -35,9 +35,12 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -45,12 +48,14 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "ca-unrevoke",
         description = "unrevoke CA")
+@Service
 public class CaUnrevokeCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (!caManager.getCaNames().contains(caName)) {
             throw new IllegalCmdParamException("invalid CA name " + caName);

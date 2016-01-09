@@ -45,7 +45,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -77,6 +78,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ocsp", name = "status",
         description = "request certificate status")
+@Service
 public class OCSPStatusCmd extends BaseOCSPStatusCmd {
     @Override
     protected void checkParameters(

@@ -37,8 +37,10 @@ package org.xipki.security.shell.p11;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.SecurityFactoryImpl;
@@ -48,6 +50,7 @@ import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.shell.CertRequestGenCmd;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -55,6 +58,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
 
 @Command(scope = "xipki-tk", name = "req",
         description = "generate PKCS#10 request with PKCS#11 device")
+@Service
 public class P11CertRequestGenCmd extends CertRequestGenCmd {
     @Option(name = "--slot",
             required = true,
@@ -74,6 +78,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCmd {
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
+    @Completion(P11ModuleNameCompleter.class)
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     private P11KeyIdentifier getKeyIdentifier()

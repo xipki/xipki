@@ -35,8 +35,12 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -44,21 +48,24 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "capub-rm",
         description = "remove publisher from CA")
+@Service
 public class CaPublisherRemoveCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--publisher",
             required = true,
             description = "publisher name\n"
                     + "(required)")
+    @Completion(PublisherNameCompleter.class)
     private String publisherName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removePublisherFromCA(publisherName, caName);
         output(b, "removed", "could not remove",

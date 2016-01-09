@@ -37,7 +37,8 @@ package org.xipki.pki.ca.qa.shell;
 
 import java.security.cert.X509CRL;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.common.RequestResponseDebug;
@@ -48,6 +49,7 @@ import org.xipki.common.RequestResponseDebug;
 
 @Command(scope = "xipki-qa", name = "neg-gencrl",
         description = "generate CRL (negative, for QA)")
+@Service
 public class NegGenCRLCmd extends NegCRLCmd {
 
     @Override

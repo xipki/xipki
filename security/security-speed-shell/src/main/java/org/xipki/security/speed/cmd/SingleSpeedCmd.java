@@ -35,7 +35,7 @@
 
 package org.xipki.security.speed.cmd;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.LoadExecutor;
 
 /**
@@ -56,7 +56,7 @@ public abstract class SingleSpeedCmd extends SecurityCmd {
     throws Exception;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         LoadExecutor tester = getTester();
         tester.setDuration(durationInSecond);

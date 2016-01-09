@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CRLControl;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -48,9 +49,10 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "crlsigner-check",
         description = "check information of CRL signers (QA)")
+@Service
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
         String name = ey.getName();

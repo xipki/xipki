@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 
 /**
@@ -45,6 +46,7 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 
 @Command(scope = "xipki-ca", name = "user-add",
         description = "add user")
+@Service
 public class UserAddCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
@@ -63,7 +65,7 @@ public class UserAddCmd extends CaCmd {
     private String cnRegex;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (password == null) {
             password = new String(readPassword());

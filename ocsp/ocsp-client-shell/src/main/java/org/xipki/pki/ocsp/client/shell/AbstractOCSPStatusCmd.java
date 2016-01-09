@@ -37,9 +37,14 @@ package org.xipki.pki.ocsp.client.shell;
 
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.HashAlgCompleter;
+import org.xipki.console.karaf.completer.SigAlgCompleter;
 import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.security.api.util.AlgorithmUtil;
@@ -48,11 +53,12 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport {
+public abstract class AbstractOCSPStatusCmd extends XipkiCommandSupport {
     @Option(name = "--issuer", aliases = "-i",
             required = true,
             description = "issuer certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     protected String issuerCertFile;
 
     @Option(name = "--nonce",
@@ -65,12 +71,14 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport {
 
     @Option(name = "--hash",
             description = "hash algorithm name")
+    @Completion(HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--sig-alg",
             multiValued = true,
             description = "comma-separated preferred signature algorithms\n"
                     + "(multi-valued)")
+    @Completion(SigAlgCompleter.class)
     protected List<String> prefSigAlgs;
 
     @Option(name = "--http-get",
@@ -81,6 +89,7 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport {
             description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
+    @Reference
     protected OCSPRequestor requestor;
 
     protected RequestOptions getRequestOptions()
@@ -101,12 +110,4 @@ public abstract class AbstractOCSPStatusCmd extends XipkiOsgiCommandSupport {
         return options;
     }
 
-    public OCSPRequestor getRequestor() {
-        return requestor;
-    }
-
-    public void setRequestor(
-            final OCSPRequestor requestor) {
-        this.requestor = requestor;
-    }
 }

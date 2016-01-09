@@ -35,12 +35,14 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
-import org.xipki.console.karaf.EnumCompleter;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.EnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class PermissionCompleter extends EnumCompleter {
 
     public PermissionCompleter() {

@@ -41,9 +41,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
 /**
@@ -52,6 +53,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
 @Command(scope = "xipki-ca", name = "profile-info",
         description = "show information of certifiate profile")
+@Service
 public class ProfileInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
@@ -61,7 +63,7 @@ public class ProfileInfoCmd extends CaCmd {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         StringBuilder sb = new StringBuilder();
 

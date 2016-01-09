@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.CmpControlRemoveCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.CmpControlRemoveCmd;
 
 /**
  * @author Lijun Liao
@@ -45,15 +46,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-cmpcontrol-rm",
         description = "remove CMP control (negative, QA)")
+@Service
 public class NegCmpControlRemoveCmd extends CmpControlRemoveCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("neg-cmpcontrol-rm");
 
         try {
-            super._doExecute();
+            super.doExecute();
         } catch (Exception e) {
             return null;
         }

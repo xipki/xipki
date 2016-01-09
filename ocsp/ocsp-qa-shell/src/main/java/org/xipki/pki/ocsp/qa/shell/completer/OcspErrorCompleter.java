@@ -35,13 +35,14 @@
 
 package org.xipki.pki.ocsp.qa.shell.completer;
 
-import org.xipki.console.karaf.EnumCompleter;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.EnumCompleter;
 import org.xipki.pki.ocsp.qa.api.OcspError;
 
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class OcspErrorCompleter extends EnumCompleter {
     public OcspErrorCompleter() {
         StringBuilder enums = new StringBuilder();

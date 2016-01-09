@@ -35,8 +35,12 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -44,21 +48,24 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "careq-rm",
         description = "remove requestor from CA")
+@Service
 public class CaRequestorRemoveCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--requestor",
             required = true,
             description = "requestor name\n"
                     + "(required)")
+    @Completion(RequestorNameCompleter.class)
     private String requestorName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
         output(b, "removed", "could not remove",

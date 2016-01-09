@@ -37,7 +37,8 @@ package org.xipki.pki.ca.dbtool.shell;
 
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**
@@ -46,11 +47,12 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 @Command(scope = "xipki-db", name = "updatedb-ocsp",
         description = "update the OCSP database schema")
+@Service
 public class UpdateDbOcspCmd extends LiquibaseCmd {
     private static final String schemaFile = "xipki/sql/ocsp-init.xml";
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 

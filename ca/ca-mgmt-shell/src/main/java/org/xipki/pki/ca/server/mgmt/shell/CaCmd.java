@@ -38,20 +38,18 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.util.Collection;
 
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class CaCmd extends XipkiOsgiCommandSupport {
-    protected CAManager caManager;
+public abstract class CaCmd extends XipkiCommandSupport {
 
-    public void setCaManager(
-            final CAManager caManager) {
-        this.caManager = caManager;
-    }
+    @Reference
+    protected CAManager caManager;
 
     protected static String getRealString(
             final String s) {

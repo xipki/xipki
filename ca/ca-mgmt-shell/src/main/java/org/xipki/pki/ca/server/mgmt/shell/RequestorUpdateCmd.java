@@ -37,10 +37,13 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -49,6 +52,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "requestor-up",
         description = "update requestor")
+@Service
 public class RequestorUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -60,10 +64,11 @@ public class RequestorUpdateCmd extends CaCmd {
             required = true,
             description = "requestor certificate file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         // check if the certificate is valid
         byte[] certBytes = IoUtil.read(certFile);

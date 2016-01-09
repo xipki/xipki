@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -43,10 +44,11 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "notify-change",
         description = "notify the change of CA system")
+@Service
 public class CaSystemNotifyChangeCmd extends CaCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.notifyCAChange();
         output(b, "notified", "could not notify", "the change of CA system");

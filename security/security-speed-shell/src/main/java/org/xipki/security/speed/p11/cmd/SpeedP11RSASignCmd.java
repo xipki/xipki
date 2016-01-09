@@ -35,8 +35,8 @@
 
 package org.xipki.security.speed.p11.cmd;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.speed.p11.P11RSASignLoadTest;

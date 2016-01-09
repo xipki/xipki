@@ -37,9 +37,10 @@ package org.xipki.pki.ca.client.shell;
 
 import java.security.cert.X509CRL;
 
-import org.apache.karaf.shell.commands.Command;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.RequestResponseDebug;
 
 /**
@@ -48,6 +49,7 @@ import org.xipki.common.RequestResponseDebug;
 
 @Command(scope = "xipki-cli", name = "gencrl",
         description = "generate CRL")
+@Service
 public class GenCRLCmd extends CRLCmd {
     @Override
     protected X509CRL retrieveCRL(

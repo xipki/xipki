@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -44,12 +45,13 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "profile-rm",
         description = "remove certifiate profile")
+@Service
 public class ProfileRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removeCertprofile(name);
         output(b, "removed", "could not remove", "certificate profile " + name);

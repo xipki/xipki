@@ -35,13 +35,15 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.EnumCompleter;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.console.karaf.EnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class DuplicationModeCompleter extends EnumCompleter {
     public DuplicationModeCompleter() {
         StringBuilder enums = new StringBuilder();

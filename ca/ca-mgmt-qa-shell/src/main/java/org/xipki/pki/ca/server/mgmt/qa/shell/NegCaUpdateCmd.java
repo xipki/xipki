@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 
 /**
  * @author Lijun Liao
@@ -45,14 +46,15 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-ca-up",
         description = "update CA")
+@Service
 public class NegCaUpdateCmd extends CaUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("neg-ca-up");
 
         try {
-            super._doExecute();
+            super.doExecute();
         } catch (Exception e) {
             return null;
         }

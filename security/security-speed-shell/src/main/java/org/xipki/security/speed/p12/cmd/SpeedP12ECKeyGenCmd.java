@@ -35,9 +35,11 @@
 
 package org.xipki.security.speed.p12.cmd;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.LoadExecutor;
+import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.security.speed.cmd.SingleSpeedCmd;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
@@ -52,6 +54,7 @@ public class SpeedP12ECKeyGenCmd extends SingleSpeedCmd {
             required = true,
             description = "EC curve name\n"
                     + "(required)")
+    @Completion(ECCurveNameCompleter.class)
     private String curveName;
 
     @Override

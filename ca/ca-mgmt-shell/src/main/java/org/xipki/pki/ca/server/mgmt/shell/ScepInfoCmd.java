@@ -37,9 +37,12 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.rmi.UnexpectedException;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -47,15 +50,17 @@ import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 
 @Command(scope = "xipki-ca", name = "scep-info",
         description = "show information of SCEP")
+@Service
 public class ScepInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "SCEP CA name\n"
                     + "(required)")
+    @Completion(ScepNameCompleter.class)
     private String name;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         ScepEntry scep = caManager.getScepEntry(name);
         if (scep == null) {

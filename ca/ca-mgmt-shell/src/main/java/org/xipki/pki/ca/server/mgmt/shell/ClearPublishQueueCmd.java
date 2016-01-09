@@ -37,8 +37,12 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 
 /**
  * @author Lijun Liao
@@ -46,21 +50,24 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "clear-publishqueue",
         description = "clear publish queue")
+@Service
 public class ClearPublishQueueCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"
                     + "(required)")
+    @Completion(CaNamePlusAllCompleter.class)
     private String caName;
 
     @Option(name = "--publisher",
         required = true, multiValued = true,
         description = "publisher name or 'all' for all publishers\n"
                     + "(required, multi-valued)")
+    @Completion(PublisherNamePlusAllCompleter.class)
     private List<String> publisherNames;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean allPublishers = false;
         for (String publisherName : publisherNames) {

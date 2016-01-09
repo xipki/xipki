@@ -40,12 +40,16 @@ import java.io.File;
 import java.rmi.UnexpectedException;
 import java.util.Properties;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.CertRevocationInfo;
 
 /**
@@ -54,6 +58,7 @@ import org.xipki.security.api.CertRevocationInfo;
 
 @Command(scope = "xipki-ca", name = "ca-export",
         description = "export CA configuration")
+@Service
 public class CaExportCmd extends CaCmd {
     static final String KEY_ART = "ART";
 
@@ -111,16 +116,18 @@ public class CaExportCmd extends CaCmd {
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String name;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the CA configuration\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String confFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CAEntry _entry = caManager.getCA(name);
         if (_entry == null) {

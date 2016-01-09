@@ -35,10 +35,14 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -46,12 +50,14 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 
 @Command(scope = "xipki-ca", name = "publisher-up",
         description = "update publisher")
+@Service
 public class PublisherUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "publisher name\n"
                     + "(required)")
+    @Completion(PublisherNameCompleter.class)
     protected String name;
 
     @Option(name = "--type",
@@ -64,10 +70,11 @@ public class PublisherUpdateCmd extends CaCmd {
 
     @Option(name = "--conf-file",
             description = "profile configuration file")
+    @Completion(FilePathCompleter.class)
     protected String confFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (type == null && conf == null && confFile == null) {
             throw new IllegalCmdParamException("nothing to update");

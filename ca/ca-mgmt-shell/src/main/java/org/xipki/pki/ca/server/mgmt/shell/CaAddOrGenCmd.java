@@ -39,16 +39,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.DuplicationModeCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 
 /**
  * @author Lijun Liao
@@ -63,6 +73,7 @@ public abstract class CaAddOrGenCmd extends CaCmd {
 
     @Option(name = "--status",
             description = "CA status")
+    @Completion(CaStatusCompleter.class)
     private String caStatus = "active";
 
     @Option(name = "--ca-cert-uri",
@@ -93,6 +104,7 @@ public abstract class CaAddOrGenCmd extends CaCmd {
             required = true, multiValued = true,
             description = "permission\n"
                     + "(required, multi-valued)")
+    @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
     @Option(name = "--next-serial",
@@ -119,14 +131,17 @@ public abstract class CaAddOrGenCmd extends CaCmd {
 
     @Option(name = "--crl-signer",
             description = "CRL signer name")
+    @Completion(CrlSignerNameCompleter.class)
     private String crlSignerName;
 
     @Option(name = "--responder",
             description = "Responder name")
+    @Completion(ResponderNameCompleter.class)
     private String responderName;
 
     @Option(name = "--cmp-control",
             description = "CMP control name")
+    @Completion(CmpControlNameCompleter.class)
     private String cmpControlName;
 
     @Option(name = "--num-crls",
@@ -141,6 +156,7 @@ public abstract class CaAddOrGenCmd extends CaCmd {
             required = true,
             description = "CA signer type\n"
                     + "(required)")
+    @Completion(SignerTypeCompleter.class)
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -149,30 +165,30 @@ public abstract class CaAddOrGenCmd extends CaCmd {
 
     @Option(name = "--duplicate-key",
             description = "mode of duplicate key")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateKeyS = "permitted";
 
     @Option(name = "--duplicate-subject",
             description = "mode of duplicate subject")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateSubjectS = "permitted";
 
     @Option(name = "--duplicate-cn",
             description = "mode of duplicateCN")
+    @Completion(DuplicationModeCompleter.class)
     private String duplicateCNS = "permitted";
 
     @Option(name = "--validity-mode",
             description = "mode of valditity")
+    @Completion(ValidityModeCompleter.class)
     private String validityModeS = "STRICT";
 
     @Option(name = "--extra-control",
             description = "extra control")
     private String extraControl;
 
+    @Reference
     private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     protected X509CAEntry getCAEntry()
     throws Exception {

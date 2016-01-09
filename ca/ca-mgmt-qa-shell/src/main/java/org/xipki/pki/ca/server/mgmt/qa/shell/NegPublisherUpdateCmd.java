@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
 
 /**
  * @author Lijun Liao
@@ -45,15 +46,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-up",
         description = "update publisher (negative, QA)")
+@Service
 public class NegPublisherUpdateCmd extends PublisherUpdateCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("neg-publisher-up");
 
         try {
-            super._doExecute();
+            super.doExecute();
         } catch (Exception e) {
             return null;
         }

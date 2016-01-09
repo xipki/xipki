@@ -35,8 +35,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
@@ -44,12 +47,14 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "caalias-rm",
         description = "remove CA alias")
+@Service
 public class CaAliasRemoveCmd extends CaCmd {
     @Argument(index = 0, name = "alias", description = "CA alias", required = true)
+    @Completion(CaAliasCompleter.class)
     private String caAlias;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.removeCaAlias(caAlias);
         output(b, "removed", "could not remove", "CA alias " + caAlias);

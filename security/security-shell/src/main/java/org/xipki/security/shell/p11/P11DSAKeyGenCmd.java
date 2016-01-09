@@ -35,8 +35,9 @@
 
 package org.xipki.security.shell.p11;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
@@ -48,6 +49,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 @Command(scope = "xipki-tk", name = "dsa",
         description = "generate DSA keypair in PKCS#11 device")
+@Service
 public class P11DSAKeyGenCmd extends P11KeyGenCmd {
     @Option(name = "--plen",
             description = "bit length of the prime")
@@ -58,7 +60,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCmd {
     private Integer qLen;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (pLen % 1024 != 0) {
             throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);

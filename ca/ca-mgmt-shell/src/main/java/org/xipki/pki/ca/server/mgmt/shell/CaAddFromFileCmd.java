@@ -43,8 +43,11 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
@@ -56,6 +59,7 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.CertRevocationInfo;
 import org.xipki.security.api.util.X509Util;
@@ -66,6 +70,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "ca-addf",
         description = "add CA from configuration file")
+@Service
 public class CaAddFromFileCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -77,17 +82,14 @@ public class CaAddFromFileCmd extends CaCmd {
             required = true,
             description = "CA configuration file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String confFile;
 
+    @Reference
     private PasswordResolver passwordResolver;
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
-
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509CAEntry caEntry = getCAEntry(false);
 

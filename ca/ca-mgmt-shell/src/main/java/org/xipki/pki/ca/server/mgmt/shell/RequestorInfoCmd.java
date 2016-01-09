@@ -41,10 +41,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -52,8 +55,10 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 @Command(scope = "xipki-ca", name = "requestor-info",
         description = "show information of requestor")
+@Service
 public class RequestorInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "requestor name")
+    @Completion(RequestorNameCompleter.class)
     private String name;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -61,7 +66,7 @@ public class RequestorInfoCmd extends CaCmd {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         StringBuilder sb = new StringBuilder();
 

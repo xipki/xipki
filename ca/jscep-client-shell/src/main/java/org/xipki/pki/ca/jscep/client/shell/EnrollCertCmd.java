@@ -38,7 +38,8 @@ package org.xipki.pki.ca.jscep.client.shell;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.ClientException;
@@ -51,6 +52,7 @@ import org.jscep.transaction.TransactionException;
 
 @Command(scope = "jscep", name = "enroll",
         description = "enroll certificate via automic selected messageType")
+@Service
 public class EnrollCertCmd extends AbstractEnrollCertCmd {
 
     @Override

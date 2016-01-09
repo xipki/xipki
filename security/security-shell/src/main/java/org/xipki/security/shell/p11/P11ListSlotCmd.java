@@ -44,8 +44,10 @@ import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
@@ -65,6 +67,7 @@ import org.xipki.security.api.util.X509Util;
 import org.xipki.security.p11.iaik.IaikP11Slot;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
 import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
@@ -79,6 +82,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 @Command(scope = "xipki-tk", name = "list",
         description = "list objects in PKCS#11 device")
+@Service
 public class P11ListSlotCmd extends SecurityCmd {
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")
@@ -86,6 +90,7 @@ public class P11ListSlotCmd extends SecurityCmd {
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--slot",
@@ -93,7 +98,7 @@ public class P11ListSlotCmd extends SecurityCmd {
     private Integer slotIndex;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         P11Module module = getP11Module(moduleName);
         if (module == null) {

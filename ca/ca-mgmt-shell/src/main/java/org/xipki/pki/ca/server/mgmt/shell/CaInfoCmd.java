@@ -41,10 +41,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.common.util.CollectionUtil;
 
 /**
@@ -53,8 +56,10 @@ import org.xipki.common.util.CollectionUtil;
 
 @Command(scope = "xipki-ca", name = "ca-info",
         description = "show information of CA")
+@Service
 public class CaInfoCmd extends CaCmd {
     @Argument(index = 0, name = "name", description = "CA name")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -62,7 +67,7 @@ public class CaInfoCmd extends CaCmd {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         StringBuilder sb = new StringBuilder();
 

@@ -37,14 +37,19 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.util.X509Util;
 
@@ -54,15 +59,18 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "scep-up",
         description = "Update SCEP")
+@Service
 public class ScepUpdateCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(ScepNameCompleter.class)
     private String caName;
 
     @Option(name = "--resp-type",
             description = "type of the responder")
+    @Completion(SignerTypeCompleter.class)
     private String responderType;
 
     @Option(name = "--resp-conf",
@@ -71,6 +79,7 @@ public class ScepUpdateCmd extends CaCmd {
 
     @Option(name = "--resp-cert",
             description = "responder certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--control",
@@ -102,7 +111,7 @@ public class ScepUpdateCmd extends CaCmd {
     }
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         String certConf = null;
         if (CAManager.NULL.equalsIgnoreCase(certFile)) {

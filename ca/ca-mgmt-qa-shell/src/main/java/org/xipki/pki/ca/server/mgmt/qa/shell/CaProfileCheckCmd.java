@@ -38,10 +38,14 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 import java.rmi.UnexpectedException;
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -49,17 +53,20 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "caprofile-check",
         description = "check information of certificate profiles in given CA (QA)")
+@Service
 public class CaProfileCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--profile",
             required = true,
             description = "profile profileName\n"
                 + "(required)")
+    @Completion(ProfileNameCompleter.class)
     private String profileName;
 
     @Option(name = "--local-name",
@@ -68,7 +75,7 @@ public class CaProfileCheckCmd extends CaCmd {
     private String profileLocalname;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking CA profile CA='" + caName +  "', profile='" + profileName + "'");
 

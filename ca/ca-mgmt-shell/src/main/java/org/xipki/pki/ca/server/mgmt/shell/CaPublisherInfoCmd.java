@@ -38,9 +38,12 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.rmi.UnexpectedException;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -48,15 +51,17 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 @Command(scope = "xipki-ca", name = "capub-info",
         description = "show information of publisher in given CA")
+@Service
 public class CaPublisherInfoCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         if (caManager.getCA(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");

@@ -47,17 +47,19 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class ClientCmd extends XipkiOsgiCommandSupport {
+public abstract class ClientCmd extends XipkiCommandSupport {
     @Option(name = "--url",
             required = true,
             description = "URL of the SCEP server\n"
@@ -72,12 +74,14 @@ public abstract class ClientCmd extends XipkiOsgiCommandSupport {
             required = true,
             description = "CA certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String caCertFile;
 
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String p12File;
 
     @Option(name = "--password",

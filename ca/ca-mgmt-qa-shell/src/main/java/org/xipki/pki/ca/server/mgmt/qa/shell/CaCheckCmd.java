@@ -40,7 +40,8 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.ConfPairs;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -59,9 +60,10 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 
 @Command(scope = "xipki-caqa", name = "ca-check",
         description = "check information of CAs (QA)")
+@Service
 public class CaCheckCmd extends CaUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         X509ChangeCAEntry ey = getChangeCAEntry();
         String caName = ey.getName();

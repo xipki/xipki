@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
@@ -47,9 +48,10 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "cmpcontrol-check",
         description = "show information of CMP control (QA)")
+@Service
 public class CmpControlCheckCmd extends CmpControlUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking CMP control " + name);
 

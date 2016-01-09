@@ -35,8 +35,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -44,6 +45,7 @@ import org.apache.karaf.shell.commands.Option;
 
 @Command(scope = "xipki-ca", name = "env-up",
         description = "update CA environment parameter")
+@Service
 public class EnvUpdateCmd extends CaCmd {
 
     @Option(name = "--name", aliases = "-n",
@@ -59,7 +61,7 @@ public class EnvUpdateCmd extends CaCmd {
     protected String value;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.changeEnvParam(name, value);
         output(b, "updated", "could not update",

@@ -37,7 +37,8 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.rmi.UnexpectedException;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -45,9 +46,10 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "unlock",
         description = "unlock CA system")
+@Service
 public class CaSystemUnlockCmd extends CaCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean unlocked = caManager.unlockCA();
 

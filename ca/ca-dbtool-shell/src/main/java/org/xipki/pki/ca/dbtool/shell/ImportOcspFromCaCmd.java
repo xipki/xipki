@@ -35,10 +35,12 @@
 
 package org.xipki.pki.ca.dbtool.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.password.api.PasswordResolver;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.completer.DirPathCompleter;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 import org.xipki.pki.ca.dbtool.port.OcspFromCaDbImportWorker;
 
@@ -48,18 +50,21 @@ import org.xipki.pki.ca.dbtool.port.OcspFromCaDbImportWorker;
 
 @Command(scope = "xipki-db", name = "import-ocspfromca",
         description = "import OCSP database from CA data")
+@Service
 public class ImportOcspFromCaCmd extends DbPortCmd {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
     private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
     @Option(name = "--db-conf",
             description = "database configuration file")
+    @Completion(FilePathCompleter.class)
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "--in-dir",
             required = true,
             description = "input directory\n"
                     + "(required)")
+    @Completion(DirPathCompleter.class)
     private String indir;
 
     @Option(name = "--publisher",
@@ -77,9 +82,6 @@ public class ImportOcspFromCaCmd extends DbPortCmd {
             description = "just test the import, no real import")
     private Boolean testOnly = Boolean.FALSE;
 
-    private DataSourceFactory dataSourceFactory;
-    private PasswordResolver passwordResolver;
-
     @Override
     protected DbPortWorker getDbPortWorker()
     throws Exception {
@@ -88,13 +90,4 @@ public class ImportOcspFromCaCmd extends DbPortCmd {
                 indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
     }
 
-    public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory) {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 }

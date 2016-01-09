@@ -39,15 +39,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.datasource.api.DataSourceFactory;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class DbPortCmd extends XipkiOsgiCommandSupport {
+public abstract class DbPortCmd extends XipkiCommandSupport {
+
+    @Reference
+    protected DataSourceFactory dataSourceFactory;
+
+    @Reference
+    protected PasswordResolver passwordResolver;
 
     public DbPortCmd() {
     }
@@ -55,7 +64,7 @@ public abstract class DbPortCmd extends XipkiOsgiCommandSupport {
     protected abstract DbPortWorker getDbPortWorker()
     throws Exception;
 
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         DbPortWorker myRun = getDbPortWorker();

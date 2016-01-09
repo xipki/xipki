@@ -35,7 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.cert;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
@@ -43,9 +44,10 @@ import org.apache.karaf.shell.commands.Command;
 
 @Command(scope = "xipki-ca", name = "remove-cert",
         description = "remove certificate")
+@Service
 public class RemoveCertCmd extends UnRevRemoveCertCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean successful =
                 caManager.removeCertificate(caName, getSerialNumber());

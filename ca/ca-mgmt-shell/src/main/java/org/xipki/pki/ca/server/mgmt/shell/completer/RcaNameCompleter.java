@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 
@@ -46,6 +47,7 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
  * @author Lijun Liao
  */
 
+@Service
 public class RcaNameCompleter extends MgmtNameCompleter {
 
     @Override

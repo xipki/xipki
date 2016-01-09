@@ -12,6 +12,9 @@
   <artifactId>ca-mgmt-shell</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <Karaf-Commands>*</Karaf-Commands>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

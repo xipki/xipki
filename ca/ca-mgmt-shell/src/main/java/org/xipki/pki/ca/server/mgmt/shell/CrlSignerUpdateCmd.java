@@ -37,15 +37,21 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -54,15 +60,18 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "crlsigner-up",
         description = "update CRL signer")
+@Service
 public class CrlSignerUpdateCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"
                     + "(required)")
+    @Completion(CrlSignerNameCompleter.class)
     private String name;
 
     @Option(name = "--signer-type",
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
+    @Completion(CrlSignerNamePlusNullCompleter.class)
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -71,18 +80,15 @@ public class CrlSignerUpdateCmd extends CaCmd {
 
     @Option(name = "--cert",
             description = "CRL signer's certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
     private String signerCert;
 
     @Option(name = "--control",
             description = "CRL control")
     private String crlControl;
 
+    @Reference
     private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry()
     throws Exception {
@@ -118,7 +124,7 @@ public class CrlSignerUpdateCmd extends CaCmd {
     }
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         boolean b = caManager.changeCrlSigner(getCrlSignerChangeEntry());
         output(b, "updated", "could not update", "CRL signer " + name);

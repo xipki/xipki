@@ -37,10 +37,13 @@ package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+
 /**
  * @author Lijun Liao
  */
 
+@Service
 public class CaAliasCompleter extends MgmtNameCompleter {
 
     @Override

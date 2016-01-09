@@ -38,7 +38,9 @@ package org.xipki.security.shell.p12;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.shell.KeyGenCmd;
 
@@ -57,10 +59,12 @@ public abstract class P12KeyGenCmd extends KeyGenCmd {
             required = true,
             description = "where to save the key\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     protected String keyOutFile;
 
     @Option(name = "--cert-out",
             description = "where to save the self-signed certificate")
+    @Completion(FilePathCompleter.class)
     protected String certOutFile;
 
     @Option(name = "--password",

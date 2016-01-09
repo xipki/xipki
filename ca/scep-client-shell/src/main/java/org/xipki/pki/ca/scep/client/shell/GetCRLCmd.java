@@ -38,11 +38,14 @@ package org.xipki.pki.ca.scep.client.shell;
 import java.io.File;
 import java.security.cert.X509CRL;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.scep.client.ScepClient;
 
 /**
@@ -51,21 +54,24 @@ import org.xipki.scep.client.ScepClient;
 
 @Command(scope = "scep", name = "getcrl",
         description = "download CRL")
+@Service
 public class GetCRLCmd extends ClientCmd {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
         ScepClient client = getScepClient();

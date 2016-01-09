@@ -35,11 +35,16 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -48,6 +53,7 @@ import org.xipki.security.api.util.X509Util;
 
 @Command(scope = "xipki-ca", name = "crlsigner-add",
         description = "add CRL signer")
+@Service
 public class CrlSignerAddCmd extends CaCmd {
     @Option(name = "--name", aliases = "-n",
             required = true,
@@ -59,6 +65,7 @@ public class CrlSignerAddCmd extends CaCmd {
             required = true,
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n"
                     + "(required)")
+    @Completion(CrlSignerNameCompleter.class)
     private String signerType;
 
     @Option(name = "--signer-conf",
@@ -67,6 +74,7 @@ public class CrlSignerAddCmd extends CaCmd {
 
     @Option(name = "--cert",
             description = "CRL signer's certificate file")
+    @Completion(FilePathCompleter.class)
     private String signerCertFile;
 
     @Option(name = "--control",
@@ -75,15 +83,11 @@ public class CrlSignerAddCmd extends CaCmd {
                     + "(required)")
     private String crlControl;
 
+    @Reference
     private PasswordResolver passwordResolver;
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
-
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         String base64Cert = null;
         if (!"CA".equalsIgnoreCase(signerType)) {

@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.ResponderRemoveCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.ResponderRemoveCmd;
 
 /**
  * @author Lijun Liao
@@ -45,15 +46,16 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "neg-responder-rm",
         description = "remove responder (negative, QA)")
+@Service
 public class NegResponderRemoveCmd extends ResponderRemoveCmd {
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("neg-responder-rm");
 
         try {
-            super._doExecute();
+            super.doExecute();
         } catch (Exception e) {
             return null;
         }

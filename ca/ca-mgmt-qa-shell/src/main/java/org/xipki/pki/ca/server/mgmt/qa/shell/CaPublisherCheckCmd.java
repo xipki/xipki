@@ -38,10 +38,14 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 import java.rmi.UnexpectedException;
 import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
 
 /**
@@ -50,21 +54,24 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "capub-check",
         description = "check information of publishers in given CA (QA)")
+@Service
 public class CaPublisherCheckCmd extends CaCmd {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--publisher",
             required = true,
             description = "publisher name\n"
                     + "(required)")
+    @Completion(PublisherNameCompleter.class)
     private String publisherName;
 
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking CA publisher CA='" + caName +  "', publisher='" + publisherName + "'");
 

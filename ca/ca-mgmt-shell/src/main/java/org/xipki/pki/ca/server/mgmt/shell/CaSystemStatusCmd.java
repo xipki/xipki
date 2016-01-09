@@ -37,7 +37,8 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.rmi.UnexpectedException;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CASystemStatus;
 
 /**
@@ -46,9 +47,10 @@ import org.xipki.pki.ca.server.mgmt.api.CASystemStatus;
 
 @Command(scope = "xipki-ca", name = "system-status",
         description = "show CA system status")
+@Service
 public class CaSystemStatusCmd extends CaCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         CASystemStatus status = caManager.getCASystemStatus();
         if (status != null) {

@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell;
 
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.console.karaf.XipkiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
@@ -51,18 +52,10 @@ import org.xipki.security.p11.keystore.KeystoreP11ModulePool;
  * @author Lijun Liao
  */
 
-public abstract class SecurityCmd extends XipkiOsgiCommandSupport {
+public abstract class SecurityCmd extends XipkiCommandSupport {
 
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory() {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
-    }
 
     protected P11Module getP11Module(
             final String moduleName)

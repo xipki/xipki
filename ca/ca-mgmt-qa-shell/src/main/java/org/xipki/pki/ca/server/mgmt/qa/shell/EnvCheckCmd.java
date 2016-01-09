@@ -35,9 +35,10 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
 
 /**
  * @author Lijun Liao
@@ -45,9 +46,10 @@ import org.xipki.console.karaf.CmdFailure;
 
 @Command(scope = "xipki-caqa", name = "env-check",
         description = "check information of CA environment parameters (QA)")
+@Service
 public class EnvCheckCmd extends EnvUpdateCmd {
     @Override
-    protected Object _doExecute()
+    protected Object doExecute()
     throws Exception {
         out("checking environment " + name);
 

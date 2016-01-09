@@ -43,7 +43,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.karaf.shell.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
@@ -51,6 +52,7 @@ import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.security.api.util.X509Util;
@@ -62,6 +64,7 @@ import org.xipki.security.api.util.X509Util;
 public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
+    @Completion(FilePathCompleter.class)
     private String respIssuerFile;
 
     @Option(name = "--url",
@@ -70,10 +73,12 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
 
     @Option(name = "--req-out",
             description = "where to save the request")
+    @Completion(FilePathCompleter.class)
     private String reqout;
 
     @Option(name = "--resp-out",
             description = "where to save the response")
+    @Completion(FilePathCompleter.class)
     private String respout;
 
     @Option(name = "--serial", aliases = "-s",
@@ -86,6 +91,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
             multiValued = true,
             description = "certificate\n"
                     + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -115,7 +121,7 @@ public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
     throws Exception;
 
     @Override
-    protected final Object _doExecute()
+    protected final Object doExecute()
     throws Exception {
         if (isEmpty(serialNumbers) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");

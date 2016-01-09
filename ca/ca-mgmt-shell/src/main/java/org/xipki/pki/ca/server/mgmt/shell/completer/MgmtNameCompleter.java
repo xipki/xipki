@@ -35,8 +35,8 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
+import org.xipki.console.karaf.completer.DynamicEnumCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao

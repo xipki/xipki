@@ -37,32 +37,33 @@ package org.xipki.pki.ca.client.shell;
 
 import java.io.IOException;
 
-import org.apache.karaf.shell.commands.Option;
 import org.xipki.pki.ca.client.api.CAClient;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class ClientCmd extends XipkiOsgiCommandSupport {
+public abstract class ClientCmd extends XipkiCommandSupport {
     @Option(name = "--req-out",
             description = "where to save the request")
+    @Completion(FilePathCompleter.class)
     private String reqout;
 
     @Option(name = "--resp-out",
             description = "where to save the response")
+    @Completion(FilePathCompleter.class)
     private String respout;
 
+    @Reference
     protected CAClient caClient;
-
-    public void setCaClient(
-            final CAClient caClient) {
-        this.caClient = caClient;
-    }
 
     protected RequestResponseDebug getRequestResponseDebug() {
         boolean saveReq = isNotBlank(reqout);
