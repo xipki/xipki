@@ -1,0 +1,2 @@
+1. Update karaf-plugin.version to 4.0.4+.
+2. Change to new karaf if paxweb 4.2.5+ is supported natively (remove folder features/org.apache.karaf.feature.standard)
