@@ -14,6 +14,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <DynamicImport-Package>*</DynamicImport-Package>
+    <Karaf-Commands>*</Karaf-Commands>
   </properties>
   <dependencies>
     <dependency>

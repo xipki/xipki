@@ -36,7 +36,7 @@
   <properties>
     <karaf.version>4.0.3</karaf.version>
     <karaf-plugin.version>4.0.3</karaf-plugin.version>
-    <paxweb.version>4.2.3</paxweb.version>
+    <paxweb.version>4.2.5-SNAPSHOT</paxweb.version>
     <!-- the following OSGi version is used in the above karaf version -->
     <osgi.version>5.0.0</osgi.version>
     <bc.version>1.53</bc.version>
