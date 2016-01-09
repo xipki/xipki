@@ -11,6 +11,7 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>NCM client</app.name>
+    <assembly.finalName>xipki-ncmclient</assembly.finalName>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
   </properties>
@@ -153,7 +154,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-ncmclient-${project.version}</finalName>
+                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -186,7 +187,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-ncmclient-${project.version}</finalName>
+                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>
