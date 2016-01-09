@@ -164,7 +164,7 @@ public class IaikP11Module implements P11Module {
         }
         extSlot = new IaikP11Slot(_slotId, slot, pwd);
 
-        slots.put(slotId, extSlot);
+        slots.put(_slotId, extSlot);
         return extSlot;
     }
 
