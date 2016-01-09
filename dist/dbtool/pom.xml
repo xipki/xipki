@@ -6,20 +6,23 @@
     <artifactId>dist-group</artifactId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>pkcs11proxy</artifactId>
+  <artifactId>ncmclient</artifactId>
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
-    <app.name>PKCS#11 proxy</app.name>
-    <assembly.finalName>xipki-pkcs11proxy</assembly.finalName>
+    <app.name>DB-Tool</app.name>
+    <assembly.finalName>xipki-dbtool</assembly.finalName>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
+    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
+    <h2-jdbc.version>1.4.185</h2-jdbc.version>
+    <hsqldb.version>2.3.2</hsqldb.version>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.pki.features</groupId>
-      <artifactId>pkcs11proxy</artifactId>
+      <artifactId>dbtool</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -65,7 +68,7 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- include additional artifacts -->
+        <!--  include additional artifacts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -95,25 +98,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <execution>
-            <!-- Uncompress the IAIK PKCS#11 native libraries -->
-            <id>unpack-iaik</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>at.tugraz.iaik</groupId>
-                  <artifactId>pkcs11-wrapper-native</artifactId>
-                  <version>${pkcs11-wrapper.version}</version>
-                  <type>zip</type>
-                  <outputDirectory>target/xipki/native-lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -133,17 +117,15 @@
               <repository>${features.repo}</repository>
               <!--
                   Feature Descriptors (Karaf core features are available by default)
+
                   NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
                   to make them visible after deployment.
-               -->
+              -->
               <descriptors>
-                <descriptor>mvn:org.xipki.pki.features/pkcs11proxy/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.pki.features/dbtool/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <feature>http-whiteboard</feature>
-                <!-- project-core features -->
-                <feature>xipki-pkcs11-proxy</feature>
-                <feature>xipki-security-shell</feature>
+                <feature>xipki-database-tool</feature>
               </features>
             </configuration>
           </execution>
@@ -153,7 +135,7 @@
   </build>
   <profiles>
     <profile>
-      <id>unix-bin</id>
+      <id>unix</id>
       <activation>
         <os>
           <family>unix</family>

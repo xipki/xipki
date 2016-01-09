@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-  Copyright (c) 2014 - 2015 Lijun Liao
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -14,6 +11,7 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>PKI</app.name>
+    <assembly.finalName>xipki-pki</assembly.finalName>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
@@ -327,7 +325,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-pki-${project.version}</finalName>
+                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -360,7 +358,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-pki-${project.version}</finalName>
+                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>
