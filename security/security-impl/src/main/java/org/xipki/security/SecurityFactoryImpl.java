@@ -390,7 +390,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             signatureAlgId, parallelism);
                 } catch (OperatorCreationException | NoSuchPaddingException
                         | NoSuchAlgorithmException e) {
-                    throw new SignerException(e.getMessage());
+                    throw new SignerException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
                 }
             }
         } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
