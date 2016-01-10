@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QaDirectoryString {
+
     private final DirectoryStringType type;
+
     private final String text;
 
     public QaDirectoryString(

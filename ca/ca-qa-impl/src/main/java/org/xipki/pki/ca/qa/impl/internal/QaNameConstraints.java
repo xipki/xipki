@@ -48,7 +48,9 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class QaNameConstraints extends QaExtension {
+
     private final List<QaGeneralSubtree> permittedSubtrees;
+
     private final List<QaGeneralSubtree> excludedSubtrees;
 
     public QaNameConstraints(

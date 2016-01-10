@@ -42,6 +42,7 @@ import java.security.cert.X509CRL;
  */
 
 public class CRLResultType {
+
     private X509CRL crl;
 
     public CRLResultType() {

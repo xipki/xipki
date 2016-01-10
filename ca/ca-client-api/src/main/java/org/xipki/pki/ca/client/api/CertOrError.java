@@ -45,7 +45,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertOrError {
+
     private final Certificate certificate;
+
     private final PKIStatusInfo error;
 
     public CertOrError(

@@ -121,7 +121,9 @@ import org.xml.sax.SAXException;
  */
 
 public class XmlX509CertprofileUtil {
+
     private final static Object jaxbUnmarshallerLock = new Object();
+
     private static Unmarshaller jaxbUnmarshaller;
 
     private XmlX509CertprofileUtil() {

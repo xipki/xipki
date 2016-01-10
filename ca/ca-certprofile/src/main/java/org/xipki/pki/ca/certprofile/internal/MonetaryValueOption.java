@@ -44,9 +44,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class MonetaryValueOption {
+
     private final Iso4217CurrencyCode currency;
+
     private final String currencyString;
+
     private final Range2Type amountRange;
+
     private final Range2Type exponentRange;
 
     public MonetaryValueOption(

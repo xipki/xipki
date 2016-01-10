@@ -62,6 +62,7 @@ import org.xipki.security.api.NoIdleSignerException;
  */
 
 public class CmpUtil {
+
     private CmpUtil() {
     }
 

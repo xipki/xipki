@@ -74,6 +74,7 @@ import org.xml.sax.SAXException;
  */
 
 public class QASystemManagerImpl implements QASystemManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(QASystemManagerImpl.class);
 
     private String confFile;
@@ -88,7 +89,9 @@ public class QASystemManagerImpl implements QASystemManager {
     }
 
     private Map<String, X509CertprofileQAImpl> x509ProfileMap = new HashMap<>();
+
     private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+
     private static Unmarshaller jaxbUnmarshaller;
 
     public QASystemManagerImpl() {
@@ -243,4 +246,5 @@ public class QASystemManagerImpl implements QASystemManager {
         }
         return data;
     }
+
 }

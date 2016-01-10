@@ -40,6 +40,7 @@ package org.xipki.common.util;
  */
 
 public class LogUtil {
+
     private LogUtil() {
     }
 

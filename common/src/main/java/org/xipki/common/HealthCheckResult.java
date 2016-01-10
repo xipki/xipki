@@ -51,9 +51,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class HealthCheckResult {
+
     private String name;
+
     private boolean healthy = false;
+
     private Map<String, Object> statuses = new ConcurrentHashMap<>();
+
     private List<HealthCheckResult> childChecks = new LinkedList<>();
 
     /**
@@ -371,4 +375,5 @@ public class HealthCheckResult {
         System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
     }
+
 }

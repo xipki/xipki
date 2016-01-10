@@ -40,12 +40,14 @@ package org.xipki.audit.api;
  */
 
 public enum AuditLevel {
+
     ERROR    (3, "ERROR    "),
     WARN     (4, "WARN     "),
     INFO     (6, "INFO     "),
     DEBUG    (7, "DEBUG    ");
 
     private final int value;
+
     private final String alignedText;
 
     private AuditLevel(

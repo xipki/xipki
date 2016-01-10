@@ -151,6 +151,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 public class XmlX509Certprofile extends BaseX509Certprofile {
+
     private static final Logger LOG = LoggerFactory.getLogger(XmlX509Certprofile.class);
 
     private SpecialX509CertprofileBehavior specialBehavior;
@@ -158,41 +159,73 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     private SubjectControl subjectControl;
+
     private Map<String, String> parameters;
+
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     private CertValidity validity;
+
     private X509CertVersion version;
+
     private List<String> signatureAlgorithms;
+
     private boolean incSerialNoIfSubjectExists;
+
     private boolean raOnly;
+
     private boolean ca;
+
     private boolean duplicateKeyPermitted;
+
     private boolean duplicateSubjectPermitted;
+
     private boolean duplicateCNPermitted;
+
     private boolean serialNumberInReqPermitted;
+
     private boolean notBeforeMidnight;
+
     private boolean includeIssuerAndSerialInAKI;
+
     private Integer pathLen;
+
     private AuthorityInfoAccessControl aIAControl;
+
     private Set<KeyUsageControl> keyusages;
+
     private Set<ExtKeyUsageControl> extendedKeyusages;
+
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
+
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
     private ExtensionValue certificatePolicies;
+
     private ExtensionValue policyMappings;
+
     private ExtensionValue nameConstraints;
+
     private ExtensionValue policyConstraints;
+
     private ExtensionValue inhibitAnyPolicy;
+
     private ExtensionValue admission;
+
     private ExtensionValue restriction;
+
     private ExtensionValue additionalInformation;
+
     private ExtensionValue validityModel;
+
     private CertValidity privateKeyUsagePeriod;
+
     private ExtensionValue qCStatments;
+
     private List<QcStatementOption> qcStatementsOption;
+
     private ExtensionValue authorizationTemplate;
+
     private BiometricInfoOption biometricDataOption;
 
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;

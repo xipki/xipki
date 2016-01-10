@@ -197,7 +197,6 @@ public class AuditEvent {
             }
 
             event.setDuration(duration);
-
             expandedEvents.add(event);
         }
 
@@ -212,4 +211,5 @@ public class AuditEvent {
             final long duration) {
         this.duration = duration;
     }
+
 }

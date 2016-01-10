@@ -55,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
         description = "unrevoke certificate")
 @Service
 public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -100,4 +101,5 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
         }
         return null;
     }
+
 }

@@ -64,14 +64,19 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CALoadTestEnroll extends LoadExecutor {
+
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
 
     private final CAClient caClient;
+
     private final LoadTestEntry loadtestEntry;
+
     private final AtomicLong index;
+
     private final String userPrefix = "LOADTEST-";
+
     private final int n;
 
     @Override
@@ -181,6 +186,6 @@ public class CALoadTestEnroll extends LoadExecutor {
 
             return nSuccess == certRequests.size();
         }
-
     }
+
 }

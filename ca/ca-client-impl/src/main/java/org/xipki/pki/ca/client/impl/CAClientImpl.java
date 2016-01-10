@@ -135,9 +135,13 @@ import org.xml.sax.SAXException;
  */
 
 public final class CAClientImpl implements CAClient {
+
     private class ClientConfigUpdater implements Runnable {
+
         private static final long MINUTE = 60L * 1000;
+
         private AtomicBoolean inProcess = new AtomicBoolean(false);
+
         private long lastUpdate;
 
         ClientConfigUpdater() {
@@ -163,11 +167,13 @@ public final class CAClientImpl implements CAClient {
                 inProcess.set(false);
             }
         }
+
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CAClientImpl.class);
 
     private static Object jaxbUnmarshallerLock = new Object();
+
     private static Unmarshaller jaxbUnmarshaller;
 
     private final Map<String, CAConf> casMap = new HashMap<>();
@@ -175,7 +181,9 @@ public final class CAClientImpl implements CAClient {
     private SecurityFactory securityFactory;
 
     private String confFile;
+
     private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
+
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     public CAClientImpl() {

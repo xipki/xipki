@@ -69,8 +69,11 @@ import org.xml.sax.SAXException;
  */
 
 public class XMLUtil {
+
     static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     private static Document document;
+
     private static DocumentBuilder builder;
 
     static {

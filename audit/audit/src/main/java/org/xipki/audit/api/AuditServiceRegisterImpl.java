@@ -46,9 +46,12 @@ import org.xipki.audit.slf4j.impl.Slf4jAuditServiceImpl;
  */
 
 public class AuditServiceRegisterImpl implements AuditServiceRegister {
+
     private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+
     private ConcurrentLinkedDeque<AuditService> services =
             new ConcurrentLinkedDeque<AuditService>();
+
     private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
     private boolean auditEnabled;
@@ -109,4 +112,5 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
     public boolean isAuditEnabled() {
         return auditEnabled;
     }
+
 }

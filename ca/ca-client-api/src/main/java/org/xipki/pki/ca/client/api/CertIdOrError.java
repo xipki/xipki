@@ -44,7 +44,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertIdOrError {
+
     private final CertId certId;
+
     private final PKIStatusInfo error;
 
     public CertIdOrError(

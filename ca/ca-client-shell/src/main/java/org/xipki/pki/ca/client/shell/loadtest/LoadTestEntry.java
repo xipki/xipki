@@ -49,6 +49,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class LoadTestEntry {
+
     public static enum RandomDN {
         GIVENNAME,
         SURNAME,
@@ -68,10 +69,13 @@ public class LoadTestEntry {
             }
             return null;
         }
+
     }
 
     private static class IncreasableSubject {
+
         private final X500Name subjectTemplate;
+
         private final ASN1ObjectIdentifier subjectRDNForIncrement;
 
         private IncreasableSubject(
@@ -138,7 +142,9 @@ public class LoadTestEntry {
     }
 
     private final String certprofile;
+
     private final KeyEntry keyEntry;
+
     private final IncreasableSubject subject;
 
     public LoadTestEntry(

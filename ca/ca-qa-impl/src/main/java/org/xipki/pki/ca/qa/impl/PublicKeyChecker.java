@@ -71,7 +71,9 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class PublicKeyChecker {
+
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyChecker.class);
+
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
@@ -272,4 +274,5 @@ public class PublicKeyChecker {
                     "invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         } // end switch
     }
+
 }

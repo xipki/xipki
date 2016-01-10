@@ -45,6 +45,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class RevokeCertResultType {
+
     private List<ResultEntryType> resultEntries;
 
     public List<ResultEntryType> getResultEntries() {

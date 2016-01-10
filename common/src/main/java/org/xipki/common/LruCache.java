@@ -49,16 +49,22 @@ import java.util.Map;
  */
 
 public class LruCache<K, V> {
+
     private final LinkedHashMap<K, V> map;
 
     /** Size of this cache in units. Not necessarily the number of elements. */
     private int size;
+
     private int maxSize;
 
     private int putCount;
+
     private int createCount;
+
     private int evictionCount;
+
     private int hitCount;
+
     private int missCount;
 
     /**
@@ -381,4 +387,5 @@ public class LruCache<K, V> {
         return String.format("LruCache[maxSize=%d,hits=%d,misses=%d,hitRate=%d%%]",
                 maxSize, hitCount, missCount, hitPercent);
     }
+
 }

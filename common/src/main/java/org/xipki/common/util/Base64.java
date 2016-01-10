@@ -51,6 +51,7 @@ import java.io.UnsupportedEncodingException;
  * @author Android team
  */
 public class Base64 {
+
     /**
      * Default values for encoder/decoder flags.
      */

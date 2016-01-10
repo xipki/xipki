@@ -49,7 +49,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ConfPairs {
+
     public static final char NAME_TERM = '=';
+
     public static final char TOKEN_TERM = ',';
 
     private final Map<String, String> pairs = new HashMap<>();

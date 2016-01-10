@@ -62,20 +62,24 @@ import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
  */
 
 public class SyslogAuditServiceImpl implements AuditService {
+
     private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
 
     /**
      * The default port is 514.
      */
     public static final int DFLT_SYSLOG_PORT = 514;
+
     /**
      * The default mode is TCP.
      */
     public static final String DFLT_SYSLOG_PROTOCOL = "tcp";
+
     /**
      * The default facility is USER.
      */
     public static final String  DFLT_SYSLOG_FACILITY = "user";
+
     /**
      * The default ip is localhost.
      */
@@ -92,9 +96,13 @@ public class SyslogAuditServiceImpl implements AuditService {
     protected AbstractSyslogMessageSender syslog = null;
 
     private String host = DFLT_SYSLOG_HOST;
+
     private int port = DFLT_SYSLOG_PORT;
+
     private String protocol = DFLT_SYSLOG_PROTOCOL;
+
     private String facility = DFLT_SYSLOG_FACILITY;
+
     private String messageFormat = DFLT_MESSAGE_FORMAT;
 
     private int maxMessageLength = 1024;
@@ -102,7 +110,9 @@ public class SyslogAuditServiceImpl implements AuditService {
     private int writeRetries;
 
     private String localname;
+
     private String prefix;
+
     private boolean ssl;
 
     private boolean initialized;
@@ -369,4 +379,5 @@ public class SyslogAuditServiceImpl implements AuditService {
             throw new RuntimeException("unknown auditLevel '" + auditLevel + "'");
         }
     }
+
 }

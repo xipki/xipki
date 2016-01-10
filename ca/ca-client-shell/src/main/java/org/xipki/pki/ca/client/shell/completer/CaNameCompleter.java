@@ -48,6 +48,7 @@ import org.xipki.pki.ca.client.api.CAClient;
 
 @Service
 public class CaNameCompleter extends AbstractDynamicEnumCompleter {
+
     @Reference
     protected CAClient caClient;
 

@@ -177,7 +177,9 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class ExtensionsChecker {
+
     private static final byte[] DERNull = new byte[]{5, 0};
+
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionsChecker.class);
 
     private static final List<String> allUsages = Arrays.asList(
@@ -197,28 +199,49 @@ public class ExtensionsChecker {
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     private X509CertVersion version;
+
     private Set<String> signatureAlgorithms;
+
     private boolean ca;
+
     private Integer pathLen;
+
     private AuthorityInfoAccessControl aiaControl;
+
     private Set<KeyUsageControl> keyusages;
+
     private Set<ExtKeyUsageControl> extendedKeyusages;
+
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
+
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
     private boolean includeIssuerAndSerialInAKI;
+
     private QaCertificatePolicies certificatePolicies;
+
     private QaPolicyMappingsOption policyMappings;
+
     private QaNameConstraints nameConstraints;
+
     private QaPolicyConstraints policyConstraints;
+
     private QaInhibitAnyPolicy inhibitAnyPolicy;
+
     private QaAdmission admission;
+
     private QaDirectoryString restriction;
+
     private QaDirectoryString additionalInformation;
+
     private ASN1ObjectIdentifier validityModelId;
+
     private CertValidity privateKeyUsagePeriod;
+
     private QCStatements qcStatements;
+
     private BiometricInfoOption biometricInfo;
+
     private QaAuthorizationTemplate authorizationTemplate;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
@@ -2923,4 +2946,5 @@ public class ExtensionsChecker {
 
         return Collections.unmodifiableMap(map);
     }
+
 }

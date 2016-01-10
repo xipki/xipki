@@ -46,7 +46,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class EnrollCertResultType {
+
     private List<CMPCertificate> cACertificates;
+
     private List<ResultEntryType> resultEntries;
 
     public EnrollCertResultType() {

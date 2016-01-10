@@ -40,7 +40,9 @@ package org.xipki.common.qa;
  */
 
 public class MeasurePoint {
+
     private final long measureTime;
+
     private final long measureAccount;
 
     public MeasurePoint(
