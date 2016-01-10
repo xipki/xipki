@@ -147,6 +147,4 @@ xipki-qa:check-cert \
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
 feature:uninstall xipki-caqa-shell
-#feature:uninstall xipki-caclient-shell
-#feature:uninstall xipki-caclient
 feature:uninstall xipki-security-shell

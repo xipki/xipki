@@ -305,5 +305,3 @@ xipki-qa:ocsp-status \
   --resp-issuer output/SubCAwithCRL1.der
 
 feature:uninstall xipki-ocspqa-shell
-#feature:uninstall xipki-ocspclient-shell
-#feature:uninstall xipki-ocspclient
