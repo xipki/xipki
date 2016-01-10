@@ -71,7 +71,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-ca", name = "ca-addf",
         description = "add CA from configuration file")
 @Service
-public class CaAddFromFileCmd extends CaCmd {
+public class CaAddFromFileCmd extends CaCommandSupport {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"

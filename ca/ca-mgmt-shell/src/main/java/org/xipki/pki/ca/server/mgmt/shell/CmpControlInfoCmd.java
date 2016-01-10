@@ -55,7 +55,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 @Command(scope = "xipki-ca", name = "cmpcontrol-info",
         description = "show information of CMP control")
 @Service
-public class CmpControlInfoCmd extends CaCmd {
+public class CmpControlInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CMP control name")
     @Completion(CmpControlNameCompleter.class)
     private String name;

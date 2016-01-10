@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "unrevoke-cert",
         description = "unrevoke certificate")
 @Service
-public class UnrevokeCertCmd extends UnRevRemoveCertCmd {
+public class UnrevokeCertCmd extends UnRevRmCertCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {

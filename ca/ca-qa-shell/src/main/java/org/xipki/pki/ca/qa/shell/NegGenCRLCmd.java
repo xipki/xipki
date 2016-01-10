@@ -50,7 +50,7 @@ import org.xipki.common.RequestResponseDebug;
 @Command(scope = "xipki-qa", name = "neg-gencrl",
         description = "generate CRL (negative, for QA)")
 @Service
-public class NegGenCRLCmd extends NegCRLCmd {
+public class NegGenCRLCmd extends NegCRLCommandSupport {
 
     @Override
     protected X509CRL retrieveCRL(

@@ -51,7 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 @Command(scope = "xipki-ca", name = "scep-info",
         description = "show information of SCEP")
 @Service
-public class ScepInfoCmd extends CaCmd {
+public class ScepInfoCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "SCEP CA name\n"

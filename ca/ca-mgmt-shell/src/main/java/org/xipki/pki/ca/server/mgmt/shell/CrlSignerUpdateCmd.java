@@ -61,7 +61,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-ca", name = "crlsigner-up",
         description = "update CRL signer")
 @Service
-public class CrlSignerUpdateCmd extends CaCmd {
+public class CrlSignerUpdateCmd extends CaCommandSupport {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"

@@ -51,7 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Command(scope = "xipki-ca", name = "profile-up",
         description = "update certificate profile")
 @Service
-public class ProfileUpdateCmd extends CaCmd {
+public class ProfileUpdateCmd extends CaCommandSupport {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

@@ -58,7 +58,7 @@ import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 @Command(scope = "xipki-cli", name = "loadtest-enroll",
         description = "CA Client Enroll Load test")
 @Service
-public class CALoadTestEnrollCmd extends CALoadTestCmd {
+public class CALoadTestEnrollCmd extends CALoadTestCommandSupport {
 
     @Option(name = "--profile", aliases = "-p",
             required = true,

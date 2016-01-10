@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.pki.ca.client.api.CertIdOrError;
-import org.xipki.pki.ca.client.shell.UnRevRemoveCertCmd;
+import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -60,7 +60,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-qa", name = "neg-revoke",
         description = "revoke certificate (negative, for QA)")
 @Service
-public class NegRevokeCertCmd extends UnRevRemoveCertCmd {
+public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Option(name = "--reason",
             required = true,

@@ -50,7 +50,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-ca", name = "profile-add",
         description = "add certificate profile")
 @Service
-public class ProfileAddCmd extends CaCmd {
+public class ProfileAddCmd extends CaCommandSupport {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

@@ -36,14 +36,14 @@
 package org.xipki.pki.ocsp.qa.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.EnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
 
 /**
  * @author Lijun Liao
  */
 @Service
-public class CertStatusCompleter extends EnumCompleter {
+public class CertStatusCompleter extends AbstractEnumCompleter {
     public CertStatusCompleter() {
         StringBuilder enums = new StringBuilder();
 

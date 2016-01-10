@@ -47,7 +47,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "unlock",
         description = "unlock CA system")
 @Service
-public class CaSystemUnlockCmd extends CaCmd {
+public class CaSystemUnlockCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {

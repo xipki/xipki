@@ -56,7 +56,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 @Command(scope = "xipki-ca", name = "responder-info",
         description = "show information of responder")
 @Service
-public class ResponderInfoCmd extends CaCmd {
+public class ResponderInfoCmd extends CaCommandSupport {
 
     @Argument(index = 0, name = "name", description = "responder name")
     @Completion(ResponderNameCompleter.class)

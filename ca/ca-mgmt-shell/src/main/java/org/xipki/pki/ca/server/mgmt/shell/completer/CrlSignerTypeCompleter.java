@@ -36,14 +36,14 @@
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.EnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Service
-public class CrlSignerTypeCompleter extends EnumCompleter {
+public class CrlSignerTypeCompleter extends AbstractEnumCompleter {
 
     public CrlSignerTypeCompleter() {
         setTokens("CA, JKS, PKCS11, PKCS12");

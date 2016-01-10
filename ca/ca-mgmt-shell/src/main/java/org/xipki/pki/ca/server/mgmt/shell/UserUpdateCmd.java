@@ -46,7 +46,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "user-up",
         description = "update user")
 @Service
-public class UserUpdateCmd extends CaCmd {
+public class UserUpdateCmd extends CaCommandSupport {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

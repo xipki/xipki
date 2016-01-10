@@ -55,7 +55,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Command(scope = "xipki-ca", name = "publisher-info",
         description = "show information of publisher")
 @Service
-public class PublisherInfoCmd extends CaCmd {
+public class PublisherInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "publisher name")
     @Completion(PublisherNameCompleter.class)
     private String name;

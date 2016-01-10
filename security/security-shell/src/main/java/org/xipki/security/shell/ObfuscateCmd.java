@@ -46,7 +46,7 @@ import org.xipki.password.OBFPasswordResolver;
 @Command(scope = "xipki-tk", name = "obfuscate",
         description = "obfuscate password")
 @Service
-public class ObfuscateCmd extends SecurityCmd {
+public class ObfuscateCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {

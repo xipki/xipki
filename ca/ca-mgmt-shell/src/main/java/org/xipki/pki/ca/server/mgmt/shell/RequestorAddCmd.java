@@ -50,7 +50,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-ca", name = "requestor-add",
         description = "add requestor")
 @Service
-public class RequestorAddCmd extends CaCmd {
+public class RequestorAddCmd extends CaCommandSupport {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"

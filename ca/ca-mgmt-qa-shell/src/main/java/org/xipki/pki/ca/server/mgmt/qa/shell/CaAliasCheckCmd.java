@@ -40,7 +40,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
@@ -50,7 +50,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-caqa", name = "caalias-check",
         description = "check CA aliases (QA)")
 @Service
-public class CaAliasCheckCmd extends CaCmd {
+public class CaAliasCheckCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

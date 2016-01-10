@@ -46,7 +46,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "profile-rm",
         description = "remove certifiate profile")
 @Service
-public class ProfileRemoveCmd extends CaCmd {
+public class ProfileRemoveCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
     private String name;
 

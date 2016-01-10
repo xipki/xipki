@@ -56,7 +56,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 @Command(scope = "xipki-ca", name = "crlsigner-info",
         description = "show information of CRL signer")
 @Service
-public class CrlSignerInfoCmd extends CaCmd {
+public class CrlSignerInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CRL signer name")
     @Completion(CrlSignerNameCompleter.class)
     private String name;

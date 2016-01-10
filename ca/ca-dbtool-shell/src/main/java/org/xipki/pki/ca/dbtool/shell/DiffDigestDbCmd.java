@@ -56,7 +56,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 @Command(scope = "xipki-db", name = "diff-digest-db",
         description = "diff digest XiPKI/EJBCA database")
 @Service
-public class DiffDigestDbCmd extends DbPortCmd {
+public class DiffDigestDbCmd extends DbPortCommandSupport {
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
                     + "(one of--ref-db and--ref-dir must be specified)")

@@ -36,14 +36,14 @@
 package org.xipki.pki.ca.dbtool.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.EnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Service
-public class LogLevelCompleter extends EnumCompleter {
+public class LogLevelCompleter extends AbstractEnumCompleter {
 
     public LogLevelCompleter() {
         setTokens("debug,info,warning,severe,off");

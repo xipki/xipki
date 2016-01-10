@@ -52,7 +52,7 @@ import org.xipki.security.speed.p11.P11ECSignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-sign",
         description = "performance test of PKCS#11 EC signature creation (batch)")
-public class BSpeedP11ECSignCmd extends BSpeedP11SignCmd {
+public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

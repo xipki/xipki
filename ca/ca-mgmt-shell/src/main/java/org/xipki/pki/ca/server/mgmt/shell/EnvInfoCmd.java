@@ -52,7 +52,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "env-info",
         description = "show information of CA environment parameter")
 @Service
-public class EnvInfoCmd extends CaCmd {
+public class EnvInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "environment parameter name")
     private String name;
 

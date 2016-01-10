@@ -49,7 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-ca", name = "publish-self",
         description = "publish the certificate of root CA")
 @Service
-public class CaPublishRCACertCmd extends CaCmd {
+public class CaPublishRCACertCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
     private String caName;

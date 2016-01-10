@@ -51,7 +51,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 @Command(scope = "xipki-tk", name = "ec-p12",
         description = "generate EC keypair in PKCS#12 keystore")
 @Service
-public class P12ECKeyGenCmd extends P12KeyGenCmd {
+public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
     @Option(name = "--curve",
             required = true,
             description = "EC curve name or OID\n"

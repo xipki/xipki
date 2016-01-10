@@ -52,7 +52,7 @@ import org.xipki.scep.client.exception.ScepClientException;
 @Command(scope = "scep", name = "renewal-req",
         description = "enroll certificate via messageType RenewalReq")
 @Service
-public class RenewalReqCmd extends AbstractEnrollCertCmd {
+public class RenewalReqCmd extends EnrollCertCommandSupport {
 
     @Override
     protected EnrolmentResponse requestCertificate(

@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
-import org.xipki.pki.ca.client.shell.ClientCmd;
+import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
@@ -57,7 +57,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-qa", name = "neg-p10-enroll",
         description = "enroll certificate via PKCS#10 request (negative, for QA)")
 @Service
-public class NegP10EnrollCertCmd extends ClientCmd {
+public class NegP10EnrollCertCmd extends ClientCommandSupport {
 
     @Option(name = "--p10",
             required = true,

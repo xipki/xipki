@@ -48,8 +48,6 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XipkiCommandSupport;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
-import jline.console.ConsoleReader;
-
 /**
  * @author Lijun Liao
  */
@@ -108,8 +106,7 @@ public class FileListCmd extends XipkiCommandSupport {
             l2.add(s);
         }
 
-        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-        int width = reader.getTerminal().getWidth();
+        int width = session.getTerminal().getWidth();
 
         int n = width / (maxLen + 1);
         if (n == 0) {

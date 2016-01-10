@@ -53,7 +53,7 @@ import org.xipki.pki.ca.client.shell.loadtest.CALoadTestTemplateEnroll;
 @Command(scope = "xipki-cli", name = "loadtest-template-enroll",
         description = "CA Client Template Enroll Load test")
 @Service
-public class CALoadTestTemplateEnrollCmd extends CALoadTestCmd {
+public class CALoadTestTemplateEnrollCmd extends CALoadTestCommandSupport {
 
     @Option(name = "--template", aliases = "-t",
             required = true,
