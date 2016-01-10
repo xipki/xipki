@@ -12,6 +12,7 @@
   <properties>
     <app.name>NCM client</app.name>
     <assembly.finalName>xipki-ncmclient</assembly.finalName>
+    <boot.features>xipki-database-tool</boot.features>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
   </properties>
