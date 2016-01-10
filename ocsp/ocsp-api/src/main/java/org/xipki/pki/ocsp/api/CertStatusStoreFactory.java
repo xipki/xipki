@@ -40,5 +40,7 @@ package org.xipki.pki.ocsp.api;
  */
 
 public interface CertStatusStoreFactory {
+
     CertStatusStore generateCertStatusStore();
+
 }

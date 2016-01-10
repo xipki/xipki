@@ -57,6 +57,7 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class RequestOptions {
+
     private static final Map<String, AlgorithmIdentifier> sigAlgsMap = new HashMap<>();
 
     static {
@@ -99,10 +100,15 @@ public class RequestOptions {
     }
 
     private boolean signRequest = false;
+
     private boolean useNonce = true;
+
     private int nonceLen = 8;
+
     private boolean useHttpGetForRequest = false;
+
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
+
     private List<AlgorithmIdentifier> preferredSignatureAlgorithms;
 
     public RequestOptions() {

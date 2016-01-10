@@ -49,8 +49,11 @@ import org.bouncycastle.crypto.Digest;
  */
 
 abstract class AbstractECDSASignatureSpi extends SignatureSpi {
+
     private Digest digest;
+
     private P11PrivateKey signingKey;
+
     private boolean x962;
 
     AbstractECDSASignatureSpi(
@@ -144,4 +147,5 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
+
 }

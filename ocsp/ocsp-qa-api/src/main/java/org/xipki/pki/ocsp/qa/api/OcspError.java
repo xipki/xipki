@@ -40,6 +40,7 @@ package org.xipki.pki.ocsp.qa.api;
  */
 
 public enum OcspError {
+
     malformedRequest(1),
     internalError(2),
     tryLater(3),

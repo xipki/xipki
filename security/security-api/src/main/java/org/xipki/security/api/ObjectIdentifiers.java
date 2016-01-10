@@ -62,17 +62,22 @@ public class ObjectIdentifiers {
      * registered PEN for xipki.org: 45522
      */
     private static final ASN1ObjectIdentifier id_pen = new ASN1ObjectIdentifier("1.3.6.2.4.1");
+
     private static final ASN1ObjectIdentifier id_xipki = id_pen.branch("45522");
 
     private static final ASN1ObjectIdentifier id_xipki_ext = id_xipki.branch("1");
+
     public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset
             = id_xipki_ext.branch("1");
+
     public static final ASN1ObjectIdentifier id_xipki_ext_cmRequestExtensions
             = id_xipki_ext.branch("2");
+
     public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
             = id_xipki_ext.branch("3");
 
     private static final ASN1ObjectIdentifier id_xipki_cm = id_xipki.branch("2");
+
     public static final ASN1ObjectIdentifier id_xipki_cm_cmpGenmsg
             = id_xipki_cm.branch("1");
 

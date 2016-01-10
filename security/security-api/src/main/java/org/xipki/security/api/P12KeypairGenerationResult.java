@@ -44,7 +44,9 @@ import org.bouncycastle.cert.X509CertificateHolder;
  */
 
 public class P12KeypairGenerationResult extends KeypairGenerationResult {
+
     private final byte[] keystore;
+
     private KeyStore keystoreObject;
 
     public P12KeypairGenerationResult(

@@ -108,10 +108,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class CrlCertStatusStore extends CertStatusStore {
+
     private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
 
     private static class CertWithInfo {
+
         private Certificate cert;
+
         private String profileName;
 
         public CertWithInfo(
@@ -122,45 +125,61 @@ public class CrlCertStatusStore extends CertStatusStore {
             this.cert = cert;
             this.profileName = profileName;
         }
+
     }
 
     private class StoreUpdateService implements Runnable {
+
         @Override
         public void run() {
             initializeStore(false);
         }
+
     }
 
     private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap = new ConcurrentHashMap<>();
 
     private final X509Certificate caCert;
+
     private final X509Certificate issuerCert;
+
     private final String crlFilename;
+
     private final String deltaCrlFilename;
+
     private final SHA1Digest sha1;
+
     private final String crlUrl;
+
     private final Date caNotBefore;
+
     private final String certsDirname;
 
     private boolean useUpdateDatesFromCRL;
+
     private CertRevocationInfo caRevInfo;
 
     private CrlID crlID;
 
     private byte[] fpOfCrlFile;
+
     private long lastmodifiedOfCrlFile = 0;
 
     private byte[] fpOfDeltaCrlFile;
+
     private long lastModifiedOfDeltaCrlFile = 0;
 
     private Date thisUpdate;
+
     private Date nextUpdate;
+
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
             new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     private boolean initialized = false;
+
     private boolean initializationFailed = false;
 
     public CrlCertStatusStore(

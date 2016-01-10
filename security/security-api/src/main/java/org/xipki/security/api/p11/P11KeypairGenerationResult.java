@@ -45,7 +45,9 @@ import org.xipki.security.api.KeypairGenerationResult;
  */
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
+
     private final byte[] id;
+
     private final String label;
 
     public P11KeypairGenerationResult(

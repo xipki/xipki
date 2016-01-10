@@ -103,6 +103,7 @@ import org.xipki.scep.crypto.KeyUsage;
  */
 
 public class ScepUtil {
+
     private ScepUtil() {
     }
 

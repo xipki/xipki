@@ -49,7 +49,9 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public class IssuerStore {
+
     private final Set<Integer> ids;
+
     private final List<IssuerEntry> entries;
 
     public IssuerStore(

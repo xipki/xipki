@@ -49,8 +49,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class P11Control {
+
     private final String defaultModuleName;
+
     private final Map<String, P11ModuleConf> moduleConfs;
+
     private final Set<String> moduleNames;
 
     public P11Control(

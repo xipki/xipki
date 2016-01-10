@@ -51,10 +51,12 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
  */
 
 public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor {
+
     // result in maximal 254 Base-64 encoded octets
     private static final int MAX_LEN_GET = 190;
 
     private static final String CT_REQUEST  = "application/ocsp-request";
+
     private static final String CT_RESPONSE = "application/ocsp-response";
 
     public DefaultHttpOCSPRequestor() {

@@ -60,6 +60,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
         description = "generate PKCS#10 request with PKCS#11 device")
 @Service
 public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
+
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

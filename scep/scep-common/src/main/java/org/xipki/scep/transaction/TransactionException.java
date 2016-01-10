@@ -40,6 +40,7 @@ package org.xipki.scep.transaction;
  */
 
 public class TransactionException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
     public TransactionException(

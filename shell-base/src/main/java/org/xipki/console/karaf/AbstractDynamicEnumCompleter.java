@@ -48,6 +48,7 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
  */
 
 public abstract class AbstractDynamicEnumCompleter implements Completer {
+
     protected abstract Set<String> getEnums();
 
     @Override

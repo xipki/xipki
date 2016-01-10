@@ -51,9 +51,11 @@ import org.xipki.console.karaf.intern.MyFilenameFilter;
  */
 
 abstract class AbstractPathCompleter implements Completer {
+
     protected abstract boolean isDirOnly();
 
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
+
     private static final FilenameFilter filenameFilter = new MyFilenameFilter();
 
     @Override
@@ -173,4 +175,5 @@ abstract class AbstractPathCompleter implements Completer {
             final CharSequence name) {
         return name;
     }
+
 }

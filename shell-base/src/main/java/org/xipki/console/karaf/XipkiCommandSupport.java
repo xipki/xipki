@@ -58,6 +58,7 @@ import org.xipki.password.api.SecurePasswordInputPanel;
  */
 
 public abstract class XipkiCommandSupport implements Action {
+
     private static final Logger LOG = LoggerFactory.getLogger(XipkiCommandSupport.class);
 
     @Reference

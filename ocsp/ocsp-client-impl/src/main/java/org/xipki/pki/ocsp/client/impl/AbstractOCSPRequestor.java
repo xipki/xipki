@@ -89,12 +89,17 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class AbstractOCSPRequestor implements OCSPRequestor {
+
     private SecurityFactory securityFactory;
 
     private final Object signerLock = new Object();
+
     private ConcurrentContentSigner signer;
+
     private String signerType;
+
     private String signerConf;
+
     private String signerCertFile;
 
     private SecureRandom random = new SecureRandom();

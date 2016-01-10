@@ -59,6 +59,7 @@ import org.xipki.security.api.util.X509Util;
         description = "update certificate in PKCS#12 keystore")
 @Service
 public class P12CertUpdateCmd extends P12SecurityCommandSupport {
+
     @Option(name = "--cert",
             required = true,
             description = "certificate file\n"

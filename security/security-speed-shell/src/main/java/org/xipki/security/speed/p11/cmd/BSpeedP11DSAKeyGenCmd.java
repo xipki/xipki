@@ -69,4 +69,5 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
 
         return ret;
     }
+
 }

@@ -70,11 +70,13 @@ import org.xipki.security.api.HashCalculator;
  */
 
 public class HttpOcspServlet extends HttpServlet {
+
     private final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
 
     private static final long serialVersionUID = 1L;
 
     private static final String CT_REQUEST  = "application/ocsp-request";
+
     private static final String CT_RESPONSE = "application/ocsp-response";
 
     private AuditServiceRegister auditServiceRegister;

@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
  * @author Lijun Liao
  */
 public class MyFilenameFilter implements FilenameFilter {
+
     private static final Pattern ignorePattern;
 
     static {

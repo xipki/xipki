@@ -47,9 +47,13 @@ import org.xipki.scep.client.exception.ScepClientException;
  */
 
 public class ScepHttpResponse {
+
     private final String contentType;
+
     private final int contentLength;
+
     private final InputStream content;
+
     private String contentEncoding;
 
     public ScepHttpResponse(

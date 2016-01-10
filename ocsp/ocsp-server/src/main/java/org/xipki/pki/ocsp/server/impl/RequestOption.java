@@ -68,6 +68,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class RequestOption {
+
     static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<>();
 
     static {
@@ -79,17 +80,27 @@ class RequestOption {
     }
 
     private final boolean supportsHttpGet;
+
     private final boolean signatureRequired;
+
     private final boolean validateSignature;
 
     private final int maxRequestSize;
+
     private final Collection<Integer> versions;
+
     private final boolean nonceRequired;
+
     private final int nonceMinLen;
+
     private final int nonceMaxLen;
+
     private final Set<HashAlgoType> hashAlgos;
+
     private final Set<CertWithEncoded> trustAnchors;
+
     private final Set<X509Certificate> certs;
+
     private final CertpathValidationModel certpathValidationModel;
 
     public RequestOption(

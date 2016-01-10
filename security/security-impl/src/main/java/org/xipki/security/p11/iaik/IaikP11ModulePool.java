@@ -56,6 +56,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  */
 
 public class IaikP11ModulePool {
+
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
     private final Map<String, IaikP11Module> modules = new HashMap<>();
@@ -205,4 +206,5 @@ public class IaikP11ModulePool {
             final String defaultModuleName) {
         this.defaultModuleName = defaultModuleName;
     }
+
 }

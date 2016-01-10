@@ -45,6 +45,7 @@ import org.bouncycastle.crypto.Digest;
  */
 
 public class DigestOutputStream extends OutputStream {
+
     private Digest digest;
 
     public DigestOutputStream(

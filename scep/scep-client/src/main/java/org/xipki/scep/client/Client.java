@@ -86,19 +86,26 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public abstract class Client {
+
     public static final String REQ_CONTENT_TYPE = "application/octet-stream";
 
     // 5 minutes
     public static final long DEFAULT_SIGNINGTIME_BIAS = 5L * 60 * 1000;
+
     protected final CAIdentifier cAId;
+
     protected CACaps cACaps;
 
     private final CACertValidator cACertValidator;
+
     private long maxSigningTimeBiasInMs = DEFAULT_SIGNINGTIME_BIAS;
 
     private AuthorityCertStore authorityCertStore;
+
     private CollectionStore<X509CertificateHolder> responseSignerCerts;
+
     private boolean httpGetOnly = false;
+
     private boolean useInsecureAlgorithms = false;
 
     public Client(
@@ -750,4 +757,5 @@ public abstract class Client {
                     "SenderNonce of the request and RecipientNonce of response are not the same");
         }
     }
+
 }

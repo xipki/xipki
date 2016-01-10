@@ -46,8 +46,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertWithEncoded {
+
     private final X509Certificate certificate;
+
     private final String className;
+
     private final byte[] encoded;
 
     public CertWithEncoded(

@@ -167,9 +167,12 @@ import org.xml.sax.SAXException;
  */
 
 public class OcspServer {
+
     private static class ServletPathResponderName
     implements Comparable<ServletPathResponderName> {
+
         private final String path;
+
         private final String responderName;
 
         public ServletPathResponderName(
@@ -202,6 +205,7 @@ public class OcspServer {
                     ? 1
                     : -1;
         }
+
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
@@ -209,18 +213,27 @@ public class OcspServer {
     public static final long defaultCacheMaxAge = 60; // 1 minute
 
     private DataSourceFactory dataSourceFactory;
+
     private SecurityFactory securityFactory;
 
     private String confFile;
+
     private AuditServiceRegister auditServiceRegister;
 
     private Map<String, Responder> responders = new HashMap<>();
+
     private Map<String, ResponderSigner> signers = new HashMap<>();
+
     private Map<String, RequestOption> requestOptions = new HashMap<>();
+
     private Map<String, ResponseOption> responseOptions = new HashMap<>();
+
     private Map<String, AuditOption> auditOptions = new HashMap<>();
+
     private Map<String, CertprofileOption> certprofileOptions = new HashMap<>();
+
     private Map<String, CertStatusStore> stores = new HashMap<>();
+
     private List<ServletPathResponderName> servletPaths = new ArrayList<>();
 
     public OcspServer() {

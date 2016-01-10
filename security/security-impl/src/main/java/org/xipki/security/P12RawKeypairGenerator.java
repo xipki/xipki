@@ -47,6 +47,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 
 public abstract class P12RawKeypairGenerator {
+
     public abstract KeyPair genKeypair()
     throws Exception;
 
@@ -58,7 +59,9 @@ public abstract class P12RawKeypairGenerator {
     }
 
     public static class ECKeypairGenerator extends P12RawKeypairGenerator {
+
         private final String curveName;
+
         private final ASN1ObjectIdentifier curveOid;
 
         public ECKeypairGenerator(
@@ -96,7 +99,9 @@ public abstract class P12RawKeypairGenerator {
     }
 
     public static class RSAKeypairGenerator extends P12RawKeypairGenerator {
+
         private final int keysize;
+
         private final BigInteger publicExponent;
 
         public RSAKeypairGenerator(
@@ -118,7 +123,9 @@ public abstract class P12RawKeypairGenerator {
     }
 
     public static class DSAKeypairGenerator extends P12RawKeypairGenerator {
+
         private final int pLength;
+
         private final int qLength;
 
         public DSAKeypairGenerator(

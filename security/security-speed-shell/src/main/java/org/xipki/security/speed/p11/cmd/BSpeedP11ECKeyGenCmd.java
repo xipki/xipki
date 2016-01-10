@@ -68,4 +68,5 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
         return ret;
     }
+
 }

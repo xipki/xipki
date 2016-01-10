@@ -46,12 +46,19 @@ import org.xipki.pki.ocsp.api.CertprofileOption;
  */
 
 class Responder {
+
     private final ResponderOption responderOption;
+
     private final RequestOption requestOption;
+
     private final ResponseOption responseOption;
+
     private final AuditOption auditOption;
+
     private final CertprofileOption certprofileOption;
+
     private final ResponderSigner signer;
+
     private final List<CertStatusStore> stores;
 
     Responder(

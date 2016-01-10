@@ -44,6 +44,7 @@ import org.xipki.pki.ocsp.qa.api.Occurrence;
  */
 @Service
 public class OccurrenceCompleter extends AbstractEnumCompleter {
+
     public OccurrenceCompleter() {
         StringBuilder enums = new StringBuilder();
 
@@ -53,4 +54,5 @@ public class OccurrenceCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

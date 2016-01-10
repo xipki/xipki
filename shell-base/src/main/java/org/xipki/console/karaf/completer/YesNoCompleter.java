@@ -44,7 +44,9 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 
 @Service
 public class YesNoCompleter extends AbstractEnumCompleter {
+
     public YesNoCompleter() {
         setTokens("yes, no");
     }
+
 }

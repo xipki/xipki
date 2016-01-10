@@ -50,6 +50,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
+
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;

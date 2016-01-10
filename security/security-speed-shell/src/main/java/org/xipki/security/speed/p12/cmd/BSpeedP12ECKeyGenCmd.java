@@ -65,4 +65,5 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
 
         return ret;
     }
+
 }

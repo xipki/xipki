@@ -89,21 +89,27 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class PkiMessage {
+
     private static final Set<ASN1ObjectIdentifier> scepAttrTypes
             = new HashSet<ASN1ObjectIdentifier>();
 
     private final MessageType messageType;
+
     private final Nonce senderNonce;
+
     private final TransactionId transactionId;
 
     private Nonce recipientNonce;
+
     private PkiStatus pkiStatus;
+
     private FailInfo failInfo;
 
     private ASN1Encodable messageData;
 
     private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
             new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+
     private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
             new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
@@ -391,4 +397,5 @@ public class PkiMessage {
             final ASN1Encodable attrValue) {
         v.add(new Attribute(attrType, new DERSet(attrValue)));
     }
+
 }

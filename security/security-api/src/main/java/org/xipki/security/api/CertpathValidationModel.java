@@ -40,6 +40,8 @@ package org.xipki.security.api;
  */
 
 public enum CertpathValidationModel {
+
     PKIX,
     CHAIN
+
 }

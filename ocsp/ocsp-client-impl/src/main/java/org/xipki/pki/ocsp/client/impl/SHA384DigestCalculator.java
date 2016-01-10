@@ -45,6 +45,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
  */
 
 class SHA384DigestCalculator extends AbstractDigestCalculator {
+
     @Override
     protected ASN1ObjectIdentifier getObjectIdentifier() {
         return NISTObjectIdentifiers.id_sha384;
@@ -54,4 +55,5 @@ class SHA384DigestCalculator extends AbstractDigestCalculator {
     protected Digest getDigester() {
         return new SHA384Digest();
     }
+
 }

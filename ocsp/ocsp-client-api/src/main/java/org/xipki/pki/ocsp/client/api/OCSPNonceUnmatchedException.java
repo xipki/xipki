@@ -43,6 +43,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 @SuppressWarnings("serial")
 public class OCSPNonceUnmatchedException extends OCSPResponseException {
+
     public OCSPNonceUnmatchedException(
             final byte[] expected,
             final byte[] is) {

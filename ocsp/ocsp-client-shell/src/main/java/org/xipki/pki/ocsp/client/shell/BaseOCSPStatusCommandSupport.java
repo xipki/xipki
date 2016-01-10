@@ -62,6 +62,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupport {
+
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
     @Completion(FilePathCompleter.class)
@@ -99,6 +100,7 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
     protected Boolean verbose = Boolean.FALSE;
 
     protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
+
     static {
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
         extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");

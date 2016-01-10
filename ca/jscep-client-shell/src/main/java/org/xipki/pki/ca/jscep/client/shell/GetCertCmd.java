@@ -56,6 +56,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {
+
     @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
@@ -84,4 +85,5 @@ public class GetCertCmd extends ClientCommandSupport {
         saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
         return null;
     }
+
 }

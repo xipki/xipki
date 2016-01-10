@@ -44,6 +44,7 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 public class XipkiProviderRegister {
+
     public void regist() {
         if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new XipkiProvider());

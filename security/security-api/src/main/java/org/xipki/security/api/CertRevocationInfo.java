@@ -48,8 +48,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertRevocationInfo implements Serializable {
+
     private CRLReason reason;
+
     private Date revocationTime;
+
     private Date invalidityTime;
 
     public CertRevocationInfo(

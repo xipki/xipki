@@ -57,6 +57,7 @@ import org.xipki.security.api.util.X509Util;
         description = "OCSP Load test")
 @Service
 public class OCSPStatusLoadTestCmd extends OCSPStatusCommandSupport {
+
     @Option(name = "--serial",
             required = true,
             description = "serial numbers, comma-separated serial numbers or ranges\n"

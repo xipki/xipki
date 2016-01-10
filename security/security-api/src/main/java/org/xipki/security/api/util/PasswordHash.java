@@ -82,6 +82,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * www: http://crackstation.net/hashing-security.htm
  */
 public class PasswordHash {
+
     private PasswordHash() {
     }
 

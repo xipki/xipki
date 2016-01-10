@@ -137,4 +137,5 @@ public class ExtractCertFromCRLCmd extends SecurityCommandSupport {
                 encodedExtensionValue);
         return derOctet.getOctets();
     }
+
 }

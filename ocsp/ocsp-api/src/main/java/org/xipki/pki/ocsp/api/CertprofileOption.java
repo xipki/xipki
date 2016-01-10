@@ -47,7 +47,9 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class CertprofileOption {
+
     private final Set<String> includes;
+
     private final Set<String> excludes;
 
     public CertprofileOption(
@@ -92,4 +94,5 @@ public class CertprofileOption {
                 ? true
                 : !excludes.contains(certprofile);
     }
+
 }

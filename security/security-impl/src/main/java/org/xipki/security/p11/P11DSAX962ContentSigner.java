@@ -49,6 +49,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class P11DSAX962ContentSigner extends AbstractP11DSAContentSigner {
+
     public P11DSAX962ContentSigner(
             final P11CryptService cryptService,
             final P11SlotIdentifier slot,

@@ -51,7 +51,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class FpIdCalculator {
+
     private final static int parallelism = 50;
+
     private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
 
     private FpIdCalculator() {

@@ -63,4 +63,5 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
         }
         return ret;
     }
+
 }

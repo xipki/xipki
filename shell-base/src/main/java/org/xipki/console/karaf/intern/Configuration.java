@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
  */
 
 public class Configuration {
+
     private Configuration() {
     }
 
@@ -103,4 +104,5 @@ public class Configuration {
         }
         return null;
     }
+
 }

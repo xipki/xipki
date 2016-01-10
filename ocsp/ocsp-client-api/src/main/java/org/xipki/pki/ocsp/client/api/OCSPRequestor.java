@@ -49,8 +49,10 @@ import org.xipki.common.RequestResponseDebug;
  */
 
 public interface OCSPRequestor {
+
     ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
             = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+
     ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
             = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 

@@ -51,6 +51,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
         description = "generate DSA keypair in PKCS#11 device")
 @Service
 public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;

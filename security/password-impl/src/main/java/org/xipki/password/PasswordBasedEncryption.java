@@ -52,6 +52,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 
 public class PasswordBasedEncryption {
+
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
     private static AtomicBoolean initialized = new AtomicBoolean(false);
@@ -110,4 +111,5 @@ public class PasswordBasedEncryption {
         cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
         return cipher.doFinal(cipherText);
     }
+
 }

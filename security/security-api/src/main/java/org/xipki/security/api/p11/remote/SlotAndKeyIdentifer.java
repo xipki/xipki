@@ -58,7 +58,9 @@ import org.xipki.security.api.BadASN1ObjectException;
  */
 
 public class SlotAndKeyIdentifer extends ASN1Object {
+
     private SlotIdentifier slotIdentifier;
+
     private KeyIdentifier keyIdentifier;
 
     public SlotAndKeyIdentifer(

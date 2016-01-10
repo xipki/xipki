@@ -64,13 +64,17 @@ public class SecurePasswordInputPanel extends Panel {
     private static final long serialVersionUID = 1L;
 
     private static final String BACKSPACE = "\u21E6";
+
     private static final String CAPS = "\u21E7";
+
     private static final String CLEAR = "Clear";
+
     private static final String OK = "OK";
 
     private final JPasswordField passwordField;
 
     private static final Map<Integer, String[]> keysMap = new HashMap<Integer, String[]>();
+
     private final Set<JButton> buttons = new HashSet<JButton>();
 
     static {

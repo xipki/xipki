@@ -43,7 +43,9 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public class NextCAandRA {
+
     private final Certificate cACert;
+
     private final Certificate rACert;
 
     public NextCAandRA(

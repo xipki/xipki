@@ -49,6 +49,7 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
  */
 
 public abstract class AbstractEnumCompleter implements Completer {
+
     private final List<String> enums = new LinkedList<>();
 
     protected void setTokens(

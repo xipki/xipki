@@ -45,6 +45,7 @@ import org.xipki.security.P12RawKeypairGenerator.RSAKeypairGenerator;
  */
 
 public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
+
     private final RSAKeypairGenerator kpGen;
 
     public P12RSAKeyGenLoadTest(
@@ -62,4 +63,5 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
     protected P12RawKeypairGenerator getKeypairGenerator() {
         return kpGen;
     }
+
 }

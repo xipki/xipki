@@ -45,8 +45,11 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public class IssuerHashNameAndKey {
+
     private final HashAlgoType algo;
+
     private final byte[] issuerNameHash;
+
     private final byte[] issuerKeyHash;
 
     public IssuerHashNameAndKey(

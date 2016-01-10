@@ -45,8 +45,11 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public class AuthorityCertStore {
+
     private final X509Certificate cACert;
+
     private final X509Certificate signatureCert;
+
     private final X509Certificate encryptionCert;
 
     private AuthorityCertStore(

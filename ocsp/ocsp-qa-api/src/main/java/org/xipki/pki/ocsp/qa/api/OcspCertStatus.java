@@ -40,6 +40,7 @@ package org.xipki.pki.ocsp.qa.api;
  */
 
 public enum OcspCertStatus {
+
     issuerUnknown,
     unknown,
     good,
@@ -70,4 +71,5 @@ public enum OcspCertStatus {
 
         return null;
     }
+
 }

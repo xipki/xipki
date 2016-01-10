@@ -68,8 +68,11 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 
 class RSADigestSignatureSpi
     extends SignatureSpi {
+
     private Digest digest;
+
     private AlgorithmIdentifier algId;
+
     private P11PrivateKey signingKey;
 
     // care - this constructor is actually used by outside organisations
@@ -193,57 +196,74 @@ class RSADigestSignatureSpi
 
     static public class SHA1
         extends RSADigestSignatureSpi {
+
         public SHA1() {
             super(OIWObjectIdentifiers.idSHA1, new SHA1Digest());
         }
+
     }
 
     static public class SHA224
         extends RSADigestSignatureSpi {
+
         public SHA224() {
             super(NISTObjectIdentifiers.id_sha224, new SHA224Digest());
         }
+
     }
 
     static public class SHA256
         extends RSADigestSignatureSpi {
+
         public SHA256() {
             super(NISTObjectIdentifiers.id_sha256, new SHA256Digest());
         }
+
     }
 
     static public class SHA384
         extends RSADigestSignatureSpi {
+
         public SHA384() {
             super(NISTObjectIdentifiers.id_sha384, new SHA384Digest());
         }
+
     }
 
     static public class SHA512
         extends RSADigestSignatureSpi {
+
         public SHA512() {
             super(NISTObjectIdentifiers.id_sha512, new SHA512Digest());
         }
+
     }
 
     static public class RIPEMD160
         extends RSADigestSignatureSpi {
+
         public RIPEMD160() {
             super(TeleTrusTObjectIdentifiers.ripemd160, new RIPEMD160Digest());
         }
+
     }
 
     static public class RIPEMD256
         extends RSADigestSignatureSpi {
+
         public RIPEMD256() {
             super(TeleTrusTObjectIdentifiers.ripemd256, new RIPEMD256Digest());
         }
+
     }
 
     static public class noneRSA
         extends RSADigestSignatureSpi {
+
         public noneRSA() {
             super(new NullDigest());
         }
+
     }
+
 }

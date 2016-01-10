@@ -73,8 +73,11 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public class DbCertStatusStore extends CertStatusStore {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+
     private static final String sqlCs = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+
     private static final Map<HashAlgoType, String> sqlCsHashMap = new HashMap<>();
 
     static {
@@ -89,7 +92,9 @@ public class DbCertStatusStore extends CertStatusStore {
     }
 
     private static class SimpleIssuerEntry {
+
         private final int id;
+
         private final Long revocationTimeMs;
 
         public SimpleIssuerEntry(
@@ -115,21 +120,26 @@ public class DbCertStatusStore extends CertStatusStore {
 
             return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
         }
+
     }
 
     private class StoreUpdateService implements Runnable {
+
         @Override
         public void run() {
             initIssuerStore();
         }
+
     }
 
     private DataSourceWrapper dataSource;
+
     private final IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
 
     private boolean initialized = false;
+
     private boolean initializationFailed = false;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;

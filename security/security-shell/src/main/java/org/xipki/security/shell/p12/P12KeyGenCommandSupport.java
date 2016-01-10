@@ -49,6 +49,7 @@ import org.xipki.security.shell.KeyGenCommandSupport;
  */
 
 public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
+
     @Option(name = "--subject", aliases = "-s",
             required = true,
             description = "subject in the self-signed certificate\n"

@@ -43,6 +43,7 @@ import org.xipki.security.P12RawKeypairGenerator.ECKeypairGenerator;
  */
 
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
+
     private final ECKeypairGenerator kpGen;
 
     public P12ECKeyGenLoadTest(
@@ -58,4 +59,5 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
     protected P12RawKeypairGenerator getKeypairGenerator() {
         return kpGen;
     }
+
 }

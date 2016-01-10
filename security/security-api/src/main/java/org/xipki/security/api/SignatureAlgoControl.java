@@ -40,7 +40,9 @@ package org.xipki.security.api;
  */
 
 public class SignatureAlgoControl {
+
     private final boolean rsaMgf1;
+
     private final boolean dsaPlain;
 
     public SignatureAlgoControl() {

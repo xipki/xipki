@@ -49,7 +49,9 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class CAIdentifier {
+
     private final String url;
+
     private final String profile;
 
     public CAIdentifier(

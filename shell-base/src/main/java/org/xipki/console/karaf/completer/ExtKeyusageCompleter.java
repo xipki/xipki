@@ -49,6 +49,7 @@ import org.xipki.security.api.ObjectIdentifiers;
 
 @Service
 public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
+
     private static final Set<String> usages;
 
     static {

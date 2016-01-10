@@ -124,18 +124,23 @@ import org.xml.sax.SAXException;
  */
 
 public class SecurityFactoryImpl extends AbstractSecurityFactory {
+
     private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
     private String pkcs11Provider;
+
     private int defaultParallelism = 20;
 
     private P11Control p11Control;
 
     private P11CryptServiceFactory p11CryptServiceFactory;
+
     private boolean p11CryptServiciceFactoryInitialized;
 
     private PasswordResolver passwordResolver;
+
     private String pkcs11ConfFile;
+
     private final Map<String, String> signerTypeMapping = new HashMap<>();
 
     public SecurityFactoryImpl() {
