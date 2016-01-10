@@ -49,6 +49,7 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public class TransactionId {
+
     private static final SecureRandom random = new SecureRandom();
 
     private final String id;

@@ -47,13 +47,16 @@ import org.bouncycastle.util.encoders.Hex;
  */
 
 public enum HashAlgoType {
+
     MD5   (16, "1.2.840.113549.2.5", "MD5"),
     SHA1  (20, "1.3.14.3.2.26", "SHA1"),
     SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
     SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
 
     private final int length;
+
     private final String oid;
+
     private final String name;
 
     private HashAlgoType(
@@ -122,4 +125,5 @@ public enum HashAlgoType {
         digest.doFinal(ret, 0);
         return ret;
     }
+
 }

@@ -67,7 +67,9 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class NextCAMessage {
+
     private X509Certificate caCert;
+
     private List<X509Certificate> raCerts;
 
     public NextCAMessage() {

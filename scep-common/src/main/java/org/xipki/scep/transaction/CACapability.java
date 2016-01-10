@@ -40,6 +40,7 @@ package org.xipki.scep.transaction;
  */
 
 public enum CACapability {
+
     AES ("AES"),
     DES3 ("DES3"),
     GetNextCACert ("GetNextCACert"),
@@ -51,6 +52,7 @@ public enum CACapability {
     Update ("Update");
 
     private String text;
+
     private CACapability(
             final String text) {
         this.text = text;
@@ -69,4 +71,5 @@ public enum CACapability {
         }
         return null;
     }
+
 }

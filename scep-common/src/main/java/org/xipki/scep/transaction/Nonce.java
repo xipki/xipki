@@ -45,7 +45,9 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public class Nonce {
+
     private static final SecureRandom random = new SecureRandom();
+
     private static final int NONCE_LEN = 16;
 
     private final byte[] bytes;

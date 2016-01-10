@@ -46,9 +46,10 @@ import org.bouncycastle.asn1.x500.X500Name;
  * @author Lijun Liao
  */
 
-public class IssuerAndSubject
-    extends ASN1Object {
+public class IssuerAndSubject extends ASN1Object {
+
     private X500Name issuer;
+
     private X500Name subject;
 
     public static IssuerAndSubject getInstance(
@@ -91,4 +92,5 @@ public class IssuerAndSubject
 
         return new DERSequence(v);
     }
+
 }

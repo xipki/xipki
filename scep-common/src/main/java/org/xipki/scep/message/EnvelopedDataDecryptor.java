@@ -50,6 +50,7 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public final class EnvelopedDataDecryptor {
+
     private final List<EnvelopedDataDecryptorInstance> decryptors;
 
     public EnvelopedDataDecryptor(

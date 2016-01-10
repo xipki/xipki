@@ -51,9 +51,11 @@ import org.xipki.scep.transaction.CACapability;
  */
 
 public class CACaps {
+
     private static final Logger LOG = LoggerFactory.getLogger(CACaps.class);
 
     private byte[] bytes;
+
     private final Set<CACapability> capabilities;
 
     public CACaps() {
@@ -181,4 +183,5 @@ public class CACaps {
     public byte[] getBytes() {
         return Arrays.clone(bytes);
     }
+
 }
