@@ -141,8 +141,10 @@ import org.xml.sax.SAXException;
  */
 
 abstract class X509CmpRequestor extends CmpRequestor {
+
     private final static DigestCalculatorProvider digesetCalculatorProvider
             = new BcDigestCalculatorProvider();
+
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);

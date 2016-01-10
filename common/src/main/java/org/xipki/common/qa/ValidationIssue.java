@@ -42,9 +42,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ValidationIssue {
+
     private final String code;
+
     private final String description;
+
     private boolean failed;
+
     private String message;
 
     public ValidationIssue(

@@ -55,6 +55,7 @@ import org.xipki.password.api.PasswordResolver;
         description = "add SCEP")
 @Service
 public class ScepAddCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -115,4 +116,5 @@ public class ScepAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "SCEP responder " + caName);
         return null;
     }
+
 }

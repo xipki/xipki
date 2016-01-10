@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ClearPublishQueueCmd;
         description = "clear publish queue")
 @Service
 public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -61,4 +62,5 @@ public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

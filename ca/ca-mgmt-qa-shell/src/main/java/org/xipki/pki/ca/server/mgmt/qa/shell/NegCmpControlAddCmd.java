@@ -62,4 +62,5 @@ public class NegCmpControlAddCmd extends CmpControlAddCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

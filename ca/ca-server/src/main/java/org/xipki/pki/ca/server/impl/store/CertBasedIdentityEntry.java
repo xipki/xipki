@@ -44,9 +44,13 @@ import org.bouncycastle.util.encoders.Base64;
  */
 
 class CertBasedIdentityEntry {
+
     private final int id;
+
     private final String subject;
+
     private final byte[] sha1Fp;
+
     private final byte[] cert;
 
     CertBasedIdentityEntry(
@@ -78,4 +82,5 @@ class CertBasedIdentityEntry {
             final byte[] encodedCert) {
         return Arrays.equals(this.cert, encodedCert);
     }
+
 }

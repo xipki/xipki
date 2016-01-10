@@ -79,6 +79,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class SubjectChecker {
+
     private final String specialBehavior;
 
     private final SubjectControl subjectControl;
@@ -631,4 +632,5 @@ public class SubjectChecker {
             }
         }
     }
+
 }

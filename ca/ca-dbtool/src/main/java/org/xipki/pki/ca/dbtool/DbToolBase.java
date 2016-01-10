@@ -65,11 +65,15 @@ import org.xipki.datasource.api.exception.DataAccessException;
  */
 
 public class DbToolBase {
+
     private static final int STREAM_BUFFER_SIZE = 1048576; // 1M
 
     protected final AtomicBoolean stopMe;
+
     protected final DataSourceWrapper dataSource;
+
     protected Connection connection;
+
     private boolean connectionAutoCommit;
 
     protected final String baseDir;
@@ -390,4 +394,5 @@ public class DbToolBase {
             }
         }
     }
+
 }

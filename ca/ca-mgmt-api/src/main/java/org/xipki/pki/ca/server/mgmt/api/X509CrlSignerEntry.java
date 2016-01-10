@@ -52,16 +52,23 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class X509CrlSignerEntry implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
 
     private static final long serialVersionUID = 1L;
+
     private final String name;
+
     private final String signerType;
+
     private final String signerConf;
+
     private final String base64Cert;
 
     private X509Certificate cert;
+
     private boolean certFaulty;
+
     private boolean confFaulty;
 
     private String crlControl;
@@ -186,4 +193,5 @@ public class X509CrlSignerEntry implements Serializable {
 
         return sb.toString();
     }
+
 }

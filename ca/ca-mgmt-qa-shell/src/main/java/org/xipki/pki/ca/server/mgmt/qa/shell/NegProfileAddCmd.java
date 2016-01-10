@@ -62,4 +62,5 @@ public class NegProfileAddCmd extends ProfileAddCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

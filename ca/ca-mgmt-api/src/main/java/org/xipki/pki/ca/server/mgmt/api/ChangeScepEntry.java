@@ -45,12 +45,17 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ChangeScepEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private final String caName;
+
     private String responderType;
+
     private String responderConf;
+
     private String base64Cert;
+
     private String control;
 
     public ChangeScepEntry(

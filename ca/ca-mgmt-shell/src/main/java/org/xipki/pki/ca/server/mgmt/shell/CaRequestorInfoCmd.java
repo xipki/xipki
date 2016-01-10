@@ -53,6 +53,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "show information of requestor in CA")
 @Service
 public class CaRequestorInfoCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -81,4 +82,5 @@ public class CaRequestorInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

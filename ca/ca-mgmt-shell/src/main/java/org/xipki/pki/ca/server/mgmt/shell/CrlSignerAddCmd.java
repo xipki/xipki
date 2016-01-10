@@ -55,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
         description = "add CRL signer")
 @Service
 public class CrlSignerAddCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"

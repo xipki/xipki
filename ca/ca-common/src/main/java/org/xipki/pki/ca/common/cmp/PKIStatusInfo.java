@@ -43,8 +43,11 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 public class PKIStatusInfo {
+
     private final int status;
+
     private final int pkiFailureInfo;
+
     private final String statusMessage;
 
     public PKIStatusInfo(

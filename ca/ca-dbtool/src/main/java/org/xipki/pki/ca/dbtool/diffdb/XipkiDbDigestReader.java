@@ -59,6 +59,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class XipkiDbDigestReader extends DbDigestReader {
+
     private class XipkiDbRetriever
     implements Retriever {
         private Connection conn;
@@ -139,10 +140,15 @@ public class XipkiDbDigestReader extends DbDigestReader {
     }
 
     private final int caId;
+
     private final XipkiDbControl dbControl;
+
     private final Connection conn;
+
     private final String selectCertSql;
+
     private final String numCertSql;
+
     private final PreparedStatement numCertStmt;
 
     public static XipkiDbDigestReader getInstance(
@@ -325,4 +331,5 @@ public class XipkiDbDigestReader extends DbDigestReader {
     throws DataAccessException {
         return new XipkiDbRetriever();
     }
+
 }

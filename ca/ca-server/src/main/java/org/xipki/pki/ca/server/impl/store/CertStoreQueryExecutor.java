@@ -102,17 +102,22 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class CertStoreQueryExecutor {
+
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private final DataSourceWrapper dataSource;
 
     @SuppressWarnings("unused")
     private final int dbSchemaVersion;
+
     private final int maxX500nameLen;
 
     private final CertBasedIdentityStore caInfoStore;
+
     private final NameIdStore requestorInfoStore;
+
     private final NameIdStore certprofileStore;
+
     private final NameIdStore publisherStore;
 
     CertStoreQueryExecutor(

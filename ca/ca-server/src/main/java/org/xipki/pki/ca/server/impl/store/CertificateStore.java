@@ -68,7 +68,9 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public class CertificateStore {
+
     private static final Logger LOG = LoggerFactory.getLogger(CertificateStore.class);
+
     private final CertStoreQueryExecutor queryExecutor;
 
     public CertificateStore(
@@ -876,4 +878,5 @@ public class CertificateStore {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
+
 }

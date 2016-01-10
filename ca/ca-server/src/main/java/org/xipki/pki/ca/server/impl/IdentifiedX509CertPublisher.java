@@ -58,7 +58,9 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 class IdentifiedX509CertPublisher {
+
     private final PublisherEntry entry;
+
     private final X509CertPublisher certPublisher;
 
     public IdentifiedX509CertPublisher(

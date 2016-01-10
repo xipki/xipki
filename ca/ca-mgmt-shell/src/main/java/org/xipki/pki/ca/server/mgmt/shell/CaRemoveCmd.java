@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "remove CA")
 @Service
 public class CaRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
     private String name;
@@ -60,4 +61,5 @@ public class CaRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "CA " + name);
         return null;
     }
+
 }

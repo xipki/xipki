@@ -51,6 +51,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QaPolicyQualifiers {
+
     private final List<QaPolicyQualifierInfo> policyQualifiers;
 
     public QaPolicyQualifiers(

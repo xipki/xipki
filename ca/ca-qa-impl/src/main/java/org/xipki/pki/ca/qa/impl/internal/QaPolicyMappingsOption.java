@@ -47,6 +47,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
  */
 
 public class QaPolicyMappingsOption extends QaExtension {
+
     private final Map<String, String> policyMappings;
 
     public QaPolicyMappingsOption(

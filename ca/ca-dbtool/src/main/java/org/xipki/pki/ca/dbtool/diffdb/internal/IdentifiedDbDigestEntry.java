@@ -42,8 +42,11 @@ import org.xipki.pki.ca.dbtool.QueueEntry;
  */
 
 public class IdentifiedDbDigestEntry implements QueueEntry {
+
     private final DbDigestEntry content;
+
     private Integer caId;
+
     private final int id;
 
     public IdentifiedDbDigestEntry(
@@ -68,4 +71,5 @@ public class IdentifiedDbDigestEntry implements QueueEntry {
     public Integer getCaId() {
         return caId;
     }
+
 }

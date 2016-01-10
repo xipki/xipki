@@ -43,6 +43,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QaGeneralSubtree {
+
     private final GeneralSubtreeBaseType jaxb;
 
     public QaGeneralSubtree(

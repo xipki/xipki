@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaGenRootCACmd;
         description = "generate selfsigned CA (negative, QA)")
 @Service
 public class NegCaGenRootCACmd extends CaGenRootCACmd {
+
     @Override
     protected Object doExecute()
     throws Exception {

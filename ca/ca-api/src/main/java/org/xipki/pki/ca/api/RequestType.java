@@ -40,6 +40,7 @@ package org.xipki.pki.ca.api;
  */
 
 public enum RequestType {
+
     CA(1),
     CMP(2),
     SCEP(3);
@@ -64,4 +65,5 @@ public enum RequestType {
 
         return null;
     }
+
 }

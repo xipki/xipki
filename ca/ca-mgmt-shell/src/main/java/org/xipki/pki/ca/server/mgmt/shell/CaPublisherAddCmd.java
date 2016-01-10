@@ -52,6 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
         description = "add publisher to CA")
 @Service
 public class CaPublisherAddCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -75,4 +76,5 @@ public class CaPublisherAddCmd extends CaCommandSupport {
         }
         return null;
     }
+
 }

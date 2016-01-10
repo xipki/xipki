@@ -40,9 +40,13 @@ package org.xipki.pki.ca.client.api;
  */
 
 public class RemoveExpiredCertsResult {
+
     private int numOfCerts;
+
     private long expiredAt;
+
     private String userLike;
+
     private String certprofile;
 
     public int getNumOfCerts() {

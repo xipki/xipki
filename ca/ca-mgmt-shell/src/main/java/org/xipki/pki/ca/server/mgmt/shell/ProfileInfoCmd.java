@@ -55,6 +55,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
         description = "show information of certifiate profile")
 @Service
 public class ProfileInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
 
@@ -98,4 +99,5 @@ public class ProfileInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

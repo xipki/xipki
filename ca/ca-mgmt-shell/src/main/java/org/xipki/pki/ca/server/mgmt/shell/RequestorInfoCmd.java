@@ -57,6 +57,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
         description = "show information of requestor")
 @Service
 public class RequestorInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "requestor name")
     @Completion(RequestorNameCompleter.class)
     private String name;
@@ -101,4 +102,5 @@ public class RequestorInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

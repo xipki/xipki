@@ -40,9 +40,11 @@ package org.xipki.pki.ca.common.cmp;
  */
 
 public enum ProtectionResult {
+
     VALID,
     INVALID,
     SIGALGO_FORBIDDEN,
     NOT_SIGNATURE_BASED,
     SENDER_NOT_AUTHORIZED;
+
 }

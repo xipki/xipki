@@ -40,6 +40,7 @@ package org.xipki.pki.ca.client.impl;
  */
 
 public class ClientErrorCode {
+
     /**
      * Intern status to indicate that there are errors in the response
      */
@@ -49,4 +50,5 @@ public class ClientErrorCode {
 
     private ClientErrorCode() {
     }
+
 }

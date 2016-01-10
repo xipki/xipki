@@ -42,6 +42,7 @@ package org.xipki.pki.ca.dbtool;
 public class IDRange {
 
     private final int from;
+
     private final int to;
 
     public IDRange(

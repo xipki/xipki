@@ -45,7 +45,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 class CertBasedIdentityStore {
+
     private final String table;
+
     private final List<CertBasedIdentityEntry> entries;
 
     CertBasedIdentityStore(
@@ -109,4 +111,5 @@ class CertBasedIdentityStore {
     String getTable() {
         return table;
     }
+
 }

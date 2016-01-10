@@ -42,60 +42,71 @@ import javax.xml.stream.XMLStreamException;
  */
 
 public class OcspCertType extends DbDataObject {
+
     public static final String TAG_ROOT = "cert";
 
     public static final String TAG_id = "id";
+
     private Integer id;
 
     /**
      * issuer id
      */
     public static final String TAG_iid = "iid";
+
     private Integer iid;
 
     /**
      * certificate serial number
      */
     public static final String TAG_sn = "sn";
+
     private String sn;
 
     public static final String TAG_update = "update";
+
     private Long update;
 
     /**
      * whether revoked
      */
     public static final String TAG_rev = "rev";
+
     private Boolean rev;
 
     /**
      * revocation reason
      */
     public static final String TAG_rr = "rr";
+
     private Integer rr;
 
     /**
      * revocation time
      */
     public static final String TAG_rt = "rt";
+
     private Long rt;
 
     /**
      * revocation invalidity time
      */
     public static final String TAG_rit = "rit";
+
     private Long rit;
 
     /**
      * certificate profile name
      */
     public static final String TAG_profile = "profile";
+
     private String profile;
 
     /**
      * file name of the certificate
      */
     public static final String TAG_file = "file";
+
     private String file;
 
     public Integer getId() {
@@ -224,4 +235,5 @@ public class OcspCertType extends DbDataObject {
         writer.writeEndElement();
         writer.writeNewline();
     }
+
 }

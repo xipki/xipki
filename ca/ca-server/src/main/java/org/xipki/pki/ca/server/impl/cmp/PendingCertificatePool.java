@@ -51,9 +51,13 @@ import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
  */
 
 class PendingCertificatePool {
+
     private static class MyEntry {
+
         private final BigInteger certReqId;
+
         private final long waitForConfirmTill;
+
         private final X509CertificateInfo certInfo;
 
         public MyEntry(
@@ -87,6 +91,7 @@ class PendingCertificatePool {
             return certReqId.equals(another.certReqId)
                     && certInfo.equals(another.certInfo);
         }
+
     }
 
     private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<>();

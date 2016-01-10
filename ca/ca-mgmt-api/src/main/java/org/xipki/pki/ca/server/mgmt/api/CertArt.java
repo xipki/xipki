@@ -40,6 +40,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  */
 
 public enum CertArt {
+
     X509PKC(1),
     X509AC(2),
     CVC(3);
@@ -64,4 +65,5 @@ public enum CertArt {
         }
         return null;
     }
+
 }

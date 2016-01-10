@@ -40,10 +40,12 @@ package org.xipki.pki.ca.server.mgmt.api;
  */
 
 public enum CASystemStatus {
+
     STARTED_AS_MASTER,
     STARTED_AS_SLAVE,
     NOT_INITED,
     INITIALIZING,
     LOCK_FAILED,
     ERROR;
+
 }

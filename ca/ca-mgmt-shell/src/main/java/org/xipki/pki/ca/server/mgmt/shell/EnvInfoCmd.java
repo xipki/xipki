@@ -53,6 +53,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
         description = "show information of CA environment parameter")
 @Service
 public class EnvInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "environment parameter name")
     private String name;
 
@@ -92,4 +93,5 @@ public class EnvInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

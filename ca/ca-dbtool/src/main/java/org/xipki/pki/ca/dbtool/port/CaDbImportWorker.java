@@ -71,12 +71,17 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
  */
 
 public class CaDbImportWorker extends DbPortWorker {
+
     private static class CAInfoBundle {
+
         private final String CA_name;
+
         private final long CA_nextSerial;
+
         private final byte[] cert;
 
         private long should_CA_nextSerial;
+
         private Integer CA_id;
 
         public CAInfoBundle(
@@ -88,14 +93,21 @@ public class CaDbImportWorker extends DbPortWorker {
             this.should_CA_nextSerial = CA_nextSerial;
             this.cert = cert;
         }
+
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
+
     private final DataSourceWrapper dataSource;
+
     private final Unmarshaller unmarshaller;
+
     private final boolean resume;
+
     private final String srcFolder;
+
     private final int batchEntriesPerCommit;
+
     private final boolean evaluateOnly;
 
     public CaDbImportWorker(
@@ -252,7 +264,6 @@ public class CaDbImportWorker extends DbPortWorker {
             String seqName = IoUtil.convertSequenceName("SN_" + entry.CA_name);
             dataSource.dropAndCreateSequence(seqName, nextSerial);
         }
-
     }
 
 }

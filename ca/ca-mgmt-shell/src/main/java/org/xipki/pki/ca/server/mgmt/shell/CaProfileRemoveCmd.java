@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "remove certificate profile from CA")
 @Service
 public class CaProfileRemoveCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -69,4 +70,5 @@ public class CaProfileRemoveCmd extends CaCommandSupport {
                 "certificate with localname " + profileLocalname + " from CA " + caName);
         return null;
     }
+
 }

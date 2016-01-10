@@ -50,6 +50,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "publish the certificate of root CA")
 @Service
 public class CaPublishRCACertCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
     private String caName;
@@ -67,4 +68,5 @@ public class CaPublishRCACertCmd extends CaCommandSupport {
         output(b, "published", "could not publish", "CA certificate of root CA " + caName);
         return null;
     }
+
 }

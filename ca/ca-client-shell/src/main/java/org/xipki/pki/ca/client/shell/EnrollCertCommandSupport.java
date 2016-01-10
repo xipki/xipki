@@ -101,6 +101,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
+
     @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested\n"
                     + "(defaults to subject of self-signed certifite)")

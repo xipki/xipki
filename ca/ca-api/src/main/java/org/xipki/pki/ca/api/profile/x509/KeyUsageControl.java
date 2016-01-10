@@ -43,7 +43,9 @@ import org.xipki.security.api.KeyUsage;
  */
 
 public class KeyUsageControl {
+
     private final KeyUsage keyUsage;
+
     private final boolean required;
 
     public KeyUsageControl(

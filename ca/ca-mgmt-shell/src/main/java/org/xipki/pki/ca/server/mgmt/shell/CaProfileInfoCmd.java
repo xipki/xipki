@@ -53,6 +53,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "show information of certificate profile in given CA")
 @Service
 public class CaProfileInfoCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -88,4 +89,5 @@ public class CaProfileInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

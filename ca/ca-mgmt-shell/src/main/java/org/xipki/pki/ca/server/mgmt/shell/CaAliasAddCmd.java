@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "add CA alias")
 @Service
 public class CaAliasAddCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -70,4 +71,5 @@ public class CaAliasAddCmd extends CaCommandSupport {
                 "CA alias " + caAlias + " associated with CA " + caName);
         return null;
     }
+
 }

@@ -46,16 +46,21 @@ import org.xipki.datasource.api.exception.DataAccessException;
  */
 
 class AbstractCaCertStoreDbPorter extends DbPorter {
+
     private static final String CRLS_DIRNAME = "crls";
+
     private static final String CRLS_MANIFEST_FILENAME = "crls-manifest";
 
     private static final String USERS_DIRNAME = "users";
+
     private static final String USERS_MANIFEST_FILENAME = "users-manifest";
 
     protected final String crlsDir;
+
     protected final String crlsListFile;
 
     protected final String usersDir;
+
     protected final String usersListFile;
 
     AbstractCaCertStoreDbPorter(

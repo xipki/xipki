@@ -43,6 +43,7 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
  */
 
 public abstract class MgmtNameCompleter extends AbstractDynamicEnumCompleter {
+
     protected CAManager caManager;
 
     public void setCaManager(

@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
         description = "check information of CA environment parameters (QA)")
 @Service
 public class EnvCheckCmd extends EnvUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -62,4 +63,5 @@ public class EnvCheckCmd extends EnvUpdateCmd {
         out(" checked environment " + name);
         return null;
     }
+
 }

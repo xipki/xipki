@@ -51,6 +51,7 @@ import org.xipki.console.karaf.CmdFailure;
         description = "check information of CRL signers (QA)")
 @Service
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -94,4 +95,5 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
         out(" checked CRL signer " + name);
         return null;
     }
+
 }

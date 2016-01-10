@@ -61,4 +61,5 @@ public class UserRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "user " + name);
         return null;
     }
+
 }

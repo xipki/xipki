@@ -43,7 +43,9 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
  */
 
 public class CmpRequestorEntryWrapper {
+
     private CmpRequestorEntry dbEntry;
+
     private X509CertWithDBCertId cert;
 
     public CmpRequestorEntryWrapper() {

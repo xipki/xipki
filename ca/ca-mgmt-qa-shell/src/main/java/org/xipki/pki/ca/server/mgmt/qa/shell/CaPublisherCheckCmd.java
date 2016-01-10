@@ -56,6 +56,7 @@ import org.xipki.console.karaf.CmdFailure;
         description = "check information of publishers in given CA (QA)")
 @Service
 public class CaPublisherCheckCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

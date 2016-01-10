@@ -40,9 +40,11 @@ package org.xipki.audit.api;
  */
 
 public interface AuditService {
+
     void logEvent(
             AuditEvent event);
 
     void logEvent(
             PCIAuditEvent event);
+
 }

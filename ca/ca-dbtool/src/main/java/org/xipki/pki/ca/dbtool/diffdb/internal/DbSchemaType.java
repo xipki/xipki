@@ -40,9 +40,11 @@ package org.xipki.pki.ca.dbtool.diffdb.internal;
  */
 
 public enum DbSchemaType {
+
     XIPKI_CA_v1,
     XIPKI_OCSP_v1,
     XIPKI_CA_v2,
     XIPKI_OCSP_v2,
     EJBCA_CA_v3;
+
 }

@@ -47,6 +47,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class EnrollCertRequestType {
+
     public static enum Type {
         CERT_REQ,
         KEY_UPDATE,
@@ -54,6 +55,7 @@ public class EnrollCertRequestType {
     }
 
     private final Type type;
+
     private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public EnrollCertRequestType(
@@ -87,4 +89,5 @@ public class EnrollCertRequestType {
     public List<EnrollCertRequestEntryType> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
+
 }

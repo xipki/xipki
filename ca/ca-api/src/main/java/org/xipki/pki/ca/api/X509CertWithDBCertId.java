@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
  */
 
 public class X509CertWithDBCertId extends X509Cert {
+
     private Integer certId;
 
     public X509CertWithDBCertId(

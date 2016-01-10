@@ -58,6 +58,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "enroll certificate")
 @Service
 public class EnrollCertCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

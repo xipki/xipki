@@ -237,15 +237,19 @@ implements CAManager, CmpResponderManager, ScepManager {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
+
     private static final String EVENT_LOCK = "LOCK";
+
     private static final String EVENT_CACHAGNE = "CA_CHANGE";
 
     private final String lockInstanceId;
 
     private Map<String, CmpResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
+
     private Map<String, CmpResponderEntryWrapper> responders = new ConcurrentHashMap<>();
 
     private boolean caLockedByMe = false;
+
     private boolean masterMode = false;
 
     private Map<String, DataSourceWrapper> dataSources = null;
@@ -253,58 +257,84 @@ implements CAManager, CmpResponderManager, ScepManager {
     private final Map<String, X509CAInfo> caInfos = new ConcurrentHashMap<>();
 
     private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
+
     private final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
+
     private final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, CmpControl> cmpControls = new ConcurrentHashMap<>();
+
     private final Map<String, CmpControlEntry> cmpControlDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
+
     private final Map<String, CmpRequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
+
     private final Map<String, X509CrlSignerEntry> crlSignerDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, Scep> sceps = new ConcurrentHashMap<>();
+
     private final Map<String, ScepEntry> scepDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, Map<String, String>> ca_has_profiles = new ConcurrentHashMap<>();
+
     private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
+
     private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors
             = new ConcurrentHashMap<>();
+
     private final Map<String, String> caAliases = new ConcurrentHashMap<>();
 
     private final DfltEnvParameterResolver envParameterResolver = new DfltEnvParameterResolver();
 
     private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
+
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     private final Map<String, X509CACmpResponder> x509Responders = new ConcurrentHashMap<>();
+
     private final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
 
     private String caConfFile;
 
     private boolean caSystemSetuped = false;
+
     private boolean responderInitialized = false;
+
     private boolean requestorsInitialized = false;
+
     private boolean caAliasesInitialized = false;
+
     private boolean certprofilesInitialized = false;
+
     private boolean publishersInitialized = false;
+
     private boolean crlSignersInitialized = false;
+
     private boolean cmpControlInitialized = false;
+
     private boolean cAsInitialized = false;
+
     private boolean environmentParametersInitialized = false;
+
     private boolean scepsInitialized = false;
+
     private Date lastStartTime;
 
     private AuditServiceRegister auditServiceRegister;
 
     private DataSourceWrapper dataSource;
+
     private CertificateStore certstore;
+
     private SecurityFactory securityFactory;
+
     private DataSourceFactory dataSourceFactory;
+
     private CAManagerQueryExecutor queryExecutor;
 
     public CAManagerImpl()

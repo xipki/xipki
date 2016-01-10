@@ -55,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport {
+
     @Option(name = "--cert", aliases = "-c",
             description = "certificate file")
     @Completion(FilePathCompleter.class)

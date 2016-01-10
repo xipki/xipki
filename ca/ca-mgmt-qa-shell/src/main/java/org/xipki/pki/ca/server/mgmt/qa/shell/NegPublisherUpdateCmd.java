@@ -62,4 +62,5 @@ public class NegPublisherUpdateCmd extends PublisherUpdateCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

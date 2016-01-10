@@ -44,6 +44,7 @@ import java.util.List;
  */
 
 public class AuditChildEvent {
+
     /**
      * The data array belonging to the event.
      */

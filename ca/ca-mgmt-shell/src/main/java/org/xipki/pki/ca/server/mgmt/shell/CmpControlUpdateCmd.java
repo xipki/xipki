@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
         description = "update CMP control")
 @Service
 public class CmpControlUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CMP control name\n"
@@ -69,4 +70,5 @@ public class CmpControlUpdateCmd extends CaCommandSupport {
         output(b, "updated", "could not update", "CMP control " + name);
         return null;
     }
+
 }

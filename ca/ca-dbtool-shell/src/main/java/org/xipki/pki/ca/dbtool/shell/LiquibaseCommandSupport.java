@@ -62,6 +62,7 @@ import org.xipki.pki.ca.dbtool.shell.completer.LogLevelCompleter;
  */
 
 public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
+
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
     private static final List<String> yesNo = new ArrayList<>(2);

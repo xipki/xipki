@@ -52,6 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
         description = "show information of SCEP")
 @Service
 public class ScepInfoCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "SCEP CA name\n"
@@ -70,4 +71,5 @@ public class ScepInfoCmd extends CaCommandSupport {
         System.out.println(scep.toString());
         return null;
     }
+
 }

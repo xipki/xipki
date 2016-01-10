@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
         description = "remove publisher")
 @Service
 public class PublisherRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "publisher name", required = true)
     @Completion(PublisherNameCompleter.class)
     private String name;
@@ -60,4 +61,5 @@ public class PublisherRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "certificate profile " + name);
         return null;
     }
+
 }

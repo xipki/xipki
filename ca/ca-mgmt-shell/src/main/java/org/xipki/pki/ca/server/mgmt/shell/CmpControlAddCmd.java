@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
         description = "add CMP control")
 @Service
 public class CmpControlAddCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CMP control name\n"
@@ -68,4 +69,5 @@ public class CmpControlAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "CMP control " + name);
         return null;
     }
+
 }

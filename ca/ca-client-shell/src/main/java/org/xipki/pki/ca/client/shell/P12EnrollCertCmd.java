@@ -55,6 +55,7 @@ import org.xipki.security.api.SignerException;
         description = "enroll certificate (PKCS#12 keystore)")
 @Service
 public class P12EnrollCertCmd extends EnrollCertCommandSupport {
+
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 request file\n"

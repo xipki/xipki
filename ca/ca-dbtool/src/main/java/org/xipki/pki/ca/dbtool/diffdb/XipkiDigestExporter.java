@@ -71,11 +71,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter {
+
     private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExporter.class);
 
     private final int numCertsPerSelect;
 
     private final XipkiDbControl dbControl;
+
     private final int numThreads;
 
     public XipkiDigestExporter(
@@ -184,7 +186,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
     }
 
     private void doDigest(
-            XipkiDigestExportReader certsReader,
+            final XipkiDigestExportReader certsReader,
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer)
     throws Exception {

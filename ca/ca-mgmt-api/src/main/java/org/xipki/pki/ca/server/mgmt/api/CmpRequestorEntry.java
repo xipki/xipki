@@ -51,11 +51,15 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class CmpRequestorEntry implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestorEntry.class);
 
     private static final long serialVersionUID = 1L;
+
     private final String name;
+
     private final String base64Cert;
+
     private X509Certificate cert;
 
     public CmpRequestorEntry(
@@ -122,4 +126,5 @@ public class CmpRequestorEntry implements Serializable {
 
         return sb.toString();
     }
+
 }

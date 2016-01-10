@@ -87,4 +87,5 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
         out(" checked responder " + name);
         return null;
     }
+
 }

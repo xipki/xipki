@@ -42,7 +42,9 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
  */
 
 public class PKIResponse {
+
     private final GeneralPKIMessage pkiMessage;
+
     private ProtectionVerificationResult protectionVerificationResult;
 
     public PKIResponse(

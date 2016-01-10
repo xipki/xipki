@@ -45,6 +45,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 class IssuerStore {
+
     private final List<IssuerEntry> entries;
 
     IssuerStore(
@@ -102,4 +103,5 @@ class IssuerStore {
 
         return null;
     }
+
 }

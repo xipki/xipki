@@ -45,7 +45,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 class NameIdStore {
+
     private final String table;
+
     private final Map<String, Integer> entries;
 
     NameIdStore(

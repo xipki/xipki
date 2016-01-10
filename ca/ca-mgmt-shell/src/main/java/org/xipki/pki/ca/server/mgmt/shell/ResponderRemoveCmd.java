@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
         description = "remove responder")
 @Service
 public class ResponderRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "responder name", required = true)
     @Completion(ResponderNameCompleter.class)
     private String name;
@@ -60,4 +61,5 @@ public class ResponderRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "CMP responder " + name);
         return null;
     }
+
 }

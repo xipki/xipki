@@ -63,14 +63,23 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
  */
 
 public class OcspDbExportWorker extends DbPortWorker {
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
+
     private final DataSourceWrapper dataSource;
+
     private final Marshaller marshaller;
+
     private final Unmarshaller unmarshaller;
+
     private final String destFolder;
+
     private final boolean resume;
+
     private final int numCertsInBundle;
+
     private final int numCertsPerSelect;
+
     private final boolean evaluateOnly;
 
     public OcspDbExportWorker(

@@ -52,6 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllComplete
         description = "clear publish queue")
 @Service
 public class ClearPublishQueueCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"
@@ -90,4 +91,5 @@ public class ClearPublishQueueCmd extends CaCommandSupport {
                 "publish queue of CA " + caName + " for publishers " + toString(publisherNames));
         return null;
     }
+
 }

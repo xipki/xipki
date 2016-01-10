@@ -43,7 +43,9 @@ import org.bouncycastle.asn1.cmp.PKIStatus;
  */
 
 public class EnrollCertResultEntryType extends ResultEntryType {
+
     private final CMPCertificate cert;
+
     private final int status;
 
     public EnrollCertResultEntryType(
@@ -68,4 +70,5 @@ public class EnrollCertResultEntryType extends ResultEntryType {
     public int getStatus() {
         return status;
     }
+
 }

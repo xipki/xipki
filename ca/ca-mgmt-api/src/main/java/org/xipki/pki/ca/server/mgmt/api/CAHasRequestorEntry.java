@@ -47,11 +47,15 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CAHasRequestorEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private final String requestorName;
+
     private boolean ra;
+
     private Set<Permission> permissions;
+
     private Set<String> profiles;
 
     public CAHasRequestorEntry(
@@ -104,4 +108,5 @@ public class CAHasRequestorEntry implements Serializable {
         sb.append("permissions: ").append(Permission.toString(permissions));
         return sb.toString();
     }
+
 }

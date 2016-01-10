@@ -40,7 +40,9 @@ package org.xipki.common;
  */
 
 public class RequestResponsePair {
+
     private byte[] request;
+
     private byte[] response;
 
     public byte[] getRequest() {

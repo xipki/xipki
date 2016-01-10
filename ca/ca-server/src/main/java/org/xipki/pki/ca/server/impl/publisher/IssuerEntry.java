@@ -44,9 +44,13 @@ import org.bouncycastle.util.encoders.Base64;
  */
 
 class IssuerEntry {
+
     private final int id;
+
     private final String subject;
+
     private final byte[] sha1Fp;
+
     private final byte[] cert;
 
     IssuerEntry(

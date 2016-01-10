@@ -40,7 +40,9 @@ package org.xipki.pki.ca.api;
  */
 
 public interface RequestorInfo {
+
     String getName();
 
     boolean isRA();
+
 }

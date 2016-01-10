@@ -40,6 +40,8 @@ package org.xipki.pki.ca.dbtool.diffdb;
  */
 
 public interface DbDigestExporter {
+
     void digest()
     throws Exception;
+
 }

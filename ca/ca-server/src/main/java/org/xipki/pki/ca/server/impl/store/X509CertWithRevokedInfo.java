@@ -42,7 +42,9 @@ import org.xipki.pki.ca.api.X509CertWithDBCertId;
  */
 
 public class X509CertWithRevokedInfo {
+
     private final X509CertWithDBCertId cert;
+
     private final boolean revoked;
 
     public X509CertWithRevokedInfo(

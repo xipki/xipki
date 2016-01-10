@@ -73,6 +73,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class OCSPStoreQueryExecutor {
+
     private static final String SQL_ADD_REVOKED_CERT =
             "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN,RT,RIT,RR)"
             + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
@@ -97,6 +98,7 @@ class OCSPStoreQueryExecutor {
 
     @SuppressWarnings("unused")
     private final int dbSchemaVersion;
+
     private final int maxX500nameLen;
 
     OCSPStoreQueryExecutor(

@@ -85,4 +85,5 @@ public class PublisherAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "publisher " + name);
         return null;
     }
+
 }

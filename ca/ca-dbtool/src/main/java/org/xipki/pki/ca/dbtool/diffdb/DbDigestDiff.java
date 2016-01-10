@@ -70,19 +70,29 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class DbDigestDiff {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiff.class);
+
     private final String refDirname;
+
     private final DataSourceWrapper refDatasource;
+
     private final boolean revokedOnly;
 
     private final DataSourceWrapper targetDatasource;
+
     private final XipkiDbControl targetDbControl;
+
     private Set<byte[]> includeCACerts;
 
     private final String reportDirName;
+
     private final AtomicBoolean stopMe;
+
     private final int numPerSelect;
+
     private final int numRefThreads;
+
     private final int numTargetThreads;
 
     public static DbDigestDiff getInstanceForDirRef(
@@ -264,8 +274,9 @@ public class DbDigestDiff {
         }
     }
 
-    private void diffSingleCA(DigestReader refReader,
-            Map<Integer, byte[]> caIdCertBytesMap)
+    private void diffSingleCA(
+            final DigestReader refReader,
+            final Map<Integer, byte[]> caIdCertBytesMap)
     throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.getCaCert();
         byte[] caCertBytes = caCert.getEncoded();
@@ -339,7 +350,8 @@ public class DbDigestDiff {
     }
 
     private static Map<Integer, byte[]> getCAs(
-            DataSourceWrapper datasource, XipkiDbControl dbControl)
+            final DataSourceWrapper datasource,
+            final XipkiDbControl dbControl)
     throws DataAccessException {
         // get a list of available CAs in the target database
         String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();

@@ -43,6 +43,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ErrorResultEntryType extends ResultEntryType {
+
     private final PKIStatusInfo statusInfo;
 
     public ErrorResultEntryType(
@@ -72,4 +73,5 @@ public class ErrorResultEntryType extends ResultEntryType {
     public PKIStatusInfo getStatusInfo() {
         return statusInfo;
     }
+
 }

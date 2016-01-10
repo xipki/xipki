@@ -54,6 +54,7 @@ import org.xipki.common.util.ParamUtil;
 */
 
 class CACertRespBytes {
+
     private final byte[] bytes;
 
     CACertRespBytes(

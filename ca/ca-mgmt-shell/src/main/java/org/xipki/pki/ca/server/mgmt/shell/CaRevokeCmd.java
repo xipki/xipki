@@ -60,6 +60,7 @@ import org.xipki.security.api.CertRevocationInfo;
         description = "revoke CA")
 @Service
 public class CaRevokeCmd extends CaCommandSupport {
+
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
             Arrays.asList(new CRLReason[] {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
@@ -121,4 +122,5 @@ public class CaRevokeCmd extends CaCommandSupport {
         output(b, "revoked", "could not revoke", "CA " + caName);
         return null;
     }
+
 }

@@ -54,12 +54,19 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class X509IssuerInfo {
+
     private final Set<String> caIssuerURLs;
+
     private final Set<String> ocspURLs;
+
     private final Set<String> crlURLs;
+
     private final Set<String> deltaCrlURLs;
+
     private final X509Certificate cert;
+
     private final Certificate bcCert;
+
     private final byte[] ski;
 
     public X509IssuerInfo(

@@ -74,6 +74,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter {
+
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExporter.class);
 
     private final int numCertsPerSelect;
@@ -81,7 +82,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
     private final boolean tblCertHasId;
 
     private final String sql;
+
     private final String certSql;
+
     private final int numThreads;
 
     public EjbcaDigestExporter(

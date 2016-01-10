@@ -46,6 +46,7 @@ import java.util.Set;
 public class EnrollCertResult {
 
     private final Certificate caCertificate;
+
     private final Map<String, CertOrError> certificatesOrErrors;
 
     public EnrollCertResult(

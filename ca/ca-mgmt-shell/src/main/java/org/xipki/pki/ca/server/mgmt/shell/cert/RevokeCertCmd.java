@@ -54,6 +54,7 @@ import org.xipki.security.api.CRLReason;
         description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRmCertCommandSupport {
+
     @Option(name = "--reason", aliases = "-r",
             required = true,
             description = "CRL reason\n"

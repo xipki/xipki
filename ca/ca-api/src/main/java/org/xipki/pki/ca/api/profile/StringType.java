@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.DERUTF8String;
  */
 
 public enum StringType {
+
     teletexString,
     printableString,
     utf8String,
@@ -69,4 +70,5 @@ public enum StringType {
             throw new RuntimeException("should not reach here, unkown StringType '" + text + "'");
         }
     }
+
 }

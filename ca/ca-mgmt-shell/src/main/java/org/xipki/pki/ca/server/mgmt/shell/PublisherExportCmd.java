@@ -55,6 +55,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "export publisher configuration")
 @Service
 public class PublisherExportCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "publisher name\n"
@@ -85,4 +86,5 @@ public class PublisherExportCmd extends CaCommandSupport {
         }
         return null;
     }
+
 }

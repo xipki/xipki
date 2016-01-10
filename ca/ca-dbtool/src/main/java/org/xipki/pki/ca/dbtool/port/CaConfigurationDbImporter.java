@@ -89,6 +89,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class CaConfigurationDbImporter extends DbPorter {
+
     private final Unmarshaller unmarshaller;
 
     CaConfigurationDbImporter(

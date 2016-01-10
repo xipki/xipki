@@ -50,6 +50,7 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
         description = "show information of user")
 @Service
 public class UserInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;
 
@@ -68,4 +69,5 @@ public class UserInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

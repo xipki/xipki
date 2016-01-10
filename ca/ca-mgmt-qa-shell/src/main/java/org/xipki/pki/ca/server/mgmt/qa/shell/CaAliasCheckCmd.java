@@ -51,6 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "check CA aliases (QA)")
 @Service
 public class CaAliasCheckCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -77,4 +78,5 @@ public class CaAliasCheckCmd extends CaCommandSupport {
         out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
         return null;
     }
+
 }

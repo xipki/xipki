@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ExtensionValue {
+
     private final boolean critical;
+
     private final ASN1Encodable value;
 
     public ExtensionValue(

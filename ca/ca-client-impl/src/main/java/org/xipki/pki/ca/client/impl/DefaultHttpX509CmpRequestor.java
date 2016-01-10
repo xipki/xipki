@@ -53,7 +53,9 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
+
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
+
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
     private final URL serverUrl;

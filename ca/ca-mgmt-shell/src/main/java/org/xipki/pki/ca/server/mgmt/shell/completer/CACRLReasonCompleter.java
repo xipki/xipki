@@ -46,6 +46,7 @@ import org.xipki.security.api.CRLReason;
 
 @Service
 public class CACRLReasonCompleter extends AbstractEnumCompleter {
+
     public CACRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();
 
@@ -55,4 +56,5 @@ public class CACRLReasonCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

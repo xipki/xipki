@@ -56,6 +56,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
         description = "show information of CMP control")
 @Service
 public class CmpControlInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CMP control name")
     @Completion(CmpControlNameCompleter.class)
     private String name;
@@ -96,4 +97,5 @@ public class CmpControlInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

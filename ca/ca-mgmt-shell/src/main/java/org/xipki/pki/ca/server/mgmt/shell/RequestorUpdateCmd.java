@@ -54,6 +54,7 @@ import org.xipki.security.api.util.X509Util;
         description = "update requestor")
 @Service
 public class RequestorUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"
@@ -77,4 +78,5 @@ public class RequestorUpdateCmd extends CaCommandSupport {
         output(b, "updated", "could not update", "CMP requestor " + name);
         return null;
     }
+
 }

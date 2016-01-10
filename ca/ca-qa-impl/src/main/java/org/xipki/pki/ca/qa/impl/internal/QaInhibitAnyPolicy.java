@@ -42,6 +42,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
  */
 
 public class QaInhibitAnyPolicy extends QaExtension {
+
     private final int skipCerts;
 
     public QaInhibitAnyPolicy(

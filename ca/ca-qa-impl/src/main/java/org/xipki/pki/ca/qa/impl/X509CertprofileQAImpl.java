@@ -88,18 +88,27 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class X509CertprofileQAImpl implements X509CertprofileQA {
+
     private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQAImpl.class);
+
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     private static final long SECOND = 1000L;
+
     private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
     private final SubjectChecker subjectChecker;
+
     private final PublicKeyChecker publicKeyChecker;
+
     private final ExtensionsChecker extensionsChecker;
 
     private final CertValidity validity;
+
     private final X509CertVersion version;
+
     private final Set<String> signatureAlgorithms;
+
     private final boolean notBeforeMidnight;
 
     public X509CertprofileQAImpl(
@@ -332,4 +341,5 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
 
         return Collections.unmodifiableMap(map);
     }
+
 }

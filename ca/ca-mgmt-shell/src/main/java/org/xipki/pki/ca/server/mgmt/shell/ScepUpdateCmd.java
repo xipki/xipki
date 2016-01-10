@@ -61,6 +61,7 @@ import org.xipki.security.api.util.X509Util;
         description = "Update SCEP")
 @Service
 public class ScepUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -144,4 +145,5 @@ public class ScepUpdateCmd extends CaCommandSupport {
         output(b, "updated", "could not update", "SCEP responder " + caName);
         return null;
     }
+
 }

@@ -76,6 +76,7 @@ import org.xipki.security.api.util.X509Util;
         description = "update CA")
 @Service
 public class CaUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
@@ -333,4 +334,5 @@ public class CaUpdateCmd extends CaCommandSupport {
             return new ArrayList<>(uris);
         }
     }
+
 }

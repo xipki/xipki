@@ -47,9 +47,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertValidity implements Comparable<CertValidity>, Serializable {
+
     private static final long serialVersionUID = 1917871166917453960L;
 
     private static final long SECOND = 1000L;
+
     private static final TimeZone utc = TimeZone.getTimeZone("UTC");
 
     public static enum Unit {

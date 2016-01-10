@@ -40,7 +40,9 @@ package org.xipki.pki.ca.api.profile;
  */
 
 public class Range {
+
     private Integer min;
+
     private Integer max;
 
     public Range(
@@ -99,4 +101,5 @@ public class Range {
         sb.append("]");
         return sb.toString();
     }
+
 }

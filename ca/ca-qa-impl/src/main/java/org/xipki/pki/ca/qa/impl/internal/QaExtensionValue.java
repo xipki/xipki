@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QaExtensionValue {
+
     private final boolean critical;
+
     private final byte[] value;
 
     public QaExtensionValue(

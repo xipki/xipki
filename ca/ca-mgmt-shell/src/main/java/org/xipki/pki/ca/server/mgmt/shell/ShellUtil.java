@@ -47,6 +47,7 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 class ShellUtil {
+
     private ShellUtil() {
     }
 

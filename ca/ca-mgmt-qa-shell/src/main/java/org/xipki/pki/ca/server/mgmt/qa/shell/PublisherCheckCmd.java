@@ -49,6 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
         description = "check information of publishers (QA)")
 @Service
 public class PublisherCheckCmd extends PublisherUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -74,4 +75,5 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
         out(" checked publisher " + name);
         return null;
     }
+
 }

@@ -44,9 +44,13 @@ import org.xipki.security.api.HashCalculator;
  */
 
 public class EjbcaCaInfo {
+
     private final int caId;
+
     private final X500Name subject;
+
     private final String hexSha1;
+
     private final String caDirname;
 
     public EjbcaCaInfo(

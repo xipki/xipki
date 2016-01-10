@@ -52,6 +52,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
         description = "digest XiPKI/EJBCA database")
 @Service
 public class DigestDbCmd extends DbPortCommandSupport {
+
     @Option(name = "--db-conf",
             required = true,
             description = "database configuration file")

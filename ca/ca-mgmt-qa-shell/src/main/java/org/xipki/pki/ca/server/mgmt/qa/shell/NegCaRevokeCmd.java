@@ -62,4 +62,5 @@ public class NegCaRevokeCmd extends CaRevokeCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

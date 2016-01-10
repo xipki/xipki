@@ -44,8 +44,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QcStatementOption {
+
     private final QCStatement statement;
+
     private final ASN1ObjectIdentifier statementId;
+
     private final MonetaryValueOption monetaryValueOption;
 
     public QcStatementOption(

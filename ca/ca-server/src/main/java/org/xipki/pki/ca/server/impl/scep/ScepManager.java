@@ -40,6 +40,8 @@ package org.xipki.pki.ca.server.impl.scep;
  */
 
 public interface ScepManager {
+
     Scep getScep(
             String name);
+
 }

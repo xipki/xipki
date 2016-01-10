@@ -51,6 +51,7 @@ import org.xipki.common.util.StringUtil;
  */
 
 public abstract class LoadExecutor {
+
     private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
     private boolean interrupted = false;

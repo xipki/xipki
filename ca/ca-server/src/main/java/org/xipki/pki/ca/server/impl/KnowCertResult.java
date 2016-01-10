@@ -40,8 +40,11 @@ package org.xipki.pki.ca.server.impl;
  */
 
 public class KnowCertResult {
+
     public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+
     private final boolean known;
+
     private final String user;
 
     public KnowCertResult(

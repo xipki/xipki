@@ -47,7 +47,9 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class DbPortFileNameIterator implements Iterator<String> {
+
     private BufferedReader reader;
+
     private String nextFilename;
 
     public DbPortFileNameIterator(
@@ -99,4 +101,5 @@ public class DbPortFileNameIterator implements Iterator<String> {
 
         return null;
     }
+
 }

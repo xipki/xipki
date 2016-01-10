@@ -40,8 +40,11 @@ package org.xipki.pki.ca.server.impl;
  */
 
 class SystemEvent {
+
     private final String name;
+
     private final String owner;
+
     private final long eventTime;
 
     public SystemEvent(

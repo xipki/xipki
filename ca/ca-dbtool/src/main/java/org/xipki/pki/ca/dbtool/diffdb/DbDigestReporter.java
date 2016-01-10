@@ -53,16 +53,25 @@ import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
  */
 
 public class DbDigestReporter {
+
     private final String reportDirname;
+
     private final BufferedWriter missingWriter;
+
     private final BufferedWriter diffWriter;
+
     private final BufferedWriter goodWriter;
+
     private final BufferedWriter errorWriter;
 
     private Date startTime;
+
     private AtomicInteger numDiff = new AtomicInteger(0);
+
     private AtomicInteger numGood = new AtomicInteger(0);
+
     private AtomicInteger numMissing = new AtomicInteger(0);
+
     private AtomicInteger numError = new AtomicInteger(0);
 
     public DbDigestReporter(

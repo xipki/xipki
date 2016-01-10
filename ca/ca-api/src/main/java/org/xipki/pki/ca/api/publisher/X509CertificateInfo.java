@@ -50,20 +50,29 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public class X509CertificateInfo {
+
     private final byte[] subjectPublicKey;
+
     private final X509CertWithDBCertId cert;
+
     private final X509Cert issuerCert;
+
     private final String profileName;
+
     private RequestType reqType;
+
     private byte[] transactionId;
 
     private RequestorInfo requestor;
+
     private String user;
 
     private String warningMessage;
 
     private CertRevocationInfo revInfo;
+
     private X500Name requestedSubject;
+
     private boolean alreadyIssued;
 
     public X509CertificateInfo(

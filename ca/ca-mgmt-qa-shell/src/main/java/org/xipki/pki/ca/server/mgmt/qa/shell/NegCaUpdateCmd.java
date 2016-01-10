@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
         description = "update CA")
 @Service
 public class NegCaUpdateCmd extends CaUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -61,4 +62,5 @@ public class NegCaUpdateCmd extends CaUpdateCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

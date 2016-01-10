@@ -49,9 +49,13 @@ import org.xipki.security.api.SignerException;
  */
 
 public class CmpResponderEntryWrapper {
+
     private CmpResponderEntry dbEntry;
+
     private ConcurrentContentSigner signer;
+
     private X500Name subjectAsX500Name;
+
     private GeneralName subjectAsGeneralName;
 
     public CmpResponderEntryWrapper() {

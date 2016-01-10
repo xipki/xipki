@@ -62,11 +62,15 @@ import org.xipki.pki.ca.dbtool.diffdb.DigestReader;
  */
 
 public class TargetDigestRetriever {
-    private class Retriever
-    implements Runnable {
+
+    private class Retriever implements Runnable {
+
         private Connection conn;
+
         private PreparedStatement singleSelectStmt = null;
+
         private PreparedStatement inArraySelectStmt = null;
+
         private PreparedStatement rangeSelectStmt = null;
 
         public Retriever()
@@ -182,24 +186,33 @@ public class TargetDigestRetriever {
 
             return certsInB;
         }
+
     }
 
     private final XipkiDbControl dbControl;
+
     private final DataSourceWrapper datasource;
 
     private final int numPerSelect;
 
     private final String singleCertSql;
+
     private final String inArrayCertsSql;
+
     private final String rangeCertsSql;
+
     private final StopMe stopMe;
+
     private Exception exception;
 
     private ExecutorService executor;
 
     private final DigestReader reader;
+
     private final DbDigestReporter reporter;
+
     private final ProcessLog processLog;
+
     private final List<Retriever> retrievers;
 
     public TargetDigestRetriever(

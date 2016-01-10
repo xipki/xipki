@@ -48,6 +48,7 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
  */
 
 public class CaEntryContainer {
+
     private final Map<Integer, CaEntry> caEntryMap;
 
     public CaEntryContainer(
@@ -90,4 +91,5 @@ public class CaEntryContainer {
             throw new IOException(sb.toString());
         }
     }
+
 }

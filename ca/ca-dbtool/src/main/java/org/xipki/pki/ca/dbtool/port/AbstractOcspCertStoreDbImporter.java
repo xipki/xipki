@@ -49,6 +49,7 @@ import org.xipki.security.api.HashCalculator;
  */
 
 abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
+
     protected static final String SQL_ADD_ISSUER =
         "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
         + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";

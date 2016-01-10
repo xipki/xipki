@@ -40,9 +40,11 @@ package org.xipki.pki.ca.server.impl.cmp;
  */
 
 public interface CmpResponderManager {
+
     String getCaNameForAlias(
             String caAlias);
 
     X509CACmpResponder getX509CACmpResponder(
             String caName);
+
 }

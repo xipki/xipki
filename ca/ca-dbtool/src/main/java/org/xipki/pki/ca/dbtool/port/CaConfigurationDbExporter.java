@@ -85,6 +85,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
  */
 
 class CaConfigurationDbExporter extends DbPorter {
+
     private final Marshaller marshaller;
 
     CaConfigurationDbExporter(
@@ -676,4 +677,5 @@ class CaConfigurationDbExporter extends DbPorter {
         caconf.setCaHasProfiles(ca_has_profiles);
         System.out.println(" exported table CA_HAS_PROFILE");
     }
+
 }

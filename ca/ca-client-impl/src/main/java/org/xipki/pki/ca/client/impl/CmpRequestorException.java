@@ -40,6 +40,7 @@ package org.xipki.pki.ca.client.impl;
  */
 
 public class CmpRequestorException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
     public CmpRequestorException() {

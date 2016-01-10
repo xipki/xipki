@@ -51,6 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
         description = "add certificate profile to CA")
 @Service
 public class CaProfileAddCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -89,4 +90,5 @@ public class CaProfileAddCmd extends CaCommandSupport {
                 sb.toString());
         return null;
     }
+
 }

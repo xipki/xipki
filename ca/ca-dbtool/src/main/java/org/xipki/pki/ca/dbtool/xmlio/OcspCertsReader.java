@@ -46,6 +46,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 
 public class OcspCertsReader extends DbiXmlReader {
+
     public OcspCertsReader(
             final InputStream xmlStream)
     throws XMLStreamException, InvalidDataObjectException {
@@ -129,7 +130,7 @@ public class OcspCertsReader extends DbiXmlReader {
                 break;
             } // end switch (event)
         } // end while
-
         return null;
     }
+
 }

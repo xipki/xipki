@@ -45,6 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 
 @Service
 public class ValidityModeCompleter extends AbstractEnumCompleter {
+
     public ValidityModeCompleter() {
         StringBuilder enums = new StringBuilder();
         for (ValidityMode mode : ValidityMode.values()) {

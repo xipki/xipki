@@ -88,11 +88,15 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
     private final Unmarshaller unmarshaller;
+
     private final String publisherName;
+
     private final boolean resume;
+
     private final int numCertsPerCommit;
 
     OcspCertStoreFromCaDbImporter(

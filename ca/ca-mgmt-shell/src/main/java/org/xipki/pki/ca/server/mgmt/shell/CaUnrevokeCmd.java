@@ -50,6 +50,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "unrevoke CA")
 @Service
 public class CaUnrevokeCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
     private String caName;
@@ -65,4 +66,5 @@ public class CaUnrevokeCmd extends CaCommandSupport {
         output(b, "unrevoked", "could not unrevoke", "CA " + caName);
         return null;
     }
+
 }

@@ -42,18 +42,23 @@ import javax.xml.stream.XMLStreamException;
  */
 
 public class CaCrlType extends DbDataObject {
+
     public static final String TAG_ROOT = "crl";
 
     public static final String TAG_id = "id";
+
     private Integer id;
 
     public static final String TAG_caId = "caId";
+
     private Integer caId;
 
     public static final String TAG_crlNo = "crlNo";
+
     private String crlNo;
 
     public static final String TAG_file = "file";
+
     private String file;
 
     public Integer getId() {

@@ -60,6 +60,7 @@ import org.xipki.security.api.CertRevocationInfo;
         description = "export CA configuration")
 @Service
 public class CaExportCmd extends CaCommandSupport {
+
     static final String KEY_ART = "ART";
 
     static final String KEY_NEXT_SN = "NEXT_SN";

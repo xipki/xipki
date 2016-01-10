@@ -55,6 +55,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
         description = "show information of CA alias")
 @Service
 public class CaAliasInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "alias", description = "CA alias")
     @Completion(CaAliasCompleter.class)
     private String caAlias;
@@ -96,4 +97,5 @@ public class CaAliasInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

@@ -40,6 +40,7 @@ package org.xipki.pki.ca.api.profile;
  */
 
 public enum GeneralNameTag {
+
     otherName(0),
     rfc822Name(1),
     dNSName(2),
@@ -60,4 +61,5 @@ public enum GeneralNameTag {
     public int getTag() {
         return tag;
     }
+
 }

@@ -52,6 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllComplete
         description = "republish certificates")
 @Service
 public class RepublishCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"
@@ -89,4 +90,5 @@ public class RepublishCmd extends CaCommandSupport {
         output(b, "replubished", "could not republish", "certificates");
         return null;
     }
+
 }
