@@ -63,9 +63,13 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class P11RSAPSSContentSigner implements ContentSigner {
+
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAPSSContentSigner.class);
+
     private final AlgorithmIdentifier algorithmIdentifier;
+
     private final PSSSigner pssSigner;
+
     private final OutputStream outputStream;
 
     public P11RSAPSSContentSigner(

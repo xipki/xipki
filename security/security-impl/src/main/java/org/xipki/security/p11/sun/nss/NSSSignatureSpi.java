@@ -72,10 +72,13 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public class NSSSignatureSpi extends SignatureSpi {
+
     private final Signature service;
 
     private final ASN1ObjectIdentifier hashAlgOid;
+
     private final MessageDigest md;
+
     private final Cipher cipher;
 
     private static final String MSG_UNSUPPORTED_ALGO =
@@ -485,78 +488,105 @@ public class NSSSignatureSpi extends SignatureSpi {
     }
 
     public static final String SHA1 = "SHA1";
+
     public static final String SHA224 = "SHA224";
+
     public static final String SHA256 = "SHA256";
+
     public static final String SHA384 = "SHA384";
+
     public static final String SHA512 = "SHA512";
 
     public static final String RSA = "RSA";
+
     public static final String ECDSA = "ECDSA";
 
     public static class SHA1withRSA extends NSSSignatureSpi {
+
         public SHA1withRSA() {
             super(SHA1, RSA);
         }
+
     }
 
     public static class SHA224withRSA extends NSSSignatureSpi {
+
         public SHA224withRSA() {
             super(SHA224, RSA);
         }
+
     }
 
     public static class SHA256withRSA extends NSSSignatureSpi {
+
         public SHA256withRSA() {
             super(SHA256, RSA);
         }
+
     }
 
     public static class SHA384withRSA extends NSSSignatureSpi {
+
         public SHA384withRSA() {
             super(SHA384, RSA);
         }
+
     }
 
     public static class SHA512withRSA extends NSSSignatureSpi {
+
         public SHA512withRSA() {
             super(SHA512, RSA);
         }
+
     }
 
     public static class SHA1withECDSA extends NSSSignatureSpi {
+
         public SHA1withECDSA() {
             super(SHA1, ECDSA);
         }
+
     }
 
     public static class SHA256withECDSA extends NSSSignatureSpi {
+
         public SHA256withECDSA() {
             super(SHA256, ECDSA);
         }
+
     }
 
     public static class SHA384withECDSA extends NSSSignatureSpi {
+
         public SHA384withECDSA() {
             super(SHA384, ECDSA);
         }
+
     }
 
     public static class SHA512withECDSA extends NSSSignatureSpi {
+
         public SHA512withECDSA() {
             super(SHA512, ECDSA);
         }
+
     }
 
     public static class RawECDSA extends NSSSignatureSpi {
+
         public RawECDSA() {
             super("NONEwith" + ECDSA);
         }
+
     }
 
     public static class SHA224withECDSA extends NSSSignatureSpi {
+
         public SHA224withECDSA() {
             super(SHA224, ECDSA);
         }
+
     }
 
 }

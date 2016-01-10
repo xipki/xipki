@@ -44,11 +44,17 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  */
 
 public class OcspResponseOption {
+
     private X509Certificate respIssuer;
+
     private Occurrence nonceOccurrence;
+
     private Occurrence certhashOccurrence;
+
     private Occurrence nextUpdateOccurrence;
+
     private ASN1ObjectIdentifier certhashAlgId;
+
     private String signatureAlgName;
 
     public OcspResponseOption() {

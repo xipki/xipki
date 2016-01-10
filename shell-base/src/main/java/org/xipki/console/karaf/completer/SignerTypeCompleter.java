@@ -44,7 +44,9 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 
 @Service
 public class SignerTypeCompleter extends AbstractEnumCompleter {
+
     public SignerTypeCompleter() {
         setTokens("JKS, PKCS11, PKCS12");
     }
+
 }

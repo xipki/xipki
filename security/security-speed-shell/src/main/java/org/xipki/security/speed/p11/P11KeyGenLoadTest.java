@@ -46,6 +46,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  */
 
 public abstract class P11KeyGenLoadTest extends LoadExecutor {
+
     protected final P11WritableSlot slot;
 
     private AtomicLong l = new AtomicLong(System.currentTimeMillis());
@@ -72,6 +73,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
     }
 
     class Testor implements Runnable {
+
         @Override
         public void run() {
             while (!stop() && getErrorAccout() < 1) {
@@ -83,5 +85,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
                 }
             }
         }
+
     }
+
 }

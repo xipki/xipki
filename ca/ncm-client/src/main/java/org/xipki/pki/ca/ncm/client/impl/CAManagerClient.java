@@ -79,7 +79,9 @@ import com.caucho.hessian.client.HessianProxyFactory;
 public class CAManagerClient implements CAManager {
 
     private final Logger LOG = LoggerFactory.getLogger(getClass());
+
     private HessianCAManager client;
+
     private int version;
 
     private String serverURL;

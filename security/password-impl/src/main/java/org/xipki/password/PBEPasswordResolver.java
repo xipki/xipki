@@ -54,7 +54,9 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
     private static final int iterationCount = 2000;
 
     private char[] masterPassword;
+
     private final Object masterPasswordLock = new Object();
+
     private PasswordCallback masterPwdCallback;
 
     protected char[] getMasterPassword()

@@ -47,10 +47,15 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class P11ModuleConf {
+
     private final String name;
+
     private final String nativeLibrary;
+
     private final Set<P11SlotIdentifier> excludeSlots;
+
     private final Set<P11SlotIdentifier> includeSlots;
+
     private final P11PasswordRetriever passwordRetriever;
 
     public P11ModuleConf(

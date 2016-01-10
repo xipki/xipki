@@ -86,13 +86,17 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class KeystoreP11Slot implements P11WritableSlot {
+
     private static final String NOCERT_COMMON_NAME = "NO-CERT";
+
     private static Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
 
     private final File slotDir;
 
     private final P11SlotIdentifier slotId;
+
     private final List<KeystoreP11Identity> identities = new LinkedList<>();
+
     private final char[] password;
 
     public static byte[] deriveKeyIdFromLabel(

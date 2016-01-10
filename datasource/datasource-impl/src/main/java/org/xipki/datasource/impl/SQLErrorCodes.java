@@ -52,14 +52,23 @@ public class SQLErrorCodes {
     protected boolean useSqlStateForTranslation = false;
 
     protected Set<String> badSqlGrammarCodes;
+
     protected Set<String> invalidResultSetAccessCodes;
+
     protected Set<String> duplicateKeyCodes;
+
     protected Set<String> dataIntegrityViolationCodes;
+
     protected Set<String> permissionDeniedCodes;
+
     protected Set<String> dataAccessResourceFailureCodes;
+
     protected Set<String> transientDataAccessResourceCodes;
+
     protected Set<String> cannotAcquireLockCodes;
+
     protected Set<String> deadlockLoserCodes;
+
     protected Set<String> cannotSerializeTransactionCodes;
 
     public static SQLErrorCodes newInstance(

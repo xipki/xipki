@@ -51,8 +51,11 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public class IssuerEntry {
+
     private final int id;
+
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
+
     private final Date notBefore;
 
     private CertRevocationInfo revocationInfo;
@@ -100,4 +103,5 @@ public class IssuerEntry {
     Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
         return Collections.unmodifiableCollection(issuerHashMap.values());
     }
+
 }

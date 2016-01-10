@@ -57,6 +57,7 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 
 public class ECDSAContentVerifierProviderBuilder
     extends BcContentVerifierProviderBuilder {
+
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public ECDSAContentVerifierProviderBuilder(
@@ -83,4 +84,5 @@ public class ECDSAContentVerifierProviderBuilder
     throws IOException {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }
+
 }

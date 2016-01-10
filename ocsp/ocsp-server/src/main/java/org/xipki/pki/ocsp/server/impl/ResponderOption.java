@@ -48,14 +48,23 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
  */
 
 class ResponderOption {
+
     private final OCSPMode mode;
+
     private final boolean inheritCaRevocation;
+
     private final String requestOptionName;
+
     private final String responseOptionName;
+
     private final String auditOptionName;
+
     private final String certprofileOptionName;
+
     private final String signerName;
+
     private final List<String> storeNames;
+
     private final List<String> servletPaths;
 
     public ResponderOption(

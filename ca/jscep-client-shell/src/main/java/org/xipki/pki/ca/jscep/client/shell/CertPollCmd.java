@@ -61,6 +61,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientCommandSupport {
+
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"
@@ -105,4 +106,5 @@ public class CertPollCmd extends ClientCommandSupport {
         saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
         return null;
     }
+
 }

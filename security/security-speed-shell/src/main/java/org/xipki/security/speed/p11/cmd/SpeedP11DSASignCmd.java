@@ -48,6 +48,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
 @Command(scope = "xipki-tk", name = "speed-dsa-sign",
         description = "performance test of PKCS#11 DSA signature creation")
 public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
+
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;

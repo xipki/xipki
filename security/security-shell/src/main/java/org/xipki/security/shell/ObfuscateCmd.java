@@ -47,6 +47,7 @@ import org.xipki.password.OBFPasswordResolver;
         description = "obfuscate password")
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {
+
     @Override
     protected Object doExecute()
     throws Exception {

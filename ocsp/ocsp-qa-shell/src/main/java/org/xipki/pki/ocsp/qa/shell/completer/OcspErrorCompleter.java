@@ -44,6 +44,7 @@ import org.xipki.pki.ocsp.qa.api.OcspError;
  */
 @Service
 public class OcspErrorCompleter extends AbstractEnumCompleter {
+
     public OcspErrorCompleter() {
         StringBuilder enums = new StringBuilder();
 
@@ -53,4 +54,5 @@ public class OcspErrorCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

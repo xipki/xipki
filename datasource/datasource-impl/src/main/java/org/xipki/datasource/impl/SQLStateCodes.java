@@ -48,19 +48,29 @@ import org.xipki.datasource.api.DatabaseType;
  * @author Lijun Liao
  */
 public class SQLStateCodes {
+
     // bad grammar error
     private static final String bge_dynamic_SQL_error = "07";
+
     private static final String bge_cardinality_violation = "21";
+
     private static final String bge_syntax_error_directSQL = "2A";
+
     private static final String bge_syntax_error_dynamicSQL = "37";
+
     private static final String bge_general_SQL_syntax_error = "42";
 
     // data integrity violation
     private static final String div_data_truncation = "01";
+
     private static final String div_no_data_found = "02";
+
     private static final String div_value_outof_range = "22";
+
     private static final String div_integrity_constraint_violation = "23";
+
     private static final String div_triggered_data_change_violation = "27";
+
     private static final String div_with_check_violation = "44";
 
     // data access resource failure
@@ -73,9 +83,13 @@ public class SQLStateCodes {
     private static final String cf_transaction_rollback = "40";
 
     protected Set<String> badSQLGrammarCodes;
+
     protected Set<String> dataIntegrityViolationCodes;
+
     protected Set<String> dataAccessResourceFailureCodes;
+
     protected Set<String> transientDataAccessResourceCodes;
+
     protected Set<String> concurrencyFailureCodes;
 
     public static SQLStateCodes newInstance(DatabaseType dbType) {

@@ -81,6 +81,7 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class ScepServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -88,6 +89,7 @@ public class ScepServlet extends HttpServlet {
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
     private AuditService auditService;
+
     private ScepResponder responder;
 
     public ScepServlet(

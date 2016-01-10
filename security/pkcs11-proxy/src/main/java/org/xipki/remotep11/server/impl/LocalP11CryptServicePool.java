@@ -51,12 +51,15 @@ import org.xipki.security.api.p11.P11CryptService;
  */
 
 public class LocalP11CryptServicePool {
+
     private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
     public static final int version = 2;
 
     private SecurityFactory securityFactory;
+
     private String defaultPkcs11ModuleName;
+
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
     public LocalP11CryptServicePool() {

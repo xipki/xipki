@@ -43,6 +43,7 @@ import org.xipki.security.api.SignerException;
  */
 
 public class P11DSAPlainSigner extends AbstractP11DSASigner {
+
     public P11DSAPlainSigner(
             final Digest digest) {
         super(digest);

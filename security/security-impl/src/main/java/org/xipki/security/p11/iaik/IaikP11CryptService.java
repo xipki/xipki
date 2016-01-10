@@ -63,7 +63,9 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
  */
 
 public final class IaikP11CryptService implements P11CryptService {
+
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
+
     private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
 
     private final ConcurrentSkipListSet<IaikP11Identity> identities =

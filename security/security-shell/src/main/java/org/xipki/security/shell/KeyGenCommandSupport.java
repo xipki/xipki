@@ -47,6 +47,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
+
     protected Integer getKeyUsage()
     throws Exception {
         return KeyUsage.cRLSign
@@ -64,4 +65,5 @@ public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
                 ObjectIdentifiers.id_kp_emailProtection,
                 ObjectIdentifiers.id_kp_OCSPSigning);
     }
+
 }

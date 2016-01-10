@@ -54,6 +54,7 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class HealthCheckServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
     private static final long serialVersionUID = 1L;

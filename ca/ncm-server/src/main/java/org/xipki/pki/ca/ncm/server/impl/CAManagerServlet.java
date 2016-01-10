@@ -89,22 +89,29 @@ import com.caucho.hessian.server.HessianServlet;
 
 public class CAManagerServlet extends HessianServlet
 implements HessianCAManager {
+
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerServlet.class);
 
     private static final long serialVersionUID = 1L;
 
     private CAManager caManager;
+
     private String truststoreFile;
+
     private String truststoreProvider;
+
     private String truststoreType = "PKCS12";
+
     private String truststorePassword;
+
     private SecurityFactory securityFactory;
+
     private Set<X509Certificate> trustedUserCerts = new HashSet<>();
 
     public CAManagerServlet() {
     }
 
-    public  void setCaManager(
+    public void setCaManager(
             CAManager caManager) {
         this.caManager = caManager;
     }

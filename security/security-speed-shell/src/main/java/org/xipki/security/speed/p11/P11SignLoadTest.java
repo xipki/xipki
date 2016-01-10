@@ -55,10 +55,13 @@ import org.xipki.security.api.p11.P11WritableSlot;
  */
 
 public abstract class P11SignLoadTest extends LoadExecutor {
+
     private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
 
     private final P11WritableSlot slot;
+
     private final ConcurrentContentSigner signer;
+
     private final P11KeyIdentifier keyId;
 
     public P11SignLoadTest(
@@ -99,6 +102,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     }
 
     class Testor implements Runnable {
+
         @Override
         public void run() {
             ContentSigner singleSigner;
@@ -122,6 +126,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
             signer.returnContentSigner(singleSigner);
             close();
         }
+
     }
 
 }

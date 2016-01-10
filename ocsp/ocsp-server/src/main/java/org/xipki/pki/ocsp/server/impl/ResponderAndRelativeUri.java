@@ -42,7 +42,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 class ResponderAndRelativeUri {
+
     private final Responder responder;
+
     private final String relativeUri;
 
     public ResponderAndRelativeUri(

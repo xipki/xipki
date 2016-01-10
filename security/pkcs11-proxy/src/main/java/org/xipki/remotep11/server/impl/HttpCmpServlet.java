@@ -57,14 +57,17 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 public class HttpCmpServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
 
     private static final long serialVersionUID = 1L;
 
     private static final String CT_REQUEST  = "application/pkixcmp";
+
     private static final String CT_RESPONSE = "application/pkixcmp";
 
     private final CmpResponder responder;
+
     private LocalP11CryptServicePool localP11CryptServicePool;
 
     public HttpCmpServlet() {
@@ -180,4 +183,5 @@ public class HttpCmpServlet extends HttpServlet {
             final LocalP11CryptServicePool localP11CryptServicePool) {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }
+
 }

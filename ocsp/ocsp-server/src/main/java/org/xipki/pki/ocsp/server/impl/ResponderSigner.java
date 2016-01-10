@@ -58,12 +58,17 @@ import org.xipki.security.api.ConcurrentContentSigner;
  */
 
 class ResponderSigner {
+
     private final Map<String, ConcurrentContentSigner> algoSignerMap;
+
     private final List<ConcurrentContentSigner> signers;
 
     private final X509CertificateHolder bcCertificate;
+
     private final X509Certificate certificate;
+
     private final X509CertificateHolder[] bcCertificateChain;
+
     private final X509Certificate[] certificateChain;
 
     private final X500Name responderId;

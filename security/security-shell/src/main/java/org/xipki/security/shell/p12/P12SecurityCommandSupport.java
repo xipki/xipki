@@ -48,6 +48,7 @@ import org.xipki.security.shell.SecurityCommandSupport;
  */
 
 public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
+
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
@@ -84,4 +85,5 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
 
         return ks;
     }
+
 }

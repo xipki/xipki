@@ -49,6 +49,7 @@ import org.xipki.password.api.PasswordResolverException;
  */
 
 public class FilePasswordCallback implements PasswordCallback {
+
     private String passwordFile;
 
     @Override

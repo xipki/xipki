@@ -40,6 +40,8 @@ package org.xipki.pki.ocsp.api;
  */
 
 public enum OCSPMode {
+
     RFC2560,
     RFC6960
+
 }

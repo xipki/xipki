@@ -49,6 +49,7 @@ import org.xipki.security.api.KeyUsage;
 
 @Service
 public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
+
     private static final Set<String> usages;
 
     static {

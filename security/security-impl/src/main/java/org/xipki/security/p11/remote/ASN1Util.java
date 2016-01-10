@@ -50,10 +50,13 @@ import org.xipki.security.api.BadASN1ObjectException;
  */
 
 public class ASN1Util {
+
     private static final BigInteger MAX_BYTE = BigInteger.valueOf(Byte.MAX_VALUE);
+
     private static final BigInteger MIN_BYTE = BigInteger.valueOf(Byte.MIN_VALUE);
 
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+
     private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
     private ASN1Util() {

@@ -46,6 +46,7 @@ import org.xipki.password.api.SinglePasswordResolver;
  */
 
 public class OBFPasswordResolver  implements SinglePasswordResolver {
+
     public static final String __OBFUSCATE = "OBF:";
 
     @Override
@@ -118,4 +119,5 @@ public class OBFPasswordResolver  implements SinglePasswordResolver {
 
         return new String(b, 0, l, StandardCharsets.UTF_8);
     }
+
 }

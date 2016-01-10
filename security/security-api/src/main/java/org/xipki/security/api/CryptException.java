@@ -62,4 +62,5 @@ public class CryptException extends Exception {
             final Throwable cause) {
         super(cause);
     }
+
 }

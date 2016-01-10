@@ -52,9 +52,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class SignatureSigner implements ContentSigner {
+
     private final AlgorithmIdentifier sigAlgId;
+
     private final Signature signer;
+
     private final SignatureStream stream = new SignatureStream();
+
     private final PrivateKey key;
 
     public SignatureSigner(

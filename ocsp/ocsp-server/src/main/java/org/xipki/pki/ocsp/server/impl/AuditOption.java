@@ -47,6 +47,7 @@ import org.xipki.pki.ocsp.server.impl.jaxb.MappingType;
  */
 
 class AuditOption {
+
     private final Map<String, String> certprofileMapping;
 
     public AuditOption(

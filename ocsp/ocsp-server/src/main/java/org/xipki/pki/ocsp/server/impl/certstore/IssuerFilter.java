@@ -47,7 +47,9 @@ import org.xipki.security.api.HashCalculator;
  */
 
 public class IssuerFilter {
+
     private final Set<String> includeSha1Fps;
+
     private final Set<String> excludeSha1Fps;
 
     public IssuerFilter(
@@ -87,4 +89,5 @@ public class IssuerFilter {
             return false;
         }
     }
+
 }

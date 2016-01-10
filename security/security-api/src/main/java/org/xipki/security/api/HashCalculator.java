@@ -56,7 +56,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class HashCalculator {
+
     private final static int parallelism = 50;
+
     private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
             new ConcurrentHashMap<>();
 
@@ -184,4 +186,5 @@ public class HashCalculator {
             mds.addLast(md);
         }
     }
+
 }

@@ -40,6 +40,7 @@ package org.xipki.scep.client.exception;
  */
 
 public class ScepClientException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
     public ScepClientException(

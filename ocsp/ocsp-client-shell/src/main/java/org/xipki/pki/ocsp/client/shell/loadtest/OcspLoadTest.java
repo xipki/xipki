@@ -62,15 +62,21 @@ import org.xipki.pki.ocsp.client.shell.OCSPUtils;
  */
 
 public class OcspLoadTest extends LoadExecutor {
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
     private final OCSPRequestor requestor;
+
     private final List<Long> serials;
+
     private final int numSerials;
+
     private int serialIndex;
 
     private X509Certificate caCert;
+
     private URL serverUrl;
+
     private RequestOptions options;
 
     @Override

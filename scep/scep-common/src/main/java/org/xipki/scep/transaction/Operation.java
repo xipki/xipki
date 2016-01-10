@@ -40,6 +40,7 @@ package org.xipki.scep.transaction;
  */
 
 public enum Operation {
+
     GetCACaps("GetCACaps"),
     PKIOperation("PKIOperation"),
     GetCACert("GetCACert"),

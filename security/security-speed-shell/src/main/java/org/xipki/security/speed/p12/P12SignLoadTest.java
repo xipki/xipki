@@ -57,7 +57,9 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 public abstract class P12SignLoadTest extends LoadExecutor {
+
     private final ConcurrentContentSigner signer;
+
     protected final static String password = "1234";
 
     public P12SignLoadTest(

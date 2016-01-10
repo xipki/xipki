@@ -47,11 +47,17 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 class ResponseOption {
+
     private final boolean includeInvalidityDate;
+
     private final boolean includeRevReason;
+
     private final EmbedCertsMode embedCertsMode;
+
     private final boolean includeCerthash;
+
     private final HashAlgoType certHashAlgo;
+
     private final Long cacheMaxAge;
 
     public ResponseOption(
@@ -115,4 +121,5 @@ class ResponseOption {
                 ? dflt
                 : b.booleanValue();
     }
+
 }

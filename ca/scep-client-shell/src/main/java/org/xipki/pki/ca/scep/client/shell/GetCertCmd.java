@@ -57,6 +57,7 @@ import org.xipki.scep.client.ScepClient;
         description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {
+
     @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"
@@ -86,4 +87,5 @@ public class GetCertCmd extends ClientCommandSupport {
         saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
         return null;
     }
+
 }

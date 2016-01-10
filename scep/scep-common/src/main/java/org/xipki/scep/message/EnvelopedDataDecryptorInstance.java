@@ -49,7 +49,9 @@ import org.xipki.scep.util.ParamUtil;
  */
 
 public final class EnvelopedDataDecryptorInstance {
+
     private final RecipientId recipientId;
+
     private final KeyTransRecipient recipient;
 
     public EnvelopedDataDecryptorInstance(

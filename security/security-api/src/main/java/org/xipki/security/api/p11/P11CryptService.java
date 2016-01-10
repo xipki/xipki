@@ -45,6 +45,7 @@ import org.xipki.security.api.SignerException;
  */
 
 public interface P11CryptService {
+
     void refresh()
     throws SignerException;
 
@@ -105,4 +106,5 @@ public interface P11CryptService {
     String[] getKeyLabels(
             P11SlotIdentifier slotId)
     throws SignerException;
+
 }

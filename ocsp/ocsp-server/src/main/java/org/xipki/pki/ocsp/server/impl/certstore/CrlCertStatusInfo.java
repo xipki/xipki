@@ -49,9 +49,13 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 class CrlCertStatusInfo {
+
     private final CertStatus certStatus;
+
     private final CertRevocationInfo revocationInfo;
+
     private final String certprofile;
+
     private final Map<HashAlgoType, byte[]> certHashes;
 
     private CrlCertStatusInfo(

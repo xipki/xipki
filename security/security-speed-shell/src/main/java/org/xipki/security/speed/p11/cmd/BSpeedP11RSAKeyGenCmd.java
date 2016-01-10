@@ -66,4 +66,5 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
         }
         return ret;
     }
+
 }

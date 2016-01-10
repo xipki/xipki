@@ -40,6 +40,7 @@ package org.xipki.datasource.api;
  */
 
 public enum DatabaseType {
+
     H2,
     DB2,
     HSQL,

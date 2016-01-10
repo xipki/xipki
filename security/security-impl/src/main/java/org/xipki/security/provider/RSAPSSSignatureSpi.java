@@ -62,14 +62,23 @@ import org.xipki.security.p11.P11RSAKeyParameter;
 
 class RSAPSSSignatureSpi
     extends SignatureSpi {
+
     private AlgorithmParameters engineParams;
+
     private PSSParameterSpec paramSpec;
+
     private PSSParameterSpec originalSpec;
+
     private P11PlainRSASigner signer = new P11PlainRSASigner();
+
     private Digest contentDigest;
+
     private Digest mgfDigest;
+
     private int saltLength;
+
     private byte trailer;
+
     private boolean isRaw;
 
     private P11PrivateKey signingKey;
@@ -270,61 +279,78 @@ class RSAPSSSignatureSpi
 
     static public class nonePSS
         extends RSAPSSSignatureSpi {
+
         public nonePSS() {
             super(null, true);
         }
+
     }
 
     static public class PSSwithRSA
         extends RSAPSSSignatureSpi {
+
         public PSSwithRSA() {
             super(null);
         }
+
     }
 
     static public class SHA1withRSA
         extends RSAPSSSignatureSpi {
+
         public SHA1withRSA() {
             super(PSSParameterSpec.DEFAULT);
         }
+
     }
 
     static public class SHA224withRSA
         extends RSAPSSSignatureSpi {
+
         public SHA224withRSA() {
             super(new PSSParameterSpec("SHA-224", "MGF1",
                     new MGF1ParameterSpec("SHA-224"), 28, 1));
         }
+
     }
 
     static public class SHA256withRSA
         extends RSAPSSSignatureSpi {
+
         public SHA256withRSA() {
             super(new PSSParameterSpec("SHA-256", "MGF1",
                     new MGF1ParameterSpec("SHA-256"), 32, 1));
         }
+
     }
 
     static public class SHA384withRSA
         extends RSAPSSSignatureSpi {
+
         public SHA384withRSA() {
             super(new PSSParameterSpec("SHA-384", "MGF1",
                     new MGF1ParameterSpec("SHA-384"), 48, 1));
         }
+
     }
 
     static public class SHA512withRSA
         extends RSAPSSSignatureSpi {
+
         public SHA512withRSA() {
             super(new PSSParameterSpec("SHA-512", "MGF1",
                     new MGF1ParameterSpec("SHA-512"), 64, 1));
         }
+
     }
 
     private class NullPssDigest
         implements Digest {
+
         private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
         private Digest baseDigest;
+
         private boolean oddTime = true;
 
         public NullPssDigest(
@@ -376,5 +402,7 @@ class RSAPSSSignatureSpi
             bOut.reset();
             baseDigest.reset();
         }
+
     }
+
 }

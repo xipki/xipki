@@ -46,6 +46,7 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
  */
 
 public class OCSPUtils {
+
     private OCSPUtils() {
     }
 
@@ -65,4 +66,5 @@ public class OCSPUtils {
             throw new OCSPResponseUnsuccessfulException(status);
         }
     }
+
 }

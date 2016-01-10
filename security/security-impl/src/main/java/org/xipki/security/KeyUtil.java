@@ -102,6 +102,7 @@ import org.xipki.security.bcext.ECDSAContentVerifierProviderBuilder;
  */
 
 public class KeyUtil {
+
     private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
             new DefaultDigestAlgorithmIdentifierFinder();
 

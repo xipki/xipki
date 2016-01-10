@@ -68,22 +68,31 @@ import org.xipki.common.util.LogUtil;
  */
 
 public class SunNamedCurveExtender {
+
     private static Logger LOG = LoggerFactory.getLogger(SunNamedCurveExtender.class);
 
     private final static int P  = 1; // prime curve
+
     private final static int B  = 2; // binary curve
 
     private static final Pattern SPLIT_PATTERN = Pattern.compile(",|\\[|\\]");
 
     private static Boolean EXECUTED = Boolean.FALSE;
+
     private static final boolean jdk18on;
 
     private static Class<?> class_NamedCurve;
+
     private static Class<?> class_CurveDB;
+
     private static Method method_CurveDB_lookup_paramSpec;
+
     private static Method method_CurveDB_lookup_name;
+
     private static Method method_NamedCurve_getEncoded;
+
     private static Method method_NamedCurve_getObjectId;
+
     private static boolean successful = true;
 
     static {
@@ -594,4 +603,5 @@ public class SunNamedCurveExtender {
             return null;
         }
     }
+
 }

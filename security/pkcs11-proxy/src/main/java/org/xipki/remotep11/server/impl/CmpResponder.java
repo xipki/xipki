@@ -79,9 +79,11 @@ import org.xipki.security.api.p11.remote.SlotIdentifier;
  */
 
 class CmpResponder {
+
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();
+
     private final GeneralName sender = XipkiCmpConstants.remoteP11_cmp_server;
 
     CmpResponder() {
@@ -309,4 +311,5 @@ class CmpResponder {
         }
         return  b;
     }
+
 }

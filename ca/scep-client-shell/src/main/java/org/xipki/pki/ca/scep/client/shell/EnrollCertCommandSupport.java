@@ -54,6 +54,7 @@ import org.xipki.scep.client.exception.ScepClientException;
  */
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
+
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"

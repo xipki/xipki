@@ -59,11 +59,13 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class KeystoreP11Module implements P11Module {
+
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
     private P11ModuleConf moduleConf;
 
     private Map<P11SlotIdentifier, KeystoreP11Slot> slots = new HashMap<>();
+
     private List<P11SlotIdentifier> slotIds;
 
     public KeystoreP11Module(

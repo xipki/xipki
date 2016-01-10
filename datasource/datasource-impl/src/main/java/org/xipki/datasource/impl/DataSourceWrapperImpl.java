@@ -74,11 +74,14 @@ import com.zaxxer.hikari.HikariDataSource;
  */
 
 public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
+
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
+
     private final ConcurrentHashMap<String, Long> lastUsedSeqValues
             = new ConcurrentHashMap<String, Long>();
 
     private static class MySQL extends DataSourceWrapperImpl {
+
         MySQL(
                 final String name,
                 final HikariDataSource service) {
@@ -202,6 +205,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     private static class DB2 extends DataSourceWrapperImpl {
+
         DB2(
                 final String name,
                 final HikariDataSource service) {
@@ -261,6 +265,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     private static class PostgreSQL extends DataSourceWrapperImpl {
+
         PostgreSQL(
                 final String name,
                 final HikariDataSource service) {
@@ -341,6 +346,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     private static class Oracle extends DataSourceWrapperImpl {
+
         Oracle(
                 final String name,
                 final HikariDataSource service) {
@@ -463,6 +469,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     private static class H2 extends DataSourceWrapperImpl {
+
         H2(
                 final String name,
                 final HikariDataSource service) {
@@ -520,6 +527,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     private static class HSQL extends DataSourceWrapperImpl {
+
         HSQL(
                 final String name,
                 final HikariDataSource service) {
@@ -585,6 +593,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     protected final String name;
 
     private final SQLErrorCodes sqlErrorCodes;
+
     private final SQLStateCodes sqlStateCodes;
 
     private DataSourceWrapperImpl(

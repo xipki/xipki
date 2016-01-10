@@ -60,13 +60,17 @@ import iaik.pkcs.pkcs11.TokenException;
  */
 
 public class IaikP11Module implements P11Module {
+
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
     private Module module;
+
     private P11ModuleConf moduleConf;
 
     private Map<P11SlotIdentifier, IaikP11Slot> slots = new HashMap<>();
+
     private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
+
     private List<P11SlotIdentifier> slotIds;
 
     public IaikP11Module(

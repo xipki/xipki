@@ -77,6 +77,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 public class SignerUtil {
+
     private SignerUtil() {
     }
 

@@ -97,10 +97,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class RemoteP11CryptService implements P11CryptService {
+
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptService.class);
+
     private final  Random random = new Random();
 
     private final GeneralName sender = XipkiCmpConstants.remotep11_cmp_client;
+
     private final GeneralName recipient = XipkiCmpConstants.remoteP11_cmp_server;
 
     private final P11ModuleConf moduleConf;

@@ -48,6 +48,7 @@ import org.xipki.common.qa.ValidationResult;
  */
 
 public interface OcspQA {
+
     ValidationResult checkOCSP(
             OCSPResp response,
             X509Certificate issuer,
@@ -56,4 +57,5 @@ public interface OcspQA {
             OcspError expectedOcspError,
             Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
             OcspResponseOption responseOption);
+
 }

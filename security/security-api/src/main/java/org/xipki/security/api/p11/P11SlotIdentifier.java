@@ -40,7 +40,9 @@ package org.xipki.security.api.p11;
  */
 
 public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
+
     private final Integer slotIndex;
+
     private final Long slotId;
 
     public P11SlotIdentifier(
@@ -134,4 +136,5 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
         return 0;
     }
+
 }

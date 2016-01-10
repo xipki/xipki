@@ -44,6 +44,7 @@ import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
  */
 @Service
 public class CertStatusCompleter extends AbstractEnumCompleter {
+
     public CertStatusCompleter() {
         StringBuilder enums = new StringBuilder();
 
@@ -53,4 +54,5 @@ public class CertStatusCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

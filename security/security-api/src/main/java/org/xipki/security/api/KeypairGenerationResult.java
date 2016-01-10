@@ -42,6 +42,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
  */
 
 public abstract class KeypairGenerationResult {
+
     private final X509CertificateHolder certificate;
 
     protected KeypairGenerationResult(

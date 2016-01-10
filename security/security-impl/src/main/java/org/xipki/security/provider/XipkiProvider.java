@@ -44,6 +44,7 @@ import java.security.Provider;
  */
 
 public class XipkiProvider extends Provider {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -210,4 +211,5 @@ public class XipkiProvider extends Provider {
             return null;
         }
     }
+
 }

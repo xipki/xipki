@@ -52,6 +52,7 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  * @author Lijun Liao
  */
 public class RSAUtil {
+
     public static final ASN1ObjectIdentifier[] rsaOids = {
         PKCSObjectIdentifiers.rsaEncryption,
         X509ObjectIdentifiers.id_ea_rsa,
@@ -94,4 +95,5 @@ public class RSAUtil {
             return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
         }
     }
+
 }

@@ -50,6 +50,7 @@ import org.xipki.security.api.HashAlgoType;
  */
 
 public abstract class CertStatusStore {
+
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(

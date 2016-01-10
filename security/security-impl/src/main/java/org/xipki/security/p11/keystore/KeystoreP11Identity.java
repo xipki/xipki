@@ -71,11 +71,15 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 public class KeystoreP11Identity extends P11Identity {
+
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 
     private final String sha1sum;
+
     private final PrivateKey privateKey;
+
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
+
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
 
     public KeystoreP11Identity(

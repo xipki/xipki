@@ -54,10 +54,13 @@ import org.xipki.security.api.p11.P11ModuleConf;
  */
 
 class DefaultRemoteP11CryptService extends RemoteP11CryptService {
+
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
+
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
     private URL _serverUrl;
+
     private final String serverUrl;
 
     DefaultRemoteP11CryptService(

@@ -45,6 +45,7 @@ import org.xipki.security.api.CRLReason;
 
 @Service
 public class ClientCRLReasonCompleter extends AbstractEnumCompleter {
+
     public ClientCRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();
 
@@ -54,4 +55,5 @@ public class ClientCRLReasonCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }
