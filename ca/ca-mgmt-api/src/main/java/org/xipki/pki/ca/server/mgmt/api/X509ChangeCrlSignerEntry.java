@@ -45,12 +45,17 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class X509ChangeCrlSignerEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private final String name;
+
     private String signerType;
+
     private String signerConf;
+
     private String base64Cert;
+
     private String crlControl;
 
     public X509ChangeCrlSignerEntry(

@@ -42,7 +42,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ProtectionVerificationResult {
+
     private final Object requestor;
+
     private final ProtectionResult protectionResult;
 
     public ProtectionVerificationResult(

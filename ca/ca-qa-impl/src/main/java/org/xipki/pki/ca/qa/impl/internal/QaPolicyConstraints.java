@@ -42,7 +42,9 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
  */
 
 public class QaPolicyConstraints extends QaExtension {
+
     private final Integer requireExplicitPolicy;
+
     private final Integer inhibitPolicyMapping;
 
     public QaPolicyConstraints(

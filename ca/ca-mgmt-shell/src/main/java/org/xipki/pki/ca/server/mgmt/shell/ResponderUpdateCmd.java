@@ -61,6 +61,7 @@ import org.xipki.security.api.util.X509Util;
         description = "update responder")
 @Service
 public class ResponderUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"

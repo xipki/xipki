@@ -62,4 +62,5 @@ public class NegCmpControlRemoveCmd extends CmpControlRemoveCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

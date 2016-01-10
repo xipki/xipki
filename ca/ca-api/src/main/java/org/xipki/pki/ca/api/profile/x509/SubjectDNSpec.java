@@ -54,15 +54,22 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class SubjectDNSpec {
+
     /**
      * ranges
      */
     private static final Range r_64 = new Range(1, 64);
+
     private static final Range r_128 = new Range(1, 128);
+
     private static final Range r_postalCode = new Range(1, 40);
+
     private static final Range r_countryName = new Range(2, 2);
+
     private static final Range r_postalAddress = new Range(0, 30);
+
     private static final Range r_gender = new Range(1, 1);
+
     private static final Range r_dateOfBirth = new Range(15, 15);
 
     // according to specification should be 32768, 256 is specified by xipki.
@@ -70,7 +77,9 @@ public class SubjectDNSpec {
 
     // patterns
     private static final Pattern p_gender = Pattern.compile("M|m|F|f");
+
     private static final Pattern p_country = Pattern.compile("[A-Za-z]{2}");
+
     public static final Pattern p_dateOfBirth =
             Pattern.compile("^(19|20)\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])000000Z");
 
@@ -86,9 +95,13 @@ public class SubjectDNSpec {
             Arrays.asList(StringType.ia5String));
 
     private static final Map<ASN1ObjectIdentifier, StringType> defaultStringTypes = new HashMap<>();
+
     private static final Map<ASN1ObjectIdentifier, Range> ranges = new HashMap<>();
+
     private static final Map<ASN1ObjectIdentifier, Pattern> patterns = new HashMap<>();
+
     private static final Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
+
     private static final Map<ASN1ObjectIdentifier, Set<StringType>> stringTypeSets =
             new HashMap<>();
 

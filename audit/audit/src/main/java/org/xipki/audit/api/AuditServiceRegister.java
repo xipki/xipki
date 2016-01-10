@@ -40,7 +40,9 @@ package org.xipki.audit.api;
  */
 
 public interface AuditServiceRegister {
+
     AuditService getAuditService();
 
     boolean isAuditEnabled();
+
 }

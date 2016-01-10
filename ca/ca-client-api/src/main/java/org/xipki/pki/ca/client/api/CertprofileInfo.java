@@ -43,8 +43,11 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class CertprofileInfo {
+
     private final String name;
+
     private final String type;
+
     private final String conf;
 
     public CertprofileInfo(

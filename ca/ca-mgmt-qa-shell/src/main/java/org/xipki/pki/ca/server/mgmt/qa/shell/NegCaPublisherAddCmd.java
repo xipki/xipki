@@ -62,4 +62,5 @@ public class NegCaPublisherAddCmd extends CaPublisherAddCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

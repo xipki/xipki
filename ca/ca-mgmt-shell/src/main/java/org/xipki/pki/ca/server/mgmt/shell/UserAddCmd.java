@@ -75,4 +75,5 @@ public class UserAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "user " + name);
         return null;
     }
+
 }

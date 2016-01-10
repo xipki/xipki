@@ -67,6 +67,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "check the certificate")
 @Service
 public class CheckCertCmd extends XipkiCommandSupport {
+
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate file\n"

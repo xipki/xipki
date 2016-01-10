@@ -43,8 +43,11 @@ import java.util.List;
  */
 
 public class DigestDBEntrySet implements Comparable<DigestDBEntrySet> {
+
     private final int startId;
+
     private Exception exception;
+
     private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
     public DigestDBEntrySet(
@@ -84,4 +87,5 @@ public class DigestDBEntrySet implements Comparable<DigestDBEntrySet> {
             return 1;
         }
     }
+
 }

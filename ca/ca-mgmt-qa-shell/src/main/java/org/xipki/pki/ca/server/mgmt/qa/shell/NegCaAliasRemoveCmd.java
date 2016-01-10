@@ -62,4 +62,5 @@ public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

@@ -53,6 +53,7 @@ import org.xipki.security.api.util.X509Util;
         description = "add CA")
 @Service
 public class CaAddCmd extends CaAddOrGenCommandSupport {
+
     @Option(name = "--cert",
             description = "CA certificate file")
     @Completion(FilePathCompleter.class)
@@ -71,4 +72,5 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
         output(b, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }
+
 }

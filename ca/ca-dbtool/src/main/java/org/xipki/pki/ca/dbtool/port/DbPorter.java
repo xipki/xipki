@@ -58,19 +58,29 @@ import org.xml.sax.SAXException;
  */
 
 public class DbPorter extends DbToolBase {
+
     public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
+
     public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
+
     public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
+
     public static final String DIRNAME_CRL = "crl";
+
     public static final String DIRNAME_CERT = "cert";
+
     public static final String PREFIX_FILENAME_CERTS = "certs-";
 
     public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
+
     public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
+
     public static final String MSG_CERTS_FINISHED = "certs.finished";
+
     public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
     private static final String CERTS_DIRNAME = "certs";
+
     private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
 
     public static final int VERSION = 1;
@@ -78,9 +88,11 @@ public class DbPorter extends DbToolBase {
     protected final boolean evaulateOnly;
 
     protected final String certsDir;
+
     protected final String certsListFile;
 
     protected final int dbSchemaVersion;
+
     protected final int maxX500nameLen;
 
     public DbPorter(
@@ -197,4 +209,5 @@ public class DbPorter extends DbToolBase {
                 ? " evaluated export "
                 : " exported ";
     }
+
 }

@@ -53,18 +53,25 @@ import org.xipki.security.api.util.X509Util;
 
 public class ScepEntry
 implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
+
     private static final long serialVersionUID = 1L;
 
     private final String caName;
+
     private final String control;
+
     private final String responderType;
+
     private final String responderConf;
 
     private final String base64Cert;
 
     private X509Certificate cert;
+
     private boolean certFaulty;
+
     private boolean confFaulty;
 
     public ScepEntry(

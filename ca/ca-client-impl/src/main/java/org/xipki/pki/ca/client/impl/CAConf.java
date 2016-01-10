@@ -51,18 +51,27 @@ import org.xipki.common.util.StringUtil;
  */
 
 class CAConf {
+
     private final String name;
+
     private final String url;
+
     private final String healthUrl;
+
     private final String requestorName;
+
     private X509CmpRequestor requestor;
 
     private boolean certAutoconf;
+
     private boolean certprofilesAutoconf;
 
     private X509Certificate cert;
+
     private final X509Certificate responder;
+
     private X500Name subject;
+
     private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
     CAConf(
@@ -181,4 +190,5 @@ class CAConf {
     public X509CmpRequestor getRequestor() {
         return requestor;
     }
+
 }

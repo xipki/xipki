@@ -50,6 +50,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
         description = "remove requestor from CA")
 @Service
 public class CaRequestorRemoveCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -72,4 +73,5 @@ public class CaRequestorRemoveCmd extends CaCommandSupport {
                 "requestor " + requestorName + " from CA " + caName);
         return null;
     }
+
 }

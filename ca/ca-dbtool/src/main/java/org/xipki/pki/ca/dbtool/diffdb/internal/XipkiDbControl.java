@@ -42,17 +42,27 @@ package org.xipki.pki.ca.dbtool.diffdb.internal;
 public class XipkiDbControl {
 
     private final String tblCa;
+
     private final String tblCerthash;
+
     private final String colCaId;
+
     private final String colCertId;
+
     private final String colCerthash;
+
     private final String colRevoked;
+
     private final String colRevReason;
+
     private final String colRevTime;
+
     private final String colRevInvTime;
+
     private final String colSerialNumber;
 
     private final String caSql;
+
     private final String certSql;
 
     public XipkiDbControl(

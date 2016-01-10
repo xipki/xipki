@@ -45,7 +45,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertificatePolicyInformation {
+
     private final String certPolicyId;
+
     private final List<CertificatePolicyQualifier> qualifiers;
 
     public CertificatePolicyInformation(

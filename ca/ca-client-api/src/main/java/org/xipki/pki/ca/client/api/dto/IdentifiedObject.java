@@ -42,6 +42,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class IdentifiedObject {
+
     private final String id;
 
     public IdentifiedObject(
@@ -53,4 +54,5 @@ public class IdentifiedObject {
     public String getId() {
         return id;
     }
+
 }

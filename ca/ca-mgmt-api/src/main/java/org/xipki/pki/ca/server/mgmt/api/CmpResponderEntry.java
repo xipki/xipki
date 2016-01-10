@@ -49,13 +49,21 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class CmpResponderEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     private final String name;
+
     private final String type;
+
     private final String conf;
+
     private boolean certFaulty;
+
     private boolean confFaulty;
+
     private final String base64Cert;
+
     private X509Certificate cert;
 
     public CmpResponderEntry(

@@ -141,14 +141,17 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class X509CACmpResponder extends CmpResponder {
+
     private static final Set<String> knownGenMsgIds = new HashSet<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
+
     private final PendingCertificatePool pendingCertPool;
 
     private final String caName;
+
     private final CAManagerImpl caManager;
 
     static {

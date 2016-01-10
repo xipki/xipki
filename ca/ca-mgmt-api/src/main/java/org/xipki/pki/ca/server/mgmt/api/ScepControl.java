@@ -57,12 +57,15 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class ScepControl implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     public static final String KEY_caCertIncluded = "caCert.included";
+
     public static final String KEY_signerCertIncluded = "signerCert.included";
 
     private boolean includeCACert = true;
+
     private boolean includeSignerCert = true;
 
     public ScepControl(
@@ -153,4 +156,5 @@ public class ScepControl implements Serializable {
 
         return true;
     }
+
 }

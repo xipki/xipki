@@ -51,6 +51,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "add requestor")
 @Service
 public class RequestorAddCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "requestor name\n"
@@ -79,4 +80,5 @@ public class RequestorAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "CMP requestor " + name);
         return null;
     }
+
 }

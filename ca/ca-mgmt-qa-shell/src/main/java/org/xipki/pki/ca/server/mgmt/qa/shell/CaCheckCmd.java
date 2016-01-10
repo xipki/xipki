@@ -62,6 +62,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
         description = "check information of CAs (QA)")
 @Service
 public class CaCheckCmd extends CaUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -250,4 +251,5 @@ public class CaCheckCmd extends CaUpdateCmd {
         out(" checked CA" + caName);
         return null;
     }
+
 }

@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.RepublishCmd;
         description = "republish certificates (negative, QA)")
 @Service
 public class NegRepublishCmd extends RepublishCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -61,4 +62,5 @@ public class NegRepublishCmd extends RepublishCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

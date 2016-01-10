@@ -52,6 +52,7 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public abstract class X509CertPublisher {
+
     public abstract void initialize(
             String conf,
             PasswordResolver passwordResolver,
@@ -103,4 +104,5 @@ public abstract class X509CertPublisher {
 
     public abstract void setAuditServiceRegister(
             AuditServiceRegister auditServiceRegister);
+
 }

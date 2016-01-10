@@ -40,10 +40,15 @@ package org.xipki.pki.ca.server.impl;
  */
 
 public class SubjectKeyProfileBundle {
+
     private final int certId;
+
     private final long subjectFp;
+
     private final long keyFp;
+
     private final String profile;
+
     private final boolean revoked;
 
     public SubjectKeyProfileBundle(

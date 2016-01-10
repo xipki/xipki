@@ -48,6 +48,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class QaCertificatePolicies extends QaExtension {
+
     private final List<QaCertificatePolicyInformation> policyInformations;
 
     public QaCertificatePolicies(
@@ -77,7 +78,9 @@ public class QaCertificatePolicies extends QaExtension {
     }
 
     public static class QaCertificatePolicyInformation {
+
         private final String policyId;
+
         private final QaPolicyQualifiers policyQualifiers;
 
         public QaCertificatePolicyInformation(
@@ -98,6 +101,7 @@ public class QaCertificatePolicies extends QaExtension {
         public QaPolicyQualifiers getPolicyQualifiers() {
             return policyQualifiers;
         }
+
     }
 
 }

@@ -60,11 +60,13 @@ import org.xipki.pki.ca.dbtool.IDRange;
  */
 
 public class XipkiDigestExportReader {
+
     private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
 
-    private class Retriever
-    implements Runnable {
+    private class Retriever implements Runnable {
+
         private Connection conn;
+
         private PreparedStatement selectCertStmt;
 
         public Retriever()
@@ -145,12 +147,19 @@ public class XipkiDigestExportReader {
     }
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
+
     protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
+
     protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+
     private final int numThreads;
+
     private ExecutorService executor;
+
     private final List<Retriever> retrievers;
+
     private final DataSourceWrapper datasource;
+
     private final XipkiDbControl dbControl;
 
     private final String selectCertSql;
@@ -178,7 +187,8 @@ public class XipkiDigestExportReader {
         }
     }
 
-    public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(
+            final List<IDRange> idRanges)
     throws DataAccessException {
         int n = idRanges.size();
         for (IDRange range : idRanges) {
@@ -222,4 +232,5 @@ public class XipkiDigestExportReader {
         stop.set(true);
         executor.shutdownNow();
     }
+
 }

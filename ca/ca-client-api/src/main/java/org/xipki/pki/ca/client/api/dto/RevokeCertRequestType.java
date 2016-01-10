@@ -44,6 +44,7 @@ import java.util.List;
  */
 
 public class RevokeCertRequestType {
+
     private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public boolean addRequestEntry(
@@ -61,4 +62,5 @@ public class RevokeCertRequestType {
     public List<RevokeCertRequestEntryType> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
+
 }

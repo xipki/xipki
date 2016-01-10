@@ -55,6 +55,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
         description = "check information of certificate profiles in given CA (QA)")
 @Service
 public class CaProfileCheckCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -99,4 +100,5 @@ public class CaProfileCheckCmd extends CaCommandSupport {
         out(" checked CA profile CA='" + caName +  "', profile='" + profileName + "'");
         return null;
     }
+
 }

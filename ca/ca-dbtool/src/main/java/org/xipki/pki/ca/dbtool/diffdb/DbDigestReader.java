@@ -74,6 +74,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 abstract class DbDigestReader implements DigestReader {
+
     interface Retriever extends Runnable {
     }
 
@@ -135,28 +136,43 @@ abstract class DbDigestReader implements DigestReader {
                 return;
             }
         }
+
     }
 
     private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
 
     protected final BlockingQueue<IDRange> inQueue;
+
     protected final BlockingQueue<DigestDBEntrySet> outQueue;
+
     private final int numThreads;
+
     private ExecutorService executor;
+
     private List<Retriever> retrievers;
 
     protected final DataSourceWrapper datasource;
+
     protected final X509Certificate caCert;
+
     private final boolean revokedOnly;
+
     private final int totalAccount;
+
     private final String caSubjectName;
+
     private final int minId;
+
     private final int maxId;
+
     private final AtomicBoolean endReached = new AtomicBoolean(false);
+
     private Exception exception;
 
     protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
+
     private int nextId;
+
     protected final StopMe stopMe;
 
     public DbDigestReader(

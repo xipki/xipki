@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaAliasAddCmd;
         description = "add CA alias (negative, QA)")
 @Service
 public class NegCaAliasAddCmd extends CaAliasAddCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -61,4 +62,5 @@ public class NegCaAliasAddCmd extends CaAliasAddCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

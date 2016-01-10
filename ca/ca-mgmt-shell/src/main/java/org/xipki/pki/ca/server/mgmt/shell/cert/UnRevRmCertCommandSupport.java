@@ -57,6 +57,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

@@ -49,6 +49,7 @@ import org.xipki.dbtool.LiquibaseDatabaseConf;
         description = "update the CA database schema")
 @Service
 public class UpdateDbCaCmd extends LiquibaseCommandSupport {
+
     private static final String schemaFile = "xipki/sql/ca-init.xml";
 
     @Override

@@ -86,8 +86,11 @@ import org.xml.sax.SAXException;
  */
 
 public class CALoadTestTemplateEnroll extends LoadExecutor {
+
     private final static class CertRequestWithProfile {
+
         private final String certprofile;
+
         private final CertRequest certRequest;
 
         public CertRequestWithProfile(
@@ -96,6 +99,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
             this.certprofile = certprofile;
             this.certRequest = certRequest;
         }
+
     }
 
     class Testor implements Runnable {
@@ -166,13 +170,17 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestTemplateEnroll.class);
+
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
 
     private static Object jaxbUnmarshallerLock = new Object();
+
     private static Unmarshaller jaxbUnmarshaller;
 
     private final CAClient caClient;
+
     private final String userPrefix = "LOADTEST-";
+
     private final List<LoadTestEntry> loadtestEntries;
 
     private final AtomicLong index;

@@ -50,6 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
         description = "show information of CMP control (QA)")
 @Service
 public class CmpControlCheckCmd extends CmpControlUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -67,4 +68,5 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd {
         out(" checked CMP control " + name);
         return null;
     }
+
 }

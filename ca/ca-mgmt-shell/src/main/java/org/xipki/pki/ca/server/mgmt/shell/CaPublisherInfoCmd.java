@@ -53,6 +53,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
         description = "show information of publisher in given CA")
 @Service
 public class CaPublisherInfoCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -82,4 +83,5 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

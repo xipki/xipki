@@ -66,6 +66,7 @@ import org.xipki.security.SignerUtil;
  */
 
 public abstract class KeyEntry {
+
     private static final Logger LOG = LoggerFactory.getLogger(KeyEntry.class);
 
     public static final class RSAKeyEntry extends KeyEntry {
@@ -310,4 +311,5 @@ public abstract class KeyEntry {
 
     public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(
             long index);
+
 }

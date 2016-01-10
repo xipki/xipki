@@ -113,6 +113,7 @@ import org.xipki.security.api.util.X509Util;
  *
  */
 public class Scep {
+
     private static final Logger LOG = LoggerFactory.getLogger(Scep.class);
 
     private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
@@ -120,17 +121,25 @@ public class Scep {
     private final static Set<ASN1ObjectIdentifier> aesEncAlgs = new HashSet<>();
 
     private final String caName;
+
     private final ScepEntry dbEntry;
+
     private final ScepControl control;
+
     private final CAManagerImpl caManager;
 
     private PrivateKey responderKey;
+
     private X509Certificate responderCert;
+
     private CACertRespBytes cACertRespBytes;
+
     private X509CertificateHolder cACert;
 
     private CACaps caCaps;
+
     private EnvelopedDataDecryptor envelopedDataDecryptor;
+
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
     static {

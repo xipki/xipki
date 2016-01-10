@@ -64,6 +64,7 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
         description = "check information of requestors in CA (QA)")
 @Service
 public class CaRequestorCheckCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -157,4 +158,5 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         out("checking CA requestor CA='" + caName +  "', requestor='" + requestorName + "'");
         return null;
     }
+
 }

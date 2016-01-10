@@ -62,6 +62,7 @@ import org.xipki.security.api.util.X509Util;
         description = "update CRL signer")
 @Service
 public class CrlSignerUpdateCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CRL signer name\n"
@@ -130,4 +131,5 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
         output(b, "updated", "could not update", "CRL signer " + name);
         return null;
     }
+
 }

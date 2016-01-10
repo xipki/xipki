@@ -92,4 +92,5 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
             throw new CmdFailure(negPrefix + " " + message);
         }
     }
+
 }

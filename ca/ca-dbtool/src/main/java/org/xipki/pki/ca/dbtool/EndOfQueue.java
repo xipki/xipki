@@ -40,6 +40,7 @@ package org.xipki.pki.ca.dbtool;
  */
 
 public class EndOfQueue implements QueueEntry {
+
     public static final EndOfQueue INSTANCE = new EndOfQueue();
 
     private EndOfQueue() {

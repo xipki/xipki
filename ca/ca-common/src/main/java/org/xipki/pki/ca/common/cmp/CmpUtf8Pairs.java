@@ -49,10 +49,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CmpUtf8Pairs {
+
     public static final String KEY_CERT_PROFILE = "cert_profile";
+
     public static final String KEY_USER = "user";
 
     private static final char NAME_TERM = '?';
+
     private static final char TOKEN_TERM = '%';
 
     private final Map<String, String> pairs = new HashMap<>();

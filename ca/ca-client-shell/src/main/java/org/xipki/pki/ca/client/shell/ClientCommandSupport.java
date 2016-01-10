@@ -52,6 +52,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  */
 
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
+
     @Option(name = "--req-out",
             description = "where to save the request")
     @Completion(FilePathCompleter.class)
@@ -132,4 +133,5 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         sb.insert(idx, '-');
         return sb.toString();
     }
+
 }

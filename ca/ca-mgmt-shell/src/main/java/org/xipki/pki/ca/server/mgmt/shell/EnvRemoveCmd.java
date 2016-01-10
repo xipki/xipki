@@ -47,6 +47,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
         description = "remove CA environment parameter")
 @Service
 public class EnvRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
     private String name;
 
@@ -57,4 +58,5 @@ public class EnvRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "environment parameter " + name);
         return null;
     }
+
 }

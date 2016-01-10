@@ -62,10 +62,15 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
  */
 
 public class DbDigestExportWorker extends DbPortWorker {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
+
     private final DataSourceWrapper dataSource;
+
     private final String destFolder;
+
     private final int numCertsPerSelect;
+
     private final int numThreads;
 
     public DbDigestExportWorker(

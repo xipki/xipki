@@ -52,6 +52,7 @@ import org.xipki.audit.api.PCIAuditEvent;
  */
 
 public class Slf4jAuditServiceImpl implements AuditService {
+
     private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
 
     public Slf4jAuditServiceImpl() {
@@ -149,4 +150,5 @@ public class Slf4jAuditServiceImpl implements AuditService {
                     AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
+
 }

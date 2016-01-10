@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
         description = "remove CMP control")
 @Service
 public class CmpControlRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CMP control name", required = true)
     @Completion(CmpControlNameCompleter.class)
     private String name;
@@ -60,4 +61,5 @@ public class CmpControlRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "CMP control");
         return null;
     }
+
 }

@@ -59,6 +59,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
         description = "enroll certificate (PKCS#11 token)")
 @Service
 public class P11EnrollCertCmd extends EnrollCertCommandSupport {
+
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

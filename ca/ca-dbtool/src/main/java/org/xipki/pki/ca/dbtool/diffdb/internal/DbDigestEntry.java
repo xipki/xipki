@@ -47,11 +47,17 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class DbDigestEntry {
+
     private final long serialNumber;
+
     private final boolean revoked;
+
     private final Integer revReason;
+
     private final Long revTime;
+
     private final Long revInvTime;
+
     private final String base64Sha1;
 
     public DbDigestEntry(

@@ -43,8 +43,11 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public class X509CertWithRevocationInfo {
+
     private X509CertWithDBCertId cert;
+
     private CertRevocationInfo revInfo;
+
     private String certprofile;
 
     public X509CertWithRevocationInfo() {

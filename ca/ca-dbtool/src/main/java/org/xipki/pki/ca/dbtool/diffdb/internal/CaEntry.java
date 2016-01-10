@@ -50,26 +50,37 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
  */
 
 public class CaEntry {
+
     public static final String FILENAME_OVERVIEW = "overview.properties";
+
     public static final String PROPKEY_ACCOUNT = "account";
+
     public static final String PROPKEY_ACCOUNT_REVOKED = "account-revoked";
 
     public static final int DFLT_NUM_CERTS_IN_BUNDLE = 100000;
+
     public static final int STREAM_BUFFERSIZE = 1024 * 1024; // 1M
 
     private final int caId;
+
     private final FileOutputStream certsManifestOs;
+
     private final File caDir;
+
     private final File certsDir;
 
     private int numProcessed;
+
     private int numProcessedRevoked;
 
     private File csvFile;
+
     private BufferedOutputStream csvOutputStream;
 
     private int minIdInCsvFile;
+
     private int maxIdInCsvFile;
+
     private int numInCsvFile;
 
     public CaEntry(
@@ -159,4 +170,5 @@ public class CaEntry {
         csvOutputStream = new BufferedOutputStream(
                 new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
     }
+
 }

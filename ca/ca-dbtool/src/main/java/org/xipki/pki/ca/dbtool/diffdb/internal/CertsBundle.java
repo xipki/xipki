@@ -45,8 +45,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertsBundle {
+
     private int numSkipped;
+
     private Map<Long, DbDigestEntry> certs;
+
     private List<Long> serialNumbers;
 
     public CertsBundle(

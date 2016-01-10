@@ -47,4 +47,5 @@ public class InsuffientPermissionException extends Exception {
             final String message) {
         super(message);
     }
+
 }

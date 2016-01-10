@@ -61,16 +61,25 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
  */
 
 public class DbDigestDiffWorker extends DbPortWorker {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
+
     private final boolean revokedOnly;
+
     private final String refDirname;
+
     private final DataSourceWrapper refDatasource;
+
     private final Set<byte[]> includeCACerts;
 
     private final DataSourceWrapper dataSource;
+
     private final String reportDir;
+
     private final int numCertsPerSelect;
+
     private final int numRefThreads;
+
     private final int numTargetThreads;
 
     public DbDigestDiffWorker(

@@ -47,6 +47,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
         description = "remove certifiate profile")
 @Service
 public class ProfileRemoveCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
     private String name;
 
@@ -57,4 +58,5 @@ public class ProfileRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "certificate profile " + name);
         return null;
     }
+
 }

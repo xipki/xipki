@@ -45,7 +45,9 @@ import org.xipki.pki.ca.client.api.CertprofileInfo;
  */
 
 class CAInfo {
+
     private final X509Certificate cert;
+
     private final Set<CertprofileInfo> certprofiles;
 
     CAInfo(
@@ -62,4 +64,5 @@ class CAInfo {
     Set<CertprofileInfo> getCertprofiles() {
         return certprofiles;
     }
+
 }

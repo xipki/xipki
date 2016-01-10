@@ -85,4 +85,5 @@ public class ProfileAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "certificate profile " + name);
         return null;
     }
+
 }

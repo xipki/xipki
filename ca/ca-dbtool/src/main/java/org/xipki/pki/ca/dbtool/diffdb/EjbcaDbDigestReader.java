@@ -61,10 +61,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class EjbcaDbDigestReader extends DbDigestReader {
-    private class EjbcaDbRetriever
-    implements Retriever {
+
+    private class EjbcaDbRetriever implements Retriever {
+
         private Connection conn;
+
         private PreparedStatement selectCertStmt;
+
         private PreparedStatement selectBase64CertStmt;
 
         public EjbcaDbRetriever()
@@ -171,10 +174,13 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
             outQueue.add(result);
         }
+
     }
 
     private final int caId;
+
     private final String selectCertSql;
+
     private final String selectBase64CertSql;
 
     private final String caFingerprint;

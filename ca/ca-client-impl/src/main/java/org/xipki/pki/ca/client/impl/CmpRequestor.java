@@ -95,19 +95,25 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class CmpRequestor {
+
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
 
     private final  Random random = new Random();
 
     private final ConcurrentContentSigner requestor;
+
     private final GeneralName sender;
 
     private final X509Certificate responderCert;
+
     private final GeneralName recipient;
+
     private final String c14nRecipientName;
 
     protected final SecurityFactory securityFactory;
+
     protected boolean signRequest;
+
     private boolean sendRequestorCert = false;
 
     public CmpRequestor(
@@ -562,4 +568,5 @@ public abstract class CmpRequestor {
             final X500Name name) {
         return X509Util.getRFC4519Name(X509Util.sortX509Name(name));
     }
+
 }

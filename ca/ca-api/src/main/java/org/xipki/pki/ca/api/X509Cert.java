@@ -50,10 +50,15 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class X509Cert {
+
     private final X509Certificate cert;
+
     private final String subject;
+
     private final byte[] encodedCert;
+
     private final byte[] subjectKeyIdentifer;
+
     private final X500Name subjectAsX500Name;
 
     public X509Cert(

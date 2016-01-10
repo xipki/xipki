@@ -112,21 +112,35 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class CRLControl implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     public static final String KEY_updateMode = "updateMode";
+
     public static final String KEY_extensions = "extensions";
+
     public static final String KEY_expiredCerts_included = "expiredCerts.included";
+
     public static final String KEY_certs_embedded = "certs.embedded";
+
     public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
+
     public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
+
     public static final String KEY_overlap_minutes = "overlap.minutes";
+
     public static final String KEY_interval_minutes = "interval.minutes";
+
     public static final String KEY_interval_time = "interval.time";
+
     public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
+
     public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
+
     public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
+
     public static final String KEY_excludeReason = "excludeReason";
+
     public static final String KEY_invalidityDate = "invalidityDate";
 
     public static enum UpdateMode implements Serializable {
@@ -518,4 +532,5 @@ public class CRLControl implements Serializable {
 
         return true;
     }
+
 }

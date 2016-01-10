@@ -60,13 +60,21 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
  */
 
 public class OcspFromCaDbImportWorker extends DbPortWorker {
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImportWorker.class);
+
     private final DataSourceWrapper dataSource;
+
     private final Unmarshaller unmarshaller;
+
     private final String publisherName;
+
     private final boolean resume;
+
     private final String srcFolder;
+
     private final int batchEntriesPerCommit;
+
     private final boolean evaluateOnly;
 
     public OcspFromCaDbImportWorker(

@@ -62,4 +62,5 @@ public class NegCaPublishRCACertCmd extends CaPublishRCACertCmd {
 
         throw new CmdFailure("exception expected, but received none");
     }
+
 }

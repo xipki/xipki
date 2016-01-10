@@ -84,13 +84,11 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class BaseX509Certprofile
-extends X509Certprofile {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseX509Certprofile.class);
-    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
+public abstract class BaseX509Certprofile extends X509Certprofile {
 
-    static {
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(BaseX509Certprofile.class);
+
+    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
@@ -328,6 +326,7 @@ extends X509Certprofile {
     }
 
     protected EnvParameterResolver parameterResolver;
+
     @Override
     public void setEnvParameterResolver(
             final EnvParameterResolver parameterResolver) {

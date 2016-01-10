@@ -48,6 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.cert.EnrollCertCmd;
         description = "enroll certificate (negative, QA)")
 @Service
 public class NegEnrollCertCmd extends EnrollCertCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {

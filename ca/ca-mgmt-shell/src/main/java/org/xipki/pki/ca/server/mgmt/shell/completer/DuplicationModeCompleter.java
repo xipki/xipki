@@ -45,6 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 
 @Service
 public class DuplicationModeCompleter extends AbstractEnumCompleter {
+
     public DuplicationModeCompleter() {
         StringBuilder enums = new StringBuilder();
         for (DuplicationMode mode : DuplicationMode.values()) {

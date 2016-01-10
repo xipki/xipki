@@ -42,6 +42,7 @@ import java.util.Set;
  */
 
 public interface QASystemManager {
+
     Set<String> getIssuerNames();
 
     X509IssuerInfo getIssuer(
@@ -51,4 +52,5 @@ public interface QASystemManager {
 
     X509CertprofileQA getCertprofile(
             String certprofileName);
+
 }

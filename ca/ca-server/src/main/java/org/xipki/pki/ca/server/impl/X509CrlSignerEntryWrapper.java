@@ -58,9 +58,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class X509CrlSignerEntryWrapper {
+
     private X509CrlSignerEntry dbEntry;
+
     private CRLControl crlControl;
+
     private ConcurrentContentSigner signer;
+
     private byte[] subjectKeyIdentifier;
 
     public X509CrlSignerEntryWrapper() {

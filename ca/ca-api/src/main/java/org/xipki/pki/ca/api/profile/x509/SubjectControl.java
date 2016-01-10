@@ -54,10 +54,15 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class SubjectControl {
+
     private final Map<ASN1ObjectIdentifier, RDNControl> controls;
+
     private final Map<ASN1ObjectIdentifier, String> typeGroups;
+
     private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
+
     private final Set<String> groups;
+
     private final List<ASN1ObjectIdentifier> types;
 
     public SubjectControl(
@@ -108,17 +113,20 @@ public class SubjectControl {
         this.groups = Collections.unmodifiableSet(groups);
     }
 
-    public RDNControl getControl(ASN1ObjectIdentifier type) {
+    public RDNControl getControl(
+            final ASN1ObjectIdentifier type) {
         return controls.isEmpty()
                 ? SubjectDNSpec.getRDNControl(type)
                 : controls.get(type);
     }
 
-    public String getGroup(ASN1ObjectIdentifier type) {
+    public String getGroup(
+            final ASN1ObjectIdentifier type) {
         return typeGroups.get(type);
     }
 
-    public Set<ASN1ObjectIdentifier> getTypesForGroup(String group) {
+    public Set<ASN1ObjectIdentifier> getTypesForGroup(
+            final String group) {
         return groupTypes.get(group);
     }
 

@@ -65,12 +65,15 @@ import org.xipki.pki.ca.dbtool.IDRange;
  */
 
 public class EjbcaDigestExportReader {
+
     private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExportReader.class);
 
-    private class Retriever
-    implements Runnable {
+    private class Retriever implements Runnable {
+
         private Connection conn;
+
         private PreparedStatement selectCertStmt;
+
         private PreparedStatement selectRawCertStmt;
 
         public Retriever()
@@ -191,19 +194,29 @@ public class EjbcaDigestExportReader {
                 DbToolBase.releaseResources(null, rs);
             }
         }
+
     }
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
+
     protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
+
     protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+
     private final int numThreads;
+
     private ExecutorService executor;
+
     private final List<Retriever> retrievers;
+
     private final DataSourceWrapper datasource;
+
     private final Map<String, EjbcaCaInfo> fpCaInfoMap;
 
     private final String selectCertSql;
+
     private final String selectRawCertSql;
+
     private final AtomicInteger numSkippedCerts = new AtomicInteger(0);
 
     public EjbcaDigestExportReader(
@@ -235,7 +248,8 @@ public class EjbcaDigestExportReader {
         }
     }
 
-    public List<IdentifiedDbDigestEntry> readCerts(List<IDRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(
+            final List<IDRange> idRanges)
     throws DataAccessException {
         int n = idRanges.size();
         for (IDRange range : idRanges) {

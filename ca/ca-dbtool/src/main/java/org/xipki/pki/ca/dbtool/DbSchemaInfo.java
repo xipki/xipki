@@ -52,6 +52,7 @@ import org.xipki.datasource.api.exception.DataAccessException;
  */
 
 public class DbSchemaInfo {
+
     private final Map<String, String> variables = new HashMap<>();
 
     public DbSchemaInfo(

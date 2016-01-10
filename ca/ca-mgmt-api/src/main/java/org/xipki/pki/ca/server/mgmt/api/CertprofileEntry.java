@@ -44,10 +44,15 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertprofileEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     private final String name;
+
     private final String type;
+
     private final String conf;
+
     private boolean faulty;
 
     public CertprofileEntry(

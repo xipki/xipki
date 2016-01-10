@@ -40,8 +40,11 @@ package org.xipki.pki.ca.api.profile;
  */
 
 public class ExtensionControl {
+
     private final boolean critical;
+
     private final boolean required;
+
     private final boolean request;
 
     public ExtensionControl(
@@ -64,4 +67,5 @@ public class ExtensionControl {
     public boolean isRequest() {
         return request;
     }
+
 }

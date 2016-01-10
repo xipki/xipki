@@ -53,28 +53,41 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 public class CmpControl {
+
     public static final String ALGO_DELIMITER = ":";
 
     public static final String KEY_CONFIRM_CERT = "confirm.cert";
+
     public static final String KEY_SEND_CA = "send.ca";
+
     public static final String KEY_SEND_RESPONDER = "send.responder";
+
     public static final String KEY_MESSAGETIME_REQUIRED = "messageTime.required";
+
     public static final String KEY_MESSAGETIME_BIAS = "messageTime.bias";
+
     public static final String KEY_CONFIRM_WAITTIME = "confirm.waittime";
+
     public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
+
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
 
     private final CmpControlEntry dbEntry;
+
     private final boolean confirmCert;
+
     private final boolean sendCaCert;
 
     private final boolean messageTimeRequired;
+
     private final boolean sendResponderCert;
 
     private final int messageTimeBias;
+
     private final int confirmWaitTime;
+
     private final Set<String> sigAlgos;
 
     public boolean isMessageTimeRequired() {

@@ -42,18 +42,23 @@ import javax.xml.stream.XMLStreamException;
  */
 
 public class CaUserType extends DbDataObject {
+
     public static final String TAG_ROOT = "user";
 
     public static final String TAG_id = "id";
+
     private Integer id;
 
     public static final String TAG_name = "name";
+
     private String name;
 
     public static final String TAG_password = "password";
+
     private String password;
 
     public static final String TAG_cnRegex = "cnRegex";
+
     private String cnRegex;
 
     public Integer getId() {

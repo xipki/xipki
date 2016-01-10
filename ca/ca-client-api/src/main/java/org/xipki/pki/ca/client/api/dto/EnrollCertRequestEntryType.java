@@ -44,9 +44,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class EnrollCertRequestEntryType extends IdentifiedObject {
+
     private final String certprofile;
 
     private final CertRequest certReq;
+
     private final ProofOfPossession popo;
 
     public EnrollCertRequestEntryType(

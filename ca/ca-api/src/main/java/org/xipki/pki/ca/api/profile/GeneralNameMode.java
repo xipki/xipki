@@ -45,7 +45,9 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class GeneralNameMode {
+
     private final GeneralNameTag tag;
+
     // not applied to all tags, currently only for tag otherName
     private final Set<ASN1ObjectIdentifier> allowedTypes;
 

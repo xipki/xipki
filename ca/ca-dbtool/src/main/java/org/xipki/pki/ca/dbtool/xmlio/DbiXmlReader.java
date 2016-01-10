@@ -49,10 +49,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public abstract class DbiXmlReader {
+
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
     private final String rootElementName;
+
     private final XMLStreamReader reader;
+
     private DbDataObject next;
 
     public DbiXmlReader(

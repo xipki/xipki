@@ -50,6 +50,7 @@ import org.xipki.console.karaf.CmdFailure;
         description = "check information of profiles (QA)")
 @Service
 public class ProfileCheckCmd extends ProfileUpdateCmd {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -82,4 +83,5 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
         out(" checked profile " + name);
         return null;
     }
+
 }

@@ -45,10 +45,12 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class EjbcaCACertExtractor {
+
     private EjbcaCACertExtractor() {
     }
 
-    public static X509Certificate extractCACert(String caData)
+    public static X509Certificate extractCACert(
+            final String caData)
     throws Exception {
         XMLDocumentReader cadataReader = new XMLDocumentReader(
                 new ByteArrayInputStream(caData.getBytes()), false);

@@ -45,10 +45,13 @@ import org.xipki.common.util.ParamUtil;
 
 public class AddUserEntry
 implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private final String name;
+
     private final String password;
+
     private final String cnRegex;
 
     public AddUserEntry(

@@ -48,6 +48,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
         description = "unlock CA system")
 @Service
 public class CaSystemUnlockCmd extends CaCommandSupport {
+
     @Override
     protected Object doExecute()
     throws Exception {
@@ -61,4 +62,5 @@ public class CaSystemUnlockCmd extends CaCommandSupport {
 
         return null;
     }
+
 }

@@ -42,7 +42,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CertificatePolicyQualifier {
+
     private final String cpsUri;
+
     private final String userNotice;
 
     private CertificatePolicyQualifier(

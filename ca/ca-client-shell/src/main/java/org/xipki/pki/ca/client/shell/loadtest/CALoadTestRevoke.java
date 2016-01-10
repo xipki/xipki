@@ -71,22 +71,33 @@ import org.xipki.security.api.HashCalculator;
  */
 
 public class CALoadTestRevoke extends LoadExecutor {
+
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
     private final CAClient caClient;
+
     private final DataSourceWrapper caDataSource;
+
     private final X500Name caSubject;
+
     private final Set<Long> excludeSerials = new HashSet<>();
+
     private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
+
     private final int caInfoId;
+
     private final long minSerial;
+
     private final long maxSerial;
+
     private final int maxCerts;
+
     private final int n;
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
     private long nextStartSerial;
+
     private boolean noUnrevokedCerts = false;
 
     private CRLReason[] reasons = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,

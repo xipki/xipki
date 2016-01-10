@@ -45,9 +45,11 @@ import org.slf4j.LoggerFactory;
  */
 
 public abstract class DbPortWorker implements Runnable {
+
     private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
 
     private Exception exception;
+
     private final AtomicBoolean stopMe = new AtomicBoolean(false);
 
     public DbPortWorker() {

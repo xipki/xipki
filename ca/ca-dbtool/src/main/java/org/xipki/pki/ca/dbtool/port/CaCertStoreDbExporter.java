@@ -98,17 +98,25 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
+
     private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
 
     private final Marshaller marshaller;
+
     private final Unmarshaller unmarshaller;
 
     private final int numCertsInBundle;
+
     private final int numUsersInBundle;
+
     private final int numCrlsInBundle;
+
     private final int numCertsPerSelect;
+
     private final int numUsersPerSelect;
+
     private final int numCrlsPerSelect;
+
     private final boolean resume;
 
     CaCertStoreDbExporter(

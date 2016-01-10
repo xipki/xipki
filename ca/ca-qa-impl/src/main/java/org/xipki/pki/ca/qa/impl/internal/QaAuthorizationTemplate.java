@@ -42,7 +42,9 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
  */
 
 public class QaAuthorizationTemplate extends QaExtension {
+
     private final String type;
+
     private final byte[] accessRights;
 
     public QaAuthorizationTemplate(

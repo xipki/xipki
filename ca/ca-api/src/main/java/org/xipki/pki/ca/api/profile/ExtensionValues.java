@@ -49,6 +49,7 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ExtensionValues {
+
     private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
     public boolean addExtension(

@@ -40,6 +40,7 @@ package org.xipki.pki.ca.api;
  */
 
 public class OperationException extends Exception {
+
     public static enum ErrorCode {
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,
@@ -60,6 +61,7 @@ public class OperationException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private final ErrorCode errorCode;
+
     private final String errorMessage;
 
     public OperationException(

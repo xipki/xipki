@@ -46,14 +46,23 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class RDNControl {
+
     private final int minOccurs;
+
     private final int maxOccurs;
+
     private final ASN1ObjectIdentifier type;
+
     private List<Pattern> patterns;
+
     private StringType stringType;
+
     private Range stringLengthRange;
+
     private String prefix;
+
     private String suffix;
+
     private String group;
 
     public RDNControl(

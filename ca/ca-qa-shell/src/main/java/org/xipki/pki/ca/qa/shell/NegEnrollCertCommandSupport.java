@@ -67,6 +67,7 @@ import org.xipki.security.api.SignerException;
  */
 
 public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
+
     @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested.\n"
                     + "default is the subject of self-signed certifite.")

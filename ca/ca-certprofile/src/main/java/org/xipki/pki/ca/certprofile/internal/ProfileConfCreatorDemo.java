@@ -132,11 +132,13 @@ import org.xml.sax.SAXException;
  */
 
 public class ProfileConfCreatorDemo {
+
     private static final ASN1ObjectIdentifier id_gematik =
             new ASN1ObjectIdentifier("1.2.276.0.76.4");
 
     private static final String REGEX_FQDN =
             "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
+
     private static final String REGEX_SN = "[\\d]{1,}";
 
     private static final Set<ASN1ObjectIdentifier> requestExtensions;

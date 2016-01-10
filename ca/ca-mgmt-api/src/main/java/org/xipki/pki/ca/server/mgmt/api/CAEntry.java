@@ -48,19 +48,33 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 public class CAEntry {
+
     private String name;
+
     private CAStatus status;
+
     private CertValidity maxValidity;
+
     private String signerType;
+
     private String signerConf;
+
     private String cmpControlName;
+
     private String responderName;
+
     private DuplicationMode duplicateKeyMode;
+
     private DuplicationMode duplicateSubjectMode;
+
     private ValidityMode validityMode = ValidityMode.STRICT;
+
     private Set<Permission> permissions;
+
     private int expirationPeriod;
+
     private int keepExpiredCertInDays;
+
     private String extraControl;
 
     public CAEntry(

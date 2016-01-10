@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class P10EnrollCertEntryType {
+
     private final CertificationRequest p10Request;
+
     private final String profile;
 
     public P10EnrollCertEntryType(

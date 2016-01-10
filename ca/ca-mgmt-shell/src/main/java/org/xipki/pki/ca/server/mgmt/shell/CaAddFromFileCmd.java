@@ -72,6 +72,7 @@ import org.xipki.security.api.util.X509Util;
         description = "add CA from configuration file")
 @Service
 public class CaAddFromFileCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"
@@ -397,4 +398,5 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid " + key + ": '" + value + "'");
         }
     }
+
 }

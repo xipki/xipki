@@ -46,7 +46,9 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public class CertRevInfoWithSerial extends CertRevocationInfo {
+
     private static final long serialVersionUID = 1L;
+
     private BigInteger serial;
 
     public CertRevInfoWithSerial(

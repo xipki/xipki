@@ -54,6 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "generate selfsigned CA")
 @Service
 public class CaGenRootCACmd extends CaAddOrGenCommandSupport {
+
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request of the Root CA\n"

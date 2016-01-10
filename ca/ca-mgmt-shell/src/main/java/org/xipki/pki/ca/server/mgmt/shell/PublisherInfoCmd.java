@@ -56,6 +56,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
         description = "show information of publisher")
 @Service
 public class PublisherInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "publisher name")
     @Completion(PublisherNameCompleter.class)
     private String name;
@@ -96,4 +97,5 @@ public class PublisherInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

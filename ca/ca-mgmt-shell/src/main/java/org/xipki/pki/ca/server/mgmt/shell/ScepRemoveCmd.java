@@ -49,6 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
         description = "remove SCEP")
 @Service
 public class ScepRemoveCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "SCEP CA name\n"
@@ -63,4 +64,5 @@ public class ScepRemoveCmd extends CaCommandSupport {
         output(b, "removed", "could not remove", "SCEP for CA " + name);
         return null;
     }
+
 }

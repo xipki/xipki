@@ -59,6 +59,7 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
         description = "add requestor to CA")
 @Service
 public class CaRequestorAddCmd extends CaCommandSupport {
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -114,4 +115,5 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
         return null;
     }
+
 }

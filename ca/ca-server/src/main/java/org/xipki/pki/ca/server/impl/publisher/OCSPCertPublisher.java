@@ -67,12 +67,16 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class OCSPCertPublisher extends X509CertPublisher {
+
     private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
 
     @SuppressWarnings("unused")
     private EnvParameterResolver envParameterResolver;
+
     private OCSPStoreQueryExecutor queryExecutor;
+
     private boolean asyn = false;
+
     private boolean publishsGoodCert = true;
 
     private AuditServiceRegister auditServiceRegister;

@@ -42,9 +42,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class StopMe {
+
     private final AtomicBoolean stopMe;
 
-    public StopMe(AtomicBoolean stopMe) {
+    public StopMe(
+            final AtomicBoolean stopMe) {
         this.stopMe = stopMe;
     }
 

@@ -56,19 +56,33 @@ import org.xipki.security.api.util.X509Util;
 public class X509CAEntry
 extends CAEntry
 implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     private List<String> crlUris;
+
     private List<String> deltaCrlUris;
+
     private List<String> ocspUris;
+
     private List<String> cacertUris;
+
     private X509Certificate cert;
+
     private String crlSignerName;
+
     private long nextSerial;
+
     private int nextCRLNumber;
+
     private int numCrls;
+
     private CertRevocationInfo revocationInfo;
+
     private String subject;
+
     private String serialSeqName;
+
     private DuplicationMode duplicateCNMode;
 
     public X509CAEntry(

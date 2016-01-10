@@ -50,11 +50,15 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class DbiXmlWriter {
+
     private final static XMLOutputFactory factory = XMLOutputFactory.newFactory();
 
     private final String rootElementName;
+
     private final ByteArrayOutputStream stream;
+
     private final XMLStreamWriter writer;
+
     private boolean flushed = false;
 
     public DbiXmlWriter(

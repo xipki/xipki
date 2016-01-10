@@ -40,11 +40,13 @@ package org.xipki.pki.ca.server.mgmt.api;
  */
 
 public enum DuplicationMode {
+
     FORBIDDEN (1, "forbidden"),
     FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
     PERMITTED (3, "permitted");
 
     private final int mode;
+
     private final String description;
 
     private DuplicationMode(
@@ -85,4 +87,5 @@ public enum DuplicationMode {
 
         return null;
     }
+
 }

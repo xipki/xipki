@@ -46,19 +46,33 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ChangeCAEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     private final String name;
+
     private CAStatus status;
+
     private CertValidity maxValidity;
+
     private String signerType;
+
     private String signerConf;
+
     private String cmpControlName;
+
     private String responderName;
+
     private DuplicationMode duplicateKeyMode;
+
     private DuplicationMode duplicateSubjectMode;
+
     private ValidityMode validityMode;
+
     private Set<Permission> permissions;
+
     private Integer keepExpiredCertInDays;
+
     private Integer expirationPeriod;
 
     public ChangeCAEntry(

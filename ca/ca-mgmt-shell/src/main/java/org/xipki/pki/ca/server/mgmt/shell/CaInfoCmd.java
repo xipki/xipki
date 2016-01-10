@@ -58,6 +58,7 @@ import org.xipki.common.util.CollectionUtil;
         description = "show information of CA")
 @Service
 public class CaInfoCmd extends CaCommandSupport {
+
     @Argument(index = 0, name = "name", description = "CA name")
     @Completion(CaNameCompleter.class)
     private String caName;
@@ -107,4 +108,5 @@ public class CaInfoCmd extends CaCommandSupport {
         out(sb.toString());
         return null;
     }
+
 }

@@ -40,6 +40,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  */
 
 public enum CAStatus {
+
     ACTIVE ("active"),
     INACTIVE ("inactive");
 

@@ -44,10 +44,13 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class CmpControlEntry implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private final String name;
+
     private final String conf;
+
     private boolean faulty;
 
     public CmpControlEntry(
@@ -85,4 +88,5 @@ public class CmpControlEntry implements Serializable {
 
         return sb.toString();
     }
+
 }

@@ -40,6 +40,7 @@ package org.xipki.pki.ca.api.profile.x509;
  */
 
 public enum SpecialX509CertprofileBehavior {
+
     gematik_gSMC_K;
 
     public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
@@ -54,4 +55,5 @@ public enum SpecialX509CertprofileBehavior {
 
         return null;
     }
+
 }

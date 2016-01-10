@@ -54,6 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "export certificate profile configuration")
 @Service
 public class ProfileExportCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "profile name\n"
@@ -83,4 +84,5 @@ public class ProfileExportCmd extends CaCommandSupport {
         }
         return null;
     }
+
 }

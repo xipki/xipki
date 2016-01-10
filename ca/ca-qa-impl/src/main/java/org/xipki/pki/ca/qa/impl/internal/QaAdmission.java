@@ -49,9 +49,13 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class QaAdmission extends QaExtension {
+
     private final String registrationNumber;
+
     private final byte[] addProfessionInfo;
+
     private final List<String> professionOIDs;
+
     private final List<String> professionItems;
 
     public QaAdmission(

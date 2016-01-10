@@ -77,15 +77,19 @@ import org.xipki.scep.util.ScepConstants;
  */
 
 public class ScepServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 
     private static final long serialVersionUID = 1L;
+
     private static final String CGI_PROGRAM = "/pkiclient.exe";
+
     private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
     private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
     private AuditServiceRegister auditServiceRegister;
+
     private CAManagerImpl responderManager;
 
     public ScepServlet() {

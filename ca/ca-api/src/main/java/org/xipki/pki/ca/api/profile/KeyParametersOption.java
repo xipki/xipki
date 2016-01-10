@@ -46,6 +46,7 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class KeyParametersOption {
+
     public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
 
     private KeyParametersOption() {

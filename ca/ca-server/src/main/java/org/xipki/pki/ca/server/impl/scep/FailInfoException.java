@@ -43,6 +43,7 @@ import org.xipki.scep.transaction.FailInfo;
  */
 
 public class FailInfoException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
     public static final FailInfoException badAlg = new FailInfoException(FailInfo.badAlg);

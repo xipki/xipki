@@ -57,6 +57,7 @@ import org.xipki.security.api.util.X509Util;
         description = "add responder")
 @Service
 public class ResponderAddCmd extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"

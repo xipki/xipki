@@ -60,17 +60,29 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class PublicCAInfo {
+
     private final X500Principal subject;
+
     private final X500Name x500Subject;
+
     private final String c14nSubject;
+
     private final byte[] subjectKeyIdentifier;
+
     private final GeneralNames  subjectAltName;
+
     private final BigInteger serialNumber;
+
     private final X509Cert caCertificate;
+
     private X509Certificate crlSignerCertificate;
+
     private final List<String> caCertUris;
+
     private final List<String> ocspUris;
+
     private final List<String> crlUris;
+
     private final List<String> deltaCrlUris;
 
     public PublicCAInfo(

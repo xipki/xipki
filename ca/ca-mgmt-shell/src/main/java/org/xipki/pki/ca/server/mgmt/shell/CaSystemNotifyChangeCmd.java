@@ -54,4 +54,5 @@ public class CaSystemNotifyChangeCmd extends CaCommandSupport {
         output(b, "notified", "could not notify", "the change of CA system");
         return null;
     }
+
 }

@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class P10EnrollCertRequestType extends IdentifiedObject {
+
     private final String certprofile;
+
     private final CertificationRequest p10Req;
 
     public P10EnrollCertRequestType(
@@ -65,4 +67,5 @@ public class P10EnrollCertRequestType extends IdentifiedObject {
     public String getCertprofile() {
         return certprofile;
     }
+
 }

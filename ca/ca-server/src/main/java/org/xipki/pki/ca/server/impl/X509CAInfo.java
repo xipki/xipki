@@ -71,6 +71,7 @@ import org.xipki.security.api.SignerException;
  */
 
 public class X509CAInfo {
+
     private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 
     private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
@@ -78,17 +79,27 @@ public class X509CAInfo {
     private final X509CAEntry caEntry;
 
     private long noNewCertificateAfter;
+
     private BigInteger serialNumber;
+
     private Date notBefore;
+
     private Date notAfter;
+
     private boolean selfSigned;
+
     private CMPCertificate certInCMPFormat;
+
     private PublicCAInfo publicCAInfo;
 
     private CertificateStore certStore;
+
     private boolean useRandomSerialNumber;
+
     private RandomSerialNumberGenerator randomSNGenerator;
+
     private Map<String, ConcurrentContentSigner> signers;
+
     private ConcurrentContentSigner dfltSigner;
 
     public X509CAInfo(

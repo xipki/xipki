@@ -45,7 +45,9 @@ import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
  */
 
 public class CmpRequestorInfo implements RequestorInfo {
+
     private final CAHasRequestorEntry caHasRequestor;
+
     private final X509CertWithDBCertId cert;
 
     public CmpRequestorInfo(

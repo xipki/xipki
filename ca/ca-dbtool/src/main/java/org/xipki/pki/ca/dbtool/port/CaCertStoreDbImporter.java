@@ -97,6 +97,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
+
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private static final String SQL_ADD_CERT =
@@ -117,9 +118,13 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
 
     private final Unmarshaller unmarshaller;
+
     private final boolean resume;
+
     private final int numCertsPerCommit;
+
     private final int numUsersPerCommit;
+
     private final int numCrlsPerCommit;
 
     CaCertStoreDbImporter(

@@ -52,9 +52,13 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 public class BiometricInfoOption {
+
     private final Set<Integer> predefinedTypes;
+
     private final Set<ASN1ObjectIdentifier> idTypes;
+
     private final Set<ASN1ObjectIdentifier> hashAlgorithms;
+
     private final TripleState sourceDataUriOccurrence;
 
     public BiometricInfoOption(

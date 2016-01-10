@@ -43,7 +43,9 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ExtKeyUsageControl {
+
     private final ASN1ObjectIdentifier extKeyUsage;
+
     private final boolean required;
 
     public ExtKeyUsageControl(

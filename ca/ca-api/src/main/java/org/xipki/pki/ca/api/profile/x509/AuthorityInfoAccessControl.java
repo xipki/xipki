@@ -40,7 +40,9 @@ package org.xipki.pki.ca.api.profile.x509;
  */
 
 public class AuthorityInfoAccessControl {
+
     private final boolean includesCaIssuers;
+
     private final boolean includesOcsp;
 
     public AuthorityInfoAccessControl(

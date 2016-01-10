@@ -105,9 +105,13 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class IdentifiedX509Certprofile {
+
     private static final Set<ASN1ObjectIdentifier> criticalOnlyExtensionTypes;
+
     private static final Set<ASN1ObjectIdentifier> noncriticalOnlyExtensionTypes;
+
     private static final Set<ASN1ObjectIdentifier> caOnlyExtensionTypes;
+
     private static final Set<ASN1ObjectIdentifier> noneRequestExtensionTypes;
 
     static {
@@ -1047,4 +1051,5 @@ class IdentifiedX509Certprofile {
                 ? new DERSequence(v)
                 : null;
     }
+
 }

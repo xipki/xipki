@@ -46,7 +46,9 @@ import org.bouncycastle.asn1.x500.X500Name;
  */
 
 public class RevokeCertRequestEntryType extends IssuerSerialEntryType {
+
     private final int reason;
+
     private final Date invalidityDate;
 
     public RevokeCertRequestEntryType(

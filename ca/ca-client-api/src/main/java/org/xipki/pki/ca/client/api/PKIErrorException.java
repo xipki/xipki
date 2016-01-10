@@ -43,10 +43,13 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 public class PKIErrorException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
     private final int status;
+
     private final int pkiFailureInfo;
+
     private final String statusMessage;
 
     public PKIErrorException(

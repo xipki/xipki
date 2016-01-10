@@ -65,9 +65,13 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile {
+
     private final CertValidity validity;
+
     private final Set<KeyUsageControl> keyUsage;
+
     private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
+
     private final SubjectControl subjectControl;
 
     public DemoEE1X509Certprofile() {

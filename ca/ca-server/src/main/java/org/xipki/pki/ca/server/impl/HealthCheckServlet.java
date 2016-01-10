@@ -56,6 +56,7 @@ import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
  */
 
 public class HealthCheckServlet extends HttpServlet {
+
     private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
     private static final long serialVersionUID = 1L;

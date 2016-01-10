@@ -75,15 +75,19 @@ import org.xipki.security.api.HashCalculator;
  */
 
 class OcspCertStoreDbExporter extends DbPorter {
+
     public static final String PROCESS_LOG_FILENAME = "export.process";
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
 
     private final Marshaller marshaller;
+
     private final Unmarshaller unmarshaller;
 
     private final int numCertsInBundle;
+
     private final int numCertsPerSelect;
+
     private final boolean resume;
 
     OcspCertStoreDbExporter(

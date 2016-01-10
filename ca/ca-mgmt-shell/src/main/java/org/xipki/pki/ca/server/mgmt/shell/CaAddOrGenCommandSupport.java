@@ -65,6 +65,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
  */
 
 public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "CA name\n"

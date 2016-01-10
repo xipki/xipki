@@ -42,90 +42,108 @@ import javax.xml.stream.XMLStreamException;
  */
 
 public class CaCertType extends DbDataObject {
+
     public static final String TAG_ROOT = "cert";
 
     public static final String TAG_id = "id";
+
     private Integer id;
 
     public static final String TAG_art = "art";
+
     private Integer art;
 
     public static final String TAG_caId = "caId";
+
     private Integer caId;
 
     /**
      * certificate serial number
      */
     public static final String TAG_sn = "sn";
+
     private String sn;
 
     /**
      * certificate profile id
      */
     public static final String TAG_pid = "pid";
+
     private Integer pid;
 
     /**
      * requestor id
      */
     public static final String TAG_rid = "rid";
+
     private Integer rid;
 
     public static final String TAG_update = "update";
+
     private Long update;
 
     /**
      * whether revoked
      */
     public static final String TAG_rev = "rev";
+
     private Boolean rev;
 
     /**
      * revocation reason
      */
     public static final String TAG_rr = "rr";
+
     private Integer rr;
 
     /**
      * revocation time
      */
     public static final String TAG_rt = "rt";
+
     private Long rt;
 
     /**
      * revocation invalidity time
      */
     public static final String TAG_rit = "rit";
+
     private Long rit;
 
     public static final String TAG_user = "user";
+
     private String user;
 
     /**
      * base64 encoded transaction id
      */
     public static final String TAG_tid = "tid";
+
     private String tid;
 
     public static final String TAG_reqType = "reqType";
+
     private Integer reqType;
 
     /**
      * first 8 bytes of the SHA1 sum of the requested subject
      */
     public static final String TAG_fpRs = "fpRs";
+
     private Long fpRs;
 
     /**
      * requested subject, if differs from the one in certificate
      */
     public static final String TAG_rs = "rs";
+
     private String rs;
 
     /**
      * file name of the certificate
      */
     public static final String TAG_file = "file";
+
     private String file;
 
     public Integer getId() {

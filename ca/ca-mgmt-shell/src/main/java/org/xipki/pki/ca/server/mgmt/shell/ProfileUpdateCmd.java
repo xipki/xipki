@@ -88,4 +88,5 @@ public class ProfileUpdateCmd extends CaCommandSupport {
         output(b, "updated", "could not update", "certificate profile " + name);
         return null;
     }
+
 }

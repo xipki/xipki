@@ -61,13 +61,21 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class FileDigestReader implements DigestReader {
+
     private final int totalAccount;
+
     private final String caDirname;
+
     private final String caSubjectName;
+
     private final X509Certificate caCert;
+
     private final BufferedReader certsFilesReader;
+
     private final boolean revokedOnly;
+
     private BufferedReader certsReader;
+
     private DbDigestEntry next;
 
     public FileDigestReader(

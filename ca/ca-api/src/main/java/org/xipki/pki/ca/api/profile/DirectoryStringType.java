@@ -46,6 +46,7 @@ import org.bouncycastle.asn1.DERUTF8String;
  */
 
 public enum DirectoryStringType {
+
     teletexString,
     printableString,
     utf8String,
@@ -66,4 +67,5 @@ public enum DirectoryStringType {
                     + text + "'");
         }
     }
+
 }

@@ -46,6 +46,7 @@ import org.xipki.security.api.KeyUsage;
  */
 
 public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile {
+
     protected Set<KeyUsageControl> keyUsages;
 
     public AbstractCAX509Certprofile() {

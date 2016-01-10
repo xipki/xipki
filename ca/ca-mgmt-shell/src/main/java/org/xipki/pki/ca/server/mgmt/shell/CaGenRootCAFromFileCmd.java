@@ -54,6 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "generate selfsigned CA from configuration file")
 @Service
 public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd {
+
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request of the Root CA\n"
@@ -85,4 +86,5 @@ public class CaGenRootCAFromFileCmd extends CaAddFromFileCmd {
         out("generated root CA " + caEntry.getName());
         return null;
     }
+
 }

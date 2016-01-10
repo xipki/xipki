@@ -46,16 +46,25 @@ import java.util.List;
 public class X509ChangeCAEntry
 extends ChangeCAEntry
 implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private List<String> crlUris;
+
     private List<String> deltaCrlUris;
+
     private List<String> ocspUris;
+
     private List<String> caCertUris;
+
     private X509Certificate cert;
+
     private String crlSignerName;
+
     private Integer numCrls;
+
     private String extraControl;
+
     private DuplicationMode duplicateCNMode;
 
     public X509ChangeCAEntry(
