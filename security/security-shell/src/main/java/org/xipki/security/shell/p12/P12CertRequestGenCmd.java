@@ -57,6 +57,7 @@ import org.xipki.security.shell.CertRequestGenCommandSupport;
         description = "generate PKCS#10 request with PKCS#12 keystore")
 @Service
 public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
+
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"

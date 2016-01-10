@@ -120,4 +120,5 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
 
         securityFactory.getP11CryptService(moduleName).refresh();
     }
+
 }

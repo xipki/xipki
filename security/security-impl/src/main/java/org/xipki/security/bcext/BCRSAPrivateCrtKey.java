@@ -58,13 +58,19 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.KeyUtil;
 public class BCRSAPrivateCrtKey
     extends BCRSAPrivateKey
     implements RSAPrivateCrtKey {
+
     static final long serialVersionUID = 7834723820638524718L;
 
     private BigInteger  publicExponent;
+
     private BigInteger  primeP;
+
     private BigInteger  primeQ;
+
     private BigInteger  primeExponentP;
+
     private BigInteger  primeExponentQ;
+
     private BigInteger  crtCoefficient;
 
     /**
@@ -272,4 +278,5 @@ public class BCRSAPrivateCrtKey
 
         return buf.toString();
     }
+
 }

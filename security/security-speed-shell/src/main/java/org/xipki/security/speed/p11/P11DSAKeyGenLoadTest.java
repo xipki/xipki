@@ -43,7 +43,9 @@ import org.xipki.security.api.p11.P11WritableSlot;
  */
 
 public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
+
     private final int pLength;
+
     private final int qLength;
 
     public P11DSAKeyGenLoadTest(

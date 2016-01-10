@@ -56,6 +56,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
         description = "list directory contents")
 @Service
 public class FileListCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "file",
             required = true,
             description = "file or directory\n"
@@ -125,4 +126,5 @@ public class FileListCmd extends XipkiCommandSupport {
 
         return null;
     }
+
 }

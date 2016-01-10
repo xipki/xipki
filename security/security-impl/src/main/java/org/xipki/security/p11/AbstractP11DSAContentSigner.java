@@ -59,13 +59,17 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 abstract class AbstractP11DSAContentSigner implements ContentSigner {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);
 
     private final AlgorithmIdentifier algorithmIdentifier;
+
     private final DigestOutputStream outputStream;
 
     protected final P11CryptService cryptService;
+
     protected final P11SlotIdentifier slot;
+
     protected final P11KeyIdentifier keyId;
 
     protected abstract byte[] CKM_SIGN(
@@ -126,4 +130,5 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
             throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());
         }
     }
+
 }

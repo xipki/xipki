@@ -40,6 +40,7 @@ package org.xipki.scep.transaction;
  */
 
 public enum PkiStatus {
+
     /**
      * request granted
      */

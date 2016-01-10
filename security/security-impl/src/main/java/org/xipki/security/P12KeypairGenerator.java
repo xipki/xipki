@@ -85,7 +85,9 @@ import org.xipki.security.bcext.ECDSAContentSignerBuilder;
  */
 
 public abstract class P12KeypairGenerator {
+
     private static final long MIN = 60L * 1000;
+
     private static final long DAY = 24L * 60 * 60 * 1000;
 
     private final char[] password;
@@ -93,9 +95,11 @@ public abstract class P12KeypairGenerator {
     private final String subject;
 
     private final int serialNumber = 1;
+
     private final int validity = 3650;
 
     private final Integer keyUsage;
+
     private List<ASN1ObjectIdentifier> extendedKeyUsage;
 
     protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
@@ -238,7 +242,9 @@ public abstract class P12KeypairGenerator {
     }
 
     private static class KeyPairWithSubjectPublicKeyInfo {
+
         private KeyPair keypair;
+
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
         public KeyPairWithSubjectPublicKeyInfo(
@@ -257,11 +263,15 @@ public abstract class P12KeypairGenerator {
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
             return subjectPublicKeyInfo;
         }
+
     }
 
     static class KeyAndCertPair {
+
         private final X509CertificateHolder cert;
+
         private final X509Certificate jceCert;
+
         private final PrivateKey key;
 
         KeyAndCertPair(
@@ -284,10 +294,13 @@ public abstract class P12KeypairGenerator {
         public PrivateKey getKey() {
             return key;
         }
+
     }
 
     public static class ECDSAIdentityGenerator extends P12KeypairGenerator {
+
         private final String curveName;
+
         private final ASN1ObjectIdentifier curveOid;
 
         public ECDSAIdentityGenerator(
@@ -342,7 +355,9 @@ public abstract class P12KeypairGenerator {
     }
 
     public static class RSAIdentityGenerator extends P12KeypairGenerator {
+
         private final int keysize;
+
         private final BigInteger publicExponent;
 
         public RSAIdentityGenerator(
@@ -376,10 +391,13 @@ public abstract class P12KeypairGenerator {
         protected String getKeyAlgorithm() {
             return "RSA";
         }
+
     }
 
     public static class DSAIdentityGenerator extends P12KeypairGenerator {
+
         private final int pLength;
+
         private final int qLength;
 
         public DSAIdentityGenerator(
@@ -409,6 +427,7 @@ public abstract class P12KeypairGenerator {
         protected String getKeyAlgorithm() {
             return "RSA";
         }
+
     }
 
 }

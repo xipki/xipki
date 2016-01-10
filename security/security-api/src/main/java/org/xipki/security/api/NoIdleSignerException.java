@@ -61,4 +61,5 @@ public class NoIdleSignerException extends Exception {
             final Throwable cause) {
         super(message, cause);
     }
+
 }

@@ -43,8 +43,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 @Service
 public class DirPathCompleter extends AbstractPathCompleter {
+
     @Override
     protected boolean isDirOnly() {
         return true;
     }
+
 }

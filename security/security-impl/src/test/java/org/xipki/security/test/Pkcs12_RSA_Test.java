@@ -55,6 +55,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class Pkcs12_RSA_Test {
+
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
@@ -134,4 +135,5 @@ public abstract class Pkcs12_RSA_Test {
         signature.update(data);
         return signature.verify(signatureValue);
     }
+
 }

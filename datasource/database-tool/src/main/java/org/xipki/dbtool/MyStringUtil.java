@@ -40,6 +40,7 @@ package org.xipki.dbtool;
  */
 
 class MyStringUtil {
+
     private MyStringUtil() {
     }
 

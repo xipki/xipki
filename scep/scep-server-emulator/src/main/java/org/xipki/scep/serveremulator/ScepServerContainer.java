@@ -47,6 +47,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
  */
 
 public class ScepServerContainer {
+
     private Server server;
 
     public ScepServerContainer(
@@ -89,4 +90,5 @@ public class ScepServerContainer {
     throws Exception {
         server.stop();
     }
+
 }

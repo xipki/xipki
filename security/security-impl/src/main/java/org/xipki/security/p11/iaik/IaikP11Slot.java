@@ -176,21 +176,29 @@ public class IaikP11Slot implements P11WritableSlot {
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
     private final static long DEFAULT_MAX_COUNT_SESSION = 20;
+
     private Slot slot;
+
     private int maxSessionCount;
+
     private List<char[]> password;
 
     private long timeOutWaitNewSession = 10000; // maximal wait for 10 second
+
     private AtomicLong countSessions = new AtomicLong(0);
+
     private BlockingQueue<Session> idleSessions = new LinkedBlockingDeque<>();
 
     private ConcurrentHashMap<String, PrivateKey> signingKeysById = new ConcurrentHashMap<>();
+
     private ConcurrentHashMap<String, PrivateKey> signingKeysByLabel = new ConcurrentHashMap<>();
 
     private final List<IaikP11Identity> identities = new LinkedList<>();
 
     private boolean writableSessionInUse = false;
+
     private Session writableSession;
+
     private final P11SlotIdentifier slotId;
 
     IaikP11Slot(

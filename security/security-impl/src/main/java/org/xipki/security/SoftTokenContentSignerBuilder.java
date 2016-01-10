@@ -102,11 +102,15 @@ import org.xipki.security.bcext.DSAPlainDigestSigner;
  */
 
 public class SoftTokenContentSignerBuilder {
+
     private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
+
     public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
+
     public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
 
     private final PrivateKey key;
+
     private final X509Certificate[] certificateChain;
 
     public SoftTokenContentSignerBuilder(
@@ -300,6 +304,7 @@ public class SoftTokenContentSignerBuilder {
     }
 
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
+
         private RSAContentSignerBuilder(
                 final AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
@@ -341,6 +346,7 @@ public class SoftTokenContentSignerBuilder {
     } // RSAContentSignerBuilder
 
     private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
+
         private final boolean plain;
 
         private DSAContentSignerBuilder(
@@ -369,9 +375,11 @@ public class SoftTokenContentSignerBuilder {
                 return new DSADigestSigner(dsaSigner, dig);
             }
         }
+
     } // DSAContentSignerBuilder
 
     private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
+
         private final boolean plain;
 
         private ECDSAContentSignerBuilder(
@@ -401,11 +409,15 @@ public class SoftTokenContentSignerBuilder {
                 return new DSADigestSigner(dsaSigner, dig);
             }
         }
+
     } // ECDSAContentSignerBuilder
 
     public static class NssPlainRSASigner implements AsymmetricBlockCipher {
+
         private static final String algorithm = "RSA/ECB/NoPadding";
+
         private Cipher cipher;
+
         private RSAKeyParameters key;
 
         public NssPlainRSASigner()
@@ -467,6 +479,7 @@ public class SoftTokenContentSignerBuilder {
                 throw new InvalidCipherTextException(e.getMessage(), e);
             }
         }
-    }
+
+    } // NssPlainRSASigner
 
 }

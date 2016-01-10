@@ -50,6 +50,7 @@ import org.xipki.security.api.p11.P11ModuleConf;
  */
 
 public class KeystoreP11ModulePool {
+
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11ModulePool.class);
 
     private final Map<String, KeystoreP11Module> modules = new HashMap<>();
@@ -133,4 +134,5 @@ public class KeystoreP11ModulePool {
             final String defaultModuleName) {
         this.defaultModuleName = defaultModuleName;
     }
+
 }

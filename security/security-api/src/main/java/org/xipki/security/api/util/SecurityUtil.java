@@ -66,7 +66,9 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class SecurityUtil {
+
     public static final Map<Integer, String> statusTextMap = new HashMap<>();
+
     public static final String[] failureInfoTexts = new String[] {
         // 0 - 3
         "incorrectData", "wrongAuthority", "badDataFormat", "badCertId",

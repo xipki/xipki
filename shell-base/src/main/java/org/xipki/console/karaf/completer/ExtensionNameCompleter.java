@@ -51,6 +51,7 @@ import org.xipki.security.api.ObjectIdentifiers;
 
 @Service
 public class ExtensionNameCompleter extends AbstractEnumCompleter {
+
     public ExtensionNameCompleter() {
         List<ASN1ObjectIdentifier> oids = new LinkedList<>();
         oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);

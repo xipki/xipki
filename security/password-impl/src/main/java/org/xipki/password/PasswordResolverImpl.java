@@ -48,6 +48,7 @@ import org.xipki.password.api.SinglePasswordResolver;
  */
 
 public class PasswordResolverImpl implements PasswordResolver {
+
     private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
     private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =

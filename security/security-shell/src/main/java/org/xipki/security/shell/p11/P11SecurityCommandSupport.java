@@ -49,6 +49,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
  */
 
 public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
+
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

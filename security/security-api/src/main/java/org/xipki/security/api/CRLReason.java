@@ -51,6 +51,7 @@ import java.util.Map;
  */
 
 public enum CRLReason {
+
     /**
      * This reason indicates that it is unspecified as to why the
      * certificate has been revoked.
@@ -161,4 +162,5 @@ public enum CRLReason {
 
         return null;
     }
+
 }

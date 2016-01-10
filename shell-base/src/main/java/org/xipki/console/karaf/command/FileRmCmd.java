@@ -54,6 +54,7 @@ import org.xipki.console.karaf.intern.FileUtils;
         description = "remove file or directory")
 @Service
 public class FileRmCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "file",
             required = true,
             description = "file or directory to be deleted\n"
@@ -98,4 +99,5 @@ public class FileRmCmd extends XipkiCommandSupport {
 
         return null;
     }
+
 }

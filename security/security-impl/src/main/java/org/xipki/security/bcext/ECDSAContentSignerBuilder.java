@@ -51,6 +51,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 
 public class ECDSAContentSignerBuilder
     extends BcContentSignerBuilder {
+
     public ECDSAContentSignerBuilder(
             final AlgorithmIdentifier sigAlgId,
             final AlgorithmIdentifier digAlgId) {
@@ -65,4 +66,5 @@ public class ECDSAContentSignerBuilder
 
         return new DSADigestSigner(new ECDSASigner(), dig);
     }
+
 }

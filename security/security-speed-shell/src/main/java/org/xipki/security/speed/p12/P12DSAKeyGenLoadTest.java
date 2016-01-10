@@ -43,6 +43,7 @@ import org.xipki.security.P12RawKeypairGenerator.DSAKeypairGenerator;
  */
 
 public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
+
     private final DSAKeypairGenerator kpGen;
 
     public P12DSAKeyGenLoadTest(
@@ -59,4 +60,5 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
     protected P12RawKeypairGenerator getKeypairGenerator() {
         return kpGen;
     }
+
 }

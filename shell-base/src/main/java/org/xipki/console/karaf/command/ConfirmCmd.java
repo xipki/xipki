@@ -49,6 +49,7 @@ import org.xipki.console.karaf.XipkiCommandSupport;
         description = "prompt")
 @Service
 public class ConfirmCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "message",
             required = true,
             description = "prompt message\n"

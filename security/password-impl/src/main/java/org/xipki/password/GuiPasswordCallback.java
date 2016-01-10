@@ -45,6 +45,7 @@ import org.xipki.password.api.SecurePasswordInputPanel;
  */
 
 public class GuiPasswordCallback implements PasswordCallback {
+
     @Override
     public char[] getPassword(
             String prompt)
@@ -64,4 +65,5 @@ public class GuiPasswordCallback implements PasswordCallback {
             final String conf)
     throws PasswordResolverException {
     }
+
 }

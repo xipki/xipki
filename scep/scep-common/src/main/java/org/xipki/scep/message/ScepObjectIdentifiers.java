@@ -42,15 +42,24 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  */
 
 public class ScepObjectIdentifiers {
+
     public static final ASN1ObjectIdentifier id_VeriSign
             = new ASN1ObjectIdentifier("2.16.840.1.113733");
+
     public static final ASN1ObjectIdentifier id_pki = id_VeriSign.branch("1");
+
     public static final ASN1ObjectIdentifier id_attributes = id_pki.branch("9");
+
     public static final ASN1ObjectIdentifier id_transactionID = id_attributes.branch("7");
+
     public static final ASN1ObjectIdentifier id_messageType = id_attributes.branch("2");
+
     public static final ASN1ObjectIdentifier id_pkiStatus = id_attributes.branch("3");
+
     public static final ASN1ObjectIdentifier id_failInfo = id_attributes.branch("4");
+
     public static final ASN1ObjectIdentifier id_senderNonce = id_attributes.branch("5");
+
     public static final ASN1ObjectIdentifier id_recipientNonce = id_attributes.branch("6");
 
     private ScepObjectIdentifiers() {

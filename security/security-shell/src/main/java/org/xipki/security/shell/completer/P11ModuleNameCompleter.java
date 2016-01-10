@@ -50,6 +50,7 @@ import org.xipki.security.api.SecurityFactory;
  */
 @Service
 public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
+
     @Reference
     private SecurityFactory securityFactory;
 

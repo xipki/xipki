@@ -61,11 +61,13 @@ import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 
 public class BCRSAPrivateKey
     implements RSAPrivateKey, PKCS12BagAttributeCarrier {
+
     static final long serialVersionUID = 5110188922551353628L;
 
     private static BigInteger ZERO = BigInteger.valueOf(0);
 
     protected BigInteger modulus;
+
     protected BigInteger privateExponent;
 
     private transient PKCS12BagAttributeCarrierImpl attrCarrier =
@@ -164,4 +166,5 @@ public class BCRSAPrivateKey
     throws IOException {
         out.defaultWriteObject();
     }
+
 }

@@ -44,6 +44,7 @@ import org.xipki.password.api.PasswordResolverException;
  */
 
 public class P11NullPasswordRetriever implements P11PasswordRetriever {
+
     public static final P11NullPasswordRetriever INSTANCE = new P11NullPasswordRetriever();
 
     @Override
@@ -52,4 +53,5 @@ public class P11NullPasswordRetriever implements P11PasswordRetriever {
     throws PasswordResolverException {
         return null;
     }
+
 }

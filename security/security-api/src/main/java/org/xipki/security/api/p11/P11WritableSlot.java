@@ -48,6 +48,7 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 public interface P11WritableSlot {
+
     P11SlotIdentifier getSlotIdentifier();
 
     void updateCertificate(

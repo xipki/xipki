@@ -75,6 +75,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 @SuppressWarnings("restriction")
 public final class SunP11CryptService implements P11CryptService {
+
     private static final Logger LOG = LoggerFactory.getLogger(SunP11CryptService.class);
 
     private final ConcurrentSkipListSet<SunP11Identity> identities =
@@ -512,4 +513,5 @@ public final class SunP11CryptService implements P11CryptService {
 
     private synchronized void ensureResource() {
     }
+
 }

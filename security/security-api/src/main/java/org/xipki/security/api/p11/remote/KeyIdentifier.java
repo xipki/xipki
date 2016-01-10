@@ -60,6 +60,7 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
  */
 
 public class KeyIdentifier extends ASN1Object {
+
     private P11KeyIdentifier keyId;
 
     public KeyIdentifier(

@@ -40,6 +40,7 @@ package org.xipki.security.api;
  */
 
 public enum HashAlgoType {
+
     SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
     SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
     SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
@@ -47,8 +48,11 @@ public enum HashAlgoType {
     SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
 
     private final int length;
+
     private final String oid;
+
     private final String name;
+
     private final String shortName;
 
     private HashAlgoType(
@@ -97,4 +101,5 @@ public enum HashAlgoType {
 
         return null;
     }
+
 }

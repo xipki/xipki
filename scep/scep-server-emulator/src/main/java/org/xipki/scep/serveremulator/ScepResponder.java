@@ -89,16 +89,23 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class ScepResponder {
+
     private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
 
     private final CACaps cACaps;
+
     private final CAEmulator cAEmulator;
+
     private final RAEmulator rAEmulator;
+
     private final NextCAandRA nextCAandRA;
+
     private final ScepControl control;
+
     private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
     private final static Set<ASN1ObjectIdentifier> aesEncAlgs = new HashSet<ASN1ObjectIdentifier>();
+
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
     static {

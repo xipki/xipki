@@ -62,16 +62,21 @@ import org.xipki.security.api.SignerException;
  */
 
 public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
+
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
     private final AlgorithmIdentifier algorithmIdentifier;
+
     private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<>();
+
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<>();
+
     private final PrivateKey privateKey;
 
     private X509Certificate[] certificateChain;
+
     private X509CertificateHolder[] certificateChainAsBCObjects;
 
     static {

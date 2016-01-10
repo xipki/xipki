@@ -52,6 +52,7 @@ import org.xipki.console.karaf.completer.DirPathCompleter;
         description = "make directories")
 @Service
 public class MkdirCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "directory_name",
             required = true,
             description = "directory\n"
