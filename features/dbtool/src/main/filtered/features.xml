@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="dbtool-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   name="xipki-${project.version}"
-   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
   <repository>mvn:org.xipki.pki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
-  <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-database-tool" version="${project.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
