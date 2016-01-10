@@ -12,6 +12,7 @@
   <properties>
     <app.name>PKI</app.name>
     <assembly.finalName>xipki-pki</assembly.finalName>
+    <boot.features>http-whiteboard, xipki-caserver</boot.features>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>

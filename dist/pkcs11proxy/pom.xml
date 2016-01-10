@@ -12,6 +12,7 @@
   <properties>
     <app.name>PKCS#11 proxy</app.name>
     <assembly.finalName>xipki-pkcs11proxy</assembly.finalName>
+    <boot.features>http-whiteboard, xipki-pkcs11-proxy</boot.features>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
   </properties>
