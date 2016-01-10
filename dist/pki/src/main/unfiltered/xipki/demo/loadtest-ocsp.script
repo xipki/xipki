@@ -26,4 +26,3 @@ xipki-ocsp:loadtest-status \
   --url $URL_CRL
 
 feature:uninstall xipki-ocspclient-shell
-#feature:uninstall xipki-ocspclient

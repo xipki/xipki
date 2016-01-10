@@ -17,4 +17,3 @@ xipki-cli:loadtest-revoke \
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
 feature:uninstall xipki-caclient-shell
-#feature:uninstall xipki-caclient
