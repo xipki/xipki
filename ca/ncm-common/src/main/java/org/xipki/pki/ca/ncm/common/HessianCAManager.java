@@ -66,6 +66,7 @@ import org.xipki.security.api.CertRevocationInfo;
  */
 
 public interface HessianCAManager {
+
     String getAttribute(
             String attributeKey);
 
@@ -369,4 +370,5 @@ public interface HessianCAManager {
     ScepEntry getScepEntry(
             String name)
     throws HessianCAMgmtException;
+
 }

@@ -40,6 +40,7 @@ package org.xipki.scep.transaction;
  */
 
 public enum MessageType {
+
     /**
      * Response to certificate or CRL request
      */
@@ -97,4 +98,5 @@ public enum MessageType {
         }
         return null;
     }
+
 }

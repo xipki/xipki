@@ -71,10 +71,13 @@ import org.xipki.security.provider.P11PrivateKey;
  */
 
 public class P11ContentSignerBuilder {
+
     private final X509Certificate[] certificateChain;
 
     private final P11CryptService cryptService;
+
     private final P11SlotIdentifier slot;
+
     private final P11KeyIdentifier keyId;
 
     public P11ContentSignerBuilder(
@@ -216,4 +219,5 @@ public class P11ContentSignerBuilder {
 
         return concurrentSigner;
     }
+
 }

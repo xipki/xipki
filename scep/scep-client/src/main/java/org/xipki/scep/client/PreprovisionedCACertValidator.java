@@ -49,6 +49,7 @@ import org.xipki.scep.util.ParamUtil;
 
 public final class PreprovisionedCACertValidator
 implements CACertValidator {
+
     private final Set<String> fpOfCerts;
 
     public PreprovisionedCACertValidator(
@@ -92,4 +93,5 @@ implements CACertValidator {
         }
         return fpOfCerts.contains(hextFp);
     }
+
 }

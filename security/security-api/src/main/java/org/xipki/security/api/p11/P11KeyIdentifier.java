@@ -44,8 +44,11 @@ import org.bouncycastle.util.encoders.Hex;
  */
 
 public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
+
     private final byte[] keyId;
+
     private final String keyIdHex;
+
     private final String keyLabel;
 
     public P11KeyIdentifier(

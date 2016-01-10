@@ -50,6 +50,7 @@ import org.xipki.scep.util.ParamUtil;
 
 public final class PreprovisionedHashCACertValidator
 implements CACertValidator {
+
     private final HashAlgoType hashAlgo;
 
     private final Set<byte[]> hashValues;
@@ -93,4 +94,5 @@ implements CACertValidator {
 
         return false;
     }
+
 }

@@ -64,4 +64,5 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
 
         return ret;
     }
+
 }

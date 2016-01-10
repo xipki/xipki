@@ -44,6 +44,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  */
 
 public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
+
     private final String curveNameOrOid;
 
     public P11ECKeyGenLoadTest(

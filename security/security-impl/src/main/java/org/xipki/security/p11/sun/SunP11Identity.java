@@ -63,14 +63,21 @@ import org.xipki.security.api.util.SecurityUtil;
  */
 
 class SunP11Identity implements Comparable<SunP11Identity> {
+
     private final Cipher rsaCipher;
+
     private final Signature dsaSignature;
+
     private final P11SlotIdentifier slotId;
 
     private final String keyLabel;
+
     private final PrivateKey privateKey;
+
     private final X509Certificate[] certificateChain;
+
     private final PublicKey publicKey;
+
     private final int signatureKeyBitLength;
 
     public SunP11Identity(
@@ -270,4 +277,5 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             final SunP11Identity o) {
         return this.keyLabel.compareTo(o.keyLabel);
     }
+
 }

@@ -47,7 +47,9 @@ import org.xipki.scep.crypto.HashAlgoType;
 
 public final class CachingCertificateValidator
 implements CACertValidator {
+
     private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+
     private final CACertValidator delegate;
 
     public CachingCertificateValidator(

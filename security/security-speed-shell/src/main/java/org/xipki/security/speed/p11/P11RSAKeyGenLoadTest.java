@@ -45,7 +45,9 @@ import org.xipki.security.api.p11.P11WritableSlot;
  */
 
 public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
+
     private final int keysize;
+
     private final BigInteger publicExponent;
 
     public P11RSAKeyGenLoadTest(

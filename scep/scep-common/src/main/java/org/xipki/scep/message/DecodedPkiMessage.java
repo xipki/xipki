@@ -85,14 +85,21 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class DecodedPkiMessage extends PkiMessage {
+
     private final static Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
     private X509Certificate signatureCert;
+
     private ASN1ObjectIdentifier digestAlgorithm;
+
     private ASN1ObjectIdentifier contentEncryptionAlgorithm;
+
     private Boolean signatureValid;
+
     private Boolean decryptionSuccessful;
+
     private Date signingTime;
+
     private String failureMessage;
 
     public DecodedPkiMessage(

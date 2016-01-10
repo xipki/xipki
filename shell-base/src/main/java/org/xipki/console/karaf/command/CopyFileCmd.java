@@ -55,6 +55,7 @@ import org.xipki.console.karaf.intern.FileUtils;
         description = "copy file")
 @Service
 public class CopyFileCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "source file",
             required = true,
             description = "file to be copied\n"

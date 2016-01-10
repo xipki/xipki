@@ -40,6 +40,7 @@ package org.xipki.pki.ocsp.qa.api;
  */
 
 public enum Occurrence {
+
     required,
     optional,
     forbidden;

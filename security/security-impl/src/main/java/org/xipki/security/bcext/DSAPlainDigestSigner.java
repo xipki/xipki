@@ -56,9 +56,13 @@ import org.xipki.common.util.ParamUtil;
 
 public class DSAPlainDigestSigner
     implements Signer {
+
     private final Digest digest;
+
     private final DSA dsaSigner;
+
     private boolean forSigning;
+
     private int keyBitLen;
 
     public DSAPlainDigestSigner(
@@ -210,4 +214,5 @@ public class DSAPlainDigestSigner
         ret[1] = new BigInteger(1, buffer);
         return ret;
     }
+
 }

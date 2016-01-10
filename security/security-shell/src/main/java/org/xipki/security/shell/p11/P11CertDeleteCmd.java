@@ -54,6 +54,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
         description = "remove certificate from PKCS#11 device")
 @Service
 public class P11CertDeleteCmd extends SecurityCommandSupport {
+
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

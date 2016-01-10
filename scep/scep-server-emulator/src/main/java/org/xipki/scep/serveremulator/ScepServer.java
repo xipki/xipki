@@ -63,18 +63,29 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class ScepServer {
+
     private final String name;
+
     private final CACaps caCaps;
+
     private final boolean withRA;
+
     private final boolean withNextCA;
+
     private final boolean generateCRL;
+
     private final ScepControl control;
 
     private Long maxSigningTimeBiasInMs;
+
     private ScepServlet servlet;
+
     private Certificate cACert;
+
     private Certificate rACert;
+
     private Certificate nextCACert;
+
     private Certificate nextRACert;
 
     public ScepServer(

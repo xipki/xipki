@@ -58,9 +58,13 @@ public class P11PrivateKey implements PrivateKey {
     private static final long serialVersionUID = 1L;
 
     private final P11CryptService p11CryptService;
+
     private final P11SlotIdentifier slotId;
+
     private final P11KeyIdentifier keyId;
+
     private final String algorithm;
+
     private final int keysize;
 
     public P11PrivateKey(

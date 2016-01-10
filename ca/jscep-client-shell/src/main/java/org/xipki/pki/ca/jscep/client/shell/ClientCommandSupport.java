@@ -60,6 +60,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
+
     @Option(name = "--url",
             required = true,
             description = "URL of the SCEP server\n"
@@ -156,4 +157,5 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         }
         return null;
     }
+
 }

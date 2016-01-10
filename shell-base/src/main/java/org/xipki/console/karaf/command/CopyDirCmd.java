@@ -53,6 +53,7 @@ import org.xipki.console.karaf.intern.FileUtils;
         description = "copy content of the directory to destination")
 @Service
 public class CopyDirCmd extends XipkiCommandSupport {
+
     @Argument(index = 0, name = "source directory",
             required = true,
             description = "content of this directory will be copied\n"

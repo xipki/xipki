@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.Option;
  */
 
 public abstract class SpeedP11SignCommandSupport extends SpeedP11CommandSupport {
+
     @Option(name = "--sig-algo",
             required = true,
             description = "signature algorithm\n"

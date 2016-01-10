@@ -43,7 +43,9 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 
 @SuppressWarnings("serial")
 public class OCSPResponseUnsuccessfulException extends OCSPResponseException {
+
     private int status;
+
     public OCSPResponseUnsuccessfulException(
             final int status) {
         super(getOCSPResponseStatus(status));

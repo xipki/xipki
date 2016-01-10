@@ -46,7 +46,9 @@ import org.xipki.scep.crypto.HashAlgoType;
 
 public abstract class FingerprintCertificateValidator
 implements CACertValidator {
+
     private static final HashAlgoType DEFAULT_HASHALGO = HashAlgoType.SHA256;
+
     private HashAlgoType hashAlgo;
 
     public HashAlgoType getHashAlgo() {
@@ -78,4 +80,5 @@ implements CACertValidator {
     protected abstract boolean isCertTrusted(
             HashAlgoType hashAlgo,
             byte[] hashValue);
+
 }

@@ -40,6 +40,7 @@ package org.xipki.scep.util;
  */
 
 public class ScepConstants {
+
     public static final String CT_x_x509_next_ca_cert = "application/x-x509-next-ca-cert";
     public static final String CT_x_x509_ca_cert = "application/x-x509-ca-cert";
     public static final String CT_x_x509_ca_ra_cert = "application/x-x509-ca-ra-cert";
@@ -48,4 +49,5 @@ public class ScepConstants {
 
     private ScepConstants() {
     }
+
 }

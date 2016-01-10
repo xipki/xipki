@@ -42,7 +42,9 @@ import java.security.cert.X509Certificate;
  */
 
 public interface CertificateValidator {
+
     boolean trustCertificate(
             X509Certificate target,
             X509Certificate[] otherCerts);
+
 }

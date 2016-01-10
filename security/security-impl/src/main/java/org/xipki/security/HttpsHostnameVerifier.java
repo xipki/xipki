@@ -56,13 +56,17 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class HttpsHostnameVerifier implements HostnameVerifier {
+
     private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
 
     private boolean enabled = false;
+
     private boolean trustAll = false;
 
     private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
+
     private HostnameVerifier oldHostnameVerifier = null;
+
     private boolean meAsDefaultHostnameVerifier = false;
 
     public void init() {

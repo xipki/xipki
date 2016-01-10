@@ -48,9 +48,11 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class P11KeyParameter extends AsymmetricKeyParameter {
+
     private final P11CryptService p11CryptService;
 
     private final P11SlotIdentifier slot;
+
     private final P11KeyIdentifier keyId;
 
     private P11KeyParameter(

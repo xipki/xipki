@@ -50,7 +50,9 @@ import org.xipki.security.api.SignerException;
  */
 
 abstract class AbstractP11DSASigner implements Signer {
+
     private final Digest digest;
+
     protected P11KeyParameter param;
 
     protected abstract byte[] sign(

@@ -45,10 +45,15 @@ import org.xipki.password.api.PasswordResolverException;
  */
 
 public class LiquibaseDatabaseConf {
+
     private final String driver;
+
     private final String username;
+
     private final String password;
+
     private final String url;
+
     private final String schema;
 
     public static LiquibaseDatabaseConf getInstance(

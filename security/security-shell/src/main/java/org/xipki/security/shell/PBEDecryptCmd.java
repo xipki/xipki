@@ -50,6 +50,7 @@ import org.xipki.password.PBEPasswordResolver;
         description = "decrypt password with master password")
 @Service
 public class PBEDecryptCmd extends SecurityCommandSupport {
+
     @Option(name = "--password",
             required = true,
             description = "encrypted password, starts with PBE:\n"

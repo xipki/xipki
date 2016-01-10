@@ -40,6 +40,7 @@ package org.xipki.password.api;
  */
 
 public interface PasswordCallback {
+
     void init(
             String conf)
     throws PasswordResolverException;
@@ -47,4 +48,5 @@ public interface PasswordCallback {
     char[] getPassword(
             String prompt)
     throws PasswordResolverException;
+
 }

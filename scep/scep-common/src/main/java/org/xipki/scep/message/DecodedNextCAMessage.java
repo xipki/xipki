@@ -75,13 +75,19 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class DecodedNextCAMessage {
+
     private final static Logger LOG = LoggerFactory.getLogger(DecodedNextCAMessage.class);
 
     private AuthorityCertStore authorityCertStore;
+
     private X509Certificate signatureCert;
+
     private ASN1ObjectIdentifier digestAlgorithm;
+
     private Boolean signatureValid;
+
     private Date signingTime;
+
     private String failureMessage;
 
     public DecodedNextCAMessage() {

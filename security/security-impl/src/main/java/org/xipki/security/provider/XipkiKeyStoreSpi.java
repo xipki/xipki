@@ -69,6 +69,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class XipkiKeyStoreSpi extends KeyStoreSpi {
+
     private static SecurityFactory securityFactory;
 
     private Date creationDate;

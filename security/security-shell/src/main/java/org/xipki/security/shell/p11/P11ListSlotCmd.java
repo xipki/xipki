@@ -84,6 +84,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
         description = "list objects in PKCS#11 device")
 @Service
 public class P11ListSlotCmd extends SecurityCommandSupport {
+
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;

@@ -54,6 +54,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public interface SecurityFactory {
+
     String DEFAULT_P11MODULE_NAME = "default";
 
     Set<String> getPkcs11ModuleNames();
@@ -126,4 +127,5 @@ public interface SecurityFactory {
     throws InvalidKeyException;
 
     String getPkcs11Provider();
+
 }

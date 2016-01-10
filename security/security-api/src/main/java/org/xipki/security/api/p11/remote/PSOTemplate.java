@@ -59,7 +59,9 @@ import org.xipki.security.api.BadASN1ObjectException;
  */
 
 public class PSOTemplate extends ASN1Object {
+
     private SlotAndKeyIdentifer slotAndKeyIdentifier;
+
     private byte[] message;
 
     private PSOTemplate(

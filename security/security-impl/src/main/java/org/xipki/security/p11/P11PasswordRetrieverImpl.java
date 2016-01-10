@@ -51,8 +51,11 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
+
     private static final class SingleRetriever {
+
         private final Set<P11SlotIdentifier> slots;
+
         private final List<String> singlePasswords;
 
         private SingleRetriever(

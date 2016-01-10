@@ -44,9 +44,13 @@ import org.xipki.scep.util.ParamUtil;
 public class ScepControl {
 
     private final boolean sendCACert;
+
     private final boolean pendingCert;
+
     private final boolean useInsecureAlg;
+
     private final boolean sendSignerCert;
+
     private final String secret;
 
     public ScepControl(

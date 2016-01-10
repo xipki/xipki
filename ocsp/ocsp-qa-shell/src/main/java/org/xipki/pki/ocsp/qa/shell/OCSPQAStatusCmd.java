@@ -72,6 +72,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
         description = "request certificate status (QA)")
 @Service
 public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
+
     @Option(name = "--exp-error",
             description = "expected error")
     @Completion(OcspErrorCompleter.class)

@@ -54,6 +54,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
+
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptServiceFactory.class);
 
     private P11Control p11Control;

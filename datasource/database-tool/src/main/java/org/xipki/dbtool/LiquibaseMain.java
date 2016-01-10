@@ -59,10 +59,13 @@ import liquibase.resource.ResourceAccessor;
  */
 
 public class LiquibaseMain {
+
     private final LiquibaseDatabaseConf dbConf;
+
     private final String changeLogFile;
 
     private Database database;
+
     private Liquibase liquibase;
 
     public static boolean loglevelIsSevereOrOff(
@@ -194,4 +197,5 @@ public class LiquibaseMain {
             liquibase = null;
         }
     }
+
 }

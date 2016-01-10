@@ -61,9 +61,11 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class KeystoreP11CryptService implements P11CryptService {
+
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11CryptService.class);
 
     private final P11ModuleConf moduleConf;
+
     private KeystoreP11Module module;
 
     private static final Map<String, KeystoreP11CryptService> instances = new HashMap<>();

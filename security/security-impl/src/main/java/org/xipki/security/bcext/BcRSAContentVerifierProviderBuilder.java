@@ -58,6 +58,7 @@ import org.xipki.security.SignerUtil;
 
 public class BcRSAContentVerifierProviderBuilder
     extends BcContentVerifierProviderBuilder {
+
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public BcRSAContentVerifierProviderBuilder(
@@ -83,4 +84,5 @@ public class BcRSAContentVerifierProviderBuilder
     throws IOException {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }
+
 }

@@ -63,6 +63,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  */
 
 public class SlotIdentifier extends ASN1Object {
+
     private P11SlotIdentifier slotId;
 
     public SlotIdentifier(

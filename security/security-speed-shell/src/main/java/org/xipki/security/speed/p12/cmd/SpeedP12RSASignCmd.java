@@ -47,6 +47,7 @@ import org.xipki.security.speed.p12.P12RSASignLoadTest;
 @Command(scope = "xipki-tk", name = "speed-rsa-sign-p12",
         description = "performance test of PKCS#12 RSA signature creation")
 public class SpeedP12RSASignCmd extends SpeedP12SignCommandSupport {
+
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;

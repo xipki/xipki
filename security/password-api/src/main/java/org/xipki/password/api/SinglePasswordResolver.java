@@ -40,10 +40,12 @@ package org.xipki.password.api;
  */
 
 public interface SinglePasswordResolver {
+
     boolean canResolveProtocol(
             String protocol);
 
     char[] resolvePassword(
             String passwordHint)
     throws PasswordResolverException;
+
 }

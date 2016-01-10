@@ -48,11 +48,15 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class P11Identity implements Comparable<P11Identity> {
+
     protected final P11SlotIdentifier slotId;
+
     protected final P11KeyIdentifier keyId;
 
     protected final X509Certificate[] certificateChain;
+
     protected final PublicKey publicKey;
+
     private final int signatureKeyBitLength;
 
     public P11Identity(

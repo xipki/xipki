@@ -70,21 +70,31 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public class CAEmulator {
+
     public static final long MIN_IN_MS = 60L * 1000;
+
     public static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
     private final PrivateKey cAKey;
+
     private final Certificate cACert;
+
     private final X500Name cASubject;
+
     private final byte[] cACertBytes;
+
     private final boolean generateCRL;
 
     private final Map<BigInteger, Certificate> serialCertMap
         = new HashMap<BigInteger, Certificate>();
+
     private final Map<X500Name, Certificate> reqSubjectCertMap
         = new HashMap<X500Name, Certificate>();
+
     private final AtomicLong serialNumber = new AtomicLong(2);
+
     private final AtomicLong crlNumber = new AtomicLong(2);
+
     private CertificateList crl;
 
     public CAEmulator(

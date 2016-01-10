@@ -68,4 +68,5 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
 
         return ret;
     }
+
 }

@@ -100,6 +100,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 public class X509Util {
+
     private X509Util() {
     }
 

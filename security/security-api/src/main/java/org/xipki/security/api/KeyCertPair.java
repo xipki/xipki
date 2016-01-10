@@ -47,6 +47,7 @@ import org.xipki.common.util.ParamUtil;
 public class KeyCertPair {
 
     private final PrivateKey privateKey;
+
     private final X509Certificate certificate;
 
     public KeyCertPair(

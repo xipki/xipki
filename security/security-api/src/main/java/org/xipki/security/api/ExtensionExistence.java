@@ -66,7 +66,9 @@ import org.xipki.common.util.CollectionUtil;
  */
 
 public class ExtensionExistence extends ASN1Object {
+
     private List<ASN1ObjectIdentifier> needExtensions;
+
     private List<ASN1ObjectIdentifier> wantExtensions;
 
     public ExtensionExistence(

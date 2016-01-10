@@ -57,7 +57,9 @@ import org.xipki.scep.util.ScepUtil;
  */
 
 public final class EnrolmentResponse {
+
     private PkiMessage pkcsRep;
+
     private List<X509Certificate> certificates;
 
     public EnrolmentResponse(
@@ -130,4 +132,5 @@ public final class EnrolmentResponse {
     public PkiMessage getPkcsRep() {
         return pkcsRep;
     }
+
 }

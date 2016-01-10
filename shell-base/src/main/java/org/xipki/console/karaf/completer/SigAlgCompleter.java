@@ -44,6 +44,7 @@ import org.xipki.console.karaf.AbstractEnumCompleter;
 
 @Service
 public class SigAlgCompleter extends AbstractEnumCompleter {
+
     public SigAlgCompleter() {
         String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
         String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
@@ -56,4 +57,5 @@ public class SigAlgCompleter extends AbstractEnumCompleter {
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

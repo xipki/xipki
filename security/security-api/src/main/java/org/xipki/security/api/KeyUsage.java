@@ -40,6 +40,7 @@ package org.xipki.security.api;
  */
 
 public enum KeyUsage {
+
     digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
             "digitalSignature"),
     contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
@@ -60,7 +61,9 @@ public enum KeyUsage {
             "decipherOnly");
 
     private int bit;
+
     private int bcUsage;
+
     private String[] names;
 
     private KeyUsage(
@@ -122,4 +125,5 @@ public enum KeyUsage {
     public String getName() {
         return names[0];
     }
+
 }

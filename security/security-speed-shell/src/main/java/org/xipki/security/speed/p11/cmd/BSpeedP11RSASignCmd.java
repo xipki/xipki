@@ -67,4 +67,5 @@ public class BSpeedP11RSASignCmd extends BSpeedP11SignCommandSupport {
         }
         return ret;
     }
+
 }

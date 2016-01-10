@@ -64,12 +64,17 @@ import org.xipki.security.api.util.AlgorithmUtil;
  */
 
 public class P11RSAContentSigner implements ContentSigner {
+
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
+
     private final AlgorithmIdentifier algorithmIdentifier;
+
     private final DigestOutputStream outputStream;
 
     private final P11CryptService cryptService;
+
     private final P11SlotIdentifier slot;
+
     private final P11KeyIdentifier keyId;
 
     private final AlgorithmIdentifier digAlgId;

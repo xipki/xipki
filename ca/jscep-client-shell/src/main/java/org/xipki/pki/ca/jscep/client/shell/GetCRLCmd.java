@@ -56,6 +56,7 @@ import org.xipki.security.api.util.X509Util;
         description = "download CRL")
 @Service
 public class GetCRLCmd extends ClientCommandSupport {
+
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate\n"
@@ -86,4 +87,5 @@ public class GetCRLCmd extends ClientCommandSupport {
         saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
         return null;
     }
+
 }
