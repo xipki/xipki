@@ -53,12 +53,15 @@ import java.util.List;
  */
 
 public class PCIAuditEvent {
+
     private static final String UNDEFINED = "undefined";
 
     private static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
+
     private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
     private static final char DEFAULT_DELIMITER = ' ';
+
     private static final String DEFAULT_REPLACE_DELIMITER = "_";
 
     /**

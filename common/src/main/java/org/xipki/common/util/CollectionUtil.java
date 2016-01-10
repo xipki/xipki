@@ -49,6 +49,7 @@ import java.util.Set;
  */
 
 public class CollectionUtil {
+
     private CollectionUtil() {
     }
 

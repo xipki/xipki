@@ -56,6 +56,7 @@ import java.util.List;
  */
 
 public class IoUtil {
+
     private IoUtil() {
     }
 
@@ -267,4 +268,5 @@ public class IoUtil {
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
+
 }

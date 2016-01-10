@@ -48,18 +48,27 @@ import org.xipki.common.util.StringUtil;
  */
 
 public class ProcessLog {
+
     private static final long MS_900 = 900L;
+
     private static final long DAY_IN_SEC = 24L * 60 * 60;
+
     private static final int minLen = 12;
 
     private final long total;
+
     private final boolean hasTotal;
+
     private long startTimeMs;
+
     private AtomicLong numProcessed;
+
     private AtomicLong lastPrintTimeMs;
 
     private final AtomicBoolean finished = new AtomicBoolean(false);
+
     private long totalElapsedTimeMs;
+
     private int totalAverageSpeed;
 
     private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();

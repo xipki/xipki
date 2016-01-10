@@ -40,7 +40,9 @@ package org.xipki.audit.api;
  */
 
 public class AuditEventData {
+
     private final String name;
+
     private final String value;
 
     public AuditEventData(

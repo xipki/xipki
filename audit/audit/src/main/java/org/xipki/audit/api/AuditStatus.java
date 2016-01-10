@@ -40,6 +40,7 @@ package org.xipki.audit.api;
  */
 
 public enum AuditStatus {
+
     SUCCESSFUL,
     FAILED,
     UNDEFINED;
