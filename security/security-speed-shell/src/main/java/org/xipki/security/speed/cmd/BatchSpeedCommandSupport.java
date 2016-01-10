@@ -35,6 +35,8 @@
 
 package org.xipki.security.speed.cmd;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.common.LoadExecutor;
 
@@ -42,27 +44,32 @@ import org.xipki.common.LoadExecutor;
  * @author Lijun Liao
  */
 
-public abstract class SingleSpeedCmd extends SecurityCmd {
+public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
 
     @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+            description = "duration in seconds for each test case")
+    private Integer durationInSecond = 10;
 
     @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract LoadExecutor getTester()
+    protected abstract List<LoadExecutor> getTesters()
     throws Exception;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        LoadExecutor tester = getTester();
-        tester.setDuration(durationInSecond);
-        tester.setThreads(Math.max(20, numThreads));
-
-        tester.test();
+        List<LoadExecutor> testers = getTesters();
+        for (LoadExecutor tester : testers) {
+            tester.setDuration(durationInSecond);
+            tester.setThreads(Math.min(20, numThreads));
+            System.out.println("============================================");
+            tester.test();
+            if (tester.isInterrupted()) {
+                throw new InterruptedException("cancelled by the user");
+            }
+        }
         return null;
     }
 

@@ -33,73 +33,78 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.jscep.client.shell;
+package org.xipki.pki.ca.client.shell;
 
 import java.io.File;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+import java.security.cert.X509CRL;
+import java.util.Set;
 
+import org.xipki.pki.ca.client.api.CAClientException;
+import org.xipki.pki.ca.client.api.PKIErrorException;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.jscep.client.Client;
-import org.jscep.client.ClientException;
-import org.jscep.client.EnrollmentResponse;
-import org.jscep.transaction.TransactionException;
-import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractEnrollCertCmd extends ClientCmd {
-    @Option(name = "--p10",
-            required = true,
-            description = "PKCS#10 request file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10File;
+public abstract class CRLCommandSupport extends ClientCommandSupport {
+
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "(required if multiple CAs are configured)")
+    @Completion(CaNameCompleter.class)
+    protected String caName;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
-            description = "where to save the certificate\n"
+            description = "where to save the CRL\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String outputFile;
+    protected String outFile;
 
-    protected abstract EnrollmentResponse requestCertificate(
-            Client client,
-            PKCS10CertificationRequest csr,
-            PrivateKey identityKey,
-            X509Certificate identityCert)
-    throws ClientException, TransactionException;
+    protected abstract X509CRL retrieveCRL(
+            String caName)
+    throws CAClientException, PKIErrorException;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        Client client = getScepClient();
-
-        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
-
-        EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-                getIdentityCert());
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
+        Set<String> caNames = caClient.getCaNames();
+        if (isEmpty(caNames)) {
+            throw new CmdFailure("no CA is configured");
         }
 
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
+        if (caName != null && !caNames.contains(caName)) {
+            throw new IllegalCmdParamException("CA " + caName
+                    + " is not within the configured CAs " + caNames);
         }
 
-        X509Certificate cert = extractEECerts(resp.getCertStore());
-
-        if (cert == null) {
-            throw new Exception("received no certificate");
+        if (caName == null) {
+            if (caNames.size() == 1) {
+                caName = caNames.iterator().next();
+            } else {
+                throw new IllegalCmdParamException("no caname is specified, one of "
+                        + caNames + " is required");
+            }
         }
 
-        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+        X509CRL crl = null;
+        try {
+            crl = retrieveCRL(caName);
+        } catch (PKIErrorException e) {
+            throw new CmdFailure("received no CRL from server: " + e.getMessage());
+        }
+
+        if (crl == null) {
+            throw new CmdFailure("received no CRL from server");
+        }
+
+        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
         return null;
     }
 

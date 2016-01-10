@@ -52,7 +52,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen",
         description = "performance test of PKCS#11 EC key generation (batch)")
-public class BSpeedP11ECKeyGenCmd extends BSpeedP11Cmd {
+public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

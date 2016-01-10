@@ -61,7 +61,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-cli", name = "getcrl",
         description = "download CRL")
 @Service
-public class GetCRLCmd extends CRLCmd {
+public class GetCRLCmd extends CRLCommandSupport {
     @Option(name = "--with-basecrl",
             description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
     private Boolean withBaseCRL = Boolean.FALSE;

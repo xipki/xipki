@@ -35,16 +35,31 @@
 
 package org.xipki.security.speed.p11.cmd;
 
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class BSpeedP11SignCmd extends BSpeedP11Cmd {
-    @Option(name = "--sig-algo",
+public abstract class BSpeedP11CommandSupport extends BatchSpeedCommandSupport {
+
+    @Option(name = "--slot",
             required = true,
-            description = "signature algorithm\n"
+            description = "slot index\n"
                     + "(required)")
-    protected String sigAlgo;
+    protected Integer slotIndex;
+
+    @Option(name = "--module",
+            description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+
+    protected P11SlotIdentifier getSlotId() {
+        return new P11SlotIdentifier(slotIndex, null);
+    }
+
 }

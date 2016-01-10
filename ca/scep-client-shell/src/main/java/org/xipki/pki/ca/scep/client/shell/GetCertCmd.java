@@ -56,7 +56,7 @@ import org.xipki.scep.client.ScepClient;
 @Command(scope = "scep", name = "getcert",
         description = "download certificate")
 @Service
-public class GetCertCmd extends ClientCmd {
+public class GetCertCmd extends ClientCommandSupport {
     @Option(name = "--serial", aliases = "-s",
             required = true,
             description = "serial number\n"

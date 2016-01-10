@@ -49,7 +49,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
 @Command(scope = "xipki-tk", name = "rsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
-public class P12RSAKeyGenCmd extends P12KeyGenCmd {
+public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;

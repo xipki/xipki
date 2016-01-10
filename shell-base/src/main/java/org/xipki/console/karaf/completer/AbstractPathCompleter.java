@@ -50,7 +50,7 @@ import org.xipki.console.karaf.intern.MyFilenameFilter;
  * @author Lijun Liao
  */
 
-abstract class PathCompleter implements Completer {
+abstract class AbstractPathCompleter implements Completer {
     protected abstract boolean isDirOnly();
 
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();

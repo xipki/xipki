@@ -33,17 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell;
+package org.xipki.console.karaf;
 
-import org.xipki.pki.ca.client.api.CAClient;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class CALoadTestCmd extends XipkiCommandSupport {
-    @Reference
-    protected CAClient caClient;
+public abstract class AbstractDynamicEnumCompleter implements Completer {
+    protected abstract Set<String> getEnums();
+
+    @Override
+    public int complete(
+            Session session,
+            final CommandLine commandLine,
+            final List<String> candidates) {
+        StringsCompleter delegate = new StringsCompleter();
+
+        for (String s : getEnums()) {
+            delegate.getStrings().add(s);
+        }
+
+        return delegate.complete(session, commandLine, candidates);
+    }
+
 }

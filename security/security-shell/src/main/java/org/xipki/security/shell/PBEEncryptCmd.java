@@ -46,7 +46,7 @@ import org.xipki.password.PBEPasswordResolver;
 @Command(scope = "xipki-tk", name = "pbe-enc",
         description = "encrypt password with master password")
 @Service
-public class PBEEncryptCmd extends SecurityCmd {
+public class PBEEncryptCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {

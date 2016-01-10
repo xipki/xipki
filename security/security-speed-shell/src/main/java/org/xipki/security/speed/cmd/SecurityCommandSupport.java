@@ -52,7 +52,7 @@ import org.xipki.security.p11.keystore.KeystoreP11ModulePool;
  * @author Lijun Liao
  */
 
-public abstract class SecurityCmd extends XipkiCommandSupport {
+public abstract class SecurityCommandSupport extends XipkiCommandSupport {
 
     @Reference
     protected SecurityFactory securityFactory;

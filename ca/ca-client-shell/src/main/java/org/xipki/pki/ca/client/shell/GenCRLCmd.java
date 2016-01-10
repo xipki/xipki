@@ -50,7 +50,7 @@ import org.xipki.common.RequestResponseDebug;
 @Command(scope = "xipki-cli", name = "gencrl",
         description = "generate CRL")
 @Service
-public class GenCRLCmd extends CRLCmd {
+public class GenCRLCmd extends CRLCommandSupport {
     @Override
     protected X509CRL retrieveCRL(
             final String caName)

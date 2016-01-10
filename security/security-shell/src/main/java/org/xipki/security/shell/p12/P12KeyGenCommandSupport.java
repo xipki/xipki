@@ -42,13 +42,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.shell.KeyGenCmd;
+import org.xipki.security.shell.KeyGenCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P12KeyGenCmd extends KeyGenCmd {
+public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     @Option(name = "--subject", aliases = "-s",
             required = true,
             description = "subject in the self-signed certificate\n"

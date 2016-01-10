@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.client.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.EnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 
 /**
@@ -44,7 +44,7 @@ import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
  */
 
 @Service
-public class RandomDNCompleter extends EnumCompleter {
+public class RandomDNCompleter extends AbstractEnumCompleter {
 
     public RandomDNCompleter() {
         StringBuilder enums = new StringBuilder();

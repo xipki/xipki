@@ -51,7 +51,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
  * @author Lijun Liao
  */
 
-public abstract class ClientCmd extends XipkiCommandSupport {
+public abstract class ClientCommandSupport extends XipkiCommandSupport {
     @Option(name = "--req-out",
             description = "where to save the request")
     @Completion(FilePathCompleter.class)

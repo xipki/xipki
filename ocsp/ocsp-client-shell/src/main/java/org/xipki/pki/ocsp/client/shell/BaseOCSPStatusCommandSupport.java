@@ -61,7 +61,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class BaseOCSPStatusCmd extends AbstractOCSPStatusCmd {
+public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupport {
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
     @Completion(FilePathCompleter.class)

@@ -46,7 +46,7 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.api.util.X509Util;
-import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.SecurityCommandSupport;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -56,7 +56,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xipki-tk", name = "add-cert",
         description = "add certificate to PKCS#11 device")
 @Service
-public class P11CertAddCmd extends SecurityCmd {
+public class P11CertAddCmd extends SecurityCommandSupport {
 
     @Option(name = "--slot",
             required = true,

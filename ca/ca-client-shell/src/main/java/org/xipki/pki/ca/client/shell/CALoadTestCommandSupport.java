@@ -33,33 +33,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.speed.p11.cmd;
+package org.xipki.pki.ca.client.shell;
 
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.speed.cmd.SingleSpeedCmd;
+import org.xipki.pki.ca.client.api.CAClient;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.console.karaf.XipkiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class SpeedP11Cmd extends SingleSpeedCmd {
-
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    protected Integer slotIndex;
-
-    @Option(name = "--module",
-            description = "Name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
-
-    protected P11SlotIdentifier getSlotId() {
-        return new P11SlotIdentifier(slotIndex, null);
-    }
-
+public abstract class CALoadTestCommandSupport extends XipkiCommandSupport {
+    @Reference
+    protected CAClient caClient;
 }

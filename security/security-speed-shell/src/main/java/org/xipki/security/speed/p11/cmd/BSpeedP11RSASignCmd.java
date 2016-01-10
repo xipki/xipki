@@ -50,7 +50,7 @@ import org.xipki.security.speed.p11.P11RSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-sign",
         description = "performance test of PKCS#11 RSA signature creation (batch)")
-public class BSpeedP11RSASignCmd extends BSpeedP11SignCmd {
+public class BSpeedP11RSASignCmd extends BSpeedP11SignCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

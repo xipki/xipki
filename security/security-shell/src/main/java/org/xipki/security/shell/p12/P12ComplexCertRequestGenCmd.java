@@ -59,7 +59,7 @@ import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.SignatureAlgoControl;
-import org.xipki.security.shell.CertRequestGenCmd;
+import org.xipki.security.shell.CertRequestGenCommandSupport;
 
 /**
  * @author Lijun Liao
@@ -68,7 +68,7 @@ import org.xipki.security.shell.CertRequestGenCmd;
 @Command(scope = "xipki-tk", name = "req-p12-complex",
         description = "generate complex PKCS#10 request with PKCS#12 keystore")
 @Service
-public class P12ComplexCertRequestGenCmd extends CertRequestGenCmd {
+public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"

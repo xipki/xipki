@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
-import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.SecurityCommandSupport;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -53,7 +53,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xipki-tk", name = "rm-cert",
         description = "remove certificate from PKCS#11 device")
 @Service
-public class P11CertDeleteCmd extends SecurityCmd {
+public class P11CertDeleteCmd extends SecurityCommandSupport {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

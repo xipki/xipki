@@ -55,7 +55,7 @@ import org.xipki.scep.client.ScepClient;
 @Command(scope = "scep", name = "getcrl",
         description = "download CRL")
 @Service
-public class GetCRLCmd extends ClientCmd {
+public class GetCRLCmd extends ClientCommandSupport {
     @Option(name = "--cert", aliases = "-c",
             required = true,
             description = "certificate\n"

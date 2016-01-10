@@ -36,6 +36,7 @@
 package org.xipki.console.karaf.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.api.CRLReason;
 
 /**
@@ -43,7 +44,7 @@ import org.xipki.security.api.CRLReason;
  */
 
 @Service
-public class ClientCRLReasonCompleter extends EnumCompleter {
+public class ClientCRLReasonCompleter extends AbstractEnumCompleter {
     public ClientCRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();
 

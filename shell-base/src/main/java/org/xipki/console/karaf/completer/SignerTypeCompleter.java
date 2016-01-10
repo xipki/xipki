@@ -36,13 +36,14 @@
 package org.xipki.console.karaf.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Service
-public class SignerTypeCompleter extends EnumCompleter {
+public class SignerTypeCompleter extends AbstractEnumCompleter {
     public SignerTypeCompleter() {
         setTokens("JKS, PKCS11, PKCS12");
     }

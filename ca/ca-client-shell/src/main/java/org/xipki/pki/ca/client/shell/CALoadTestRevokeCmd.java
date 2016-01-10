@@ -59,7 +59,7 @@ import org.xipki.security.api.SecurityFactory;
 @Command(scope = "xipki-cli", name = "loadtest-revoke",
         description = "CA Client Revoke Load test")
 @Service
-public class CALoadTestRevokeCmd extends CALoadTestCmd {
+public class CALoadTestRevokeCmd extends CALoadTestCommandSupport {
     @Option(name = "--issuer",
             required = true,
             description = "issuer certificate file\n"

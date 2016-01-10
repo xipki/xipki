@@ -53,7 +53,7 @@ import org.xipki.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractOCSPStatusCmd extends XipkiCommandSupport {
+public abstract class OCSPStatusCommandSupport extends XipkiCommandSupport {
     @Option(name = "--issuer", aliases = "-i",
             required = true,
             description = "issuer certificate file\n"

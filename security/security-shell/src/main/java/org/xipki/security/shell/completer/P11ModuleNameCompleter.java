@@ -42,14 +42,14 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.common.util.CollectionUtil;
-import org.xipki.console.karaf.completer.DynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
  */
 @Service
-public class P11ModuleNameCompleter extends DynamicEnumCompleter {
+public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
     @Reference
     private SecurityFactory securityFactory;
 

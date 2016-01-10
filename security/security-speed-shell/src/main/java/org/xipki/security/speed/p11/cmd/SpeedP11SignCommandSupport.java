@@ -33,19 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.speed.p12.cmd;
+package org.xipki.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.security.speed.cmd.BatchSpeedCmd;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class BSpeedP12SignCmd extends BatchSpeedCmd {
+public abstract class SpeedP11SignCommandSupport extends SpeedP11CommandSupport {
     @Option(name = "--sig-algo",
             required = true,
             description = "signature algorithm\n"
                     + "(required)")
     protected String sigAlgo;
+
 }

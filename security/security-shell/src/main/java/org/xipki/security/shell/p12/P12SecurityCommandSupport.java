@@ -33,44 +33,55 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.speed.cmd;
+package org.xipki.security.shell.p12;
 
-import java.util.List;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.common.LoadExecutor;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.security.shell.SecurityCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class BatchSpeedCmd extends SecurityCmd {
+public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
+    @Option(name = "--p12",
+            required = true,
+            description = "PKCS#12 keystore file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    protected String p12File;
 
-    @Option(name = "--duration",
-            description = "duration in seconds for each test case")
-    private Integer durationInSecond = 10;
+    @Option(name = "--password",
+            description = "password of the PKCS#12 file")
+    protected String password;
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
-
-    protected abstract List<LoadExecutor> getTesters()
-    throws Exception;
-
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        List<LoadExecutor> testers = getTesters();
-        for (LoadExecutor tester : testers) {
-            tester.setDuration(durationInSecond);
-            tester.setThreads(Math.min(20, numThreads));
-            System.out.println("============================================");
-            tester.test();
-            if (tester.isInterrupted()) {
-                throw new InterruptedException("cancelled by the user");
-            }
+    protected char[] getPassword() {
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if (pwdInChar != null) {
+            password = new String(pwdInChar);
         }
-        return null;
+        return pwdInChar;
     }
 
+    protected KeyStore getKeyStore()
+    throws Exception {
+        KeyStore ks;
+
+        FileInputStream fIn = null;
+        try {
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        } finally {
+            if (fIn != null) {
+                fIn.close();
+            }
+        }
+
+        return ks;
+    }
 }

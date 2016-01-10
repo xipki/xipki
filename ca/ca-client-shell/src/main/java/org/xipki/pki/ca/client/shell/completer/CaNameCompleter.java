@@ -39,7 +39,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.DynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.pki.ca.client.api.CAClient;
 
 /**
@@ -47,7 +47,7 @@ import org.xipki.pki.ca.client.api.CAClient;
  */
 
 @Service
-public class CaNameCompleter extends DynamicEnumCompleter {
+public class CaNameCompleter extends AbstractDynamicEnumCompleter {
     @Reference
     protected CAClient caClient;
 
