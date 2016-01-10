@@ -33,35 +33,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.security.speed.p12.cmd;
 
-import java.util.List;
-import java.util.Set;
-
-import org.apache.karaf.shell.api.console.CommandLine;
-import org.apache.karaf.shell.api.console.Completer;
-import org.apache.karaf.shell.api.console.Session;
-import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.apache.karaf.shell.api.action.Option;
+import org.xipki.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class DynamicEnumCompleter implements Completer {
-    protected abstract Set<String> getEnums();
-
-    @Override
-    public int complete(
-            Session session,
-            final CommandLine commandLine,
-            final List<String> candidates) {
-        StringsCompleter delegate = new StringsCompleter();
-
-        for (String s : getEnums()) {
-            delegate.getStrings().add(s);
-        }
-
-        return delegate.complete(session, commandLine, candidates);
-    }
+public abstract class SpeedP12SignCommandSupport extends SingleSpeedCommandSupport {
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    protected String sigAlgo;
 
 }

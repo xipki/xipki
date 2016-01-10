@@ -33,55 +33,55 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell.p12;
-
-import java.io.FileInputStream;
-import java.security.KeyStore;
+package org.xipki.security.shell.p11;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.shell.SecurityCmd;
+import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.shell.SecurityCommandSupport;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P12SecurityCmd extends SecurityCmd {
-    @Option(name = "--p12",
+public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
+    @Option(name = "--slot",
             required = true,
-            description = "PKCS#12 keystore file\n"
+            description = "slot index\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String p12File;
+    protected Integer slotIndex;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    protected String password;
+    @Option(name = "--key-id",
+            description = "id of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    protected String keyId;
 
-    protected char[] getPassword() {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
+    @Option(name = "--key-label",
+            description = "label of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    protected String keyLabel;
+
+    @Option(name = "--module",
+            description = "name of the PKCS#11 module")
+    @Completion(P11ModuleNameCompleter.class)
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+
+    public P11KeyIdentifier getKeyIdentifier()
+    throws IllegalCmdParamException {
+        P11KeyIdentifier keyIdentifier;
+        if (keyId != null && keyLabel == null) {
+            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+        } else if (keyId == null && keyLabel != null) {
+            keyIdentifier = new P11KeyIdentifier(keyLabel);
+        } else {
+            throw new IllegalCmdParamException(
+                    "exactly one of keyId or keyLabel should be specified");
         }
-        return pwdInChar;
+        return keyIdentifier;
     }
 
-    protected KeyStore getKeyStore()
-    throws Exception {
-        KeyStore ks;
-
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
-        }
-
-        return ks;
-    }
 }

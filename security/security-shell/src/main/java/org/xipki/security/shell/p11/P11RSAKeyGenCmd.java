@@ -50,7 +50,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "rsa",
         description = "generate RSA keypair in PKCS#11 device")
 @Service
-public class P11RSAKeyGenCmd extends P11KeyGenCmd {
+public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;

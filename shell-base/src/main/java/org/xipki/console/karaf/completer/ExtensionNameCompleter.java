@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.security.api.ObjectIdentifiers;
 
 /**
@@ -49,7 +50,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 @Service
-public class ExtensionNameCompleter extends EnumCompleter {
+public class ExtensionNameCompleter extends AbstractEnumCompleter {
     public ExtensionNameCompleter() {
         List<ASN1ObjectIdentifier> oids = new LinkedList<>();
         oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);

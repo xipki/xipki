@@ -49,7 +49,7 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.shell.CertRequestGenCmd;
+import org.xipki.security.shell.CertRequestGenCommandSupport;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -59,7 +59,7 @@ import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xipki-tk", name = "req",
         description = "generate PKCS#10 request with PKCS#11 device")
 @Service
-public class P11CertRequestGenCmd extends CertRequestGenCmd {
+public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"

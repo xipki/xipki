@@ -41,7 +41,7 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.BatchSpeedCmd;
+import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 /**
@@ -50,7 +50,7 @@ import org.xipki.security.speed.p12.P12RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen-p12",
         description = "performance test of PKCS#12 RSA key generation (batch)")
-public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCmd {
+public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

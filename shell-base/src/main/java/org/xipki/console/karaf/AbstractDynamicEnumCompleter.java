@@ -33,33 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.speed.p11.cmd;
+package org.xipki.console.karaf;
 
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.speed.cmd.BatchSpeedCmd;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class BSpeedP11Cmd extends BatchSpeedCmd {
+public abstract class AbstractDynamicEnumCompleter implements Completer {
+    protected abstract Set<String> getEnums();
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    protected Integer slotIndex;
+    @Override
+    public int complete(
+            Session session,
+            final CommandLine commandLine,
+            final List<String> candidates) {
+        StringsCompleter delegate = new StringsCompleter();
 
-    @Option(name = "--module",
-            description = "Name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+        for (String s : getEnums()) {
+            delegate.getStrings().add(s);
+        }
 
-    protected P11SlotIdentifier getSlotId() {
-        return new P11SlotIdentifier(slotIndex, null);
+        return delegate.complete(session, commandLine, candidates);
     }
 
 }

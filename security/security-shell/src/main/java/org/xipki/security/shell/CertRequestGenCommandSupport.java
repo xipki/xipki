@@ -92,7 +92,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public abstract class CertRequestGenCmd extends SecurityCmd {
+public abstract class CertRequestGenCommandSupport extends SecurityCommandSupport {
     @Option(name = "--subject", aliases = "-s",
             description = "subject in the PKCS#10 request\n"
                     + "default is the subject of self-signed certifite")

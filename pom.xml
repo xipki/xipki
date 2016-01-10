@@ -34,8 +34,6 @@
     <karaf.version>4.0.3</karaf.version>
     <karaf-plugin.version>4.0.3</karaf-plugin.version>
     <paxweb.version>4.2.5-SNAPSHOT</paxweb.version>
-    <!-- the following OSGi version is used in the above karaf version -->
-    <osgi.version>5.0.0</osgi.version>
     <bc.version>1.54</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
@@ -113,11 +111,6 @@
         <groupId>org.apache.karaf.shell</groupId>
         <artifactId>org.apache.karaf.shell.core</artifactId>
         <version>${karaf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
-        <version>${osgi.version}</version>
       </dependency>
       <dependency>
         <groupId>com.caucho</groupId>

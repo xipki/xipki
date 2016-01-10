@@ -33,20 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.speed.p12.cmd;
+package org.xipki.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.security.speed.cmd.SingleSpeedCmd;
+import org.xipki.common.LoadExecutor;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class SpeedP12SignCmd extends SingleSpeedCmd {
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
+
+    @Option(name = "--duration",
+            description = "duration in seconds")
+    private Integer durationInSecond = 30;
+
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
+
+    protected abstract LoadExecutor getTester()
+    throws Exception;
+
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        LoadExecutor tester = getTester();
+        tester.setDuration(durationInSecond);
+        tester.setThreads(Math.max(20, numThreads));
+
+        tester.test();
+        return null;
+    }
 
 }

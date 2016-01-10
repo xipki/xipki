@@ -33,43 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.console.karaf.completer;
+package org.xipki.security.shell;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
 
-import org.apache.karaf.shell.api.console.CommandLine;
-import org.apache.karaf.shell.api.console.Completer;
-import org.apache.karaf.shell.api.console.Session;
-import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
  */
 
-public class EnumCompleter implements Completer {
-    private final List<String> enums = new LinkedList<>();
-
-    protected void setTokens(
-            final String tokens) {
-        enums.clear();
-        StringTokenizer st = new StringTokenizer(tokens, ", ");
-        while (st.hasMoreTokens()) {
-            enums.add(st.nextToken());
-        }
+public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
+    protected Integer getKeyUsage()
+    throws Exception {
+        return KeyUsage.cRLSign
+                | KeyUsage.dataEncipherment
+                | KeyUsage.digitalSignature
+                | KeyUsage.keyAgreement
+                | KeyUsage.keyCertSign
+                | KeyUsage.keyEncipherment;
     }
 
-    @Override
-    public int complete(
-            Session session,
-            final CommandLine commandLine,
-            final List<String> candidates) {
-        StringsCompleter delegate = new StringsCompleter();
-        for (String entry : enums) {
-            delegate.getStrings().add(entry);
-        }
-        return delegate.complete(session, commandLine, candidates);
+    protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
+    throws Exception {
+        return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
+                ObjectIdentifiers.id_kp_serverAuth,
+                ObjectIdentifiers.id_kp_emailProtection,
+                ObjectIdentifiers.id_kp_OCSPSigning);
     }
-
 }
