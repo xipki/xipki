@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.completer.EnumCompleter;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 
 /**
@@ -44,7 +44,7 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
  */
 
 @Service
-public class DuplicationModeCompleter extends EnumCompleter {
+public class DuplicationModeCompleter extends AbstractEnumCompleter {
     public DuplicationModeCompleter() {
         StringBuilder enums = new StringBuilder();
         for (DuplicationMode mode : DuplicationMode.values()) {

@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.security.api.ObjectIdentifiers;
 
 /**
@@ -47,7 +48,7 @@ import org.xipki.security.api.ObjectIdentifiers;
  */
 
 @Service
-public class ExtKeyusageCompleter extends DynamicEnumCompleter {
+public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
     private static final Set<String> usages;
 
     static {

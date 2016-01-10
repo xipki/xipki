@@ -66,7 +66,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.api.util.X509Util;
 import org.xipki.security.p11.iaik.IaikP11Slot;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
-import org.xipki.security.shell.SecurityCmd;
+import org.xipki.security.shell.SecurityCommandSupport;
 import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
@@ -83,7 +83,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 @Command(scope = "xipki-tk", name = "list",
         description = "list objects in PKCS#11 device")
 @Service
-public class P11ListSlotCmd extends SecurityCmd {
+public class P11ListSlotCmd extends SecurityCommandSupport {
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;

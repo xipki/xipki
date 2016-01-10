@@ -46,7 +46,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.pki.ocsp.client.shell.AbstractOCSPStatusCmd;
+import org.xipki.pki.ocsp.client.shell.OCSPStatusCommandSupport;
 import org.xipki.security.api.util.X509Util;
 
 /**
@@ -56,7 +56,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-ocsp", name = "loadtest-status",
         description = "OCSP Load test")
 @Service
-public class OCSPStatusLoadTestCmd extends AbstractOCSPStatusCmd {
+public class OCSPStatusLoadTestCmd extends OCSPStatusCommandSupport {
     @Option(name = "--serial",
             required = true,
             description = "serial numbers, comma-separated serial numbers or ranges\n"

@@ -58,7 +58,7 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
 @Command(scope = "xipki-ca", name = "careq-add",
         description = "add requestor to CA")
 @Service
-public class CaRequestorAddCmd extends CaCmd {
+public class CaRequestorAddCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

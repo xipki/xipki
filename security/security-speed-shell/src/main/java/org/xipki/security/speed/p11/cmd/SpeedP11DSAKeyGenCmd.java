@@ -47,7 +47,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen",
         description = "performance test of PKCS#11 DSA key generation")
-public class SpeedP11DSAKeyGenCmd extends SpeedP11Cmd {
+public class SpeedP11DSAKeyGenCmd extends SpeedP11CommandSupport {
     @Option(name = "--plen",
             description = "bit length of the prime")
     private Integer pLen = 2048;

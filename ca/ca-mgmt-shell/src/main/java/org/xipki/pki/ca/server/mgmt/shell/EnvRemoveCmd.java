@@ -46,7 +46,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "env-rm",
         description = "remove CA environment parameter")
 @Service
-public class EnvRemoveCmd extends CaCmd {
+public class EnvRemoveCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
     private String name;
 

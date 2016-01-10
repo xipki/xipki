@@ -52,7 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-ca", name = "caprofile-info",
         description = "show information of certificate profile in given CA")
 @Service
-public class CaProfileInfoCmd extends CaCmd {
+public class CaProfileInfoCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

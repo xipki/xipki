@@ -56,7 +56,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-ca", name = "responder-add",
         description = "add responder")
 @Service
-public class ResponderAddCmd extends CaCmd {
+public class ResponderAddCmd extends CaCommandSupport {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"

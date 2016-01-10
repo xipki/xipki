@@ -55,7 +55,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-cli", name = "remove-cert",
         description = "remove certificate")
 @Service
-public class RemoveCertCmd extends UnRevRemoveCertCmd {
+public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
     protected Object doExecute()

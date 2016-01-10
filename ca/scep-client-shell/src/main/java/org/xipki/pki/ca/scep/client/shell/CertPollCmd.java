@@ -58,7 +58,7 @@ import org.xipki.scep.client.ScepClient;
 @Command(scope = "scep", name = "certpoll",
         description = "poll certificate")
 @Service
-public class CertPollCmd extends ClientCmd {
+public class CertPollCmd extends ClientCommandSupport {
     @Option(name = "--p10",
             required = true,
             description = "PKCS#10 request file\n"

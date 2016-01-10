@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Command(scope = "xipki-ca", name = "notify-change",
         description = "notify the change of CA system")
 @Service
-public class CaSystemNotifyChangeCmd extends CaCmd {
+public class CaSystemNotifyChangeCmd extends CaCommandSupport {
 
     @Override
     protected Object doExecute()

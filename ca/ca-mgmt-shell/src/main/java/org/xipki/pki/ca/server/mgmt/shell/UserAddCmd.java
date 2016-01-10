@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 @Command(scope = "xipki-ca", name = "user-add",
         description = "add user")
 @Service
-public class UserAddCmd extends CaCmd {
+public class UserAddCmd extends CaCommandSupport {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

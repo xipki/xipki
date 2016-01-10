@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.CmdFailure;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
@@ -54,7 +54,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Command(scope = "xipki-caqa", name = "caprofile-check",
         description = "check information of certificate profiles in given CA (QA)")
 @Service
-public class CaProfileCheckCmd extends CaCmd {
+public class CaProfileCheckCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

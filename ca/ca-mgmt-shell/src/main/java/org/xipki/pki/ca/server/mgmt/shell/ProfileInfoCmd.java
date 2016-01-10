@@ -54,7 +54,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 @Command(scope = "xipki-ca", name = "profile-info",
         description = "show information of certifiate profile")
 @Service
-public class ProfileInfoCmd extends CaCmd {
+public class ProfileInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "certificate profile name")
     private String name;
 

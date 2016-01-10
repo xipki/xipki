@@ -49,7 +49,7 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 @Command(scope = "xipki-ca", name = "user-info",
         description = "show information of user")
 @Service
-public class UserInfoCmd extends CaCmd {
+public class UserInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;
 

@@ -54,7 +54,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-tk", name = "export-cert-p12",
         description = "export certificate from PKCS#12 keystore")
 @Service
-public class P12CertExportCmd extends P12SecurityCmd {
+public class P12CertExportCmd extends P12SecurityCommandSupport {
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"

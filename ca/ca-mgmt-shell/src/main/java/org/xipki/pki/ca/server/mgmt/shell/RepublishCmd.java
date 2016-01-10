@@ -51,7 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllComplete
 @Command(scope = "xipki-ca", name = "republish",
         description = "republish certificates")
 @Service
-public class RepublishCmd extends CaCmd {
+public class RepublishCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name or 'all' for all CAs\n"

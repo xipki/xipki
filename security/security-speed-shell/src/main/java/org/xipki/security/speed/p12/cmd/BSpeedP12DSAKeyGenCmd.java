@@ -40,7 +40,7 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.xipki.common.LoadExecutor;
-import org.xipki.security.speed.cmd.BatchSpeedCmd;
+import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
 /**
@@ -49,7 +49,7 @@ import org.xipki.security.speed.p12.P12DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen-p12",
         description = "performance test of PKCS#12 DSA key generation (batch)")
-public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCmd {
+public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

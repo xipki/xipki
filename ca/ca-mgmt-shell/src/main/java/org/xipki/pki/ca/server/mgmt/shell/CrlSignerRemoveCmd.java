@@ -48,7 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 @Command(scope = "xipki-ca", name = "crlsigner-rm",
         description = "remove CRL signer")
 @Service
-public class CrlSignerRemoveCmd extends CaCmd {
+public class CrlSignerRemoveCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
     @Completion(CrlSignerNameCompleter.class)
     private String name;

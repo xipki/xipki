@@ -49,7 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Command(scope = "xipki-ca", name = "capub-rm",
         description = "remove publisher from CA")
 @Service
-public class CaPublisherRemoveCmd extends CaCmd {
+public class CaPublisherRemoveCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

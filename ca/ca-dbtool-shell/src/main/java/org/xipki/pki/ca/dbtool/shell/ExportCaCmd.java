@@ -51,7 +51,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 @Command(scope = "xipki-db", name = "export-ca",
         description = "export CA database")
 @Service
-public class ExportCaCmd extends DbPortCmd {
+public class ExportCaCmd extends DbPortCommandSupport {
     private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
     @Option(name = "--db-conf",

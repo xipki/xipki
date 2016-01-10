@@ -47,7 +47,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "delete-key",
         description = "generate EC keypair in PKCS#11 device")
 @Service
-public class P11KeyDeleteCmd extends P11SecurityCmd {
+public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {

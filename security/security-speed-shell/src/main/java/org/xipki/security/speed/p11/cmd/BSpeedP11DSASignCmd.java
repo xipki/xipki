@@ -49,7 +49,7 @@ import org.xipki.security.speed.p11.P11DSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
         description = "performance test of PKCS#11 DSA signature creation (batch)")
-public class BSpeedP11DSASignCmd extends BSpeedP11SignCmd {
+public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

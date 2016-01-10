@@ -52,7 +52,7 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-cli", name = "health",
         description = "check healty status of CA")
 @Service
-public class HealthCmd extends ClientCmd {
+public class HealthCmd extends ClientCommandSupport {
 
     @Option(name = "--ca",
             description = "CA name\n"

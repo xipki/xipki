@@ -52,7 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-ca", name = "careq-info",
         description = "show information of requestor in CA")
 @Service
-public class CaRequestorInfoCmd extends CaCmd {
+public class CaRequestorInfoCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

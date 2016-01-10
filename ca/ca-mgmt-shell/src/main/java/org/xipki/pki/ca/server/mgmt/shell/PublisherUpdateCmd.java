@@ -51,7 +51,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 @Command(scope = "xipki-ca", name = "publisher-up",
         description = "update publisher")
 @Service
-public class PublisherUpdateCmd extends CaCmd {
+public class PublisherUpdateCmd extends CaCommandSupport {
 
     @Option(name = "--name", aliases = "-n",
             required = true,

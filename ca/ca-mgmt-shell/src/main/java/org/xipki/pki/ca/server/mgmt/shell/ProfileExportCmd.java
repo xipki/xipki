@@ -53,7 +53,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-ca", name = "profile-export",
         description = "export certificate profile configuration")
 @Service
-public class ProfileExportCmd extends CaCmd {
+public class ProfileExportCmd extends CaCommandSupport {
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "profile name\n"

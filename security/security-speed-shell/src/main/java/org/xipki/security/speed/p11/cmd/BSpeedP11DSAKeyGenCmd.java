@@ -49,7 +49,7 @@ import org.xipki.security.speed.p11.P11DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
         description = "performance test of PKCS#11 DSA key generation (batch)")
-public class BSpeedP11DSAKeyGenCmd extends BSpeedP11Cmd {
+public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

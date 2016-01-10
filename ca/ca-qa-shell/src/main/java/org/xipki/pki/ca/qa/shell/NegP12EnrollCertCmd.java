@@ -54,7 +54,7 @@ import org.xipki.security.api.SignerException;
 @Command(scope = "xipki-qa", name = "neg-enroll-p12",
         description = "enroll certificate (PKCS#12 keystore, negative, for QA)")
 @Service
-public class NegP12EnrollCertCmd extends NegEnrollCertCmd {
+public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
 
     @Option(name = "--p12",
             required = true,

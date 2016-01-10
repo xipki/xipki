@@ -50,7 +50,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 @Command(scope = "xipki-ca", name = "caprofile-add",
         description = "add certificate profile to CA")
 @Service
-public class CaProfileAddCmd extends CaCmd {
+public class CaProfileAddCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

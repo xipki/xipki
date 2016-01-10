@@ -52,7 +52,7 @@ import org.xipki.scep.client.exception.ScepClientException;
 @Command(scope = "scep", name = "update-req",
         description = "enroll certificate via messageType UpdateReq")
 @Service
-public class UpdateReqCmd extends AbstractEnrollCertCmd {
+public class UpdateReqCmd extends EnrollCertCommandSupport {
 
     @Override
     protected EnrolmentResponse requestCertificate(

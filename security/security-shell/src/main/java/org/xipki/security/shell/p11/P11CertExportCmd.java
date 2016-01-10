@@ -54,7 +54,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "export-cert",
         description = "export certificate from PKCS#11 device")
 @Service
-public class P11CertExportCmd extends P11SecurityCmd {
+public class P11CertExportCmd extends P11SecurityCommandSupport {
 
     @Option(name = "--out", aliases = "-o",
             required = true,

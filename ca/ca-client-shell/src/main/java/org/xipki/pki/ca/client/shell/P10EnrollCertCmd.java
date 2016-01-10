@@ -58,7 +58,7 @@ import org.xipki.console.karaf.completer.FilePathCompleter;
 @Command(scope = "xipki-cli", name = "p10-enroll",
         description = "enroll certificate via PKCS#10 request")
 @Service
-public class P10EnrollCertCmd extends ClientCmd {
+public class P10EnrollCertCmd extends ClientCommandSupport {
 
     @Option(name = "--p10",
             required = true,

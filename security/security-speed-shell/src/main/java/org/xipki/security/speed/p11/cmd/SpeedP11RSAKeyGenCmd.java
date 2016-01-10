@@ -47,7 +47,7 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-rsa-gen",
         description = "performance test of PKCS#11 RSA key generation")
-public class SpeedP11RSAKeyGenCmd extends SpeedP11Cmd {
+public class SpeedP11RSAKeyGenCmd extends SpeedP11CommandSupport {
     @Option(name = "--key-size",
             description = "keysize in bit")
     private Integer keysize = 2048;

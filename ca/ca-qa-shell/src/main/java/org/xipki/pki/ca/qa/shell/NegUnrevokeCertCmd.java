@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.pki.ca.client.api.CertIdOrError;
-import org.xipki.pki.ca.client.shell.UnRevRemoveCertCmd;
+import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -54,7 +54,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-qa", name = "neg-unrevoke",
         description = "unrevoke certificate (negative, for QA)")
 @Service
-public class NegUnrevokeCertCmd extends UnRevRemoveCertCmd {
+public class NegUnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
     protected Object doExecute()

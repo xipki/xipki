@@ -36,13 +36,14 @@
 package org.xipki.console.karaf.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Service
-public class SigAlgCompleter extends EnumCompleter {
+public class SigAlgCompleter extends AbstractEnumCompleter {
     public SigAlgCompleter() {
         String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
         String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};

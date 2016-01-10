@@ -48,7 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 @Command(scope = "xipki-ca", name = "requestor-rm",
         description = "remove requestor")
 @Service
-public class RequestorRemoveCmd extends CaCmd {
+public class RequestorRemoveCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "requestor name", required = true)
     @Completion(RequestorNameCompleter.class)
     private String name;

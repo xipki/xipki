@@ -79,7 +79,7 @@ import org.xipki.security.api.util.X509Util;
 @Command(scope = "xipki-ocsp", name = "status",
         description = "request certificate status")
 @Service
-public class OCSPStatusCmd extends BaseOCSPStatusCmd {
+public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
     @Override
     protected void checkParameters(
             final X509Certificate respIssuer,

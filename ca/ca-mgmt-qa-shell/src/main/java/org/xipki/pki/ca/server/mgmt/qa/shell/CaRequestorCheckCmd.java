@@ -47,7 +47,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
@@ -63,7 +63,7 @@ import org.xipki.console.karaf.completer.YesNoCompleter;
 @Command(scope = "xipki-caqa", name = "careq-check",
         description = "check information of requestors in CA (QA)")
 @Service
-public class CaRequestorCheckCmd extends CaCmd {
+public class CaRequestorCheckCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

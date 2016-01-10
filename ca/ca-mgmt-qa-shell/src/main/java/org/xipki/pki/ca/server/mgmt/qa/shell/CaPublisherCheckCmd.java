@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.pki.ca.server.mgmt.shell.CaCmd;
+import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 import org.xipki.console.karaf.CmdFailure;
@@ -55,7 +55,7 @@ import org.xipki.console.karaf.CmdFailure;
 @Command(scope = "xipki-caqa", name = "capub-check",
         description = "check information of publishers in given CA (QA)")
 @Service
-public class CaPublisherCheckCmd extends CaCmd {
+public class CaPublisherCheckCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

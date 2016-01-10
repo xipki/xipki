@@ -44,13 +44,14 @@ import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Service
-public class ECCurveNameCompleter extends DynamicEnumCompleter {
+public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Override
     protected Set<String> getEnums() {

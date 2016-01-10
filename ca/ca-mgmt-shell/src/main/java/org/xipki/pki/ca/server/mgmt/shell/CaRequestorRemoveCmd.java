@@ -49,7 +49,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 @Command(scope = "xipki-ca", name = "careq-rm",
         description = "remove requestor from CA")
 @Service
-public class CaRequestorRemoveCmd extends CaCmd {
+public class CaRequestorRemoveCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

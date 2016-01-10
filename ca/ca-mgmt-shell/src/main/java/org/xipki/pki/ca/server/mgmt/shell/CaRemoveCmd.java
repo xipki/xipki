@@ -48,7 +48,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-ca", name = "ca-rm",
         description = "remove CA")
 @Service
-public class CaRemoveCmd extends CaCmd {
+public class CaRemoveCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
     private String name;

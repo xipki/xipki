@@ -57,7 +57,7 @@ import org.xipki.common.util.CollectionUtil;
 @Command(scope = "xipki-ca", name = "ca-info",
         description = "show information of CA")
 @Service
-public class CaInfoCmd extends CaCmd {
+public class CaInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", description = "CA name")
     @Completion(CaNameCompleter.class)
     private String caName;

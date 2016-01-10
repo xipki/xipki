@@ -52,7 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Command(scope = "xipki-ca", name = "capub-info",
         description = "show information of publisher in given CA")
 @Service
-public class CaPublisherInfoCmd extends CaCmd {
+public class CaPublisherInfoCmd extends CaCommandSupport {
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"

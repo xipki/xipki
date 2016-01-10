@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.common.LoadExecutor;
 import org.xipki.security.KeyUtil;
-import org.xipki.security.speed.cmd.BatchSpeedCmd;
+import org.xipki.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
@@ -52,7 +52,7 @@ import org.xipki.security.speed.p12.P12ECKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen-p12",
         description = "performance test of PKCS#12 EC key generation (batch)")
-public class BSpeedP12ECKeyGenCmd extends BatchSpeedCmd {
+public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()

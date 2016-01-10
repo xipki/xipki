@@ -50,7 +50,7 @@ import org.xipki.security.speed.p11.P11RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
         description = "performance test of PKCS#11 RSA key generation (batch)")
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11Cmd {
+public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override
     protected List<LoadExecutor> getTesters()
