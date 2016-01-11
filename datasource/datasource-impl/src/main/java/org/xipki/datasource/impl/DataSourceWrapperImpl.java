@@ -75,11 +75,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
-
-    private final ConcurrentHashMap<String, Long> lastUsedSeqValues
-            = new ConcurrentHashMap<String, Long>();
-
     private static class MySQL extends DataSourceWrapperImpl {
 
         MySQL(
@@ -202,7 +197,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return "ALTER TABLE " + table + " DROP KEY " + constraintName;
         }
 
-    }
+    } // class MySQL
 
     private static class DB2 extends DataSourceWrapperImpl {
 
@@ -262,7 +257,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return sql.toString();
         }
 
-    }
+    } // class DB2
 
     private static class PostgreSQL extends DataSourceWrapperImpl {
 
@@ -343,7 +338,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return sb.toString();
         }
 
-    }
+    } // class PostgreSQL
 
     private static class Oracle extends DataSourceWrapperImpl {
 
@@ -466,7 +461,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return sb.toString();
         }
 
-    }
+    } // class Oracle
 
     private static class H2 extends DataSourceWrapperImpl {
 
@@ -524,7 +519,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return sql.toString();
         }
 
-    }
+    } // class H2
 
     private static class HSQL extends DataSourceWrapperImpl {
 
@@ -582,7 +577,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             return sql.toString();
         }
 
-    }
+    } // class HSQL
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
+
+    private final ConcurrentHashMap<String, Long> lastUsedSeqValues
+            = new ConcurrentHashMap<String, Long>();
 
     /**
      * References the real data source implementation this class acts as pure
@@ -605,74 +605,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         this.service = service;
         this.sqlErrorCodes = SQLErrorCodes.newInstance(dbType);
         this.sqlStateCodes = SQLStateCodes.newInstance(dbType);
-    }
-
-    static DataSourceWrapper createDataSource(
-            final String name,
-            final Properties props,
-            final DatabaseType databaseType) {
-        ParamUtil.assertNotEmpty("props", props);
-        ParamUtil.assertNotNull("databaseType", databaseType);
-
-        // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
-        String dataSourceClassName = props.getProperty("dataSourceClassName");
-        if (dataSourceClassName != null) {
-            if (dataSourceClassName.contains(".db2.")) {
-                String propName = "dataSource.currentSchema";
-                String schema = props.getProperty(propName);
-                if (schema != null) {
-                    String upperCaseSchema = schema.toUpperCase();
-                    if (!schema.equals(upperCaseSchema)) {
-                        props.setProperty(propName, upperCaseSchema);
-                    }
-                }
-            }
-        } else {
-            String propName = "jdbcUrl";
-            final String url = props.getProperty(propName);
-            if (StringUtil.startsWithIgnoreCase(url, "jdbc:db2:")) {
-                String sep = ":currentSchema=";
-                int idx = url.indexOf(sep);
-                if (idx != 1) {
-                    String schema = url.substring(idx + sep.length());
-                    if (schema.endsWith(";")) {
-                        schema = schema.substring(0, schema.length() - 1);
-                    }
-
-                    String upperCaseSchema = schema.toUpperCase();
-                    if (!schema.equals(upperCaseSchema)) {
-                        String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
-                        props.setProperty(propName, newUrl);
-                    }
-                }
-            }
-        }
-
-        if (databaseType == DatabaseType.DB2
-                || databaseType == DatabaseType.H2
-                || databaseType == DatabaseType.HSQL
-                || databaseType == DatabaseType.MYSQL
-                || databaseType == DatabaseType.ORACLE
-                || databaseType == DatabaseType.POSTGRES) {
-            HikariConfig conf = new HikariConfig(props);
-            HikariDataSource service = new HikariDataSource(conf);
-            switch (databaseType) {
-                case DB2:
-                    return new DB2(name, service);
-                case H2:
-                    return new H2(name, service);
-                case HSQL:
-                    return new HSQL(name, service);
-                case MYSQL:
-                    return new MySQL(name, service);
-                case ORACLE:
-                    return new Oracle(name, service);
-                default: // POSTGRESQL:
-                    return new PostgreSQL(name, service);
-            }
-        } else {
-            throw new IllegalArgumentException("unknown datasource type " + databaseType);
-        }
     }
 
     @Override
@@ -1535,6 +1467,74 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             } else {
                 releaseStatementAndResultSet(stmt, null);
             }
+        }
+    }
+
+    static DataSourceWrapper createDataSource(
+            final String name,
+            final Properties props,
+            final DatabaseType databaseType) {
+        ParamUtil.assertNotEmpty("props", props);
+        ParamUtil.assertNotNull("databaseType", databaseType);
+
+        // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
+        String dataSourceClassName = props.getProperty("dataSourceClassName");
+        if (dataSourceClassName != null) {
+            if (dataSourceClassName.contains(".db2.")) {
+                String propName = "dataSource.currentSchema";
+                String schema = props.getProperty(propName);
+                if (schema != null) {
+                    String upperCaseSchema = schema.toUpperCase();
+                    if (!schema.equals(upperCaseSchema)) {
+                        props.setProperty(propName, upperCaseSchema);
+                    }
+                }
+            }
+        } else {
+            String propName = "jdbcUrl";
+            final String url = props.getProperty(propName);
+            if (StringUtil.startsWithIgnoreCase(url, "jdbc:db2:")) {
+                String sep = ":currentSchema=";
+                int idx = url.indexOf(sep);
+                if (idx != 1) {
+                    String schema = url.substring(idx + sep.length());
+                    if (schema.endsWith(";")) {
+                        schema = schema.substring(0, schema.length() - 1);
+                    }
+
+                    String upperCaseSchema = schema.toUpperCase();
+                    if (!schema.equals(upperCaseSchema)) {
+                        String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
+                        props.setProperty(propName, newUrl);
+                    }
+                }
+            }
+        }
+
+        if (databaseType == DatabaseType.DB2
+                || databaseType == DatabaseType.H2
+                || databaseType == DatabaseType.HSQL
+                || databaseType == DatabaseType.MYSQL
+                || databaseType == DatabaseType.ORACLE
+                || databaseType == DatabaseType.POSTGRES) {
+            HikariConfig conf = new HikariConfig(props);
+            HikariDataSource service = new HikariDataSource(conf);
+            switch (databaseType) {
+                case DB2:
+                    return new DB2(name, service);
+                case H2:
+                    return new H2(name, service);
+                case HSQL:
+                    return new HSQL(name, service);
+                case MYSQL:
+                    return new MySQL(name, service);
+                case ORACLE:
+                    return new Oracle(name, service);
+                default: // POSTGRESQL:
+                    return new PostgreSQL(name, service);
+            }
+        } else {
+            throw new IllegalArgumentException("unknown datasource type " + databaseType);
         }
     }
 

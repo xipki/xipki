@@ -59,10 +59,6 @@ public class KeystoreP11ModulePool {
 
     private static KeystoreP11ModulePool INSTANCE = new KeystoreP11ModulePool();
 
-    public static KeystoreP11ModulePool getInstance() {
-        return INSTANCE;
-    }
-
     public synchronized void removeModule(
             final String moduleName) {
         KeystoreP11Module module = modules.remove(moduleName);
@@ -133,6 +129,10 @@ public class KeystoreP11ModulePool {
     public void setDefaultModuleName(
             final String defaultModuleName) {
         this.defaultModuleName = defaultModuleName;
+    }
+
+    public static KeystoreP11ModulePool getInstance() {
+        return INSTANCE;
     }
 
 }

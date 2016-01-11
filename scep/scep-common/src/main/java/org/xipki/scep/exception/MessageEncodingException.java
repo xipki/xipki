@@ -53,6 +53,7 @@ public class MessageEncodingException extends Exception {
             final String message) {
         super(message);
     }
+
     public MessageEncodingException(
             final Throwable cause) {
         super(cause.getMessage(), cause);

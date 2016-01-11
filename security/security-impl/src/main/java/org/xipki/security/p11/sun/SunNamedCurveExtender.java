@@ -69,6 +69,62 @@ import org.xipki.common.util.LogUtil;
 
 public class SunNamedCurveExtender {
 
+    private static class CurveData {
+
+        final int type;
+
+        final String sfield;
+
+        final String a;
+
+        final String b;
+
+        final String x;
+
+        final String y;
+
+        final String n;
+
+        final int h;
+
+        CurveData(
+                final X9ECParameters params) {
+            ECCurve curve = params.getCurve();
+
+            this.a = curve.getA().toBigInteger().toString(16);
+            this.b = curve.getB().toBigInteger().toString(16);
+            this.x = params.getG().getAffineXCoord().toBigInteger().toString(16);
+            this.y = params.getG().getAffineYCoord().toBigInteger().toString(16);
+            this.n = params.getN().toString(16);
+            this.h = params.getH().intValue();
+
+            if (curve instanceof ECCurve.Fp) {
+                this.type = P;
+
+                ECCurve.Fp c = (ECCurve.Fp) curve;
+                this.sfield = c.getQ().toString(16);
+            } else { // if (curve instanceof ECCurve.F2m)
+                this.type = B;
+
+                ECCurve.F2m c = (ECCurve.F2m) curve;
+                int m = c.getM();
+
+                int[] ks = new int[]{c.getK1(), c.getK2(), c.getK3()};
+
+                BigInteger rp = BigInteger.ONE;
+                rp = rp.setBit(m);
+
+                for (int j = 0; j < ks.length; j++) {
+                    if (ks[j] > 0) {
+                        rp = rp.setBit(ks[j]);
+                    }
+                }
+                this.sfield = rp.toString(16);
+            }
+        }
+
+    } // class CurveData
+
     private static Logger LOG = LoggerFactory.getLogger(SunNamedCurveExtender.class);
 
     private final static int P  = 1; // prime curve
@@ -494,53 +550,6 @@ public class SunNamedCurveExtender {
         }
 
         return null;
-    }
-
-    private static class CurveData {
-        final int type;
-        final String sfield;
-        final String a;
-        final String b;
-        final String x;
-        final String y;
-        final String n;
-        final int h;
-
-        CurveData(
-                final X9ECParameters params) {
-            ECCurve curve = params.getCurve();
-
-            this.a = curve.getA().toBigInteger().toString(16);
-            this.b = curve.getB().toBigInteger().toString(16);
-            this.x = params.getG().getAffineXCoord().toBigInteger().toString(16);
-            this.y = params.getG().getAffineYCoord().toBigInteger().toString(16);
-            this.n = params.getN().toString(16);
-            this.h = params.getH().intValue();
-
-            if (curve instanceof ECCurve.Fp) {
-                this.type = P;
-
-                ECCurve.Fp c = (ECCurve.Fp) curve;
-                this.sfield = c.getQ().toString(16);
-            } else { // if (curve instanceof ECCurve.F2m)
-                this.type = B;
-
-                ECCurve.F2m c = (ECCurve.F2m) curve;
-                int m = c.getM();
-
-                int[] ks = new int[]{c.getK1(), c.getK2(), c.getK3()};
-
-                BigInteger rp = BigInteger.ONE;
-                rp = rp.setBit(m);
-
-                for (int j = 0; j < ks.length; j++) {
-                    if (ks[j] > 0) {
-                        rp = rp.setBit(ks[j]);
-                    }
-                }
-                this.sfield = rp.toString(16);
-            }
-        }
     }
 
     private static void logAddedCurves(

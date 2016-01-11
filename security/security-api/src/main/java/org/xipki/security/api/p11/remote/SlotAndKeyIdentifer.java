@@ -94,6 +94,22 @@ public class SlotAndKeyIdentifer extends ASN1Object {
         this.keyIdentifier = KeyIdentifier.getInstance(seq.getObjectAt(1));
     }
 
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(slotIdentifier.toASN1Primitive());
+        vector.add(keyIdentifier.toASN1Primitive());
+        return new DERSequence(vector);
+    }
+
+    public SlotIdentifier getSlotIdentifier() {
+        return slotIdentifier;
+    }
+
+    public KeyIdentifier getKeyIdentifier() {
+        return keyIdentifier;
+    }
+
     public static SlotAndKeyIdentifer getInstance(
             final Object obj)
     throws BadASN1ObjectException {
@@ -116,22 +132,6 @@ public class SlotAndKeyIdentifer extends ASN1Object {
         throw new BadASN1ObjectException(
                 "unknown object in SlotAndKeyIdentifier.getInstance(): "
                 + obj.getClass().getName());
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotIdentifier.toASN1Primitive());
-        vector.add(keyIdentifier.toASN1Primitive());
-        return new DERSequence(vector);
-    }
-
-    public SlotIdentifier getSlotIdentifier() {
-        return slotIdentifier;
-    }
-
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
     }
 
 }

@@ -117,6 +117,26 @@ public class SlotIdentifier extends ASN1Object {
         }
     }
 
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        if (slotId.getSlotIndex() != null) {
+            vector.add(new ASN1Integer(slotId.getSlotIndex()));
+        }
+
+        if (slotId.getSlotId() != null) {
+            DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
+                    new ASN1Integer(slotId.getSlotId()));
+            vector.add(taggedObj);
+        }
+
+        return new DERSequence(vector);
+    }
+
+    public P11SlotIdentifier getSlotId() {
+        return slotId;
+    }
+
     public static SlotIdentifier getInstance(
             final Object obj)
     throws BadASN1ObjectException {
@@ -138,26 +158,6 @@ public class SlotIdentifier extends ASN1Object {
 
         throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): "
                 + obj.getClass().getName());
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        if (slotId.getSlotIndex() != null) {
-            vector.add(new ASN1Integer(slotId.getSlotIndex()));
-        }
-
-        if (slotId.getSlotId() != null) {
-            DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
-                    new ASN1Integer(slotId.getSlotId()));
-            vector.add(taggedObj);
-        }
-
-        return new DERSequence(vector);
-    }
-
-    public P11SlotIdentifier getSlotId() {
-        return slotId;
     }
 
 }

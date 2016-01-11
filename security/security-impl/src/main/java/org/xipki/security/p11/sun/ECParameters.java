@@ -96,19 +96,6 @@ import org.bouncycastle.math.ec.ECCurve;
 
 public final class ECParameters extends AlgorithmParametersSpi {
 
-    // used by ECPublicKeyImpl and ECPrivateKeyImpl
-    static AlgorithmParameters getAlgorithmParameters(
-            final ECParameterSpec spec)
-    throws InvalidKeyException {
-        try {
-            AlgorithmParameters params = AlgorithmParameters.getInstance("EC", "BC");
-            params.init(spec);
-            return params;
-        } catch (GeneralSecurityException e) {
-            throw new InvalidKeyException("EC parameters error", e);
-        }
-    }
-
     /*
      * The parameters these AlgorithmParameters object represents.
      * Currently, it is always an instance of NamedCurve.
@@ -229,6 +216,19 @@ public final class ECParameters extends AlgorithmParametersSpi {
         }
 
         return namedCurve.toString();
+    }
+
+    // used by ECPublicKeyImpl and ECPrivateKeyImpl
+    static AlgorithmParameters getAlgorithmParameters(
+            final ECParameterSpec spec)
+    throws InvalidKeyException {
+        try {
+            AlgorithmParameters params = AlgorithmParameters.getInstance("EC", "BC");
+            params.init(spec);
+            return params;
+        } catch (GeneralSecurityException e) {
+            throw new InvalidKeyException("EC parameters error", e);
+        }
     }
 
 }

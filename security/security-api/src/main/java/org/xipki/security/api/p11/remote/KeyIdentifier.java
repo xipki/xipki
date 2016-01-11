@@ -72,6 +72,19 @@ public class KeyIdentifier extends ASN1Object {
         this.keyId = keyId;
     }
 
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        if (keyId.getKeyLabel() != null) {
+            return new DERUTF8String(keyId.getKeyLabel());
+        } else {
+            return new DEROctetString(keyId.getKeyId());
+        }
+    }
+
+    public P11KeyIdentifier getKeyId() {
+        return keyId;
+    }
+
     public static KeyIdentifier getInstance(
             final Object obj)
     throws BadASN1ObjectException {
@@ -99,19 +112,6 @@ public class KeyIdentifier extends ASN1Object {
 
         throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): "
                 + obj.getClass().getName());
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        if (keyId.getKeyLabel() != null) {
-            return new DERUTF8String(keyId.getKeyLabel());
-        } else {
-            return new DEROctetString(keyId.getKeyId());
-        }
-    }
-
-    public P11KeyIdentifier getKeyId() {
-        return keyId;
     }
 
 }

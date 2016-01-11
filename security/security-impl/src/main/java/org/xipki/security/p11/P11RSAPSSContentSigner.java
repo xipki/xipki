@@ -64,6 +64,43 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 
 public class P11RSAPSSContentSigner implements ContentSigner {
 
+    private class PSSSignerOutputStream extends OutputStream {
+
+        @Override
+        public void write(
+                final int b)
+        throws IOException {
+            pssSigner.update((byte) b);
+        }
+
+        @Override
+        public void write(
+                final byte[] b)
+        throws IOException {
+            pssSigner.update(b, 0, b.length);
+        }
+
+        @Override
+        public void write(
+                final byte[] b,
+                final int off,
+                final int len)
+        throws IOException {
+            pssSigner.update(b, off, len);
+        }
+
+        @Override
+        public void flush()
+        throws IOException {
+        }
+
+        @Override
+        public void close()
+        throws IOException {
+        }
+
+    } // class PSSSignerOutputStream
+
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAPSSContentSigner.class);
 
     private final AlgorithmIdentifier algorithmIdentifier;
@@ -124,42 +161,6 @@ public class P11RSAPSSContentSigner implements ContentSigner {
             LOG.warn("SignerException: {}", e.getMessage());
             LOG.debug("SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-        }
-    }
-
-    private class PSSSignerOutputStream extends OutputStream {
-
-        @Override
-        public void write(
-                final int b)
-        throws IOException {
-            pssSigner.update((byte) b);
-        }
-
-        @Override
-        public void write(
-                final byte[] b)
-        throws IOException {
-            pssSigner.update(b, 0, b.length);
-        }
-
-        @Override
-        public void write(
-                final byte[] b,
-                final int off,
-                final int len)
-        throws IOException {
-            pssSigner.update(b, off, len);
-        }
-
-        @Override
-        public void flush()
-        throws IOException {
-        }
-
-        @Override
-        public void close()
-        throws IOException {
         }
     }
 

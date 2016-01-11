@@ -54,11 +54,23 @@ public abstract class LoadExecutor {
 
     private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
+    private static final int DEFAULT_DURATION = 30; // 30 seconds
+
+    private static final int DEFAULT_THREADS = 25;
+
     private boolean interrupted = false;
 
     private String description;
 
     private final ProcessLog processLog;
+
+    private int duration = DEFAULT_DURATION; // in seconds
+
+    private int threads = DEFAULT_THREADS;
+
+    private AtomicLong errorAccount = new AtomicLong(0);
+
+    private String unit = "";
 
     public LoadExecutor(
             final String description) {
@@ -128,8 +140,6 @@ public abstract class LoadExecutor {
         return interrupted;
     }
 
-    private static int DEFAULT_DURATION = 30; // 30 seconds
-    private int duration = DEFAULT_DURATION; // in seconds
     public void setDuration(
             final int duration) {
         if (duration > 0) {
@@ -137,16 +147,12 @@ public abstract class LoadExecutor {
         }
     }
 
-    private static int DEFAULT_THREADS = 25;
-    private int threads = DEFAULT_THREADS;
     public void setThreads(
             final int threads) {
         if (threads > 0) {
             this.threads = threads;
         }
     }
-
-    private AtomicLong errorAccount = new AtomicLong(0);
 
     public long getErrorAccout() {
         return errorAccount.get();
@@ -177,21 +183,10 @@ public abstract class LoadExecutor {
         processLog.printStatus();
     }
 
-    private String unit = "";
     public void setUnit(
             final String unit) {
         if (unit != null) {
             this.unit = unit;
-        }
-    }
-
-    protected static long getSecureIndex() {
-        SecureRandom random = new SecureRandom();
-        while (true) {
-            long l = random.nextLong();
-            if (l > 0) {
-                return l;
-            }
         }
     }
 
@@ -206,6 +201,16 @@ public abstract class LoadExecutor {
         sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
         sb.append("average: " + processLog.getTotalAverageSpeed() + " " + unit + "/s\n");
         System.out.println(sb.toString());
+    }
+
+    protected static long getSecureIndex() {
+        SecureRandom random = new SecureRandom();
+        while (true) {
+            long l = random.nextLong();
+            if (l > 0) {
+                return l;
+            }
+        }
     }
 
 }

@@ -47,8 +47,11 @@ import org.xipki.common.util.ParamUtil;
  */
 
 public class ValidationResult {
+
     private final List<ValidationIssue> validationIssues;
+
     private final List<ValidationIssue> failedValidationIssues;
+
     private final List<ValidationIssue> successfulValidationIssues;
 
     public ValidationResult(

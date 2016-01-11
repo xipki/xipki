@@ -56,6 +56,34 @@ import org.xipki.security.api.p11.P11WritableSlot;
 
 public abstract class P11SignLoadTest extends LoadExecutor {
 
+    class Testor implements Runnable {
+
+        @Override
+        public void run() {
+            ContentSigner singleSigner;
+            try {
+                singleSigner = signer.borrowContentSigner();
+            } catch (NoIdleSignerException e) {
+                account(1, 1);
+                return;
+            }
+
+            while (!stop() && getErrorAccout() < 1) {
+                try {
+                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
+                    singleSigner.getSignature();
+                    account(1, 0);
+                } catch (Exception e) {
+                    account(1, 1);
+                }
+            }
+
+            signer.returnContentSigner(singleSigner);
+            close();
+        }
+
+    } // class Testor
+
     private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
 
     private final P11WritableSlot slot;
@@ -99,34 +127,6 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     protected Runnable getTestor()
     throws Exception {
         return new Testor();
-    }
-
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            ContentSigner singleSigner;
-            try {
-                singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e) {
-                account(1, 1);
-                return;
-            }
-
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-                    singleSigner.getSignature();
-                    account(1, 0);
-                } catch (Exception e) {
-                    account(1, 1);
-                }
-            }
-
-            signer.returnContentSigner(singleSigner);
-            close();
-        }
-
     }
 
 }

@@ -231,8 +231,12 @@ public abstract class XipkiCommandSupport implements Action {
         if ("gui".equalsIgnoreCase(passwordUi)) {
             return SecurePasswordInputPanel.readPassword(prompt);
         } else {
+            String tPrompt = prompt;
+            if (prompt != null && !prompt.endsWith("\n")) {
+                tPrompt += "\n";
+            }
             try {
-                String pwd = session.readLine(prompt, '*');
+                String pwd = session.readLine(tPrompt, '*');
                 return pwd.toCharArray();
             } catch (IOException e) {
                 return new char[0];
@@ -297,7 +301,11 @@ public abstract class XipkiCommandSupport implements Action {
     protected boolean confirm(
             final String prompt, int maxTries)
     throws IOException {
-        String answer = session.readLine(prompt, null);
+        String tPrompt = prompt;
+        if (prompt != null && !prompt.endsWith("\n")) {
+            tPrompt += "\n";
+        }
+        String answer = session.readLine(tPrompt, null);
         if (answer == null) {
             throw new IOException("interrupted");
         }
@@ -305,7 +313,7 @@ public abstract class XipkiCommandSupport implements Action {
         int tries = 1;
 
         while (tries < maxTries) {
-            answer = session.readLine("Please answer with yes or no. ", null);
+            answer = session.readLine("Please answer with yes or no\n", null);
             if ("yes".equalsIgnoreCase(answer)) {
                 return true;
             } else if ("no".equalsIgnoreCase(answer)) {

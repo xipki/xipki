@@ -49,8 +49,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
  * @author Lijun Liao
  */
 
-public class ECDSAContentSignerBuilder
-    extends BcContentSignerBuilder {
+public class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
 
     public ECDSAContentSignerBuilder(
             final AlgorithmIdentifier sigAlgId,

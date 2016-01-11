@@ -61,6 +61,18 @@ public class AuthorityCertStore {
         this.encryptionCert = encryptionCert;
     }
 
+    public X509Certificate getSignatureCert() {
+        return signatureCert;
+    }
+
+    public X509Certificate getEncryptionCert() {
+        return encryptionCert;
+    }
+
+    public X509Certificate getCACert() {
+        return cACert;
+    }
+
     public static AuthorityCertStore getInstance(
             final X509Certificate cACert,
             final X509Certificate... rACerts) {
@@ -105,18 +117,6 @@ public class AuthorityCertStore {
         }
 
         return new AuthorityCertStore(cACert, signatureCert, encryptionCert);
-    }
-
-    public X509Certificate getSignatureCert() {
-        return signatureCert;
-    }
-
-    public X509Certificate getEncryptionCert() {
-        return encryptionCert;
-    }
-
-    public X509Certificate getCACert() {
-        return cACert;
     }
 
     private static boolean hasKeyusage(

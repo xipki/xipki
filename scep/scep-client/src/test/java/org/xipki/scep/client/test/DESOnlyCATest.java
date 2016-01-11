@@ -42,6 +42,7 @@ import org.xipki.scep.transaction.CACapability;
  */
 
 public class DESOnlyCATest extends AbstractCATest {
+
     protected boolean useInsecureAlgorithms() {
         return true;
     }

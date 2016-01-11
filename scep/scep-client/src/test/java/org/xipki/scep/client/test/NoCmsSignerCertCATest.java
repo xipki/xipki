@@ -42,6 +42,7 @@ import org.xipki.scep.transaction.CACapability;
  */
 
 public class NoCmsSignerCertCATest extends AbstractCATest {
+
     @Override
     protected boolean sendSignerCert() {
         return false;

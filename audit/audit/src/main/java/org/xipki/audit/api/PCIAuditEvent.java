@@ -221,7 +221,7 @@ public class PCIAuditEvent {
         return buffer;
     }
 
-    public static boolean isBlank(
+    private static boolean isBlank(
             final CharSequence cs) {
         int strLen;
         if (cs == null || (strLen = cs.length()) == 0) {
@@ -235,7 +235,7 @@ public class PCIAuditEvent {
         return true;
     }
 
-    private String replaceDelimiter(
+    private static String replaceDelimiter(
             final String fieldValue,
             final char delimiter,
             final String replaceDelimiter) {

@@ -99,19 +99,6 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private final char[] password;
 
-    public static byte[] deriveKeyIdFromLabel(
-            final String keyLabel) {
-        byte[] keyLabelBytes;
-        try {
-            keyLabelBytes = keyLabel.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            keyLabelBytes = keyLabel.getBytes();
-        }
-
-        byte[] sha1Fp = HashCalculator.sha1(keyLabelBytes);
-        return Arrays.copyOf(sha1Fp, 8);
-    }
-
     public KeystoreP11Slot(
             final File slotDir,
             final P11SlotIdentifier slotId,
@@ -559,6 +546,19 @@ public class KeystoreP11Slot implements P11WritableSlot {
     @Override
     public P11SlotIdentifier getSlotIdentifier() {
         return slotId;
+    }
+
+    public static byte[] deriveKeyIdFromLabel(
+            final String keyLabel) {
+        byte[] keyLabelBytes;
+        try {
+            keyLabelBytes = keyLabel.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            keyLabelBytes = keyLabel.getBytes();
+        }
+
+        byte[] sha1Fp = HashCalculator.sha1(keyLabelBytes);
+        return Arrays.copyOf(sha1Fp, 8);
     }
 
 }

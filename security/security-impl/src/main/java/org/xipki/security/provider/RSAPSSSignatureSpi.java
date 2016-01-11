@@ -60,8 +60,127 @@ import org.xipki.security.p11.P11RSAKeyParameter;
  * @author Lijun Liao
  */
 
-class RSAPSSSignatureSpi
-    extends SignatureSpi {
+class RSAPSSSignatureSpi extends SignatureSpi {
+
+    static public class NonePSS extends RSAPSSSignatureSpi {
+
+        public NonePSS() {
+            super(null, true);
+        }
+
+    } // class nonePSS
+
+    static public class PSSwithRSA extends RSAPSSSignatureSpi {
+
+        public PSSwithRSA() {
+            super(null);
+        }
+
+    } // class PSSwithRSA
+
+    static public class SHA1withRSA extends RSAPSSSignatureSpi {
+
+        public SHA1withRSA() {
+            super(PSSParameterSpec.DEFAULT);
+        }
+
+    } // class SHA1withRSA
+
+    static public class SHA224withRSA extends RSAPSSSignatureSpi {
+
+        public SHA224withRSA() {
+            super(new PSSParameterSpec("SHA-224", "MGF1",
+                    new MGF1ParameterSpec("SHA-224"), 28, 1));
+        }
+
+    } // class SHA224withRSA
+
+    static public class SHA256withRSA extends RSAPSSSignatureSpi {
+
+        public SHA256withRSA() {
+            super(new PSSParameterSpec("SHA-256", "MGF1",
+                    new MGF1ParameterSpec("SHA-256"), 32, 1));
+        }
+
+    } // class SHA256withRSA
+
+    static public class SHA384withRSA extends RSAPSSSignatureSpi {
+
+        public SHA384withRSA() {
+            super(new PSSParameterSpec("SHA-384", "MGF1",
+                    new MGF1ParameterSpec("SHA-384"), 48, 1));
+        }
+
+    } // class SHA384withRSA
+
+    static public class SHA512withRSA extends RSAPSSSignatureSpi {
+
+        public SHA512withRSA() {
+            super(new PSSParameterSpec("SHA-512", "MGF1",
+                    new MGF1ParameterSpec("SHA-512"), 64, 1));
+        }
+
+    } // class SHA512withRSA
+
+    private static class NullPssDigest implements Digest {
+
+        private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
+        private Digest baseDigest;
+
+        private boolean oddTime = true;
+
+        public NullPssDigest(
+                final Digest mgfDigest) {
+            this.baseDigest = mgfDigest;
+        }
+
+        public String getAlgorithmName() {
+            return "NULL";
+        }
+
+        public int getDigestSize() {
+            return baseDigest.getDigestSize();
+        }
+
+        public void update(
+                final byte in) {
+            bOut.write(in);
+        }
+
+        public void update(
+                final byte[] in,
+                final int inOff,
+                final int len) {
+            bOut.write(in, inOff, len);
+        }
+
+        public int doFinal(
+                final byte[] out,
+                final int outOff) {
+            byte[] res = bOut.toByteArray();
+
+            if (oddTime) {
+                System.arraycopy(res, 0, out, outOff, res.length);
+            } else {
+                baseDigest.update(res, 0, res.length);
+
+                baseDigest.doFinal(out, outOff);
+            }
+
+            reset();
+
+            oddTime = !oddTime;
+
+            return res.length;
+        }
+
+        public void reset() {
+            bOut.reset();
+            baseDigest.reset();
+        }
+
+    } // class NullPssDigest
 
     private AlgorithmParameters engineParams;
 
@@ -271,138 +390,6 @@ class RSAPSSSignatureSpi
     protected Object engineGetParameter(
             final String param) {
         throw new UnsupportedOperationException("engineGetParameter unsupported");
-    }
-
-/**
- * @author Lijun Liao
- */
-
-    static public class nonePSS
-        extends RSAPSSSignatureSpi {
-
-        public nonePSS() {
-            super(null, true);
-        }
-
-    }
-
-    static public class PSSwithRSA
-        extends RSAPSSSignatureSpi {
-
-        public PSSwithRSA() {
-            super(null);
-        }
-
-    }
-
-    static public class SHA1withRSA
-        extends RSAPSSSignatureSpi {
-
-        public SHA1withRSA() {
-            super(PSSParameterSpec.DEFAULT);
-        }
-
-    }
-
-    static public class SHA224withRSA
-        extends RSAPSSSignatureSpi {
-
-        public SHA224withRSA() {
-            super(new PSSParameterSpec("SHA-224", "MGF1",
-                    new MGF1ParameterSpec("SHA-224"), 28, 1));
-        }
-
-    }
-
-    static public class SHA256withRSA
-        extends RSAPSSSignatureSpi {
-
-        public SHA256withRSA() {
-            super(new PSSParameterSpec("SHA-256", "MGF1",
-                    new MGF1ParameterSpec("SHA-256"), 32, 1));
-        }
-
-    }
-
-    static public class SHA384withRSA
-        extends RSAPSSSignatureSpi {
-
-        public SHA384withRSA() {
-            super(new PSSParameterSpec("SHA-384", "MGF1",
-                    new MGF1ParameterSpec("SHA-384"), 48, 1));
-        }
-
-    }
-
-    static public class SHA512withRSA
-        extends RSAPSSSignatureSpi {
-
-        public SHA512withRSA() {
-            super(new PSSParameterSpec("SHA-512", "MGF1",
-                    new MGF1ParameterSpec("SHA-512"), 64, 1));
-        }
-
-    }
-
-    private class NullPssDigest
-        implements Digest {
-
-        private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
-        private Digest baseDigest;
-
-        private boolean oddTime = true;
-
-        public NullPssDigest(
-                final Digest mgfDigest) {
-            this.baseDigest = mgfDigest;
-        }
-
-        public String getAlgorithmName() {
-            return "NULL";
-        }
-
-        public int getDigestSize() {
-            return baseDigest.getDigestSize();
-        }
-
-        public void update(
-                final byte in) {
-            bOut.write(in);
-        }
-
-        public void update(
-                final byte[] in,
-                final int inOff,
-                final int len) {
-            bOut.write(in, inOff, len);
-        }
-
-        public int doFinal(
-                final byte[] out,
-                final int outOff) {
-            byte[] res = bOut.toByteArray();
-
-            if (oddTime) {
-                System.arraycopy(res, 0, out, outOff, res.length);
-            } else {
-                baseDigest.update(res, 0, res.length);
-
-                baseDigest.doFinal(out, outOff);
-            }
-
-            reset();
-
-            oddTime = !oddTime;
-
-            return res.length;
-        }
-
-        public void reset() {
-            bOut.reset();
-            baseDigest.reset();
-        }
-
     }
 
 }
