@@ -52,38 +52,6 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 public class HttpsClientTestor {
 
-    public static void main(String[] args) {
-        System.out.println("HELLO".hashCode());
-        System.out.println(("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
-                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda").hashCode());
-        System.out.println(hashCode("HELLO"));
-        System.out.println(hashCode("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
-                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda"));
-        System.exit(1);
-        try {
-            prepare();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        new HttpsClientTestor().testIt();
-    }
-
-    public static long hashCode(
-            final String s) {
-        long h = 0;
-        char[] value = s.toCharArray();
-        if (h == 0 && value.length > 0) {
-            char val[] = value;
-
-            for (int i = 0; i < value.length; i++) {
-                h = 31 * h + val[i];
-            }
-        }
-        return h;
-    }
-
     private static void prepare()
     throws NoSuchAlgorithmException {
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,TLSv1");
@@ -165,6 +133,38 @@ public class HttpsClientTestor {
             } catch (IOException e) {
             }
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("HELLO".hashCode());
+        System.out.println(("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
+                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda").hashCode());
+        System.out.println(hashCode("HELLO"));
+        System.out.println(hashCode("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
+                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda"));
+        System.exit(1);
+        try {
+            prepare();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        new HttpsClientTestor().testIt();
+    }
+
+    public static long hashCode(
+            final String s) {
+        long h = 0;
+        char[] value = s.toCharArray();
+        if (h == 0 && value.length > 0) {
+            char val[] = value;
+
+            for (int i = 0; i < value.length; i++) {
+                h = 31 * h + val[i];
+            }
+        }
+        return h;
     }
 
 }

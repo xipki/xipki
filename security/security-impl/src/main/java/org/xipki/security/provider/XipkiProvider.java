@@ -45,35 +45,11 @@ import java.security.Provider;
 
 public class XipkiProvider extends Provider {
 
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Exactly the name this provider is registered under at
-     * <code>java.security.Security</code>: "<code>XiPKI</code>".
-     */
-    public static final String PROVIDER_NAME = "XiPKI";
-
-    /**
-     * Version of this provider as registered at
-     * <code>java.security.Security</code>.
-     */
-    public static final double PROVIDER_VERSION = 1.0;
-
-    /**
-     * An informational text giving the name and the version of this provider
-     * and also telling about the provided algorithms.
-     */
-    private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
-
-    @SuppressWarnings("unchecked")
-    public XipkiProvider() {
-        super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
-        AccessController.doPrivileged(new MyPrivilegedAction(this));
-    }
-
     @SuppressWarnings("rawtypes")
     private static class MyPrivilegedAction implements PrivilegedAction {
+
         private final XipkiProvider provider;
+
         MyPrivilegedAction(
                 final XipkiProvider provider) {
             this.provider = provider;
@@ -84,7 +60,7 @@ public class XipkiProvider extends Provider {
             provider.put("KeyStore.PKCS11", XipkiKeyStoreSpi.class.getName());
 
             provider.put("Signature.NONEwithRSA",
-                    RSADigestSignatureSpi.noneRSA.class.getName());
+                    RSADigestSignatureSpi.NoneRSA.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithNONE", "NONEwithRSA");
 
             provider.put("Signature.SHA1withRSA",
@@ -210,6 +186,33 @@ public class XipkiProvider extends Provider {
 
             return null;
         }
+
+    } // class MyPrivilegedAction
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Exactly the name this provider is registered under at
+     * <code>java.security.Security</code>: "<code>XiPKI</code>".
+     */
+    public static final String PROVIDER_NAME = "XiPKI";
+
+    /**
+     * Version of this provider as registered at
+     * <code>java.security.Security</code>.
+     */
+    public static final double PROVIDER_VERSION = 1.0;
+
+    /**
+     * An informational text giving the name and the version of this provider
+     * and also telling about the provided algorithms.
+     */
+    private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
+
+    @SuppressWarnings("unchecked")
+    public XipkiProvider() {
+        super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
+        AccessController.doPrivileged(new MyPrivilegedAction(this));
     }
 
 }

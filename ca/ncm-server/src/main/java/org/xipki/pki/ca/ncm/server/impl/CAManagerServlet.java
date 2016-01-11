@@ -87,8 +87,7 @@ import com.caucho.hessian.server.HessianServlet;
  * @author Lijun Liao
  */
 
-public class CAManagerServlet extends HessianServlet
-implements HessianCAManager {
+public class CAManagerServlet extends HessianServlet implements HessianCAManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerServlet.class);
 

@@ -47,8 +47,7 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class CollectionCertificateValidator
-implements CertificateValidator {
+public class CollectionCertificateValidator implements CertificateValidator {
 
     private final Collection<String> certHashes;
 

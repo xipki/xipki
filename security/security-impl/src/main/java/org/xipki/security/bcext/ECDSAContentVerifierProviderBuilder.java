@@ -55,8 +55,7 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
  * @author Lijun Liao
  */
 
-public class ECDSAContentVerifierProviderBuilder
-    extends BcContentVerifierProviderBuilder {
+public class ECDSAContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
 
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 

@@ -63,60 +63,6 @@ import org.xipki.pki.ocsp.client.shell.OCSPUtils;
 
 public class OcspLoadTest extends LoadExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
-
-    private final OCSPRequestor requestor;
-
-    private final List<Long> serials;
-
-    private final int numSerials;
-
-    private int serialIndex;
-
-    private X509Certificate caCert;
-
-    private URL serverUrl;
-
-    private RequestOptions options;
-
-    @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
-    }
-
-    public OcspLoadTest(
-            final OCSPRequestor requestor,
-            final List<Long> serials,
-            final X509Certificate caCert,
-            final URL serverUrl,
-            final RequestOptions options,
-            final String description) {
-        super(description);
-        ParamUtil.assertNotNull("requestor", requestor);
-        ParamUtil.assertNotEmpty("serials", serials);
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("serverUrl", serverUrl);
-        ParamUtil.assertNotNull("options", options);
-
-        this.requestor = requestor;
-        this.serials = serials;
-        this.numSerials = serials.size();
-        this.caCert = caCert;
-        this.serverUrl = serverUrl;
-        this.options = options;
-
-        this.serialIndex = 0;
-    }
-
-    private synchronized long nextSerialNumber() {
-        serialIndex++;
-        if (serialIndex >= numSerials) {
-            serialIndex = 0;
-        }
-        return this.serials.get(serialIndex);
-    }
-
     class Testor implements Runnable {
 
         @Override
@@ -191,6 +137,60 @@ public class OcspLoadTest extends LoadExecutor {
             }
         }
 
+    } // class Testor
+
+    private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
+
+    private final OCSPRequestor requestor;
+
+    private final List<Long> serials;
+
+    private final int numSerials;
+
+    private int serialIndex;
+
+    private X509Certificate caCert;
+
+    private URL serverUrl;
+
+    private RequestOptions options;
+
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
+    }
+
+    public OcspLoadTest(
+            final OCSPRequestor requestor,
+            final List<Long> serials,
+            final X509Certificate caCert,
+            final URL serverUrl,
+            final RequestOptions options,
+            final String description) {
+        super(description);
+        ParamUtil.assertNotNull("requestor", requestor);
+        ParamUtil.assertNotEmpty("serials", serials);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("serverUrl", serverUrl);
+        ParamUtil.assertNotNull("options", options);
+
+        this.requestor = requestor;
+        this.serials = serials;
+        this.numSerials = serials.size();
+        this.caCert = caCert;
+        this.serverUrl = serverUrl;
+        this.options = options;
+
+        this.serialIndex = 0;
+    }
+
+    private synchronized long nextSerialNumber() {
+        serialIndex++;
+        if (serialIndex >= numSerials) {
+            serialIndex = 0;
+        }
+        return this.serials.get(serialIndex);
     }
 
 }

@@ -63,9 +63,6 @@ import org.xipki.security.api.NoIdleSignerException;
 
 public class CmpUtil {
 
-    private CmpUtil() {
-    }
-
     public static PKIMessage addProtection(
             final PKIMessage pkiMessage,
             final ConcurrentContentSigner signer,
@@ -201,6 +198,9 @@ public class CmpUtil {
             final CmpUtf8Pairs utf8Pairs) {
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
+    }
+
+    private CmpUtil() {
     }
 
 }

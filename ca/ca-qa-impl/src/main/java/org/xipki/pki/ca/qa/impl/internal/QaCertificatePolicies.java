@@ -49,6 +49,33 @@ import org.xipki.common.util.ParamUtil;
 
 public class QaCertificatePolicies extends QaExtension {
 
+    public static class QaCertificatePolicyInformation {
+
+        private final String policyId;
+
+        private final QaPolicyQualifiers policyQualifiers;
+
+        public QaCertificatePolicyInformation(
+                final CertificatePolicyInformationType jaxb) {
+            ParamUtil.assertNotNull("jaxb", jaxb);
+            this.policyId = jaxb.getPolicyIdentifier().getValue();
+            if (jaxb.getPolicyQualifiers() == null) {
+                this.policyQualifiers = null;
+            } else {
+                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
+            }
+        }
+
+        public String getPolicyId() {
+            return policyId;
+        }
+
+        public QaPolicyQualifiers getPolicyQualifiers() {
+            return policyQualifiers;
+        }
+
+    } // class QaCertificatePolicyInformation
+
     private final List<QaCertificatePolicyInformation> policyInformations;
 
     public QaCertificatePolicies(
@@ -75,33 +102,6 @@ public class QaCertificatePolicies extends QaExtension {
         }
 
         return null;
-    }
-
-    public static class QaCertificatePolicyInformation {
-
-        private final String policyId;
-
-        private final QaPolicyQualifiers policyQualifiers;
-
-        public QaCertificatePolicyInformation(
-                final CertificatePolicyInformationType jaxb) {
-            ParamUtil.assertNotNull("jaxb", jaxb);
-            this.policyId = jaxb.getPolicyIdentifier().getValue();
-            if (jaxb.getPolicyQualifiers() == null) {
-                this.policyQualifiers = null;
-            } else {
-                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
-            }
-        }
-
-        public String getPolicyId() {
-            return policyId;
-        }
-
-        public QaPolicyQualifiers getPolicyQualifiers() {
-            return policyQualifiers;
-        }
-
     }
 
 }

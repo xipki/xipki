@@ -154,15 +154,6 @@ public class KeystoreP11Identity extends P11Identity {
         }
     }
 
-    private static PublicKey getPublicKeyOfFirstCert(
-            final X509Certificate[] certificateChain) {
-        if (certificateChain == null || certificateChain.length < 1
-                || certificateChain[0] == null) {
-            throw new IllegalArgumentException("no certificate is specified");
-        }
-        return certificateChain[0].getPublicKey();
-    }
-
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
     throws SignerException {
@@ -268,6 +259,15 @@ public class KeystoreP11Identity extends P11Identity {
 
     public PrivateKey getPrivateKey() {
         return privateKey;
+    }
+
+    private static PublicKey getPublicKeyOfFirstCert(
+            final X509Certificate[] certificateChain) {
+        if (certificateChain == null || certificateChain.length < 1
+                || certificateChain[0] == null) {
+            throw new IllegalArgumentException("no certificate is specified");
+        }
+        return certificateChain[0].getPublicKey();
     }
 
 }

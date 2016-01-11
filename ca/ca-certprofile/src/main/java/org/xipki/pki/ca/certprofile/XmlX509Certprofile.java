@@ -1250,6 +1250,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         return signatureAlgorithms;
     }
 
+    @Override
+    public boolean incSerialNumberIfSubjectExists() {
+        return incSerialNoIfSubjectExists;
+    }
+
     private static Object getExtensionValue(
             final ASN1ObjectIdentifier type,
             final ExtensionsType extensionsType,
@@ -1280,11 +1285,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         throw new RuntimeException("should not reach here: undefined extension "
                 + ObjectIdentifiers.oidToDisplayName(type));
-    }
-
-    @Override
-    public boolean incSerialNumberIfSubjectExists() {
-        return incSerialNoIfSubjectExists;
     }
 
 }

@@ -397,6 +397,91 @@ public class SubjectChecker {
         return issue;
     }
 
+    private void checkAttributeTypeAndValue(
+            final String name,
+            final ASN1ObjectIdentifier type,
+            final String _atvTextValue,
+            final RDNControl rdnControl,
+            final List<String> requestedCoreAtvTextValues,
+            final int index,
+            final StringBuilder failureMsg)
+    throws BadCertTemplateException {
+        String atvTextValue = _atvTextValue;
+        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
+            if (!SubjectDNSpec.p_dateOfBirth.matcher(atvTextValue).matches()) {
+                throw new BadCertTemplateException(
+                        "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+            }
+        } else if (rdnControl != null) {
+            String prefix = rdnControl.getPrefix();
+            if (prefix != null) {
+                if (!atvTextValue.startsWith(prefix)) {
+                    failureMsg.append(name).append(" '").append(atvTextValue).
+                        append("' does not start with prefix '").append(prefix).append("'");
+                    failureMsg.append("; ");
+                    return;
+                } else {
+                    atvTextValue = atvTextValue.substring(prefix.length());
+                }
+            }
+
+            String suffix = rdnControl.getSuffix();
+            if (suffix != null) {
+                if (!atvTextValue.endsWith(suffix)) {
+                    failureMsg.append(name).append(" '").append(atvTextValue)
+                        .append("' does not end with suffx '").append(suffix).append("'");
+                    failureMsg.append("; ");
+                    return;
+                } else {
+                    atvTextValue = atvTextValue.substring(0,
+                            atvTextValue.length() - suffix.length());
+                }
+            }
+
+            List<Pattern> patterns = rdnControl.getPatterns();
+            if (patterns != null) {
+                Pattern pattern = patterns.get(index);
+                boolean matches = pattern.matcher(atvTextValue).matches();
+                if (!matches) {
+                    failureMsg.append(name).append(" '").append(atvTextValue)
+                        .append("' is not valid against regex '")
+                        .append(pattern.pattern()).append("'");
+                    failureMsg.append("; ");
+                    return;
+                }
+            }
+        }
+
+        if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
+            if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+                failureMsg.append("is present but not contained in the request");
+                failureMsg.append("; ");
+            }
+        } else {
+            String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
+            if (ObjectIdentifiers.DN_CN.equals(type)
+                    && specialBehavior != null
+                    && "gematik_gSMC_K".equals(specialBehavior)) {
+                if (!atvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
+                    failureMsg.append("content '")
+                        .append(atvTextValue)
+                        .append("' does not start with '")
+                        .append(requestedCoreAtvTextValue).append("-'");
+                    failureMsg.append("; ");
+                }
+            } else if (type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+            } else {
+                if (!atvTextValue.equals(requestedCoreAtvTextValue)) {
+                    failureMsg.append("content '")
+                        .append(atvTextValue)
+                        .append("' but expected '")
+                        .append(requestedCoreAtvTextValue).append("'");
+                    failureMsg.append("; ");
+                }
+            }
+        }
+    }
+
     private static List<String> sort(
             final List<String> contentList,
             final List<Pattern> patternList) {
@@ -545,91 +630,6 @@ public class SubjectChecker {
             }
 
             return X509Util.rdnValueToString(atvValue);
-        }
-    }
-
-    private void checkAttributeTypeAndValue(
-            final String name,
-            final ASN1ObjectIdentifier type,
-            final String _atvTextValue,
-            final RDNControl rdnControl,
-            final List<String> requestedCoreAtvTextValues,
-            final int index,
-            final StringBuilder failureMsg)
-    throws BadCertTemplateException {
-        String atvTextValue = _atvTextValue;
-        if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!SubjectDNSpec.p_dateOfBirth.matcher(atvTextValue).matches()) {
-                throw new BadCertTemplateException(
-                        "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
-            }
-        } else if (rdnControl != null) {
-            String prefix = rdnControl.getPrefix();
-            if (prefix != null) {
-                if (!atvTextValue.startsWith(prefix)) {
-                    failureMsg.append(name).append(" '").append(atvTextValue).
-                        append("' does not start with prefix '").append(prefix).append("'");
-                    failureMsg.append("; ");
-                    return;
-                } else {
-                    atvTextValue = atvTextValue.substring(prefix.length());
-                }
-            }
-
-            String suffix = rdnControl.getSuffix();
-            if (suffix != null) {
-                if (!atvTextValue.endsWith(suffix)) {
-                    failureMsg.append(name).append(" '").append(atvTextValue)
-                        .append("' does not end with suffx '").append(suffix).append("'");
-                    failureMsg.append("; ");
-                    return;
-                } else {
-                    atvTextValue = atvTextValue.substring(0,
-                            atvTextValue.length() - suffix.length());
-                }
-            }
-
-            List<Pattern> patterns = rdnControl.getPatterns();
-            if (patterns != null) {
-                Pattern pattern = patterns.get(index);
-                boolean matches = pattern.matcher(atvTextValue).matches();
-                if (!matches) {
-                    failureMsg.append(name).append(" '").append(atvTextValue)
-                        .append("' is not valid against regex '")
-                        .append(pattern.pattern()).append("'");
-                    failureMsg.append("; ");
-                    return;
-                }
-            }
-        }
-
-        if (CollectionUtil.isEmpty(requestedCoreAtvTextValues)) {
-            if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-                failureMsg.append("is present but not contained in the request");
-                failureMsg.append("; ");
-            }
-        } else {
-            String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-            if (ObjectIdentifiers.DN_CN.equals(type)
-                    && specialBehavior != null
-                    && "gematik_gSMC_K".equals(specialBehavior)) {
-                if (!atvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
-                    failureMsg.append("content '")
-                        .append(atvTextValue)
-                        .append("' does not start with '")
-                        .append(requestedCoreAtvTextValue).append("-'");
-                    failureMsg.append("; ");
-                }
-            } else if (type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-            } else {
-                if (!atvTextValue.equals(requestedCoreAtvTextValue)) {
-                    failureMsg.append("content '")
-                        .append(atvTextValue)
-                        .append("' but expected '")
-                        .append(requestedCoreAtvTextValue).append("'");
-                    failureMsg.append("; ");
-                }
-            }
         }
     }
 

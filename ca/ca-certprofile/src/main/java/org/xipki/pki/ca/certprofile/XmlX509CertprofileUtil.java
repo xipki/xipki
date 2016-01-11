@@ -126,9 +126,6 @@ public class XmlX509CertprofileUtil {
 
     private static Unmarshaller jaxbUnmarshaller;
 
-    private XmlX509CertprofileUtil() {
-    }
-
     public static X509ProfileType parse(
             final InputStream xmlConfStream)
     throws CertprofileException {
@@ -689,6 +686,9 @@ public class XmlX509CertprofileUtil {
         default:
             throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
         }
+    }
+
+    private XmlX509CertprofileUtil() {
     }
 
 }

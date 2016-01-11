@@ -72,6 +72,68 @@ import org.xipki.security.api.HashCalculator;
 
 public class CALoadTestRevoke extends LoadExecutor {
 
+    class Testor implements Runnable {
+
+        @Override
+        public void run() {
+            while (!stop() && getErrorAccout() < 1) {
+                List<Long> serialNumbers;
+                try {
+                    serialNumbers = nextSerials();
+                } catch (DataAccessException e) {
+                    account(1, 1);
+                    break;
+                }
+
+                if (CollectionUtil.isEmpty(serialNumbers)) {
+                    break;
+                }
+
+                boolean successful = testNext(serialNumbers);
+                int numFailed = successful
+                        ? 0
+                        : 1;
+                account(1, numFailed);
+            }
+        }
+
+        private boolean testNext(
+                final List<Long> serialNumbers) {
+            RevokeCertRequestType request = new RevokeCertRequestType();
+            int id = 1;
+            for (Long serialNumber : serialNumbers) {
+                CRLReason reason = reasons[(int) (serialNumber % reasons.length)];
+                RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
+                        Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
+                        reason.getCode(), null);
+                request.addRequestEntry(entry);
+            }
+
+            Map<String, CertIdOrError> result;
+            try {
+                result = caClient.revokeCerts(request, null);
+            } catch (CAClientException | PKIErrorException e) {
+                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+                return false;
+            } catch (Throwable t) {
+                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+                return false;
+            }
+
+            if (result == null) {
+                return false;
+            }
+
+            int nSuccess = 0;
+            for (CertIdOrError entry : result.values()) {
+                if (entry.getCertId() != null) {
+                    nSuccess++;
+                }
+            }
+            return nSuccess == serialNumbers.size();
+        }
+    } // class Testor
+
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
     private final CAClient caClient;
@@ -230,68 +292,6 @@ public class CALoadTestRevoke extends LoadExecutor {
             }
 
             return serials.pollFirst();
-        }
-    }
-
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                List<Long> serialNumbers;
-                try {
-                    serialNumbers = nextSerials();
-                } catch (DataAccessException e) {
-                    account(1, 1);
-                    break;
-                }
-
-                if (CollectionUtil.isEmpty(serialNumbers)) {
-                    break;
-                }
-
-                boolean successful = testNext(serialNumbers);
-                int numFailed = successful
-                        ? 0
-                        : 1;
-                account(1, numFailed);
-            }
-        }
-
-        private boolean testNext(
-                final List<Long> serialNumbers) {
-            RevokeCertRequestType request = new RevokeCertRequestType();
-            int id = 1;
-            for (Long serialNumber : serialNumbers) {
-                CRLReason reason = reasons[(int) (serialNumber % reasons.length)];
-                RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
-                        Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
-                        reason.getCode(), null);
-                request.addRequestEntry(entry);
-            }
-
-            Map<String, CertIdOrError> result;
-            try {
-                result = caClient.revokeCerts(request, null);
-            } catch (CAClientException | PKIErrorException e) {
-                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return false;
-            }
-
-            if (result == null) {
-                return false;
-            }
-
-            int nSuccess = 0;
-            for (CertIdOrError entry : result.values()) {
-                if (entry.getCertId() != null) {
-                    nSuccess++;
-                }
-            }
-            return nSuccess == serialNumbers.size();
         }
     }
 

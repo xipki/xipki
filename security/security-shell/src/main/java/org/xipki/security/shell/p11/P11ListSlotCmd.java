@@ -390,7 +390,9 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
     }
 
     private static class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey> {
+
         private final byte[] keyId;
+
         private final char[] keyLabel;
 
         public ComparableIaikPrivateKey(
@@ -431,7 +433,8 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
                     ? null
                     : new String(keyLabel);
         }
-    }
+
+    } // class ComparableIaikPrivateKey
 
     private void output(
             final List<P11SlotIdentifier> slots) {

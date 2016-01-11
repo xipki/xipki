@@ -48,16 +48,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public abstract class P12RawKeypairGenerator {
 
-    public abstract KeyPair genKeypair()
-    throws Exception;
-
-    public P12RawKeypairGenerator()
-    throws Exception {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
-
     public static class ECKeypairGenerator extends P12RawKeypairGenerator {
 
         private final String curveName;
@@ -96,7 +86,7 @@ public abstract class P12RawKeypairGenerator {
             return KeyUtil.generateECKeypair(this.curveOid);
         }
 
-    }
+    } // class ECKeypairGenerator
 
     public static class RSAKeypairGenerator extends P12RawKeypairGenerator {
 
@@ -120,7 +110,7 @@ public abstract class P12RawKeypairGenerator {
             return KeyUtil.generateRSAKeypair(keysize, publicExponent);
         }
 
-    }
+    } // class RSAKeypairGenerator
 
     public static class DSAKeypairGenerator extends P12RawKeypairGenerator {
 
@@ -144,6 +134,16 @@ public abstract class P12RawKeypairGenerator {
             return KeyUtil.generateDSAKeypair(pLength, qLength);
         }
 
+    } // class DSAKeypairGenerator
+
+    public abstract KeyPair genKeypair()
+    throws Exception;
+
+    public P12RawKeypairGenerator()
+    throws Exception {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
     }
 
 }

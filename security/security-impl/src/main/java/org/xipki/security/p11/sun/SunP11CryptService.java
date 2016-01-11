@@ -278,61 +278,6 @@ public final class SunP11CryptService implements P11CryptService {
         }
     }
 
-    private static Provider getPKCS11Provider(
-            final String pkcs11Module,
-            final int slotIndex) {
-        File f = new File(pkcs11Module);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Slot-").append(slotIndex);
-        sb.append("_Lib-").append(f.getName());
-
-        String name = sb.toString();
-
-        Provider p = Security.getProvider("SunPKCS11-" + name);
-        if (p != null) {
-            return p;
-        }
-
-        sb = new StringBuilder();
-        sb.append("name = ").append(name).append("\n");
-        sb.append("slotListIndex = ").append(slotIndex).append("\n");
-
-        sb.append("library = ").append(pkcs11Module).append("\n");
-
-        byte[] pkcs11configBytes = sb.toString().getBytes();
-
-        ByteArrayInputStream configStream = new ByteArrayInputStream(pkcs11configBytes);
-        p = new sun.security.pkcs11.SunPKCS11(configStream);
-        Security.addProvider(p);
-
-        return p;
-    }
-
-    private static long[] allSlots(
-            final String pkcs11Module)
-    throws SignerException {
-        String functionList = null;
-        sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS pInitArgs = null;
-        boolean omitInitialize = true;
-
-        sun.security.pkcs11.wrapper.PKCS11 pkcs11;
-        try {
-            pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
-                    pkcs11Module, functionList, pInitArgs, omitInitialize);
-        } catch (IOException | PKCS11Exception e) {
-            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
-        }
-
-        long[] slotList;
-        try {
-            slotList = pkcs11.C_GetSlotList(false);
-        } catch (PKCS11Exception e) {
-            throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
-        }
-        return slotList;
-    }
-
     @Override
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo,
@@ -512,6 +457,61 @@ public final class SunP11CryptService implements P11CryptService {
     }
 
     private synchronized void ensureResource() {
+    }
+
+    private static Provider getPKCS11Provider(
+            final String pkcs11Module,
+            final int slotIndex) {
+        File f = new File(pkcs11Module);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Slot-").append(slotIndex);
+        sb.append("_Lib-").append(f.getName());
+
+        String name = sb.toString();
+
+        Provider p = Security.getProvider("SunPKCS11-" + name);
+        if (p != null) {
+            return p;
+        }
+
+        sb = new StringBuilder();
+        sb.append("name = ").append(name).append("\n");
+        sb.append("slotListIndex = ").append(slotIndex).append("\n");
+
+        sb.append("library = ").append(pkcs11Module).append("\n");
+
+        byte[] pkcs11configBytes = sb.toString().getBytes();
+
+        ByteArrayInputStream configStream = new ByteArrayInputStream(pkcs11configBytes);
+        p = new sun.security.pkcs11.SunPKCS11(configStream);
+        Security.addProvider(p);
+
+        return p;
+    }
+
+    private static long[] allSlots(
+            final String pkcs11Module)
+    throws SignerException {
+        String functionList = null;
+        sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS pInitArgs = null;
+        boolean omitInitialize = true;
+
+        sun.security.pkcs11.wrapper.PKCS11 pkcs11;
+        try {
+            pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
+                    pkcs11Module, functionList, pInitArgs, omitInitialize);
+        } catch (IOException | PKCS11Exception e) {
+            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+        }
+
+        long[] slotList;
+        try {
+            slotList = pkcs11.C_GetSlotList(false);
+        } catch (PKCS11Exception e) {
+            throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
+        }
+        return slotList;
     }
 
 }

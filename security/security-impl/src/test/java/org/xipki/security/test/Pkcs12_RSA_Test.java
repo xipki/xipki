@@ -56,9 +56,11 @@ import org.xipki.security.api.util.X509Util;
 
 public abstract class Pkcs12_RSA_Test {
 
-    protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
-
     private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
+
+    private ConcurrentContentSigner signer;
+
+    protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     protected Pkcs12_RSA_Test() {
         if (Security.getProvider("BC") == null) {
@@ -84,8 +86,6 @@ public abstract class Pkcs12_RSA_Test {
         conf.putPair("keystore", "file:" + getPkcs12File());
         return conf.getEncoded();
     }
-
-    private ConcurrentContentSigner signer;
 
     private ConcurrentContentSigner getSigner()
     throws Exception {

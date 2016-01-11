@@ -77,8 +77,11 @@ import junit.framework.Assert;
  */
 
 public abstract class AbstractCATest {
+
     private final String secret = "preshared-secret";
+
     private ScepServerContainer scepServerContainer;
+
     private ScepServer scepServer;
 
     protected abstract CACapability[] getExcludedCACaps();
@@ -312,6 +315,7 @@ public abstract class AbstractCATest {
         }
         return caCaps;
     }
+
     private boolean equals(
             final Certificate bcCert,
             final X509Certificate cert)

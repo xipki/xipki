@@ -102,7 +102,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
             return ret;
         }
 
-    }
+    } // class SingleRetriever
 
     private final List<SingleRetriever> singleRetrievers;
     private PasswordResolver passwordResolver;

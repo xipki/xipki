@@ -70,6 +70,7 @@ public abstract class KeyEntry {
     private static final Logger LOG = LoggerFactory.getLogger(KeyEntry.class);
 
     public static final class RSAKeyEntry extends KeyEntry {
+
         private final BigInteger baseN;
 
         public RSAKeyEntry(
@@ -105,9 +106,11 @@ public abstract class KeyEntry {
                 return null;
             }
         }
-    }
+
+    } // class RSAKeyEntry
 
     public static final class DSAKeyEntry extends KeyEntry {
+
         private static final String P_1024 =
                 "AM/6AjYLnnzRa99zmdhuMmikFKF/HhotHagBxoHlT4alq415sX94psaJPI3D5+/e"
                 + "YUaZbnFMn/IEBh6YyEL4zPQs4xOYdcNoMJ6XccGelEHjVWDvocf00L417XiTJObM"
@@ -115,6 +118,7 @@ public abstract class KeyEntry {
 
         private static final String Q_1024 =
                 "ANMDutPywwIBAbqpSxN8CAvbPkaL";
+
         private static final String G_1024 =
                 "AcFvVWWRJlZsT2xCtto0gZj6QyaVAVJmvkZinCm2kafbFPQ+MLeZJKk3mvCaq2i8"
                 + "DPptJ5LC1FaaE+Is4rhX0BcW5/rxxSk6JVboakH48KEg5nZvzphMNe9mC2bYV29z"
@@ -187,6 +191,7 @@ public abstract class KeyEntry {
                 + "wJfVmq5g/Sp4ysk+JTzAl6r4T1dDr9BXpGgRdYdgwE/2RTMfunqTcUYlV752sbvy";
 
         private AlgorithmIdentifier algId;
+
         private BigInteger baseY;
 
         public DSAKeyEntry(
@@ -259,10 +264,13 @@ public abstract class KeyEntry {
                 return null;
             }
         }
-    }
+
+    } // class DSAKeyEntry
 
     public static final class ECKeyEntry extends KeyEntry {
+
         private final AlgorithmIdentifier algId;
+
         private final BigInteger basePublicKey;
 
         public ECKeyEntry(
@@ -307,7 +315,8 @@ public abstract class KeyEntry {
             BigInteger publicKey = basePublicKey.add(BigInteger.valueOf(index));
             return new SubjectPublicKeyInfo(algId, publicKey.toByteArray());
         }
-    }
+
+    } // class ECKeyEntry
 
     public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(
             long index);

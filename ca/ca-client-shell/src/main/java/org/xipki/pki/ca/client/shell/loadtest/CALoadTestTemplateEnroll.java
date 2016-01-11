@@ -100,7 +100,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
             this.certRequest = certRequest;
         }
 
-    }
+    } // class CertRequestWithProfile
 
     class Testor implements Runnable {
 
@@ -167,7 +167,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
             return true;
         }
 
-    }
+    } // class Testor
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestTemplateEnroll.class);
 

@@ -360,7 +360,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         return text != null && !text.isEmpty();
     }
 
-    private Severity getSeverity(
+    private static Severity getSeverity(
             final AuditLevel auditLevel) {
         if (auditLevel == null) {
             return Severity.INFORMATIONAL;

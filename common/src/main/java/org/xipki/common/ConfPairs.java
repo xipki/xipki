@@ -159,24 +159,6 @@ public class ConfPairs {
         }
     }
 
-    private static String encodeNameOrValue(
-            final String s) {
-        if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1) {
-            return s;
-        }
-
-        final int n = s.length();
-        StringBuilder sb = new StringBuilder(n + 1);
-        for (int i = 0; i < n; i++) {
-            char c = s.charAt(i);
-            if (c == NAME_TERM || c == TOKEN_TERM) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-
     public void putPair(
             final String name,
             final String value) {
@@ -321,6 +303,24 @@ public class ConfPairs {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static String encodeNameOrValue(
+            final String s) {
+        if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1) {
+            return s;
+        }
+
+        final int n = s.length();
+        StringBuilder sb = new StringBuilder(n + 1);
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
+            if (c == NAME_TERM || c == TOKEN_TERM) {
+                sb.append('\\');
+            }
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
 }

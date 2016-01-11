@@ -194,34 +194,6 @@ public class ScepServer {
         return this.servlet;
     }
 
-    private static Certificate issueSubCACert(
-            final PrivateKey rCAKey,
-            final X500Name issuer,
-            final SubjectPublicKeyInfo pubKeyInfo,
-            final X500Name subject,
-            final BigInteger serialNumber,
-            final Date startTime)
-    throws CertIOException, OperatorCreationException {
-        Date notAfter = new Date(startTime.getTime() + CAEmulator.DAY_IN_MS * 3650);
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                issuer,
-                serialNumber,
-                startTime,
-                notAfter,
-                subject,
-                pubKeyInfo);
-
-        X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-        certGenerator.addExtension(Extension.keyUsage, true, ku);
-        BasicConstraints bc = new BasicConstraints(0);
-        certGenerator.addExtension(Extension.basicConstraints, true, bc);
-
-        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rCAKey, HashAlgoType.SHA256);
-        ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rCAKey);
-        return certGenerator.build(contentSigner).toASN1Structure();
-    }
-
     public Certificate getCACert() {
         return cACert;
     }
@@ -248,6 +220,34 @@ public class ScepServer {
 
     public boolean isGenerateCRL() {
         return generateCRL;
+    }
+
+    private static Certificate issueSubCACert(
+            final PrivateKey rCAKey,
+            final X500Name issuer,
+            final SubjectPublicKeyInfo pubKeyInfo,
+            final X500Name subject,
+            final BigInteger serialNumber,
+            final Date startTime)
+    throws CertIOException, OperatorCreationException {
+        Date notAfter = new Date(startTime.getTime() + CAEmulator.DAY_IN_MS * 3650);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
+                issuer,
+                serialNumber,
+                startTime,
+                notAfter,
+                subject,
+                pubKeyInfo);
+
+        X509KeyUsage ku = new X509KeyUsage(
+                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+        certGenerator.addExtension(Extension.keyUsage, true, ku);
+        BasicConstraints bc = new BasicConstraints(0);
+        certGenerator.addExtension(Extension.basicConstraints, true, bc);
+
+        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rCAKey, HashAlgoType.SHA256);
+        ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rCAKey);
+        return certGenerator.build(contentSigner).toASN1Structure();
     }
 
 }

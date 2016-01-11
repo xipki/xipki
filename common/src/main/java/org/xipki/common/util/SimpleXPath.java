@@ -54,6 +54,70 @@ import org.w3c.dom.Node;
  */
 public class SimpleXPath {
 
+    private static class SimpleXPathStep {
+
+        private final String namespaceURI;
+
+        private final String localPart;
+
+        private boolean isElement = true;
+
+        /**
+         *
+         * @param step
+         * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
+         *        namespace will not be evaluated.
+         */
+        SimpleXPathStep(
+                final String pStep,
+                final Map<String, String> nsPrefixURIMap)
+        throws XPathExpressionException {
+            String step = pStep;
+            if (step.charAt(0) == '@') {
+                isElement = false;
+                step = step.substring(1);
+            }
+
+            int idx = step.indexOf(':');
+            String prefix;
+            if (idx != -1) {
+                prefix = step.substring(0, idx);
+                this.localPart = step.substring(idx + 1);
+            } else {
+                prefix = isElement
+                        ? ""
+                        : null;
+                this.localPart = step;
+            }
+
+            if (nsPrefixURIMap != null && prefix != null) {
+                this.namespaceURI = nsPrefixURIMap.get(prefix);
+                if (this.namespaceURI == null) {
+                    throw new XPathExpressionException(
+                            "could not find namespace for the prefix '" + prefix + "'");
+                }
+            } else {
+                this.namespaceURI = null;
+            }
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(isElement
+                    ? "Element"
+                    : "Attribute");
+            sb.append(" localPart='");
+            sb.append(localPart);
+            sb.append("'");
+            sb.append(" namespace='");
+            sb.append(namespaceURI);
+            sb.append("'");
+            return sb.toString();
+        }
+
+    } // class SimpleXPathStep
+
     private final List<SimpleXPathStep> steps;
 
     /**
@@ -144,66 +208,6 @@ public class SimpleXPath {
                 results.add(attr);
             }
         }
-    }
-
-    private static class SimpleXPathStep {
-        private final String namespaceURI;
-        private final String localPart;
-        private boolean isElement = true;
-        /**
-         *
-         * @param step
-         * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
-         *        namespace will not be evaluated.
-         */
-        SimpleXPathStep(
-                final String pStep,
-                final Map<String, String> nsPrefixURIMap)
-        throws XPathExpressionException {
-            String step = pStep;
-            if (step.charAt(0) == '@') {
-                isElement = false;
-                step = step.substring(1);
-            }
-
-            int idx = step.indexOf(':');
-            String prefix;
-            if (idx != -1) {
-                prefix = step.substring(0, idx);
-                this.localPart = step.substring(idx + 1);
-            } else {
-                prefix = isElement
-                        ? ""
-                        : null;
-                this.localPart = step;
-            }
-
-            if (nsPrefixURIMap != null && prefix != null) {
-                this.namespaceURI = nsPrefixURIMap.get(prefix);
-                if (this.namespaceURI == null) {
-                    throw new XPathExpressionException(
-                            "could not find namespace for the prefix '" + prefix + "'");
-                }
-            } else {
-                this.namespaceURI = null;
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(isElement
-                    ? "Element"
-                    : "Attribute");
-            sb.append(" localPart='");
-            sb.append(localPart);
-            sb.append("'");
-            sb.append(" namespace='");
-            sb.append(namespaceURI);
-            sb.append("'");
-            return sb.toString();
-        }
-
     }
 
 }
