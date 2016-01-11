@@ -75,6 +75,18 @@ public enum KeyUsage {
         this.names = names;
     }
 
+    public int getBit() {
+        return bit;
+    }
+
+    public int getBcUsage() {
+        return bcUsage;
+    }
+
+    public String getName() {
+        return names[0];
+    }
+
     public static KeyUsage getKeyUsage(
             final String usage) {
         if (usage == null) {
@@ -112,18 +124,6 @@ public enum KeyUsage {
         }
 
         return null;
-    }
-
-    public int getBit() {
-        return bit;
-    }
-
-    public int getBcUsage() {
-        return bcUsage;
-    }
-
-    public String getName() {
-        return names[0];
     }
 
 }

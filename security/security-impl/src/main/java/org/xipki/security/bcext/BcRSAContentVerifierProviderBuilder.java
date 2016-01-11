@@ -56,8 +56,7 @@ import org.xipki.security.SignerUtil;
  * @author Lijun Liao
  */
 
-public class BcRSAContentVerifierProviderBuilder
-    extends BcContentVerifierProviderBuilder {
+public class BcRSAContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
 
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 

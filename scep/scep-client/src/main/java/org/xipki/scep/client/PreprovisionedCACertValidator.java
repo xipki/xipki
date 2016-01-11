@@ -47,8 +47,7 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public final class PreprovisionedCACertValidator
-implements CACertValidator {
+public final class PreprovisionedCACertValidator implements CACertValidator {
 
     private final Set<String> fpOfCerts;
 

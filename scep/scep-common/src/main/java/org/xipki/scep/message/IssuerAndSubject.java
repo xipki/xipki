@@ -52,17 +52,6 @@ public class IssuerAndSubject extends ASN1Object {
 
     private X500Name subject;
 
-    public static IssuerAndSubject getInstance(
-            final Object obj) {
-        if (obj instanceof IssuerAndSubject) {
-            return (IssuerAndSubject) obj;
-        } else if (obj != null) {
-            return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
-        }
-
-        return null;
-    }
-
     private IssuerAndSubject(
             final ASN1Sequence seq) {
         this.issuer = X500Name.getInstance(seq.getObjectAt(0));
@@ -91,6 +80,17 @@ public class IssuerAndSubject extends ASN1Object {
         v.add(subject);
 
         return new DERSequence(v);
+    }
+
+    public static IssuerAndSubject getInstance(
+            final Object obj) {
+        if (obj instanceof IssuerAndSubject) {
+            return (IssuerAndSubject) obj;
+        } else if (obj != null) {
+            return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
+        }
+
+        return null;
     }
 
 }

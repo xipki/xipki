@@ -61,8 +61,6 @@ import org.xipki.pki.ca.dbtool.IDRange;
 
 public class XipkiDigestExportReader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
-
     private class Retriever implements Runnable {
 
         private Connection conn;
@@ -144,7 +142,9 @@ public class XipkiDigestExportReader {
                 DbToolBase.releaseResources(null, rs);
             }
         }
-    }
+    } // class Retriever
+
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
 

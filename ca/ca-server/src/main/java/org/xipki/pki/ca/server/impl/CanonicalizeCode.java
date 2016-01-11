@@ -89,24 +89,34 @@ public class CanonicalizeCode {
 
     private final static String THROWS_PREFIX = "    ";
 
+    private final String baseDir;
+    private final int baseDirLen;
+
     public static void main(
             final String[] args) {
         try {
-            String dirName = args[0];
-
-            File dir = new File(dirName);
-            canonicalizeDir(dir);
-
-            checkWarningsInDir(dir);
+            String baseDir = args[0];
+            CanonicalizeCode canonicalizer = new CanonicalizeCode(baseDir);
+            canonicalizer.canonicalize();
+            canonicalizer.checkWarnings();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private CanonicalizeCode() {
+    private CanonicalizeCode(String baseDir) {
+        this.baseDir = baseDir.endsWith(File.separator)
+                ? baseDir
+                : baseDir + File.separator;
+        this.baseDirLen = this.baseDir.length();
     }
 
-    private static void canonicalizeDir(
+    private void canonicalize()
+    throws Exception {
+        canonicalizeDir(new File(baseDir));
+    }
+
+    private void canonicalizeDir(
             final File dir)
     throws Exception {
         File[] files = dir.listFiles();
@@ -122,7 +132,7 @@ public class CanonicalizeCode {
         }
     }
 
-    private static void canonicalizeFile(
+    private void canonicalizeFile(
             final File file)
     throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -175,52 +185,16 @@ public class CanonicalizeCode {
             File newFile = new File(file.getPath() + "-new");
             IoUtil.save(file, newBytes);
             newFile.renameTo(file);
-            System.out.println(file.getPath());
+            System.out.println(file.getPath().substring(baseDirLen));
         }
     }
 
-    /**
-     * replace tab by 4 spaces, delete white spaces at the end
-     * @param line
-     * @return
-     */
-    private static String canonicalizeLine(
-            final String line) {
-        if (line.trim().startsWith("//")) {
-            // comments
-            String nline = line.replace("\t", "    ");
-            return removeTrailingSpaces(nline);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        int len = line.length();
-
-        int lastNonSpaceCharIndex = 0;
-        int index = 0;
-        for (int i = 0; i < len; i++) {
-            char c = line.charAt(i);
-            if (c == '\t') {
-                sb.append("    ");
-                index += 4;
-            } else if (c == ' ') {
-                sb.append(c);
-                index++;
-            } else {
-                sb.append(c);
-                index++;
-                lastNonSpaceCharIndex = index;
-            }
-        }
-
-        int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
-        if (numSpacesAtEnd > 0) {
-            sb.delete(lastNonSpaceCharIndex, sb.length());
-        }
-
-        return sb.toString();
+    private void checkWarnings()
+    throws Exception {
+        checkWarningsInDir(new File(baseDir));
     }
 
-    private static void checkWarningsInDir(
+    private void checkWarningsInDir(
             final File dir)
     throws Exception {
         File[] files = dir.listFiles();
@@ -236,7 +210,7 @@ public class CanonicalizeCode {
         }
     }
 
-    private static void checkWarningsInFile(
+    private void checkWarningsInFile(
             final File file)
     throws Exception {
         if (file.getName().equals("package-info.java")) {
@@ -287,6 +261,12 @@ public class CanonicalizeCode {
                             lineNumbers.add(lineNumber);
                         }
                     }
+
+                    String trimmedLine = line.trim();
+                    if (trimmedLine.startsWith("extends") || trimmedLine.startsWith("implements")) {
+                        lineNumbers.add(lineNumber);
+                    }
+
                     continue;
                 }
 
@@ -323,15 +303,56 @@ public class CanonicalizeCode {
         }
 
         if (!lineNumbers.isEmpty()) {
-            System.out.println("Please check file " + file.getPath()
+            System.out.println("Please check file " + file.getPath().substring(baseDirLen)
                 + ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
         if (!authorsLineAvailable) {
-            System.out.println("Please check file " + file.getPath()
+            System.out.println("Please check file " + file.getPath().substring(baseDirLen)
                     + ": no authors line");
         }
 
+    }
+
+    /**
+     * replace tab by 4 spaces, delete white spaces at the end
+     * @param line
+     * @return
+     */
+    private static String canonicalizeLine(
+            final String line) {
+        if (line.trim().startsWith("//")) {
+            // comments
+            String nline = line.replace("\t", "    ");
+            return removeTrailingSpaces(nline);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int len = line.length();
+
+        int lastNonSpaceCharIndex = 0;
+        int index = 0;
+        for (int i = 0; i < len; i++) {
+            char c = line.charAt(i);
+            if (c == '\t') {
+                sb.append("    ");
+                index += 4;
+            } else if (c == ' ') {
+                sb.append(c);
+                index++;
+            } else {
+                sb.append(c);
+                index++;
+                lastNonSpaceCharIndex = index;
+            }
+        }
+
+        int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
+        if (numSpacesAtEnd > 0) {
+            sb.delete(lastNonSpaceCharIndex, sb.length());
+        }
+
+        return sb.toString();
     }
 
     private static String removeTrailingSpaces(

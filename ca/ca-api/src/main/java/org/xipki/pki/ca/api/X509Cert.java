@@ -108,13 +108,13 @@ public class X509Cert {
         return subjectAsX500Name;
     }
 
+    public byte[] getSubjectKeyIdentifier() {
+        return Arrays.clone(subjectKeyIdentifer);
+    }
+
     @Override
     public String toString() {
         return cert.toString();
-    }
-
-    public byte[] getSubjectKeyIdentifier() {
-        return Arrays.clone(subjectKeyIdentifer);
     }
 
 }

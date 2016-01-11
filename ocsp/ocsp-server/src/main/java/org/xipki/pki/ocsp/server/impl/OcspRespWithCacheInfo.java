@@ -67,7 +67,7 @@ class OcspRespWithCacheInfo {
             return nextUpdate;
         }
 
-    }
+    } // ResponseCacheInfo
 
     private final OCSPResp response;
 

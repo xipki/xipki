@@ -176,44 +176,6 @@ public class CmpControl {
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     }
 
-    private static Set<String> canonicalizeAlgos(
-            final Set<String> algos)
-    throws InvalidConfException {
-        Set<String> ret = new HashSet<String>();
-        for (String m : algos) {
-            try {
-                ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
-            } catch (NoSuchAlgorithmException e) {
-                throw new InvalidConfException(e.getMessage(), e);
-            }
-        }
-        return Collections.unmodifiableSet(ret);
-    }
-
-    private static boolean getBoolean(
-            final ConfPairs pairs,
-            final String key,
-            final boolean defaultValue) {
-        String s = pairs.getValue(key);
-        boolean ret = StringUtil.isBlank(s)
-                ? defaultValue
-                : Boolean.parseBoolean(s);
-        pairs.putPair(key, Boolean.toString(ret));
-        return ret;
-    }
-
-    private static int getInt(
-            final ConfPairs pairs,
-            final String key,
-            final int defaultValue) {
-        String s = pairs.getValue(key);
-        int ret = StringUtil.isBlank(s)
-                ? defaultValue
-                : Integer.parseInt(s);
-        pairs.putPair(key, Integer.toString(ret));
-        return ret;
-    }
-
     public boolean isConfirmCert() {
         return confirmCert;
     }
@@ -273,6 +235,44 @@ public class CmpControl {
         sb.append("               conf: ").append(dbEntry.getConf());
 
         return sb.toString();
+    }
+
+    private static Set<String> canonicalizeAlgos(
+            final Set<String> algos)
+    throws InvalidConfException {
+        Set<String> ret = new HashSet<String>();
+        for (String m : algos) {
+            try {
+                ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
+            } catch (NoSuchAlgorithmException e) {
+                throw new InvalidConfException(e.getMessage(), e);
+            }
+        }
+        return Collections.unmodifiableSet(ret);
+    }
+
+    private static boolean getBoolean(
+            final ConfPairs pairs,
+            final String key,
+            final boolean defaultValue) {
+        String s = pairs.getValue(key);
+        boolean ret = StringUtil.isBlank(s)
+                ? defaultValue
+                : Boolean.parseBoolean(s);
+        pairs.putPair(key, Boolean.toString(ret));
+        return ret;
+    }
+
+    private static int getInt(
+            final ConfPairs pairs,
+            final String key,
+            final int defaultValue) {
+        String s = pairs.getValue(key);
+        int ret = StringUtil.isBlank(s)
+                ? defaultValue
+                : Integer.parseInt(s);
+        pairs.putPair(key, Integer.toString(ret));
+        return ret;
     }
 
     private static String getYesNo(boolean b) {

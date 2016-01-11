@@ -95,52 +95,6 @@ public class DbDigestDiff {
 
     private final int numTargetThreads;
 
-    public static DbDigestDiff getInstanceForDirRef(
-            final String refDirname,
-            final DataSourceWrapper targetDatasource,
-            final String reportDirName,
-            final boolean revokedOnly,
-            final AtomicBoolean stopMe,
-            final int numPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads)
-    throws IOException, DataAccessException {
-        ParamUtil.assertNotBlank("refDirname", refDirname);
-        ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
-        ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1) {
-            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
-        }
-
-        return new DbDigestDiff(refDirname, null,
-                targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numRefThreads, numTargetThreads);
-    }
-
-    public static DbDigestDiff getInstanceForDbRef(
-            final DataSourceWrapper refDatasource,
-            final DataSourceWrapper targetDatasource,
-            final String reportDirName,
-            final boolean revokedOnly,
-            final AtomicBoolean stopMe,
-            final int numPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads)
-    throws IOException, DataAccessException {
-        ParamUtil.assertNotNull("refDatasource", refDatasource);
-        ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
-        ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1) {
-            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
-        }
-
-        return new DbDigestDiff(null, refDatasource,
-                targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numRefThreads, numTargetThreads);
-    }
-
     private DbDigestDiff(
             final String refDir,
             final DataSourceWrapper refDatasource,
@@ -347,6 +301,52 @@ public class DbDigestDiff {
                 target.close();
             }
         }
+    }
+
+    public static DbDigestDiff getInstanceForDirRef(
+            final String refDirname,
+            final DataSourceWrapper targetDatasource,
+            final String reportDirName,
+            final boolean revokedOnly,
+            final AtomicBoolean stopMe,
+            final int numPerSelect,
+            final int numRefThreads,
+            final int numTargetThreads)
+    throws IOException, DataAccessException {
+        ParamUtil.assertNotBlank("refDirname", refDirname);
+        ParamUtil.assertNotBlank("reportDirName", reportDirName);
+        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
+        ParamUtil.assertNotNull("stopMe", stopMe);
+        if (numPerSelect < 1) {
+            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
+        }
+
+        return new DbDigestDiff(refDirname, null,
+                targetDatasource, reportDirName, revokedOnly, stopMe,
+                numPerSelect, numRefThreads, numTargetThreads);
+    }
+
+    public static DbDigestDiff getInstanceForDbRef(
+            final DataSourceWrapper refDatasource,
+            final DataSourceWrapper targetDatasource,
+            final String reportDirName,
+            final boolean revokedOnly,
+            final AtomicBoolean stopMe,
+            final int numPerSelect,
+            final int numRefThreads,
+            final int numTargetThreads)
+    throws IOException, DataAccessException {
+        ParamUtil.assertNotNull("refDatasource", refDatasource);
+        ParamUtil.assertNotBlank("reportDirName", reportDirName);
+        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
+        ParamUtil.assertNotNull("stopMe", stopMe);
+        if (numPerSelect < 1) {
+            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
+        }
+
+        return new DbDigestDiff(null, refDatasource,
+                targetDatasource, reportDirName, revokedOnly, stopMe,
+                numPerSelect, numRefThreads, numTargetThreads);
     }
 
     private static Map<Integer, byte[]> getCAs(

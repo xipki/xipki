@@ -103,27 +103,6 @@ public class CACaps {
         return capabilities.contains(cap);
     }
 
-    public static CACaps getInstance(
-            final String scepMessage) {
-        CACaps ret = new CACaps();
-        if (scepMessage == null || scepMessage.isEmpty()) {
-            return ret;
-        }
-
-        StringTokenizer st = new StringTokenizer(scepMessage, "\r\n");
-
-        while (st.hasMoreTokens()) {
-            String m = st.nextToken();
-            CACapability cap = CACapability.valueForText(m);
-            if (cap == null) {
-                LOG.warn("ignore unknown CACap '{}'", m);
-            } else {
-                ret.addCapability(cap);
-            }
-        }
-        return ret;
-    }
-
     @Override
     public String toString() {
         return toScepMessage();
@@ -182,6 +161,27 @@ public class CACaps {
 
     public byte[] getBytes() {
         return Arrays.clone(bytes);
+    }
+
+    public static CACaps getInstance(
+            final String scepMessage) {
+        CACaps ret = new CACaps();
+        if (scepMessage == null || scepMessage.isEmpty()) {
+            return ret;
+        }
+
+        StringTokenizer st = new StringTokenizer(scepMessage, "\r\n");
+
+        while (st.hasMoreTokens()) {
+            String m = st.nextToken();
+            CACapability cap = CACapability.valueForText(m);
+            if (cap == null) {
+                LOG.warn("ignore unknown CACap '{}'", m);
+            } else {
+                ret.addCapability(cap);
+            }
+        }
+        return ret;
     }
 
 }

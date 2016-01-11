@@ -43,9 +43,7 @@ import java.util.List;
  * @author Lijun Liao
  */
 
-public class X509ChangeCAEntry
-extends ChangeCAEntry
-implements Serializable {
+public class X509ChangeCAEntry extends ChangeCAEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

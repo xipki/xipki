@@ -76,7 +76,7 @@ import org.xipki.security.api.util.X509Util;
 abstract class DbDigestReader implements DigestReader {
 
     interface Retriever extends Runnable {
-    }
+    } // interface Retriever
 
     private class Dispatcher implements Runnable {
 
@@ -137,7 +137,7 @@ abstract class DbDigestReader implements DigestReader {
             }
         }
 
-    }
+    } // class Dispatcher
 
     private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
 
@@ -311,14 +311,14 @@ abstract class DbDigestReader implements DigestReader {
         }
     }
 
+    public int getMinId() {
+        return minId;
+    }
+
     protected static void releaseResources(
             final Statement ps,
             final ResultSet rs) {
         DbToolBase.releaseResources(ps, rs);
-    }
-
-    public int getMinId() {
-        return minId;
     }
 
 }

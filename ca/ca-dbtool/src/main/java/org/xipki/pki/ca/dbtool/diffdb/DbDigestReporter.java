@@ -158,18 +158,6 @@ public class DbDigestReporter {
         }
     }
 
-    private static void writeSerialNumberLine(
-            final BufferedWriter writer,
-            final long serialNumber)
-    throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append(serialNumber).append('\n');
-        String msg = sb.toString();
-        synchronized (writer) {
-            writer.write(msg);
-        }
-    }
-
     public void close() {
         close(missingWriter);
         close(diffWriter);
@@ -212,6 +200,18 @@ public class DbDigestReporter {
                     + sb.toString());
         }
 
+    }
+
+    private static void writeSerialNumberLine(
+            final BufferedWriter writer,
+            final long serialNumber)
+    throws IOException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(serialNumber).append('\n');
+        String msg = sb.toString();
+        synchronized (writer) {
+            writer.write(msg);
+        }
     }
 
     private static void close(

@@ -54,6 +54,10 @@ public enum OcspResponseStatus {
         this.status = status;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public static OcspResponseStatus getOCSPResponseStatus(
             final int status) {
         for (OcspResponseStatus entry : values()) {
@@ -63,10 +67,6 @@ public enum OcspResponseStatus {
         }
 
         return null;
-    }
-
-    public int getStatus() {
-        return status;
     }
 
 }

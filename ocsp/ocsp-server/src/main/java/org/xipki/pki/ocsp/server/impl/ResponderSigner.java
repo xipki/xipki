@@ -129,19 +129,6 @@ class ResponderSigner {
         return null;
     }
 
-    private static String getSignatureAlgorithmName(
-            final AlgorithmIdentifier sigAlgId) {
-        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
-            return algOid.getId();
-        }
-
-        ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-        RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
-        ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-        return digestAlgOid.getId() + "WITHRSAANDMGF1";
-    }
-
     public X500Name getResponderId() {
         return responderId;
     }
@@ -170,6 +157,19 @@ class ResponderSigner {
         }
 
         return true;
+    }
+
+    private static String getSignatureAlgorithmName(
+            final AlgorithmIdentifier sigAlgId) {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
+            return algOid.getId();
+        }
+
+        ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+        RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+        ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+        return digestAlgOid.getId() + "WITHRSAANDMGF1";
     }
 
 }

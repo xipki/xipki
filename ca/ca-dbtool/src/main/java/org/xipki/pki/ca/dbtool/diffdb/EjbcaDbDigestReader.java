@@ -175,7 +175,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             outQueue.add(result);
         }
 
-    }
+    } // class EjbcaDbRetriever
 
     private final int caId;
 
@@ -184,6 +184,62 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     private final String selectBase64CertSql;
 
     private final String caFingerprint;
+
+    private EjbcaDbDigestReader(
+            final DataSourceWrapper datasource,
+            final X509Certificate caCert,
+            final boolean revokedOnly,
+            final int totalAccount,
+            final int minId,
+            final int maxId,
+            final int numThreads,
+            final DbSchemaType dbSchemaType,
+            final int caId,
+            final boolean dbContainsOtherCA,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
+    throws Exception {
+        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+                numCertsToPredicate, stopMe);
+        ParamUtil.assertNotNull("datasource", datasource);
+
+        this.caId = caId;
+
+        this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
+
+        this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
+        sb.append(",status,revocationDate,revocationReason");
+        sb.append(" FROM CertificateData WHERE id>=? AND id<?");
+        if (revokedOnly) {
+            sb.append(" AND status=40");
+        }
+        this.selectCertSql = sb.toString();
+        if (!init()) {
+            throw new Exception("could not initialize the EjbcaDigestReader");
+        }
+    }
+
+    public int getCaId() {
+        return caId;
+    }
+
+    @Override
+    protected Retriever getRetriever()
+    throws DataAccessException {
+        return new EjbcaDbRetriever();
+    }
+
+    @Override
+    protected int getNumSkippedCerts(
+            final int fromId,
+            final int toId,
+            final int numCerts)
+    throws DataAccessException {
+        return 0;
+    }
 
     public static EjbcaDbDigestReader getInstance(
             final DataSourceWrapper datasource,
@@ -267,62 +323,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         return new EjbcaDbDigestReader(datasource, caCert, revokedOnly, totalAccount,
                 minId, maxId, numThreads, dbSchemaType, caId, dbContainsOtherCA,
                 numCertsToPredicate, stopMe);
-    }
-
-    private EjbcaDbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final boolean revokedOnly,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final DbSchemaType dbSchemaType,
-            final int caId,
-            final boolean dbContainsOtherCA,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
-    throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
-                numCertsToPredicate, stopMe);
-        ParamUtil.assertNotNull("datasource", datasource);
-
-        this.caId = caId;
-
-        this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
-
-        this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
-        sb.append(",status,revocationDate,revocationReason");
-        sb.append(" FROM CertificateData WHERE id>=? AND id<?");
-        if (revokedOnly) {
-            sb.append(" AND status=40");
-        }
-        this.selectCertSql = sb.toString();
-        if (!init()) {
-            throw new Exception("could not initialize the EjbcaDigestReader");
-        }
-    }
-
-    public int getCaId() {
-        return caId;
-    }
-
-    @Override
-    protected Retriever getRetriever()
-    throws DataAccessException {
-        return new EjbcaDbRetriever();
-    }
-
-    @Override
-    protected int getNumSkippedCerts(
-            final int fromId,
-            final int toId,
-            final int numCerts)
-    throws DataAccessException {
-        return 0;
     }
 
 }

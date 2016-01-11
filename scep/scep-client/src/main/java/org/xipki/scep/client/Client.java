@@ -522,6 +522,148 @@ public abstract class Client {
     public void destroy() {
     }
 
+    private AuthorityCertStore retrieveNextCAAuthorityCertStore(
+            final ScepHttpResponse httpResp)
+    throws ScepClientException {
+        String ct = httpResp.getContentType();
+
+        if (!ScepConstants.CT_x_x509_next_ca_cert.equalsIgnoreCase(ct)) {
+            throw new ScepClientException("invalid Content-Type '" + ct + "'");
+        }
+
+        CMSSignedData cmsSignedData;
+        try {
+            cmsSignedData = new CMSSignedData(httpResp.getContentBytes());
+        } catch (CMSException e) {
+            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
+        }
+
+        DecodedNextCAMessage resp;
+        try {
+            resp = DecodedNextCAMessage.decode(cmsSignedData, responseSignerCerts);
+        } catch (MessageDecodingException e) {
+            throw new ScepClientException("could not decode response: " + e.getMessage(), e);
+        }
+
+        if (resp.getFailureMessage() != null) {
+            throw new ScepClientException("Error: " + resp.getFailureMessage());
+        }
+
+        Boolean b = resp.isSignatureValid();
+        if (b != null && !b.booleanValue()) {
+            throw new ScepClientException("Signature is invalid");
+        }
+
+        Date signingTime = resp.getSigningTime();
+        long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
+        if (maxSigningTimeBias > 0) {
+            if (signingTime == null) {
+                throw new ScepClientException("CMS signingTime attribute is not present");
+            }
+
+            long now = System.currentTimeMillis();
+            long diff = now - signingTime.getTime();
+            if (diff < 0) {
+                diff = -1 * diff;
+            }
+            if (diff > maxSigningTimeBias) {
+                throw new ScepClientException("CMS signingTime is out of permitted period");
+            }
+        }
+
+        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
+            throw new ScepClientException("the signature certificate could not be trusted");
+        }
+
+        return resp.getAuthorityCertStore();
+    }
+
+    private void initIfNotInited()
+    throws ScepClientException {
+        if (cACaps == null) {
+            init();
+        }
+    }
+
+    private DecodedPkiMessage decode(
+            final CMSSignedData pkiMessage,
+            final PrivateKey recipientKey,
+            final X509Certificate recipientCert)
+    throws ScepClientException {
+        DecodedPkiMessage resp;
+        try {
+            resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert,
+                    responseSignerCerts);
+        } catch (MessageDecodingException e) {
+            throw new ScepClientException(e);
+        }
+
+        if (resp.getFailureMessage() != null) {
+            throw new ScepClientException("Error: " + resp.getFailureMessage());
+        }
+
+        Boolean b = resp.isSignatureValid();
+        if (b != null && !b.booleanValue()) {
+            throw new ScepClientException("Signature is invalid");
+        }
+
+        b = resp.isDecryptionSuccessful();
+        if (b != null && !b.booleanValue()) {
+            throw new ScepClientException("Decryption failed");
+        }
+
+        Date signingTime = resp.getSigningTime();
+        long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
+        if (maxSigningTimeBias > 0) {
+            if (signingTime == null) {
+                throw new ScepClientException("CMS signingTime attribute is not present");
+            }
+
+            long now = System.currentTimeMillis();
+            long diff = now - signingTime.getTime();
+            if (diff < 0) {
+                diff = -1 * diff;
+            }
+            if (diff > maxSigningTimeBias) {
+                throw new ScepClientException("CMS signingTime is out of permitted period");
+            }
+        }
+
+        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
+            throw new ScepClientException("the signature certificate could not be trusted");
+        }
+        return resp;
+    }
+
+    private boolean isGutmannScep() {
+        return cACaps.containsCapability(CACapability.AES)
+                || cACaps.containsCapability(CACapability.Update);
+    }
+
+    private static X509Certificate parseCert(
+            final byte[] certBytes)
+    throws ScepClientException {
+        try {
+            return ScepUtil.parseCert(certBytes);
+        } catch (IOException e) {
+            throw new ScepClientException(e);
+        } catch (CertificateException e) {
+            throw new ScepClientException(e);
+        }
+    }
+
+    private static CMSSignedData parsePkiMessage(
+            final byte[] messageBytes)
+    throws ScepClientException {
+        try {
+            return new CMSSignedData(messageBytes);
+        } catch (CMSException e) {
+            throw new ScepClientException(e);
+        }
+    }
+
     private static AuthorityCertStore retrieveCACertStore(
             final ScepHttpResponse resp,
             final CACertValidator cAValidator)
@@ -604,148 +746,6 @@ public abstract class Client {
             }
             return cs;
         }
-    }
-
-    private AuthorityCertStore retrieveNextCAAuthorityCertStore(
-            final ScepHttpResponse httpResp)
-    throws ScepClientException {
-        String ct = httpResp.getContentType();
-
-        if (!ScepConstants.CT_x_x509_next_ca_cert.equalsIgnoreCase(ct)) {
-            throw new ScepClientException("invalid Content-Type '" + ct + "'");
-        }
-
-        CMSSignedData cmsSignedData;
-        try {
-            cmsSignedData = new CMSSignedData(httpResp.getContentBytes());
-        } catch (CMSException e) {
-            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
-        }
-
-        DecodedNextCAMessage resp;
-        try {
-            resp = DecodedNextCAMessage.decode(cmsSignedData, responseSignerCerts);
-        } catch (MessageDecodingException e) {
-            throw new ScepClientException("could not decode response: " + e.getMessage(), e);
-        }
-
-        if (resp.getFailureMessage() != null) {
-            throw new ScepClientException("Error: " + resp.getFailureMessage());
-        }
-
-        Boolean b = resp.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
-            throw new ScepClientException("Signature is invalid");
-        }
-
-        Date signingTime = resp.getSigningTime();
-        long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
-        if (maxSigningTimeBias > 0) {
-            if (signingTime == null) {
-                throw new ScepClientException("CMS signingTime attribute is not present");
-            }
-
-            long now = System.currentTimeMillis();
-            long diff = now - signingTime.getTime();
-            if (diff < 0) {
-                diff = -1 * diff;
-            }
-            if (diff > maxSigningTimeBias) {
-                throw new ScepClientException("CMS signingTime is out of permitted period");
-            }
-        }
-
-        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
-            throw new ScepClientException("the signature certificate could not be trusted");
-        }
-
-        return resp.getAuthorityCertStore();
-    }
-
-    private static X509Certificate parseCert(
-            final byte[] certBytes)
-    throws ScepClientException {
-        try {
-            return ScepUtil.parseCert(certBytes);
-        } catch (IOException e) {
-            throw new ScepClientException(e);
-        } catch (CertificateException e) {
-            throw new ScepClientException(e);
-        }
-    }
-
-    private static CMSSignedData parsePkiMessage(
-            final byte[] messageBytes)
-    throws ScepClientException {
-        try {
-            return new CMSSignedData(messageBytes);
-        } catch (CMSException e) {
-            throw new ScepClientException(e);
-        }
-    }
-
-    private void initIfNotInited()
-    throws ScepClientException {
-        if (cACaps == null) {
-            init();
-        }
-    }
-
-    private DecodedPkiMessage decode(
-            final CMSSignedData pkiMessage,
-            final PrivateKey recipientKey,
-            final X509Certificate recipientCert)
-    throws ScepClientException {
-        DecodedPkiMessage resp;
-        try {
-            resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert,
-                    responseSignerCerts);
-        } catch (MessageDecodingException e) {
-            throw new ScepClientException(e);
-        }
-
-        if (resp.getFailureMessage() != null) {
-            throw new ScepClientException("Error: " + resp.getFailureMessage());
-        }
-
-        Boolean b = resp.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
-            throw new ScepClientException("Signature is invalid");
-        }
-
-        b = resp.isDecryptionSuccessful();
-        if (b != null && !b.booleanValue()) {
-            throw new ScepClientException("Decryption failed");
-        }
-
-        Date signingTime = resp.getSigningTime();
-        long maxSigningTimeBias = getMaxSigningTimeBiasInMs();
-        if (maxSigningTimeBias > 0) {
-            if (signingTime == null) {
-                throw new ScepClientException("CMS signingTime attribute is not present");
-            }
-
-            long now = System.currentTimeMillis();
-            long diff = now - signingTime.getTime();
-            if (diff < 0) {
-                diff = -1 * diff;
-            }
-            if (diff > maxSigningTimeBias) {
-                throw new ScepClientException("CMS signingTime is out of permitted period");
-            }
-        }
-
-        if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
-            throw new ScepClientException("the signature certificate could not be trusted");
-        }
-        return resp;
-    }
-
-    private boolean isGutmannScep() {
-        return cACaps.containsCapability(CACapability.AES)
-                || cACaps.containsCapability(CACapability.Update);
     }
 
     private static void assertSameNonce(

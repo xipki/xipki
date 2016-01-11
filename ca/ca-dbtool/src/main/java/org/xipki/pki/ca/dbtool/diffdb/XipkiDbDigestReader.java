@@ -60,8 +60,7 @@ import org.xipki.security.api.util.X509Util;
 
 public class XipkiDbDigestReader extends DbDigestReader {
 
-    private class XipkiDbRetriever
-    implements Retriever {
+    private class XipkiDbRetriever     implements Retriever {
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
@@ -137,7 +136,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
             outQueue.add(result);
         }
-    }
+
+    } // class XipkiDbRetriever
 
     private final int caId;
 
@@ -150,83 +150,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
     private final String numCertSql;
 
     private final PreparedStatement numCertStmt;
-
-    public static XipkiDbDigestReader getInstance(
-            final DataSourceWrapper datasource,
-            final DbSchemaType dbSchemaType,
-            final int caId,
-            final boolean revokedOnly,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
-    throws Exception {
-        ParamUtil.assertNotNull("datasource", datasource);
-        Connection conn = datasource.getConnection();
-
-        XipkiDbControl dbControl = new XipkiDbControl(dbSchemaType);
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        String sql = null;
-
-        X509Certificate caCert;
-        int totalAccount;
-        int minId;
-        int maxId;
-
-        try {
-            stmt = datasource.createStatement(conn);
-
-            sql = "SELECT CERT FROM " + dbControl.getTblCa() + " WHERE ID=" + caId;
-            rs = stmt.executeQuery(sql);
-            if (!rs.next()) {
-                throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
-            }
-
-            caCert = X509Util.parseBase64EncodedCert(rs.getString("CERT"));
-            rs.close();
-
-            sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
-            rs = stmt.executeQuery(sql);
-
-            totalAccount = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
-            rs.close();
-
-            sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
-
-            rs = stmt.executeQuery(sql);
-            maxId = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
-            rs.close();
-
-            sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
-
-            rs = stmt.executeQuery(sql);
-            minId = rs.next()
-                    ? rs.getInt(1)
-                    : 1;
-
-            return new XipkiDbDigestReader(datasource, caCert, revokedOnly,
-                    totalAccount, minId, maxId, numThreads, dbSchemaType, caId,
-                    numCertsToPredicate, stopMe);
-        } catch (SQLException e) {
-            throw datasource.translate(sql, e);
-        } finally {
-            releaseResources(stmt, rs);
-        }
-    }
 
     private XipkiDbDigestReader(
             final DataSourceWrapper datasource,
@@ -330,6 +253,83 @@ public class XipkiDbDigestReader extends DbDigestReader {
     protected Retriever getRetriever()
     throws DataAccessException {
         return new XipkiDbRetriever();
+    }
+
+    public static XipkiDbDigestReader getInstance(
+            final DataSourceWrapper datasource,
+            final DbSchemaType dbSchemaType,
+            final int caId,
+            final boolean revokedOnly,
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
+    throws Exception {
+        ParamUtil.assertNotNull("datasource", datasource);
+        Connection conn = datasource.getConnection();
+
+        XipkiDbControl dbControl = new XipkiDbControl(dbSchemaType);
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = null;
+
+        X509Certificate caCert;
+        int totalAccount;
+        int minId;
+        int maxId;
+
+        try {
+            stmt = datasource.createStatement(conn);
+
+            sql = "SELECT CERT FROM " + dbControl.getTblCa() + " WHERE ID=" + caId;
+            rs = stmt.executeQuery(sql);
+            if (!rs.next()) {
+                throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
+            }
+
+            caCert = X509Util.parseBase64EncodedCert(rs.getString("CERT"));
+            rs.close();
+
+            sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            if (revokedOnly) {
+                sql += " AND " + dbControl.getColRevoked() + "=1";
+            }
+            rs = stmt.executeQuery(sql);
+
+            totalAccount = rs.next()
+                    ? rs.getInt(1)
+                    : 0;
+            rs.close();
+
+            sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            if (revokedOnly) {
+                sql += " AND " + dbControl.getColRevoked() + "=1";
+            }
+
+            rs = stmt.executeQuery(sql);
+            maxId = rs.next()
+                    ? rs.getInt(1)
+                    : 0;
+            rs.close();
+
+            sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            if (revokedOnly) {
+                sql += " AND " + dbControl.getColRevoked() + "=1";
+            }
+
+            rs = stmt.executeQuery(sql);
+            minId = rs.next()
+                    ? rs.getInt(1)
+                    : 1;
+
+            return new XipkiDbDigestReader(datasource, caCert, revokedOnly,
+                    totalAccount, minId, maxId, numThreads, dbSchemaType, caId,
+                    numCertsToPredicate, stopMe);
+        } catch (SQLException e) {
+            throw datasource.translate(sql, e);
+        } finally {
+            releaseResources(stmt, rs);
+        }
     }
 
 }

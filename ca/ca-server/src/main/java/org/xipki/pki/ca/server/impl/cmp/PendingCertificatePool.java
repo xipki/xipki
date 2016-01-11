@@ -92,7 +92,7 @@ class PendingCertificatePool {
                     && certInfo.equals(another.certInfo);
         }
 
-    }
+    } // class MyEntry
 
     private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<>();
 

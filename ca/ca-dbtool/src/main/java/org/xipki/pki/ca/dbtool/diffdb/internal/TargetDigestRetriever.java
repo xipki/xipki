@@ -187,7 +187,7 @@ public class TargetDigestRetriever {
             return certsInB;
         }
 
-    }
+    } // class Retriever
 
     private final XipkiDbControl dbControl;
 

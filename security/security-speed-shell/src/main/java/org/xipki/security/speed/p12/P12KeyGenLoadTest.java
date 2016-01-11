@@ -44,19 +44,6 @@ import org.xipki.security.P12RawKeypairGenerator;
 
 public abstract class P12KeyGenLoadTest extends LoadExecutor {
 
-    public P12KeyGenLoadTest(
-            final String description) {
-        super(description);
-    }
-
-    protected abstract P12RawKeypairGenerator getKeypairGenerator();
-
-    @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
-    }
-
     class Testor implements Runnable {
 
         @Override
@@ -72,6 +59,19 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
             }
         }
 
+    } // class Testor
+
+    public P12KeyGenLoadTest(
+            final String description) {
+        super(description);
+    }
+
+    protected abstract P12RawKeypairGenerator getKeypairGenerator();
+
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
     }
 
 }

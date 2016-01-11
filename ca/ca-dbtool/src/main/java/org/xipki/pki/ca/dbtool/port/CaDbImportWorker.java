@@ -94,7 +94,7 @@ public class CaDbImportWorker extends DbPortWorker {
             this.cert = cert;
         }
 
-    }
+    } // class CAInfoBundle
 
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
 

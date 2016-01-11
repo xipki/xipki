@@ -51,6 +51,20 @@ import org.xipki.security.api.HashAlgoType;
 
 public abstract class CertStatusStore {
 
+    protected static final long DAY = 24L * 60 * 60 * 1000;
+
+    private final String name;
+
+    private boolean unknownSerialAsGood;
+
+    private int retentionInterval;
+
+    private boolean includeArchiveCutoff;
+
+    private boolean includeCrlID;
+
+    private AuditServiceRegister auditServiceRegister;
+
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(
@@ -82,16 +96,6 @@ public abstract class CertStatusStore {
     throws CertStatusStoreException;
 
     public abstract boolean isHealthy();
-
-    protected static final long DAY = 24L * 60 * 60 * 1000;
-
-    private final String name;
-    private boolean unknownSerialAsGood;
-    private int retentionInterval;
-    private boolean includeArchiveCutoff;
-    private boolean includeCrlID;
-
-    private AuditServiceRegister auditServiceRegister;
 
     protected CertStatusStore(
             final String name) {

@@ -69,25 +69,6 @@ class CrlCertStatusInfo {
         this.certHashes = certHashes;
     }
 
-    static CrlCertStatusInfo getIgnoreCertStatusInfo() {
-        return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
-    }
-
-    static CrlCertStatusInfo getGoodCertStatusInfo(
-            final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes) {
-        ParamUtil.assertNotBlank("certprofile", certprofile);
-        return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
-    }
-
-    static CrlCertStatusInfo getRevokedCertStatusInfo(
-            final CertRevocationInfo revocationInfo,
-            final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes) {
-        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
-        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
-    }
-
     CertStatus getCertStatus() {
         return certStatus;
     }
@@ -129,6 +110,25 @@ class CrlCertStatusInfo {
         default:
             throw new RuntimeException("unknown certStatus: " + certStatus);
         }
+    }
+
+    static CrlCertStatusInfo getIgnoreCertStatusInfo() {
+        return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
+    }
+
+    static CrlCertStatusInfo getGoodCertStatusInfo(
+            final String certprofile,
+            final Map<HashAlgoType, byte[]> certHashes) {
+        ParamUtil.assertNotBlank("certprofile", certprofile);
+        return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
+    }
+
+    static CrlCertStatusInfo getRevokedCertStatusInfo(
+            final CertRevocationInfo revocationInfo,
+            final String certprofile,
+            final Map<HashAlgoType, byte[]> certHashes) {
+        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
+        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }
 
 }

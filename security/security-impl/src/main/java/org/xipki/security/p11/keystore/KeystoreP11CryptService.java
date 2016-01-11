@@ -70,21 +70,6 @@ public class KeystoreP11CryptService implements P11CryptService {
 
     private static final Map<String, KeystoreP11CryptService> instances = new HashMap<>();
 
-    public static KeystoreP11CryptService getInstance(
-            final P11ModuleConf moduleConf)
-    throws SignerException {
-        synchronized (instances) {
-            final String name = moduleConf.getName();
-            KeystoreP11CryptService instance = instances.get(name);
-            if (instance == null) {
-                instance = new KeystoreP11CryptService(moduleConf);
-                instances.put(name, instance);
-            }
-
-            return instance;
-        }
-    }
-
     public KeystoreP11CryptService(
             final P11ModuleConf moduleConf)
     throws SignerException {
@@ -336,6 +321,21 @@ public class KeystoreP11CryptService implements P11CryptService {
     @Override
     public String toString() {
         return moduleConf.toString();
+    }
+
+    public static KeystoreP11CryptService getInstance(
+            final P11ModuleConf moduleConf)
+    throws SignerException {
+        synchronized (instances) {
+            final String name = moduleConf.getName();
+            KeystoreP11CryptService instance = instances.get(name);
+            if (instance == null) {
+                instance = new KeystoreP11CryptService(moduleConf);
+                instances.put(name, instance);
+            }
+
+            return instance;
+        }
     }
 
 }

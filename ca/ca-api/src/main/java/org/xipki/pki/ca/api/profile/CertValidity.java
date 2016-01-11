@@ -48,13 +48,8 @@ import org.xipki.common.util.ParamUtil;
 
 public class CertValidity implements Comparable<CertValidity>, Serializable {
 
-    private static final long serialVersionUID = 1917871166917453960L;
-
-    private static final long SECOND = 1000L;
-
-    private static final TimeZone utc = TimeZone.getTimeZone("UTC");
-
     public static enum Unit {
+
         YEAR("y"),
         DAY("d"),
         HOUR("h");
@@ -68,7 +63,14 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         public String getSuffix() {
             return suffix;
         }
-    }
+
+    } // enum Unit
+
+    private static final long serialVersionUID = 1917871166917453960L;
+
+    private static final long SECOND = 1000L;
+
+    private static final TimeZone utc = TimeZone.getTimeZone("UTC");
 
     private final int validity;
     private final Unit unit;
@@ -157,17 +159,6 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         }
     }
 
-    private static boolean isLeapYear(
-            final int year) {
-        if (year % 4 != 0) {
-            return false;
-        } else if (year % 100 != 0) {
-            return true;
-        } else {
-            return year % 400 == 0;
-        }
-    }
-
     private int getApproxHours() {
         switch (unit) {
         case HOUR:
@@ -232,6 +223,17 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             return validity + "y";
         default:
             throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
+        }
+    }
+
+    private static boolean isLeapYear(
+            final int year) {
+        if (year % 4 != 0) {
+            return false;
+        } else if (year % 100 != 0) {
+            return true;
+        } else {
+            return year % 400 == 0;
         }
     }
 

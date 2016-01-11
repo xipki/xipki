@@ -52,8 +52,83 @@ import java.util.Map;
  */
 
 @SuppressWarnings("restriction")
-public class XipkiNSSProvider
-extends Provider {
+public class XipkiNSSProvider extends Provider {
+
+    public static final class Descriptor {
+
+        private final Service service;
+
+        private final String algorithm;
+
+        private final String className;
+
+        private final String oid;
+
+        private final String[] aliases;
+
+        private Descriptor(
+                final Service service,
+                final String algorithm,
+                final String classNameWithoutPackage,
+                final String oid,
+                final String... aliases) {
+            this.service = service;
+            this.algorithm = algorithm;
+            this.className = classNameWithoutPackage;
+            this.oid = oid;
+            this.aliases = aliases;
+        }
+
+        private List<String> aliasesWithOid;
+        List<String> getAliases() {
+            if (aliasesWithOid == null) {
+                aliasesWithOid = new ArrayList<>();
+                if (aliases != null) {
+                    for (String alias : aliases) {
+                        aliasesWithOid.add(alias);
+                    }
+                }
+                if (oid != null) {
+                    aliasesWithOid.add(oid);
+                    aliasesWithOid.add("OID." + oid);
+                }
+            }
+
+            return aliasesWithOid;
+        }
+
+        public String getClassName() {
+            return service.classPrefix + className;
+        }
+
+        @Override
+        public String toString() {
+            return service.type + "." + algorithm;
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
+
+    } // class Descriptor
+
+    private static enum Service {
+
+        Signature("Signature", NSSSignatureSpi.class.getName() + "$");
+
+        private String type;
+
+        private String classPrefix;
+
+        private Service(
+                final String type,
+                final String classPrefix) {
+            this.type = type;
+            this.classPrefix = classPrefix;
+        }
+
+    } // enum Service
 
     // Signature
     public static final String OID_SHA1withRSA = "1.2.840.113549.1.1.5";
@@ -91,6 +166,10 @@ extends Provider {
 
     static Provider nssProvider;
 
+    // Map from mechanism to List of Descriptors that should be registered if the mechanism
+    // is supported
+    private final static Map<String, Descriptor> descriptors = new HashMap<>();
+
     public XipkiNSSProvider() {
         super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_NAME + " v" + PROVIDER_VERSION);
 
@@ -124,10 +203,6 @@ extends Provider {
             return false;
         }
     }
-
-    // Map from mechanism to List of Descriptors that should be registered if the mechanism
-    // is supported
-    private final static Map<String, Descriptor> descriptors = new HashMap<>();
 
     private synchronized static void init() {
         if (nssProvider != null) {
@@ -180,72 +255,6 @@ extends Provider {
         Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
         if (support(d)) {
             descriptors.put(d.toString(), d);
-        }
-    }
-
-    public static final class Descriptor {
-        private final Service service;
-        private final String algorithm;
-        private final String className;
-        private final String oid;
-        private final String[] aliases;
-
-        private Descriptor(
-                final Service service,
-                final String algorithm,
-                final String classNameWithoutPackage,
-                final String oid,
-                final String... aliases) {
-            this.service = service;
-            this.algorithm = algorithm;
-            this.className = classNameWithoutPackage;
-            this.oid = oid;
-            this.aliases = aliases;
-        }
-
-        private List<String> aliasesWithOid;
-        List<String> getAliases() {
-            if (aliasesWithOid == null) {
-                aliasesWithOid = new ArrayList<>();
-                if (aliases != null) {
-                    for (String alias : aliases) {
-                        aliasesWithOid.add(alias);
-                    }
-                }
-                if (oid != null) {
-                    aliasesWithOid.add(oid);
-                    aliasesWithOid.add("OID." + oid);
-                }
-            }
-
-            return aliasesWithOid;
-        }
-
-        public String getClassName() {
-            return service.classPrefix + className;
-        }
-
-        @Override
-        public String toString() {
-            return service.type + "." + algorithm;
-        }
-
-        @Override
-        public int hashCode() {
-            return toString().hashCode();
-        }
-    }
-
-    private static enum Service {
-        Signature("Signature", NSSSignatureSpi.class.getName() + "$");
-
-        private String type;
-        private String classPrefix;
-        private Service(
-                final String type,
-                final String classPrefix) {
-            this.type = type;
-            this.classPrefix = classPrefix;
         }
     }
 

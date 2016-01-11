@@ -91,10 +91,11 @@ import org.xipki.security.api.util.X509Util;
  */
 
 class X509SelfSignedCertBuilder {
-    private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
 
     static class GenerateSelfSignedResult {
+
         private final String signerConf;
+
         private final X509Certificate cert;
 
         GenerateSelfSignedResult(
@@ -111,7 +112,10 @@ class X509SelfSignedCertBuilder {
         X509Certificate getCert() {
             return cert;
         }
-    }
+
+    } // class GenerateSelfSignedResult
+
+    private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
 
     private X509SelfSignedCertBuilder() {
     }

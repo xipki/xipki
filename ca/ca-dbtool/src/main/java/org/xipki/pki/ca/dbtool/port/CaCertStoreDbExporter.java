@@ -1037,15 +1037,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         zipOutStream.close();
     }
 
-    private static NameIdType createNameId(
-            final String name,
-            final int id) {
-        NameIdType info = new NameIdType();
-        info.setId(id);
-        info.setName(name);
-        return info;
-    }
-
     private void finalizeZip(
             final String zipFilename,
             final CaUsersWriter os)
@@ -1063,6 +1054,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         zipOutStream.close();
 
         zipFile.renameTo(new File(zipFilename));
+    }
+
+    private static NameIdType createNameId(
+            final String name,
+            final int id) {
+        NameIdType info = new NameIdType();
+        info.setId(id);
+        info.setName(name);
+        return info;
     }
 
 }

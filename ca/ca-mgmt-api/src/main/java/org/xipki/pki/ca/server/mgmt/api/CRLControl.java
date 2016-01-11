@@ -113,37 +113,8 @@ import org.xipki.common.util.StringUtil;
 
 public class CRLControl implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    public static final String KEY_updateMode = "updateMode";
-
-    public static final String KEY_extensions = "extensions";
-
-    public static final String KEY_expiredCerts_included = "expiredCerts.included";
-
-    public static final String KEY_certs_embedded = "certs.embedded";
-
-    public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
-
-    public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
-
-    public static final String KEY_overlap_minutes = "overlap.minutes";
-
-    public static final String KEY_interval_minutes = "interval.minutes";
-
-    public static final String KEY_interval_time = "interval.time";
-
-    public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
-
-    public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
-
-    public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
-
-    public static final String KEY_excludeReason = "excludeReason";
-
-    public static final String KEY_invalidityDate = "invalidityDate";
-
     public static enum UpdateMode implements Serializable {
+
         interval,
         onDemand;
 
@@ -157,10 +128,13 @@ public class CRLControl implements Serializable {
 
             return null;
         }
-    }
+
+    } // enum UpdateMode
 
     public static class HourMinute {
+
         private final int hour;
+
         private final int minute;
 
         public HourMinute(
@@ -216,21 +190,65 @@ public class CRLControl implements Serializable {
             HourMinute b = (HourMinute) obj;
             return hour == b.hour && minute == b.minute;
         }
-    }
+
+    } // class HourMinute
+
+    private static final long serialVersionUID = 1L;
+
+    public static final String KEY_updateMode = "updateMode";
+
+    public static final String KEY_extensions = "extensions";
+
+    public static final String KEY_expiredCerts_included = "expiredCerts.included";
+
+    public static final String KEY_certs_embedded = "certs.embedded";
+
+    public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
+
+    public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
+
+    public static final String KEY_overlap_minutes = "overlap.minutes";
+
+    public static final String KEY_interval_minutes = "interval.minutes";
+
+    public static final String KEY_interval_time = "interval.time";
+
+    public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
+
+    public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
+
+    public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
+
+    public static final String KEY_excludeReason = "excludeReason";
+
+    public static final String KEY_invalidityDate = "invalidityDate";
 
     private UpdateMode updateMode = UpdateMode.interval;
+
     private boolean embedsCerts = false;
+
     private boolean includeExpiredCerts = false;
+
     private int fullCRLIntervals = 1;
+
     private int deltaCRLIntervals = 0;
+
     private int overlapMinutes = 10;
+
     private boolean extendedNextUpdate = false;
+
     private Integer intervalMinutes;
+
     private HourMinute intervalDayTime;
+
     private boolean onlyContainsUserCerts = false;
+
     private boolean onlyContainsCACerts = false;
+
     private boolean excludeReason = false;
+
     private TripleState invalidityDateMode = TripleState.OPTIONAL;
+
     private final Set<String> extensionOIDs;
 
     public CRLControl(
@@ -314,41 +332,6 @@ public class CRLControl implements Serializable {
         }
 
         validate();
-    }
-
-    private static int getInteger(
-            final ConfPairs props,
-            final String propKey,
-            final int dfltValue)
-    throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            try {
-                return Integer.parseInt(s.trim());
-            } catch (NumberFormatException e) {
-                throw new InvalidConfException(propKey + " does not have numeric value: " + s);
-            }
-        }
-        return dfltValue;
-    }
-
-    private static boolean getBoolean(
-            final ConfPairs props,
-            final String propKey,
-            final boolean dfltValue)
-    throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            s = s.trim();
-            if ("true".equalsIgnoreCase(s)) {
-                return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
-                return Boolean.FALSE;
-            } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
-            }
-        }
-        return dfltValue;
     }
 
     public String getConf() {
@@ -531,6 +514,41 @@ public class CRLControl implements Serializable {
         }
 
         return true;
+    }
+
+    private static int getInteger(
+            final ConfPairs props,
+            final String propKey,
+            final int dfltValue)
+    throws InvalidConfException {
+        String s = props.getValue(propKey);
+        if (s != null) {
+            try {
+                return Integer.parseInt(s.trim());
+            } catch (NumberFormatException e) {
+                throw new InvalidConfException(propKey + " does not have numeric value: " + s);
+            }
+        }
+        return dfltValue;
+    }
+
+    private static boolean getBoolean(
+            final ConfPairs props,
+            final String propKey,
+            final boolean dfltValue)
+    throws InvalidConfException {
+        String s = props.getValue(propKey);
+        if (s != null) {
+            s = s.trim();
+            if ("true".equalsIgnoreCase(s)) {
+                return Boolean.TRUE;
+            } else if ("false".equalsIgnoreCase(s)) {
+                return Boolean.FALSE;
+            } else {
+                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+            }
+        }
+        return dfltValue;
     }
 
 }

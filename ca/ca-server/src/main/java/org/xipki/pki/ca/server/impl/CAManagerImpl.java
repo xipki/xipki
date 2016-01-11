@@ -138,10 +138,10 @@ import org.xipki.security.api.util.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class CAManagerImpl
-implements CAManager, CmpResponderManager, ScepManager {
+public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManager {
 
     private class ScheduledPublishQueueCleaner implements Runnable {
+
         private boolean inProcess = false;
 
         @Override
@@ -168,10 +168,13 @@ implements CAManager, CmpResponderManager, ScepManager {
                 inProcess = false;
             }
         }
-    }
+
+    } // class ScheduledPublishQueueCleaner
 
     private class ScheduledDeleteCertsInProcessService implements Runnable {
+
         private boolean inProcess = false;
+
         @Override
         public void run() {
             if (inProcess) {
@@ -196,11 +199,12 @@ implements CAManager, CmpResponderManager, ScepManager {
             } finally {
                 inProcess = false;
             }
-
         }
-    }
+
+    } // class ScheduledDeleteCertsInProcessService
 
     private class ScheduledCARestarter implements Runnable {
+
         private boolean inProcess = false;
 
         @Override
@@ -234,7 +238,8 @@ implements CAManager, CmpResponderManager, ScepManager {
                 inProcess = false;
             }
         }
-    }
+
+    } // class ScheduledCARestarter
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
@@ -2675,47 +2680,6 @@ implements CAManager, CmpResponderManager, ScepManager {
         }
     }
 
-    private static void assertNotNULL(
-            final String parameterName,
-            final String parameterValue) {
-        if (CAManager.NULL.equalsIgnoreCase(parameterValue)) {
-            throw new IllegalArgumentException(parameterName + " could not be " + CAManager.NULL);
-        }
-    }
-
-    private static String canonicalizeSignerConf(
-            final String keystoreType,
-            final String signerConf,
-            final PasswordResolver passwordResolver,
-            final X509Certificate[] certChain)
-    throws Exception {
-        if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
-            return signerConf;
-        }
-
-        ConfPairs pairs = new ConfPairs(signerConf);
-        String keystoreConf = pairs.getValue("keystore");
-        String passwordHint = pairs.getValue("password");
-        String keyLabel     = pairs.getValue("key-label");
-
-        byte[] keystoreBytes;
-        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
-            String keystoreFile = keystoreConf.substring("file:".length());
-            keystoreBytes = IoUtil.read(keystoreFile);
-        } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
-            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
-        } else {
-            return signerConf;
-        }
-
-        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel,
-                passwordResolver.resolvePassword(passwordHint), certChain);
-
-        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
-        return pairs.getEncoded();
-    }
-
     void shutdownCertprofile(
             final IdentifiedX509Certprofile profile) {
         if (profile == null) {
@@ -2856,53 +2820,6 @@ implements CAManager, CmpResponderManager, ScepManager {
                 publisherType);
     }
 
-    private static String getRealType(
-            String typeMap,
-            final String type) {
-        if (typeMap == null) {
-            return null;
-        }
-
-        typeMap = typeMap.trim();
-        if (StringUtil.isBlank(typeMap)) {
-            return null;
-        }
-
-        ConfPairs pairs;
-        try {
-            pairs = new ConfPairs(typeMap);
-        } catch (IllegalArgumentException e) {
-            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs", typeMap, type);
-            return null;
-        }
-        return pairs.getValue(type);
-    }
-
-    static List<String[]> splitCASignerConfs(
-            final String conf)
-    throws SignerException {
-        ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("algo");
-        List<String> list = StringUtil.split(str, ":");
-        if (list == null) {
-            throw new SignerException("no algo is defined in CA signerConf");
-        }
-
-        List<String[]> signerConfs = new ArrayList<>(list.size());
-        for (String n : list) {
-            String c14nAlgo;
-            try {
-                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
-            } catch (NoSuchAlgorithmException e) {
-                throw new SignerException(e.getMessage(), e);
-            }
-            pairs.putPair("algo", c14nAlgo);
-            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
-        }
-
-        return signerConfs;
-    }
-
     @Override
     public boolean addUser(
             final AddUserEntry userEntry)
@@ -3016,6 +2933,94 @@ implements CAManager, CmpResponderManager, ScepManager {
         return (scepDbEntries == null)
                 ? null
                 : Collections.unmodifiableSet(scepDbEntries.keySet());
+    }
+
+    private static void assertNotNULL(
+            final String parameterName,
+            final String parameterValue) {
+        if (CAManager.NULL.equalsIgnoreCase(parameterValue)) {
+            throw new IllegalArgumentException(parameterName + " could not be " + CAManager.NULL);
+        }
+    }
+
+    private static String canonicalizeSignerConf(
+            final String keystoreType,
+            final String signerConf,
+            final PasswordResolver passwordResolver,
+            final X509Certificate[] certChain)
+    throws Exception {
+        if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
+            return signerConf;
+        }
+
+        ConfPairs pairs = new ConfPairs(signerConf);
+        String keystoreConf = pairs.getValue("keystore");
+        String passwordHint = pairs.getValue("password");
+        String keyLabel     = pairs.getValue("key-label");
+
+        byte[] keystoreBytes;
+        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
+            String keystoreFile = keystoreConf.substring("file:".length());
+            keystoreBytes = IoUtil.read(keystoreFile);
+        } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
+            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+        } else {
+            return signerConf;
+        }
+
+        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel,
+                passwordResolver.resolvePassword(passwordHint), certChain);
+
+        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return pairs.getEncoded();
+    }
+
+    private static String getRealType(
+            String typeMap,
+            final String type) {
+        if (typeMap == null) {
+            return null;
+        }
+
+        typeMap = typeMap.trim();
+        if (StringUtil.isBlank(typeMap)) {
+            return null;
+        }
+
+        ConfPairs pairs;
+        try {
+            pairs = new ConfPairs(typeMap);
+        } catch (IllegalArgumentException e) {
+            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs", typeMap, type);
+            return null;
+        }
+        return pairs.getValue(type);
+    }
+
+    static List<String[]> splitCASignerConfs(
+            final String conf)
+    throws SignerException {
+        ConfPairs pairs = new ConfPairs(conf);
+        String str = pairs.getValue("algo");
+        List<String> list = StringUtil.split(str, ":");
+        if (list == null) {
+            throw new SignerException("no algo is defined in CA signerConf");
+        }
+
+        List<String[]> signerConfs = new ArrayList<>(list.size());
+        for (String n : list) {
+            String c14nAlgo;
+            try {
+                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
+            } catch (NoSuchAlgorithmException e) {
+                throw new SignerException(e.getMessage(), e);
+            }
+            pairs.putPair("algo", c14nAlgo);
+            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
+        }
+
+        return signerConfs;
     }
 
 }

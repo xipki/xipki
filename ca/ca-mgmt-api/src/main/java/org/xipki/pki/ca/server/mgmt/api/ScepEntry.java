@@ -51,8 +51,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class ScepEntry
-implements Serializable {
+public class ScepEntry implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
 

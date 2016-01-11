@@ -86,25 +86,6 @@ public class ScepControl implements Serializable {
         this.includeSignerCert = getBoolean(props, KEY_signerCertIncluded, true);
     }
 
-    private static boolean getBoolean(
-            final ConfPairs props,
-            final String propKey,
-            final boolean dfltValue)
-    throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            s = s.trim();
-            if ("true".equalsIgnoreCase(s)) {
-                return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
-                return Boolean.FALSE;
-            } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
-            }
-        }
-        return dfltValue;
-    }
-
     public String getConf() {
         ConfPairs pairs = new ConfPairs();
         pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
@@ -155,6 +136,25 @@ public class ScepControl implements Serializable {
         }
 
         return true;
+    }
+
+    private static boolean getBoolean(
+            final ConfPairs props,
+            final String propKey,
+            final boolean dfltValue)
+    throws InvalidConfException {
+        String s = props.getValue(propKey);
+        if (s != null) {
+            s = s.trim();
+            if ("true".equalsIgnoreCase(s)) {
+                return Boolean.TRUE;
+            } else if ("false".equalsIgnoreCase(s)) {
+                return Boolean.FALSE;
+            } else {
+                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+            }
+        }
+        return dfltValue;
     }
 
 }

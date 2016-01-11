@@ -142,6 +142,30 @@ import org.xipki.security.api.util.X509Util;
 
 public class X509CACmpResponder extends CmpResponder {
 
+    private class PendingPoolCleaner implements Runnable {
+
+        @Override
+        public void run() {
+            Set<X509CertificateInfo> remainingCerts =
+                    pendingCertPool.removeConfirmTimeoutedCertificates();
+
+            if (CollectionUtil.isEmpty(remainingCerts)) {
+                return;
+            }
+
+            Date invalidityDate = new Date();
+            X509CA ca = getCA();
+            for (X509CertificateInfo remainingCert : remainingCerts) {
+                try {
+                    ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
+                        CRLReason.CESSATION_OF_OPERATION, invalidityDate);
+                } catch (Throwable t) {
+                }
+            }
+        }
+
+    } // class PendingPoolCleaner
+
     private static final Set<String> knownGenMsgIds = new HashSet<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
@@ -1077,28 +1101,6 @@ public class X509CACmpResponder extends CmpResponder {
 
         throw new IllegalStateException(
                 "should not happen, no CMP control is defined for CA " + caName);
-    }
-
-    private class PendingPoolCleaner implements Runnable {
-        @Override
-        public void run() {
-            Set<X509CertificateInfo> remainingCerts =
-                    pendingCertPool.removeConfirmTimeoutedCertificates();
-
-            if (CollectionUtil.isEmpty(remainingCerts)) {
-                return;
-            }
-
-            Date invalidityDate = new Date();
-            X509CA ca = getCA();
-            for (X509CertificateInfo remainingCert : remainingCerts) {
-                try {
-                    ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
-                        CRLReason.CESSATION_OF_OPERATION, invalidityDate);
-                } catch (Throwable t) {
-                }
-            }
-        }
     }
 
     private void checkPermission(

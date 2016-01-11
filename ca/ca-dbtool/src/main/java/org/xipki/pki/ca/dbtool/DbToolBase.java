@@ -99,41 +99,6 @@ public class DbToolBase {
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
-    protected static void setLong(
-            final PreparedStatement ps,
-            final int index,
-            final Long i)
-    throws SQLException {
-        if (i != null) {
-            ps.setLong(index, i.longValue());
-        } else {
-            ps.setNull(index, Types.BIGINT);
-        }
-    }
-
-    protected static void setInt(
-            final PreparedStatement ps,
-            final int index,
-            final Integer i)
-    throws SQLException {
-        if (i != null) {
-            ps.setInt(index, i.intValue());
-        } else {
-            ps.setNull(index, Types.INTEGER);
-        }
-    }
-
-    protected static void setBoolean(
-            final PreparedStatement ps,
-            final int index,
-            final boolean b)
-    throws SQLException {
-        int i =  b
-                ? 1
-                : 0;
-        ps.setInt(index, i);
-    }
-
     protected Statement createStatement()
     throws DataAccessException {
         try {
@@ -290,6 +255,41 @@ public class DbToolBase {
         } catch (SQLException e) {
             throw dataSource.translate(task, e);
         }
+    }
+
+    protected static void setLong(
+            final PreparedStatement ps,
+            final int index,
+            final Long i)
+    throws SQLException {
+        if (i != null) {
+            ps.setLong(index, i.longValue());
+        } else {
+            ps.setNull(index, Types.BIGINT);
+        }
+    }
+
+    protected static void setInt(
+            final PreparedStatement ps,
+            final int index,
+            final Integer i)
+    throws SQLException {
+        if (i != null) {
+            ps.setInt(index, i.intValue());
+        } else {
+            ps.setNull(index, Types.INTEGER);
+        }
+    }
+
+    protected static void setBoolean(
+            final PreparedStatement ps,
+            final int index,
+            final boolean b)
+    throws SQLException {
+        int i =  b
+                ? 1
+                : 0;
+        ps.setInt(index, i);
     }
 
     public static Properties getDbConfProperties(

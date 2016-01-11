@@ -47,15 +47,11 @@ import org.xipki.common.util.CollectionUtil;
 
 public class KeyParametersOption {
 
-    public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
-
-    private KeyParametersOption() {
-    }
-
     public static class AllowAllParametersOption extends KeyParametersOption {
-    }
+    } // class AllowAllParametersOption
 
     public static class RSAParametersOption extends KeyParametersOption {
+
         private Set<Range> modulusLengths;
 
         public RSAParametersOption() {
@@ -83,12 +79,17 @@ public class KeyParametersOption {
             }
             return false;
         }
-    }
+
+    } // class RSAParametersOption
 
     public static class RSAPSSParametersOption extends RSAParametersOption {
+
         private Set<ASN1ObjectIdentifier> hashAlgs;
+
         private Set<ASN1ObjectIdentifier> maskGenAlgs;
+
         private Set<Integer> saltLengths;
+
         private Set<Integer> trailerFields;
 
         public RSAPSSParametersOption() {
@@ -166,10 +167,12 @@ public class KeyParametersOption {
             return trailerFields.contains(trailerField);
         }
 
-    }
+    } // class RSAPSSParametersOption
 
     public static class DSAParametersOption extends KeyParametersOption {
+
         private Set<Range> pLengths;
+
         private Set<Range> qLengths;
 
         public DSAParametersOption() {
@@ -222,13 +225,16 @@ public class KeyParametersOption {
 
             return false;
         }
-    }
+
+    } // class DSAParametersOption
 
     public static class DHParametersOption extends DSAParametersOption {
-    }
+    } // class DHParametersOption
 
     public static class ECParamatersOption extends KeyParametersOption {
+
         private Set<ASN1ObjectIdentifier> curveOids;
+
         private Set<Byte> pointEncodings;
 
         public ECParamatersOption() {
@@ -261,11 +267,15 @@ public class KeyParametersOption {
                 final byte encoding) {
             return pointEncodings.contains(encoding);
         }
-    }
+
+    } // class ECParamatersOption
 
     public static class GostParametersOption extends KeyParametersOption {
+
         private Set<ASN1ObjectIdentifier> publicKeyParamSets;
+
         private Set<ASN1ObjectIdentifier> digestParamSets;
+
         private Set<ASN1ObjectIdentifier> encryptionParamSets;
 
         public GostParametersOption() {
@@ -321,6 +331,12 @@ public class KeyParametersOption {
             }
             return encryptionParamSets.contains(oid);
         }
+
+    } // class GostParametersOption
+
+    public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
+
+    private KeyParametersOption() {
     }
 
 }

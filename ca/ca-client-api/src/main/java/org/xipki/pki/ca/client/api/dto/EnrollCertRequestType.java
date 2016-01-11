@@ -49,10 +49,12 @@ import org.xipki.common.util.ParamUtil;
 public class EnrollCertRequestType {
 
     public static enum Type {
+
         CERT_REQ,
         KEY_UPDATE,
         CROSS_CERT_REQ;
-    }
+
+    } // enum Type
 
     private final Type type;
 

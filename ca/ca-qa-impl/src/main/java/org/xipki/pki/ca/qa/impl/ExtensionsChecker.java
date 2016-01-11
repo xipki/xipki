@@ -1785,71 +1785,6 @@ public class ExtensionsChecker {
         }
     }
 
-    private static void checkAIA(
-            final StringBuilder failureMsg,
-            final AuthorityInformationAccess aia,
-            final ASN1ObjectIdentifier accessMethod,
-            final Set<String> expectedUris) {
-        String typeDesc;
-        if (X509ObjectIdentifiers.id_ad_ocsp.equals(accessMethod)) {
-            typeDesc = "OCSP";
-        } else if (X509ObjectIdentifiers.id_ad_caIssuers.equals(accessMethod)) {
-            typeDesc = "caIssuer";
-        } else {
-            typeDesc = accessMethod.getId();
-        }
-
-        List<AccessDescription> iAccessDescriptions = new LinkedList<>();
-        for (AccessDescription accessDescription : aia.getAccessDescriptions()) {
-            if (accessMethod.equals(accessDescription.getAccessMethod())) {
-                iAccessDescriptions.add(accessDescription);
-            }
-        }
-
-        int n = iAccessDescriptions.size();
-        if (n != expectedUris.size()) {
-            failureMsg.append("number of AIA ").append(typeDesc).append(" URIs is '").append(n);
-            failureMsg.append("' but expected is '").append(expectedUris.size()).append("'");
-            failureMsg.append("; ");
-            return;
-        }
-
-        Set<String> iUris = new HashSet<>();
-        for (int i = 0; i < n; i++) {
-            GeneralName iAccessLocation = iAccessDescriptions.get(i).getAccessLocation();
-            if (iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
-                failureMsg.append("tag of accessLocation of AIA ")
-                    .append(typeDesc)
-                    .append(" is '").append(iAccessLocation.getTagNo());
-                failureMsg.append("' but expected is '")
-                    .append(GeneralName.uniformResourceIdentifier)
-                    .append("'");
-                failureMsg.append("; ");
-            } else {
-                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                iUris.add(iOCSPUri);
-            }
-        }
-
-        Set<String> diffs = str_in_b_not_in_a(expectedUris, iUris);
-        if (CollectionUtil.isNotEmpty(diffs)) {
-            failureMsg.append(typeDesc)
-                .append(" URIs ")
-                .append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
-        }
-
-        diffs = str_in_b_not_in_a(iUris, expectedUris);
-        if (CollectionUtil.isNotEmpty(diffs)) {
-            failureMsg.append(typeDesc)
-                .append(" URIs ")
-                .append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
-        }
-    }
-
     private void checkExtensionCrlDistributionPoints(
             final StringBuilder failureMsg,
             final byte[] extensionValue,
@@ -2703,6 +2638,114 @@ public class ExtensionsChecker {
         }
     }
 
+    private Set<KeyUsageControl> getKeyusage(
+            final boolean required) {
+        Set<KeyUsageControl> ret = new HashSet<>();
+
+        Set<KeyUsageControl> controls = keyusages;
+        if (controls != null) {
+            for (KeyUsageControl control : controls) {
+                if (control.isRequired() == required) {
+                    ret.add(control);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private Set<ExtKeyUsageControl> getExtKeyusage(
+            final boolean required) {
+        Set<ExtKeyUsageControl> ret = new HashSet<>();
+
+        Set<ExtKeyUsageControl> controls = extendedKeyusages;
+        if (controls != null) {
+            for (ExtKeyUsageControl control : controls) {
+                if (control.isRequired() == required) {
+                    ret.add(control);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private byte[] getConstantExtensionValue(
+            final ASN1ObjectIdentifier type) {
+        return (constantExtensions == null)
+                ? null
+                : constantExtensions.get(type).getValue();
+    }
+
+    private Object getExtensionValue(
+            final ASN1ObjectIdentifier type,
+            final ExtensionsType extensionsType,
+            final Class<?> expectedClass)
+    throws CertprofileException {
+        for (ExtensionType m : extensionsType.getExtension()) {
+            if (!m.getType().getValue().equals(type.getId())) {
+                continue;
+            }
+
+            if (m.getValue() == null || m.getValue().getAny() == null) {
+                return null;
+            }
+
+            Object o = m.getValue().getAny();
+            if (expectedClass.isAssignableFrom(o.getClass())) {
+                return o;
+            } else if (ConstantExtValue.class.isAssignableFrom(o.getClass())) {
+                // will be processed later
+                return null;
+            } else {
+                String displayName = ObjectIdentifiers.oidToDisplayName(type);
+                throw new CertprofileException("the extension configuration for " + displayName
+                        + " is not of the expected type " + expectedClass.getName());
+            }
+        }
+
+        throw new RuntimeException("should not reach here: undefined extension "
+                + ObjectIdentifiers.oidToDisplayName(type));
+    }
+
+    public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
+            final ExtensionsType extensionsType)
+    throws CertprofileException {
+        if (extensionsType == null) {
+            return null;
+        }
+
+        Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
+
+        for (ExtensionType m : extensionsType.getExtension()) {
+            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue)) {
+                continue;
+            }
+
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+            if (Extension.subjectAlternativeName.equals(oid)
+                    || Extension.subjectInfoAccess.equals(oid)
+                    || Extension.biometricInfo.equals(oid)) {
+                continue;
+            }
+
+            ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
+            byte[] encodedValue = extConf.getValue();
+            ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
+            try {
+                parser.readObject();
+            } catch (IOException e) {
+                throw new CertprofileException("could not parse the constant extension value", e);
+            }
+            QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
+            map.put(oid, extension);
+        }
+
+        if (CollectionUtil.isEmpty(map)) {
+            return null;
+        }
+
+        return Collections.unmodifiableMap(map);
+    }
+
     private static String hex(
             final byte[] bytes) {
         return Hex.toHexString(bytes);
@@ -2839,112 +2882,69 @@ public class ExtensionsChecker {
         return usages;
     }
 
-    private Set<KeyUsageControl> getKeyusage(
-            final boolean required) {
-        Set<KeyUsageControl> ret = new HashSet<>();
+    private static void checkAIA(
+            final StringBuilder failureMsg,
+            final AuthorityInformationAccess aia,
+            final ASN1ObjectIdentifier accessMethod,
+            final Set<String> expectedUris) {
+        String typeDesc;
+        if (X509ObjectIdentifiers.id_ad_ocsp.equals(accessMethod)) {
+            typeDesc = "OCSP";
+        } else if (X509ObjectIdentifiers.id_ad_caIssuers.equals(accessMethod)) {
+            typeDesc = "caIssuer";
+        } else {
+            typeDesc = accessMethod.getId();
+        }
 
-        Set<KeyUsageControl> controls = keyusages;
-        if (controls != null) {
-            for (KeyUsageControl control : controls) {
-                if (control.isRequired() == required) {
-                    ret.add(control);
-                }
+        List<AccessDescription> iAccessDescriptions = new LinkedList<>();
+        for (AccessDescription accessDescription : aia.getAccessDescriptions()) {
+            if (accessMethod.equals(accessDescription.getAccessMethod())) {
+                iAccessDescriptions.add(accessDescription);
             }
         }
-        return ret;
-    }
 
-    private Set<ExtKeyUsageControl> getExtKeyusage(
-            final boolean required) {
-        Set<ExtKeyUsageControl> ret = new HashSet<>();
-
-        Set<ExtKeyUsageControl> controls = extendedKeyusages;
-        if (controls != null) {
-            for (ExtKeyUsageControl control : controls) {
-                if (control.isRequired() == required) {
-                    ret.add(control);
-                }
-            }
+        int n = iAccessDescriptions.size();
+        if (n != expectedUris.size()) {
+            failureMsg.append("number of AIA ").append(typeDesc).append(" URIs is '").append(n);
+            failureMsg.append("' but expected is '").append(expectedUris.size()).append("'");
+            failureMsg.append("; ");
+            return;
         }
-        return ret;
-    }
 
-    private byte[] getConstantExtensionValue(
-            final ASN1ObjectIdentifier type) {
-        return (constantExtensions == null)
-                ? null
-                : constantExtensions.get(type).getValue();
-    }
-
-    private Object getExtensionValue(
-            final ASN1ObjectIdentifier type,
-            final ExtensionsType extensionsType,
-            final Class<?> expectedClass)
-    throws CertprofileException {
-        for (ExtensionType m : extensionsType.getExtension()) {
-            if (!m.getType().getValue().equals(type.getId())) {
-                continue;
-            }
-
-            if (m.getValue() == null || m.getValue().getAny() == null) {
-                return null;
-            }
-
-            Object o = m.getValue().getAny();
-            if (expectedClass.isAssignableFrom(o.getClass())) {
-                return o;
-            } else if (ConstantExtValue.class.isAssignableFrom(o.getClass())) {
-                // will be processed later
-                return null;
+        Set<String> iUris = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            GeneralName iAccessLocation = iAccessDescriptions.get(i).getAccessLocation();
+            if (iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
+                failureMsg.append("tag of accessLocation of AIA ")
+                    .append(typeDesc)
+                    .append(" is '").append(iAccessLocation.getTagNo());
+                failureMsg.append("' but expected is '")
+                    .append(GeneralName.uniformResourceIdentifier)
+                    .append("'");
+                failureMsg.append("; ");
             } else {
-                String displayName = ObjectIdentifiers.oidToDisplayName(type);
-                throw new CertprofileException("the extension configuration for " + displayName
-                        + " is not of the expected type " + expectedClass.getName());
+                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
+                iUris.add(iOCSPUri);
             }
         }
 
-        throw new RuntimeException("should not reach here: undefined extension "
-                + ObjectIdentifiers.oidToDisplayName(type));
-    }
-
-    public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
-        if (extensionsType == null) {
-            return null;
+        Set<String> diffs = str_in_b_not_in_a(expectedUris, iUris);
+        if (CollectionUtil.isNotEmpty(diffs)) {
+            failureMsg.append(typeDesc)
+                .append(" URIs ")
+                .append(diffs.toString())
+                .append(" are present but not expected");
+            failureMsg.append("; ");
         }
 
-        Map<ASN1ObjectIdentifier, QaExtensionValue> map = new HashMap<>();
-
-        for (ExtensionType m : extensionsType.getExtension()) {
-            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue)) {
-                continue;
-            }
-
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if (Extension.subjectAlternativeName.equals(oid)
-                    || Extension.subjectInfoAccess.equals(oid)
-                    || Extension.biometricInfo.equals(oid)) {
-                continue;
-            }
-
-            ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
-            byte[] encodedValue = extConf.getValue();
-            ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
-            try {
-                parser.readObject();
-            } catch (IOException e) {
-                throw new CertprofileException("could not parse the constant extension value", e);
-            }
-            QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
-            map.put(oid, extension);
+        diffs = str_in_b_not_in_a(iUris, expectedUris);
+        if (CollectionUtil.isNotEmpty(diffs)) {
+            failureMsg.append(typeDesc)
+                .append(" URIs ")
+                .append(diffs.toString())
+                .append(" are absent but are required");
+            failureMsg.append("; ");
         }
-
-        if (CollectionUtil.isEmpty(map)) {
-            return null;
-        }
-
-        return Collections.unmodifiableMap(map);
     }
 
 }

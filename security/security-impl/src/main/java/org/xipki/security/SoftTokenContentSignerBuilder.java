@@ -103,6 +103,185 @@ import org.xipki.security.bcext.DSAPlainDigestSigner;
 
 public class SoftTokenContentSignerBuilder {
 
+    private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
+
+        private RSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId)
+        throws NoSuchAlgorithmException, NoSuchPaddingException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+        }
+
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid RSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
+
+            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+                if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null) {
+                    NssPlainRSASigner plainRSASigner;
+                    try {
+                        plainRSASigner = new NssPlainRSASigner();
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchProviderException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchPaddingException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    }
+                    return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
+                } else {
+                    return SignerUtil.createPSSRSASigner(sigAlgId);
+                }
+            } else {
+                Digest dig = digestProvider.get(digAlgId);
+                return new RSADigestSigner(dig);
+            }
+        }
+
+    } // class RSAContentSignerBuilder
+
+    private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
+
+        private final boolean plain;
+
+        private DSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
+        throws NoSuchAlgorithmException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
+        }
+
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid DSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
+
+            Digest dig = digestProvider.get(digAlgId);
+            DSASigner dsaSigner = new DSASigner();
+            if (plain) {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            } else {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
+        }
+
+    } // class DSAContentSignerBuilder
+
+    private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
+
+        private final boolean plain;
+
+        private ECDSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
+        throws NoSuchAlgorithmException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
+        }
+
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid EC signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
+
+            Digest dig = digestProvider.get(digAlgId);
+            ECDSASigner dsaSigner = new ECDSASigner();
+
+            if (plain) {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            } else {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
+        }
+
+    } // class ECDSAContentSignerBuilder
+
+    public static class NssPlainRSASigner implements AsymmetricBlockCipher {
+
+        private static final String algorithm = "RSA/ECB/NoPadding";
+
+        private Cipher cipher;
+
+        private RSAKeyParameters key;
+
+        public NssPlainRSASigner()
+        throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
+            cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
+        }
+
+        @Override
+        public void init(
+                final boolean forEncryption,
+                final CipherParameters param) {
+            if (!forEncryption) {
+                throw new RuntimeCryptoException("verification mode not supported.");
+            }
+
+            if (param instanceof ParametersWithRandom) {
+                ParametersWithRandom rParam = (ParametersWithRandom) param;
+
+                key = (RSAKeyParameters) rParam.getParameters();
+            } else {
+                key = (RSAKeyParameters) param;
+            }
+
+            RSAPrivateKey signingKey;
+            if (key instanceof RSAPrivateCrtKeyParameters) {
+                signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
+            } else {
+                signingKey = new BCRSAPrivateKey(key);
+            }
+
+            try {
+                cipher.init(Cipher.ENCRYPT_MODE, signingKey);
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+                throw new RuntimeCryptoException("could not initialize the cipher: "
+                        + e.getMessage());
+            }
+        }
+
+        @Override
+        public int getInputBlockSize() {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public int getOutputBlockSize() {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public byte[] processBlock(
+                final byte[] in,
+                final int inOff,
+                final int len)
+        throws InvalidCipherTextException {
+            try {
+                return cipher.doFinal(in, 0, in.length);
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                throw new InvalidCipherTextException(e.getMessage(), e);
+            }
+        }
+
+    } // class NssPlainRSASigner
+
     private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
 
     public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
@@ -302,184 +481,5 @@ public class SoftTokenContentSignerBuilder {
     public PrivateKey getKey() {
         return key;
     }
-
-    private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
-
-        private RSAContentSignerBuilder(
-                final AlgorithmIdentifier signatureAlgId)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-        }
-
-        protected Signer createSigner(
-                final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-            if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
-                throw new OperatorCreationException(
-                        "the given algorithm is not a valid RSA signature algirthm '"
-                        + sigAlgId.getAlgorithm().getId() + "'");
-            }
-
-            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-                if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null) {
-                    NssPlainRSASigner plainRSASigner;
-                    try {
-                        plainRSASigner = new NssPlainRSASigner();
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    } catch (NoSuchProviderException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    } catch (NoSuchPaddingException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    }
-                    return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
-                } else {
-                    return SignerUtil.createPSSRSASigner(sigAlgId);
-                }
-            } else {
-                Digest dig = digestProvider.get(digAlgId);
-                return new RSADigestSigner(dig);
-            }
-        }
-
-    } // RSAContentSignerBuilder
-
-    private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
-
-        private final boolean plain;
-
-        private DSAContentSignerBuilder(
-                final AlgorithmIdentifier signatureAlgId,
-                final boolean plain)
-        throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-            this.plain = plain;
-        }
-
-        protected Signer createSigner(
-                final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-            if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
-                throw new OperatorCreationException(
-                        "the given algorithm is not a valid DSA signature algirthm '"
-                        + sigAlgId.getAlgorithm().getId() + "'");
-            }
-
-            Digest dig = digestProvider.get(digAlgId);
-            DSASigner dsaSigner = new DSASigner();
-            if (plain) {
-                return new DSAPlainDigestSigner(dsaSigner, dig);
-            } else {
-                return new DSADigestSigner(dsaSigner, dig);
-            }
-        }
-
-    } // DSAContentSignerBuilder
-
-    private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
-
-        private final boolean plain;
-
-        private ECDSAContentSignerBuilder(
-                final AlgorithmIdentifier signatureAlgId,
-                final boolean plain)
-        throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-            this.plain = plain;
-        }
-
-        protected Signer createSigner(
-                final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-            if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
-                throw new OperatorCreationException(
-                        "the given algorithm is not a valid EC signature algirthm '"
-                        + sigAlgId.getAlgorithm().getId() + "'");
-            }
-
-            Digest dig = digestProvider.get(digAlgId);
-            ECDSASigner dsaSigner = new ECDSASigner();
-
-            if (plain) {
-                return new DSAPlainDigestSigner(dsaSigner, dig);
-            } else {
-                return new DSADigestSigner(dsaSigner, dig);
-            }
-        }
-
-    } // ECDSAContentSignerBuilder
-
-    public static class NssPlainRSASigner implements AsymmetricBlockCipher {
-
-        private static final String algorithm = "RSA/ECB/NoPadding";
-
-        private Cipher cipher;
-
-        private RSAKeyParameters key;
-
-        public NssPlainRSASigner()
-        throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-            cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
-        }
-
-        @Override
-        public void init(
-                final boolean forEncryption,
-                final CipherParameters param) {
-            if (!forEncryption) {
-                throw new RuntimeCryptoException("verification mode not supported.");
-            }
-
-            if (param instanceof ParametersWithRandom) {
-                ParametersWithRandom rParam = (ParametersWithRandom) param;
-
-                key = (RSAKeyParameters) rParam.getParameters();
-            } else {
-                key = (RSAKeyParameters) param;
-            }
-
-            RSAPrivateKey signingKey;
-            if (key instanceof RSAPrivateCrtKeyParameters) {
-                signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
-            } else {
-                signingKey = new BCRSAPrivateKey(key);
-            }
-
-            try {
-                cipher.init(Cipher.ENCRYPT_MODE, signingKey);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-                throw new RuntimeCryptoException("could not initialize the cipher: "
-                        + e.getMessage());
-            }
-        }
-
-        @Override
-        public int getInputBlockSize() {
-            return (key.getModulus().bitLength() + 7) / 8;
-        }
-
-        @Override
-        public int getOutputBlockSize() {
-            return (key.getModulus().bitLength() + 7) / 8;
-        }
-
-        @Override
-        public byte[] processBlock(
-                final byte[] in,
-                final int inOff,
-                final int len)
-        throws InvalidCipherTextException {
-            try {
-                return cipher.doFinal(in, 0, in.length);
-            } catch (IllegalBlockSizeException | BadPaddingException e) {
-                throw new InvalidCipherTextException(e.getMessage(), e);
-            }
-        }
-
-    } // NssPlainRSASigner
 
 }

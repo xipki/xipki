@@ -51,6 +51,7 @@ import org.xipki.security.api.util.X509Util;
 public class LoadTestEntry {
 
     public static enum RandomDN {
+
         GIVENNAME,
         SURNAME,
         STREET,
@@ -70,7 +71,7 @@ public class LoadTestEntry {
             return null;
         }
 
-    }
+    } // enum RandomDN
 
     private static class IncreasableSubject {
 
@@ -139,7 +140,8 @@ public class LoadTestEntry {
             }
             return new X500Name(newRDNS);
         }
-    }
+
+    } // class IncreasableSubject
 
     private final String certprofile;
 

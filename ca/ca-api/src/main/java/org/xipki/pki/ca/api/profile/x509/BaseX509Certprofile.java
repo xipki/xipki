@@ -248,83 +248,6 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         return new SubjectInfo(grantedSubject, null);
     }
 
-    private static RDN createDateOfBirthRDN(
-            final ASN1ObjectIdentifier type,
-            final ASN1Encodable rdnValue)
-    throws BadCertTemplateException {
-        String text;
-        ASN1Encodable newRdnValue = null;
-        if (rdnValue instanceof ASN1GeneralizedTime) {
-            text = ((ASN1GeneralizedTime) rdnValue).getTimeString();
-            newRdnValue = rdnValue;
-        } else if (rdnValue instanceof ASN1String && !(rdnValue instanceof DERUniversalString)) {
-            text = ((ASN1String) rdnValue).getString();
-        } else {
-            throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
-        }
-
-        if (!SubjectDNSpec.p_dateOfBirth.matcher(text).matches()) {
-            throw new BadCertTemplateException(
-                    "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
-        }
-
-        if (newRdnValue == null) {
-            newRdnValue = new DERGeneralizedTime(text);
-        }
-
-        return new RDN(type, newRdnValue);
-    }
-
-    private static RDN createPostalAddressRDN(
-            final ASN1ObjectIdentifier type,
-            final ASN1Encodable rdnValue,
-            final RDNControl control,
-            final int index)
-    throws BadCertTemplateException {
-        if (!(rdnValue instanceof ASN1Sequence)) {
-            throw new BadCertTemplateException("Value of RDN postalAddress has incorrect syntax");
-        }
-
-        ASN1Sequence seq = (ASN1Sequence) rdnValue;
-        final int size = seq.size();
-        if (size < 1 || size > 6) {
-            throw new BadCertTemplateException(
-                    "Sequence size of RDN postalAddress is not within [1, 6]: " + size);
-        }
-
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        for (int i = 0; i < size; i++) {
-            ASN1Encodable line = seq.getObjectAt(i);
-            String text;
-            if (line instanceof ASN1String && !(line instanceof DERUniversalString)) {
-                text = ((ASN1String) line).getString();
-            } else {
-                throw new BadCertTemplateException("postalAddress[" + i + "] has incorrect syntax");
-            }
-
-            ASN1Encodable asn1Line = createRDNValue(text, type, control, index);
-            v.add(asn1Line);
-        }
-
-        return new RDN(type, new DERSequence(v));
-    }
-
-    private static RDN[] getRDNs(
-            final RDN[] rdns,
-            final ASN1ObjectIdentifier type) {
-        List<RDN> ret = new ArrayList<>(1);
-        for (int i = 0; i < rdns.length; i++) {
-            RDN rdn = rdns[i];
-            if (rdn.getFirst().getType().equals(type)) {
-                ret.add(rdn);
-            }
-        }
-
-        return CollectionUtil.isEmpty(ret)
-                ? null
-                : ret.toArray(new RDN[0]);
-    }
-
     protected EnvParameterResolver parameterResolver;
 
     @Override
@@ -511,6 +434,83 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         return (rdnValue == null)
                 ? null
                 : new RDN(type, rdnValue);
+    }
+
+    private static RDN createDateOfBirthRDN(
+            final ASN1ObjectIdentifier type,
+            final ASN1Encodable rdnValue)
+    throws BadCertTemplateException {
+        String text;
+        ASN1Encodable newRdnValue = null;
+        if (rdnValue instanceof ASN1GeneralizedTime) {
+            text = ((ASN1GeneralizedTime) rdnValue).getTimeString();
+            newRdnValue = rdnValue;
+        } else if (rdnValue instanceof ASN1String && !(rdnValue instanceof DERUniversalString)) {
+            text = ((ASN1String) rdnValue).getString();
+        } else {
+            throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
+        }
+
+        if (!SubjectDNSpec.p_dateOfBirth.matcher(text).matches()) {
+            throw new BadCertTemplateException(
+                    "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
+        }
+
+        if (newRdnValue == null) {
+            newRdnValue = new DERGeneralizedTime(text);
+        }
+
+        return new RDN(type, newRdnValue);
+    }
+
+    private static RDN createPostalAddressRDN(
+            final ASN1ObjectIdentifier type,
+            final ASN1Encodable rdnValue,
+            final RDNControl control,
+            final int index)
+    throws BadCertTemplateException {
+        if (!(rdnValue instanceof ASN1Sequence)) {
+            throw new BadCertTemplateException("Value of RDN postalAddress has incorrect syntax");
+        }
+
+        ASN1Sequence seq = (ASN1Sequence) rdnValue;
+        final int size = seq.size();
+        if (size < 1 || size > 6) {
+            throw new BadCertTemplateException(
+                    "Sequence size of RDN postalAddress is not within [1, 6]: " + size);
+        }
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        for (int i = 0; i < size; i++) {
+            ASN1Encodable line = seq.getObjectAt(i);
+            String text;
+            if (line instanceof ASN1String && !(line instanceof DERUniversalString)) {
+                text = ((ASN1String) line).getString();
+            } else {
+                throw new BadCertTemplateException("postalAddress[" + i + "] has incorrect syntax");
+            }
+
+            ASN1Encodable asn1Line = createRDNValue(text, type, control, index);
+            v.add(asn1Line);
+        }
+
+        return new RDN(type, new DERSequence(v));
+    }
+
+    private static RDN[] getRDNs(
+            final RDN[] rdns,
+            final ASN1ObjectIdentifier type) {
+        List<RDN> ret = new ArrayList<>(1);
+        for (int i = 0; i < rdns.length; i++) {
+            RDN rdn = rdns[i];
+            if (rdn.getFirst().getType().equals(type)) {
+                ret.add(rdn);
+            }
+        }
+
+        return CollectionUtil.isEmpty(ret)
+                ? null
+                : ret.toArray(new RDN[0]);
     }
 
     private static ASN1Encodable createRDNValue(
