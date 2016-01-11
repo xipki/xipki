@@ -80,25 +80,6 @@ public enum HashAlgoType {
         return name;
     }
 
-    public static HashAlgoType getHashAlgoType(
-            String nameOrOid) {
-        for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(nameOrOid)) {
-                return hashAlgo;
-            }
-
-            if (nameOrOid.indexOf('-') != -1) {
-                nameOrOid = nameOrOid.replace("-", "");
-            }
-
-            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)) {
-                return hashAlgo;
-            }
-        }
-
-        return null;
-    }
-
     public String hexDigest(
             final byte[] content) {
         byte[] dgst = digest(content);
@@ -124,6 +105,25 @@ public enum HashAlgoType {
         byte[] ret = new byte[length];
         digest.doFinal(ret, 0);
         return ret;
+    }
+
+    public static HashAlgoType getHashAlgoType(
+            String nameOrOid) {
+        for (HashAlgoType hashAlgo : values()) {
+            if (hashAlgo.oid.equals(nameOrOid)) {
+                return hashAlgo;
+            }
+
+            if (nameOrOid.indexOf('-') != -1) {
+                nameOrOid = nameOrOid.replace("-", "");
+            }
+
+            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)) {
+                return hashAlgo;
+            }
+        }
+
+        return null;
     }
 
 }

@@ -88,6 +88,9 @@ public class DecodedPkiMessage extends PkiMessage {
 
     private final static Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
+    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+            = new HashSet<ASN1ObjectIdentifier>();
+
     private X509Certificate signatureCert;
 
     private ASN1ObjectIdentifier digestAlgorithm;
@@ -108,9 +111,6 @@ public class DecodedPkiMessage extends PkiMessage {
             final Nonce senderNonce) {
         super(transactionId, messageType, senderNonce);
     }
-
-    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
-            = new HashSet<ASN1ObjectIdentifier>();
 
     static {
         scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
@@ -174,6 +174,15 @@ public class DecodedPkiMessage extends PkiMessage {
 
     public Boolean isSignatureValid() {
         return signatureValid;
+    }
+
+    public Date getSigningTime() {
+        return signingTime;
+    }
+
+    public void setSigningTime(
+            final Date signingTime) {
+        this.signingTime = signingTime;
     }
 
     public static DecodedPkiMessage decode(
@@ -536,15 +545,6 @@ public class DecodedPkiMessage extends PkiMessage {
         } else {
             return null;
         }
-    }
-
-    public Date getSigningTime() {
-        return signingTime;
-    }
-
-    public void setSigningTime(
-            final Date signingTime) {
-        this.signingTime = signingTime;
     }
 
 }
