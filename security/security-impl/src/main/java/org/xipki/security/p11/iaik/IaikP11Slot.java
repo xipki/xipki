@@ -150,7 +150,9 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 public class IaikP11Slot implements P11WritableSlot {
 
     private static class PrivateKeyAndPKInfo {
+
         private final PrivateKey privateKey;
+
         private final SubjectPublicKeyInfo publicKeyInfo;
 
         public PrivateKeyAndPKInfo(
@@ -169,7 +171,8 @@ public class IaikP11Slot implements P11WritableSlot {
         public SubjectPublicKeyInfo getPublicKeyInfo() {
             return publicKeyInfo;
         }
-    }
+
+    } // class PrivateKeyAndPKInfo
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 
@@ -645,33 +648,6 @@ public class IaikP11Slot implements P11WritableSlot {
         }
     }
 
-    private static boolean checkSessionLoggedIn(
-            final Session session)
-    throws SignerException {
-        SessionInfo info;
-        try {
-            info = session.getSessionInfo();
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
-        }
-        if (LOG.isTraceEnabled()) {
-            LOG.debug("SessionInfo: {}", info);
-        }
-
-        State state = info.getState();
-        long deviceError = info.getDeviceError();
-
-        LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
-
-        boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
-        boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
-
-        boolean sessionSessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn)
-                && deviceError == 0);
-        LOG.debug("sessionSessionLoggedIn: {}", sessionSessionLoggedIn);
-        return sessionSessionLoggedIn;
-    }
-
     public void close() {
         if (slot != null) {
             try {
@@ -931,48 +907,6 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
-
-    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
-            final Session session,
-            final iaik.pkcs.pkcs11.objects.Object template)
-    throws SignerException {
-        return getObjects(session, template, 9999);
-    }
-
-    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
-            final Session session,
-            final iaik.pkcs.pkcs11.objects.Object template,
-            final int maxNo)
-    throws SignerException {
-        List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<>();
-
-        try {
-            session.findObjectsInit(template);
-
-            while (objList.size() < maxNo) {
-                iaik.pkcs.pkcs11.objects.Object[] foundObjects = session.findObjects(1);
-                if (foundObjects == null || foundObjects.length == 0) {
-                    break;
-                }
-
-                for (iaik.pkcs.pkcs11.objects.Object object : foundObjects) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.debug("foundObject: {}", object);
-                    }
-                    objList.add(object);
-                }
-            }
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
-        } finally {
-            try {
-                session.findObjectsFinal();
-            } catch (Exception e) {
-            }
-        }
-
-        return objList;
     }
 
     private X509PublicKeyCertificate[] getCertificateObjects(
@@ -1378,56 +1312,6 @@ public class IaikP11Slot implements P11WritableSlot {
         } catch (Throwable t) {
             return "Exception while calling listPublicKeyObjects(): " + t.getMessage();
         }
-    }
-
-    private static String getDescription(
-            final byte[] keyId,
-            final char[] keyLabel) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("id ");
-        if (keyId == null) {
-            sb.append("null");
-        } else {
-            sb.append(Hex.toHexString(keyId));
-        }
-
-        sb.append(" and label ");
-        if (keyLabel == null) {
-            sb.append("null");
-        } else {
-            sb.append(new String(keyLabel));
-        }
-        return sb.toString();
-    }
-
-    private static X509PublicKeyCertificate createPkcs11Template(
-            final X509Certificate cert,
-            byte[] encodedCert,
-            final byte[] keyId,
-            final char[] label)
-    throws Exception {
-        if (label == null || label.length == 0) {
-            throw new IllegalArgumentException("label could not be null or empty");
-        }
-        if (encodedCert == null) {
-            encodedCert = cert.getEncoded();
-        }
-
-        X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
-        newCertTemp.getId().setByteArrayValue(keyId);
-        newCertTemp.getLabel().setCharArrayValue(label);
-        newCertTemp.getToken().setBooleanValue(true);
-        newCertTemp.getCertificateType().setLongValue(
-                CertificateType.X_509_PUBLIC_KEY);
-
-        newCertTemp.getSubject().setByteArrayValue(
-                cert.getSubjectX500Principal().getEncoded());
-        newCertTemp.getIssuer().setByteArrayValue(
-                cert.getIssuerX500Principal().getEncoded());
-        newCertTemp.getSerialNumber().setByteArrayValue(
-                cert.getSerialNumber().toByteArray());
-        newCertTemp.getValue().setByteArrayValue(encodedCert);
-        return newCertTemp;
     }
 
     private void assertMatch(
@@ -1901,48 +1785,6 @@ public class IaikP11Slot implements P11WritableSlot {
         return new X509CertificateHolder(Certificate.getInstance(cert));
     }
 
-    private static byte[] convertToX962Signature(
-            final byte[] signature)
-    throws IOException {
-        int n = signature.length / 2;
-        byte[] x = Arrays.copyOfRange(signature, 0, n);
-        byte[] y = Arrays.copyOfRange(signature, n, 2 * n);
-
-        ASN1EncodableVector sigder = new ASN1EncodableVector();
-        sigder.add(new ASN1Integer(
-                new BigInteger(1, x)));
-        sigder.add(new ASN1Integer(
-                new BigInteger(1, y)));
-
-        return new DERSequence(sigder).getEncoded();
-    }
-
-    private static void setKeyAttributes(
-            final byte[] id,
-            final String label,
-            final long keyType,
-            final PrivateKey privateKey,
-            final PublicKey publicKey) {
-        if (privateKey != null) {
-            privateKey.getId().setByteArrayValue(id);
-            privateKey.getToken().setBooleanValue(true);
-            privateKey.getLabel().setCharArrayValue(label.toCharArray());
-            privateKey.getKeyType().setLongValue(keyType);
-            privateKey.getSign().setBooleanValue(true);
-            privateKey.getPrivate().setBooleanValue(true);
-            privateKey.getSensitive().setBooleanValue(true);
-        }
-
-        if (publicKey != null) {
-            publicKey.getId().setByteArrayValue(id);
-            publicKey.getToken().setBooleanValue(true);
-            publicKey.getLabel().setCharArrayValue(label.toCharArray());
-            publicKey.getKeyType().setLongValue(keyType);
-            publicKey.getVerify().setBooleanValue(true);
-            publicKey.getModifiable().setBooleanValue(Boolean.TRUE);
-        }
-    }
-
     private PrivateKeyAndPKInfo generateRSAKeyPair(
             final Session session,
             final int keySize,
@@ -1974,33 +1816,6 @@ public class IaikP11Slot implements P11WritableSlot {
                 keyParams);
 
         return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
-    }
-
-    private static ASN1ObjectIdentifier getCurveId(
-            final String curveNameOrOid) {
-        ASN1ObjectIdentifier curveId;
-
-        try {
-            curveId = new ASN1ObjectIdentifier(curveNameOrOid);
-            return curveId;
-        } catch (Exception e) {
-        }
-
-        curveId = X962NamedCurves.getOID(curveNameOrOid);
-
-        if (curveId == null) {
-            curveId = SECNamedCurves.getOID(curveNameOrOid);
-        }
-
-        if (curveId == null) {
-            curveId = TeleTrusTNamedCurves.getOID(curveNameOrOid);
-        }
-
-        if (curveId == null) {
-            curveId = NISTNamedCurves.getOID(curveNameOrOid);
-        }
-
-        return curveId;
     }
 
     private PrivateKeyAndPKInfo generateECDSAKeyPair(
@@ -2067,6 +1882,218 @@ public class IaikP11Slot implements P11WritableSlot {
                 publicKeyTemplate, privateKeyTemplate);
     }
 
+    @Override
+    public List<? extends P11Identity> getP11Identities() {
+        return Collections.unmodifiableList(identities);
+    }
+
+    @Override
+    public X509Certificate exportCert(
+            final P11KeyIdentifier keyIdentifier)
+    throws Exception {
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
+        if (privKey == null) {
+            return null;
+        }
+
+        X509PublicKeyCertificate cert =
+                getCertificateObject(privKey.getId().getByteArrayValue(), null);
+        return X509Util.parseCert(cert.getValue().getByteArrayValue());
+    }
+
+    @Override
+    public P11SlotIdentifier getSlotIdentifier() {
+        return slotId;
+    }
+
+    private static boolean checkSessionLoggedIn(
+            final Session session)
+    throws SignerException {
+        SessionInfo info;
+        try {
+            info = session.getSessionInfo();
+        } catch (TokenException e) {
+            throw new SignerException(e.getMessage(), e);
+        }
+        if (LOG.isTraceEnabled()) {
+            LOG.debug("SessionInfo: {}", info);
+        }
+
+        State state = info.getState();
+        long deviceError = info.getDeviceError();
+
+        LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
+
+        boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
+        boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
+
+        boolean sessionSessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn)
+                && deviceError == 0);
+        LOG.debug("sessionSessionLoggedIn: {}", sessionSessionLoggedIn);
+        return sessionSessionLoggedIn;
+    }
+
+    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
+            final Session session,
+            final iaik.pkcs.pkcs11.objects.Object template)
+    throws SignerException {
+        return getObjects(session, template, 9999);
+    }
+
+    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
+            final Session session,
+            final iaik.pkcs.pkcs11.objects.Object template,
+            final int maxNo)
+    throws SignerException {
+        List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<>();
+
+        try {
+            session.findObjectsInit(template);
+
+            while (objList.size() < maxNo) {
+                iaik.pkcs.pkcs11.objects.Object[] foundObjects = session.findObjects(1);
+                if (foundObjects == null || foundObjects.length == 0) {
+                    break;
+                }
+
+                for (iaik.pkcs.pkcs11.objects.Object object : foundObjects) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.debug("foundObject: {}", object);
+                    }
+                    objList.add(object);
+                }
+            }
+        } catch (TokenException e) {
+            throw new SignerException(e.getMessage(), e);
+        } finally {
+            try {
+                session.findObjectsFinal();
+            } catch (Exception e) {
+            }
+        }
+
+        return objList;
+    }
+
+    private static String getDescription(
+            final byte[] keyId,
+            final char[] keyLabel) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id ");
+        if (keyId == null) {
+            sb.append("null");
+        } else {
+            sb.append(Hex.toHexString(keyId));
+        }
+
+        sb.append(" and label ");
+        if (keyLabel == null) {
+            sb.append("null");
+        } else {
+            sb.append(new String(keyLabel));
+        }
+        return sb.toString();
+    }
+
+    private static X509PublicKeyCertificate createPkcs11Template(
+            final X509Certificate cert,
+            byte[] encodedCert,
+            final byte[] keyId,
+            final char[] label)
+    throws Exception {
+        if (label == null || label.length == 0) {
+            throw new IllegalArgumentException("label could not be null or empty");
+        }
+        if (encodedCert == null) {
+            encodedCert = cert.getEncoded();
+        }
+
+        X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
+        newCertTemp.getId().setByteArrayValue(keyId);
+        newCertTemp.getLabel().setCharArrayValue(label);
+        newCertTemp.getToken().setBooleanValue(true);
+        newCertTemp.getCertificateType().setLongValue(
+                CertificateType.X_509_PUBLIC_KEY);
+
+        newCertTemp.getSubject().setByteArrayValue(
+                cert.getSubjectX500Principal().getEncoded());
+        newCertTemp.getIssuer().setByteArrayValue(
+                cert.getIssuerX500Principal().getEncoded());
+        newCertTemp.getSerialNumber().setByteArrayValue(
+                cert.getSerialNumber().toByteArray());
+        newCertTemp.getValue().setByteArrayValue(encodedCert);
+        return newCertTemp;
+    }
+
+    private static byte[] convertToX962Signature(
+            final byte[] signature)
+    throws IOException {
+        int n = signature.length / 2;
+        byte[] x = Arrays.copyOfRange(signature, 0, n);
+        byte[] y = Arrays.copyOfRange(signature, n, 2 * n);
+
+        ASN1EncodableVector sigder = new ASN1EncodableVector();
+        sigder.add(new ASN1Integer(
+                new BigInteger(1, x)));
+        sigder.add(new ASN1Integer(
+                new BigInteger(1, y)));
+
+        return new DERSequence(sigder).getEncoded();
+    }
+
+    private static void setKeyAttributes(
+            final byte[] id,
+            final String label,
+            final long keyType,
+            final PrivateKey privateKey,
+            final PublicKey publicKey) {
+        if (privateKey != null) {
+            privateKey.getId().setByteArrayValue(id);
+            privateKey.getToken().setBooleanValue(true);
+            privateKey.getLabel().setCharArrayValue(label.toCharArray());
+            privateKey.getKeyType().setLongValue(keyType);
+            privateKey.getSign().setBooleanValue(true);
+            privateKey.getPrivate().setBooleanValue(true);
+            privateKey.getSensitive().setBooleanValue(true);
+        }
+
+        if (publicKey != null) {
+            publicKey.getId().setByteArrayValue(id);
+            publicKey.getToken().setBooleanValue(true);
+            publicKey.getLabel().setCharArrayValue(label.toCharArray());
+            publicKey.getKeyType().setLongValue(keyType);
+            publicKey.getVerify().setBooleanValue(true);
+            publicKey.getModifiable().setBooleanValue(Boolean.TRUE);
+        }
+    }
+
+    private static ASN1ObjectIdentifier getCurveId(
+            final String curveNameOrOid) {
+        ASN1ObjectIdentifier curveId;
+
+        try {
+            curveId = new ASN1ObjectIdentifier(curveNameOrOid);
+            return curveId;
+        } catch (Exception e) {
+        }
+
+        curveId = X962NamedCurves.getOID(curveNameOrOid);
+
+        if (curveId == null) {
+            curveId = SECNamedCurves.getOID(curveNameOrOid);
+        }
+
+        if (curveId == null) {
+            curveId = TeleTrusTNamedCurves.getOID(curveNameOrOid);
+        }
+
+        if (curveId == null) {
+            curveId = NISTNamedCurves.getOID(curveNameOrOid);
+        }
+
+        return curveId;
+    }
+
     private static String hex(
             final byte[] bytes) {
         return Hex.toHexString(bytes).toUpperCase();
@@ -2115,30 +2142,6 @@ public class IaikP11Slot implements P11WritableSlot {
         } else {
             throw new SignerException("unknown public key class " + p11Key.getClass().getName());
         }
-    }
-
-    @Override
-    public List<? extends P11Identity> getP11Identities() {
-        return Collections.unmodifiableList(identities);
-    }
-
-    @Override
-    public X509Certificate exportCert(
-            final P11KeyIdentifier keyIdentifier)
-    throws Exception {
-        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
-        if (privKey == null) {
-            return null;
-        }
-
-        X509PublicKeyCertificate cert =
-                getCertificateObject(privKey.getId().getByteArrayValue(), null);
-        return X509Util.parseCert(cert.getValue().getByteArrayValue());
-    }
-
-    @Override
-    public P11SlotIdentifier getSlotIdentifier() {
-        return slotId;
     }
 
 }

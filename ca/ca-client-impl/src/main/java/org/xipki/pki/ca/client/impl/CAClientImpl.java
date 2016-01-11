@@ -168,7 +168,7 @@ public final class CAClientImpl implements CAClient {
             }
         }
 
-    }
+    } // class ClientConfigUpdater
 
     private static final Logger LOG = LoggerFactory.getLogger(CAClientImpl.class);
 
@@ -480,16 +480,6 @@ public final class CAClientImpl implements CAClient {
             }
             scheduledThreadPoolExecutor = null;
         }
-    }
-
-    private static byte[] readData(
-            final FileOrValueType fileOrValue)
-    throws IOException {
-        byte[] data = fileOrValue.getValue();
-        if (data == null) {
-            data = IoUtil.read(fileOrValue.getFile());
-        }
-        return data;
     }
 
     @Override
@@ -1177,39 +1167,6 @@ public final class CAClientImpl implements CAClient {
         return healthCheckResult;
     }
 
-    private static CAClientType parse(
-            final InputStream configStream)
-    throws InvalidConfException {
-        synchronized (jaxbUnmarshallerLock) {
-            Object root;
-            try {
-                if (jaxbUnmarshaller == null) {
-                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                    jaxbUnmarshaller = context.createUnmarshaller();
-
-                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = CAClientType.class.getResource("/xsd/caclient-conf.xsd");
-                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-                }
-
-                root = jaxbUnmarshaller.unmarshal(configStream);
-            } catch (SAXException e) {
-                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(),
-                        e);
-            } catch (JAXBException e) {
-                throw new InvalidConfException("parse profile failed, message: "
-                        + XMLUtil.getMessage((JAXBException) e), e);
-            }
-
-            if (root instanceof JAXBElement) {
-                return (CAClientType) ((JAXBElement<?>) root).getValue();
-            } else {
-                throw new InvalidConfException("invalid root element type");
-            }
-        }
-    }
-
     private EnrollCertResult parseEnrollCertResult(
             final EnrollCertResultType result,
             final String caName)
@@ -1294,6 +1251,49 @@ public final class CAClientImpl implements CAClient {
         }
 
         return new EnrollCertResult(caCert, certOrErrors);
+    }
+
+    private static CAClientType parse(
+            final InputStream configStream)
+    throws InvalidConfException {
+        synchronized (jaxbUnmarshallerLock) {
+            Object root;
+            try {
+                if (jaxbUnmarshaller == null) {
+                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+                    jaxbUnmarshaller = context.createUnmarshaller();
+
+                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    URL url = CAClientType.class.getResource("/xsd/caclient-conf.xsd");
+                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
+                }
+
+                root = jaxbUnmarshaller.unmarshal(configStream);
+            } catch (SAXException e) {
+                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(),
+                        e);
+            } catch (JAXBException e) {
+                throw new InvalidConfException("parse profile failed, message: "
+                        + XMLUtil.getMessage((JAXBException) e), e);
+            }
+
+            if (root instanceof JAXBElement) {
+                return (CAClientType) ((JAXBElement<?>) root).getValue();
+            } else {
+                throw new InvalidConfException("invalid root element type");
+            }
+        }
+    }
+
+    private static byte[] readData(
+            final FileOrValueType fileOrValue)
+    throws IOException {
+        byte[] data = fileOrValue.getValue();
+        if (data == null) {
+            data = IoUtil.read(fileOrValue.getFile());
+        }
+        return data;
     }
 
 }

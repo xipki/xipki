@@ -114,37 +114,6 @@ public class DbPorter extends DbToolBase {
         this.maxX500nameLen = Integer.parseInt(s);
     }
 
-    public static final Schema retrieveSchema(
-            final String schemaPath)
-    throws JAXBException {
-        URL schemaUrl = DbPorter.class.getResource(schemaPath);
-        final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try {
-            return schemaFact.newSchema(schemaUrl);
-        } catch (SAXException e) {
-            throw new JAXBException(
-                    "error while loading schemas for the specified classes\nDetails:\n"
-                    + e.getMessage());
-        }
-    }
-
-    public static void echoToFile(
-            final String content,
-            final File file)
-    throws IOException {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(file);
-            out.write(content.getBytes());
-        } finally {
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
-        }
-    }
-
     protected FileOrValueType buildFileOrValue(
             final String content,
             final String fileName)
@@ -208,6 +177,37 @@ public class DbPorter extends DbToolBase {
         return evaulateOnly
                 ? " evaluated export "
                 : " exported ";
+    }
+
+    public static final Schema retrieveSchema(
+            final String schemaPath)
+    throws JAXBException {
+        URL schemaUrl = DbPorter.class.getResource(schemaPath);
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try {
+            return schemaFact.newSchema(schemaUrl);
+        } catch (SAXException e) {
+            throw new JAXBException(
+                    "error while loading schemas for the specified classes\nDetails:\n"
+                    + e.getMessage());
+        }
+    }
+
+    public static void echoToFile(
+            final String content,
+            final File file)
+    throws IOException {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            out.write(content.getBytes());
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
     }
 
 }

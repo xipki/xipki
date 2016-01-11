@@ -74,23 +74,6 @@ import org.xipki.security.api.HashAlgoType;
 
 public class DbCertStatusStore extends CertStatusStore {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
-
-    private static final String sqlCs = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
-
-    private static final Map<HashAlgoType, String> sqlCsHashMap = new HashMap<>();
-
-    static {
-        for (HashAlgoType h : HashAlgoType.values()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("ID,REV,RR,RT,RIT,PN,");
-            sb.append(h.getShortName()).append(" ");
-            sb.append(" FROM CERT INNER JOIN CHASH ON ");
-            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
-            sqlCsHashMap.put(h, sb.toString());
-        }
-    }
-
     private static class SimpleIssuerEntry {
 
         private final int id;
@@ -121,7 +104,7 @@ public class DbCertStatusStore extends CertStatusStore {
             return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
         }
 
-    }
+    } // class SimpleIssuerEntry
 
     private class StoreUpdateService implements Runnable {
 
@@ -130,6 +113,23 @@ public class DbCertStatusStore extends CertStatusStore {
             initIssuerStore();
         }
 
+    } // class StoreUpdateService
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+
+    private static final String sqlCs = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+
+    private static final Map<HashAlgoType, String> sqlCsHashMap = new HashMap<>();
+
+    static {
+        for (HashAlgoType h : HashAlgoType.values()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID,REV,RR,RT,RIT,PN,");
+            sb.append(h.getShortName()).append(" ");
+            sb.append(" FROM CERT INNER JOIN CHASH ON ");
+            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
+            sqlCsHashMap.put(h, sb.toString());
+        }
     }
 
     private DataSourceWrapper dataSource;

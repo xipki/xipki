@@ -129,28 +129,6 @@ public class ExtensionExistence extends ASN1Object {
 
     }
 
-    public static ExtensionExistence getInstance(
-            final Object obj) {
-        if (obj == null || obj instanceof ExtensionExistence) {
-            return (ExtensionExistence) obj;
-        }
-
-        if (obj instanceof ASN1Sequence) {
-            return new ExtensionExistence((ASN1Sequence) obj);
-        }
-
-        if (obj instanceof byte[]) {
-            try {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            } catch (IOException e) {
-                throw new IllegalArgumentException("unable to parse encoded general name");
-            }
-        }
-
-        throw new IllegalArgumentException("unknown object in getInstance: "
-                + obj.getClass().getName());
-    }
-
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -179,6 +157,28 @@ public class ExtensionExistence extends ASN1Object {
 
     public List<ASN1ObjectIdentifier> getWantExtensions() {
         return wantExtensions;
+    }
+
+    public static ExtensionExistence getInstance(
+            final Object obj) {
+        if (obj == null || obj instanceof ExtensionExistence) {
+            return (ExtensionExistence) obj;
+        }
+
+        if (obj instanceof ASN1Sequence) {
+            return new ExtensionExistence((ASN1Sequence) obj);
+        }
+
+        if (obj instanceof byte[]) {
+            try {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            } catch (IOException e) {
+                throw new IllegalArgumentException("unable to parse encoded general name");
+            }
+        }
+
+        throw new IllegalArgumentException("unknown object in getInstance: "
+                + obj.getClass().getName());
     }
 
 }

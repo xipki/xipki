@@ -76,6 +76,52 @@ public class CertStatusInfo {
         this.certprofile = certprofile;
     }
 
+    public Date getThisUpdate() {
+        return thisUpdate;
+    }
+
+    public Date getNextUpdate() {
+        return nextUpdate;
+    }
+
+    public CertStatus getCertStatus() {
+        return certStatus;
+    }
+
+    public CertRevocationInfo getRevocationInfo() {
+        return revocationInfo;
+    }
+
+    public HashAlgoType getCertHashAlgo() {
+        return certHashAlgo;
+    }
+
+    public byte[] getCertHash() {
+        return certHash;
+    }
+
+    public String getCertprofile() {
+        return certprofile;
+    }
+
+    public CrlID getCrlID() {
+        return crlID;
+    }
+
+    public void setCrlID(
+            final CrlID crlID) {
+        this.crlID = crlID;
+    }
+
+    public Date getArchiveCutOff() {
+        return archiveCutOff;
+    }
+
+    public void setArchiveCutOff(
+            final Date archiveCutOff) {
+        this.archiveCutOff = archiveCutOff;
+    }
+
     public static CertStatusInfo getUnknownCertStatusInfo(
             final Date thisUpdate,
             final Date nextUpdate) {
@@ -123,52 +169,6 @@ public class CertStatusInfo {
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
         return ret;
-    }
-
-    public Date getThisUpdate() {
-        return thisUpdate;
-    }
-
-    public Date getNextUpdate() {
-        return nextUpdate;
-    }
-
-    public CertStatus getCertStatus() {
-        return certStatus;
-    }
-
-    public CertRevocationInfo getRevocationInfo() {
-        return revocationInfo;
-    }
-
-    public HashAlgoType getCertHashAlgo() {
-        return certHashAlgo;
-    }
-
-    public byte[] getCertHash() {
-        return certHash;
-    }
-
-    public String getCertprofile() {
-        return certprofile;
-    }
-
-    public CrlID getCrlID() {
-        return crlID;
-    }
-
-    public void setCrlID(
-            final CrlID crlID) {
-        this.crlID = crlID;
-    }
-
-    public Date getArchiveCutOff() {
-        return archiveCutOff;
-    }
-
-    public void setArchiveCutOff(
-            final Date archiveCutOff) {
-        this.archiveCutOff = archiveCutOff;
     }
 
 }

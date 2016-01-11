@@ -183,6 +183,15 @@ public class RequestOptions {
         this.useHttpGetForRequest = useHttpGetForRequest;
     }
 
+    public boolean isSignRequest() {
+        return signRequest;
+    }
+
+    public void setSignRequest(
+            final boolean signRequest) {
+        this.signRequest = signRequest;
+    }
+
     private static AlgorithmIdentifier createAlgId(
             final String algoName) {
         ASN1ObjectIdentifier algOid = null;
@@ -255,15 +264,6 @@ public class RequestOptions {
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize),
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
-    }
-
-    public boolean isSignRequest() {
-        return signRequest;
-    }
-
-    public void setSignRequest(
-            final boolean signRequest) {
-        this.signRequest = signRequest;
     }
 
 }

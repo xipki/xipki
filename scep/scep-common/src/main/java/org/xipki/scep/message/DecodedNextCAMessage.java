@@ -138,6 +138,15 @@ public class DecodedNextCAMessage {
         return signatureValid;
     }
 
+    public Date getSigningTime() {
+        return signingTime;
+    }
+
+    public void setSigningTime(
+            final Date signingTime) {
+        this.signingTime = signingTime;
+    }
+
     @SuppressWarnings("unchecked")
     public static DecodedNextCAMessage decode(
             final CMSSignedData pkiMessage,
@@ -321,15 +330,6 @@ public class DecodedNextCAMessage {
         ret.setAuthorityCertStore(authorityCertStore);
 
         return ret;
-    }
-
-    public Date getSigningTime() {
-        return signingTime;
-    }
-
-    public void setSigningTime(
-            final Date signingTime) {
-        this.signingTime = signingTime;
     }
 
 }

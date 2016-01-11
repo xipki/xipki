@@ -82,6 +82,32 @@ public class Slf4jAuditServiceImpl implements AuditService {
         }
     }
 
+    @Override
+    public void logEvent(
+            final PCIAuditEvent event) {
+        if (event == null) {
+            return;
+        }
+
+        try {
+            CharArrayWriter msg = event.toCharArrayWriter("");
+            AuditLevel al = event.getLevel();
+            switch (al) {
+            case DEBUG:
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("{} | {}", al.getAlignedText(), msg);
+                }
+                break;
+            default:
+                LOG.info("{} | {}", al.getAlignedText(), msg);
+                break;
+            } // end switch
+        } catch (Throwable t) {
+            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
+                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
+        }
+    }
+
     private static String createMessage(
             final AuditEvent event) {
         StringBuilder sb = new StringBuilder();
@@ -123,32 +149,6 @@ public class Slf4jAuditServiceImpl implements AuditService {
         }
 
         return sb.toString();
-    }
-
-    @Override
-    public void logEvent(
-            final PCIAuditEvent event) {
-        if (event == null) {
-            return;
-        }
-
-        try {
-            CharArrayWriter msg = event.toCharArrayWriter("");
-            AuditLevel al = event.getLevel();
-            switch (al) {
-            case DEBUG:
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{} | {}", al.getAlignedText(), msg);
-                }
-                break;
-            default:
-                LOG.info("{} | {}", al.getAlignedText(), msg);
-                break;
-            } // end switch
-        } catch (Throwable t) {
-            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
-        }
     }
 
 }

@@ -53,9 +53,7 @@ import org.xipki.security.api.util.X509Util;
  * @author Lijun Liao
  */
 
-public class X509CAEntry
-extends CAEntry
-implements Serializable {
+public class X509CAEntry extends CAEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

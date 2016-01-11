@@ -94,6 +94,47 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         return resolvePassword(getMasterPassword(), passwordHint);
     }
 
+    public void setMasterPasswordCallback(
+            String masterPasswordCallback) {
+        if (masterPasswordCallback == null) {
+            return;
+        }
+
+        masterPasswordCallback = masterPasswordCallback.trim();
+        if (StringUtil.isBlank(masterPasswordCallback)) {
+            return;
+        }
+
+        String className;
+        String conf = null;
+
+        int delimIndex = masterPasswordCallback.indexOf(' ');
+        if (delimIndex == -1) {
+            className = masterPasswordCallback;
+        } else {
+            className = masterPasswordCallback.substring(0, delimIndex);
+            conf = masterPasswordCallback.substring(delimIndex + 1);
+        }
+
+        try {
+            Class<?> clazz = Class.forName(className);
+            Object obj = clazz.newInstance();
+            if (obj instanceof PasswordCallback) {
+                ((PasswordCallback) obj).init(conf);
+                this.masterPwdCallback = (PasswordCallback) obj;
+            } else {
+                throw new IllegalArgumentException(
+                        "invalid masterPasswordCallback configuration "
+                        + masterPasswordCallback);
+            }
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
+                    + masterPasswordCallback
+                    + ", " + e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
     public static char[] resolvePassword(
             final char[] masterPassword,
             final String passwordHint)
@@ -145,47 +186,6 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         System.arraycopy(encrypted, 0, encryptedWithSalt, salt.length, encrypted.length);
         String pbeText = "PBE:" + Base64.encodeToString(encryptedWithSalt, Base64.NO_WRAP);
         return pbeText;
-    }
-
-    public void setMasterPasswordCallback(
-            String masterPasswordCallback) {
-        if (masterPasswordCallback == null) {
-            return;
-        }
-
-        masterPasswordCallback = masterPasswordCallback.trim();
-        if (StringUtil.isBlank(masterPasswordCallback)) {
-            return;
-        }
-
-        String className;
-        String conf = null;
-
-        int delimIndex = masterPasswordCallback.indexOf(' ');
-        if (delimIndex == -1) {
-            className = masterPasswordCallback;
-        } else {
-            className = masterPasswordCallback.substring(0, delimIndex);
-            conf = masterPasswordCallback.substring(delimIndex + 1);
-        }
-
-        try {
-            Class<?> clazz = Class.forName(className);
-            Object obj = clazz.newInstance();
-            if (obj instanceof PasswordCallback) {
-                ((PasswordCallback) obj).init(conf);
-                this.masterPwdCallback = (PasswordCallback) obj;
-            } else {
-                throw new IllegalArgumentException(
-                        "invalid masterPasswordCallback configuration "
-                        + masterPasswordCallback);
-            }
-
-        } catch (Exception e) {
-            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-                    + masterPasswordCallback
-                    + ", " + e.getClass().getName() + ": " + e.getMessage());
-        }
     }
 
 }

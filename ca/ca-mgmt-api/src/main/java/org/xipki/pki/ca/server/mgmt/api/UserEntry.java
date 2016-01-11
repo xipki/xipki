@@ -43,8 +43,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class UserEntry
-implements Serializable {
+public class UserEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

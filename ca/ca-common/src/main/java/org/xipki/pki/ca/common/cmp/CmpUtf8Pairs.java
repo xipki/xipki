@@ -116,49 +116,6 @@ public class CmpUtf8Pairs {
         }
     }
 
-    private static String encodeNameOrValue(
-            String s) {
-        if (s.indexOf("%") != -1) {
-            s = s.replaceAll("%", "%25");
-        }
-
-        if (s.indexOf("?") != -1) {
-            s = s.replaceAll("\\?", "%3f");
-        }
-
-        return s;
-    }
-
-    private static String decodeNameOrValue(
-            final String s) {
-        int idx = s.indexOf(TOKEN_TERM);
-        if (idx == -1) {
-            return s;
-        }
-
-        StringBuilder newS = new StringBuilder();
-
-        for (int i = 0; i < s.length();) {
-            char c = s.charAt(i);
-            if (c != TOKEN_TERM) {
-                newS.append(c);
-                i++;
-            } else {
-                if (i + 3 <= s.length()) {
-                    String hex = s.substring(i + 1, i + 3);
-                    c = (char) Byte.parseByte(hex, 16);
-                    newS.append(c);
-                    i += 3;
-                } else {
-                    newS.append(s.substring(i));
-                    break;
-                }
-            }
-        }
-
-        return newS.toString();
-    }
-
     public void putUtf8Pair(
             final String name,
             final String value) {
@@ -279,6 +236,49 @@ public class CmpUtf8Pairs {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static String encodeNameOrValue(
+            String s) {
+        if (s.indexOf("%") != -1) {
+            s = s.replaceAll("%", "%25");
+        }
+
+        if (s.indexOf("?") != -1) {
+            s = s.replaceAll("\\?", "%3f");
+        }
+
+        return s;
+    }
+
+    private static String decodeNameOrValue(
+            final String s) {
+        int idx = s.indexOf(TOKEN_TERM);
+        if (idx == -1) {
+            return s;
+        }
+
+        StringBuilder newS = new StringBuilder();
+
+        for (int i = 0; i < s.length();) {
+            char c = s.charAt(i);
+            if (c != TOKEN_TERM) {
+                newS.append(c);
+                i++;
+            } else {
+                if (i + 3 <= s.length()) {
+                    String hex = s.substring(i + 1, i + 3);
+                    c = (char) Byte.parseByte(hex, 16);
+                    newS.append(c);
+                    i += 3;
+                } else {
+                    newS.append(s.substring(i));
+                    break;
+                }
+            }
+        }
+
+        return newS.toString();
     }
 
 }

@@ -155,7 +155,9 @@ import org.xipki.security.api.util.X509Util;
 public class X509CA {
 
     private class ScheduledNextSerialCommitService implements Runnable {
+
         private boolean inProcess = false;
+
         @Override
         public void run() {
             if (inProcess) {
@@ -188,12 +190,14 @@ public class X509CA {
             } finally {
                 inProcess = false;
             }
-
         }
+
     } // class ScheduledNextSerialCommitService
 
     private class ScheduledExpiredCertsRemover implements Runnable {
+
         private boolean inProcess = false;
+
         @Override
         public void run() {
             int keepDays = caInfo.getKeepExpiredCertInDays();
@@ -250,6 +254,7 @@ public class X509CA {
     } // class ScheduledExpiredCertsRemover
 
     private class ScheduledCRLGenerationService implements Runnable {
+
         @Override
         public void run() {
             X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -424,28 +429,41 @@ public class X509CA {
                 crlGenInProcess.set(false);
             }
         }
-    }
+
+    } // class ScheduledCRLGenerationService
 
     private static final long MS_PER_SECOND = 1000L;
+
     private static final int SECOND_PER_MIN = 60;
+
     private static final int MIN_PER_DAY = 24 * 60;
+
     private static final long DAY_IN_MS = MS_PER_SECOND * SECOND_PER_MIN * MIN_PER_DAY;
+
     private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
+
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
+
     private final CertificateFactory cf;
 
     private final X509CAInfo caInfo;
+
     private final CertificateStore certstore;
+
     private final boolean masterMode;
 
     private final CAManagerImpl caManager;
+
     private Boolean tryXipkiNSStoVerify;
+
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
     private ScheduledFuture<?> nextSerialCommitService;
+
     private ScheduledFuture<?> crlGenerationService;
+
     private ScheduledFuture<?> expiredCertsRemover;
 
     private AuditServiceRegister serviceRegister;
@@ -987,44 +1005,6 @@ public class X509CA {
             if (!successful) {
                 LOG.info("    FAILED generateCRL: ca={}", caInfo.getName());
             }
-        }
-    }
-
-    private static Extension createReasonExtension(
-            final int reasonCode) {
-        org.bouncycastle.asn1.x509.CRLReason crlReason =
-                org.bouncycastle.asn1.x509.CRLReason.lookup(reasonCode);
-
-        try {
-            return new Extension(Extension.reasonCode, false, crlReason.getEncoded());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
-        }
-    }
-
-    private static Extension createInvalidityDateExtension(
-            final Date invalidityDate) {
-        try {
-            ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(invalidityDate);
-            return new Extension(Extension.invalidityDate, false, asnTime.getEncoded());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * added by lijun liao add the support of
-     * @param certificateIssuer
-     * @return
-     */
-    private static Extension createCertificateIssuerExtension(
-            final X500Name certificateIssuer) {
-        try {
-            GeneralName generalName = new GeneralName(certificateIssuer);
-            return new Extension(Extension.certificateIssuer, true,
-                    new GeneralNames(generalName).getEncoded());
-        } catch (IOException e) {
-            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
 
@@ -2282,28 +2262,6 @@ public class X509CA {
         }
     }
 
-    // remove the RDNs with empty content
-    private static X500Name removeEmptyRDNs(
-            final X500Name name) {
-        RDN[] rdns = name.getRDNs();
-        List<RDN> l = new ArrayList<RDN>(rdns.length);
-        boolean changed = false;
-        for (RDN rdn : rdns) {
-            String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
-            if (StringUtil.isBlank(textValue)) {
-                changed = true;
-            } else {
-                l.add(rdn);
-            }
-        }
-
-        if (changed) {
-            return new X500Name(l.toArray(new RDN[0]));
-        } else {
-            return name;
-        }
-    }
-
     public IdentifiedX509Certprofile getX509Certprofile(
             final String certprofileLocalName) {
         if (certprofileLocalName == null) {
@@ -2521,53 +2479,6 @@ public class X509CA {
         return ae;
     }
 
-    private static Object[] incSerialNumber(
-            final IdentifiedX509Certprofile profile,
-            final X500Name origName,
-            final String latestSN)
-    throws BadFormatException {
-        RDN[] rdns = origName.getRDNs();
-
-        int commonNameIndex = -1;
-        int serialNumberIndex = -1;
-        for (int i = 0; i < rdns.length; i++) {
-            RDN rdn = rdns[i];
-            ASN1ObjectIdentifier type = rdn.getFirst().getType();
-            if (ObjectIdentifiers.DN_CN.equals(type)) {
-                commonNameIndex = i;
-            } else if (ObjectIdentifiers.DN_SERIALNUMBER.equals(type)) {
-                serialNumberIndex = i;
-            }
-        }
-
-        String newSerialNumber = profile.incSerialNumber(latestSN);
-        RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN_SERIALNUMBER,
-                new DERPrintableString(newSerialNumber));
-
-        X500Name newName;
-        if (serialNumberIndex != -1) {
-            rdns[serialNumberIndex] = serialNumberRdn;
-            newName = new X500Name(rdns);
-        } else {
-            List<RDN> newRdns = new ArrayList<>(rdns.length + 1);
-
-            if (commonNameIndex == -1) {
-                newRdns.add(serialNumberRdn);
-            }
-
-            for (int i = 0; i < rdns.length; i++) {
-                newRdns.add(rdns[i]);
-                if (i == commonNameIndex) {
-                    newRdns.add(serialNumberRdn);
-                }
-            }
-
-            newName = new X500Name(newRdns.toArray(new RDN[0]));
-        }
-
-        return new Object[]{newName, newSerialNumber};
-    }
-
     private boolean verifySignature(
             final X509Certificate cert) {
         PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
@@ -2620,18 +2531,6 @@ public class X509CA {
         }
     }
 
-    private static Date setToMidnight(
-            final Date date,
-            final TimeZone timezone) {
-        Calendar c = Calendar.getInstance(timezone);
-        c.setTime(date);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
-    }
-
     private X509CrlSignerEntryWrapper getCrlSigner() {
         String crlSignerName = caInfo.getCrlSignerName();
         X509CrlSignerEntryWrapper crlSigner = (crlSignerName == null)
@@ -2665,6 +2564,125 @@ public class X509CA {
         if (s != null) {
             s.purge();
         }
+    }
+
+    private static Extension createReasonExtension(
+            final int reasonCode) {
+        org.bouncycastle.asn1.x509.CRLReason crlReason =
+                org.bouncycastle.asn1.x509.CRLReason.lookup(reasonCode);
+
+        try {
+            return new Extension(Extension.reasonCode, false, crlReason.getEncoded());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
+        }
+    }
+
+    private static Extension createInvalidityDateExtension(
+            final Date invalidityDate) {
+        try {
+            ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(invalidityDate);
+            return new Extension(Extension.invalidityDate, false, asnTime.getEncoded());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * added by lijun liao add the support of
+     * @param certificateIssuer
+     * @return
+     */
+    private static Extension createCertificateIssuerExtension(
+            final X500Name certificateIssuer) {
+        try {
+            GeneralName generalName = new GeneralName(certificateIssuer);
+            return new Extension(Extension.certificateIssuer, true,
+                    new GeneralNames(generalName).getEncoded());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
+        }
+    }
+
+    // remove the RDNs with empty content
+    private static X500Name removeEmptyRDNs(
+            final X500Name name) {
+        RDN[] rdns = name.getRDNs();
+        List<RDN> l = new ArrayList<RDN>(rdns.length);
+        boolean changed = false;
+        for (RDN rdn : rdns) {
+            String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
+            if (StringUtil.isBlank(textValue)) {
+                changed = true;
+            } else {
+                l.add(rdn);
+            }
+        }
+
+        if (changed) {
+            return new X500Name(l.toArray(new RDN[0]));
+        } else {
+            return name;
+        }
+    }
+
+    private static Object[] incSerialNumber(
+            final IdentifiedX509Certprofile profile,
+            final X500Name origName,
+            final String latestSN)
+    throws BadFormatException {
+        RDN[] rdns = origName.getRDNs();
+
+        int commonNameIndex = -1;
+        int serialNumberIndex = -1;
+        for (int i = 0; i < rdns.length; i++) {
+            RDN rdn = rdns[i];
+            ASN1ObjectIdentifier type = rdn.getFirst().getType();
+            if (ObjectIdentifiers.DN_CN.equals(type)) {
+                commonNameIndex = i;
+            } else if (ObjectIdentifiers.DN_SERIALNUMBER.equals(type)) {
+                serialNumberIndex = i;
+            }
+        }
+
+        String newSerialNumber = profile.incSerialNumber(latestSN);
+        RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN_SERIALNUMBER,
+                new DERPrintableString(newSerialNumber));
+
+        X500Name newName;
+        if (serialNumberIndex != -1) {
+            rdns[serialNumberIndex] = serialNumberRdn;
+            newName = new X500Name(rdns);
+        } else {
+            List<RDN> newRdns = new ArrayList<>(rdns.length + 1);
+
+            if (commonNameIndex == -1) {
+                newRdns.add(serialNumberRdn);
+            }
+
+            for (int i = 0; i < rdns.length; i++) {
+                newRdns.add(rdns[i]);
+                if (i == commonNameIndex) {
+                    newRdns.add(serialNumberRdn);
+                }
+            }
+
+            newName = new X500Name(newRdns.toArray(new RDN[0]));
+        }
+
+        return new Object[]{newName, newSerialNumber};
+    }
+
+    private static Date setToMidnight(
+            final Date date,
+            final TimeZone timezone) {
+        Calendar c = Calendar.getInstance(timezone);
+        c.setTime(date);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTime();
     }
 
 }

@@ -168,8 +168,7 @@ import org.xml.sax.SAXException;
 
 public class OcspServer {
 
-    private static class ServletPathResponderName
-    implements Comparable<ServletPathResponderName> {
+    private static class ServletPathResponderName implements Comparable<ServletPathResponderName> {
 
         private final String path;
 
@@ -206,7 +205,7 @@ public class OcspServer {
                     : -1;
         }
 
-    }
+    } // class ServletPathResponderName
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
@@ -1069,13 +1068,6 @@ public class OcspServer {
         }
     }
 
-    private static OcspRespWithCacheInfo createUnsuccessfulOCSPResp(
-            final OcspResponseStatus status) {
-        OCSPResp resp = new OCSPResp(new OCSPResponse(
-                new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
-        return new OcspRespWithCacheInfo(resp, null);
-    }
-
     public HealthCheckResult healthCheck(
             final Responder responder) {
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
@@ -1100,42 +1092,6 @@ public class OcspServer {
 
         result.setHealthy(healthy);
         return result;
-    }
-
-    private static void fillAuditEvent(
-            final AuditEvent auditEvent,
-            final AuditLevel level,
-            final AuditStatus status,
-            final String message) {
-        if (level != null) {
-            auditEvent.setLevel(level);
-        }
-
-        if (status != null) {
-            auditEvent.setStatus(status);
-        }
-
-        if (message != null) {
-            auditEvent.addEventData(new AuditEventData("messsage", message));
-        }
-    }
-
-    private static void fillAuditEvent(
-            final AuditChildEvent auditEvent,
-            final AuditLevel level,
-            final AuditStatus status,
-            final String message) {
-        if (level != null) {
-            auditEvent.setLevel(level);
-        }
-
-        if (status != null) {
-            auditEvent.setStatus(status);
-        }
-
-        if (message != null) {
-            auditEvent.addEventData(new AuditEventData("messsage", message));
-        }
     }
 
     public void setAuditServiceRegister(
@@ -1471,6 +1427,49 @@ public class OcspServer {
         }
 
         return false;
+    }
+
+    private static OcspRespWithCacheInfo createUnsuccessfulOCSPResp(
+            final OcspResponseStatus status) {
+        OCSPResp resp = new OCSPResp(new OCSPResponse(
+                new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
+        return new OcspRespWithCacheInfo(resp, null);
+    }
+
+    private static void fillAuditEvent(
+            final AuditEvent auditEvent,
+            final AuditLevel level,
+            final AuditStatus status,
+            final String message) {
+        if (level != null) {
+            auditEvent.setLevel(level);
+        }
+
+        if (status != null) {
+            auditEvent.setStatus(status);
+        }
+
+        if (message != null) {
+            auditEvent.addEventData(new AuditEventData("messsage", message));
+        }
+    }
+
+    private static void fillAuditEvent(
+            final AuditChildEvent auditEvent,
+            final AuditLevel level,
+            final AuditStatus status,
+            final String message) {
+        if (level != null) {
+            auditEvent.setLevel(level);
+        }
+
+        if (status != null) {
+            auditEvent.setStatus(status);
+        }
+
+        if (message != null) {
+            auditEvent.addEventData(new AuditEventData("messsage", message));
+        }
     }
 
     private static boolean getBoolean(

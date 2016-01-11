@@ -55,9 +55,6 @@ import org.xipki.common.util.StringUtil;
 
 public class ObjectIdentifiers {
 
-    private ObjectIdentifiers() {
-    }
-
     /**
      * registered PEN for xipki.org: 45522
      */
@@ -485,6 +482,9 @@ public class ObjectIdentifiers {
         oidNameMap.put(id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
         oidNameMap.put(id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
         oidNameMap.put(id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
+    }
+
+    private ObjectIdentifiers() {
     }
 
     public static String oidToDisplayName(

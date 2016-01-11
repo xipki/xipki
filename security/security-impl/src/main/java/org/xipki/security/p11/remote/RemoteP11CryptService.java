@@ -437,38 +437,6 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         return tid;
     }
 
-    private static PublicKey generatePublicKey(
-            final byte[] encodedSubjectPublicKeyInfo)
-    throws SignerException {
-        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
-                encodedSubjectPublicKeyInfo);
-
-        X509EncodedKeySpec keyspec = new X509EncodedKeySpec(encodedSubjectPublicKeyInfo);
-        ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
-
-        KeyFactory kf;
-
-        try {
-            if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
-                kf = KeyFactory.getInstance("RSA");
-            } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
-                kf = KeyFactory.getInstance("ECDSA");
-            } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
-                kf = KeyFactory.getInstance("DSA");
-            } else {
-                throw new SignerException("unsupported key algorithm: " + aid);
-            }
-        } catch (NoSuchAlgorithmException e) {
-            throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
-        }
-
-        try {
-            return kf.generatePublic(keyspec);
-        } catch (InvalidKeySpecException e) {
-            throw new SignerException("InvalidKeySpecException: " + e.getMessage(), e);
-        }
-    }
-
     @Override
     public P11SlotIdentifier[] getSlotIdentifiers()
     throws SignerException {
@@ -539,6 +507,38 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     public P11ModuleConf getModuleConf() {
         return moduleConf;
+    }
+
+    private static PublicKey generatePublicKey(
+            final byte[] encodedSubjectPublicKeyInfo)
+    throws SignerException {
+        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
+                encodedSubjectPublicKeyInfo);
+
+        X509EncodedKeySpec keyspec = new X509EncodedKeySpec(encodedSubjectPublicKeyInfo);
+        ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
+
+        KeyFactory kf;
+
+        try {
+            if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
+                kf = KeyFactory.getInstance("RSA");
+            } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
+                kf = KeyFactory.getInstance("ECDSA");
+            } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
+                kf = KeyFactory.getInstance("DSA");
+            } else {
+                throw new SignerException("unsupported key algorithm: " + aid);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
+        }
+
+        try {
+            return kf.generatePublic(keyspec);
+        } catch (InvalidKeySpecException e) {
+            throw new SignerException("InvalidKeySpecException: " + e.getMessage(), e);
+        }
     }
 
 }

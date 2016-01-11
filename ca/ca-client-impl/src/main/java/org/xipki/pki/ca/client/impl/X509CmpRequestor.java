@@ -170,16 +170,6 @@ abstract class X509CmpRequestor extends CmpRequestor {
         xmlDocBuilder = newDocumentBuilder();
     }
 
-    private static DocumentBuilder newDocumentBuilder() {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        try {
-            return dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("could not create XML document builder", e);
-        }
-    }
-
     public CRLResultType generateCRL(
             final RequestResponseDebug debug)
     throws CmpRequestorException, PKIErrorException {
@@ -795,6 +785,16 @@ abstract class X509CmpRequestor extends CmpRequestor {
             return new CAInfo(caCert, profiles);
         } else {
             throw new CmpRequestorException("unknown CAInfo version " + version);
+        }
+    }
+
+    private static DocumentBuilder newDocumentBuilder() {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try {
+            return dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("could not create XML document builder", e);
         }
     }
 

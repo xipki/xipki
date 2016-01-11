@@ -59,8 +59,7 @@ import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
  * @author Lijun Liao
  */
 
-public class BCRSAPrivateKey
-    implements RSAPrivateKey, PKCS12BagAttributeCarrier {
+public class BCRSAPrivateKey implements RSAPrivateKey, PKCS12BagAttributeCarrier {
 
     static final long serialVersionUID = 5110188922551353628L;
 

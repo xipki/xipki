@@ -44,6 +44,7 @@ import org.xipki.common.util.ParamUtil;
 public abstract class QaPolicyQualifierInfo {
 
     public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo {
+
         private final String cPSUri;
 
         public QaCPSUriPolicyQualifier(
@@ -55,9 +56,11 @@ public abstract class QaPolicyQualifierInfo {
         public String getCPSUri() {
             return cPSUri;
         }
-    }
+
+    } // class QaCPSUriPolicyQualifier
 
     public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo {
+
         private final String userNotice;
 
         public QaUserNoticePolicyQualifierInfo(
@@ -69,6 +72,7 @@ public abstract class QaPolicyQualifierInfo {
         public String getUserNotice() {
             return userNotice;
         }
-    }
+
+    } // class QaUserNoticePolicyQualifierInfo
 
 }

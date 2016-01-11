@@ -61,6 +61,40 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class SecurePasswordInputPanel extends Panel {
 
+    public class MyActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(
+                final ActionEvent e) {
+            JButton btn = (JButton) e.getSource();
+            String pressedKey = (String) btn.getClientProperty("key");
+
+            if (CAPS.equals(pressedKey)) {
+                for (JButton button : buttons) {
+                    String text = button.getText();
+                    text = caps
+                            ? text.toLowerCase()
+                            : text.toUpperCase();
+                    button.setText(text);
+                }
+                caps = !caps;
+                return;
+            }
+
+            if (BACKSPACE.equals(pressedKey)) {
+                if (password.length() > 0) {
+                    password = password.substring(0, password.length() - 1);
+                }
+            } else if (CLEAR.equals(pressedKey)) {
+                password = "";
+            } else {
+                password += btn.getText();
+            }
+            passwordField.setText(password);
+        }
+
+    } // class MyActionListener
+
     private static final long serialVersionUID = 1L;
 
     private static final String BACKSPACE = "\u21E6";
@@ -139,38 +173,6 @@ public class SecurePasswordInputPanel extends Panel {
 
     private String password = "";
     private boolean caps = false;
-
-    public class MyActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(
-                final ActionEvent e) {
-            JButton btn = (JButton) e.getSource();
-            String pressedKey = (String) btn.getClientProperty("key");
-
-            if (CAPS.equals(pressedKey)) {
-                for (JButton button : buttons) {
-                    String text = button.getText();
-                    text = caps
-                            ? text.toLowerCase()
-                            : text.toUpperCase();
-                    button.setText(text);
-                }
-                caps = !caps;
-                return;
-            }
-
-            if (BACKSPACE.equals(pressedKey)) {
-                if (password.length() > 0) {
-                    password = password.substring(0, password.length() - 1);
-                }
-            } else if (CLEAR.equals(pressedKey)) {
-                password = "";
-            } else {
-                password += btn.getText();
-            }
-            passwordField.setText(password);
-        }
-    }
 
     public static void main(
             final String[] args) {

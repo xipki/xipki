@@ -74,6 +74,22 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         this.keysize = modulus.bitLength();
     }
 
+    public int getKeysize() {
+        return keysize;
+    }
+
+    public P11CryptService getP11CryptService() {
+        return p11CryptService;
+    }
+
+    public P11SlotIdentifier getSlot() {
+        return slot;
+    }
+
+    public P11KeyIdentifier getKeyId() {
+        return keyId;
+    }
+
     public static P11RSAKeyParameter getInstance(
             final P11CryptService p11CryptService,
             final P11SlotIdentifier slot,
@@ -93,22 +109,6 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         BigInteger modulus = key.getModulus();
         BigInteger publicExponent = key.getPublicExponent();
         return new P11RSAKeyParameter(p11CryptService, slot, keyId, modulus, publicExponent);
-    }
-
-    public int getKeysize() {
-        return keysize;
-    }
-
-    public P11CryptService getP11CryptService() {
-        return p11CryptService;
-    }
-
-    public P11SlotIdentifier getSlot() {
-        return slot;
-    }
-
-    public P11KeyIdentifier getKeyId() {
-        return keyId;
     }
 
 }

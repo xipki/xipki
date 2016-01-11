@@ -70,11 +70,8 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 
 public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
-    private static SecurityFactory securityFactory;
-
-    private Date creationDate;
-
     private static class MyEnumeration<E> implements Enumeration<E> {
+
         private Iterator<E> iter;
 
         public MyEnumeration(
@@ -91,10 +88,13 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         public E nextElement() {
             return iter.next();
         }
-    }
+
+    } // class MyEnumeration
 
     private static class KeyCertEntry {
+
         private PrivateKey key;
+
         private Certificate[] chain;
 
         public KeyCertEntry(
@@ -120,7 +120,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         Certificate getCertificate() {
             return chain[0];
         }
-    }
+
+    } // class KeyCertEntry
+
+    private static SecurityFactory securityFactory;
+
+    private Date creationDate;
 
     private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
 

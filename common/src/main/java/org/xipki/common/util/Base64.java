@@ -95,8 +95,10 @@ public class Base64 {
     //  shared code
     // --------------------------------------------------------
 
-    /* package */ static abstract class Coder {
+    static abstract class Coder {
+
         public byte[] output;
+
         public int op;
 
         /**
@@ -125,7 +127,8 @@ public class Base64 {
          */
         public abstract int maxOutputSize(
                 int len);
-    }
+
+    } // class Coder
 
     // --------------------------------------------------------
     //  decoding
@@ -213,7 +216,8 @@ public class Base64 {
         return temp;
     }
 
-    /* package */ static class Decoder extends Coder {
+    static class Decoder extends Coder {
+
         /**
          * Lookup table for turning bytes into their position in the
          * Base64 alphabet.
@@ -260,6 +264,7 @@ public class Base64 {
 
         /** Non-data values in the DECODE arrays. */
         private static final int SKIP = -1;
+
         private static final int EQUALS = -2;
 
         /**
@@ -272,6 +277,7 @@ public class Base64 {
          * in the input and no future input can "fix" it.
          */
         private int state;   // state number (0 to 6)
+
         private int value;
 
         final private int[] alphabet;
@@ -491,7 +497,7 @@ public class Base64 {
             this.op = op;
             return true;
         }
-    }
+    } // class Decoder
 
     // --------------------------------------------------------
     //  encoding
@@ -609,7 +615,8 @@ public class Base64 {
         return encoder.output;
     }
 
-    /* package */ static class Encoder extends Coder {
+    static class Encoder extends Coder {
+
         /**
          * Emit a new line every this many output tuples.  Corresponds to
          * a 76-character line length (the maximum allowable according to
@@ -638,12 +645,17 @@ public class Base64 {
             'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'};
 
         final private byte[] tail;
-        /* package */ int tailLen;
+
+        int tailLen;
+
         private int count;
 
         final public boolean do_padding;
+
         final public boolean do_newline;
+
         final public boolean do_cr;
+
         final private byte[] alphabet;
 
         public Encoder(
@@ -832,7 +844,8 @@ public class Base64 {
 
             return true;
         }
-    }
+
+    } // class Encoder
 
     private Base64() {
         // don't instantiate

@@ -54,6 +54,14 @@ public class CertificatePolicyQualifier {
         this.userNotice = userNotice;
     }
 
+    public String getCpsUri() {
+        return cpsUri;
+    }
+
+    public String getUserNotice() {
+        return userNotice;
+    }
+
     public static CertificatePolicyQualifier getInstanceForUserNotice(
             final String userNotice) {
         ParamUtil.assertNotBlank("userNotice", userNotice);
@@ -64,14 +72,6 @@ public class CertificatePolicyQualifier {
             final String cpsUri) {
         ParamUtil.assertNotBlank("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
-    }
-
-    public String getCpsUri() {
-        return cpsUri;
-    }
-
-    public String getUserNotice() {
-        return userNotice;
     }
 
 }

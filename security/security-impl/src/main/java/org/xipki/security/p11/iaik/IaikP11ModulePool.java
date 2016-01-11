@@ -65,10 +65,6 @@ public class IaikP11ModulePool {
 
     private static IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
 
-    public static IaikP11ModulePool getInstance() {
-        return INSTANCE;
-    }
-
     public synchronized void removeModule(
             final String moduleName) {
         IaikP11Module module = modules.remove(moduleName);
@@ -181,6 +177,19 @@ public class IaikP11ModulePool {
         modules.clear();
     }
 
+    public String getDefaultModuleName() {
+        return defaultModuleName;
+    }
+
+    public void setDefaultModuleName(
+            final String defaultModuleName) {
+        this.defaultModuleName = defaultModuleName;
+    }
+
+    public static IaikP11ModulePool getInstance() {
+        return INSTANCE;
+    }
+
     private static void close(
             final Module module) {
         if (module != null) {
@@ -196,15 +205,6 @@ public class IaikP11ModulePool {
                 LOG.debug(message, t);
             }
         }
-    }
-
-    public String getDefaultModuleName() {
-        return defaultModuleName;
-    }
-
-    public void setDefaultModuleName(
-            final String defaultModuleName) {
-        this.defaultModuleName = defaultModuleName;
     }
 
 }

@@ -48,8 +48,7 @@ import org.xipki.scep.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public final class PreprovisionedHashCACertValidator
-implements CACertValidator {
+public final class PreprovisionedHashCACertValidator implements CACertValidator {
 
     private final HashAlgoType hashAlgo;
 

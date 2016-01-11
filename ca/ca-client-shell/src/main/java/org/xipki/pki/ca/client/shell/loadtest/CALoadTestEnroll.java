@@ -65,67 +65,6 @@ import org.xipki.common.util.ParamUtil;
 
 public class CALoadTestEnroll extends LoadExecutor {
 
-    private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-
-    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
-
-    private final CAClient caClient;
-
-    private final LoadTestEntry loadtestEntry;
-
-    private final AtomicLong index;
-
-    private final String userPrefix = "LOADTEST-";
-
-    private final int n;
-
-    @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
-    }
-
-    public CALoadTestEnroll(
-            final CAClient caClient,
-            final LoadTestEntry loadtestEntry,
-            final int n,
-            final String description) {
-        super(description);
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
-        if (n < 1) {
-            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
-        }
-        this.n = n;
-        this.loadtestEntry = loadtestEntry;
-        this.caClient = caClient;
-
-        this.index = new AtomicLong(getSecureIndex());
-    }
-
-    private Map<Integer, CertRequest> nextCertRequests() {
-        Map<Integer, CertRequest> certRequests = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            final int certId = i + 1;
-            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
-
-            long thisIndex = index.getAndIncrement();
-            certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
-
-            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null) {
-                return null;
-            }
-
-            certTempBuilder.setPublicKey(spki);
-
-            CertTemplate certTemplate = certTempBuilder.build();
-            CertRequest certRequest = new CertRequest(certId, certTemplate, null);
-            certRequests.put(certId, certRequest);
-        }
-        return certRequests;
-    }
-
     class Testor implements Runnable {
         @Override
         public void run() {
@@ -186,6 +125,67 @@ public class CALoadTestEnroll extends LoadExecutor {
 
             return nSuccess == certRequests.size();
         }
+    } // class Testor
+
+    private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
+
+    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
+
+    private final CAClient caClient;
+
+    private final LoadTestEntry loadtestEntry;
+
+    private final AtomicLong index;
+
+    private final String userPrefix = "LOADTEST-";
+
+    private final int n;
+
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
+    }
+
+    public CALoadTestEnroll(
+            final CAClient caClient,
+            final LoadTestEntry loadtestEntry,
+            final int n,
+            final String description) {
+        super(description);
+        ParamUtil.assertNotNull("caClient", caClient);
+        ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
+        if (n < 1) {
+            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+        }
+        this.n = n;
+        this.loadtestEntry = loadtestEntry;
+        this.caClient = caClient;
+
+        this.index = new AtomicLong(getSecureIndex());
+    }
+
+    private Map<Integer, CertRequest> nextCertRequests() {
+        Map<Integer, CertRequest> certRequests = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            final int certId = i + 1;
+            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+
+            long thisIndex = index.getAndIncrement();
+            certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
+
+            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
+            if (spki == null) {
+                return null;
+            }
+
+            certTempBuilder.setPublicKey(spki);
+
+            CertTemplate certTemplate = certTempBuilder.build();
+            CertRequest certRequest = new CertRequest(certId, certTemplate, null);
+            certRequests.put(certId, certRequest);
+        }
+        return certRequests;
     }
 
 }

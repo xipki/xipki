@@ -49,6 +49,65 @@ import org.xipki.datasource.api.DatabaseType;
  */
 public class SQLStateCodes {
 
+    private static class DB2 extends SQLStateCodes {
+
+        DB2() {
+            super();
+            // 57: out-of-memory exception / database not started
+            // 58: unexpected system error
+            dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "57", "58");
+
+            // 51: communication failure
+            transientDataAccessResourceCodes = addToSet(transientDataAccessResourceCodes, "51");
+        }
+
+    } // class DB2
+
+    private static class H2 extends SQLStateCodes {
+
+        H2() {
+            super();
+        }
+
+    } // class H2
+
+    private static class HSQL extends SQLStateCodes {
+
+        HSQL() {
+            super();
+        }
+
+    } // class HSQL
+
+    private static class MySQL extends SQLStateCodes {
+        MySQL() {
+            super();
+        }
+    }
+
+    private static class Oracle extends SQLStateCodes {
+
+        Oracle() {
+            super();
+            // 65: unknown identifier
+            badSQLGrammarCodes = addToSet(badSQLGrammarCodes, "65");
+            // 61: deadlock
+            concurrencyFailureCodes = addToSet(concurrencyFailureCodes, "61");
+        }
+
+    } // class Oracle
+
+    private static class PostgreSQL extends SQLStateCodes {
+
+        PostgreSQL() {
+            super();
+            // 53: insufficient resources (e.g. disk full)
+            // 54: program limit exceeded (e.g. statement too complex)
+            dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "53", "54");
+        }
+
+    } // class PostgreSQL
+
     // bad grammar error
     private static final String bge_dynamic_SQL_error = "07";
 
@@ -92,28 +151,6 @@ public class SQLStateCodes {
 
     protected Set<String> concurrencyFailureCodes;
 
-    public static SQLStateCodes newInstance(DatabaseType dbType) {
-        ParamUtil.assertNotNull("dbType", dbType);
-        switch (dbType) {
-        case DB2:
-            return new DB2();
-        case H2:
-            return new H2();
-        case HSQL:
-            return new HSQL();
-        case MYSQL:
-            return new MySQL();
-        case ORACLE:
-            return new Oracle();
-        case POSTGRES:
-            return new PostgreSQL();
-        case UNKNOWN:
-            return new SQLStateCodes();
-        default:
-            throw new RuntimeException("should not reach here, unknown database type " + dbType);
-        }
-    }
-
     private SQLStateCodes() {
         badSQLGrammarCodes = toSet(bge_dynamic_SQL_error, bge_cardinality_violation,
                 bge_syntax_error_directSQL, bge_syntax_error_dynamicSQL,
@@ -146,52 +183,25 @@ public class SQLStateCodes {
         return concurrencyFailureCodes;
     }
 
-    private static class DB2 extends SQLStateCodes {
-        DB2() {
-            super();
-            // 57: out-of-memory exception / database not started
-            // 58: unexpected system error
-            dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "57", "58");
-
-            // 51: communication failure
-            transientDataAccessResourceCodes = addToSet(transientDataAccessResourceCodes, "51");
-        }
-    }
-
-    private static class H2 extends SQLStateCodes {
-        H2() {
-            super();
-        }
-    }
-
-    private static class HSQL extends SQLStateCodes {
-        HSQL() {
-            super();
-        }
-    }
-
-    private static class MySQL extends SQLStateCodes {
-        MySQL() {
-            super();
-        }
-    }
-
-    private static class Oracle extends SQLStateCodes {
-        Oracle() {
-            super();
-            // 65: unknown identifier
-            badSQLGrammarCodes = addToSet(badSQLGrammarCodes, "65");
-            // 61: deadlock
-            concurrencyFailureCodes = addToSet(concurrencyFailureCodes, "61");
-        }
-    }
-
-    private static class PostgreSQL extends SQLStateCodes {
-        PostgreSQL() {
-            super();
-            // 53: insufficient resources (e.g. disk full)
-            // 54: program limit exceeded (e.g. statement too complex)
-            dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "53", "54");
+    public static SQLStateCodes newInstance(DatabaseType dbType) {
+        ParamUtil.assertNotNull("dbType", dbType);
+        switch (dbType) {
+        case DB2:
+            return new DB2();
+        case H2:
+            return new H2();
+        case HSQL:
+            return new HSQL();
+        case MYSQL:
+            return new MySQL();
+        case ORACLE:
+            return new Oracle();
+        case POSTGRES:
+            return new PostgreSQL();
+        case UNKNOWN:
+            return new SQLStateCodes();
+        default:
+            throw new RuntimeException("should not reach here, unknown database type " + dbType);
         }
     }
 

@@ -121,23 +121,6 @@ public class CaDbExportWorker extends DbPortWorker {
                     numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
 
-    private static Marshaller getMarshaller()
-    throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        return marshaller;
-    }
-
-    private static Unmarshaller getUnmarshaller()
-    throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        return unmarshaller;
-    }
-
     private void checkDestFolder()
     throws IOException {
         File f = new File(destFolder);
@@ -195,6 +178,23 @@ public class CaDbExportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
+    }
+
+    private static Marshaller getMarshaller()
+    throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        return marshaller;
+    }
+
+    private static Unmarshaller getUnmarshaller()
+    throws JAXBException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        return unmarshaller;
     }
 
 }

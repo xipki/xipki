@@ -42,6 +42,7 @@ package org.xipki.pki.ca.api;
 public class OperationException extends Exception {
 
     public static enum ErrorCode {
+
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,
         BAD_REQUEST,
@@ -56,7 +57,8 @@ public class OperationException extends Exception {
         SYSTEM_UNAVAILABLE,
         UNKNOWN_CERT,
         UNKNOWN_CERT_PROFILE
-    }
+
+    } // enum ErrorCode
 
     private static final long serialVersionUID = 1L;
 

@@ -88,45 +88,6 @@ public class DbDigestEntry {
         this.revInvTime = revInvTime;
     }
 
-    public static DbDigestEntry decode(
-            final String encoded) {
-        List<Integer> indexes = getIndexes(encoded);
-        if (indexes.size() != 5) {
-            throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
-        }
-
-        String s = encoded.substring(0, indexes.get(0));
-        Long serialNumber = Long.parseLong(s);
-
-        int i = 0;
-        String sha1Fp = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-
-        i++;
-        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-        boolean revoked = !"0".equals(s);
-
-        Integer revReason = null;
-        Long revTime = null;
-        Long revInvTime = null;
-        if (revoked) {
-            i++;
-            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            revReason = Integer.parseInt(s);
-
-            i++;
-            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            revTime = Long.parseLong(s);
-
-            i++;
-            s = encoded.substring(indexes.get(i) + 1);
-            if (s.length() != 0) {
-                revInvTime = Long.parseLong(s);
-            }
-        }
-
-        return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
-    }
-
     public long getSerialNumber() {
         return serialNumber;
     }
@@ -223,6 +184,45 @@ public class DbDigestEntry {
         }
 
         return true;
+    }
+
+    public static DbDigestEntry decode(
+            final String encoded) {
+        List<Integer> indexes = getIndexes(encoded);
+        if (indexes.size() != 5) {
+            throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
+        }
+
+        String s = encoded.substring(0, indexes.get(0));
+        Long serialNumber = Long.parseLong(s);
+
+        int i = 0;
+        String sha1Fp = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+
+        i++;
+        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+        boolean revoked = !"0".equals(s);
+
+        Integer revReason = null;
+        Long revTime = null;
+        Long revInvTime = null;
+        if (revoked) {
+            i++;
+            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            revReason = Integer.parseInt(s);
+
+            i++;
+            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+            revTime = Long.parseLong(s);
+
+            i++;
+            s = encoded.substring(indexes.get(i) + 1);
+            if (s.length() != 0) {
+                revInvTime = Long.parseLong(s);
+            }
+        }
+
+        return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
     }
 
     private static List<Integer> getIndexes(

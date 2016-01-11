@@ -73,6 +73,108 @@ import org.xipki.security.api.HashAlgoType;
 
 public class NSSSignatureSpi extends SignatureSpi {
 
+    public static class SHA1withRSA extends NSSSignatureSpi {
+
+        public SHA1withRSA() {
+            super(SHA1, RSA);
+        }
+
+    } // class SHA1withRSA
+
+    public static class SHA224withRSA extends NSSSignatureSpi {
+
+        public SHA224withRSA() {
+            super(SHA224, RSA);
+        }
+
+    } // class SHA224withRSA
+
+    public static class SHA256withRSA extends NSSSignatureSpi {
+
+        public SHA256withRSA() {
+            super(SHA256, RSA);
+        }
+
+    } // class SHA256withRSA
+
+    public static class SHA384withRSA extends NSSSignatureSpi {
+
+        public SHA384withRSA() {
+            super(SHA384, RSA);
+        }
+
+    } // class SHA384withRSA
+
+    public static class SHA512withRSA extends NSSSignatureSpi {
+
+        public SHA512withRSA() {
+            super(SHA512, RSA);
+        }
+
+    } // class SHA512withRSA
+
+    public static class SHA1withECDSA extends NSSSignatureSpi {
+
+        public SHA1withECDSA() {
+            super(SHA1, ECDSA);
+        }
+
+    } // class SHA1withECDSA
+
+    public static class SHA256withECDSA extends NSSSignatureSpi {
+
+        public SHA256withECDSA() {
+            super(SHA256, ECDSA);
+        }
+
+    } // class SHA256withECDSA
+
+    public static class SHA384withECDSA extends NSSSignatureSpi {
+
+        public SHA384withECDSA() {
+            super(SHA384, ECDSA);
+        }
+
+    } // class SHA384withECDSA
+
+    public static class SHA512withECDSA extends NSSSignatureSpi {
+
+        public SHA512withECDSA() {
+            super(SHA512, ECDSA);
+        }
+
+    } // class SHA512withECDSA
+
+    public static class RawECDSA extends NSSSignatureSpi {
+
+        public RawECDSA() {
+            super("NONEwith" + ECDSA);
+        }
+
+    } // class RawECDSA
+
+    public static class SHA224withECDSA extends NSSSignatureSpi {
+
+        public SHA224withECDSA() {
+            super(SHA224, ECDSA);
+        }
+
+    } // class SHA224withECDSA
+
+    public static final String SHA1 = "SHA1";
+
+    public static final String SHA224 = "SHA224";
+
+    public static final String SHA256 = "SHA256";
+
+    public static final String SHA384 = "SHA384";
+
+    public static final String SHA512 = "SHA512";
+
+    public static final String RSA = "RSA";
+
+    public static final String ECDSA = "ECDSA";
+
     private final Signature service;
 
     private final ASN1ObjectIdentifier hashAlgOid;
@@ -124,71 +226,6 @@ public class NSSSignatureSpi extends SignatureSpi {
             this.md = null;
             this.hashAlgOid = null;
         }
-    }
-
-    private static Signature getSignatureService(
-            final String algorithm) {
-        Signature service = null;
-        if (XipkiNSSProvider.nssProvider != null) {
-            try {
-                service = Signature.getInstance(algorithm, XipkiNSSProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
-                try {
-                    service = Signature.getInstance(algorithm, "SunEC");
-                } catch (NoSuchAlgorithmException | NoSuchProviderException e2) {
-                    throw new ProviderException("signature " + algorithm + "not supported");
-                }
-            }
-        }
-
-        if (service == null) {
-            final String errorMsg = "unsupported algorithm " + algorithm;
-            throw new ProviderException(errorMsg);
-        }
-
-        return service;
-    }
-
-    private static Cipher getCipherService(
-            final String algorithm) {
-        Cipher service = null;
-        if (XipkiNSSProvider.nssProvider != null) {
-            try {
-                service = Cipher.getInstance(algorithm, XipkiNSSProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
-                throw new ProviderException("cipher " + algorithm + " not supported");
-            } catch (NoSuchPaddingException e) {
-                throw new ProviderException("cipher " + algorithm + " not supported");
-            }
-        }
-        if (service == null) {
-            final String errorMsg = "unsupported algorithm " + algorithm;
-            throw new ProviderException(errorMsg);
-        }
-
-        return service;
-    }
-
-    private static MessageDigest getMessageDigestService(
-            final String algorithm) {
-        MessageDigest service = null;
-        if (XipkiNSSProvider.nssProvider != null) {
-            try {
-                service = MessageDigest.getInstance(algorithm, XipkiNSSProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
-            }
-        }
-
-        if (service == null) {
-            final String errorMsg = "could not find any provider for algorithm " + algorithm;
-            try {
-                service = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                throw new ProviderException(errorMsg);
-            }
-        }
-
-        return service;
     }
 
     @Override
@@ -408,6 +445,71 @@ public class NSSSignatureSpi extends SignatureSpi {
         }
     }
 
+    private static Signature getSignatureService(
+            final String algorithm) {
+        Signature service = null;
+        if (XipkiNSSProvider.nssProvider != null) {
+            try {
+                service = Signature.getInstance(algorithm, XipkiNSSProvider.nssProvider);
+            } catch (NoSuchAlgorithmException e) {
+                try {
+                    service = Signature.getInstance(algorithm, "SunEC");
+                } catch (NoSuchAlgorithmException | NoSuchProviderException e2) {
+                    throw new ProviderException("signature " + algorithm + "not supported");
+                }
+            }
+        }
+
+        if (service == null) {
+            final String errorMsg = "unsupported algorithm " + algorithm;
+            throw new ProviderException(errorMsg);
+        }
+
+        return service;
+    }
+
+    private static Cipher getCipherService(
+            final String algorithm) {
+        Cipher service = null;
+        if (XipkiNSSProvider.nssProvider != null) {
+            try {
+                service = Cipher.getInstance(algorithm, XipkiNSSProvider.nssProvider);
+            } catch (NoSuchAlgorithmException e) {
+                throw new ProviderException("cipher " + algorithm + " not supported");
+            } catch (NoSuchPaddingException e) {
+                throw new ProviderException("cipher " + algorithm + " not supported");
+            }
+        }
+        if (service == null) {
+            final String errorMsg = "unsupported algorithm " + algorithm;
+            throw new ProviderException(errorMsg);
+        }
+
+        return service;
+    }
+
+    private static MessageDigest getMessageDigestService(
+            final String algorithm) {
+        MessageDigest service = null;
+        if (XipkiNSSProvider.nssProvider != null) {
+            try {
+                service = MessageDigest.getInstance(algorithm, XipkiNSSProvider.nssProvider);
+            } catch (NoSuchAlgorithmException e) {
+            }
+        }
+
+        if (service == null) {
+            final String errorMsg = "could not find any provider for algorithm " + algorithm;
+            try {
+                service = MessageDigest.getInstance(algorithm);
+            } catch (NoSuchAlgorithmException e) {
+                throw new ProviderException(errorMsg);
+            }
+        }
+
+        return service;
+    }
+
     private static byte[] pkcs1padding(
             final byte[] in,
             final int blockSize) {
@@ -485,108 +587,6 @@ public class NSSSignatureSpi extends SignatureSpi {
         DigestInfo dInfo = new DigestInfo(algId, hash);
 
         return dInfo.getEncoded("DER");
-    }
-
-    public static final String SHA1 = "SHA1";
-
-    public static final String SHA224 = "SHA224";
-
-    public static final String SHA256 = "SHA256";
-
-    public static final String SHA384 = "SHA384";
-
-    public static final String SHA512 = "SHA512";
-
-    public static final String RSA = "RSA";
-
-    public static final String ECDSA = "ECDSA";
-
-    public static class SHA1withRSA extends NSSSignatureSpi {
-
-        public SHA1withRSA() {
-            super(SHA1, RSA);
-        }
-
-    }
-
-    public static class SHA224withRSA extends NSSSignatureSpi {
-
-        public SHA224withRSA() {
-            super(SHA224, RSA);
-        }
-
-    }
-
-    public static class SHA256withRSA extends NSSSignatureSpi {
-
-        public SHA256withRSA() {
-            super(SHA256, RSA);
-        }
-
-    }
-
-    public static class SHA384withRSA extends NSSSignatureSpi {
-
-        public SHA384withRSA() {
-            super(SHA384, RSA);
-        }
-
-    }
-
-    public static class SHA512withRSA extends NSSSignatureSpi {
-
-        public SHA512withRSA() {
-            super(SHA512, RSA);
-        }
-
-    }
-
-    public static class SHA1withECDSA extends NSSSignatureSpi {
-
-        public SHA1withECDSA() {
-            super(SHA1, ECDSA);
-        }
-
-    }
-
-    public static class SHA256withECDSA extends NSSSignatureSpi {
-
-        public SHA256withECDSA() {
-            super(SHA256, ECDSA);
-        }
-
-    }
-
-    public static class SHA384withECDSA extends NSSSignatureSpi {
-
-        public SHA384withECDSA() {
-            super(SHA384, ECDSA);
-        }
-
-    }
-
-    public static class SHA512withECDSA extends NSSSignatureSpi {
-
-        public SHA512withECDSA() {
-            super(SHA512, ECDSA);
-        }
-
-    }
-
-    public static class RawECDSA extends NSSSignatureSpi {
-
-        public RawECDSA() {
-            super("NONEwith" + ECDSA);
-        }
-
-    }
-
-    public static class SHA224withECDSA extends NSSSignatureSpi {
-
-        public SHA224withECDSA() {
-            super(SHA224, ECDSA);
-        }
-
     }
 
 }

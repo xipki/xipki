@@ -58,6 +58,33 @@ import org.xipki.security.api.SecurityFactory;
 
 public abstract class P12SignLoadTest extends LoadExecutor {
 
+    class Testor implements Runnable {
+
+        @Override
+        public void run() {
+            ContentSigner singleSigner;
+            try {
+                singleSigner = signer.borrowContentSigner();
+            } catch (NoIdleSignerException e) {
+                account(1, 1);
+                return;
+            }
+
+            while (!stop() && getErrorAccout() < 1) {
+                try {
+                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
+                    singleSigner.getSignature();
+                    account(1, 0);
+                } catch (Exception e) {
+                    account(1, 1);
+                }
+            }
+
+            signer.returnContentSigner(singleSigner);
+        }
+
+    } // class Testor
+
     private final ConcurrentContentSigner signer;
 
     protected final static String password = "1234";
@@ -123,31 +150,6 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         return (in == null)
                 ? null
                 : IoUtil.read(in);
-    }
-
-    class Testor implements Runnable {
-        @Override
-        public void run() {
-            ContentSigner singleSigner;
-            try {
-                singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e) {
-                account(1, 1);
-                return;
-            }
-
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-                    singleSigner.getSignature();
-                    account(1, 0);
-                } catch (Exception e) {
-                    account(1, 1);
-                }
-            }
-
-            signer.returnContentSigner(singleSigner);
-        }
     }
 
 }

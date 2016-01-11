@@ -86,6 +86,7 @@ import org.xipki.security.api.util.X509Util;
  */
 
 abstract class CmpResponder {
+
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();

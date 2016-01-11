@@ -77,21 +77,6 @@ public final class IaikP11CryptService implements P11CryptService {
 
     private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
 
-    public synchronized static IaikP11CryptService getInstance(
-            final P11ModuleConf moduleConf)
-    throws SignerException {
-        synchronized (instances) {
-            final String name = moduleConf.getName();
-            IaikP11CryptService instance = instances.get(name);
-            if (instance == null) {
-                instance = new IaikP11CryptService(moduleConf);
-                instances.put(name, instance);
-            }
-
-            return instance;
-        }
-    }
-
     private IaikP11CryptService(
             final P11ModuleConf moduleConf)
     throws SignerException {
@@ -443,6 +428,21 @@ public final class IaikP11CryptService implements P11CryptService {
         }
 
         return keyLabels.toArray(new String[0]);
+    }
+
+    public synchronized static IaikP11CryptService getInstance(
+            final P11ModuleConf moduleConf)
+    throws SignerException {
+        synchronized (instances) {
+            final String name = moduleConf.getName();
+            IaikP11CryptService instance = instances.get(name);
+            if (instance == null) {
+                instance = new IaikP11CryptService(moduleConf);
+                instances.put(name, instance);
+            }
+
+            return instance;
+        }
     }
 
 }

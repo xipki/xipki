@@ -114,9 +114,13 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
     private OcspQA ocspQA;
 
     private OcspError expectedOcspError;
+
     private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
+
     private Occurrence expectedNextUpdateOccurrence;
+
     private Occurrence expectedCerthashOccurrence;
+
     private Occurrence expectedNonceOccurrence;
 
     @Override

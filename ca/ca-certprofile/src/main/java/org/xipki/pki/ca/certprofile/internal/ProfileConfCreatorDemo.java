@@ -133,6 +133,15 @@ import org.xml.sax.SAXException;
 
 public class ProfileConfCreatorDemo {
 
+    private static class ExampleDescription extends AnyType {
+
+        public ExampleDescription(
+                final Element appInfo) {
+            setAny(appInfo);
+        }
+
+    } // class ExampleDescription
+
     private static final ASN1ObjectIdentifier id_gematik =
             new ASN1ObjectIdentifier("1.2.276.0.76.4");
 
@@ -149,16 +158,6 @@ public class ProfileConfCreatorDemo {
         requestExtensions.add(Extension.extendedKeyUsage);
         requestExtensions.add(Extension.subjectAlternativeName);
         requestExtensions.add(Extension.subjectInfoAccess);
-    }
-
-    private ProfileConfCreatorDemo() {
-    }
-
-    private static class ExampleDescription extends AnyType {
-        public ExampleDescription(
-                final Element appInfo) {
-            setAny(appInfo);
-        }
     }
 
     public static void main(
@@ -1736,6 +1735,9 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
+    }
+
+    private ProfileConfCreatorDemo() {
     }
 
 }

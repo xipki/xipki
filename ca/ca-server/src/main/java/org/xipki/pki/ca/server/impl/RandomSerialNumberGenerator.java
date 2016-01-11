@@ -131,13 +131,6 @@ class RandomSerialNumberGenerator {
         random.setSeed(seed);
     }
 
-    public static synchronized RandomSerialNumberGenerator getInstance() {
-        if (instance == null) {
-            instance = new RandomSerialNumberGenerator();
-        }
-        return instance;
-    }
-
     public BigInteger getSerialNumber() {
         if (noOctets == 0) {
             Random rand = new Random();
@@ -189,6 +182,13 @@ class RandomSerialNumberGenerator {
                     "SernoOctetSize must be 4 or 8 for this generator.");
         }
         this.noOctets = noOctets;
+    }
+
+    public static synchronized RandomSerialNumberGenerator getInstance() {
+        if (instance == null) {
+            instance = new RandomSerialNumberGenerator();
+        }
+        return instance;
     }
 
 }

@@ -54,8 +54,7 @@ import org.xipki.common.util.ParamUtil;
  * @author Lijun Liao
  */
 
-public class DSAPlainDigestSigner
-    implements Signer {
+public class DSAPlainDigestSigner implements Signer {
 
     private final Digest digest;
 

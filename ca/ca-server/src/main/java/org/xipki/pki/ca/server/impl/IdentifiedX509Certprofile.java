@@ -566,58 +566,6 @@ class IdentifiedX509Certprofile {
         return values;
     }
 
-    private static void addExtension(
-            final ExtensionValues values,
-            final ASN1ObjectIdentifier extType,
-            final ExtensionValue extValue,
-            final ExtensionControl extControl,
-            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
-            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
-    throws CertprofileException {
-        if (extValue != null) {
-            values.addExtension(extType, extValue);
-            neededExtensionTypes.remove(extType);
-            wantedExtensionTypes.remove(extType);
-            return;
-        }
-
-        if (!extControl.isRequired()) {
-            return;
-        }
-
-        String description = ObjectIdentifiers.getName(extType);
-        if (description == null) {
-            description = extType.getId();
-        }
-        throw new CertprofileException("could not add required extension " + description);
-    }
-
-    private static void addExtension(
-            final ExtensionValues values,
-            final ASN1ObjectIdentifier extType,
-            final ASN1Encodable extValue,
-            final ExtensionControl extControl,
-            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
-            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
-    throws CertprofileException {
-        if (extValue != null) {
-            values.addExtension(extType, extControl.isCritical(), extValue);
-            neededExtensionTypes.remove(extType);
-            wantedExtensionTypes.remove(extType);
-            return;
-        }
-
-        if (!extControl.isRequired()) {
-            return;
-        }
-
-        String description = ObjectIdentifiers.getName(extType);
-        if (description == null) {
-            description = extType.getId();
-        }
-        throw new CertprofileException("could not add required extension " + description);
-    }
-
     public boolean isCA() {
         return certprofile.isCA();
     }
@@ -1050,6 +998,58 @@ class IdentifiedX509Certprofile {
         return v.size() > 0
                 ? new DERSequence(v)
                 : null;
+    }
+
+    private static void addExtension(
+            final ExtensionValues values,
+            final ASN1ObjectIdentifier extType,
+            final ExtensionValue extValue,
+            final ExtensionControl extControl,
+            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+    throws CertprofileException {
+        if (extValue != null) {
+            values.addExtension(extType, extValue);
+            neededExtensionTypes.remove(extType);
+            wantedExtensionTypes.remove(extType);
+            return;
+        }
+
+        if (!extControl.isRequired()) {
+            return;
+        }
+
+        String description = ObjectIdentifiers.getName(extType);
+        if (description == null) {
+            description = extType.getId();
+        }
+        throw new CertprofileException("could not add required extension " + description);
+    }
+
+    private static void addExtension(
+            final ExtensionValues values,
+            final ASN1ObjectIdentifier extType,
+            final ASN1Encodable extValue,
+            final ExtensionControl extControl,
+            final Set<ASN1ObjectIdentifier> neededExtensionTypes,
+            final Set<ASN1ObjectIdentifier> wantedExtensionTypes)
+    throws CertprofileException {
+        if (extValue != null) {
+            values.addExtension(extType, extControl.isCritical(), extValue);
+            neededExtensionTypes.remove(extType);
+            wantedExtensionTypes.remove(extType);
+            return;
+        }
+
+        if (!extControl.isRequired()) {
+            return;
+        }
+
+        String description = ObjectIdentifiers.getName(extType);
+        if (description == null) {
+            description = extType.getId();
+        }
+        throw new CertprofileException("could not add required extension " + description);
     }
 
 }

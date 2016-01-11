@@ -109,8 +109,6 @@ import org.xipki.security.api.util.X509Util;
 
 public class CrlCertStatusStore extends CertStatusStore {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
-
     private static class CertWithInfo {
 
         private Certificate cert;
@@ -126,7 +124,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             this.profileName = profileName;
         }
 
-    }
+    } // class CertWithInfo
 
     private class StoreUpdateService implements Runnable {
 
@@ -135,7 +133,9 @@ public class CrlCertStatusStore extends CertStatusStore {
             initializeStore(false);
         }
 
-    }
+    } // StoreUpdateService
+
+    private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
 
     private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap = new ConcurrentHashMap<>();
 
@@ -657,25 +657,6 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
     }
 
-    private static Map<HashAlgoType, byte[]> getCertHashes(
-            final Certificate cert)
-    throws CertStatusStoreException {
-        byte[] encodedCert;
-        try {
-            encodedCert = cert.getEncoded();
-        } catch (IOException e) {
-            throw new CertStatusStoreException(e.getMessage(), e);
-        }
-
-        Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
-        for (HashAlgoType hashAlgo : HashAlgoType.values()) {
-            byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);
-            certHashes.put(hashAlgo, certHash);
-        }
-
-        return certHashes;
-    }
-
     @Override
     public CertStatusInfo getCertStatus(
             final HashAlgoType hashAlgo,
@@ -779,11 +760,6 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         return certStatusInfo;
-    }
-
-    private static byte[] removeTagAndLenFromExtensionValue(
-            final byte[] encodedExtensionValue) {
-        return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
 
     public X509Certificate getCaCert() {
@@ -990,6 +966,30 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         return caRevInfo;
+    }
+
+    private static Map<HashAlgoType, byte[]> getCertHashes(
+            final Certificate cert)
+    throws CertStatusStoreException {
+        byte[] encodedCert;
+        try {
+            encodedCert = cert.getEncoded();
+        } catch (IOException e) {
+            throw new CertStatusStoreException(e.getMessage(), e);
+        }
+
+        Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
+        for (HashAlgoType hashAlgo : HashAlgoType.values()) {
+            byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);
+            certHashes.put(hashAlgo, certHash);
+        }
+
+        return certHashes;
+    }
+
+    private static byte[] removeTagAndLenFromExtensionValue(
+            final byte[] encodedExtensionValue) {
+        return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
 
 }

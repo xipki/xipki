@@ -42,6 +42,7 @@ import org.xipki.scep.transaction.CACapability;
  */
 
 public class CAwithoutRATest extends AbstractCATest {
+
     @Override
     protected boolean isWithRA() {
         return false;
