@@ -33,41 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on concurrency failure.
- *
- * <p>This exception should be subclassed to indicate the type of failure:
- * optimistic locking, failure to acquire lock, etc.
+ * Data access exception thrown when a resource fails completely and the failure is permanent.
  *
  * @author Thomas Risberg
- * @since 1.1
- * @see OptimisticLockingFailureException
- * @see PessimisticLockingFailureException
- * @see could notAcquireLockException
- * @see DeadlockLoserDataAccessException
+ * @see java.sql.SQLNonTransientConnectionException
  */
 @SuppressWarnings("serial")
-public class ConcurrencyFailureException extends TransientDataAccessException {
+public class NonTransientDataAccessResourceException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for ConcurrencyFailureException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public ConcurrencyFailureException(
+    public NonTransientDataAccessResourceException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for ConcurrencyFailureException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public ConcurrencyFailureException(
+    public NonTransientDataAccessResourceException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

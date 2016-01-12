@@ -33,29 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.sprintframework.jdbc;
+
+import java.sql.SQLException;
+
+import org.springframework.dao.UncategorizedDataAccessException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Normal superclass when we can't distinguish anything more specific
- * than "something went wrong with the underlying resource": for example,
- * a SQLException from JDBC we can't pinpoint more precisely.
+ * Exception thrown when we can't classify a SQLException into
+ * one of our generic data access exceptions.
  *
  * @author Rod Johnson
+ * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
+public class UncategorizedSQLException extends UncategorizedDataAccessException {
+
+    /** SQL that led to the problem */
+    private final String sql;
 
     /**
-     * Constructor for UncategorizedDataAccessException.
-     * @param msg the detail message
-     * @param cause the exception thrown by underlying data access API
+     * Constructor for UncategorizedSQLException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
      */
-    public UncategorizedDataAccessException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
+    public UncategorizedSQLException(
+            final String sql,
+            final SQLException ex) {
+        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
+                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
+                + ex.getMessage(), ex);
+        this.sql = sql;
+    }
+
+    /**
+     * Return the underlying SQLException.
+     */
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that led to the problem.
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }

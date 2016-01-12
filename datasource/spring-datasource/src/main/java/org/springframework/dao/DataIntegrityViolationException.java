@@ -33,34 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on failure to aquire a lock during an update,
- * for example during a "select for update" statement.
+ * Exception thrown when an attempt to insert or update data
+ * results in violation of an integrity constraint. Note that this
+ * is not purely a relational concept; unique primary keys are
+ * required by most database types.
  *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class CannotAcquireLockException extends PessimisticLockingFailureException {
+public class DataIntegrityViolationException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for could notAcquireLockException.
+     * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      */
-    public CannotAcquireLockException(
+    public DataIntegrityViolationException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for could notAcquireLockException.
+     * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public CannotAcquireLockException(
+    public DataIntegrityViolationException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

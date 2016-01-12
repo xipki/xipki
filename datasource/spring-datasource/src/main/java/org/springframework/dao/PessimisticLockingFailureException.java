@@ -33,34 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on failure to complete a transaction in serialized mode
- * due to update conflicts.
+ * Exception thrown on a pessimistic locking violation.
+ * Thrown by Spring's SQLException translation mechanism
+ * if a corresponding database error is encountered.
  *
- * @author Rod Johnson
+ * <p>Serves as superclass for more specific exceptions, like
+ * could notAcquireLockException and DeadlockLoserDataAccessException.
+ *
+ * @author Thomas Risberg
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
+ * @see OptimisticLockingFailureException
  */
 @SuppressWarnings("serial")
-public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
+public class PessimisticLockingFailureException extends ConcurrencyFailureException {
 
     /**
-     * Constructor for could notSerializeTransactionException.
+     * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      */
-    public CannotSerializeTransactionException(
+    public PessimisticLockingFailureException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for could notSerializeTransactionException.
+     * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public CannotSerializeTransactionException(
+    public PessimisticLockingFailureException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

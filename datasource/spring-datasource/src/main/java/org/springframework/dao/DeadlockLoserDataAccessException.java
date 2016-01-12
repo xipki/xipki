@@ -33,35 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Data access exception thrown when a resource fails temporarily
- * and the operation can be retried.
+ * Generic exception thrown when the current process was
+ * a deadlock loser, and its transaction rolled back.
  *
- * @author Thomas Risberg
- * @see java.sql.SQLTransientConnectionException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class TransientDataAccessResourceException extends TransientDataAccessException {
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for TransientDataAccessResourceException.
-     * @param msg the detail message
-     */
-    public TransientDataAccessResourceException(
-            final String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor for TransientDataAccessResourceException.
+     * Constructor for DeadlockLoserDataAccessException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessResourceException(
+    public DeadlockLoserDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

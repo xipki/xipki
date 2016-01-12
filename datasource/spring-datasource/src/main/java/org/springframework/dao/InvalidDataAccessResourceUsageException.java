@@ -33,37 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root of the hierarchy of data access exceptions that are considered transient -
- * where a previously failed operation might be able to succeed when the operation
- * is retried without any intervention by application-level functionality.
+ * Root for exceptions thrown when we use a data access resource incorrectly.
+ * Thrown for example on specifying bad SQL when using a RDBMS.
+ * Resource-specific subclasses are supplied by concrete data access packages.
  *
- * @author Thomas Risberg
- * @see java.sql.SQLTransientException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public abstract class TransientDataAccessException extends DataAccessException {
+public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for TransientDataAccessException.
+     * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
      */
-    public TransientDataAccessException(
+    public InvalidDataAccessResourceUsageException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for TransientDataAccessException.
+     * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessException(
+    public InvalidDataAccessResourceUsageException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

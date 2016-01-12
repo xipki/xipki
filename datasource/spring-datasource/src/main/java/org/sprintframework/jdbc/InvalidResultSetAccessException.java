@@ -33,44 +33,65 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.sprintframework.jdbc;
+
+import java.sql.SQLException;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on a pessimistic locking violation.
- * Thrown by Spring's SQLException translation mechanism
- * if a corresponding database error is encountered.
+ * Exception thrown when a ResultSet has been accessed in an invalid fashion.
+ * Such exceptions always have a {@code java.sql.SQLException} root cause.
  *
- * <p>Serves as superclass for more specific exceptions, like
- * could notAcquireLockException and DeadlockLoserDataAccessException.
+ * <p>This typically happens when an invalid ResultSet column index or name
+ * has been specified. Also thrown by disconnected SqlRowSets.
  *
- * @author Thomas Risberg
- * @see could notAcquireLockException
- * @see DeadlockLoserDataAccessException
- * @see OptimisticLockingFailureException
+ * @author Juergen Hoeller
+ * @see BadSqlGrammarException
+ * @see org.springframework.jdbc.support.rowset.SqlRowSet
  */
 @SuppressWarnings("serial")
-public class PessimisticLockingFailureException extends ConcurrencyFailureException {
+public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
+
+    private String sql;
 
     /**
-     * Constructor for PessimisticLockingFailureException.
-     * @param msg the detail message
+     * Constructor for InvalidResultSetAccessException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
      */
-    public PessimisticLockingFailureException(
-            final String msg) {
-        super(msg);
+    public InvalidResultSetAccessException(
+            final String sql,
+            final SQLException ex) {
+        super("invalid ResultSet access for SQL [" + sql + "]", ex);
+        this.sql = sql;
     }
 
     /**
-     * Constructor for PessimisticLockingFailureException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * Constructor for InvalidResultSetAccessException.
+     * @param ex the root cause
      */
-    public PessimisticLockingFailureException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
+    public InvalidResultSetAccessException(
+            final SQLException ex) {
+        super(ex.getMessage(), ex);
+    }
+
+    /**
+     * Return the wrapped SQLException.
+     */
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that caused the problem.
+     * @return the offending SQL, if known
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }

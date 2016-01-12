@@ -33,34 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root of the hierarchy of data access exceptions discussed in
+ * Exception thrown when the underlying resource denied a permission
+ * to access a specific element, such as a specific database table.
  *
- * @author Rod Johnson
+ * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class DataAccessException extends Exception {
+public class PermissionDeniedDataAccessException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for DataAccessException.
+     * Constructor for PermissionDeniedDataAccessException.
      * @param msg the detail message
+     * @param cause the root cause from the underlying data access API,
+     * such as JDBC
      */
-    public DataAccessException(
-            final String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor for DataAccessException.
-     * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
-     */
-    public DataAccessException(
+    public PermissionDeniedDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

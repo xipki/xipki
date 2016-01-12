@@ -33,25 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.dao;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Generic exception thrown when the current process was
- * a deadlock loser, and its transaction rolled back.
+ * Exception thrown on failure to complete a transaction in serialized mode
+ * due to update conflicts.
  *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
+public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for DeadlockLoserDataAccessException.
+     * Constructor for could notSerializeTransactionException.
+     * @param msg the detail message
+     */
+    public CannotSerializeTransactionException(
+            final String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor for could notSerializeTransactionException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DeadlockLoserDataAccessException(
+    public CannotSerializeTransactionException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

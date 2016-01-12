@@ -33,54 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
-
-import java.sql.SQLException;
-
-import org.sprintframework.dao.UncategorizedDataAccessException;
+package org.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when we can't classify a SQLException into
- * one of our generic data access exceptions.
+ * Exception thrown on concurrency failure.
  *
- * @author Rod Johnson
- * @author Juergen Hoeller
+ * <p>This exception should be subclassed to indicate the type of failure:
+ * optimistic locking, failure to acquire lock, etc.
+ *
+ * @author Thomas Risberg
+ * @since 1.1
+ * @see OptimisticLockingFailureException
+ * @see PessimisticLockingFailureException
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")
-public class UncategorizedSQLException extends UncategorizedDataAccessException {
-
-    /** SQL that led to the problem */
-    private final String sql;
+public class ConcurrencyFailureException extends TransientDataAccessException {
 
     /**
-     * Constructor for UncategorizedSQLException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for ConcurrencyFailureException.
+     * @param msg the detail message
      */
-    public UncategorizedSQLException(
-            final String sql,
-            final SQLException ex) {
-        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
-                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
-                + ex.getMessage(), ex);
-        this.sql = sql;
+    public ConcurrencyFailureException(
+            final String msg) {
+        super(msg);
     }
 
     /**
-     * Return the underlying SQLException.
+     * Constructor for ConcurrencyFailureException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
      */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that led to the problem.
-     */
-    public String getSql() {
-        return this.sql;
+    public ConcurrencyFailureException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }
