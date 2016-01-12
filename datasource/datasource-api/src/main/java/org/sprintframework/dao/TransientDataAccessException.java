@@ -33,52 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
-
-import java.sql.SQLException;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when we can't classify a SQLException into
- * one of our generic data access exceptions.
+ * Root of the hierarchy of data access exceptions that are considered transient -
+ * where a previously failed operation might be able to succeed when the operation
+ * is retried without any intervention by application-level functionality.
  *
- * @author Rod Johnson
- * @author Juergen Hoeller
+ * @author Thomas Risberg
+ * @see java.sql.SQLTransientException
  */
 @SuppressWarnings("serial")
-public class UncategorizedSQLException extends UncategorizedDataAccessException {
-
-    /** SQL that led to the problem */
-    private final String sql;
+public abstract class TransientDataAccessException extends DataAccessException {
 
     /**
-     * Constructor for UncategorizedSQLException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for TransientDataAccessException.
+     * @param msg the detail message
      */
-    public UncategorizedSQLException(
-            final String sql,
-            final SQLException ex) {
-        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
-                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
-                + ex.getMessage(), ex);
-        this.sql = sql;
+    public TransientDataAccessException(
+            final String msg) {
+        super(msg);
     }
 
     /**
-     * Return the underlying SQLException.
+     * Constructor for TransientDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
      */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that led to the problem.
-     */
-    public String getSql() {
-        return this.sql;
+    public TransientDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

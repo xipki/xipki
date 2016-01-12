@@ -33,35 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root for exceptions thrown when we use a data access resource incorrectly.
- * Thrown for example on specifying bad SQL when using a RDBMS.
- * Resource-specific subclasses are supplied by concrete data access packages.
+ * Exception thrown on concurrency failure.
  *
- * @author Rod Johnson
+ * <p>This exception should be subclassed to indicate the type of failure:
+ * optimistic locking, failure to acquire lock, etc.
+ *
+ * @author Thomas Risberg
+ * @since 1.1
+ * @see OptimisticLockingFailureException
+ * @see PessimisticLockingFailureException
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")
-public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException {
+public class ConcurrencyFailureException extends TransientDataAccessException {
 
     /**
-     * Constructor for InvalidDataAccessResourceUsageException.
+     * Constructor for ConcurrencyFailureException.
      * @param msg the detail message
      */
-    public InvalidDataAccessResourceUsageException(
+    public ConcurrencyFailureException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for InvalidDataAccessResourceUsageException.
+     * Constructor for ConcurrencyFailureException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public InvalidDataAccessResourceUsageException(
+    public ConcurrencyFailureException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

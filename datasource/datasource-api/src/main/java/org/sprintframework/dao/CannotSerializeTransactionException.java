@@ -33,41 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on a pessimistic locking violation.
- * Thrown by Spring's SQLException translation mechanism
- * if a corresponding database error is encountered.
+ * Exception thrown on failure to complete a transaction in serialized mode
+ * due to update conflicts.
  *
- * <p>Serves as superclass for more specific exceptions, like
- * could notAcquireLockException and DeadlockLoserDataAccessException.
- *
- * @author Thomas Risberg
- * @see could notAcquireLockException
- * @see DeadlockLoserDataAccessException
- * @see OptimisticLockingFailureException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class PessimisticLockingFailureException extends ConcurrencyFailureException {
+public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for PessimisticLockingFailureException.
+     * Constructor for could notSerializeTransactionException.
      * @param msg the detail message
      */
-    public PessimisticLockingFailureException(
+    public CannotSerializeTransactionException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for PessimisticLockingFailureException.
+     * Constructor for could notSerializeTransactionException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public PessimisticLockingFailureException(
+    public CannotSerializeTransactionException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

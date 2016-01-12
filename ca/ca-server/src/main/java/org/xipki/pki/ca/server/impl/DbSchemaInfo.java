@@ -44,8 +44,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.sprintframework.dao.DataAccessException;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
 
 /**
  * @author Lijun Liao

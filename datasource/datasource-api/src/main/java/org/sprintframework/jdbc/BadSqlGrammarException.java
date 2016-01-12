@@ -33,37 +33,55 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.jdbc;
+
+import java.sql.SQLException;
+
+import org.sprintframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on failure to aquire a lock during an update,
- * for example during a "select for update" statement.
+ * Exception thrown when SQL specified is invalid. Such exceptions always have
+ * a {@code java.sql.SQLException} root cause.
+ *
+ * <p>It would be possible to have subclasses for no such table, no such column etc.
+ * A custom SQLExceptionTranslator could create such more specific exceptions,
+ * without affecting code using this class.
  *
  * @author Rod Johnson
+ * @see InvalidResultSetAccessException
  */
 @SuppressWarnings("serial")
-public class CannotAcquireLockException extends PessimisticLockingFailureException {
+public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
+
+    private String sql;
 
     /**
-     * Constructor for could notAcquireLockException.
-     * @param msg the detail message
+     * Constructor for BadSqlGrammarException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
      */
-    public CannotAcquireLockException(
-            final String msg) {
-        super(msg);
+    public BadSqlGrammarException(
+            final String sql,
+            final SQLException ex) {
+        super("bad SQL grammar [" + sql + "]", ex);
+        this.sql = sql;
     }
 
     /**
-     * Constructor for could notAcquireLockException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * Return the wrapped SQLException.
      */
-    public CannotAcquireLockException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that caused the problem.
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }

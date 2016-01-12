@@ -33,37 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root of the hierarchy of data access exceptions that are considered transient -
- * where a previously failed operation might be able to succeed when the operation
- * is retried without any intervention by application-level functionality.
+ * Data access exception thrown when a resource fails completely and the failure is permanent.
  *
  * @author Thomas Risberg
- * @see java.sql.SQLTransientException
+ * @see java.sql.SQLNonTransientConnectionException
  */
 @SuppressWarnings("serial")
-public abstract class TransientDataAccessException extends DataAccessException {
+public class NonTransientDataAccessResourceException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for TransientDataAccessException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public TransientDataAccessException(
+    public NonTransientDataAccessResourceException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for TransientDataAccessException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessException(
+    public NonTransientDataAccessResourceException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

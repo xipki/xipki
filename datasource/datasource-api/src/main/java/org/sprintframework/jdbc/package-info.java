@@ -33,40 +33,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
-
-/**
- * Copied from Spring Framework licensed under Apache License, version 2.0.
- *
- * Root of the hierarchy of data access exceptions that are considered non-transient -
- * where a retry of the same operation would fail unless the cause of the Exception
- * is corrected.
- *
- * @author Thomas Risberg
- * @see java.sql.SQLNonTransientException
- */
-@SuppressWarnings("serial")
-public abstract class NonTransientDataAccessException extends DataAccessException {
-
-    /**
-     * Constructor for NonTransientDataAccessException.
-     * @param msg the detail message
-     */
-    public NonTransientDataAccessException(
-            final String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor for NonTransientDataAccessException.
-     * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
-     */
-    public NonTransientDataAccessException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
-    }
-
-}
+package org.sprintframework.jdbc;

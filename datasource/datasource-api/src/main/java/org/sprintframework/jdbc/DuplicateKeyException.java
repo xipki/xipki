@@ -33,26 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.jdbc;
+
+import org.sprintframework.dao.DataIntegrityViolationException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Normal superclass when we can't distinguish anything more specific
- * than "something went wrong with the underlying resource": for example,
- * a SQLException from JDBC we can't pinpoint more precisely.
+ * Exception thrown when an attempt to insert or update data
+ * results in violation of an primary key or unique constraint.
+ * Note that this is not necessarily a purely relational concept;
+ * unique primary keys are required by most database types.
  *
- * @author Rod Johnson
+ * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
+public class DuplicateKeyException extends DataIntegrityViolationException {
 
     /**
-     * Constructor for UncategorizedDataAccessException.
+     * Constructor for DuplicateKeyException.
      * @param msg the detail message
-     * @param cause the exception thrown by underlying data access API
      */
-    public UncategorizedDataAccessException(
+    public DuplicateKeyException(
+            final String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor for DuplicateKeyException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public DuplicateKeyException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);
