@@ -33,27 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.sprintframework.jdbc;
 
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+import java.sql.SQLException;
+
+import org.springframework.dao.UncategorizedDataAccessException;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when we can't classify a SQLException into
+ * one of our generic data access exceptions.
+ *
+ * @author Rod Johnson
+ * @author Juergen Hoeller
  */
+@SuppressWarnings("serial")
+public class UncategorizedSQLException extends UncategorizedDataAccessException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /** SQL that led to the problem */
+    private final String sql;
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
+    /**
+     * Constructor for UncategorizedSQLException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
+     */
+    public UncategorizedSQLException(
+            final String sql,
+            final SQLException ex) {
+        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
+                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
+                + ex.getMessage(), ex);
+        this.sql = sql;
+    }
 
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Return the underlying SQLException.
+     */
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that led to the problem.
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }

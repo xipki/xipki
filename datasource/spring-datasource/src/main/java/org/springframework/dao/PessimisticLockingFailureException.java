@@ -33,27 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown on a pessimistic locking violation.
+ * Thrown by Spring's SQLException translation mechanism
+ * if a corresponding database error is encountered.
+ *
+ * <p>Serves as superclass for more specific exceptions, like
+ * could notAcquireLockException and DeadlockLoserDataAccessException.
+ *
+ * @author Thomas Risberg
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
+ * @see OptimisticLockingFailureException
  */
+@SuppressWarnings("serial")
+public class PessimisticLockingFailureException extends ConcurrencyFailureException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /**
+     * Constructor for PessimisticLockingFailureException.
+     * @param msg the detail message
+     */
+    public PessimisticLockingFailureException(
+            final String msg) {
+        super(msg);
+    }
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for PessimisticLockingFailureException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public PessimisticLockingFailureException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

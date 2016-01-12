@@ -41,7 +41,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

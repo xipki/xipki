@@ -33,27 +33,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
-
-/**
- * @author Lijun Liao
- */
-
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
-
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
-    }
-
-}
+package org.springframework.dao;

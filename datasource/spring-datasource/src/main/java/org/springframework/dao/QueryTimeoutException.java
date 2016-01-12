@@ -33,27 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception to be thrown on a query timeout. This could have different causes depending on
+ * the database API in use but most likely thrown after the database interrupts or stops
+ * the processing of a query before it has completed.
+ *
+ * <p>This exception can be thrown by user code trapping the native database exception or
+ * by exception translation.
+ *
+ * @author Thomas Risberg
  */
+@SuppressWarnings("serial")
+public class QueryTimeoutException extends TransientDataAccessException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /**
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
+     */
+    public QueryTimeoutException(
+            final String msg) {
+        super(msg);
+    }
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public QueryTimeoutException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

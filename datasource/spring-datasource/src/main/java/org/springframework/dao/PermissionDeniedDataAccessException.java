@@ -33,27 +33,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when the underlying resource denied a permission
+ * to access a specific element, such as a specific database table.
+ *
+ * @author Juergen Hoeller
  */
+@SuppressWarnings("serial")
+public class PermissionDeniedDataAccessException extends NonTransientDataAccessException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
-
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for PermissionDeniedDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause from the underlying data access API,
+     * such as JDBC
+     */
+    public PermissionDeniedDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

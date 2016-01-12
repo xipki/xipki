@@ -33,27 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Root of the hierarchy of data access exceptions that are considered non-transient -
+ * where a retry of the same operation would fail unless the cause of the Exception
+ * is corrected.
+ *
+ * @author Thomas Risberg
+ * @see java.sql.SQLNonTransientException
  */
+@SuppressWarnings("serial")
+public abstract class NonTransientDataAccessException extends DataAccessException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /**
+     * Constructor for NonTransientDataAccessException.
+     * @param msg the detail message
+     */
+    public NonTransientDataAccessException(
+            final String msg) {
+        super(msg);
+    }
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for NonTransientDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
+     */
+    public NonTransientDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

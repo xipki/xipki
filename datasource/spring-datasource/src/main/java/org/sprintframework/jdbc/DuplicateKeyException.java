@@ -33,27 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.sprintframework.jdbc;
 
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when an attempt to insert or update data
+ * results in violation of an primary key or unique constraint.
+ * Note that this is not necessarily a purely relational concept;
+ * unique primary keys are required by most database types.
+ *
+ * @author Thomas Risberg
  */
+@SuppressWarnings("serial")
+public class DuplicateKeyException extends DataIntegrityViolationException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /**
+     * Constructor for DuplicateKeyException.
+     * @param msg the detail message
+     */
+    public DuplicateKeyException(
+            final String msg) {
+        super(msg);
+    }
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for DuplicateKeyException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public DuplicateKeyException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

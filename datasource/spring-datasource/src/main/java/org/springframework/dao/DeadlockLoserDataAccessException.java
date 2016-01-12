@@ -33,27 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Generic exception thrown when the current process was
+ * a deadlock loser, and its transaction rolled back.
+ *
+ * @author Rod Johnson
  */
+@SuppressWarnings("serial")
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
-
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for DeadlockLoserDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public DeadlockLoserDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

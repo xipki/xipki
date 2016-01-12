@@ -33,27 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
-
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+package org.springframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Data access exception thrown when a resource fails temporarily
+ * and the operation can be retried.
+ *
+ * @author Thomas Risberg
+ * @see java.sql.SQLTransientConnectionException
  */
+@SuppressWarnings("serial")
+public class TransientDataAccessResourceException extends TransientDataAccessException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     */
+    public TransientDataAccessResourceException(
+            final String msg) {
+        super(msg);
+    }
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public TransientDataAccessResourceException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

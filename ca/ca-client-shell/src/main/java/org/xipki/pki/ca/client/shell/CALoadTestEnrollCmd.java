@@ -43,13 +43,13 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.pki.ca.client.shell.completer.RandomDNCompleter;
-import org.xipki.pki.ca.client.shell.loadtest.CALoadTestEnroll;
-import org.xipki.pki.ca.client.shell.loadtest.KeyEntry;
-import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
-import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
-import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestEnroll;
+import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry;
+import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.DSAKeyEntry;
+import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.ECKeyEntry;
+import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.RSAKeyEntry;
+import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry;
+import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
 
 /**
  * @author Lijun Liao

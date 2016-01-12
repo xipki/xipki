@@ -33,27 +33,55 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.sprintframework.jdbc;
 
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+import java.sql.SQLException;
+
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when SQL specified is invalid. Such exceptions always have
+ * a {@code java.sql.SQLException} root cause.
+ *
+ * <p>It would be possible to have subclasses for no such table, no such column etc.
+ * A custom SQLExceptionTranslator could create such more specific exceptions,
+ * without affecting code using this class.
+ *
+ * @author Rod Johnson
+ * @see InvalidResultSetAccessException
  */
+@SuppressWarnings("serial")
+public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
 
-@Service
-public class RandomDNCompleter extends AbstractEnumCompleter {
+    private String sql;
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
+    /**
+     * Constructor for BadSqlGrammarException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
+     */
+    public BadSqlGrammarException(
+            final String sql,
+            final SQLException ex) {
+        super("bad SQL grammar [" + sql + "]", ex);
+        this.sql = sql;
+    }
 
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    /**
+     * Return the wrapped SQLException.
+     */
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that caused the problem.
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }
