@@ -33,53 +33,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
-
-import java.sql.SQLException;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when SQL specified is invalid. Such exceptions always have
- * a {@code java.sql.SQLException} root cause.
+ * Exception thrown when the underlying resource denied a permission
+ * to access a specific element, such as a specific database table.
  *
- * <p>It would be possible to have subclasses for no such table, no such column etc.
- * A custom SQLExceptionTranslator could create such more specific exceptions,
- * without affecting code using this class.
- *
- * @author Rod Johnson
- * @see InvalidResultSetAccessException
+ * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
-
-    private String sql;
+public class PermissionDeniedDataAccessException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for BadSqlGrammarException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for PermissionDeniedDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause from the underlying data access API,
+     * such as JDBC
      */
-    public BadSqlGrammarException(
-            final String sql,
-            final SQLException ex) {
-        super("bad SQL grammar [" + sql + "]", ex);
-        this.sql = sql;
-    }
-
-    /**
-     * Return the wrapped SQLException.
-     */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that caused the problem.
-     */
-    public String getSql() {
-        return this.sql;
+    public PermissionDeniedDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

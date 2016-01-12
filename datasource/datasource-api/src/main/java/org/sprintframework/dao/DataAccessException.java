@@ -33,38 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.sprintframework.dao.DataAccessException;
-import org.xipki.password.api.PasswordResolver;
-import org.xipki.password.api.PasswordResolverException;
+package org.sprintframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Root of the hierarchy of data access exceptions discussed in
+ *
+ * @author Rod Johnson
  */
+@SuppressWarnings("serial")
+public class DataAccessException extends Exception {
 
-public interface DataSourceFactory {
+    /**
+     * Constructor for DataAccessException.
+     * @param msg the detail message
+     */
+    public DataAccessException(
+            final String msg) {
+        super(msg);
+    }
 
-    DataSourceWrapper createDataSource(
-            String name,
-            InputStream conf,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
-
-    DataSourceWrapper createDataSourceForFile(
-            String name,
-            String confFile,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
-
-    DataSourceWrapper createDataSource(
-            String name,
-            Properties conf,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for DataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
+     */
+    public DataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
+    }
 
 }

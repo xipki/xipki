@@ -41,7 +41,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.xipki.datasource.api.exception.DataAccessException;
+import org.sprintframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

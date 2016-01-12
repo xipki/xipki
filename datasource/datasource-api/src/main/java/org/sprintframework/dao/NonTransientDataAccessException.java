@@ -33,26 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when the underlying resource denied a permission
- * to access a specific element, such as a specific database table.
+ * Root of the hierarchy of data access exceptions that are considered non-transient -
+ * where a retry of the same operation would fail unless the cause of the Exception
+ * is corrected.
  *
- * @author Juergen Hoeller
+ * @author Thomas Risberg
+ * @see java.sql.SQLNonTransientException
  */
 @SuppressWarnings("serial")
-public class PermissionDeniedDataAccessException extends NonTransientDataAccessException {
+public abstract class NonTransientDataAccessException extends DataAccessException {
 
     /**
-     * Constructor for PermissionDeniedDataAccessException.
+     * Constructor for NonTransientDataAccessException.
      * @param msg the detail message
-     * @param cause the root cause from the underlying data access API,
-     * such as JDBC
      */
-    public PermissionDeniedDataAccessException(
+    public NonTransientDataAccessException(
+            final String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor for NonTransientDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
+     */
+    public NonTransientDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

@@ -33,28 +33,65 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.jdbc;
+
+import java.sql.SQLException;
+
+import org.sprintframework.dao.InvalidDataAccessResourceUsageException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Generic exception thrown when the current process was
- * a deadlock loser, and its transaction rolled back.
+ * Exception thrown when a ResultSet has been accessed in an invalid fashion.
+ * Such exceptions always have a {@code java.sql.SQLException} root cause.
  *
- * @author Rod Johnson
+ * <p>This typically happens when an invalid ResultSet column index or name
+ * has been specified. Also thrown by disconnected SqlRowSets.
+ *
+ * @author Juergen Hoeller
+ * @see BadSqlGrammarException
+ * @see org.springframework.jdbc.support.rowset.SqlRowSet
  */
 @SuppressWarnings("serial")
-public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
+public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
+
+    private String sql;
 
     /**
-     * Constructor for DeadlockLoserDataAccessException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * Constructor for InvalidResultSetAccessException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
      */
-    public DeadlockLoserDataAccessException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
+    public InvalidResultSetAccessException(
+            final String sql,
+            final SQLException ex) {
+        super("invalid ResultSet access for SQL [" + sql + "]", ex);
+        this.sql = sql;
+    }
+
+    /**
+     * Constructor for InvalidResultSetAccessException.
+     * @param ex the root cause
+     */
+    public InvalidResultSetAccessException(
+            final SQLException ex) {
+        super(ex.getMessage(), ex);
+    }
+
+    /**
+     * Return the wrapped SQLException.
+     */
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that caused the problem.
+     * @return the offending SQL, if known
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }

@@ -33,34 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on failure to complete a transaction in serialized mode
- * due to update conflicts.
+ * Normal superclass when we can't distinguish anything more specific
+ * than "something went wrong with the underlying resource": for example,
+ * a SQLException from JDBC we can't pinpoint more precisely.
  *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
+public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for could notSerializeTransactionException.
+     * Constructor for UncategorizedDataAccessException.
      * @param msg the detail message
+     * @param cause the exception thrown by underlying data access API
      */
-    public CannotSerializeTransactionException(
-            final String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor for could notSerializeTransactionException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
-     */
-    public CannotSerializeTransactionException(
+    public UncategorizedDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

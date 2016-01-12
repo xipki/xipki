@@ -33,34 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Data access exception thrown when a resource fails completely and the failure is permanent.
+ * Generic exception thrown when the current process was
+ * a deadlock loser, and its transaction rolled back.
  *
- * @author Thomas Risberg
- * @see java.sql.SQLNonTransientConnectionException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class NonTransientDataAccessResourceException extends NonTransientDataAccessException {
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for NonTransientDataAccessResourceException.
-     * @param msg the detail message
-     */
-    public NonTransientDataAccessResourceException(
-            final String msg) {
-        super(msg);
-    }
-
-    /**
-     * Constructor for NonTransientDataAccessResourceException.
+     * Constructor for DeadlockLoserDataAccessException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public NonTransientDataAccessResourceException(
+    public DeadlockLoserDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);
