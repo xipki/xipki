@@ -48,6 +48,8 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.LoadExecutor;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.client.api.CAClient;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.CertOrError;
@@ -56,8 +58,6 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
-import org.xipki.common.LoadExecutor;
-import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

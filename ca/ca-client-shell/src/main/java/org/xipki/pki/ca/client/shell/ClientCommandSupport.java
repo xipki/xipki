@@ -37,7 +37,6 @@ package org.xipki.pki.ca.client.shell;
 
 import java.io.IOException;
 
-import org.xipki.pki.ca.client.api.CAClient;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
@@ -46,6 +45,7 @@ import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.XipkiCommandSupport;
 import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.client.api.CAClient;
 
 /**
  * @author Lijun Liao

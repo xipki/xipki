@@ -36,8 +36,8 @@
 package org.xipki.pki.ca.client.api;
 
 import org.bouncycastle.asn1.crmf.CertId;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 /**
  * @author Lijun Liao

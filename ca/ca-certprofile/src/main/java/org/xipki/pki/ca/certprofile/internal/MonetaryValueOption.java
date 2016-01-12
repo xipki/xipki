@@ -36,8 +36,8 @@
 package org.xipki.pki.ca.certprofile.internal;
 
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
-import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 
 /**
  * @author Lijun Liao

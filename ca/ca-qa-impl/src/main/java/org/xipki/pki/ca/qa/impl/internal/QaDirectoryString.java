@@ -35,8 +35,8 @@
 
 package org.xipki.pki.ca.qa.impl.internal;
 
-import org.xipki.pki.ca.api.profile.DirectoryStringType;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.api.profile.DirectoryStringType;
 
 /**
  * @author Lijun Liao

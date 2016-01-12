@@ -39,9 +39,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
