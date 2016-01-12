@@ -33,36 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when an attempt to insert or update data
- * results in violation of an primary key or unique constraint.
- * Note that this is not necessarily a purely relational concept;
- * unique primary keys are required by most database types.
+ * Data access exception thrown when a resource fails completely:
+ * for example, if we can't connect to a database using JDBC.
  *
+ * @author Rod Johnson
  * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public class DuplicateKeyException extends DataIntegrityViolationException {
+public class DataAccessResourceFailureException extends NonTransientDataAccessResourceException {
 
     /**
-     * Constructor for DuplicateKeyException.
+     * Constructor for DataAccessResourceFailureException.
      * @param msg the detail message
      */
-    public DuplicateKeyException(
+    public DataAccessResourceFailureException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for DuplicateKeyException.
+     * Constructor for DataAccessResourceFailureException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DuplicateKeyException(
+    public DataAccessResourceFailureException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

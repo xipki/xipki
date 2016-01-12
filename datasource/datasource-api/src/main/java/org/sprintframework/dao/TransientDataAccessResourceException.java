@@ -33,36 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when an attempt to insert or update data
- * results in violation of an integrity constraint. Note that this
- * is not purely a relational concept; unique primary keys are
- * required by most database types.
+ * Data access exception thrown when a resource fails temporarily
+ * and the operation can be retried.
  *
- * @author Rod Johnson
+ * @author Thomas Risberg
+ * @see java.sql.SQLTransientConnectionException
  */
 @SuppressWarnings("serial")
-public class DataIntegrityViolationException extends NonTransientDataAccessException {
+public class TransientDataAccessResourceException extends TransientDataAccessException {
 
     /**
-     * Constructor for DataIntegrityViolationException.
+     * Constructor for TransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public DataIntegrityViolationException(
+    public TransientDataAccessResourceException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for DataIntegrityViolationException.
+     * Constructor for TransientDataAccessResourceException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DataIntegrityViolationException(
+    public TransientDataAccessResourceException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);
