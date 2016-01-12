@@ -42,13 +42,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.pki.ca.client.api.CertOrError;
-import org.xipki.pki.ca.client.api.EnrollCertResult;
-import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.client.api.CertOrError;
+import org.xipki.pki.ca.client.api.EnrollCertResult;
+import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 
 /**
  * @author Lijun Liao

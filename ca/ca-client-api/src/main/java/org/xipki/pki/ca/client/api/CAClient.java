@@ -46,11 +46,11 @@ import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.common.HealthCheckResult;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao

@@ -37,10 +37,10 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
-import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao

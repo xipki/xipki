@@ -91,8 +91,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
-import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.FpIdCalculator;
+import org.xipki.security.api.KeyUsage;
 import org.xipki.security.api.ObjectIdentifiers;
 
 /**

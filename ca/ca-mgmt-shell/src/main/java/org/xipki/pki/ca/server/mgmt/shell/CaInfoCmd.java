@@ -46,9 +46,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.common.util.CollectionUtil;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

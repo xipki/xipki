@@ -37,9 +37,9 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
-import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao

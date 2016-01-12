@@ -47,10 +47,6 @@ import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.xipki.pki.ca.qa.api.QASystemManager;
-import org.xipki.pki.ca.qa.api.X509CertprofileQA;
-import org.xipki.pki.ca.qa.api.X509IssuerInfo;
-import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
@@ -58,6 +54,10 @@ import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.XipkiCommandSupport;
 import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.qa.api.QASystemManager;
+import org.xipki.pki.ca.qa.api.X509CertprofileQA;
+import org.xipki.pki.ca.qa.api.X509IssuerInfo;
+import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 
 /**
  * @author Lijun Liao

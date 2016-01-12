@@ -41,10 +41,10 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
-import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

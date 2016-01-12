@@ -38,8 +38,8 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
  * @author Lijun Liao

@@ -54,6 +54,10 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XMLUtil;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.qa.api.QASystemManager;
 import org.xipki.pki.ca.qa.api.X509CertprofileQA;
@@ -63,10 +67,6 @@ import org.xipki.pki.ca.qa.impl.jaxb.ObjectFactory;
 import org.xipki.pki.ca.qa.impl.jaxb.QAConfType;
 import org.xipki.pki.ca.qa.impl.jaxb.X509CertprofileType;
 import org.xipki.pki.ca.qa.impl.jaxb.X509IssuerType;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.common.util.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**
