@@ -43,13 +43,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.pki.ca.client.api.CertIdOrError;
-import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.ClientCRLReasonCompleter;
+import org.xipki.pki.ca.client.api.CertIdOrError;
+import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 import org.xipki.security.api.CRLReason;
 import org.xipki.security.api.util.X509Util;
 

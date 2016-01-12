@@ -42,11 +42,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.password.api.PasswordResolver;
+import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.security.api.util.X509Util;
 
 /**

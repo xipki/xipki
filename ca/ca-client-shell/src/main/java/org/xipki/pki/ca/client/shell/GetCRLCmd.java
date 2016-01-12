@@ -47,12 +47,12 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.pki.ca.client.api.CAClientException;
-import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.client.api.CAClientException;
+import org.xipki.pki.ca.client.api.PKIErrorException;
 
 /**
  * @author Lijun Liao

@@ -44,9 +44,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.pki.ca.api.profile.RDNControl;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
+import org.xipki.pki.ca.api.profile.RDNControl;
 import org.xipki.security.api.ObjectIdentifiers;
 
 /**

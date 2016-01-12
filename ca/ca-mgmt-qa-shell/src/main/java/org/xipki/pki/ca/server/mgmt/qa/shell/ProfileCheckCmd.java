@@ -37,10 +37,10 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
-import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 
 /**
  * @author Lijun Liao

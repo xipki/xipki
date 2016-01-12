@@ -39,12 +39,12 @@ import java.security.cert.X509CRL;
 import java.util.Map;
 
 import org.xipki.audit.api.AuditServiceRegister;
+import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.password.api.PasswordResolver;
 import org.xipki.security.api.CertRevocationInfo;
 
 /**

@@ -192,11 +192,6 @@ class CertStoreQueryExecutor {
         }
     }
 
-    /**
-     * @throws SQLException if there is problem while accessing database.
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateEncodingException
-     */
     void addCert(
             final X509Cert issuer,
             final X509CertWithDBCertId certificate,
