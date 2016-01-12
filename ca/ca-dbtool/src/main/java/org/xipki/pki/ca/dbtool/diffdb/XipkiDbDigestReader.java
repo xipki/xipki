@@ -42,16 +42,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.StopMe;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DigestDBEntrySet;
-import org.xipki.pki.ca.dbtool.diffdb.internal.IdentifiedDbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
+import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
+import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDbControl;
 import org.xipki.security.api.util.X509Util;
 
 /**

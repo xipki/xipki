@@ -49,7 +49,7 @@ import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;

@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.sprintframework.jdbc.DuplicateKeyException;
 import org.xipki.common.util.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;

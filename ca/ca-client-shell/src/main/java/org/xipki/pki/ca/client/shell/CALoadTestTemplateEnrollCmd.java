@@ -43,8 +43,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestTemplateEnroll;
 import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollTemplateType;
-import org.xipki.pki.ca.client.shell.loadtest.CALoadTestTemplateEnroll;
 
 /**
  * @author Lijun Liao

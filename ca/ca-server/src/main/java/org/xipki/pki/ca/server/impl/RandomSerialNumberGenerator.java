@@ -53,18 +53,17 @@ class RandomSerialNumberGenerator {
     }
 
     public BigInteger getSerialNumber() {
-        while(true) {
+        while (true) {
             byte[] rdnBytes = new byte[8];
             random.nextBytes(rdnBytes);
             byte[] positiveRdnBytes = new byte[9];
             System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
             BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
-            if(serial.testBit(63))
-            {
+            if (serial.testBit(63)) {
                 serial = serial.clearBit(63);
             }
             // make sure serial != 0
-            if(serial.bitLength() != 0) {
+            if (serial.bitLength() != 0) {
                 return serial;
             }
         }
