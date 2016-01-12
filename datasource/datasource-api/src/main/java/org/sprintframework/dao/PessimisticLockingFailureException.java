@@ -33,35 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api.exception;
+package org.sprintframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Data access exception thrown when a resource fails temporarily
- * and the operation can be retried.
+ * Exception thrown on a pessimistic locking violation.
+ * Thrown by Spring's SQLException translation mechanism
+ * if a corresponding database error is encountered.
+ *
+ * <p>Serves as superclass for more specific exceptions, like
+ * could notAcquireLockException and DeadlockLoserDataAccessException.
  *
  * @author Thomas Risberg
- * @see java.sql.SQLTransientConnectionException
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
+ * @see OptimisticLockingFailureException
  */
 @SuppressWarnings("serial")
-public class TransientDataAccessResourceException extends TransientDataAccessException {
+public class PessimisticLockingFailureException extends ConcurrencyFailureException {
 
     /**
-     * Constructor for TransientDataAccessResourceException.
+     * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      */
-    public TransientDataAccessResourceException(
+    public PessimisticLockingFailureException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for TransientDataAccessResourceException.
+     * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessResourceException(
+    public PessimisticLockingFailureException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

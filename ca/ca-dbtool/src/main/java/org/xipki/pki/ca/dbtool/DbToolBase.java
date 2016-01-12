@@ -55,10 +55,10 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
+import org.sprintframework.dao.DataAccessException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.exception.DataAccessException;
 
 /**
  * @author Lijun Liao

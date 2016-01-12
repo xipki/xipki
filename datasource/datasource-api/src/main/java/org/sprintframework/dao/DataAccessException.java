@@ -33,48 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
+package org.sprintframework.dao;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Root of the hierarchy of data access exceptions discussed in
+ *
+ * @author Rod Johnson
  */
+@SuppressWarnings("serial")
+public class DataAccessException extends Exception {
 
-class RandomSerialNumberGenerator {
-
-    private final SecureRandom random;
-
-    private static RandomSerialNumberGenerator instance = null;
-
-    private RandomSerialNumberGenerator() {
-        this.random = new SecureRandom();
+    /**
+     * Constructor for DataAccessException.
+     * @param msg the detail message
+     */
+    public DataAccessException(
+            final String msg) {
+        super(msg);
     }
 
-    public BigInteger getSerialNumber() {
-        while(true) {
-            byte[] rdnBytes = new byte[8];
-            random.nextBytes(rdnBytes);
-            byte[] positiveRdnBytes = new byte[9];
-            System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
-            BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
-            if(serial.testBit(63))
-            {
-                serial = serial.clearBit(63);
-            }
-            // make sure serial != 0
-            if(serial.bitLength() != 0) {
-                return serial;
-            }
-        }
-    }
-
-    public static synchronized RandomSerialNumberGenerator getInstance() {
-        if (instance == null) {
-            instance = new RandomSerialNumberGenerator();
-        }
-        return instance;
+    /**
+     * Constructor for DataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
+     */
+    public DataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }
