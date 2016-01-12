@@ -72,7 +72,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditServiceRegister;

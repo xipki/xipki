@@ -52,18 +52,18 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
-import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
-import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntryContainer;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbSchemaType;
-import org.xipki.pki.ca.dbtool.diffdb.internal.IdentifiedDbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDbControl;
-import org.xipki.pki.ca.dbtool.diffdb.internal.XipkiDigestExportReader;
+import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.CaEntryContainer;
+import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
+import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDbControl;
+import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDigestExportReader;
 import org.xipki.security.api.util.X509Util;
 
 /**

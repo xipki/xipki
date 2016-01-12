@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.common.ProcessLog;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;

@@ -37,7 +37,7 @@ package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.security.cert.X509Certificate;
 
-import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
+import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 
 /**
  * @author Lijun Liao

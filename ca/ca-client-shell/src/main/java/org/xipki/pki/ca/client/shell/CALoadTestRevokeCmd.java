@@ -49,7 +49,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.pki.ca.client.shell.loadtest.CALoadTestRevoke;
+import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestRevoke;
 import org.xipki.security.api.SecurityFactory;
 
 /**

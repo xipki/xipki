@@ -49,11 +49,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.pki.ca.dbtool.diffdb.internal.CaEntry;
-import org.xipki.pki.ca.dbtool.diffdb.internal.CertsBundle;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
+import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.security.api.util.X509Util;
 
 /**

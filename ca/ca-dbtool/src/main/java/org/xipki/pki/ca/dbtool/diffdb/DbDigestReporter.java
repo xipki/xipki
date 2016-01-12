@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
-import org.xipki.pki.ca.dbtool.diffdb.internal.DbDigestEntry;
+import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 
 /**
  * @author Lijun Liao

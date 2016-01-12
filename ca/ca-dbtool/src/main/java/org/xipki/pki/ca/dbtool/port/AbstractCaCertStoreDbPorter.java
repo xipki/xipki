@@ -38,7 +38,7 @@ package org.xipki.pki.ca.dbtool.port;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.sprintframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessException;
 import org.xipki.datasource.api.DataSourceWrapper;
 
 /**
