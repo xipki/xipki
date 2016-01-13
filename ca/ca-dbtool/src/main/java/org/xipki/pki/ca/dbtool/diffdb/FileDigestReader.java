@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;

@@ -41,7 +41,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.springframework.dao.DataAccessException;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

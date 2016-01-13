@@ -33,41 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on a pessimistic locking violation.
- * Thrown by Spring's SQLException translation mechanism
- * if a corresponding database error is encountered.
+ * Exception thrown when an attempt to insert or update data
+ * results in violation of an integrity constraint. Note that this
+ * is not purely a relational concept; unique primary keys are
+ * required by most database types.
  *
- * <p>Serves as superclass for more specific exceptions, like
- * could notAcquireLockException and DeadlockLoserDataAccessException.
- *
- * @author Thomas Risberg
- * @see could notAcquireLockException
- * @see DeadlockLoserDataAccessException
- * @see OptimisticLockingFailureException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class PessimisticLockingFailureException extends ConcurrencyFailureException {
+public class DataIntegrityViolationException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for PessimisticLockingFailureException.
+     * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      */
-    public PessimisticLockingFailureException(
+    public DataIntegrityViolationException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for PessimisticLockingFailureException.
+     * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public PessimisticLockingFailureException(
+    public DataIntegrityViolationException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

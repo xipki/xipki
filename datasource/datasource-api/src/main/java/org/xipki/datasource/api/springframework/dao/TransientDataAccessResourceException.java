@@ -33,4 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
+package org.xipki.datasource.api.springframework.dao;
+
+/**
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Data access exception thrown when a resource fails temporarily
+ * and the operation can be retried.
+ *
+ * @author Thomas Risberg
+ * @see java.sql.SQLTransientConnectionException
+ */
+@SuppressWarnings("serial")
+public class TransientDataAccessResourceException extends TransientDataAccessException {
+
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     */
+    public TransientDataAccessResourceException(
+            final String msg) {
+        super(msg);
+    }
+
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public TransientDataAccessResourceException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
+    }
+
+}
