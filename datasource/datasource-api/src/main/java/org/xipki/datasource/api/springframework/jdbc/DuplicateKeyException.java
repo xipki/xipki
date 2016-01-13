@@ -38,7 +38,6 @@ package org.xipki.datasource.api.springframework.jdbc;
 import org.xipki.datasource.api.springframework.dao.DataIntegrityViolationException;
 
 /**
- * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
  * Exception thrown when an attempt to insert or update data
  * results in violation of an primary key or unique constraint.
