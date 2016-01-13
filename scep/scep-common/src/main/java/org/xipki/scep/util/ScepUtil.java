@@ -97,7 +97,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.scep.crypto.HashAlgoType;
 import org.xipki.scep.crypto.KeyUsage;
-import org.xipki.scep.exception.MessageDecodingException;
 
 /**
  * @author Lijun Liao

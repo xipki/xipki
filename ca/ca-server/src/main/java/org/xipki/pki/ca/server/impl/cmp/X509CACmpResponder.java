@@ -674,70 +674,54 @@ public class X509CACmpResponder extends CmpResponder {
             LOG.warn("generate certificate, OperationException: code={}, message={}",
                     code.name(), e.getErrorMessage());
 
-            String auditMessage;
-
             int failureInfo;
             switch (code) {
             case ALREADY_ISSUED:
                 failureInfo = PKIFailureInfo.badRequest;
-                auditMessage = "ALREADY_ISSUED";
                 break;
             case BAD_CERT_TEMPLATE:
                 failureInfo = PKIFailureInfo.badCertTemplate;
-                auditMessage = "BAD_CERT_TEMPLATE";
                 break;
             case BAD_REQUEST:
                 failureInfo = PKIFailureInfo.badRequest;
-                auditMessage = "BAD_REQUEST";
             case CERT_REVOKED:
                 failureInfo = PKIFailureInfo.certRevoked;
-                auditMessage = "CERT_REVOKED";
                 break;
             case CRL_FAILURE:
                 failureInfo = PKIFailureInfo.systemFailure;
-                auditMessage = "CRL_FAILURE";
                 break;
             case DATABASE_FAILURE:
                 failureInfo = PKIFailureInfo.systemFailure;
-                auditMessage = "DATABASE_FAILURE";
                 break;
             case NOT_PERMITTED:
                 failureInfo = PKIFailureInfo.notAuthorized;
-                auditMessage = "NOT_PERMITTED";
                 break;
             case INSUFFICIENT_PERMISSION:
                 failureInfo = PKIFailureInfo.notAuthorized;
-                auditMessage = "INSUFFICIENT_PERMISSION";
                 break;
             case INVALID_EXTENSION:
                 failureInfo = PKIFailureInfo.systemFailure;
-                auditMessage = "INVALID_EXTENSION";
                 break;
             case SYSTEM_FAILURE:
                 failureInfo = PKIFailureInfo.systemFailure;
-                auditMessage = "System_Failure";
                 break;
             case SYSTEM_UNAVAILABLE:
                 failureInfo = PKIFailureInfo.systemUnavail;
-                auditMessage = "System_Unavailable";
                 break;
             case UNKNOWN_CERT:
                 failureInfo = PKIFailureInfo.badCertId;
-                auditMessage = "UNKNOWN_CERT";
                 break;
             case UNKNOWN_CERT_PROFILE:
                 failureInfo = PKIFailureInfo.badCertTemplate;
-                auditMessage = "UNKNOWN_CERT_PROFILE";
                 break;
             default:
                 failureInfo = PKIFailureInfo.systemFailure;
-                auditMessage = "InternalErrorCode " + e.getErrorCode();
                 break;
             } // end switch (code)
 
             if (childAuditEvent != null) {
                 childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
+                childAuditEvent.addEventData(new AuditEventData("message", code.name()));
             }
 
             String errorMessage;

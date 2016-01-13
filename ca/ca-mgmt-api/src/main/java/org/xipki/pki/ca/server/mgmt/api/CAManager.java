@@ -36,6 +36,7 @@
 package org.xipki.pki.ca.server.mgmt.api;
 
 import java.math.BigInteger;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -335,6 +336,19 @@ public interface CAManager {
 
     UserEntry getUser(
             String username)
+    throws CAMgmtException;
+
+    X509CRL generateCRLonDemand(
+            String caName)
+    throws CAMgmtException;
+
+    X509CRL getCRL(
+            String caName,
+            BigInteger crlNumber)
+    throws CAMgmtException;
+
+    X509CRL getCurrentCRL(
+            String caName)
     throws CAMgmtException;
 
     boolean addScep(

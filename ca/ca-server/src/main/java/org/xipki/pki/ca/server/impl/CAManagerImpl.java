@@ -42,7 +42,9 @@ import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -66,12 +68,16 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.X509CRLObject;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditServiceRegister;
@@ -2848,6 +2854,92 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             final String username)
     throws CAMgmtException {
         return queryExecutor.getUser(username);
+    }
+
+    @Override
+    public X509CRL generateCRLonDemand(
+            final String caName)
+    throws CAMgmtException {
+        ParamUtil.assertNotBlank("caName", caName);
+
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND"));
+        X509CA ca = getX509CA(caName);
+        try {
+            return ca.generateCRLonDemand(auditEvent);
+        } catch (OperationException e) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", e.getErrorCode().name()));
+            throw new CAMgmtException(e.getMessage(), e);
+        } finally {
+            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
+                auditServiceRegister.getAuditService().logEvent(auditEvent);
+            }
+        }
+    }
+
+    @Override
+    public X509CRL getCRL(
+            final String caName,
+            final BigInteger crlNumber)
+    throws CAMgmtException {
+        ParamUtil.assertNotBlank("caName", caName);
+
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.addEventData(new AuditEventData("eventType", "CRL_DOWNLOAD_WITH_SN"));
+        auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
+        X509CA ca = getX509CA(caName);
+        try {
+            CertificateList crl = ca.getCRL(crlNumber);
+            if (crl == null) {
+                auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
+                return null;
+            }
+            return new X509CRLObject(crl);
+        } catch (OperationException e) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", e.getErrorCode().name()));
+            throw new CAMgmtException(e.getMessage(), e);
+        } catch (CRLException e) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", "CRLException"));
+            throw new CAMgmtException(e.getMessage(), e);
+        } finally {
+            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
+                auditServiceRegister.getAuditService().logEvent(auditEvent);
+            }
+        }
+    }
+
+    @Override
+    public X509CRL getCurrentCRL(
+            final String caName)
+    throws CAMgmtException {
+        ParamUtil.assertNotBlank("caName", caName);
+
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_DOWNLOAD"));
+        X509CA ca = getX509CA(caName);
+        try {
+            CertificateList crl = ca.getCurrentCRL();
+            if (crl == null) {
+                auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
+                return null;
+            }
+            return new X509CRLObject(crl);
+        } catch (OperationException e) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", e.getErrorCode().name()));
+            throw new CAMgmtException(e.getMessage(), e);
+        } catch (CRLException e) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", "CRLException"));
+            throw new CAMgmtException(e.getMessage(), e);
+        } finally {
+            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
+                auditServiceRegister.getAuditService().logEvent(auditEvent);
+            }
+        }
     }
 
     @Override

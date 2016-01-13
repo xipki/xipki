@@ -38,6 +38,7 @@ package org.xipki.pki.ca.ncm.client.impl;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -631,6 +632,28 @@ public class CAManagerClient implements CAManager {
             final String username)
     throws CAMgmtException {
         return client.getUser(username);
+    }
+
+    @Override
+    public X509CRL generateCRLonDemand(
+            final String caName)
+    throws CAMgmtException {
+        return client.generateCRLonDemand(caName);
+    }
+
+    @Override
+    public X509CRL getCRL(
+            final String caName,
+            final BigInteger crlNumber)
+    throws CAMgmtException {
+        return client.getCRL(caName, crlNumber);
+    }
+
+    @Override
+    public X509CRL getCurrentCRL(
+            final String caName)
+    throws CAMgmtException {
+        return client.getCurrentCRL(caName);
     }
 
     @Override

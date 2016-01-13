@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -812,6 +813,40 @@ public class CAManagerServlet extends HessianServlet implements HessianCAManager
     throws HessianCAMgmtException {
         try {
             return caManager.removeUser(username);
+        } catch (CAMgmtException e) {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public X509CRL generateCRLonDemand(
+            final String caName)
+    throws HessianCAMgmtException {
+        try {
+            return caManager.generateCRLonDemand(caName);
+        } catch (CAMgmtException e) {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public X509CRL getCRL(
+            final String caName,
+            final BigInteger crlNumber)
+    throws HessianCAMgmtException {
+        try {
+            return caManager.getCRL(caName, crlNumber);
+        } catch (CAMgmtException e) {
+            throw new HessianCAMgmtException(e.getMessage());
+        }
+    }
+
+    @Override
+    public X509CRL getCurrentCRL(
+            final String caName)
+    throws HessianCAMgmtException {
+        try {
+            return caManager.getCurrentCRL(caName);
         } catch (CAMgmtException e) {
             throw new HessianCAMgmtException(e.getMessage());
         }
