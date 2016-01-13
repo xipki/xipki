@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.springframework.dao.DataAccessException;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 

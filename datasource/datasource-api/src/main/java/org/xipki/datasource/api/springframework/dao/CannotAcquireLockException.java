@@ -33,35 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Data access exception thrown when a resource fails temporarily
- * and the operation can be retried.
+ * Exception thrown on failure to aquire a lock during an update,
+ * for example during a "select for update" statement.
  *
- * @author Thomas Risberg
- * @see java.sql.SQLTransientConnectionException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class TransientDataAccessResourceException extends TransientDataAccessException {
+public class CannotAcquireLockException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for TransientDataAccessResourceException.
+     * Constructor for could notAcquireLockException.
      * @param msg the detail message
      */
-    public TransientDataAccessResourceException(
+    public CannotAcquireLockException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for TransientDataAccessResourceException.
+     * Constructor for could notAcquireLockException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessResourceException(
+    public CannotAcquireLockException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

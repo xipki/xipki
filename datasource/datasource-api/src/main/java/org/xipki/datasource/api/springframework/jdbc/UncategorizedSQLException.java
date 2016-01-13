@@ -33,37 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.jdbc;
+
+import java.sql.SQLException;
+
+import org.xipki.datasource.api.springframework.dao.UncategorizedDataAccessException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on failure to aquire a lock during an update,
- * for example during a "select for update" statement.
+ * Exception thrown when we can't classify a SQLException into
+ * one of our generic data access exceptions.
  *
  * @author Rod Johnson
+ * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class CannotAcquireLockException extends PessimisticLockingFailureException {
+public class UncategorizedSQLException extends UncategorizedDataAccessException {
+
+    /** SQL that led to the problem */
+    private final String sql;
 
     /**
-     * Constructor for could notAcquireLockException.
-     * @param msg the detail message
+     * Constructor for UncategorizedSQLException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
      */
-    public CannotAcquireLockException(
-            final String msg) {
-        super(msg);
+    public UncategorizedSQLException(
+            final String sql,
+            final SQLException ex) {
+        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
+                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
+                + ex.getMessage(), ex);
+        this.sql = sql;
     }
 
     /**
-     * Constructor for could notAcquireLockException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * Return the underlying SQLException.
      */
-    public CannotAcquireLockException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
+    public SQLException getSQLException() {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that led to the problem.
+     */
+    public String getSql() {
+        return this.sql;
     }
 
 }
