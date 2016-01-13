@@ -36,6 +36,7 @@
 package org.xipki.pki.ca.ncm.common;
 
 import java.math.BigInteger;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -351,6 +352,19 @@ public interface HessianCAManager {
 
     UserEntry getUser(
             String username)
+    throws HessianCAMgmtException;
+
+    X509CRL generateCRLonDemand(
+            String caName)
+    throws HessianCAMgmtException;
+
+    X509CRL getCRL(
+            String caName,
+            BigInteger crlNumber)
+    throws HessianCAMgmtException;
+
+    X509CRL getCurrentCRL(
+            String caName)
     throws HessianCAMgmtException;
 
     boolean addScep(

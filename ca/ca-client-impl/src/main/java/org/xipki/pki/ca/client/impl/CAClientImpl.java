@@ -498,7 +498,7 @@ public final class CAClientImpl implements CAClient {
             }
         }
 
-        CAConf ca = casMap.get(caName);
+        CAConf ca = casMap.get(caName.trim());
         if (ca == null) {
             throw new CAClientException("could not find CA named " + caName);
         }
@@ -548,7 +548,7 @@ public final class CAClientImpl implements CAClient {
             }
         }
 
-        CAConf ca = casMap.get(caName);
+        CAConf ca = casMap.get(caName.trim());
         if (ca == null) {
             throw new CAClientException("could not find CA named " + caName);
         }
@@ -568,10 +568,10 @@ public final class CAClientImpl implements CAClient {
             String caName)
     throws CAClientException {
         if (caName != null) {
-            if (!casMap.containsKey(caName)) {
+            CAConf ca = casMap.get(caName.trim());
+            if (ca == null) {
                 throw new CAClientException("unknown ca: " + caName);
             } else {
-                CAConf ca = casMap.get(caName);
                 if (!ca.supportsProfile(certprofile)) {
                     throw new CAClientException("cert profile " + certprofile
                             + " is not supported by the CA " + caName);
@@ -702,11 +702,12 @@ public final class CAClientImpl implements CAClient {
     throws CAClientException, PKIErrorException {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (!casMap.containsKey(caName)) {
-            throw new IllegalArgumentException("unknown CAConf " + caName);
+        CAConf ca = casMap.get(caName.trim());
+        if (ca == null) {
+            throw new IllegalArgumentException("unknown CA " + caName);
         }
 
-        X509CmpRequestor requestor = casMap.get(caName).getRequestor();
+        X509CmpRequestor requestor = ca.getRequestor();
         CRLResultType result;
         try {
             if (crlNumber == null) {
@@ -728,11 +729,12 @@ public final class CAClientImpl implements CAClient {
     throws CAClientException, PKIErrorException {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (!casMap.containsKey(caName)) {
-            throw new IllegalArgumentException("unknown CAConf " + caName);
+        CAConf ca = casMap.get(caName.trim());
+        if (ca == null) {
+            throw new IllegalArgumentException("unknown CA " + caName);
         }
 
-        X509CmpRequestor requestor = casMap.get(caName).getRequestor();
+        X509CmpRequestor requestor = ca.getRequestor();
         try {
             CRLResultType result = requestor.generateCRL(debug);
             return result.getCRL();
@@ -826,7 +828,7 @@ public final class CAClientImpl implements CAClient {
             checkCertprofileSupportInCA(profileName, caName);
         }
 
-        CAConf ca = casMap.get(caName);
+        CAConf ca = casMap.get(caName.trim());
         if (ca == null) {
             throw new CAClientException("could not find CA named " + caName);
         }
@@ -1069,7 +1071,7 @@ public final class CAClientImpl implements CAClient {
     @Override
     public Set<CertprofileInfo> getCertprofiles(
             final String caName) {
-        CAConf ca = casMap.get(caName);
+        CAConf ca = casMap.get(caName.trim());
         if (ca == null) {
             return Collections.emptySet();
         }
@@ -1092,11 +1094,12 @@ public final class CAClientImpl implements CAClient {
     throws CAClientException {
         ParamUtil.assertNotNull("caName", caName);
 
-        if (!casMap.containsKey(caName)) {
-            throw new IllegalArgumentException("unknown CAConf " + caName);
+        CAConf ca = casMap.get(caName.trim());
+        if (ca == null) {
+            throw new IllegalArgumentException("unknown CA " + caName);
         }
 
-        String healthUrlStr = casMap.get(caName).getHealthUrl();
+        String healthUrlStr = ca.getHealthUrl();
 
         URL serverUrl;
         try {
