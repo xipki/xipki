@@ -9,6 +9,7 @@
   <artifactId>ncm-client</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
+  <description>XiPKI net CA management client</description>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
