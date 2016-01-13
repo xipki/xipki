@@ -33,41 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown on concurrency failure.
+ * Root of the hierarchy of data access exceptions discussed in
  *
- * <p>This exception should be subclassed to indicate the type of failure:
- * optimistic locking, failure to acquire lock, etc.
- *
- * @author Thomas Risberg
- * @since 1.1
- * @see OptimisticLockingFailureException
- * @see PessimisticLockingFailureException
- * @see could notAcquireLockException
- * @see DeadlockLoserDataAccessException
+ * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class ConcurrencyFailureException extends TransientDataAccessException {
+public class DataAccessException extends Exception {
 
     /**
-     * Constructor for ConcurrencyFailureException.
+     * Constructor for DataAccessException.
      * @param msg the detail message
      */
-    public ConcurrencyFailureException(
+    public DataAccessException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for ConcurrencyFailureException.
+     * Constructor for DataAccessException.
      * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
      */
-    public ConcurrencyFailureException(
+    public DataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

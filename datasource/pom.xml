@@ -10,7 +10,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>spring-datasource</module>
     <module>datasource-api</module>
     <module>datasource-impl</module>
     <module>database-tool</module>

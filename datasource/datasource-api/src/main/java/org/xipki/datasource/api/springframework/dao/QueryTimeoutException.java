@@ -33,55 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
-
-import java.sql.SQLException;
-
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when SQL specified is invalid. Such exceptions always have
- * a {@code java.sql.SQLException} root cause.
+ * Exception to be thrown on a query timeout. This could have different causes depending on
+ * the database API in use but most likely thrown after the database interrupts or stops
+ * the processing of a query before it has completed.
  *
- * <p>It would be possible to have subclasses for no such table, no such column etc.
- * A custom SQLExceptionTranslator could create such more specific exceptions,
- * without affecting code using this class.
+ * <p>This exception can be thrown by user code trapping the native database exception or
+ * by exception translation.
  *
- * @author Rod Johnson
- * @see InvalidResultSetAccessException
+ * @author Thomas Risberg
  */
 @SuppressWarnings("serial")
-public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
-
-    private String sql;
+public class QueryTimeoutException extends TransientDataAccessException {
 
     /**
-     * Constructor for BadSqlGrammarException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
      */
-    public BadSqlGrammarException(
-            final String sql,
-            final SQLException ex) {
-        super("bad SQL grammar [" + sql + "]", ex);
-        this.sql = sql;
+    public QueryTimeoutException(
+            final String msg) {
+        super(msg);
     }
 
     /**
-     * Return the wrapped SQLException.
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
      */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that caused the problem.
-     */
-    public String getSql() {
-        return this.sql;
+    public QueryTimeoutException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

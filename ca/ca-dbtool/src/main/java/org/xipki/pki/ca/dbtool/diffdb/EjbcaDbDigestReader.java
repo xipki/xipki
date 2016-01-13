@@ -42,9 +42,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.StopMe;

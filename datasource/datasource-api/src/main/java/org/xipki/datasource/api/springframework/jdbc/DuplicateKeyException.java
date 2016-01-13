@@ -33,37 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.jdbc;
+
+import org.xipki.datasource.api.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root of the hierarchy of data access exceptions that are considered non-transient -
- * where a retry of the same operation would fail unless the cause of the Exception
- * is corrected.
+ * Exception thrown when an attempt to insert or update data
+ * results in violation of an primary key or unique constraint.
+ * Note that this is not necessarily a purely relational concept;
+ * unique primary keys are required by most database types.
  *
  * @author Thomas Risberg
- * @see java.sql.SQLNonTransientException
  */
 @SuppressWarnings("serial")
-public abstract class NonTransientDataAccessException extends DataAccessException {
+public class DuplicateKeyException extends DataIntegrityViolationException {
 
     /**
-     * Constructor for NonTransientDataAccessException.
+     * Constructor for DuplicateKeyException.
      * @param msg the detail message
      */
-    public NonTransientDataAccessException(
+    public DuplicateKeyException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for NonTransientDataAccessException.
+     * Constructor for DuplicateKeyException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause from the data access API in use
      */
-    public NonTransientDataAccessException(
+    public DuplicateKeyException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

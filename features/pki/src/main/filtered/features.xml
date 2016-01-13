@@ -36,7 +36,6 @@
   <feature name="xipki-datasource" version="${project.version}">
     <feature>xipki-password</feature>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.xipki.pki/spring-datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-impl/${project.version}</bundle>
   </feature>
@@ -57,7 +56,6 @@
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/spring-datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>

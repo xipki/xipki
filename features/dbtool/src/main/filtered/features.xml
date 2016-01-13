@@ -12,7 +12,6 @@
     <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.xipki.pki/spring-datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>

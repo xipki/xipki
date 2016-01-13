@@ -38,9 +38,9 @@ package org.xipki.pki.ca.dbtool.port;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.security.api.HashAlgoType;
 import org.xipki.security.api.HashCalculator;
 

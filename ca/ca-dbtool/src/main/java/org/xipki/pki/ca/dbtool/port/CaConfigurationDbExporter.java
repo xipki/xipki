@@ -46,10 +46,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;

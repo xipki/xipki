@@ -33,54 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
-
-import java.sql.SQLException;
-
-import org.springframework.dao.UncategorizedDataAccessException;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when we can't classify a SQLException into
- * one of our generic data access exceptions.
+ * Generic exception thrown when the current process was
+ * a deadlock loser, and its transaction rolled back.
  *
  * @author Rod Johnson
- * @author Juergen Hoeller
  */
 @SuppressWarnings("serial")
-public class UncategorizedSQLException extends UncategorizedDataAccessException {
-
-    /** SQL that led to the problem */
-    private final String sql;
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
 
     /**
-     * Constructor for UncategorizedSQLException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for DeadlockLoserDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
      */
-    public UncategorizedSQLException(
-            final String sql,
-            final SQLException ex) {
-        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
-                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
-                + ex.getMessage(), ex);
-        this.sql = sql;
-    }
-
-    /**
-     * Return the underlying SQLException.
-     */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that led to the problem.
-     */
-    public String getSql() {
-        return this.sql;
+    public DeadlockLoserDataAccessException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

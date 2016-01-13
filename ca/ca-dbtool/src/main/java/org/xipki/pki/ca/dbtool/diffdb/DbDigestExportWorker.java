@@ -46,11 +46,11 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.password.api.PasswordResolver;
 import org.xipki.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;

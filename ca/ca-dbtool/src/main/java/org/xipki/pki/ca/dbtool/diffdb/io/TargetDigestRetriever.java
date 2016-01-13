@@ -49,10 +49,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.dao.DataAccessException;
 import org.xipki.common.ProcessLog;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
+import org.xipki.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestReporter;
 import org.xipki.pki.ca.dbtool.diffdb.DigestReader;

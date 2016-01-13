@@ -22,7 +22,6 @@
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/spring-datasource/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>

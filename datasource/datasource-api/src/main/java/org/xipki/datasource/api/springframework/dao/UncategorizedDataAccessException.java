@@ -33,25 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Generic exception thrown when the current process was
- * a deadlock loser, and its transaction rolled back.
+ * Normal superclass when we can't distinguish anything more specific
+ * than "something went wrong with the underlying resource": for example,
+ * a SQLException from JDBC we can't pinpoint more precisely.
  *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException {
+public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for DeadlockLoserDataAccessException.
+     * Constructor for UncategorizedDataAccessException.
      * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * @param cause the exception thrown by underlying data access API
      */
-    public DeadlockLoserDataAccessException(
+    public UncategorizedDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);
