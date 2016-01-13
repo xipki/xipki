@@ -33,34 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Root of the hierarchy of data access exceptions discussed in
+ * Root for exceptions thrown when we use a data access resource incorrectly.
+ * Thrown for example on specifying bad SQL when using a RDBMS.
+ * Resource-specific subclasses are supplied by concrete data access packages.
  *
  * @author Rod Johnson
  */
 @SuppressWarnings("serial")
-public class DataAccessException extends Exception {
+public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for DataAccessException.
+     * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
      */
-    public DataAccessException(
+    public InvalidDataAccessResourceUsageException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for DataAccessException.
+     * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause from the data access API in use
      */
-    public DataAccessException(
+    public InvalidDataAccessResourceUsageException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

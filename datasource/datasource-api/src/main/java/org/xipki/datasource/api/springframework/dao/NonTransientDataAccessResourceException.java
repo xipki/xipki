@@ -33,35 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.springframework.dao;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Data access exception thrown when a resource fails completely:
- * for example, if we can't connect to a database using JDBC.
+ * Data access exception thrown when a resource fails completely and the failure is permanent.
  *
- * @author Rod Johnson
  * @author Thomas Risberg
+ * @see java.sql.SQLNonTransientConnectionException
  */
 @SuppressWarnings("serial")
-public class DataAccessResourceFailureException extends NonTransientDataAccessResourceException {
+public class NonTransientDataAccessResourceException extends NonTransientDataAccessException {
 
     /**
-     * Constructor for DataAccessResourceFailureException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public DataAccessResourceFailureException(
+    public NonTransientDataAccessResourceException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for DataAccessResourceFailureException.
+     * Constructor for NonTransientDataAccessResourceException.
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DataAccessResourceFailureException(
+    public NonTransientDataAccessResourceException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);

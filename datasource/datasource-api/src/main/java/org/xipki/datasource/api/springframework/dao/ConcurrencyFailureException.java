@@ -33,65 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
-
-import java.sql.SQLException;
-
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when a ResultSet has been accessed in an invalid fashion.
- * Such exceptions always have a {@code java.sql.SQLException} root cause.
+ * Exception thrown on concurrency failure.
  *
- * <p>This typically happens when an invalid ResultSet column index or name
- * has been specified. Also thrown by disconnected SqlRowSets.
+ * <p>This exception should be subclassed to indicate the type of failure:
+ * optimistic locking, failure to acquire lock, etc.
  *
- * @author Juergen Hoeller
- * @see BadSqlGrammarException
- * @see org.springframework.jdbc.support.rowset.SqlRowSet
+ * @author Thomas Risberg
+ * @since 1.1
+ * @see OptimisticLockingFailureException
+ * @see PessimisticLockingFailureException
+ * @see could notAcquireLockException
+ * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")
-public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
-
-    private String sql;
+public class ConcurrencyFailureException extends TransientDataAccessException {
 
     /**
-     * Constructor for InvalidResultSetAccessException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
+     * Constructor for ConcurrencyFailureException.
+     * @param msg the detail message
      */
-    public InvalidResultSetAccessException(
-            final String sql,
-            final SQLException ex) {
-        super("invalid ResultSet access for SQL [" + sql + "]", ex);
-        this.sql = sql;
+    public ConcurrencyFailureException(
+            final String msg) {
+        super(msg);
     }
 
     /**
-     * Constructor for InvalidResultSetAccessException.
-     * @param ex the root cause
+     * Constructor for ConcurrencyFailureException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
      */
-    public InvalidResultSetAccessException(
-            final SQLException ex) {
-        super(ex.getMessage(), ex);
-    }
-
-    /**
-     * Return the wrapped SQLException.
-     */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
-
-    /**
-     * Return the SQL that caused the problem.
-     * @return the offending SQL, if known
-     */
-    public String getSql() {
-        return this.sql;
+    public ConcurrencyFailureException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
 }

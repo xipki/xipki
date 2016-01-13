@@ -33,38 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.sprintframework.jdbc;
-
-import org.springframework.dao.DataIntegrityViolationException;
+package org.xipki.datasource.api.springframework.dao;
 
 /**
  * Copied from Spring Framework licensed under Apache License, version 2.0.
  *
- * Exception thrown when an attempt to insert or update data
- * results in violation of an primary key or unique constraint.
- * Note that this is not necessarily a purely relational concept;
- * unique primary keys are required by most database types.
+ * Root of the hierarchy of data access exceptions that are considered transient -
+ * where a previously failed operation might be able to succeed when the operation
+ * is retried without any intervention by application-level functionality.
  *
  * @author Thomas Risberg
+ * @see java.sql.SQLTransientException
  */
 @SuppressWarnings("serial")
-public class DuplicateKeyException extends DataIntegrityViolationException {
+public abstract class TransientDataAccessException extends DataAccessException {
 
     /**
-     * Constructor for DuplicateKeyException.
+     * Constructor for TransientDataAccessException.
      * @param msg the detail message
      */
-    public DuplicateKeyException(
+    public TransientDataAccessException(
             final String msg) {
         super(msg);
     }
 
     /**
-     * Constructor for DuplicateKeyException.
+     * Constructor for TransientDataAccessException.
      * @param msg the detail message
-     * @param cause the root cause from the data access API in use
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
      */
-    public DuplicateKeyException(
+    public TransientDataAccessException(
             final String msg,
             final Throwable cause) {
         super(msg, cause);
