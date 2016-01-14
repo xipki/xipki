@@ -56,6 +56,39 @@ public class LiquibaseDatabaseConf {
 
     private final String schema;
 
+    public LiquibaseDatabaseConf(
+            final String driver,
+            final String username,
+            final String password,
+            final String url,
+            final String schema) {
+        this.driver = driver;
+        this.username = username;
+        this.password = password;
+        this.url = url;
+        this.schema = schema;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
     public static LiquibaseDatabaseConf getInstance(
             final Properties dbProps,
             final PasswordResolver passwordResolver)
@@ -173,39 +206,6 @@ public class LiquibaseDatabaseConf {
         }
 
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
-    }
-
-    public LiquibaseDatabaseConf(
-            final String driver,
-            final String username,
-            final String password,
-            final String url,
-            final String schema) {
-        this.driver = driver;
-        this.username = username;
-        this.password = password;
-        this.url = url;
-        this.schema = schema;
-    }
-
-    public String getDriver() {
-        return driver;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getSchema() {
-        return schema;
-    }
+    } // method getInstance
 
 }

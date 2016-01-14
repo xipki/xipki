@@ -162,8 +162,7 @@ public class LiquibaseMain {
             }
             throw e;
         }
-
-    }
+    } // method init
 
     public void releaseLocks()
     throws Exception {

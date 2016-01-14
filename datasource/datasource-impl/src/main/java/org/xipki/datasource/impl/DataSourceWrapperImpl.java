@@ -173,7 +173,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
             LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
             return ret;
-        }
+        } // method nextSeqValue
 
         @Override
         protected String getSqlToDropForeignKeyConstraint(
@@ -959,7 +959,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 releaseStatementAndResultSet(stmt, rs);
             }
         }
-    }
+    } // method columnExists
 
     @Override
     public boolean tableHasColumn(
@@ -1147,7 +1147,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, next);
         return next;
-    }
+    } // method nextSeqValue
 
     protected String getSqlToDropPrimaryKey(
             final String primaryKeyName,
@@ -1396,7 +1396,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 logTranslation(sql, sqlEx);
                 return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
             }
-        }
+        } // end if(errorCode)
 
         // try SQLState
         if (sqlState != null && sqlState.length() >= 2) {
@@ -1433,7 +1433,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         return new UncategorizedSQLException(buildMessage(sql, sqlEx), sqlEx);
-    }
+    } // method translate
 
     private void logTranslation(
             final String sql,
@@ -1509,7 +1509,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                     }
                 }
             }
-        }
+        } // end if
 
         if (databaseType == DatabaseType.DB2
                 || databaseType == DatabaseType.H2
@@ -1536,6 +1536,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         } else {
             throw new IllegalArgumentException("unknown datasource type " + databaseType);
         }
-    }
+    } // method createDataSource
 
 }

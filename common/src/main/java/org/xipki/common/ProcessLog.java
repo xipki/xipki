@@ -122,7 +122,7 @@ public class ProcessLog {
 
         System.out.println(sb.toString());
         System.out.flush();
-    }
+    } // method printHeader
 
     public void finish() {
         finished.set(true);
@@ -280,7 +280,7 @@ public class ProcessLog {
 
         System.out.print(sb.toString());
         System.out.flush();
-    }
+    } // method printStatus
 
     private static String formatText(String text) {
         return StringUtil.formatText(text, minLen);
@@ -328,5 +328,5 @@ public class ProcessLog {
         }
 
         return sb.toString();
-    }
+    } // method buildDateTime
 }

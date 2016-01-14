@@ -127,7 +127,7 @@ public class KeystoreP11Module implements P11Module {
             allSlotIdentifiers.add(slotId);
 
             allSlotIds.add(new P11SlotIdentifier(slotIndex, slotId));
-        }
+        } // end for
 
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
         for (P11SlotIdentifier slotId : allSlotIds) {
@@ -137,7 +137,7 @@ public class KeystoreP11Module implements P11Module {
         }
 
         this.slotIds = Collections.unmodifiableList(tmpSlotIds);
-    }
+    } // constructor
 
     @Override
     public KeystoreP11Slot getSlot(
@@ -174,7 +174,7 @@ public class KeystoreP11Module implements P11Module {
 
         slots.put(_slotId, extSlot);
         return extSlot;
-    }
+    } // method getSlot
 
     public void destroySlot(
             final long slotId) {

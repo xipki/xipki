@@ -342,7 +342,7 @@ public class X509Util {
                             IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
                     values.add(textValue);
                 }
-            }
+            } // end for(j)
 
             sb.append(values.get(0));
 
@@ -352,10 +352,10 @@ public class X509Util {
                     sb.append(";").append(values.get(j));
                 }
             }
-        }
+        } // end for(i)
 
         return sb.toString();
-    }
+    } // method canonicalizName
 
     public static byte[] extractSKI(
             final X509Certificate cert)
@@ -569,7 +569,7 @@ public class X509Util {
                     break;
                 }
             }
-        }
+        } // end for
 
         if (len == n) {
             return certChain.toArray(new X509Certificate[0]);
@@ -580,7 +580,7 @@ public class X509Util {
             }
             return ret;
         }
-    }
+    } // method buildCertPath
 
     public static X509Certificate[] buildCertPath(
             final X509Certificate cert,

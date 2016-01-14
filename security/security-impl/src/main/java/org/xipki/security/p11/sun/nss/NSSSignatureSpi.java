@@ -226,7 +226,7 @@ public class NSSSignatureSpi extends SignatureSpi {
             this.md = null;
             this.hashAlgOid = null;
         }
-    }
+    } // constructor
 
     @Override
     @SuppressWarnings("deprecation")
@@ -443,7 +443,7 @@ public class NSSSignatureSpi extends SignatureSpi {
 
             return false;
         }
-    }
+    } // method engineVerify
 
     private static Signature getSignatureService(
             final String algorithm) {
@@ -573,7 +573,7 @@ public class NSSSignatureSpi extends SignatureSpi {
         System.arraycopy(block, start, result, 0, result.length);
 
         return result;
-    }
+    } // method decodePkcs11Block
 
     private static byte[] derEncode(
             final AlgorithmIdentifier algId,

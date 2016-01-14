@@ -275,6 +275,6 @@ public class P10RequestGenerator {
         default:
             throw new RuntimeException("unsupported tag " + tag);
         } // end switch (tag)
-    }
+    } // method createGeneralName
 
 }

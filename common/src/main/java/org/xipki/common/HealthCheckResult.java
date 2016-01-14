@@ -179,7 +179,7 @@ public class HealthCheckResult {
         }
         sb.append("}");
         return sb.toString();
-    }
+    } // method toJsonMessage
 
     private static void append(
             final StringBuilder sb,
@@ -207,7 +207,7 @@ public class HealthCheckResult {
         if (!lastElement) {
             sb.append(",");
         }
-    }
+    } // method append
 
     private static String getIndent(
             final int level) {
@@ -293,7 +293,7 @@ public class HealthCheckResult {
         }
 
         return childBlocks;
-    }
+    } // method getInstanceFromJsonMessage
 
     private static String getBlock(
             final String text,
@@ -326,7 +326,7 @@ public class HealthCheckResult {
         } // end for
 
         throw new IllegalArgumentException("invalid text: '" + text + "'");
-    }
+    } // method getBlock
 
     public static void main(
             final String[] args) {
@@ -374,6 +374,6 @@ public class HealthCheckResult {
 
         System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
-    }
+    } // method main
 
 }

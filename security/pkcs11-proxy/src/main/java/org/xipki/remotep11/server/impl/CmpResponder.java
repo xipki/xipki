@@ -291,7 +291,7 @@ class CmpResponder {
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure,
                     t.getMessage());
         }
-    }
+    } // method processPKIMessage
 
     private PKIMessage createRejectionPKIMessage(
             final PKIHeader header,

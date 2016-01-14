@@ -134,7 +134,7 @@ public final class ECParameters extends AlgorithmParametersSpi {
         if (namedCurve == null) {
             throw new InvalidParameterSpecException("not a supported curve: " + paramSpec);
         }
-    }
+    } // method engineInit
 
     protected void engineInit(
             final byte[] params)
@@ -172,7 +172,7 @@ public final class ECParameters extends AlgorithmParametersSpi {
         } catch (InvalidParameterSpecException e) {
             throw new IOException("InvalidParameterSpecException: " + e.getMessage(), e);
         }
-    }
+    } // method engineInit
 
     protected void engineInit(
             final byte[] params,

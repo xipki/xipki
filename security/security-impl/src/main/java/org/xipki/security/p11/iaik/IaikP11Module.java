@@ -133,8 +133,8 @@ public class IaikP11Module implements P11Module {
                 }
                 LOG.debug(message, t);
             }
-        }
-    }
+        } // end if(LOG.isDebugEnabled())
+    } // constructor
 
     @Override
     public IaikP11Slot getSlot(
@@ -170,7 +170,7 @@ public class IaikP11Module implements P11Module {
 
         slots.put(_slotId, extSlot);
         return extSlot;
-    }
+    } // method gestSlot
 
     public void destroySlot(
             final long slotId) {
@@ -185,9 +185,8 @@ public class IaikP11Module implements P11Module {
             }
 
             availableSlots.remove(slotId);
-
         }
-        slots.clear();
+
         slots = null;
 
         for (P11SlotIdentifier slotId : availableSlots.keySet()) {
@@ -212,7 +211,7 @@ public class IaikP11Module implements P11Module {
         }
 
         module = null;
-    }
+    } // method close
 
     @Override
     public List<P11SlotIdentifier> getSlotIdentifiers() {

@@ -267,7 +267,7 @@ public class ScepServlet extends HttpServlet {
                         auditStatus = AuditStatus.FAILED;
                         return;
                     }
-                }
+                } // end if (responder.getRAEmulator() == null) {
                 response.setContentType(ct);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
@@ -317,7 +317,7 @@ public class ScepServlet extends HttpServlet {
 
                 auditMessage = "unknown SCEP operation '" + operation + "'";
                 auditStatus = AuditStatus.FAILED;
-            }
+            } // end if ("PKIOperation".equalsIgnoreCase(operation))
         } catch (EOFException e) {
             final String message = "connection reset by peer";
             if (LOG.isErrorEnabled()) {
@@ -345,8 +345,8 @@ public class ScepServlet extends HttpServlet {
                     audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
                 }
             }
-        }
-    }
+        } // end try
+    } // method service
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)

@@ -185,6 +185,6 @@ public class HashCalculator {
         } finally {
             mds.addLast(md);
         }
-    }
+    } // method hash
 
 }

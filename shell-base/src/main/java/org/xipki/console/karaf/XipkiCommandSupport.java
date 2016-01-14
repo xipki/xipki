@@ -122,12 +122,12 @@ public abstract class XipkiCommandSupport implements Action {
                         out("Please answer with yes or no. ");
                         b = false;
                     }
-                }
+                } // end while
             } catch (IOException e) {
                 saveTo = new File("tmp-" + randomHex(6));
                 randomSaveTo = true;
             }
-        }
+        } // end if(saveTo.exists())
 
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -148,7 +148,7 @@ public abstract class XipkiCommandSupport implements Action {
         }
 
         out(promptPrefix + " " + saveTo.getPath());
-    }
+    } // method saveVerbose
 
     protected void save(
             File file,

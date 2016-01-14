@@ -91,7 +91,7 @@ public class SecurePasswordInputPanel extends Panel {
                 password += btn.getText();
             }
             passwordField.setText(password);
-        }
+        } // method actionPerformed
 
     } // class MyActionListener
 
@@ -160,12 +160,12 @@ public class SecurePasswordInputPanel extends Panel {
                 button.putClientProperty("key", text);
                 button.addActionListener(new MyActionListener());
                 panel.add(button);
-            }
+            } // end for
             add(panel);
-        }
+        } // end while(!rows.isEmpty())
 
         //setVisible(true);
-    }
+    } // constructor
 
     public char[] getPassword() {
         return password.toCharArray();
@@ -213,6 +213,6 @@ public class SecurePasswordInputPanel extends Panel {
             } catch (UnsupportedLookAndFeelException e) {
             }
         }
-    }
+    } // method readPassword
 
 }

@@ -359,7 +359,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         } else {
             throw new InvalidParameterException("only PSSParameterSpec supported");
         }
-    }
+    } // method engineSetParameter
 
     protected AlgorithmParameters engineGetParameters() {
         if (engineParams == null) {

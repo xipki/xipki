@@ -179,10 +179,10 @@ public class ScepServer {
                 subject = new X500Name("CN=RA2, OU=emulator, O=xipki.org, C=DE");
                 Date rAStartTime = new Date(startTime.getTime() + 10 * CAEmulator.DAY_IN_MS);
                 this.nextRACert = tmpCA.generateCert(pkInfo, subject, rAStartTime);
-            }
+            } // end if(withRA)
 
             nextCAandRA = new NextCAandRA(this.nextCACert, this.nextRACert);
-        }
+        } // end if(withNextCA)
 
         ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
         if (maxSigningTimeBiasInMs != null) {
@@ -192,7 +192,7 @@ public class ScepServer {
         this.servlet = new ScepServlet(scepResponder);
         this.servlet.setAuditService(new Slf4jAuditServiceImpl());
         return this.servlet;
-    }
+    } // method getServlet
 
     public Certificate getCACert() {
         return cACert;
