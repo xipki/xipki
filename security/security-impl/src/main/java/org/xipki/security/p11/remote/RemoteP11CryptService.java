@@ -267,7 +267,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         return (octetString == null)
                 ? null
                 : octetString.getOctets();
-    }
+    } // method pso
 
     private byte[] getCertOrKey(
             final int action,
@@ -354,7 +354,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
 
         return extractItvInfoValue(action, response);
-    }
+    } // method send
 
     private static ASN1Encodable extractItvInfoValue(
             final int action,
@@ -411,7 +411,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
                     + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'  is incorrect");
         }
-    }
+    } // method extractItvInfoValue
 
     private PKIHeader buildPKIHeader(
             ASN1OctetString tid) {

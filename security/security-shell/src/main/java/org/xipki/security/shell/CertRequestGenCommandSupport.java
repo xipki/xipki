@@ -365,7 +365,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         File file = new File(outputFilename);
         saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
         return null;
-    }
+    } // method doExecute
 
     protected X500Name getSubject(
             final String subject) {

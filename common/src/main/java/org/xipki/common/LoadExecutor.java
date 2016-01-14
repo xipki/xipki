@@ -134,7 +134,7 @@ public abstract class LoadExecutor {
         printSummary();
 
         System.getProperties().remove(PROPKEY_LOADTEST);
-    }
+    } // method test
 
     public boolean isInterrupted() {
         return interrupted;

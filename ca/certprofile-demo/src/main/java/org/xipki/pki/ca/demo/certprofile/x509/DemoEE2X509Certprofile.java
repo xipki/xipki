@@ -117,7 +117,7 @@ public class DemoEE2X509Certprofile extends AbstractEEX509Certprofile {
         controls.put(oid, new RDNControl(oid, 1, 1));
 
         subjectControl = new SubjectControl(false, controls);
-    }
+    } // constructor
 
     @Override
     public Set<KeyUsageControl> getKeyUsage() {

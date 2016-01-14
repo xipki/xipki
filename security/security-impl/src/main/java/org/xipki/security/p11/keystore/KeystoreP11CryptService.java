@@ -130,8 +130,8 @@ public class KeystoreP11CryptService implements P11CryptService {
 
             for (P11Identity identity : slot.getP11Identities()) {
                 currentIdentifies.add((KeystoreP11Identity) identity);
-            }
-        }
+            } // end for
+        } // end for
 
         this.identities.clear();
         for (KeystoreP11Identity identity : currentIdentifies) {
@@ -154,7 +154,7 @@ public class KeystoreP11CryptService implements P11CryptService {
         }
 
         LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
-    }
+    } // method refresh
 
     @Override
     public byte[] CKM_RSA_PKCS(

@@ -129,7 +129,7 @@ public class ExtractCertFromCRLCmd extends SecurityCommandSupport {
 
         saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
         return null;
-    }
+    } // method doExecute
 
     private static byte[] removingTagAndLenFromExtensionValue(
             final byte[] encodedExtensionValue) {

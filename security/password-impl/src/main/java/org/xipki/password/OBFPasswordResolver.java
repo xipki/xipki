@@ -85,10 +85,8 @@ public class OBFPasswordResolver  implements SinglePasswordResolver {
                 buf.append("000", 0, 4 - x.length());
                 buf.append(x);
             }
-
-        }
+        } // end for
         return buf.toString();
-
     }
 
     /*------------------------------------------------------------ */
@@ -115,7 +113,7 @@ public class OBFPasswordResolver  implements SinglePasswordResolver {
                 byte bx = (byte) ((i1 + i2 - 254) / 2);
                 b[l++] = bx;
             }
-        }
+        } // end for
 
         return new String(b, 0, l, StandardCharsets.UTF_8);
     }

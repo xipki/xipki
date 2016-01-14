@@ -115,7 +115,7 @@ public class SlotIdentifier extends ASN1Object {
         } catch (IllegalArgumentException e) {
             throw new BadASN1ObjectException(e.getMessage(), e);
         }
-    }
+    } // constructor
 
     @Override
     public ASN1Primitive toASN1Primitive() {

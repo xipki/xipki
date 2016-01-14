@@ -130,7 +130,7 @@ public class P11ContentSignerBuilder {
         }
 
         this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-    }
+    } // constructor
 
     public ConcurrentContentSigner createSigner(
             final AlgorithmIdentifier signatureAlgId,
@@ -200,7 +200,7 @@ public class P11ContentSignerBuilder {
                             + publicKey.getClass().getName());
                 }
                 signers.add(signer);
-            }
+            } // end for
         } catch (NoSuchAlgorithmException e) {
             throw new OperatorCreationException("no such algorithm", e);
         }
@@ -218,6 +218,6 @@ public class P11ContentSignerBuilder {
         concurrentSigner.setCertificateChain(certificateChain);
 
         return concurrentSigner;
-    }
+    } // method createSigner
 
 }

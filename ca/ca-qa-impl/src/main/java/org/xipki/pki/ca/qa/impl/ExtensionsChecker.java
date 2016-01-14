@@ -512,7 +512,7 @@ public class ExtensionsChecker {
             throw new CertprofileException(
                     "RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
-    }
+    } // constructor
 
     public List<ValidationIssue> checkExtensions(
             final Certificate cert,
@@ -695,7 +695,7 @@ public class ExtensionsChecker {
         }
 
         return result;
-    }
+    } // method checkExtensions
 
     private byte[] getExpectedExtValue(
             final ASN1ObjectIdentifier type,
@@ -712,7 +712,7 @@ public class ExtensionsChecker {
         }
 
         return null;
-    }
+    } // getExpectedExtValue
 
     private Set<ASN1ObjectIdentifier> getExensionTypes(
             final Certificate cert,
@@ -916,7 +916,7 @@ public class ExtensionsChecker {
         }
 
         return types;
-    }
+    } // method getExensionTypes
 
     private ValidationIssue createExtensionIssue(
             final ASN1ObjectIdentifier extId) {
@@ -930,7 +930,7 @@ public class ExtensionsChecker {
                     + " (" + extId.getId() + ")");
         }
         return issue;
-    }
+    } // method createExtensionIssue
 
     private void checkExtensionBasicConstraints(
             final StringBuilder failureMsg,
@@ -963,7 +963,7 @@ public class ExtensionsChecker {
                 }
             }
         }
-    }
+    } // method checkExtensionBasicConstraints
 
     private void checkExtensionSubjectKeyIdentifier(
             final StringBuilder failureMsg,
@@ -982,7 +982,7 @@ public class ExtensionsChecker {
                 .append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionSubjectKeyIdentifier
 
     private void checkExtensionIssuerKeyIdentifier(
             final StringBuilder failureMsg,
@@ -1068,7 +1068,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionIssuerKeyIdentifier
 
     private void checkExtensionNameConstraints(
             final StringBuilder failureMsg,
@@ -1102,7 +1102,7 @@ public class ExtensionsChecker {
         checkExtensionNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
                 iNameConstraints.getExcludedSubtrees(),
                 conf.getExcludedSubtrees());
-    }
+    } // method checkExtensionNameConstraints
 
     private void checkExtensionNameConstraintsSubtrees(
             final StringBuilder failureMsg,
@@ -1194,7 +1194,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionNameConstraintsSubtrees
 
     private void checkExtensionPolicyConstraints(
             final StringBuilder failureMsg,
@@ -1267,7 +1267,7 @@ public class ExtensionsChecker {
                 .append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionPolicyConstraints
 
     private void checkExtensionKeyUsage(
             final StringBuilder failureMsg,
@@ -1332,7 +1332,7 @@ public class ExtensionsChecker {
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionKeyUsage
 
     private void checkExtensionExtendedKeyUsage(
             final StringBuilder failureMsg,
@@ -1395,7 +1395,7 @@ public class ExtensionsChecker {
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionExtendedKeyUsage
 
     private void checkExtensionCertificatePolicies(
             final StringBuilder failureMsg,
@@ -1504,7 +1504,7 @@ public class ExtensionsChecker {
                 .append("' is absent but is required");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionCertificatePolicies
 
     private void checkExtensionPolicyMappings(
             final StringBuilder failureMsg,
@@ -1565,7 +1565,7 @@ public class ExtensionsChecker {
                 .append("' are present but not expected");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionPolicyMappings
 
     private void checkExtensionInhibitAnyPolicy(
             final StringBuilder failureMsg,
@@ -1598,7 +1598,7 @@ public class ExtensionsChecker {
                 .append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionInhibitAnyPolicy
 
     private void checkExtensionSubjectAltName(
             final StringBuilder failureMsg,
@@ -1659,7 +1659,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionSubjectAltName
 
     private void checkExtensionSubjectInfoAccess(
             final StringBuilder failureMsg,
@@ -1760,7 +1760,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionSubjectInfoAccess
 
     private void checkExtensionIssuerAltNames(
             final StringBuilder failureMsg,
@@ -1783,7 +1783,7 @@ public class ExtensionsChecker {
                 .append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionIssuerAltNames
 
     private void checkExtensionCrlDistributionPoints(
             final StringBuilder failureMsg,
@@ -1850,7 +1850,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionCrlDistributionPoints
 
     private void checkExtensionDeltaCrlDistributionPoints(
             final StringBuilder failureMsg,
@@ -1919,7 +1919,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionDeltaCrlDistributionPoints
 
     private void checkExtensionAdmission(
             final StringBuilder failureMsg,
@@ -2053,7 +2053,7 @@ public class ExtensionsChecker {
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionAdmission
 
     private void checkExtensionAuthorityInfoAccess(
             final StringBuilder failureMsg,
@@ -2082,7 +2082,7 @@ public class ExtensionsChecker {
         AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
         checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
         checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
-    }
+    } // method checkExtensionAuthorityInfoAccess
 
     private void checkExtensionOcspNocheck(
             final StringBuilder failureMsg,
@@ -2175,7 +2175,7 @@ public class ExtensionsChecker {
             failureMsg.append("' but expected '").append(conf.getText()).append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkDirectoryString
 
     private void checkExtensionValidityModel(
             final StringBuilder failureMsg,
@@ -2205,7 +2205,7 @@ public class ExtensionsChecker {
             failureMsg.append("' but expected '").append(conf).append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionValidityModel
 
     private void checkExtensionPrivateKeyUsagePeriod(
             final StringBuilder failureMsg,
@@ -2246,7 +2246,7 @@ public class ExtensionsChecker {
             failureMsg.append("' but expected '").append(notAfter.getTimeString()).append("'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionPrivateKeyUsagePeriod
 
     private void checkExtensionQCStatements(
             final StringBuilder failureMsg,
@@ -2437,7 +2437,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    }
+    } // method checkExtensionQCStatements
 
     private void checkExtensionBiometricInfo(
             final StringBuilder failureMsg,
@@ -2595,7 +2595,7 @@ public class ExtensionsChecker {
                 }
             }
         }
-    }
+    } // method checkExtensionBiometricInfo
 
     private void checkExtensionAuthorizationTemplate(
             final StringBuilder failureMsg,
@@ -2636,7 +2636,7 @@ public class ExtensionsChecker {
                     + "' but expected '" + hex(conf.getAccessRights()) + "'");
             failureMsg.append("; ");
         }
-    }
+    } // method checkExtensionAuthorizationTemplate
 
     private Set<KeyUsageControl> getKeyusage(
             final boolean required) {
@@ -2704,7 +2704,7 @@ public class ExtensionsChecker {
 
         throw new RuntimeException("should not reach here: undefined extension "
                 + ObjectIdentifiers.oidToDisplayName(type));
-    }
+    } // method getExtensionValue
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
             final ExtensionsType extensionsType)
@@ -2744,7 +2744,7 @@ public class ExtensionsChecker {
         }
 
         return Collections.unmodifiableMap(map);
-    }
+    } // method buildConstantExtesions
 
     private static String hex(
             final byte[] bytes) {
@@ -2855,7 +2855,7 @@ public class ExtensionsChecker {
         default:
             throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
         } // end switch
-    }
+    } // method createGeneralName
 
     private static Set<String> getKeyUsage(
             final byte[] extensionValue) {
@@ -2945,6 +2945,6 @@ public class ExtensionsChecker {
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
-    }
+    } // method checkAIA
 
 }

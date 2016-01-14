@@ -225,7 +225,7 @@ public class ScepUtil {
 
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
         return new X509CertificateObject(asn1Cert);
-    }
+    } // method generateSelfsignedCert
 
     /**
      * The first one is a non-CA certificate if there exists one non-CA certificate
@@ -266,7 +266,7 @@ public class ScepUtil {
         }
 
         return certs;
-    }
+    } // method getCertsFromSignedData
 
     public static X509CRL getCRLFromPkiMessage(
             final SignedData signedData)

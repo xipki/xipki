@@ -105,13 +105,6 @@ public class DecodedPkiMessage extends PkiMessage {
 
     private String failureMessage;
 
-    public DecodedPkiMessage(
-            final TransactionId transactionId,
-            final MessageType messageType,
-            final Nonce senderNonce) {
-        super(transactionId, messageType, senderNonce);
-    }
-
     static {
         scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
         scepAttrTypes.add(ScepObjectIdentifiers.id_messageType);
@@ -120,6 +113,13 @@ public class DecodedPkiMessage extends PkiMessage {
         scepAttrTypes.add(ScepObjectIdentifiers.id_senderNonce);
         scepAttrTypes.add(ScepObjectIdentifiers.id_transactionID);
         scepAttrTypes.add(CMSAttributes.signingTime);
+    }
+
+    public DecodedPkiMessage(
+            final TransactionId transactionId,
+            final MessageType messageType,
+            final Nonce senderNonce) {
+        super(transactionId, messageType, senderNonce);
     }
 
     public X509Certificate getSignatureCert() {
@@ -332,8 +332,8 @@ public class DecodedPkiMessage extends PkiMessage {
                     return ret;
                 }
                 ret.setFailInfo(failInfo);
-            }
-        }
+            } // end if(pkiStatus == PkiStatus.FAILURE)
+        } // end if (MessageType.CertRep == messageType)
 
         // other signedAttributes
         Attribute[] attrs = signedAttrs.toASN1Structure().getAttributes();
@@ -378,8 +378,8 @@ public class DecodedPkiMessage extends PkiMessage {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
                         + " same digestAlgorithm");
                 return ret;
-            }
-        }
+            } // end if
+        } // end if
 
         X509CertificateHolder _signerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
@@ -498,7 +498,7 @@ public class DecodedPkiMessage extends PkiMessage {
         }
 
         return ret;
-    }
+    } // method decode
 
     private static String getPrintableStringAttrValue(
             final AttributeTable attrs,

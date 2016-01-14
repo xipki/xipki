@@ -131,7 +131,8 @@ public class CALoadTestRevoke extends LoadExecutor {
                 }
             }
             return nSuccess == serialNumbers.size();
-        }
+        } // method testNext
+
     } // class Testor
 
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
@@ -222,7 +223,7 @@ public class CALoadTestRevoke extends LoadExecutor {
         } finally {
             caDataSource.releaseResources(stmt, null);
         }
-    }
+    } // constructor
 
     private List<Long> nextSerials()
     throws DataAccessException {
@@ -293,6 +294,6 @@ public class CALoadTestRevoke extends LoadExecutor {
 
             return serials.pollFirst();
         }
-    }
+    } // method nextSerial
 
 }

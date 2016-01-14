@@ -100,6 +100,6 @@ public class HealthCmd extends ClientCommandSupport {
         }
         System.out.println(sb.toString());
         return null;
-    }
+    } // method doExecute
 
 }

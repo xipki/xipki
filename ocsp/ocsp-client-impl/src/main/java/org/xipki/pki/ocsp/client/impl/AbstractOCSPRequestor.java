@@ -310,11 +310,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
                                 + "] is not requested");
                     }
                 }
-            }
-        }
+            } // end for
+        } // end if
 
         return ocspResp;
-    }
+    } // method ask
 
     private OCSPReq buildRequest(
             final X509Certificate caCert,
@@ -407,8 +407,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
                             throw new OCSPRequestorException("could not create signer: "
                                     + e.getMessage());
                         }
-                    }
-                }
+                    } // end if
+                } // end synchronized
 
                 ContentSigner singleSigner;
                 try {
@@ -425,11 +425,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
                 }
             } else {
                 return reqBuilder.build();
-            }
+            } // end if
         } catch (OCSPException | CertificateEncodingException | IOException e) {
             throw new OCSPRequestorException(e.getMessage(), e);
         }
-    }
+    } // method buildRequest
 
     private byte[] nextNonce(
             final int nonceLen) {

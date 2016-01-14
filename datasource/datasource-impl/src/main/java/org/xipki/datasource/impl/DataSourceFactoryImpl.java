@@ -85,7 +85,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         }
 
         return createDataSource(name, config, passwordResolver);
-    }
+    } // method createDataSource
 
     @Override
     public DataSourceWrapper createDataSource(
@@ -122,7 +122,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         }
 
         return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
-    }
+    } // method createDataSource
 
     private static void assertNotNull(
             final String parameterName,

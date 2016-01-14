@@ -269,7 +269,7 @@ public abstract class CmpRequestor {
         }
 
         return ret;
-    }
+    } // method signAndSend
 
     protected ASN1Encodable extractGeneralRepContent(
             final PKIResponse response,
@@ -317,7 +317,7 @@ public abstract class CmpRequestor {
         return (n == 1)
                 ? null
                 : seq.getObjectAt(1);
-    }
+    } // method extractXipkiActionContent
 
     private ASN1Encodable extractGeneralRepContent(
             final PKIResponse response,
@@ -359,7 +359,7 @@ public abstract class CmpRequestor {
         }
 
         return itv.getInfoValue();
-    }
+    } // method extractGeneralRepContent
 
     protected PKIHeader buildPKIHeader(
             final ASN1OctetString tid) {
@@ -440,7 +440,7 @@ public abstract class CmpRequestor {
         }
 
         return hBuilder.build();
-    }
+    } // method buildPKIHeader
 
     protected PKIErrorException buildErrorResult(
             final ErrorMsgContent bodyContent) {
@@ -499,7 +499,7 @@ public abstract class CmpRequestor {
                 ? ProtectionResult.VALID
                 : ProtectionResult.INVALID;
         return new ProtectionVerificationResult(cert, protRes);
-    }
+    } // method verifyProtection
 
     protected PKIMessage buildMessageWithXipkAction(
             final int action,

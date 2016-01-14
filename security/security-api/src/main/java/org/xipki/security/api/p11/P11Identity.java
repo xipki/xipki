@@ -96,7 +96,7 @@ public class P11Identity implements Comparable<P11Identity> {
                     + this.publicKey.getAlgorithm()
                     + " (class: " + this.publicKey.getClass().getName() + ")");
         }
-    }
+    } // constructor
 
     public P11KeyIdentifier getKeyId() {
         return keyId;

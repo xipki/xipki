@@ -139,7 +139,7 @@ public class CmpUtil {
         } finally {
             signer.returnContentSigner(realSigner);
         }
-    }
+    } // method addProtection
 
     public static boolean isImplictConfirm(
             final PKIHeader header) {

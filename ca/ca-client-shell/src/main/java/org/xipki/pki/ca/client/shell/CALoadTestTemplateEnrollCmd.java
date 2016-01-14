@@ -101,6 +101,6 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCommandSupport {
         loadTest.test();
 
         return null;
-    }
+    } // method doExecute
 
 }

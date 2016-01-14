@@ -126,8 +126,7 @@ public class ExtensionExistence extends ASN1Object {
             List<ASN1ObjectIdentifier> list = Collections.emptyList();
             wantExtensions = Collections.unmodifiableList(list);
         }
-
-    }
+    } // constructor
 
     @Override
     public ASN1Primitive toASN1Primitive() {

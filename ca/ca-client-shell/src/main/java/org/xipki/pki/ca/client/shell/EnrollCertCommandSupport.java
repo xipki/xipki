@@ -407,7 +407,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         saveVerbose("saved certificate to file", certFile, cert.getEncoded());
 
         return null;
-    }
+    } // method doExecute
 
     protected X500Name getSubject(
             final String subject) {

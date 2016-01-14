@@ -118,7 +118,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
                 }
             }
         }
-    }
+    } // method saveRequestResponse
 
     private static String appendIndex(
             final String filename,

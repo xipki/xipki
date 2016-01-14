@@ -121,7 +121,7 @@ public class SunNamedCurveExtender {
                 }
                 this.sfield = rp.toString(16);
             }
-        }
+        } // constructor
 
     } // class CurveData
 
@@ -201,8 +201,8 @@ public class SunNamedCurveExtender {
             if (method_NamedCurve_getEncoded == null) {
                 successful = false;
             }
-        }
-    }
+        } // end if(jdk18on)
+    } // method static
 
     private SunNamedCurveExtender() {
     }
@@ -239,8 +239,8 @@ public class SunNamedCurveExtender {
                 }
                 LOG.debug(message, t);
             }
-        }
-    }
+        } // end synchronized (EXECUTED)
+    } // method addNamedCurves
 
     private static void addNamedCurves_jdk17() {
         final Class<?>[] Param_NamedCurve_add = new Class[] {
@@ -321,7 +321,7 @@ public class SunNamedCurveExtender {
             } else {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
-        }
+        } // end while
 
         try {
             field_SPLIT_PATTERN.set(null, null);
@@ -336,7 +336,7 @@ public class SunNamedCurveExtender {
         }
 
         logAddedCurves(addedCurves);
-    }
+    } // end addNamedCurves_jdk17
 
     private static void addNamedCurves_jdk18on() {
         final Class<?>[] Param_CurveDB_add = new Class[] {
@@ -408,7 +408,7 @@ public class SunNamedCurveExtender {
             } else {
                 LOG.info("unknown curve type {}", curve.getClass().getName());
             }
-        }
+        } // end while
 
         try {
             Map<?, ?> oidMap = (Map<?, ?>) field_oidMap.get(null);
@@ -426,7 +426,7 @@ public class SunNamedCurveExtender {
         }
 
         logAddedCurves(addedCurves);
-    }
+    } // method addNamedCurves_jdk18on
 
     private static ASN1ObjectIdentifier getCurveId(
             final String curveName) {

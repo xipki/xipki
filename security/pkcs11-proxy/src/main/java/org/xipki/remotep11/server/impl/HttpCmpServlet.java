@@ -160,7 +160,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
 
         response.flushBuffer();
-    }
+    } // method doPost
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)
