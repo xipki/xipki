@@ -51,14 +51,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.x509.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.qa.ValidationIssue;
@@ -110,6 +115,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
     private final Set<String> signatureAlgorithms;
 
     private final boolean notBeforeMidnight;
+
+    private static final long _2050010100_EPOCHTIME = 2524608000L;
 
     public X509CertprofileQAImpl(
             final String data)
@@ -176,6 +183,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
         Certificate bcCert;
+        TBSCertificate tbsCert;
         X509Certificate cert;
 
         // certificate encoding
@@ -183,6 +191,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         resultIssues.add(issue);
         try {
             bcCert = Certificate.getInstance(certBytes);
+            tbsCert = bcCert.getTBSCertificate();
             cert = X509Util.parseCert(certBytes);
         } catch (CertificateException | IOException e) {
             issue.setFailureMessage("certificate is not corrected encoded");
@@ -204,7 +213,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
             resultIssues.add(issue);
 
             AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
-            AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
+            AlgorithmIdentifier tbsSigAlgId = tbsCert.getSignature();
             if (!tbsSigAlgId.equals(sigAlgId)) {
                 issue.setFailureMessage(
                         "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
@@ -222,9 +231,17 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
             }
         }
 
+        // notBefore encoding
+        issue = new ValidationIssue("X509.NOTBEFORE.ENCODING", "notBefore encoding");
+        checkTime(tbsCert.getStartDate(), issue);
+
+        // notAfter encoding
+        issue = new ValidationIssue("X509.NOTAFTER.ENCODING", "notAfter encoding");
+        checkTime(tbsCert.getStartDate(), issue);
+
         // notBefore
         if (notBeforeMidnight) {
-            issue = new ValidationIssue("X509.NOTBEFORE", "not before midnight");
+            issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
             resultIssues.add(issue);
             Calendar c = Calendar.getInstance(UTC);
             c.setTime(cert.getNotBefore());
@@ -277,8 +294,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         // subject
         resultIssues.addAll(
                 subjectChecker.checkSubject(
-                bcCert.getTBSCertificate().getSubject(),
+                bcCert.getSubject(),
                 requestedSubject));
+
+        // issuerUniqueID
+        issue = new ValidationIssue("X509.IssuerUniqueID", "issuerUniqueID");
+        resultIssues.add(issue);
+        if (tbsCert.getIssuerUniqueId() != null) {
+            issue.setFailureMessage("is present but not permitted");
+        }
+
+        // subjectUniqueID
+        issue = new ValidationIssue("X509.SubjectUniqueID", "subjectUniqueID");
+        resultIssues.add(issue);
+        if (tbsCert.getSubjectUniqueId() != null) {
+            issue.setFailureMessage("is present but not permitted");
+        }
 
         // extensions
         resultIssues.addAll(
@@ -340,6 +371,19 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         }
 
         return Collections.unmodifiableMap(map);
+    }
+
+    private static void checkTime(Time time, ValidationIssue issue) {
+        ASN1Primitive asn1Time = time.toASN1Primitive();
+        if (time.getDate().getTime() / 1000 < _2050010100_EPOCHTIME) {
+            if (!(asn1Time instanceof ASN1UTCTime)) {
+                issue.setFailureMessage("not encoded as UTCTime");
+            }
+        } else {
+            if (!(asn1Time instanceof ASN1GeneralizedTime)) {
+                issue.setFailureMessage("not encoded as GeneralizedTime");
+            }
+        }
     }
 
 }
