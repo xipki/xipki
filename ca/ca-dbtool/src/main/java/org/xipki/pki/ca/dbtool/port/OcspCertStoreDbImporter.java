@@ -145,7 +145,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             throw e;
         }
         System.out.println(" imported OCSP certstore to database");
-    }
+    } // method importToDB
 
     private void import_issuer(
             final Issuers issuers)
@@ -214,7 +214,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table ISSUER");
-    }
+    } // method import_issuer
 
     private void import_cert(
             final CertStoreType certstore,
@@ -296,7 +296,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
-    }
+    } // method import_cert
 
     private int do_import_cert(
             final PreparedStatement ps_cert,
@@ -461,6 +461,6 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             }
             zipFile.close();
         }
-    }
+    } // method do_import_cert
 
 }

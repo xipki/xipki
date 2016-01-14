@@ -250,6 +250,6 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         out(" checked CA" + caName);
         return null;
-    }
+    } // method doExecute
 
 }

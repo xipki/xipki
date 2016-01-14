@@ -135,7 +135,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
             }
 
             outQueue.add(result);
-        }
+        } // method query
 
     } // class XipkiDbRetriever
 
@@ -207,7 +207,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         if (!init()) {
             throw new Exception("could not initialize the EjbcaDigestReader");
         }
-    }
+    } // constructor
 
     @Override
     protected int getNumSkippedCerts(
@@ -235,8 +235,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         } finally {
             releaseResources(null, rs);
         }
-
-    }
+    } // method getNumSkippedCerts
 
     public void close() {
         super.close();
@@ -330,6 +329,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
         } finally {
             releaseResources(stmt, rs);
         }
-    }
+    } // method getInstance
 
 }

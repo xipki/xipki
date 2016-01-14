@@ -131,6 +131,6 @@ public class HealthCheckServlet extends HttpServlet {
         }
 
         response.flushBuffer();
-    }
+    } // method doGet
 
 }

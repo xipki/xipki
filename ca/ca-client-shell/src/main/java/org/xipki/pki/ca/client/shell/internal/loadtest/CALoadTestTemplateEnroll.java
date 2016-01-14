@@ -165,7 +165,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
             }
 
             return true;
-        }
+        } // method testNext
 
     } // class Testor
 
@@ -229,7 +229,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
                     keyEntry, entry.getSubject(), randomDN);
             loadtestEntries.add(loadtestEntry);
         }
-    }
+    } // constructor
 
     @Override
     protected Runnable getTestor()
@@ -266,7 +266,7 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
             certRequests.put(certId, requestWithCertprofile);
         }
         return certRequests;
-    }
+    } // method nextCertRequests
 
     public static EnrollTemplateType parse(
             final InputStream configStream)
@@ -301,6 +301,6 @@ public class CALoadTestTemplateEnroll extends LoadExecutor {
                 throw new InvalidConfException("invalid root element type");
             }
         }
-    }
+    } // method parse
 
 }

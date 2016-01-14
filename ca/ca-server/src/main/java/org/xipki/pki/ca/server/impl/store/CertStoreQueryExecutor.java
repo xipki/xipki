@@ -135,7 +135,7 @@ class CertStoreQueryExecutor {
         this.dbSchemaVersion = Integer.parseInt(s);
         s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(s);
-    }
+    } // constructor
 
     private CertBasedIdentityStore initCertBasedIdentyStore(
             final String table)
@@ -157,7 +157,7 @@ class CertStoreQueryExecutor {
                 CertBasedIdentityEntry caInfoEntry = new CertBasedIdentityEntry(id, subject,
                         hexSha1Fp, b64Cert);
                 caInfos.add(caInfoEntry);
-            }
+            } // end while
 
             return new CertBasedIdentityStore(table, caInfos);
         } catch (SQLException e) {
@@ -165,7 +165,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method initCertBasedIdentyStore
 
     private NameIdStore initNameIdStore(
             final String tableName)
@@ -190,7 +190,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method initNameIdStore
 
     void addCert(
             final X509Cert issuer,
@@ -356,7 +356,7 @@ class CertStoreQueryExecutor {
                 }
 
                 break;
-            }
+            } // end for
         } catch (SQLException e) {
             throw dataSource.translate(null, e);
         } finally {
@@ -372,7 +372,7 @@ class CertStoreQueryExecutor {
                 dataSource.returnConnection(conn);
             }
         }
-    }
+    } // method addCert
 
     void addToPublishQueue(
             final String publisherName,
@@ -394,7 +394,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method addToPublishQueue
 
     void removeFromPublishQueue(
             final String publisherName,
@@ -413,7 +413,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method removeFromPublishQueue
 
     long getMaxIdOfDeltaCRLCache(
             final X509Cert caCert)
@@ -436,7 +436,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method getMaxIdOfDeltaCRLCache
 
     public void clearDeltaCRLCache(
             final X509Cert caCert,
@@ -455,7 +455,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method clearDeltaCRLCache
 
     void clearPublishQueue(
             final X509Cert caCert,
@@ -496,7 +496,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method clearPublishQueue
 
     int getMaxCrlNumber(
             final X509Cert caCert)
@@ -524,7 +524,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getMaxCrlNumber
 
     Long getThisUpdateOfCurrentCRL(
             final X509Cert caCert)
@@ -549,7 +549,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getThisUpdateOfCurrentCRL
 
     boolean hasCRL(
             final X509Cert caCert)
@@ -576,7 +576,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method hasCRL
 
     void addCRL(
             final X509Cert caCert,
@@ -646,7 +646,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method addCRL
 
     X509CertWithRevocationInfo revokeCert(
             final X509Cert caCert,
@@ -723,7 +723,7 @@ class CertStoreQueryExecutor {
 
         certWithRevInfo.setRevInfo(revInfo);
         return certWithRevInfo;
-    }
+    } // method revokeCert
 
     X509CertWithDBCertId unrevokeCert(
             final X509Cert caCert,
@@ -789,7 +789,7 @@ class CertStoreQueryExecutor {
         }
 
         return certWithRevInfo.getCert();
-    }
+    } // method unrevokeCert
 
     private void publishToDeltaCRLCache(
             final int caId,
@@ -812,7 +812,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method publishToDeltaCRLCache
 
     X509CertWithDBCertId getCert(
             final X509Cert caCert,
@@ -855,8 +855,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-
-    }
+    } // method removeCertificate
 
     Long getGreatestSerialNumber(
             final X509Cert caCert)
@@ -879,7 +878,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getGreatestSerialNumber
 
     List<Integer> getPublishQueueEntries(
             final X509Cert caCert,
@@ -927,7 +926,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getPublishQueueEntries
 
     boolean containsCertificates(
             final X509Cert caCert,
@@ -960,7 +959,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method containsCertificates
 
     List<BigInteger> getSerialNumbers(
             final X509Cert caCert,
@@ -1021,7 +1020,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getSerialNumbers
 
     List<BigInteger> getExpiredSerialNumbers(
             final X509Cert caCert,
@@ -1060,7 +1059,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getExpiredSerialNumbers
 
     byte[] getEncodedCRL(
             final X509Cert caCert,
@@ -1109,7 +1108,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getEncodedCRL
 
     int cleanupCRLs(
             final X509Cert caCert,
@@ -1168,7 +1167,7 @@ class CertStoreQueryExecutor {
         }
 
         return numCrlsToDelete;
-    }
+    } // method cleanupCRLs
 
     X509CertificateInfo getCertForId(
             final X509Cert caCert,
@@ -1218,7 +1217,7 @@ class CertStoreQueryExecutor {
                         new Date(rev_time * 1000), invalidityTime);
                 certInfo.setRevocationInfo(revInfo);
                 return certInfo;
-            }
+            } // end if
         } catch (IOException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "IOException: " + e.getMessage());
@@ -1229,7 +1228,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getCertForId
 
     X509CertWithDBCertId getCertForId(
             final int certId)
@@ -1260,7 +1259,7 @@ class CertStoreQueryExecutor {
                             "IOException: " + e.getMessage());
                 }
                 return new X509CertWithDBCertId(cert, encodedCert);
-            }
+            } // end if
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
@@ -1268,7 +1267,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getCertForId
 
     X509CertWithRevocationInfo getCertWithRevocationInfo(
             final X509Cert caCert,
@@ -1331,7 +1330,7 @@ class CertStoreQueryExecutor {
                 ret.setCert(certWithMeta);
                 ret.setRevInfo(revInfo);
                 return ret;
-            }
+            } // end if (rs.next())
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
@@ -1339,7 +1338,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getCertWithRevocationInfo
 
     X509CertificateInfo getCertificateInfo(
             final X509Cert caCert,
@@ -1407,7 +1406,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getCertificateInfo
 
     /**
      *
@@ -1465,7 +1464,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getCertificate
 
     boolean authenticateUser(
             final String user,
@@ -1499,7 +1498,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method authenticateUser
 
     String getCNRegexForUser(
             final String user)
@@ -1523,7 +1522,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getCNRegexForUser
 
     KnowCertResult knowsCertForSerial(
             final X509Cert caCert,
@@ -1552,7 +1551,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method knowsCertForSerial
 
     List<CertRevInfoWithSerial> getRevokedCertificates(
             final X509Cert caCert,
@@ -1615,7 +1614,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getRevokedCertificates
 
     List<CertRevInfoWithSerial> getCertificatesForDeltaCRL(
             final X509Cert caCert,
@@ -1701,10 +1700,10 @@ class CertStoreQueryExecutor {
             } finally {
                 releaseDbResources(null, rs);
             }
-        }
+        } // end for
 
         return ret;
-    }
+    } // method getCertificatesForDeltaCRL
 
     CertStatus getCertStatusForSubject(
             final X509Cert caCert,
@@ -1755,7 +1754,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getCertStatusForSubjectFp
 
     boolean certIssuedForSubject(
             final X509Cert caCert,
@@ -1790,7 +1789,7 @@ class CertStoreQueryExecutor {
         }
 
         return false;
-    }
+    } // method certIssuedForSubject
 
     SubjectKeyProfileBundle getLatestCert(
             final X509Cert caCert,
@@ -1837,7 +1836,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getLatestCert
 
     boolean isCertForSubjectIssued(
             final X509Cert caCert,
@@ -1910,7 +1909,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method isCertIssuedForColumn
 
     private String base64Fp(
             final byte[] data) {
@@ -1972,7 +1971,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method addCa
 
     private int getRequestorId(
             final String name) {
@@ -2047,7 +2046,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method addName
 
     private PreparedStatement[] borrowPreparedStatements(
             final String... sqlQueries)
@@ -2085,7 +2084,7 @@ class CertStoreQueryExecutor {
         }
 
         return pss;
-    }
+    } // method borrowPreparedStatements
 
     private PreparedStatement borrowPreparedStatement(
             final String sqlQuery)
@@ -2101,7 +2100,7 @@ class CertStoreQueryExecutor {
         }
 
         return ps;
-    }
+    } // method borrowPreparedStatement
 
     private void releaseDbResources(
             final Statement ps,
@@ -2127,7 +2126,7 @@ class CertStoreQueryExecutor {
             LOG.debug("isHealthy()", e);
             return false;
         }
-    }
+    } // method isHealthy
 
     String getLatestSN(
             final X500Name nameWithSN)
@@ -2175,7 +2174,7 @@ class CertStoreQueryExecutor {
         }
 
         return null;
-    }
+    } // method getLatestSN
 
     Long getNotBeforeOfFirstCertStartsWithCN(
             final String commonName,
@@ -2212,7 +2211,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method getNotBeforeOfFirstCertStartsWithCN
 
     void markMaxSerial(
             final X509Cert caCert,
@@ -2246,7 +2245,7 @@ class CertStoreQueryExecutor {
         if (maxSerial != null) {
             dataSource.setLastUsedSeqValue(seqName, maxSerial);
         }
-    }
+    } // method markMaxSerial
 
     void commitNextSerialIfLess(
             final String caName,
@@ -2294,7 +2293,7 @@ class CertStoreQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method commitNextSerialIfLess
 
     void commitNextCrlNoIfLess(
             final String caName,
@@ -2343,7 +2342,7 @@ class CertStoreQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method commitNextCrlNoIfLess
 
     long nextSerial(
             final X509Cert caCert,
@@ -2420,7 +2419,7 @@ class CertStoreQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method certExists
 
     void deleteCertInProcess(
             final long fpKey,
@@ -2438,7 +2437,7 @@ class CertStoreQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method deleteCertInProcess
 
     boolean addCertInProcess(
             final long fpKey,
@@ -2466,7 +2465,7 @@ class CertStoreQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method addCertInProcess
 
     void deleteCertsInProcessOlderThan(
             final Date time)

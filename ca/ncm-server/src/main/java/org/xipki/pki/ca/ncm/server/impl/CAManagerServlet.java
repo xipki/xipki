@@ -975,9 +975,9 @@ public class CAManagerServlet extends HessianServlet implements HessianCAManager
                                 new Object[]{x509Cert.getSubjectX500Principal().getName(),
                                         x509Cert.getIssuerX500Principal().getName(),
                                         x509Cert.getSerialNumber()});
-                    }
-                }
-            }
+                    } // end if
+                } // end if
+            } // end while
         } catch (Exception e) {
             final String message = "could not initialize CAManagerServlet";
             if (LOG.isErrorEnabled()) {
@@ -986,7 +986,7 @@ public class CAManagerServlet extends HessianServlet implements HessianCAManager
             }
             LOG.debug(message, e);
         }
-    }
+    } // method initialize
 
     public void shutdown() {
         trustedUserCerts.clear();

@@ -186,7 +186,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             LOG.error("Could not send syslog message: " + e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
-    }
+    } // method logEvent(AuditEvent)
 
     @Override
     public void logEvent(
@@ -223,7 +223,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             LOG.error("Could not send syslog message: " + e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
-    }
+    } // method logEvent(PCIAuditEvent)
 
     public void init() {
         if (initialized) {
@@ -288,7 +288,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         } catch (Exception e) {
             LOG.error("error while configuring syslog sender: "  + e.toString());
         }
-    }
+    } // method init
 
     public void destroy() {
         LOG.info("destroying: {}", SyslogAuditServiceImpl.class);

@@ -169,13 +169,13 @@ public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
                     }
                 } else {
                     out("response is equipped with valid signature");
-                }
-            }
+                } // end if(respIssuer)
+            } // end if(validOn)
 
             if (verbose.booleanValue()) {
                 out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
             }
-        }
+        } // end if
 
         for (int i = 0; i < n; i++) {
             if (n > 1) {
@@ -254,7 +254,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
                             msg.append("\tThis differs from the requested certificate");
                         }
                     }
-                }
+                } // end if (extension != null)
 
                 extension = singleResp.getExtension(
                         OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
@@ -297,14 +297,14 @@ public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
                             msg.append(", ");
                         }
                     }
-                }
-            }
+                } // end if(extensionOIDs)
+            } // end if (verbose.booleanValue())
 
             out(msg.toString());
-        }
+        } // end for
         out("");
 
         return null;
-    }
+    } // method processResponse
 
 }

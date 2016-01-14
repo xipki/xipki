@@ -163,7 +163,7 @@ public class X509CAInfo {
         } else {
             nextSerial = caEntry.getNextSerial();
         }
-    }
+    } // constructor
 
     public void commitNextSerial()
     throws OperationException {
@@ -463,7 +463,7 @@ public class X509CAInfo {
 
         this.signers = Collections.unmodifiableMap(tSigners);
         return true;
-    }
+    } // method initSigner
 
     public boolean isSignerRequired() {
         Set<Permission> permissions = caEntry.getPermissions();
@@ -489,6 +489,6 @@ public class X509CAInfo {
         }
 
         return signerRequired;
-    }
+    } // method isSignerRequired
 
 }

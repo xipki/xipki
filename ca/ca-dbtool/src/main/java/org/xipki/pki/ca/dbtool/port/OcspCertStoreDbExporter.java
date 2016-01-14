@@ -125,7 +125,7 @@ class OcspCertStoreDbExporter extends DbPorter {
             }
         }
         this.resume = resume;
-    }
+    } // constructor
 
     public void export()
     throws Exception {
@@ -169,7 +169,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         } else {
             throw exception;
         }
-    }
+    } // method export
 
     private void export_issuer(
             final CertStoreType certstore)
@@ -222,7 +222,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
 
         System.out.println(" exported table ISSUER");
-    }
+    } // method export_issuer
 
     private Exception export_cert(
             final CertStoreType certstore,
@@ -246,7 +246,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         } finally {
             IoUtil.closeStream(certsFileOs);
         }
-    }
+    } // method export_cert
 
     private void do_export_cert(
             final CertStoreType certstore,
@@ -439,7 +439,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         System.out.println(getExportedText() + processLog.getNumProcessed()
                 + " certificates from tables CERT, CHASH and CRAW");
-    }
+    } // method do_export_cert
 
     private void finalizeZip(
             final ZipOutputStream zipOutStream,

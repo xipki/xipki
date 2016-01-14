@@ -94,6 +94,6 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
         out(" checked CRL signer " + name);
         return null;
-    }
+    } // method doExecute
 
 }

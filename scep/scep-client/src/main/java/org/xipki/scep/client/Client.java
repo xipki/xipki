@@ -188,7 +188,7 @@ public abstract class Client {
                             : Base64.toBase64String(request));
                 return httpGET(url);
             }
-        }
+        } // end if
     }
 
     private ScepHttpResponse httpSend(
@@ -384,7 +384,7 @@ public abstract class Client {
                     return scepUpdateReq(csr, identityKey, identityCert);
                 }
             }
-        }
+        } // end if
 
         return scepPkcsReq(csr, identityKey, identityCert);
     }
@@ -578,7 +578,7 @@ public abstract class Client {
         }
 
         return resp.getAuthorityCertStore();
-    }
+    } // method retrieveNextCAAuthorityCertStore
 
     private void initIfNotInited()
     throws ScepClientException {
@@ -635,7 +635,7 @@ public abstract class Client {
             throw new ScepClientException("the signature certificate could not be trusted");
         }
         return resp;
-    }
+    } // method decode
 
     private boolean isGutmannScep() {
         return cACaps.containsCapability(CACapability.AES)
@@ -746,7 +746,7 @@ public abstract class Client {
             }
             return cs;
         }
-    }
+    } // method retrieveCACertStore
 
     private static void assertSameNonce(
             final PkiMessage request,

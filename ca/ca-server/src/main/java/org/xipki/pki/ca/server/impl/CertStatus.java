@@ -40,8 +40,10 @@ package org.xipki.pki.ca.server.impl;
  */
 
 public enum CertStatus {
+
     Unknown,
     Revoked,
     Good
+
 }
 

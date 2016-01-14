@@ -192,6 +192,6 @@ public class X509CrlSignerEntry implements Serializable {
         }
 
         return sb.toString();
-    }
+    } // method toString
 
 }

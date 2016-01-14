@@ -149,7 +149,7 @@ public class DbToolBase {
         }
 
         return true;
-    }
+    } // method deleteFromTableWithLargerId
 
     public void shutdown() {
         dataSource.returnConnection(connection);
@@ -365,7 +365,7 @@ public class DbToolBase {
 
         sb.append(suffix);
         return sb.toString();
-    }
+    } // method writeLine
 
     public static ZipOutputStream getZipOutputStream(
             final File zipFile)

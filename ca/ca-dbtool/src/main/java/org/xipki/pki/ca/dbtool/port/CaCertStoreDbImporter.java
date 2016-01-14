@@ -205,7 +205,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             throw e;
         }
         System.out.println(" imported CA certstore to database");
-    }
+    } // method importToDB
 
     private void import_ca(
             final Cas cas)
@@ -244,7 +244,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_CA");
-    }
+    } // method import_ca
 
     private void import_requestor(
             final Requestors requestors)
@@ -275,7 +275,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_REQUESTOR");
-    }
+    } // method import_requestor
 
     private void import_publisher(
             final Publishers publishers)
@@ -307,7 +307,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_PUBLISHER");
-    }
+    } // method import_publisher
 
     private void import_profile(
             final Profiles profiles)
@@ -336,7 +336,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_PROFILE");
-    }
+    } // method import_profile
 
     private void import_user(
             final CertStoreType certstore)
@@ -374,7 +374,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         System.out.println(getImportedText() + sum + " users");
         System.out.println(getImportedText() + "table USERNAME");
-    }
+    } // method import_user
 
     private int do_import_user(
             final PreparedStatement ps_adduser,
@@ -461,7 +461,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             zipFile.close();
         }
-    }
+    } // method do_import_user
 
     private void import_publishQueue(
             final PublishQueue publishQueue)
@@ -490,7 +490,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table PUBLISHQUEUE");
-    }
+    } // method import_publishQueue
 
     private void import_deltaCRLCache(
             final DeltaCRLCache deltaCRLCache)
@@ -523,7 +523,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         dataSource.dropAndCreateSequence("DCC_ID", maxId + 1);
 
         System.out.println(" imported table DELTACRL_CACHE");
-    }
+    } // method import_deltaCRLCache
 
     private void import_crl(
             final CertStoreType certstore)
@@ -561,7 +561,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         System.out.println(getImportedText() + sum + " CRLs");
         System.out.println(getImportedText() + "table CRL");
-    }
+    } // method import_crl
 
     @SuppressWarnings("resource")
     private int do_import_crl(
@@ -702,7 +702,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             } catch (DataAccessException e) {
             }
         }
-    }
+    } // method do_import_crl
 
     private void import_cert(
             final CertStoreType certstore,
@@ -781,7 +781,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
-    }
+    } // method import_cert
 
     private int do_import_cert(
             final PreparedStatement ps_cert,
@@ -984,7 +984,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             zipFile.close();
         }
-    }
+    } // method do_import_cert
 
     private void deleteCertGreatherThan(
             final int id) {

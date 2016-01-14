@@ -165,7 +165,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
             throw new CmdFailure("certificate is invalid");
         }
         return null;
-    }
+    } // method doExecute
 
     private static void format(
             final ValidationIssue issue,

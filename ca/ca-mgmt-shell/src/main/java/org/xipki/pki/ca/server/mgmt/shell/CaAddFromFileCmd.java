@@ -327,7 +327,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         }
 
         return entry;
-    }
+    } // method getCAEntry
 
     private String getStrProp(
             final Properties props,

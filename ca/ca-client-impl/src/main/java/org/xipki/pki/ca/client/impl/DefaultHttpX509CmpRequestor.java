@@ -130,6 +130,6 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
         }
 
         return IoUtil.read(inputStream);
-    }
+    } // method send
 
 }

@@ -392,6 +392,6 @@ public class KeyUtil {
         }
 
         return map;
-    }
+    } // method getCurveNameOIDMap
 
 }

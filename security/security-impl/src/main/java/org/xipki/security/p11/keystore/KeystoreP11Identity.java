@@ -152,7 +152,7 @@ public class KeystoreP11Identity extends P11Identity {
                 dsaSignatures.add(dsaSignature);
             }
         }
-    }
+    } // constructor
 
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)

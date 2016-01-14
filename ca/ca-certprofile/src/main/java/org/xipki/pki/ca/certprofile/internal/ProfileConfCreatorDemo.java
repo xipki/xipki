@@ -228,7 +228,7 @@ public class ProfileConfCreatorDemo {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } // method main
 
     private static void marshall(
             final Marshaller m,
@@ -246,8 +246,7 @@ public class ProfileConfCreatorDemo {
         } finally {
             out.close();
         }
-
-    }
+    } // method marshall
 
     private static X509ProfileType Certprofile_RootCA()
     throws Exception {
@@ -291,7 +290,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_RootCA
 
     private static X509ProfileType Certprofile_Cross()
     throws Exception {
@@ -338,7 +337,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_Cross
 
     private static X509ProfileType Certprofile_SubCA()
     throws Exception {
@@ -387,7 +386,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_SubCA
 
     private static X509ProfileType Certprofile_SubCA_Complex()
     throws Exception {
@@ -506,7 +505,7 @@ public class ProfileConfCreatorDemo {
                 "custom extension 1"));
 
         return profile;
-    }
+    } // method Certprofile_SubCA_Complex
 
     private static X509ProfileType Certprofile_OCSP()
     throws Exception {
@@ -560,7 +559,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_OCSP
 
     private static X509ProfileType Certprofile_SCEP()
     throws Exception {
@@ -609,7 +608,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_SCEP
 
     private static X509ProfileType Certprofile_TLS()
     throws Exception {
@@ -674,7 +673,7 @@ public class ProfileConfCreatorDemo {
                 true, false, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_TLS
 
     private static X509ProfileType Certprofile_TLS_C()
     throws Exception {
@@ -727,7 +726,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_TLS_C
 
     private static X509ProfileType Certprofile_TLSwithIncSN()
     throws Exception {
@@ -787,7 +786,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_TLSwithIncSN
 
     private static X509ProfileType Certprofile_gSMC_K()
     throws Exception {
@@ -880,7 +879,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.subjectAlternativeName, false, false, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_gSMC_K
 
     private static X509ProfileType Certprofile_MultipleOUs()
     throws Exception {
@@ -934,7 +933,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_MultipleOUs
 
     /*
      * O and OU in one RDN
@@ -987,7 +986,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_MultipleValuedRDN
 
     private static RdnType createRDN(
             final ASN1ObjectIdentifier type,
@@ -1042,7 +1041,7 @@ public class ProfileConfCreatorDemo {
         }
 
         return ret;
-    }
+    } // method createRDN
 
     private static ExtensionType createExtension(
             final ASN1ObjectIdentifier type,
@@ -1236,7 +1235,7 @@ public class ProfileConfCreatorDemo {
         extValue.getQCStatement().add(statement);
 
         return createExtensionValueType(extValue);
-    }
+    } // method createQcStatements
 
     private static ExtensionValueType createBiometricInfo() {
         BiometricInfo extValue = new BiometricInfo();
@@ -1272,7 +1271,7 @@ public class ProfileConfCreatorDemo {
 
         extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
         return createExtensionValueType(extValue);
-    }
+    } // method createBiometricInfo
 
     private static ExtensionValueType createAuthorizationTemplate() {
         AuthorizationTemplate extValue = new AuthorizationTemplate();
@@ -1444,7 +1443,7 @@ public class ProfileConfCreatorDemo {
         profile.setExtensions(extensions);
 
         return profile;
-    }
+    } // method getBaseProfile
 
     private static KeyAlgorithms createKeyAlgorithms() {
         KeyAlgorithms ret = new KeyAlgorithms();
@@ -1512,7 +1511,7 @@ public class ProfileConfCreatorDemo {
         ecParams.getPointEncodings().getPointEncoding().add(unpressed);
 
         return ret;
-    }
+    } // method createKeyAlgorithms
 
     private static KeyAlgorithms createRSAKeyAlgorithms() {
         KeyAlgorithms ret = new KeyAlgorithms();
@@ -1684,7 +1683,7 @@ public class ProfileConfCreatorDemo {
                 true, false, extensionValue));
 
         return profile;
-    }
+    } // method  Certprofile_EE_complex
 
     private static X509ProfileType Certprofile_MaxTime()
     throws Exception {
@@ -1735,7 +1734,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    }
+    } // method Certprofile_MaxTime
 
     private ProfileConfCreatorDemo() {
     }

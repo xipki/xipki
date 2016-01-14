@@ -261,7 +261,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         CRLResultType result = new CRLResultType();
         result.setCRL(crl);
         return result;
-    }
+    } // method evaluateCRLResponse
 
     public RevokeCertResultType revokeCertificate(
             final RevokeCertRequestType request,
@@ -362,7 +362,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         }
 
         return result;
-    }
+    } // method parse
 
     public EnrollCertResultType requestCertificate(
             final P10EnrollCertRequestType p10Req,
@@ -530,7 +530,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         }
 
         return result;
-    }
+    } // method intern_requestCertificate
 
     private PKIMessage buildCertConfirmRequest(
             final ASN1OctetString tid,
@@ -587,7 +587,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         RevReqContent content = new RevReqContent(revDetailsArray.toArray(new RevDetails[0]));
         PKIBody body = new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content);
         return new PKIMessage(header, body);
-    }
+    } // method buildRevokeCertRequest
 
     private PKIMessage buildUnrevokeOrRemoveCertRequest(
             final UnrevokeOrRemoveCertRequestType request,
@@ -620,7 +620,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         RevReqContent content = new RevReqContent(revDetailsArray.toArray(new RevDetails[0]));
         PKIBody body = new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content);
         return new PKIMessage(header, body);
-    }
+    } // method buildUnrevokeOrRemoveCertRequest
 
     private PKIMessage buildPKIMessage(
             final P10EnrollCertRequestType p10Req,
@@ -675,7 +675,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         PKIMessage pkiMessage = new PKIMessage(header, body);
         return pkiMessage;
-    }
+    } // method buildPKIMessage
 
     private PKIMessage buildPKIMessage(
             final CertRequest req,
@@ -786,7 +786,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         } else {
             throw new CmpRequestorException("unknown CAInfo version " + version);
         }
-    }
+    } // method retrieveCAInfo
 
     private static DocumentBuilder newDocumentBuilder() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

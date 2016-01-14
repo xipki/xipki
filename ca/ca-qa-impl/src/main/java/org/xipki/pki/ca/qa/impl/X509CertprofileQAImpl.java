@@ -37,6 +37,7 @@ package org.xipki.pki.ca.qa.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -166,7 +167,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
             throw new CertprofileException(
                     "RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
-    }
+    } // constructor
 
     @Override
     public ValidationResult checkCert(
@@ -207,6 +208,18 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
                     + "' but expected '" + version.getVersion() + "'");
         }
 
+        // serialNumber
+        issue = new ValidationIssue("X509.serialNumber", "certificate serial number");
+        resultIssues.add(issue);
+        BigInteger serialNumber = tbsCert.getSerialNumber().getValue();
+        if (serialNumber.signum() != 1) {
+            issue.setFailureMessage("not positive");
+        } else {
+            if (serialNumber.bitLength() >= 160) {
+                issue.setFailureMessage("serial number has more than 20 octets");
+            }
+        }
+
         // signatureAlgorithm
         if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
             issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
@@ -229,6 +242,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
                             + sigAlgId.getAlgorithm().getId());
                 }
             }
+
+            //TODO: check the parameters
         }
 
         // notBefore encoding
@@ -316,7 +331,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
                 extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions));
 
         return new ValidationResult(resultIssues);
-    }
+    } // method checkCert
 
     static Set<Range> buildParametersMap(
             final RangesType ranges) {
@@ -371,7 +386,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         }
 
         return Collections.unmodifiableMap(map);
-    }
+    } // method buildConstantExtesions
 
     private static void checkTime(Time time, ValidationIssue issue) {
         ASN1Primitive asn1Time = time.toASN1Primitive();

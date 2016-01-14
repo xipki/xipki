@@ -134,8 +134,8 @@ public class OcspLoadTest extends LoadExecutor {
 
                 LOG.info("SN: {}, status: {}", sn, status);
                 return true;
-            }
-        }
+            } // end if
+        } // method testNext
 
     } // class Testor
 

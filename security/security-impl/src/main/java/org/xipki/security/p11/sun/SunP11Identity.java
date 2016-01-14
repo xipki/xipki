@@ -157,7 +157,7 @@ class SunP11Identity implements Comparable<SunP11Identity> {
                     + this.publicKey.getAlgorithm()
                     + " (class: " + this.publicKey.getClass().getName() + ")");
         }
-    }
+    } // constructor
 
     public String getKeyLabel() {
         return keyLabel;

@@ -107,7 +107,7 @@ class ResponderOption {
             list = new ArrayList<>(paths);
             this.servletPaths = Collections.unmodifiableList(list);
         }
-    }
+    } // constructor
 
     public OCSPMode getMode() {
         return mode;

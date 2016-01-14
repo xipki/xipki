@@ -117,7 +117,7 @@ public class X509IssuerInfo {
         }
         this.bcCert = Certificate.getInstance(certBytes);
         this.ski = X509Util.extractSKI(cert);
-    }
+    } // constructor
 
     public Set<String> getCaIssuerURLs() {
         return caIssuerURLs;

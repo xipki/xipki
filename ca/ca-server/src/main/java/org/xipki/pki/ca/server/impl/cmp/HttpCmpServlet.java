@@ -232,7 +232,7 @@ public class HttpCmpServlet extends HttpServlet {
                 }
             }
         }
-    }
+    } // method doPost
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)
@@ -287,6 +287,6 @@ public class HttpCmpServlet extends HttpServlet {
                 auditService.logEvent(event);
             }
         }
-    }
+    } // method audit
 
 }

@@ -147,7 +147,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
         this.numCertsPerSelect = numCertsPerSelect;
         this.numRefThreads = numRefThreads;
         this.numTargetThreads = numTargetThreads;
-    }
+    } // constructor DbDigestDiffWorker
 
     @Override
     public void doRun(
@@ -185,6 +185,6 @@ public class DbDigestDiffWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    }
+    } // method doRun
 
 }

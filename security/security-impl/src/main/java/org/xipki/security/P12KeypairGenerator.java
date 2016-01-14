@@ -373,7 +373,7 @@ public abstract class P12KeypairGenerator {
                 ksStream.toByteArray(), identity.getCert());
         result.setKeystoreObject(ks);
         return result;
-    }
+    } // method generateIdentity
 
     private ContentSigner getContentSigner(
             final PrivateKey key)
@@ -423,7 +423,7 @@ public abstract class P12KeypairGenerator {
         }
 
         return builder.build(KeyUtil.generatePrivateKeyParameter(key));
-    }
+    } // method getContentSigner
 
     private static AlgorithmIdentifier buildAlgId(
             final ASN1ObjectIdentifier identifier) {

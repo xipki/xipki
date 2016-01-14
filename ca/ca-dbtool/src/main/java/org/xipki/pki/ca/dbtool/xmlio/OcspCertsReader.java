@@ -131,6 +131,6 @@ public class OcspCertsReader extends DbiXmlReader {
             } // end switch (event)
         } // end while
         return null;
-    }
+    } // method retrieveNext
 
 }

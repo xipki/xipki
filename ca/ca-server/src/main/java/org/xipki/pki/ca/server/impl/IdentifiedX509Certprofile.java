@@ -146,7 +146,7 @@ class IdentifiedX509Certprofile {
         noneRequestExtensionTypes.add(Extension.freshestCRL);
         noneRequestExtensionTypes.add(Extension.basicConstraints);
         noneRequestExtensionTypes.add(Extension.inhibitAnyPolicy);
-    }
+    } // end static
 
     private final String name;
     private final CertprofileEntry dbEntry;
@@ -209,7 +209,7 @@ class IdentifiedX509Certprofile {
         }
 
         this.certprofile = tmpCertprofile;
-    }
+    } // constructor
 
     public String getName() {
         return name;
@@ -564,7 +564,7 @@ class IdentifiedX509Certprofile {
         }
 
         return values;
-    }
+    } // method getExtensions
 
     public boolean isCA() {
         return certprofile.isCA();
@@ -764,7 +764,7 @@ class IdentifiedX509Certprofile {
             msg.delete(len - 2, len);
             throw new CertprofileException(msg.toString());
         }
-    }
+    } // method validate
 
     private static String toString(
             final Set<ASN1ObjectIdentifier> oids) {
@@ -791,7 +791,7 @@ class IdentifiedX509Certprofile {
         sb.append("]");
 
         return sb.toString();
-    }
+    } // method toString
 
     private static boolean containsKeyusage(
             final Set<KeyUsageControl> usageControls,
@@ -876,7 +876,7 @@ class IdentifiedX509Certprofile {
         default:
             throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
         } // end switch (tag)
-    }
+    } // method createGeneralName
 
     private static boolean addMe(
             final ASN1ObjectIdentifier extType,
@@ -890,7 +890,7 @@ class IdentifiedX509Certprofile {
             }
         }
         return addMe;
-    }
+    } // method addMe
 
     private static void addRequestedKeyusage(
             final Set<KeyUsage> usages,
@@ -912,7 +912,7 @@ class IdentifiedX509Certprofile {
                 usages.add(k.getKeyUsage());
             }
         }
-    }
+    } // method addRequestedKeyusage
 
     private static void addRequestedExtKeyusage(
             final Set<ASN1ObjectIdentifier> usages,
@@ -934,7 +934,7 @@ class IdentifiedX509Certprofile {
                 usages.add(k.getExtKeyUsage());
             }
         }
-    }
+    } // method addRequestedExtKeyusage
 
     private static GeneralNames createRequestedSubjectAltNames(
             final Extensions requestExtensions,
@@ -957,7 +957,7 @@ class IdentifiedX509Certprofile {
             l[i] = createGeneralName(reqL[i], modes);
         }
         return new GeneralNames(l);
-    }
+    } // method createRequestedSubjectAltNames
 
     private static ASN1Sequence createSubjectInfoAccess(
             final Extensions requestExtensions,
@@ -998,7 +998,7 @@ class IdentifiedX509Certprofile {
         return v.size() > 0
                 ? new DERSequence(v)
                 : null;
-    }
+    } // method createSubjectInfoAccess
 
     private static void addExtension(
             final ExtensionValues values,
@@ -1024,7 +1024,7 @@ class IdentifiedX509Certprofile {
             description = extType.getId();
         }
         throw new CertprofileException("could not add required extension " + description);
-    }
+    } // method addExtension
 
     private static void addExtension(
             final ExtensionValues values,
@@ -1050,6 +1050,6 @@ class IdentifiedX509Certprofile {
             description = extType.getId();
         }
         throw new CertprofileException("could not add required extension " + description);
-    }
+    } // method addExtension
 
 }

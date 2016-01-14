@@ -338,7 +338,7 @@ public class HttpOcspServlet extends HttpServlet {
                 } // end if (auditEvent != null)
             } // end inner try
         } // end external try
-    }
+    } // method processRequest
 
     public void setAuditServiceRegister(
             final AuditServiceRegister auditServiceRegister) {

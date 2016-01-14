@@ -289,7 +289,7 @@ public class OcspServer {
 
         return new ResponderAndRelativeUri(responders.get(entry.getResponderName()),
                 relativeUri);
-    }
+    } // method getResponderAndRelativeUri
 
     public Responder getResponder(
             final String name) {
@@ -352,8 +352,8 @@ public class OcspServer {
                         || (ch >= 'a' && ch <= 'z'))) {
                     throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
                 }
-            }
-        }
+            } // end for
+        } // end for
 
         // Duplication name check: signer
         c.clear();
@@ -483,8 +483,8 @@ public class OcspServer {
                     close(dsStream);
                 }
                 datasources.put(name, datasource);
-            }
-        }
+            } // end for
+        } // end if
 
         // stores
         for (StoreType m : conf.getStores().getStore()) {
@@ -528,7 +528,7 @@ public class OcspServer {
                 }
             }
             responderOptions.put(m.getName(), option);
-        }
+        } // end for
 
         // sort the servlet paths
         Set<String> pathTexts = new HashSet<>();
@@ -581,8 +581,8 @@ public class OcspServer {
                     signers.get(option.getSignerName()),
                     _stores);
             responders.put(name, responder);
-        }
-    }
+        } // end for
+    } // method do_init
 
     public void shutdown() {
         LOG.info("stopped OCSP Responder");
@@ -737,8 +737,8 @@ public class OcspServer {
                                     e.getClass().getName(), e.getMessage());
                         }
                         LOG.debug(message, e);
-                    }
-                }
+                    } // end try
+                } // end for
 
                 if (certStatusInfo == null) {
                     if (childAuditEvent != null) {
@@ -784,10 +784,10 @@ public class OcspServer {
                                         certStatusInfo.getThisUpdate(),
                                         certStatusInfo.getNextUpdate(),
                                         certStatusInfo.getCertprofile());
-                            }
-                        }
-                    }
-                }
+                            } // end if(replaced)
+                        } // end if (caRevInfo != null) {
+                    } // end if
+                } // end for
 
                 if (childAuditEvent != null) {
                     String certprofile = certStatusInfo.getCertprofile();
@@ -861,7 +861,7 @@ public class OcspServer {
                     default:
                         throw new RuntimeException(
                                 "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
-                }
+                } // end switch
 
                 byte[] certHash = certStatusInfo.getCertHash();
                 if (certHash != null) {
@@ -893,7 +893,7 @@ public class OcspServer {
                             false, encodedCertHash);
 
                     extensions.add(extension);
-                }
+                } // end if(certHash != null)
 
                 if (certStatusInfo.getArchiveCutOff() != null) {
                     Extension extension = new Extension(
@@ -953,7 +953,7 @@ public class OcspServer {
                 if (nextUpdate != null) {
                     cacheNextUpdate = Math.min(cacheNextUpdate, nextUpdate.getTime());
                 }
-            }
+            } // end for (int i = 0; i < n; i++)
 
             if (includeExtendedRevokeExtension) {
                 responseExtensions.add(
@@ -1066,7 +1066,7 @@ public class OcspServer {
 
             return createUnsuccessfulOCSPResp(OcspResponseStatus.internalError);
         }
-    }
+    } // method ask
 
     public HealthCheckResult healthCheck(
             final Responder responder) {
@@ -1092,7 +1092,7 @@ public class OcspServer {
 
         result.setHealthy(healthy);
         return result;
-    }
+    } // method healthCheck
 
     public void setAuditServiceRegister(
             final AuditServiceRegister auditServiceRegister) {
@@ -1170,7 +1170,7 @@ public class OcspServer {
         } catch (CertificateEncodingException | IOException e) {
             throw new InvalidConfException(e.getMessage(), e);
         }
-    }
+    } // method initSigner
 
     private CertStatusStore initStore(
             final StoreType conf,
@@ -1207,7 +1207,7 @@ public class OcspServer {
                 issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
             } catch (CertificateException e) {
                 throw new InvalidConfException(e.getMessage(), e);
-            }
+            } // end try
             store = new DbCertStatusStore(name, issuerFilter);
 
             Integer i = conf.getRetentionInterval();
@@ -1294,7 +1294,7 @@ public class OcspServer {
         }
 
         return store;
-    }
+    } // method initStore
 
     private OcspRespWithCacheInfo checkSignature(
             final OCSPReq request,
@@ -1363,7 +1363,7 @@ public class OcspServer {
             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
         }
         return createUnsuccessfulOCSPResp(OcspResponseStatus.unauthorized);
-    }
+    } // method checkSignature
 
     private static boolean canBuildCertpath(
             final X509CertificateHolder[] certsInReq,
@@ -1427,7 +1427,7 @@ public class OcspServer {
         }
 
         return false;
-    }
+    } // method canBuildCertpath
 
     private static OcspRespWithCacheInfo createUnsuccessfulOCSPResp(
             final OcspResponseStatus status) {

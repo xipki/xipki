@@ -124,7 +124,8 @@ public class CALoadTestEnroll extends LoadExecutor {
             }
 
             return nSuccess == certRequests.size();
-        }
+        } // method testNext
+
     } // class Testor
 
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();

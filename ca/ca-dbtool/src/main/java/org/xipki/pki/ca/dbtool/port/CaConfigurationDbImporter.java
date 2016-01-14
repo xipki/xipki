@@ -142,7 +142,7 @@ class CaConfigurationDbImporter extends DbPorter {
             throw e;
         }
         System.out.println(" imported CA configuration to database");
-    }
+    } // method importToDB
 
     private void import_cmpcontrol(
             final Cmpcontrols controls)
@@ -172,7 +172,7 @@ class CaConfigurationDbImporter extends DbPorter {
             }
         }
         System.out.println(" imported table CMPCONTROL");
-    }
+    } // method import_cmpcontrol
 
     private void import_responder(
             final Responders responders)
@@ -208,7 +208,7 @@ class CaConfigurationDbImporter extends DbPorter {
         }
 
         System.out.println(" imported table RESPONDER");
-    }
+    } // method import_responder
 
     private void import_environment(
             final Environments environments)
@@ -234,7 +234,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table ENVIRONMENT");
-    }
+    } // method import_environment
 
     private void import_crlsigner(
             final Crlsigners crlsigners)
@@ -265,7 +265,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CRLSIGNER");
-    }
+    } // method import_crlsigner
 
     private void import_requestor(
             final Requestors requestors)
@@ -293,7 +293,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table REQUESTOR");
-    }
+    } // method import_requestor
 
     private void import_publisher(
             final Publishers publishers)
@@ -321,7 +321,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table PUBLISHER");
-    }
+    } // method import_publisher
 
     private void import_profile(
             final Profiles profiles)
@@ -359,7 +359,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table PROFILE");
-    }
+    } // method import_profile
 
     private void import_ca(
             final Cas cas)
@@ -440,7 +440,7 @@ class CaConfigurationDbImporter extends DbPorter {
         }
 
         System.out.println(" imported table CA");
-    }
+    } // method import_ca
 
     private void import_caalias(
             final Caaliases caaliases)
@@ -465,7 +465,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CAALIAS");
-    }
+    } // method import_caalias
 
     private void import_ca_has_requestor(
             final CaHasRequestors ca_has_requestors)
@@ -497,7 +497,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_REQUESTOR");
-    }
+    } // method import_ca_has_requestor
 
     private void import_ca_has_publisher(
             final CaHasPublishers ca_has_publishers)
@@ -523,7 +523,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_PUBLISHER");
-    }
+    } // method import_ca_has_publisher
 
     private void import_ca_has_certprofile(
             final CaHasProfiles ca_has_certprofiles)
@@ -552,7 +552,7 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_PROFILE");
-    }
+    } // method import_ca_has_certprofile
 
     private void import_scep(
             final Sceps sceps)
@@ -580,6 +580,6 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table SCEP");
-    }
+    } // method import_scep
 
 }

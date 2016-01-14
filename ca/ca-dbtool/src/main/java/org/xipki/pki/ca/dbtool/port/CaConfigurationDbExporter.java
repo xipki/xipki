@@ -162,7 +162,7 @@ class CaConfigurationDbExporter extends DbPorter {
         }
 
         System.out.println(" exported table CMPCONTROL");
-    }
+    } // method export_cmpcontrol
 
     private void export_environment(
             final CAConfigurationType caconf)
@@ -195,7 +195,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setEnvironments(environments);
         System.out.println(" exported table ENVIRONMENT");
-    }
+    } // method export_environment
 
     private void export_crlsigner(
             final CAConfigurationType caconf)
@@ -239,7 +239,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCrlsigners(crlsigners);
         System.out.println(" exported table CRLSIGNER");
-    }
+    } // method export_crlsigner
 
     private void export_caalias(
             final CAConfigurationType caconf)
@@ -272,7 +272,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCaaliases(caaliases);
         System.out.println(" exported table CAALIAS");
-    }
+    } // method export_caalias
 
     private void export_requestor(
             final CAConfigurationType caconf)
@@ -306,7 +306,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setRequestors(requestors);
         System.out.println(" exported table REQUESTOR");
-    }
+    } // method export_requestor
 
     private void export_responder(
             final CAConfigurationType caconf)
@@ -346,7 +346,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setResponders(responders);
         System.out.println(" exported table RESPONDER");
-    }
+    } // method export_responder
 
     private void export_publisher(
             final CAConfigurationType caconf)
@@ -382,7 +382,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setPublishers(publishers);
         System.out.println(" exported table PUBLISHER");
-    }
+    } // method export_publisher
 
     private void export_profile(
             final CAConfigurationType caconf)
@@ -420,7 +420,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setProfiles(profiles);
         System.out.println(" exported table PROFILE");
-    }
+    } // method export_profile
 
     private void export_ca(
             final CAConfigurationType caconf)
@@ -524,7 +524,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCas(cas);
         System.out.println(" exported table CA");
-    }
+    } // method export_ca
 
     private void export_ca_has_requestor(
             final CAConfigurationType caconf)
@@ -564,7 +564,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCaHasRequestors(ca_has_requestors);
         System.out.println(" exported table CA_HAS_REQUESTOR");
-    }
+    } // method export_ca_has_requestor
 
     private void export_ca_has_publisher(
             final CAConfigurationType caconf)
@@ -597,7 +597,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCaHasPublishers(ca_has_publishers);
         System.out.println(" exported table CA_HAS_PUBLISHER");
-    }
+    } // method export_ca_has_publisher
 
     private void export_scep(
             final CAConfigurationType caconf)
@@ -639,7 +639,7 @@ class CaConfigurationDbExporter extends DbPorter {
         }
 
         System.out.println(" exported table SCEP");
-    }
+    } // method export_scep
 
     private void export_ca_has_profile(
             final CAConfigurationType caconf)
@@ -676,6 +676,6 @@ class CaConfigurationDbExporter extends DbPorter {
 
         caconf.setCaHasProfiles(ca_has_profiles);
         System.out.println(" exported table CA_HAS_PROFILE");
-    }
+    } // method export_ca_has_profile
 
 }

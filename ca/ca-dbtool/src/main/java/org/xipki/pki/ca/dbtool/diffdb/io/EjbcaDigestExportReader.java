@@ -191,7 +191,7 @@ public class EjbcaDigestExportReader {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
-        }
+        } // method query
 
     } // class Retriever
 
@@ -246,7 +246,7 @@ public class EjbcaDigestExportReader {
         for (Runnable runnable : retrievers) {
             executor.execute(runnable);
         }
-    }
+    } // constructor
 
     public List<IdentifiedDbDigestEntry> readCerts(
             final List<IDRange> idRanges)
@@ -283,7 +283,7 @@ public class EjbcaDigestExportReader {
         }
 
         return ret;
-    }
+    } // method readCerts
 
     public int getNumThreads() {
         return numThreads;

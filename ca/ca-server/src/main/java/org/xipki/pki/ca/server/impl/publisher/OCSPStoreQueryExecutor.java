@@ -114,7 +114,7 @@ class OCSPStoreQueryExecutor {
         this.dbSchemaVersion = Integer.parseInt(s);
         s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(s);
-    }
+    } // constructor
 
     private IssuerStore initIssuerStore()
     throws DataAccessException {
@@ -141,7 +141,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    }
+    } // method initIssuerStore
 
     /**
      * @throws DataAccessException if there is problem while accessing database.
@@ -212,7 +212,7 @@ class OCSPStoreQueryExecutor {
                 releaseDbResources(ps, null);
             }
             return;
-        }
+        } // end if
 
         final String sql_addCert = revoked
                 ? SQL_ADD_REVOKED_CERT
@@ -327,7 +327,7 @@ class OCSPStoreQueryExecutor {
                 }
 
                 break;
-            }
+            } // end for
         } catch (SQLException e) {
             throw dataSource.translate(null, e);
         } finally {
@@ -341,7 +341,7 @@ class OCSPStoreQueryExecutor {
             }
             dataSource.returnConnection(conn);
         }
-    }
+    } // method addOrUpdateCert
 
     void revokeCert(
             final X509Cert caCert,
@@ -404,7 +404,7 @@ class OCSPStoreQueryExecutor {
             }
         }
 
-    }
+    } // method unrevokeCert
 
     void removeCert(
             final X509Cert issuer,
@@ -428,7 +428,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method removeCert
 
     void revokeCa(
             final X509Cert caCert,
@@ -457,7 +457,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method revokeCa
 
     void unrevokeCa(
             final X509Cert caCert)
@@ -479,7 +479,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method unrevokeCa
 
     private int getIssuerId(
             final X509Cert issuerCert)
@@ -548,7 +548,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, null);
         }
-    }
+    } // method addIssuer
 
     /**
      *
@@ -601,10 +601,10 @@ class OCSPStoreQueryExecutor {
                 throw new DataAccessException(
                         "could not create prepared statement for " + sqlQueries[i]);
             }
-        }
+        } // end if
 
         return pss;
-    }
+    } // method borrowPreparedStatements
 
     private boolean certRegistered(
             final int issuerId,
@@ -631,7 +631,7 @@ class OCSPStoreQueryExecutor {
         }
 
         return false;
-    }
+    } // method certRegistered
 
     boolean isHealthy() {
         final String sql = "SELECT ID FROM ISSUER";
@@ -655,7 +655,7 @@ class OCSPStoreQueryExecutor {
             LOG.debug(message, e);
             return false;
         }
-    }
+    } // method isHealthy
 
     private void releaseDbResources(
             final Statement ps,
@@ -676,7 +676,7 @@ class OCSPStoreQueryExecutor {
         } finally {
             dataSource.returnConnection(conn);
         }
-    }
+    } // method nextCertId
 
     private static void setBoolean(
             final PreparedStatement ps,

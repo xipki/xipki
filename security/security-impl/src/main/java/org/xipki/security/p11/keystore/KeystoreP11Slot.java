@@ -202,12 +202,12 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 }
                 LOG.debug(message, t);
             }
-        }
+        } // end for (File file : keystoreFiles)
 
         this.identities.clear();
         this.identities.addAll(currentIdentifies);
         currentIdentifies.clear();
-    }
+    } // method refresh
 
     public File getSlotDir() {
         return slotDir;
@@ -329,7 +329,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 fOut.close();
             }
         }
-    }
+    } // method updateCertificate
 
     @Override
     public void removeCerts(
@@ -392,7 +392,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
-    }
+    } // method generateRSAKeypairAndCert
 
     @Override
     public P11KeyIdentifier generateDSAKeypair(
@@ -440,7 +440,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
-    }
+    } // method generateDSAKeypairAndCert
 
     @Override
     public P11KeyIdentifier generateECKeypair(
@@ -477,7 +477,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
-    }
+    } // method generateECDSAKeypairAndCert
 
     private KeystoreP11Identity getIdentity(
             final P11KeyIdentifier keyIdentifier) {
@@ -507,7 +507,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         }
 
         return null;
-    }
+    } // method getIdentity
 
     private void assertMatch(
             final X509Certificate cert,

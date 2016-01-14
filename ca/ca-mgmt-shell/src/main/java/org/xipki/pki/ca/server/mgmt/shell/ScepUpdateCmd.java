@@ -144,6 +144,6 @@ public class ScepUpdateCmd extends CaCommandSupport {
         boolean b = caManager.changeScep(entry);
         output(b, "updated", "could not update", "SCEP responder " + caName);
         return null;
-    }
+    } // method doExecute
 
 }

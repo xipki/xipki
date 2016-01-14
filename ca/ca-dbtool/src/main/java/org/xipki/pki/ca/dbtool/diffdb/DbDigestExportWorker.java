@@ -105,7 +105,7 @@ public class DbDigestExportWorker extends DbPortWorker {
         this.destFolder = destFolder;
         this.numCertsPerSelect = numCertsPerSelect;
         this.numThreads = numThreads;
-    }
+    } // constructor
 
     @Override
     public void doRun(
@@ -134,7 +134,7 @@ public class DbDigestExportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    }
+    } // method doRun
 
     public static DbSchemaType detectDbSchemaType(
             final DataSourceWrapper dataSource)

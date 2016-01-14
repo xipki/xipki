@@ -87,7 +87,7 @@ public class AlgorithmUtil {
         } else {
             return publicKeyInfo;
         }
-    }
+    } // method toRfc3279Style
 
     public static ASN1ObjectIdentifier getHashAlg(
             String hashAlgName)
@@ -109,7 +109,7 @@ public class AlgorithmUtil {
         } else {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
         }
-    }
+    } // method getHashAlg
 
     public static int getHashOutputSizeInOctets(
             final ASN1ObjectIdentifier hashAlgo)
@@ -131,7 +131,7 @@ public class AlgorithmUtil {
         } else {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgo.getId());
         }
-    }
+    } // method getHashOutputSizeInOctets
 
     static public String getSignatureAlgoName(
             final AlgorithmIdentifier sigAlgId)
@@ -199,7 +199,7 @@ public class AlgorithmUtil {
             throw new NoSuchAlgorithmException("unsupported signature algorithm "
                     + algOid.getId());
         }
-    }
+    } // method getSignatureAlgoName
 
     public static boolean isDSAPlainSigAlg(
             final AlgorithmIdentifier algId) {
@@ -337,7 +337,7 @@ public class AlgorithmUtil {
         }
 
         return signatureAlgId;
-    }
+    } // method getSignatureAlgoId
 
     static public boolean isRSASignatureAlgoId(
             final AlgorithmIdentifier algId) {
@@ -462,7 +462,7 @@ public class AlgorithmUtil {
         }
 
         return new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
-    }
+    } // method getRSASignatureAlgoId
 
     static public AlgorithmIdentifier getDSASignatureAlgoId(
             final String hashAlgo)
@@ -483,7 +483,7 @@ public class AlgorithmUtil {
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
-    }
+    } // method getDSASignatureAlgoId
 
     static public AlgorithmIdentifier getECDSASignatureAlgoId(
             final String hashAlgo,
@@ -515,7 +515,7 @@ public class AlgorithmUtil {
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
-    }
+    } // method getECDSASignatureAlgoId
 
     static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(
             final AlgorithmIdentifier sigAlgId)
@@ -572,7 +572,7 @@ public class AlgorithmUtil {
         }
 
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
-    }
+    } // method extractDigesetAlgorithmIdentifier
 
     public static boolean equalsAlgoName(
             String a,
@@ -650,7 +650,7 @@ public class AlgorithmUtil {
                     "no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
         }
         return new AlgorithmIdentifier(sid);
-    }
+    } // method buildRSAPSSAlgorithmIdentifier
 
     static public RSASSAPSSparams createPSSRSAParams(
             final ASN1ObjectIdentifier digestAlgOID)
@@ -677,6 +677,6 @@ public class AlgorithmUtil {
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize),
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
-    }
+    } // method createPSSRSAParams
 
 }

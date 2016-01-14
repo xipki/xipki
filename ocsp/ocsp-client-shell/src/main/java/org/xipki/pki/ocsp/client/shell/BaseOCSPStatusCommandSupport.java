@@ -157,12 +157,12 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
                             ocspUrl = url;
                         }
                     }
-                }
+                } // end if
 
                 BigInteger sn = cert.getSerialNumber();
                 sns.add(sn);
                 encodedCerts.put(sn, encodedCert);
-            }
+            } // end for
 
             if (isBlank(serverURL)) {
                 serverURL = ocspUrl;
@@ -216,10 +216,10 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
                         IoUtil.save(respout, bytes);
                     }
                 }
-            }
-        }
+            } // end if
+        } // end finally
 
         return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
-    }
+    } // method doExecute
 
 }

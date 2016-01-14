@@ -92,7 +92,7 @@ public class FilePasswordCallback implements PasswordCallback {
         } else {
             return passwordHint.toCharArray();
         }
-    }
+    } // method getPassword
 
     @Override
     public void init(

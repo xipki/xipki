@@ -173,7 +173,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             } finally {
                 inProcess = false;
             }
-        }
+        } // method run
 
     } // class ScheduledPublishQueueCleaner
 
@@ -205,7 +205,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             } finally {
                 inProcess = false;
             }
-        }
+        } // method run
 
     } // class ScheduledDeleteCertsInProcessService
 
@@ -243,7 +243,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             } finally {
                 inProcess = false;
             }
-        }
+        } // method run
 
     } // class ScheduledCARestarter
 
@@ -348,6 +348,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
     private CAManagerQueryExecutor queryExecutor;
 
+    private boolean initializing = false;
+
     public CAManagerImpl()
     throws InvalidConfException {
         if (Security.getProvider("BC") == null) {
@@ -380,7 +382,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         this.lockInstanceId = (hostAddress == null)
                 ? calockId
                 : hostAddress + "/" + calockId;
-    }
+    } // constructor
 
     public SecurityFactory getSecurityFactory() {
         return securityFactory;
@@ -490,7 +492,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         initDataObjects();
-    }
+    } // method init
 
     @Override
     public CASystemStatus getCASystemStatus() {
@@ -532,7 +534,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId,
                 System.currentTimeMillis() / 1000L);
         return queryExecutor.changeSystemEvent(newLockInfo);
-    }
+    } // method lockCA
 
     @Override
     public boolean unlockCA() {
@@ -563,7 +565,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
         auditLogPCIEvent(successful, "UNLOCK");
         return successful;
-    }
+    } // method unlockCA
 
     private void reset() {
         caSystemSetuped = false;
@@ -579,7 +581,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         scepsInitialized = false;
 
         shutdownScheduledThreadPoolExecutor();
-    }
+    } // method reset
 
     private void initDataObjects()
     throws CAMgmtException {
@@ -594,7 +596,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         initCAs();
         initSceps();
         markLastSeqValues();
-    }
+    } // method initDataObjects
 
     @Override
     public boolean restartCaSystem() {
@@ -608,7 +610,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         auditLogPCIEvent(caSystemStarted, "CA_CHANGE");
         return caSystemStarted;
-    }
+    } // method restartCaSystem
 
     @Override
     public boolean notifyCAChange()
@@ -628,7 +630,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             LOG.debug(message, e);
             return false;
         }
-    }
+    } // method notifyCAChange
 
     public void startCaSystem() {
         boolean caSystemStarted = false;
@@ -650,9 +652,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         auditLogPCIEvent(caSystemStarted, "START");
-    }
+    } // method startCaSystem
 
-    private boolean initializing = false;
     private boolean do_startCaSystem() {
         if (caSystemSetuped) {
             return true;
@@ -732,7 +733,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method do_startCaSystem
 
     private boolean startCA(
             final String caName) {
@@ -796,7 +797,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
         }
         return true;
-    }
+    } // method startCA
 
     public void shutdown() {
         LOG.info("stopping CA system");
@@ -848,7 +849,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         LOG.info("stopped CA system");
         auditLogPCIEvent(true, "SHUTDOWN");
-    }
+    } // method shutdown
 
     @Override
     public X509CACmpResponder getX509CACmpResponder(
@@ -921,7 +922,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         requestorsInitialized = true;
-    }
+    } // method initRequestors
 
     private void initResponders()
     throws CAMgmtException {
@@ -953,7 +954,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         responderInitialized = true;
-    }
+    } // method initResponders
 
     private void initEnvironemtParamters()
     throws CAMgmtException {
@@ -968,7 +969,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         environmentParametersInitialized = true;
-    }
+    } // method dinitEnvironemtParamters
 
     private void initCaAliases()
     throws CAMgmtException {
@@ -983,7 +984,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         caAliasesInitialized = true;
-    }
+    } // method initCaAliases
 
     private void initCertprofiles()
     throws CAMgmtException {
@@ -1016,7 +1017,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         certprofilesInitialized = true;
-    }
+    } // method initCertprofiles
 
     private void initPublishers()
     throws CAMgmtException {
@@ -1051,7 +1052,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         publishersInitialized = true;
-    }
+    } // method initPublishers
 
     private void initCrlSigners()
     throws CAMgmtException {
@@ -1077,7 +1078,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         crlSignersInitialized = true;
-    }
+    } // method initCrlSigners
 
     private void initCmpControls()
     throws CAMgmtException {
@@ -1118,7 +1119,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         cmpControlInitialized = true;
-    }
+    } // method initCmpControls
 
     private void initSceps()
     throws CAMgmtException {
@@ -1158,7 +1159,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         scepsInitialized = true;
-    }
+    } // method initSceps
 
     private void initCAs()
     throws CAMgmtException {
@@ -1179,7 +1180,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         cAsInitialized = true;
-    }
+    } // method initCAs
 
     private boolean createCA(
             final String name)
@@ -1212,7 +1213,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         ca_has_publishers.put(name, publisherNames);
 
         return true;
-    }
+    } // method createCA
 
     private void markLastSeqValues()
     throws CAMgmtException {
@@ -1227,7 +1228,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         } catch (DataAccessException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method markLastSeqValues
 
     @Override
     public boolean addCA(
@@ -1265,7 +1266,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         createCA(name);
         startCA(name);
         return true;
-    }
+    } // method addCA
 
     @Override
     public X509CAEntry getCA(
@@ -1294,7 +1295,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return changed;
-    }
+    } // method addCA
 
     @Override
     public boolean removeCertprofileFromCA(
@@ -1317,7 +1318,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
         }
         return true;
-    }
+    } // method removeCertprofileFromCA
 
     @Override
     public boolean addCertprofileToCA(
@@ -1350,7 +1351,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         queryExecutor.addCertprofileToCA(profileName, profileLocalname, caName);
         map.put(profileLocalname, profileName);
         return true;
-    }
+    } // method addCertprofileToCA
 
     @Override
     public boolean removePublisherFromCA(
@@ -1371,7 +1372,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             publisherNames.remove(publisherName);
         }
         return true;
-    }
+    } // method removePublisherFromCA
 
     @Override
     public boolean addPublisherToCA(
@@ -1403,7 +1404,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         publisher.issuerAdded(caInfos.get(caName).getCertificate());
         return true;
-    }
+    } // method addPublisherToCA
 
     @Override
     public Map<String, String> getCertprofilesForCA(
@@ -1464,7 +1465,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method addCmpRequestor
 
     @Override
     public boolean removeCmpRequestor(
@@ -1485,7 +1486,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         requestors.remove(requestorName);
         LOG.info("removed requestor '{}'", requestorName);
         return true;
-    }
+    } // method removeCmpRequestor
 
     @Override
     public boolean changeCmpRequestor(
@@ -1509,7 +1510,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         requestorDbEntries.put(name, requestor.getDbEntry());
         requestors.put(name, requestor);
         return true;
-    }
+    } // method changeCmpRequestor
 
     @Override
     public boolean removeCmpRequestorFromCA(
@@ -1532,7 +1533,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             entries.remove(entry);
         }
         return b;
-    }
+    } // method removeCmpRequestorFromCA
 
     @Override
     public boolean addCmpRequestorToCA(
@@ -1567,7 +1568,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         queryExecutor.addCmpRequestorToCA(requestor, caName);
         ca_has_requestors.get(caName).add(requestor);
         return true;
-    }
+    } // method addCmpRequestorToCA
 
     @Override
     public CertprofileEntry getCertprofile(
@@ -1595,7 +1596,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
         shutdownCertprofile(profile);
         return true;
-    }
+    } // method removeCertprofile
 
     @Override
     public boolean changeCertprofile(
@@ -1625,7 +1626,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method changeCertprofile
 
     @Override
     public boolean addCertprofile(
@@ -1662,7 +1663,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method addCertprofile
 
     @Override
     public boolean addCmpResponder(
@@ -1680,7 +1681,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         responders.put(name, _responder);
         responderDbEntries.put(name, dbEntry);
         return true;
-    }
+    } // method addCmpResponder
 
     @Override
     public boolean removeCmpResponder(
@@ -1703,7 +1704,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         responders.remove(name);
         LOG.info("removed Responder '{}'", name);
         return true;
-    }
+    } // method removeCmpResponder
 
     @Override
     public boolean changeCmpResponder(
@@ -1729,7 +1730,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         responderDbEntries.put(name, newResponder.getDbEntry());
         responders.put(name, newResponder);
         return true;
-    }
+    } // method changeCmpResponder
 
     @Override
     public CmpResponderEntry getCmpResponder(
@@ -1759,7 +1760,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         crlSigners.put(name, crlSigner);
         crlSignerDbEntries.put(name, _dbEntry);
         return true;
-    }
+    } // method addCrlSigner
 
     @Override
     public boolean removeCrlSigner(
@@ -1782,7 +1783,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         crlSignerDbEntries.remove(name);
         LOG.info("removed CRLSigner '{}'", name);
         return true;
-    }
+    } // method removeCrlSigner
 
     @Override
     public boolean changeCrlSigner(
@@ -1808,7 +1809,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         crlSignerDbEntries.put(name, crlSigner.getDbEntry());
         crlSigners.put(name, crlSigner);
         return true;
-    }
+    } // method changeCrlSigner
 
     @Override
     public X509CrlSignerEntry getCrlSigner(
@@ -1857,7 +1858,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method addPublisher
 
     @Override
     public List<PublisherEntry> getPublishersForCA(
@@ -1874,7 +1875,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return ret;
-    }
+    } // method getPublishersForCA
 
     @Override
     public PublisherEntry getPublisher(
@@ -1903,7 +1904,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         IdentifiedX509CertPublisher publisher = publishers.remove(name);
         shutdownPublisher(publisher);
         return true;
-    }
+    } // method removePublisher
 
     @Override
     public boolean changePublisher(
@@ -1932,7 +1933,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         publishers.put(name, publisher);
 
         return true;
-    }
+    } // method changePublisher
 
     @Override
     public CmpControlEntry getCmpControl(
@@ -1978,7 +1979,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         cmpControls.put(name, cmpControl);
         cmpControlDbEntries.put(name, _dbEntry);
         return true;
-    }
+    } // method addCmpControl
 
     @Override
     public boolean removeCmpControl(
@@ -2002,7 +2003,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         cmpControls.remove(name);
         LOG.info("removed CMPControl '{}'", name);
         return true;
-    }
+    } // method removeCmpControl
 
     @Override
     public boolean changeCmpControl(
@@ -2021,7 +2022,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         cmpControlDbEntries.put(name, newCmpControl.getDbEntry());
         cmpControls.put(name, newCmpControl);
         return true;
-    }
+    } // method changeCmpControl
 
     public EnvParameterResolver getEnvParameterResolver() {
         return envParameterResolver;
@@ -2092,7 +2093,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         envParameterResolver.addEnvParam(name, value);
         return true;
-    }
+    } // method changeEnvParam
 
     public String getCaConfFile() {
         return caConfFile;
@@ -2119,7 +2120,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         queryExecutor.addCaAlias(aliasName, caName);
         caAliases.put(aliasName, caName);
         return true;
-    }
+    } // method addCaAlias
 
     @Override
     public boolean removeCaAlias(
@@ -2158,7 +2159,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return aliases;
-    }
+    } // method getAliasesForCA
 
     @Override
     public Set<String> getCaAliasNames() {
@@ -2214,7 +2215,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             throw exception;
         }
         return true;
-    }
+    } // method removeCA
 
     @Override
     public boolean publishRootCA(
@@ -2252,7 +2253,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
         ca.publishCertificate(ci);
         return true;
-    }
+    } // method publishRootCA
 
     @Override
     public boolean republishCertificates(
@@ -2285,7 +2286,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    }
+    } // method republishCertificates
 
     @Override
     public boolean revokeCa(
@@ -2328,7 +2329,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         LOG.info("revoked CA '{}'", name);
         auditLogPCIEvent(true, "REVOKE CA " + name);
         return true;
-    }
+    } // method revokeCa
 
     @Override
     public boolean unrevokeCa(
@@ -2358,7 +2359,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         auditLogPCIEvent(true, "UNREVOKE CA " + name);
         return true;
-    }
+    } // method unrevokeCa
 
     public void setAuditServiceRegister(
             final AuditServiceRegister serviceRegister) {
@@ -2373,7 +2374,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             X509CA ca = x509cas.get(name);
             ca.setAuditServiceRegister(serviceRegister);
         }
-    }
+    } // method setAuditServiceRegister
 
     private void auditLogPCIEvent(
             final boolean successful,
@@ -2397,7 +2398,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             auditEvent.setLevel(AuditLevel.ERROR);
         }
         auditService.logEvent(auditEvent);
-    }
+    } // method auditLogPCIEvent
 
     @Override
     public boolean clearPublishQueue(
@@ -2421,7 +2422,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             throw new CAMgmtException("could not find CA named " + caName);
         }
         return ca.clearPublishQueue(publisherNames);
-    }
+    } // method clearPublishQueue
 
     private void shutdownScheduledThreadPoolExecutor() {
         if (scheduledThreadPoolExecutor == null) {
@@ -2436,7 +2437,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
         }
         scheduledThreadPoolExecutor = null;
-    }
+    } // method shutdownScheduledThreadPoolExecutor
 
     @Override
     public boolean revokeCertificate(
@@ -2453,7 +2454,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         } catch (OperationException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method revokeCertificate
 
     @Override
     public boolean unrevokeCertificate(
@@ -2468,7 +2469,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         } catch (OperationException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method unrevokeCertificate
 
     @Override
     public boolean removeCertificate(
@@ -2488,7 +2489,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         } catch (OperationException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method removeCertificate
 
     @Override
     public X509Certificate generateCertificate(
@@ -2535,7 +2536,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return certInfo.getCert().getCert();
-    }
+    } // method generateCertificate
 
     public X509CA getX509CA(
             final String name)
@@ -2567,7 +2568,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             ret.add(publisher);
         }
         return ret;
-    }
+    } // method getIdentifiedPublishersForCa
 
     @Override
     public X509Certificate generateRootCA(
@@ -2677,7 +2678,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         addCA(entry);
         return caCert;
-    }
+    } // method generateRootCA
 
     private void asssertMasterMode()
     throws CAMgmtException {
@@ -2702,7 +2703,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
             LOG.debug(message, e);
         }
-    }
+    } // method asssertMasterMode
 
     void shutdownPublisher(
             final IdentifiedX509CertPublisher publisher) {
@@ -2720,7 +2721,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
             LOG.debug(message, e);
         }
-    }
+    } // method shutdownPublisher
 
     CmpResponderEntryWrapper createCmpResponder(
             final CmpResponderEntry dbEntry)
@@ -2736,7 +2737,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             throw new CAMgmtException(e.getMessage());
         }
         return ret;
-    }
+    } // method createCmpResponder
 
     X509CrlSignerEntryWrapper createX509CrlSigner(
             final X509CrlSignerEntry dbEntry)
@@ -2767,7 +2768,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return signer;
-    }
+    } // method createX509CrlSigner
 
     IdentifiedX509Certprofile createCertprofile(
             final CertprofileEntry dbEntry) {
@@ -2788,7 +2789,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             LOG.debug(message, e);
             return null;
         }
-    }
+    } // method createCertprofile
 
     IdentifiedX509CertPublisher createPublisher(
             final PublisherEntry dbEntry)
@@ -2812,7 +2813,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             LOG.debug(message, e);
             return null;
         }
-    }
+    } // method createPublisher
 
     private String getRealCertprofileType(
             final String certprofileType) {
@@ -2876,7 +2877,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
                 auditServiceRegister.getAuditService().logEvent(auditEvent);
             }
         }
-    }
+    } // method generateCRLonDemand
 
     @Override
     public X509CRL getCRL(
@@ -2909,7 +2910,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
                 auditServiceRegister.getAuditService().logEvent(auditEvent);
             }
         }
-    }
+    } // method getCRL
 
     @Override
     public X509CRL getCurrentCRL(
@@ -2940,7 +2941,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
                 auditServiceRegister.getAuditService().logEvent(auditEvent);
             }
         }
-    }
+    } // method getCurrentCRL
 
     @Override
     public boolean addScep(
@@ -2958,7 +2959,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             sceps.put(caName, scep);
         }
         return b;
-    }
+    } // method addScep
 
     @Override
     public boolean removeScep(
@@ -2974,7 +2975,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             sceps.remove(name);
         }
         return b;
-    }
+    } // method removeScep
 
     public boolean changeScep(
             final ChangeScepEntry scepEntry)
@@ -3002,7 +3003,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         scepDbEntries.put(caName, scep.getDbEntry());
         sceps.put(caName, scep);
         return true;
-    }
+    } // method changeScep
 
     @Override
     public ScepEntry getScepEntry(
@@ -3066,7 +3067,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();
-    }
+    } // method canonicalizeSignerConf
 
     private static String getRealType(
             String typeMap,
@@ -3088,7 +3089,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             return null;
         }
         return pairs.getValue(type);
-    }
+    } // method getRealType
 
     static List<String[]> splitCASignerConfs(
             final String conf)
@@ -3113,6 +3114,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         }
 
         return signerConfs;
-    }
+    } // method splitCASignerConfs
 
 }

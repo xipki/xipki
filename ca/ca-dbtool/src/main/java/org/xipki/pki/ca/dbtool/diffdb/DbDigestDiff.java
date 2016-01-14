@@ -144,7 +144,7 @@ public class DbDigestDiff {
             LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
                     this.numTargetThreads);
         }
-    }
+    } // constuctor
 
     public Set<byte[]> getIncludeCACerts() {
         return includeCACerts;
@@ -226,7 +226,7 @@ public class DbDigestDiff {
                 diffSingleCA(refReader, caIdCertMap);
             }
         }
-    }
+    } // method diff
 
     private void diffSingleCA(
             final DigestReader refReader,
@@ -301,7 +301,7 @@ public class DbDigestDiff {
                 target.close();
             }
         }
-    }
+    } // method diffSingleCA
 
     public static DbDigestDiff getInstanceForDirRef(
             final String refDirname,

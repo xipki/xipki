@@ -97,6 +97,6 @@ public class NegUnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
             throw new CmdFailure("releasing revocation successful but expected failure");
         }
         return null;
-    }
+    } // method doExecute
 
 }

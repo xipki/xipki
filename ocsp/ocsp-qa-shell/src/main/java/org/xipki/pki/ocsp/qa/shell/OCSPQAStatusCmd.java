@@ -170,8 +170,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
         expectedCerthashOccurrence = getOccurrence(certhashOccurrenceText);
         expectedNextUpdateOccurrence = getOccurrence(nextUpdateOccurrenceText);
         expectedNonceOccurrence = getOccurrence(nonceOccurrenceText);
-
-    }
+    } // method checkParameters
 
     @Override
     protected Object processResponse(
@@ -218,7 +217,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
             throw new CmdFailure("OCSP response is invalid");
         }
         return null;
-    }
+    } // method processResponse
 
     private static void format(
             final ValidationIssue issue,

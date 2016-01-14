@@ -101,6 +101,6 @@ public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
             out("removed certificate");
         }
         return null;
-    }
+    } // method doExecute
 
 }

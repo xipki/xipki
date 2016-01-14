@@ -357,7 +357,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         } else {
             throw new SignerException("unknwon type: " + type);
         }
-    }
+    } // method doCreateSigner
 
     private AlgorithmIdentifier getSignatureAlgoId(
             final String signerConf)
@@ -479,7 +479,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         } finally {
             p11CryptServiciceFactoryInitialized = true;
         }
-    }
+    } // method initP11CryptServiceFactory
 
     private void initPkcs11ModuleConf() {
         if (p11Control != null) {
@@ -556,7 +556,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     if (nativeLibraryPath != null) {
                         break;
                     }
-                }
+                } // end for (NativeLibraryType library)
 
                 if (nativeLibraryPath == null) {
                     throw new InvalidConfException("could not find PKCS#11 library for OS "
@@ -566,7 +566,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 P11ModuleConf conf = new P11ModuleConf(name,
                         nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
                 confs.put(name, conf);
-            }
+            } // end for (ModuleType moduleType
 
             final String defaultModuleName = modulesType.getDefaultModule();
             if (!confs.containsKey(defaultModuleName)) {
@@ -591,7 +591,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
             throw new RuntimeException(message);
         }
-    }
+    } // method initPkcs11ModuleConf
 
     public void setPkcs11ConfFile(
             final String confFile) {
@@ -737,7 +737,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 signerBuilder.getKey(), signerBuilder.getCert());
         // TODO: validiate whether private key and certificate match
         return keycertPair;
-    }
+    } // method createPrivateKeyAndCert
 
     private static void validateSigner(
             final ConcurrentContentSigner signer,
@@ -802,7 +802,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 signer.returnContentSigner(csigner);
             }
         }
-    }
+    } // method validateSigner
 
     public static String getKeystoreSignerConf(
             final String keystoreFile,

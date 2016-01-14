@@ -138,7 +138,7 @@ public class TargetDigestRetriever {
             releaseResources(inArraySelectStmt, null);
             releaseResources(rangeSelectStmt, null);
             datasource.returnConnection(conn);
-        }
+        } // method run
 
         private Map<Long, DbDigestEntry> query(CertsBundle bundle)
         throws DataAccessException {
@@ -185,7 +185,7 @@ public class TargetDigestRetriever {
             }
 
             return certsInB;
-        }
+        } // method query
 
     } // class Retriever
 
@@ -295,7 +295,7 @@ public class TargetDigestRetriever {
             close();
             throw e;
         }
-    }
+    } // constructor
 
     public void close() {
         if (executor != null) {
@@ -345,7 +345,7 @@ public class TargetDigestRetriever {
         } finally {
             releaseResources(null, rs);
         }
-    }
+    } // method getCertsViaInArraySelectInB
 
     private Map<Long, DbDigestEntry> buildResult(
             final ResultSet rs,

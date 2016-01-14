@@ -98,7 +98,7 @@ public class CmpResponderEntryWrapper {
                     signer.getCertificateAsBCObject().getSubject());
             subjectAsGeneralName = new GeneralName(subjectAsX500Name);
         }
-    }
+    } // method initSigner
 
     public CmpResponderEntry getDbEntry() {
         return dbEntry;

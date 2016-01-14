@@ -235,7 +235,7 @@ public class Scep {
         EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
                 responderKey);
         this.envelopedDataDecryptor = new EnvelopedDataDecryptor(di);
-    }
+    } // method refreshCA
 
     public String getCaName() {
         return caName;
@@ -289,7 +289,7 @@ public class Scep {
             }
         }
         return encodeResponse(rep, req);
-    }
+    } // method servicePkiOperation
 
     private PkiMessage doServicePkiOperation(
             final DecodedPkiMessage req,
@@ -352,7 +352,7 @@ public class Scep {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badTime);
             }
-        }
+        } // end if
 
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
@@ -482,7 +482,7 @@ public class Scep {
                                     + " format <user>:<password>",
                                     tid);
                         }
-                    }
+                    } // end if
 
                     if (selfSigned) {
                         if (MessageType.PKCSReq != mt) {
@@ -514,7 +514,7 @@ public class Scep {
                                     (user == null)
                                         ? "null"
                                         : user);
-                        }
+                        } // end if
 
                         // only the same subject is permitted
                         String cnInSignatureCert = X509Util.getCommonName(
@@ -529,8 +529,8 @@ public class Scep {
                                         tid, "no challengePassword is contained in the request");
                                 throw FailInfoException.badRequest;
                             }
-                        }
-                    }
+                        } // end if
+                    } // end if
 
                     byte[] tidBytes = getTransactionIdBytes(tid);
 
@@ -595,7 +595,7 @@ public class Scep {
         }
 
         return rep;
-    }
+    } // method doServicePkiOperation
 
     private SignedData getCert(
             final X509CA ca,
@@ -618,7 +618,7 @@ public class Scep {
             throw FailInfoException.badCertId;
         }
         return buildSignedData(cert);
-    }
+    } // method getCert
 
     private SignedData pollCert(
             final X509CA ca,
@@ -643,7 +643,7 @@ public class Scep {
         }
 
         return buildSignedData(certs.get(0));
-    }
+    } // method pollCert
 
     private SignedData buildSignedData(
             final X509Certificate cert)
@@ -666,7 +666,7 @@ public class Scep {
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method buildSignedData
 
     private SignedData getCRL(
             final X509CA ca,
@@ -692,7 +692,7 @@ public class Scep {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
         return (SignedData) signedData.toASN1Structure().getContent();
-    }
+    } // method getCRL
 
     private ContentInfo encodeResponse(
             final PkiMessage response,
@@ -722,8 +722,7 @@ public class Scep {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
         return ci;
-
-    }
+    } // method encodeResponse
 
     private static void checkCN(
             final X509CA ca,
@@ -754,7 +753,7 @@ public class Scep {
             throw new UnsupportedOperationException(
                     "getSignatureAlgorithm() for non-RSA is not supported yet.");
         }
-    }
+    } // method getSignatureAlgorithm
 
     private static void ensureIssuedByThisCA(
             final X500Name thisCAX500Name,
@@ -797,7 +796,7 @@ public class Scep {
             }
         }
         return tid.getBytes();
-    }
+    } // method getTransactionIdBytes
 
     private static void audit(
             final AuditEvent audit,
@@ -810,6 +809,6 @@ public class Scep {
                                 ? "null"
                                 : value));
         }
-    }
+    } // method audit
 
 }

@@ -195,7 +195,7 @@ class X509SelfSignedCertBuilder {
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
-    }
+    } // method generateSelfSigned
 
     private static X509Certificate generateCertificate(
             final ConcurrentContentSigner signer,
@@ -304,7 +304,7 @@ class X509SelfSignedCertBuilder {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
         }
-    }
+    } // method generateCertificate
 
     private static void addExtensions(
             final X509v3CertificateBuilder certBuilder,
@@ -327,7 +327,7 @@ class X509SelfSignedCertBuilder {
             ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
             certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
         }
-    }
+    } // method addExtensions
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(
             final PublicKey key)
@@ -342,6 +342,6 @@ class X509SelfSignedCertBuilder {
         } else {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
-    }
+    } // method generatePublicKeyParameter
 
 }

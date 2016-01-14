@@ -173,7 +173,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             }
 
             outQueue.add(result);
-        }
+        } // method query
 
     } // class EjbcaDbRetriever
 
@@ -220,7 +220,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         if (!init()) {
             throw new Exception("could not initialize the EjbcaDigestReader");
         }
-    }
+    } // constructor
 
     public int getCaId() {
         return caId;
@@ -323,6 +323,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         return new EjbcaDbDigestReader(datasource, caCert, revokedOnly, totalAccount,
                 minId, maxId, numThreads, dbSchemaType, caId, dbContainsOtherCA,
                 numCertsToPredicate, stopMe);
-    }
+    } // method getInstance
 
 }

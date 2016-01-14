@@ -90,6 +90,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
+    protected EnvParameterResolver parameterResolver;
+
     protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
     protected BaseX509Certprofile() {
@@ -246,9 +248,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
         X500Name grantedSubject = new X500Name(rdns.toArray(new RDN[0]));
         return new SubjectInfo(grantedSubject, null);
-    }
-
-    protected EnvParameterResolver parameterResolver;
+    } // method getSubject
 
     @Override
     public void setEnvParameterResolver(
@@ -369,7 +369,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
-    }
+    } // method checkPublicKey
 
     @Override
     public void initialize(
@@ -422,7 +422,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                         + oidToDisplayName(occurence.getType()) + " is not present");
             }
         }
-    }
+    } // method verifySubjectDNOccurence
 
     protected RDN createSubjectRDN(
             final String text,
@@ -588,7 +588,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         }
 
         return stringType.createString(ttext.trim());
-    }
+    } // method createRDNValue
 
     private static String oidToDisplayName(
             final ASN1ObjectIdentifier type) {
@@ -626,6 +626,6 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 throw new BadCertTemplateException("invalid point encoding 0x"
                         + Integer.toString(encoded[0], 16));
         }
-    }
+    } // method checkECSubjectPublicKeyInfo
 
 }

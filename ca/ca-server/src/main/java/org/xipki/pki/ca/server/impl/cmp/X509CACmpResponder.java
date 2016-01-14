@@ -162,7 +162,7 @@ public class X509CACmpResponder extends CmpResponder {
                 } catch (Throwable t) {
                 }
             }
-        }
+        } // method run
 
     } // class PendingPoolCleaner
 
@@ -351,7 +351,7 @@ public class X509CACmpResponder extends CmpResponder {
         }
 
         return new PKIMessage(respHeader.build(), respBody);
-    }
+    } // method intern_processPKIMessage
 
     /**
      * handle the PKI body with the choice {@code cr}
@@ -505,7 +505,7 @@ public class X509CACmpResponder extends CmpResponder {
                 ? new CMPCertificate[]{getCA().getCAInfo().getCertInCMPFormat()}
                 : null;
         return new CertRepMessage(caPubs, certResponses);
-    }
+    } // method processCertReqMessages
 
     /**
      * handle the PKI body with the choice {@code p10cr}<br/>
@@ -590,7 +590,7 @@ public class X509CACmpResponder extends CmpResponder {
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
-    }
+    } // method processP10cr
 
     private CertResponse generateCertificate(
             final CmpRequestorInfo requestor,
@@ -737,7 +737,7 @@ public class X509CACmpResponder extends CmpResponder {
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
             return new CertResponse(certReqId, status);
         }
-    }
+    } // method generateCertificate
 
     private PKIBody revokeOrUnrevokeOrRemoveCertificates(
             final RevReqContent rr,
@@ -787,7 +787,7 @@ public class X509CACmpResponder extends CmpResponder {
                 return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "the request is not invalid");
             }
-        }
+        } // end for
 
         for (int i = 0; i < n; i++) {
             AuditChildEvent childAuditEvent = null;
@@ -954,7 +954,7 @@ public class X509CACmpResponder extends CmpResponder {
         } // end for
 
         return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
-    }
+    } // method revokeOrUnrevokeOrRemoveCertificates
 
     private PKIBody confirmCertificates(
             final ASN1OctetString transactionId,
@@ -1018,7 +1018,7 @@ public class X509CACmpResponder extends CmpResponder {
                         new PKIFailureInfo(PKIFailureInfo.systemFailure)));
 
         return new PKIBody(PKIBody.TYPE_ERROR, emc);
-    }
+    } // method confirmCertificates
 
     private boolean revokePendingCertificates(
             final ASN1OctetString transactionId) {
@@ -1042,7 +1042,7 @@ public class X509CACmpResponder extends CmpResponder {
         }
 
         return successful;
-    }
+    } // method revokePendingCertificates
 
     private boolean verifyPOP(
             final CertificateRequestMessage certRequest,
@@ -1071,7 +1071,7 @@ public class X509CACmpResponder extends CmpResponder {
             LOG.debug(message, e);
         }
         return false;
-    }
+    } // method verifyPOP
 
     @Override
     protected CmpControl getCmpControl() {
@@ -1125,7 +1125,7 @@ public class X509CACmpResponder extends CmpResponder {
         String msg = requiredPermission.getPermission() + " is not allowed";
         LOG.warn(msg);
         throw new InsuffientPermissionException(msg);
-    }
+    } // method checkPermission
 
     private String getSystemInfo(
             final CmpRequestorInfo requestor,
@@ -1204,7 +1204,7 @@ public class X509CACmpResponder extends CmpResponder {
         }
 
         return sb.toString();
-    }
+    } // method getSystemInfo
 
     @Override
     protected ConcurrentContentSigner getSigner()
@@ -1240,7 +1240,7 @@ public class X509CACmpResponder extends CmpResponder {
         }
 
         return false;
-    }
+    } // method intendsMe
 
     @Override
     protected CmpRequestorInfo getRequestor(
@@ -1316,7 +1316,7 @@ public class X509CACmpResponder extends CmpResponder {
 
         respHeader.setGeneralInfo(tv);
         return respBody;
-    }
+    } // method cmpEnrollCert
 
     private PKIBody cmpRevokeOrUnrevokeOrRemoveCertificates(
             final PKIHeaderBuilder respHeader,
@@ -1372,7 +1372,7 @@ public class X509CACmpResponder extends CmpResponder {
                     break;
                 }
             }
-        }
+        } // end for
 
         if (!allRevdetailsOfSameType) {
             ErrorMsgContent emc = new ErrorMsgContent(
@@ -1385,7 +1385,7 @@ public class X509CACmpResponder extends CmpResponder {
             checkPermission(requestor, requiredPermission);
             return revokeOrUnrevokeOrRemoveCertificates(rr, auditEvent, requiredPermission);
         }
-    }
+    } // method cmpRevokeOrUnrevokeOrRemoveCertificates
 
     private PKIBody cmpGeneralMsg(
             final PKIHeaderBuilder respHeader,
@@ -1550,7 +1550,7 @@ public class X509CACmpResponder extends CmpResponder {
             return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                     statusMessage);
         }
-    }
+    } // method cmpGeneralMsg
 
     private static PKIBody createErrorMsgPKIBody(
             final PKIStatus pkiStatus,

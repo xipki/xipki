@@ -210,7 +210,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         } else {
             throw exception;
         }
-    }
+    } // method export
 
     private Exception export_crl(
             final CertStoreType certstore) {
@@ -232,7 +232,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         } finally {
             IoUtil.closeStream(crlsFileOs);
         }
-    }
+    } // method export_crl
 
     private void do_export_crl(
             final CertStoreType certstore,
@@ -404,7 +404,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         processLog.printTrailer();
         System.out.println(getExportedText() + sum + " CRLs from table CRL");
-    }
+    } // method do_export_crl
 
     private void export_ca(
             final CertStoreType certstore)
@@ -437,7 +437,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         certstore.setCas(cas);
         System.out.println(" exported table CS_CA");
-    }
+    } // method export_ca
 
     private void export_requestor(
             final CertStoreType certstore)
@@ -467,7 +467,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         certstore.setRequestors(infos);
         System.out.println(" exported table CS_REQUESTOR");
-    }
+    } // method export_requestor
 
     private void export_publisherinfo(
             final CertStoreType certstore)
@@ -497,7 +497,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         certstore.setPublishers(infos);
         System.out.println(" exported table CS_PUBLISHER");
-    }
+    } // method export_publisherinfo
 
     private Exception export_user(
             final CertStoreType certstore) {
@@ -519,7 +519,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         } finally {
             IoUtil.closeStream(usersFileOs);
         }
-    }
+    } // method export_user
 
     private void do_export_user(
             final CertStoreType certstore,
@@ -642,7 +642,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         processLog.printTrailer();
         System.out.println(getExportedText() + sum + " users from table USERNAME");
-    }
+    } // method do_export_user
 
     private void export_certprofileinfo(
             final CertStoreType certstore)
@@ -672,7 +672,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         certstore.setProfiles(infos);
         System.out.println(" exported table CS_PROFILE");
-    }
+    } // method export_certprofileinfo
 
     /**
      *
@@ -700,7 +700,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         } finally {
             IoUtil.closeStream(certsFileOs);
         }
-    }
+    } // method export_cert
 
     private void do_export_cert(
             final CertStoreType certstore,
@@ -926,7 +926,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         // all successful, delete the processLogFile
         processLogFile.delete();
         System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");
-    }
+    } // method do_export_cert
 
     private void export_publishQueue(
             final CertStoreType certstore)
@@ -979,7 +979,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             releaseResources(ps, rs);
         }
         System.out.println(" exported table PUBLISHQUEUE");
-    }
+    } // method export_publishQueue
 
     private void export_deltaCRLCache(
             final CertStoreType certstore)
@@ -1019,7 +1019,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" exported table DELTACRL_CACHE");
-    }
+    } // method export_deltaCRLCache
 
     private void finalizeZip(
             final ZipOutputStream zipOutStream,

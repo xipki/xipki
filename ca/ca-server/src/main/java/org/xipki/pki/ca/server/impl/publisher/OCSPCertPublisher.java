@@ -127,7 +127,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
         } catch (NoSuchAlgorithmException | DataAccessException e) {
             throw new CertPublisherException(e.getMessage(), e);
         }
-    }
+    } // method initialize
 
     @Override
     public void setEnvParameterResolver(
@@ -229,7 +229,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
         auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
         auditEvent.addEventData(new AuditEventData("message", messagePrefix));
         auditService.logEvent(auditEvent);
-    }
+    } // method logAndAudit
 
     @Override
     public boolean crlAdded(
