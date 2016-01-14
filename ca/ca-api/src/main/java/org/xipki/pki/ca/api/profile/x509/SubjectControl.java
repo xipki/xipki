@@ -111,7 +111,7 @@ public class SubjectControl {
         }
 
         this.groups = Collections.unmodifiableSet(groups);
-    }
+    } // constructor
 
     public RDNControl getControl(
             final ASN1ObjectIdentifier type) {

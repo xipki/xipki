@@ -109,8 +109,8 @@ class CrlCertStatusInfo {
             }
         default:
             throw new RuntimeException("unknown certStatus: " + certStatus);
-        }
-    }
+        } // end switch
+    } // method getCertStatusInfo
 
     static CrlCertStatusInfo getIgnoreCertStatusInfo() {
         return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);

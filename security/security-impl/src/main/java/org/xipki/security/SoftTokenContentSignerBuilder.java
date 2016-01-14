@@ -464,7 +464,7 @@ public class SoftTokenContentSignerBuilder {
             concurrentSigner.setCertificateChain(certificateChain);
         }
         return concurrentSigner;
-    }
+    } // createSigner
 
     public X509Certificate getCert() {
         if (certificateChain != null && certificateChain.length > 0) {

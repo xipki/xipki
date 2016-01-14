@@ -132,8 +132,8 @@ public class ScepServlet extends HttpServlet {
                     scepName = tokens[0];
                     certProfileName = tokens[1];
                 }
-            }
-        }
+            } // end if
+        } // end if
 
         if (scepName == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -307,7 +307,7 @@ public class ScepServlet extends HttpServlet {
                 }
             }
         }
-    }
+    } // method service
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)
@@ -322,7 +322,7 @@ public class ScepServlet extends HttpServlet {
             } catch (Exception e) {
             }
         }
-    }
+    } // method generatePKIMessage
 
     public void setResponderManager(
             final CAManagerImpl responderManager) {
@@ -362,6 +362,6 @@ public class ScepServlet extends HttpServlet {
                 auditService.logEvent(event);
             }
         }
-    }
+    } // method audit
 
 }

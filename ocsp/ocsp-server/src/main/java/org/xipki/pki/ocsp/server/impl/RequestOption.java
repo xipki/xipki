@@ -211,10 +211,9 @@ class RequestOption {
                     throw new InvalidConfException(
                             "error while initializing the certs: " + e.getMessage(), e);
                 }
-            }
-        }
-
-    }
+            } // end if
+        } // end if (certpathConf == null) {
+    } // constructor
 
     public Set<HashAlgoType> getHashAlgos() {
         return hashAlgos;
@@ -312,6 +311,6 @@ class RequestOption {
         }
 
         return certs;
-    }
+    } // method getCerts
 
 }

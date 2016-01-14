@@ -153,7 +153,7 @@ public class NextCAMessage {
         } catch (OperatorCreationException e) {
             throw new MessageEncodingException(e);
         }
-    }
+    } // method encode
 
     private static String getSignatureAlgorithm(
             final PrivateKey key,

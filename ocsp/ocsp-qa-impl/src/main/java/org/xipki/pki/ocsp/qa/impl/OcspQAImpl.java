@@ -189,7 +189,7 @@ public class OcspQAImpl implements OcspQA {
                 } catch (NoSuchAlgorithmException e) {
                     issue.setFailureMessage("could not extract the signature algorithm");
                 }
-            }
+            } // end if (expectedSigalgo != null)
 
             // signer certificate
             ValidationIssue sigSignerCertIssue = new ValidationIssue("OCSP.SIGNERCERT",
@@ -221,7 +221,7 @@ public class OcspQAImpl implements OcspQA {
                                 "responder certificate is not valid on the thisUpdate[ " + i
                                 + "]" + singleResp.getThisUpdate());
                     }
-                }
+                } // end for
 
                 if (!issue.isFailed()) {
                     X509Certificate respIssuer = responseOption.getRespIssuer();
@@ -238,8 +238,8 @@ public class OcspQAImpl implements OcspQA {
                         } catch (Exception e) {
                             issue.setFailureMessage("responder signer is not trusted");
                         }
-                    }
-                }
+                    } // end if (respIssuer != null)
+                } // end if (!issue.isFailed())
 
                 try {
                     PublicKey responderPubKey = KeyUtil.generatePublicKey(
@@ -253,8 +253,8 @@ public class OcspQAImpl implements OcspQA {
                 } catch (Exception e) {
                     sigValIssue.setFailureMessage("error while validating signature");
                 }
-            }
-        }
+            } // end if
+        } // end if (hasSignature)
 
         // nonce
         Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
@@ -280,10 +280,10 @@ public class OcspQAImpl implements OcspQA {
                     responseOption.getCerthashOccurrence(),
                     responseOption.getCerthashAlgId());
             resultIssues.addAll(issues);
-        }
+        } // end for
 
         return new ValidationResult(resultIssues);
-    }
+    } // method checkOCSP
 
     private List<ValidationIssue> checkSingleCert(
             final int index,
@@ -351,10 +351,10 @@ public class OcspQAImpl implements OcspQA {
                                 "should not reach here, unknwon CRLReason " + revocationReason);
                         break;
                     }
-                }
+                } // end if
             } else {
                 status = OcspCertStatus.rev_noreason;
-            }
+            } // end if (revStatus.hasRevocationReason())
         } else if (singleCertStatus instanceof UnknownStatus) {
             status = OcspCertStatus.issuerUnknown;
         } else {
@@ -409,11 +409,11 @@ public class OcspQAImpl implements OcspQA {
                 } catch (NoSuchAlgorithmException e) {
                     issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());
                 }
-            }
-        }
+            } // end if(encodedCert != null)
+        } // end if (extension != null)
 
         return issues;
-    }
+    } // method checkSingleCert
 
     private static ValidationIssue checkOccurrence(
             final String targetName,

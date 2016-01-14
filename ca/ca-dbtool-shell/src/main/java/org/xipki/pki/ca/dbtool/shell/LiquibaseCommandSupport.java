@@ -249,6 +249,6 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
                 out(retryPromptBuilder.toString());
             }
         }
-    }
+    } // method read
 
 }

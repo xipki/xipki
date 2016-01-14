@@ -163,7 +163,7 @@ public class XmlX509CertprofileUtil {
                 throw new CertprofileException("invalid root element type");
             }
         }
-    }
+    } // method parse
 
     public static List<CertificatePolicyInformation> buildCertificatePolicies(
             final CertificatePolicies type) {
@@ -205,7 +205,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return policies;
-    }
+    } // method buildCertificatePolicies
 
     public static PolicyMappings buildPolicyMappings(
             final org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings type) {
@@ -226,7 +226,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return new PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
-    }
+    } // method buildPolicyMappings
 
     public static NameConstraints buildNameConstrains(
             final org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints type)
@@ -237,7 +237,7 @@ public class XmlX509CertprofileUtil {
             return null;
         }
         return new NameConstraints(permitted, excluded);
-    }
+    } // method buildNameConstrains
 
     private static GeneralSubtree[] buildGeneralSubtrees(
             final GeneralSubtreesType subtrees)
@@ -254,7 +254,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return ret;
-    }
+    } // method buildGeneralSubtrees
 
     private static GeneralSubtree buildGeneralSubtree(
             final GeneralSubtreeBaseType type)
@@ -295,7 +295,7 @@ public class XmlX509CertprofileUtil {
                 : BigInteger.valueOf(i.intValue());
 
         return new GeneralSubtree(base, minimum, maximum);
-    }
+    } // method buildGeneralSubtree
 
     public static ASN1Sequence buildPolicyConstrains(
             final PolicyConstraints type)
@@ -329,7 +329,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return new DERSequence(vec);
-    }
+    } //method buildPolicyConstrains
 
     public static Set<GeneralNameMode> buildGeneralNameMode(
             final GeneralNameType name) {
@@ -372,7 +372,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return ret;
-    }
+    } // method buildGeneralNameMode
 
     private static Set<Range> buildParametersMap(
             final RangesType ranges) {
@@ -411,7 +411,7 @@ public class XmlX509CertprofileUtil {
             }
         }
         return CollectionUtil.unmodifiableMap(keyAlgorithms, false, true);
-    }
+    } // method buildKeyAlgorithms
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
             final ExtensionsType extensionsType)
@@ -430,7 +430,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return Collections.unmodifiableMap(controls);
-    }
+    } // method buildExtensionControls
 
     public static List<ASN1ObjectIdentifier> toOIDList(
             final List<OidWithDescType> oidWithDescTypes) {
@@ -443,7 +443,7 @@ public class XmlX509CertprofileUtil {
             oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
         return Collections.unmodifiableList(oids);
-    }
+    } // method toOIDList
 
     public static Set<KeyUsageControl> buildKeyUsageOptions(
             final org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf) {
@@ -487,7 +487,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return Collections.unmodifiableSet(controls);
-    }
+    } // method buildKeyUsageOptions
 
     public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
             final ExtendedKeyUsage extConf) {
@@ -501,7 +501,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return Collections.unmodifiableSet(controls);
-    }
+    } // method buildExtKeyUsageOptions
 
     public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
             final ExtensionsType extensionsType)
@@ -543,7 +543,7 @@ public class XmlX509CertprofileUtil {
         }
 
         return Collections.unmodifiableMap(map);
-    }
+    } // buildConstantExtesions
 
     public static Set<ASN1ObjectIdentifier> toOIDSet(
             final List<OidWithDescType> oidWithDescTypes) {
@@ -645,7 +645,7 @@ public class XmlX509CertprofileUtil {
             throw new CertprofileException(
                     "unknown public key parameters type " + paramsObj.getClass().getName());
         }
-    }
+    } // method convertKeyParametersOption
 
     public static final DirectoryStringType convertDirectoryStringType(
             final org.xipki.pki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType) {

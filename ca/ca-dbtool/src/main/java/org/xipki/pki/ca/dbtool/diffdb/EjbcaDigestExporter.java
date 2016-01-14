@@ -145,7 +145,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         if (this.numThreads != numThreads) {
             LOG.info("adapted the numThreads from {} to {}", numThreads, this.numThreads);
         }
-    }
+    } // constructor
 
     @Override
     public void digest()
@@ -190,7 +190,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         } else {
             throw exception;
         }
-    }
+    } // method digest
 
     private Map<String, EjbcaCaInfo> getCas()
     throws Exception {
@@ -238,7 +238,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         }
 
         return cas;
-    }
+    } // method getCas
 
     private void doDigest_noTableId(
             final ProcessLog processLog,
@@ -368,7 +368,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    }
+    } // method doDigest_noTableId
 
     private void doDigest_withTableId(
             final EjbcaDigestExportReader certsReader,
@@ -430,6 +430,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    }
+    } // method doDigest_withTableId
 
 }

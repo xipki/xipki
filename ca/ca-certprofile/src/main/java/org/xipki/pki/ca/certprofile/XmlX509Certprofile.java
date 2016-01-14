@@ -266,7 +266,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         authorizationTemplate = null;
         biometricDataOption = null;
         constantExtensions = null;
-    }
+    } // method reset
 
     @Override
     public void initialize(
@@ -286,7 +286,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             throw new CertprofileException(
                     "caught RuntimeException while initializing certprofile: " + e.getMessage());
         }
-    }
+    } // method initialize
 
     private void doInitialize(
             final String data)
@@ -781,7 +781,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
-    }
+    } // method doInitialize
 
     @Override
     public CertValidity getValidity() {
@@ -1102,7 +1102,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         return values;
-    }
+    } // method getExtensions
 
     @Override
     public Set<KeyUsageControl> getKeyUsage() {
@@ -1203,7 +1203,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         AdmissionSyntax value = new AdmissionSyntax(null, new DERSequence(vector));
         return new ExtensionValue(critical, value);
-    }
+    } // method createAdmission
 
     @Override
     public boolean isDuplicateKeyPermitted() {
@@ -1285,6 +1285,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         throw new RuntimeException("should not reach here: undefined extension "
                 + ObjectIdentifiers.oidToDisplayName(type));
-    }
+    } // method getExtensionValue
 
 }

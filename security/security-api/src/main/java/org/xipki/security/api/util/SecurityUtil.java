@@ -173,7 +173,7 @@ public class SecurityUtil {
         byte[] bytes = bout.toByteArray();
         bout.close();
         return bytes;
-    }
+    } // method extractMinimalKeyStore
 
     public static String formatPKIStatusInfo(
             final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {

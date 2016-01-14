@@ -145,7 +145,7 @@ public final class SunP11CryptService implements P11CryptService {
         }
 
         refresh();
-    }
+    } // constructor
 
     @Override
     public synchronized void refresh()
@@ -247,7 +247,7 @@ public final class SunP11CryptService implements P11CryptService {
                         LOG.debug(msg, e);
                         continue;
                     }
-                }
+                } // end while
             } catch (Throwable t) {
                 final String message = "could not initialize PKCS11 slot " + i + " (module: "
                         + moduleConf.getName() + ")";
@@ -258,7 +258,7 @@ public final class SunP11CryptService implements P11CryptService {
                 LOG.debug(message, t);
                 continue;
             }
-        }
+        } // end for(i)
 
         this.identities.clear();
         this.identities.addAll(currentIdentifies);
@@ -276,7 +276,7 @@ public final class SunP11CryptService implements P11CryptService {
 
             LOG.info(sb.toString());
         }
-    }
+    } // method refresh
 
     @Override
     public byte[] CKM_RSA_PKCS(

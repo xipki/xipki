@@ -242,7 +242,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return caNamesWithError;
-    }
+    } // method autoConfCAs
 
     public void init()
     throws InvalidConfException, IOException {
@@ -467,7 +467,7 @@ public final class CAClientImpl implements CAClient {
                         cAInfoUpdateInterval, cAInfoUpdateInterval, TimeUnit.MINUTES);
             }
         }
-    }
+    } // method init
 
     public void shutdown() {
         if (scheduledThreadPoolExecutor != null) {
@@ -513,7 +513,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return parseEnrollCertResult((EnrollCertResultType) result, caName);
-    }
+    } // method requestCert
 
     @Override
     public EnrollCertResult requestCerts(
@@ -561,7 +561,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return parseEnrollCertResult((EnrollCertResultType) result, caName);
-    }
+    } // method requestCerts
 
     private void checkCertprofileSupportInCA(
             final String certprofile,
@@ -597,7 +597,7 @@ public final class CAClientImpl implements CAClient {
         if (caName == null) {
             throw new CAClientException("unsupported cert profile " + certprofile);
         }
-    }
+    } // method checkCertprofileSupportInCA
 
     @Override
     public CertIdOrError revokeCert(
@@ -845,7 +845,7 @@ public final class CAClientImpl implements CAClient {
         } catch (IOException e) {
             throw new CAClientException("IOException: " + e.getMessage(), e);
         }
-    }
+    } // method envelope
 
     private boolean verify(
             final java.security.cert.Certificate caCert,
@@ -916,7 +916,7 @@ public final class CAClientImpl implements CAClient {
             LOG.debug("{} while verifying signature: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
-    }
+    } // method verify
 
     @Override
     public byte[] envelopeRevocation(
@@ -1007,7 +1007,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return parseRevokeCertResult(result);
-    }
+    } // method unrevokeCerts
 
     @Override
     public CertIdOrError removeCert(
@@ -1168,7 +1168,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return healthCheckResult;
-    }
+    } // method getHealthCheckResult
 
     private EnrollCertResult parseEnrollCertResult(
             final EnrollCertResultType result,
@@ -1254,7 +1254,7 @@ public final class CAClientImpl implements CAClient {
         }
 
         return new EnrollCertResult(caCert, certOrErrors);
-    }
+    } // method parseEnrollCertResult
 
     private static CAClientType parse(
             final InputStream configStream)
@@ -1287,7 +1287,7 @@ public final class CAClientImpl implements CAClient {
                 throw new InvalidConfException("invalid root element type");
             }
         }
-    }
+    } // method parse
 
     private static byte[] readData(
             final FileOrValueType fileOrValue)

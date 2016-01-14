@@ -82,7 +82,7 @@ public class DbSchemaInfo {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // constructor
 
     public Set<String> getVariableNames() {
         return Collections.unmodifiableSet(variables.keySet());

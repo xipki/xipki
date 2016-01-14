@@ -121,6 +121,6 @@ public class CaRevokeCmd extends CaCommandSupport {
         boolean b = caManager.revokeCa(caName, revInfo);
         output(b, "revoked", "could not revoke", "CA " + caName);
         return null;
-    }
+    } // method doExecute
 
 }

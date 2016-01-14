@@ -184,7 +184,7 @@ public class DbDigestEntry {
         }
 
         return true;
-    }
+    } // method contentEquals
 
     public static DbDigestEntry decode(
             final String encoded) {
@@ -223,7 +223,7 @@ public class DbDigestEntry {
         }
 
         return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
-    }
+    } // method decode
 
     private static List<Integer> getIndexes(
             final String encoded) {

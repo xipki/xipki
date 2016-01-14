@@ -199,8 +199,7 @@ public class DbDigestReporter {
             System.out.println("Could not write overview.txt with following content\n"
                     + sb.toString());
         }
-
-    }
+    } // method close
 
     private static void writeSerialNumberLine(
             final BufferedWriter writer,

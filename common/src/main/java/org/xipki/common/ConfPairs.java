@@ -157,7 +157,7 @@ public class ConfPairs {
             String value = tokenBuilder.toString();
             pairs.put(name, value);
         }
-    }
+    } // constructor
 
     public void putPair(
             final String name,
@@ -217,7 +217,7 @@ public class ConfPairs {
             sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
-    }
+    } // method getEncoded
 
     @Override
     public String toString() {
@@ -303,7 +303,7 @@ public class ConfPairs {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } // method main
 
     private static String encodeNameOrValue(
             final String s) {

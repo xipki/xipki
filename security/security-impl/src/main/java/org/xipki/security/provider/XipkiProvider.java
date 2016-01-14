@@ -185,7 +185,7 @@ public class XipkiProvider extends Provider {
             provider.put("Alg.Alias.Signature.RSAandMGF1withSHA512", "SHA512withRSAandMGF1");
 
             return null;
-        }
+        } // method run
 
     } // class MyPrivilegedAction
 

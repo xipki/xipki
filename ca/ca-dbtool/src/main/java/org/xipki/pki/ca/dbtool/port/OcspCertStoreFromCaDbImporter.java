@@ -238,7 +238,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             throw e;
         }
         System.out.println(" imported OCSP certstore to database");
-    }
+    } // method importToDB
 
     private List<Integer> getIssuerIds(
             final Cas issuers,
@@ -365,7 +365,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         System.out.println(" imported table ISSUER");
         return relatedCaIds;
-    }
+    } // method import_issuer
 
     private void import_cert(
             final CertStoreType certstore,
@@ -449,7 +449,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("processed " + processLog.getNumProcessed() + " and "
                 + getImportedText() + importLog.getNumProcessed() + " certificates");
-    }
+    } // method import_cert
 
     private int do_import_cert(
             final PreparedStatement ps_cert,
@@ -655,6 +655,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             }
             zipFile.close();
         }
-    }
+    } // method do_import_cert
 
 }

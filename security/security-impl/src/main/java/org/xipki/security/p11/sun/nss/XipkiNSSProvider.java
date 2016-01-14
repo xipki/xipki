@@ -244,7 +244,7 @@ public class XipkiNSSProvider extends Provider {
         regist(Service.Signature, "SHA384withECDSA", "SHA384withECDSA", OID_SHA384withECDSA);
         regist(Service.Signature, "SHA512withECDSA", "SHA512withECDSA", OID_SHA512withECDSA);
         regist(Service.Signature, "RawECDSA", "RawECDSA", OID_DSAENC, "NONEWithECDSA");
-    }
+    } // method init
 
     private static void regist(
             final Service service,

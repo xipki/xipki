@@ -377,7 +377,7 @@ public class SubjectDNSpec {
             control.setStringType(StringType.utf8String);
         }
         return control;
-    }
+    } // static
 
     public static void fixRDNControl(
             final RDNControl control)
@@ -434,6 +434,6 @@ public class SubjectDNSpec {
                 }
             } // isRange
         } // specRange
-    }
+    } // method fixRDNControl
 
 }

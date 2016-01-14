@@ -172,6 +172,6 @@ public class CmpResponderEntry implements Serializable {
             sb.append("null");
         }
         return sb.toString();
-    }
+    } // method toString
 
 }

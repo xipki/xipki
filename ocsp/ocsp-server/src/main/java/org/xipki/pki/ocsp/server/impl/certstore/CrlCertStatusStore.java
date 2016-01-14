@@ -353,8 +353,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                         extnValue = DEROctetString.getInstance(octetString).getOctets();
                         deltaCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
                     }
-                }
-            }
+                } // end if(octetString == null)
+            } // end if(deltaCrlExists)
 
             if (!crlFileChanged && deltaCrl == null) {
                 return;
@@ -461,8 +461,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                     }
 
                     certs.add(new CertWithInfo(bcCert, profileName));
-                }
-            }
+                } // end for
+            } // end if (extnValue != null)
 
             if (certsDirname != null) {
                 if (extnValue != null) {
@@ -499,9 +499,9 @@ public class CrlCertStatusStore extends CertStatusStore {
                                 && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
                             throw new CertStatusStoreException("invalid CRLEntry");
                         }
-                    }
-                }
-            }
+                    } // end for
+                } // end if
+            } // end if(deltaCrl != null)
 
             Map<BigInteger, X509CRLEntry> revokedCertMap = null;
 
@@ -520,8 +520,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                     } else {
                         revokedCertMap.put(serialNumber, entry);
                     }
-                }
-            }
+                } // end for
+            } // end if
 
             Iterator<? extends X509CRLEntry> it = null;
             if (revokedCertMap != null) {
@@ -655,7 +655,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                 auditPCIEvent(auditLevel, eventType, auditStatus.name());
             }
         }
-    }
+    } // method initializeStore
 
     @Override
     public CertStatusInfo getCertStatus(
@@ -760,7 +760,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         return certStatusInfo;
-    }
+    } // method getCertStatus
 
     public X509Certificate getCaCert() {
         return caCert;
@@ -894,13 +894,13 @@ public class CrlCertStatusStore extends CertStatusStore {
                 if (aki == null || !Arrays.equals(issuerSKI, aki)) {
                     continue;
                 }
-            }
+            } // end if
 
             certs.add(new CertWithInfo(bcCert, profileName));
-        }
+        } // end for
 
         return certs;
-    }
+    } // method readCertWithInfosFromDir
 
     private byte[] sha1Fp(
             final File file)

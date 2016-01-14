@@ -114,7 +114,7 @@ public class CmpUtf8Pairs {
 
             beginIndex = endIndex + 1;
         }
-    }
+    } // constructor
 
     public void putUtf8Pair(
             final String name,
@@ -171,7 +171,7 @@ public class CmpUtf8Pairs {
         }
 
         return sb.toString();
-    }
+    } // method getEncoded
 
     @Override
     public String toString() {
@@ -236,7 +236,7 @@ public class CmpUtf8Pairs {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } // method main
 
     private static String encodeNameOrValue(
             String s) {
@@ -279,6 +279,6 @@ public class CmpUtf8Pairs {
         }
 
         return newS.toString();
-    }
+    } // method decodeNameOrValue
 
 }

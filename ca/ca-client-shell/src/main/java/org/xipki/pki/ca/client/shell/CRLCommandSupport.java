@@ -106,6 +106,6 @@ public abstract class CRLCommandSupport extends ClientCommandSupport {
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
         return null;
-    }
+    } // method doExecute
 
 }

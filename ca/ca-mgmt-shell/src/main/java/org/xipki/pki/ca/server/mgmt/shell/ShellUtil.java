@@ -92,6 +92,6 @@ class ShellUtil {
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();
-    }
+    } // method doExecute
 
 }

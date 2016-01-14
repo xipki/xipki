@@ -175,7 +175,7 @@ public class CaDbImportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    }
+    } // method doRun
 
     private void createSerialNumberSequences()
     throws DataAccessException {
@@ -264,6 +264,6 @@ public class CaDbImportWorker extends DbPortWorker {
             String seqName = IoUtil.convertSequenceName("SN_" + entry.CA_name);
             dataSource.dropAndCreateSequence(seqName, nextSerial);
         }
-    }
+    } // method createSerialNumberSequences
 
 }

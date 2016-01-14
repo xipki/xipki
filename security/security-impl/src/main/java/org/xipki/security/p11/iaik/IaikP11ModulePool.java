@@ -161,7 +161,7 @@ public class IaikP11ModulePool {
         modules.put(moduleConf.getName(), extModule);
 
         return extModule;
-    }
+    } // nmethod getModule
 
     @Override
     protected void finalize()

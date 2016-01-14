@@ -120,6 +120,6 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor {
         }
 
         return IoUtil.read(inputstream);
-    }
+    } // method send
 
 }

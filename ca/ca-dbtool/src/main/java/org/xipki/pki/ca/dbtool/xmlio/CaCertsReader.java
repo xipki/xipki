@@ -154,6 +154,6 @@ public class CaCertsReader extends DbiXmlReader {
         } // end while
 
         return null;
-    }
+    } // method retrieveNext
 
 }

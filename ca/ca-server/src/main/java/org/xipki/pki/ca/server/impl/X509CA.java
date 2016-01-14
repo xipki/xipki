@@ -190,7 +190,7 @@ public class X509CA {
             } finally {
                 inProcess = false;
             }
-        }
+        } // method run
 
     } // class ScheduledNextSerialCommitService
 
@@ -249,7 +249,7 @@ public class X509CA {
 
                 inProcess = false;
             }
-        }
+        } // method run
 
     } // class ScheduledExpiredCertsRemover
 
@@ -428,7 +428,7 @@ public class X509CA {
             } finally {
                 crlGenInProcess.set(false);
             }
-        }
+        } // method run
 
     } // class ScheduledCRLGenerationService
 
@@ -539,7 +539,7 @@ public class X509CA {
         expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
                 new ScheduledExpiredCertsRemover(),
                 1, 1, TimeUnit.DAYS);
-    }
+    } // constructor
 
     public X509CAInfo getCAInfo() {
         return caInfo;
@@ -632,7 +632,7 @@ public class X509CA {
                 LOG.info("    FAILED getCurrentCRL: ca={}", caInfo.getName());
             }
         }
-    }
+    } // method getCRL
 
     private void cleanupCRLs()
     throws OperationException {
@@ -660,7 +660,7 @@ public class X509CA {
                 LOG.info("    FAILED cleanupCRLs: ca={}", caInfo.getName());
             }
         }
-    }
+    } // method cleanupCRLs
 
     public X509CRL generateCRLonDemand(
             final AuditEvent auditEvent)
@@ -705,7 +705,7 @@ public class X509CA {
         } finally {
             crlGenInProcess.set(false);
         }
-    }
+    } // method generateCRLonDemand
 
     private X509CRL generateCRL(
             final boolean deltaCRL,
@@ -1006,7 +1006,7 @@ public class X509CA {
                 LOG.info("    FAILED generateCRL: ca={}", caInfo.getName());
             }
         }
-    }
+    } // method generateCRL
 
     public X509CertificateInfo generateCertificate(
             final boolean requestedByRA,
@@ -1076,7 +1076,7 @@ public class X509CA {
                         new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
-    }
+    } // method generateCertificate
 
     public X509CertificateInfo regenerateCertificate(
             final boolean requestedByRA,
@@ -1125,7 +1125,7 @@ public class X509CA {
                         new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
-    }
+    } // method regenerateCertificate
 
     public boolean publishCertificate(
             final X509CertificateInfo certInfo) {
@@ -1168,7 +1168,7 @@ public class X509CA {
                 if (successful) {
                     continue;
                 }
-            }
+            } // end if
 
             Integer certId = certInfo.getCert().getCertId();
             try {
@@ -1183,10 +1183,10 @@ public class X509CA {
                 LOG.debug(message, t);
                 return 2;
             }
-        }
+        } // end for
 
         return 0;
-    }
+    } // method intern_publishCertificate
 
     public boolean republishCertificates(
             final List<String> publisherNames) {
@@ -1212,7 +1212,7 @@ public class X509CA {
                 }
                 publishers.add(publisher);
             }
-        }
+        } // end if
 
         if (CollectionUtil.isEmpty(publishers)) {
             return true;
@@ -1241,7 +1241,7 @@ public class X509CA {
                 }
                 LOG.debug(message, e);
             }
-        }
+        } // end for
 
         try {
             List<BigInteger> serials;
@@ -1305,7 +1305,7 @@ public class X509CA {
                             return false;
                         }
                     }
-                }
+                } // end for
 
                 startSerial = maxSerial.add(BigInteger.ONE);
 
@@ -1313,6 +1313,7 @@ public class X509CA {
                 System.out.println("CA " + caInfo.getName() + " republished " + sum
                         + " certificates");
             } while (serials.size() >= numEntries);
+            // end do
 
             if (caInfo.getRevocationInfo() != null) {
                 for (IdentifiedX509CertPublisher publisher : publishers) {
@@ -1324,13 +1325,13 @@ public class X509CA {
                         return false;
                     }
                 }
-            }
+            } // end if
 
             return true;
         } finally {
             caInfo.setStatus(status);
         }
-    }
+    } // method republishCertificates
 
     public boolean clearPublishQueue(
             final List<String> publisherNames)
@@ -1353,7 +1354,7 @@ public class X509CA {
         }
 
         return true;
-    }
+    } // method clearPublishQueue
 
     public boolean publishCertsInQueue() {
         boolean allSuccessful = true;
@@ -1423,11 +1424,11 @@ public class X509CA {
                     LOG.debug(message, e);
                     continue;
                 }
-            }
-        }
+            } // end for
+        } // end while
 
         return true;
-    }
+    } // method publishCertsInQueue
 
     private boolean publishCRL(
             final X509CRL crl) {
@@ -1448,10 +1449,10 @@ public class X509CA {
                 }
                 LOG.debug(message, e);
             }
-        }
+        } // end for
 
         return true;
-    }
+    } // method publishCRL
 
     public X509CertWithRevocationInfo revokeCertificate(
             final BigInteger serialNumber,
@@ -1487,7 +1488,7 @@ public class X509CA {
         } // switch (reason)
 
         return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
-    }
+    } // method revokeCertificate
 
     public X509CertWithDBCertId unrevokeCertificate(
             final BigInteger serialNumber)
@@ -1498,7 +1499,7 @@ public class X509CA {
         }
 
         return do_unrevokeCertificate(serialNumber, false);
-    }
+    } // method unrevokeCertificate
 
     public X509CertWithDBCertId removeCertificate(
             final BigInteger serialNumber)
@@ -1509,7 +1510,7 @@ public class X509CA {
         }
 
         return do_removeCertificate(serialNumber);
-    }
+    } // method removeCertificate
 
     private X509CertWithDBCertId do_removeCertificate(
             final BigInteger serialNumber)
@@ -1551,7 +1552,7 @@ public class X509CA {
                             c.getSerialNumber(),
                             X509Util.getRFC4519Name(c.getSubjectX500Principal()),
                             publisher.getName()});
-        }
+        } // end for
 
         if (!successful) {
             return null;
@@ -1559,7 +1560,7 @@ public class X509CA {
 
         certstore.removeCertificate(caInfo.getCertificate(), serialNumber);
         return certToRemove;
-    }
+    } // method do_removeCertificate
 
     private X509CertWithRevocationInfo do_revokeCertificate(
             final BigInteger serialNumber,
@@ -1603,7 +1604,7 @@ public class X509CA {
                 if (successful) {
                     continue;
                 }
-            }
+            } // end if
 
             Integer certId = revokedCert.getCert().getCertId();
             try {
@@ -1617,7 +1618,7 @@ public class X509CA {
                 }
                 LOG.debug(message, t);
             }
-        }
+        } // end for
 
         String resultText = (revokedCert == null)
                 ? "CERT_NOT_EXIST"
@@ -1628,7 +1629,7 @@ public class X509CA {
                         invalidityTime, resultText});
 
         return revokedCert;
-    }
+    } // method do_revokeCertificate
 
     private X509CertWithDBCertId do_unrevokeCertificate(
             final BigInteger serialNumber,
@@ -1666,7 +1667,7 @@ public class X509CA {
                 if (successful) {
                     continue;
                 }
-            }
+            } // end if
 
             Integer certId = unrevokedCert.getCertId();
             try {
@@ -1680,7 +1681,7 @@ public class X509CA {
                 }
                 LOG.debug(message, t);
             }
-        }
+        } // end for
 
         String resultText = (unrevokedCert == null)
                 ? "CERT_NOT_EXIST"
@@ -1689,7 +1690,7 @@ public class X509CA {
                 new Object[]{caInfo.getName(), serialNumber, resultText});
 
         return unrevokedCert;
-    }
+    } // do_unrevokeCertificate
 
     private boolean shouldPublishToDeltaCRLCache() {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -1708,7 +1709,7 @@ public class X509CA {
         }
 
         return true;
-    }
+    } // method shouldPublishToDeltaCRLCache
 
     public void revoke(
             final CertRevocationInfo revocationInfo)
@@ -1739,8 +1740,8 @@ public class X509CA {
                 LOG.debug(message, e);
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
-        }
-    }
+        } // end for
+    } // method revoke
 
     public void unrevoke()
     throws OperationException {
@@ -1766,8 +1767,8 @@ public class X509CA {
                 LOG.debug(message, e);
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
-        }
-    }
+        } // end for
+    } // method unrevoke
 
     private List<IdentifiedX509CertPublisher> getPublishers() {
         return caManager.getIdentifiedPublishersForCa(caInfo.getName());
@@ -1891,7 +1892,7 @@ public class X509CA {
                     }
                 }
                 requestedSubject = new X500Name(rdns);
-            }
+            } // end if
         } // end if
 
         // subject
@@ -2260,7 +2261,7 @@ public class X509CA {
             } catch (OperationException e) {
             }
         }
-    }
+    } // method intern_generateCertificate
 
     public IdentifiedX509Certprofile getX509Certprofile(
             final String certprofileLocalName) {
@@ -2274,7 +2275,7 @@ public class X509CA {
         }
 
         return caManager.getIdentifiedCertprofile(profileNames.get(certprofileLocalName));
-    }
+    } // method getX509Certprofile
 
     public boolean supportsCertProfile(
             final String certprofileLocalName) {
@@ -2304,7 +2305,7 @@ public class X509CA {
         }
 
         return null;
-    }
+    } // method getRequestor
 
     public CAManagerImpl getCAManager() {
         return caManager;
@@ -2349,7 +2350,7 @@ public class X509CA {
         }
 
         return nextUpdate;
-    }
+    } // method getCRLNextUpdate
 
     private int removeExpirtedCerts(Date expiredAtTime)
     throws OperationException {
@@ -2413,7 +2414,7 @@ public class X509CA {
                 } // end finally
             } // end try
         } // end while (true)
-    } // end method removeExpirtedCerts()
+    } // method removeExpirtedCerts
 
     public HealthCheckResult healthCheck() {
         HealthCheckResult result = new HealthCheckResult("X509CA");
@@ -2459,7 +2460,7 @@ public class X509CA {
         result.setHealthy(healthy);
 
         return result;
-    }
+    } // method healthCheck
 
     public void setAuditServiceRegister(
             final AuditServiceRegister serviceRegister) {
@@ -2510,7 +2511,7 @@ public class X509CA {
                         tryXipkiNSStoVerify = Boolean.FALSE;
                     }
                 }
-            }
+            } // end if(tryXipkiNssToVerify)
 
             if (tryXipkiNSStoVerify) {
                 byte[] tbs = cert.getTBSCertificate();
@@ -2529,7 +2530,7 @@ public class X509CA {
             LOG.debug("{} while verifying signature: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
-    }
+    } // method verifySignature
 
     private X509CrlSignerEntryWrapper getCrlSigner() {
         String crlSignerName = caInfo.getCrlSignerName();
@@ -2624,7 +2625,7 @@ public class X509CA {
         } else {
             return name;
         }
-    }
+    } // method removeEmptyRDNs
 
     private static Object[] incSerialNumber(
             final IdentifiedX509Certprofile profile,
@@ -2671,7 +2672,7 @@ public class X509CA {
         }
 
         return new Object[]{newName, newSerialNumber};
-    }
+    } // method incSerialNumber
 
     private static Date setToMidnight(
             final Date date,

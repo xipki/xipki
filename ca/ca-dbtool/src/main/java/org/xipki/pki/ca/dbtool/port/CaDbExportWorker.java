@@ -147,7 +147,7 @@ public class CaDbExportWorker extends DbPortWorker {
                 throw new IOException(destFolder + " is not empty");
             }
         }
-    }
+    } // method checkDestFolder
 
     @Override
     public void doRun(
@@ -178,7 +178,7 @@ public class CaDbExportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    }
+    } // method doRun
 
     private static Marshaller getMarshaller()
     throws JAXBException {

@@ -130,7 +130,7 @@ public class XipkiDbControl {
         sb.append(tblCerthash).append(".").append(colCertId);
         sb.append(" ORDER BY CERT.ID ASC");
         this.certSql = sb.toString();
-    }
+    } // constructor
 
     public String getTblCa() {
         return tblCa;

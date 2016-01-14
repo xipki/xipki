@@ -143,7 +143,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         } else {
             throw exception;
         }
-    }
+    } // method digest
 
     private Map<Integer, String> getCaIds()
     throws DataAccessException, IOException {
@@ -183,7 +183,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         }
 
         return caIdDirMap;
-    }
+    } // method getCaIds
 
     private void doDigest(
             final XipkiDigestExportReader certsReader,
@@ -232,7 +232,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printTrailer();
 
         System.out.println(" digested " + processLog.getNumProcessed() + " certificates");
-    }
+    } // method doDigest
 
     static String toAsciiFilename(
             final String filename) {

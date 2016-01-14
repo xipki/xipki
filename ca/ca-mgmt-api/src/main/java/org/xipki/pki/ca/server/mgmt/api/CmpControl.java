@@ -120,7 +120,7 @@ public class CmpControl {
         }
 
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
-    }
+    } // constructor
 
     public CmpControl(
             final String name,
@@ -174,7 +174,7 @@ public class CmpControl {
         }
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
-    }
+    } // constructor
 
     public boolean isConfirmCert() {
         return confirmCert;

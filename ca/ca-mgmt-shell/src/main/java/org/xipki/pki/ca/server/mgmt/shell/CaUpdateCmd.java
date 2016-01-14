@@ -302,7 +302,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         return entry;
-    }
+    } // method getChangeCAEntry
 
     @Override
     protected Object doExecute()

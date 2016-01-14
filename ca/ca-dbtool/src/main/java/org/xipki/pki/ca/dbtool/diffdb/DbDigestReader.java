@@ -125,7 +125,7 @@ abstract class DbDigestReader implements DigestReader {
                         }
                     }
                 }
-            }
+            } // method run
 
             endReached.set(true);
             try {
@@ -303,7 +303,7 @@ abstract class DbDigestReader implements DigestReader {
         }
 
         return new CertsBundle(numSkipped, certsMap, serialNumbers);
-    }
+    } // method nextCerts
 
     public void close() {
         if (executor != null) {

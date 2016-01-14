@@ -182,7 +182,7 @@ public class QASystemManagerImpl implements QASystemManager {
                 }
             }
         }
-    }
+    } // method init
 
     public void shutdown() {
     }

@@ -315,7 +315,7 @@ abstract class CmpResponder {
         }
 
         return resp;
-    }
+    } // method processPKIMessage
 
     protected byte[] randomTransactionId() {
         byte[] b = new byte[10];
@@ -363,7 +363,7 @@ abstract class CmpResponder {
                 signatureValid
                     ? ProtectionResult.VALID
                     : ProtectionResult.INVALID);
-    }
+    } // method verifyProtection
 
     private PKIMessage addProtection(
             final PKIMessage pkiMessage,
@@ -394,7 +394,7 @@ abstract class CmpResponder {
             }
             return new PKIMessage(pkiMessage.getHeader(), body);
         }
-    }
+    } // method addProtection
 
     protected PKIMessage buildErrorPkiMessage(
             final ASN1OctetString tid,
@@ -417,7 +417,7 @@ abstract class CmpResponder {
         PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, error);
 
         return new PKIMessage(respHeader.build(), body);
-    }
+    } // method buildErrorPkiMessage
 
     private CmpRequestorInfo getRequestor(
             final PKIHeader reqHeader) {
@@ -427,7 +427,7 @@ abstract class CmpResponder {
         }
 
         return getRequestor((X500Name) requestSender.getName());
-    }
+    } // method getRequestor
 
     protected PKIStatusInfo generateCmpRejectionStatus(
             final Integer info,
@@ -439,7 +439,7 @@ abstract class CmpResponder {
                 ? null
                 : new PKIFailureInfo(info);
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
-    }
+    } // method generateCmpRejectionStatus
 
     public X500Name getResponderSubject()
     throws InvalidConfException {

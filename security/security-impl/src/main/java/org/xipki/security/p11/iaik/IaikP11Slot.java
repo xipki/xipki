@@ -271,7 +271,7 @@ public class IaikP11Slot implements P11WritableSlot {
         returnIdleSession(session);
 
         refresh();
-    }
+    } // constructor
 
     public void refresh()
     throws SignerException {
@@ -361,8 +361,8 @@ public class IaikP11Slot implements P11WritableSlot {
                             } catch (Exception e) {
                             }
                         }
-                    }
-                }
+                    } // end while (true)
+                } // end if (signatureCert != null)
 
                 P11KeyIdentifier tKeyId = new P11KeyIdentifier(
                         signatureKey.getId().getByteArrayValue(),
@@ -392,12 +392,12 @@ public class IaikP11Slot implements P11WritableSlot {
                 LOG.debug(message, t);
                 continue;
             }
-        }
+        } // end for (PrivateKey signatureKey : signatureKeys)
 
         this.identities.clear();
         this.identities.addAll(currentIdentifies);
         currentIdentifies.clear();
-    }
+    } // method refresh
 
     public byte[] CKM_ECDSA(
             final byte[] hash,
@@ -480,7 +480,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
+    } // method CKM_SIGN
 
     private Session openSession()
     throws TokenException {
@@ -804,7 +804,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
+    } // method getPrivateObject
 
     private String listPrivateKeyObjects(
             final Session session,
@@ -858,7 +858,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } catch (Throwable t) {
             return "Exception while calling listPrivateKeyObjects(): " + t.getMessage();
         }
-    }
+    } // method listPrivateKeyObjects
 
     public PublicKey getPublicKeyObject(
             final Boolean forSignature,
@@ -907,7 +907,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
+    } // method getPublicKeyObject
 
     private X509PublicKeyCertificate[] getCertificateObjects(
             final X500Principal subject)
@@ -943,7 +943,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
+    } // method getCertificateObjects
 
     private X509PublicKeyCertificate getCertificateObject(
             final byte[] keyId,
@@ -996,7 +996,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnIdleSession(session);
         }
-    }
+    } // method getCertificateObjects
 
     private boolean existsCertificateObjects(
             final byte[] keyId,
@@ -1069,7 +1069,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } catch (Throwable t) {
             return "Exception while calling listCertificateObjects(): " + t.getMessage();
         }
-    }
+    } // method listCertificateObjects
 
     @Override
     public void updateCertificate(
@@ -1153,11 +1153,11 @@ public class IaikP11Slot implements P11WritableSlot {
                             caCert, encodedCaCert, caCertKeyId, label.toCharArray());
                     session.createObject(newCaCertTemp);
                 }
-            }
+            } // end if(certChain.length)
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method updateCertificate
 
     @Override
     public boolean removeKey(
@@ -1227,7 +1227,7 @@ public class IaikP11Slot implements P11WritableSlot {
         }
 
         return true;
-    }
+    } // method doRemoveKeyAndCerts
 
     @Override
     public void removeCerts(
@@ -1307,12 +1307,12 @@ public class IaikP11Slot implements P11WritableSlot {
                     chars = label.getCharArrayValue();
                 }
                 msg.append(chars).append("\n");
-            }
+            } // end for
             return msg.toString();
         } catch (Throwable t) {
             return "Exception while calling listPublicKeyObjects(): " + t.getMessage();
         }
-    }
+    } // method listPublicKeyObjects
 
     private void assertMatch(
             final X509Certificate cert,
@@ -1376,7 +1376,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method addCert
 
     @Override
     public P11KeyIdentifier generateRSAKeypair(
@@ -1411,7 +1411,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method generateRSAKeypair
 
     @Override
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
@@ -1455,7 +1455,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method generateRSAKeypairAndCert
 
     @Override
     public P11KeyIdentifier generateDSAKeypair(
@@ -1529,7 +1529,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method generateDSAKeypair
 
     @Override
     public P11KeyIdentifier generateECKeypair(
@@ -1565,7 +1565,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method generateECKeypair
 
     @Override
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
@@ -1626,7 +1626,7 @@ public class IaikP11Slot implements P11WritableSlot {
         } finally {
             returnWritableSession(session);
         }
-    }
+    } // method generateECDSAKeypairAndCert
 
     private PrivateKeyAndPKInfo generateDSAKeyPair(
             final Session session,
@@ -1667,7 +1667,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 new ASN1Integer(value));
 
         return new PrivateKeyAndPKInfo((DSAPrivateKey) kp.getPrivateKey(), pkInfo);
-    }
+    } // method generateDSAKeyPair
 
     private X509CertificateHolder generateCertificate(
             final Session session,
@@ -1783,7 +1783,7 @@ public class IaikP11Slot implements P11WritableSlot {
         session.createObject(certTemp);
 
         return new X509CertificateHolder(Certificate.getInstance(cert));
-    }
+    } // method generateCertificate
 
     private PrivateKeyAndPKInfo generateRSAKeyPair(
             final Session session,
@@ -1816,7 +1816,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 keyParams);
 
         return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
-    }
+    } // method generateRSAKeyPair
 
     private PrivateKeyAndPKInfo generateECDSAKeyPair(
             final Session session,
@@ -1973,7 +1973,7 @@ public class IaikP11Slot implements P11WritableSlot {
         }
 
         return objList;
-    }
+    } // method getObjects
 
     private static String getDescription(
             final byte[] keyId,
@@ -2142,6 +2142,6 @@ public class IaikP11Slot implements P11WritableSlot {
         } else {
             throw new SignerException("unknown public key class " + p11Key.getClass().getName());
         }
-    }
+    } // method generatePublicKey
 
 }

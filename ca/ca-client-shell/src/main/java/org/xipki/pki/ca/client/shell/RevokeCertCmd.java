@@ -133,6 +133,6 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
             out("revoked certificate");
         }
         return null;
-    }
+    } // method doExecute
 
 }

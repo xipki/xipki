@@ -274,7 +274,7 @@ public class X509CAEntry extends CAEntry implements Serializable {
         }
 
         return sb.toString();
-    }
+    } // method toString
 
     public CertRevocationInfo getRevocationInfo() {
         return revocationInfo;

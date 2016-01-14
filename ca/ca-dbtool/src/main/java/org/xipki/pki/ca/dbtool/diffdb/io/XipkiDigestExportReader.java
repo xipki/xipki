@@ -141,7 +141,7 @@ public class XipkiDigestExportReader {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
             }
-        }
+        } // method run
     } // class Retriever
 
     private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
@@ -222,7 +222,7 @@ public class XipkiDigestExportReader {
         }
 
         return ret;
-    }
+    } // method readCerts
 
     public int getNumThreads() {
         return numThreads;

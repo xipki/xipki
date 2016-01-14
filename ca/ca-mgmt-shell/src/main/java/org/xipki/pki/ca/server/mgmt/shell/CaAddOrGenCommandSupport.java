@@ -283,6 +283,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             entry.setExtraControl(extraControl.trim());
         }
         return entry;
-    }
+    } // method getCAEntry
 
 }

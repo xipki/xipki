@@ -232,7 +232,7 @@ public class CaExportCmd extends CaCommandSupport {
         props.store(out, "CA configuration");
         saveVerbose("saved CA configuration to", new File(confFile), out.toByteArray());
         return null;
-    }
+    } // method doExecute
 
     private static void propsput(
             final Properties props,

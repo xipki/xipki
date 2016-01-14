@@ -138,7 +138,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
         } finally {
             inputstream.close();
         }
-    }
+    } // method send
 
     @Override
     public void refresh()

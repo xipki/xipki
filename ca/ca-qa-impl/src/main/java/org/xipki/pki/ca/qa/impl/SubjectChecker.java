@@ -132,9 +132,9 @@ public class SubjectChecker {
 
             subjectDNControls.put(type, rdnControl);
         }
-        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
 
-    }
+        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
+    } // constructor
 
     public List<ValidationIssue> checkSubject(
             final X500Name subject,
@@ -203,7 +203,7 @@ public class SubjectChecker {
         }
 
         return result;
-    }
+    } // method checkSubject
 
     private ValidationIssue checkSubjectAttribute(
             final ASN1ObjectIdentifier type,
@@ -303,7 +303,7 @@ public class SubjectChecker {
         }
 
         return issue;
-    }
+    } // method checkSubjectAttributeNotMultiValued
 
     private ValidationIssue checkSubjectAttributeMultiValued(
             final ASN1ObjectIdentifier type,
@@ -395,7 +395,7 @@ public class SubjectChecker {
         }
 
         return issue;
-    }
+    } // method checkSubjectAttributeMultiValued
 
     private void checkAttributeTypeAndValue(
             final String name,
@@ -480,7 +480,7 @@ public class SubjectChecker {
                 }
             }
         }
-    }
+    } // mehtod checkAttributeTypeAndValue
 
     private static List<String> sort(
             final List<String> contentList,
@@ -631,6 +631,6 @@ public class SubjectChecker {
 
             return X509Util.rdnValueToString(atvValue);
         }
-    }
+    } // method getAtvValueString
 
 }

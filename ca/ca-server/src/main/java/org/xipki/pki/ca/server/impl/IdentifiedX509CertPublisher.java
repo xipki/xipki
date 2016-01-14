@@ -90,7 +90,7 @@ class IdentifiedX509CertPublisher {
             throw new CertPublisherException("invalid type " + type);
         }
         this.certPublisher = realPublisher;
-    }
+    } // constructor
 
     public void initialize(
             final PasswordResolver passwordResolver,

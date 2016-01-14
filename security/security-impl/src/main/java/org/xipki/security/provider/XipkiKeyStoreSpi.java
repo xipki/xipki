@@ -156,7 +156,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                 }
 
                 keyLabelsMap.put(slotId, keyLabels);
-            }
+            } // end for
 
             for (P11SlotIdentifier slotId: slotIds) {
                 String[] keyLabels = keyLabelsMap.get(slotId);
@@ -174,12 +174,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                         KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
                         keyCerts.put(alias, keyCertEntry);
                     }
-                }
-            }
+                } // end for
+            } // end for
         } catch (SignerException | InvalidKeyException e) {
             throw new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
-    }
+    } // method engineLoad
 
     @Override
     public void engineStore(

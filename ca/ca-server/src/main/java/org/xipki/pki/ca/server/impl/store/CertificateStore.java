@@ -105,7 +105,7 @@ public class CertificateStore {
         }
 
         return true;
-    }
+    } // method addCertificate
 
     public void addToPublishQueue(
             final String publisherName,
@@ -120,7 +120,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method addToPublishQueue
 
     public void removeFromPublishQueue(
             final String publisherName,
@@ -134,7 +134,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method removeFromPublishQueue
 
     public void clearPublishQueue(
             final X509Cert caCert,
@@ -148,7 +148,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method clearPublishQueue
 
     public long getMaxIdOfDeltaCRLCache(
             final X509Cert caCert)
@@ -161,7 +161,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method getMaxIdOfDeltaCRLCache
 
     public void clearDeltaCRLCache(
             final X509Cert caCert,
@@ -175,7 +175,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method clearDeltaCRLCache
 
     public X509CertWithRevocationInfo revokeCertificate(
             final X509Cert caCert,
@@ -202,7 +202,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    }
+    } // method revokeCertificate
 
     public X509CertWithDBCertId unrevokeCertificate(
             final X509Cert caCert,

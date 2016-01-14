@@ -212,7 +212,7 @@ public class DbCertStatusStore extends CertStatusStore {
                 } finally {
                     releaseDbResources(ps, rs);
                 }
-            }
+            } // end if(initialized) {
 
             HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224,
                     HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
@@ -263,7 +263,7 @@ public class DbCertStatusStore extends CertStatusStore {
                     }
 
                     caInfos.add(caInfoEntry);
-                }
+                } // end while (rs.next())
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
@@ -283,7 +283,7 @@ public class DbCertStatusStore extends CertStatusStore {
             initializationFailed = true;
             initialized = true;
         }
-    }
+    } // method initIssuerStore
 
     @Override
     public CertStatusInfo getCertStatus(
@@ -414,13 +414,13 @@ public class DbCertStatusStore extends CertStatusStore {
 
                     certStatusInfo.setArchiveCutOff(t);
                 }
-            }
+            } // end if
 
             return certStatusInfo;
         } catch (DataAccessException e) {
             throw new CertStatusStoreException(e.getMessage(), e);
         }
-    }
+    } // method getCertStatus
 
     /**
      *

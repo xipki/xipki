@@ -104,7 +104,7 @@ public class OCSPStatusLoadTestCmd extends OCSPStatusCommandSupport {
                     throw new IllegalCmdParamException(
                             "invalid serial number " + this.serialNumbers);
                 }
-            }
+            } // end for
         } catch (Exception e) {
             throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
@@ -137,6 +137,6 @@ public class OCSPStatusLoadTestCmd extends OCSPStatusCommandSupport {
         loadTest.test();
 
         return null;
-    }
+    } // end doExecute
 
 }

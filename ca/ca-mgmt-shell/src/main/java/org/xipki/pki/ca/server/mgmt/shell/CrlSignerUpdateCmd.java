@@ -122,7 +122,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
         dbEntry.setCrlControl(crlControl);
         dbEntry.setBase64Cert(signerCertConf);
         return dbEntry;
-    }
+    } // method getCrlSignerChangeEntry
 
     @Override
     protected Object doExecute()

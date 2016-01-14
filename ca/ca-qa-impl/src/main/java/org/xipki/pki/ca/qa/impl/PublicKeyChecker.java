@@ -130,7 +130,7 @@ public class PublicKeyChecker {
         }
 
         return resultIssues;
-    }
+    } // method checkPublicKey
 
     private void checkPublicKey(
             final SubjectPublicKeyInfo publicKey)
@@ -240,7 +240,7 @@ public class PublicKeyChecker {
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
-    }
+    } // method checkPublicKey
 
     private static void checkECSubjectPublicKeyInfo(
             final ASN1ObjectIdentifier curveOid,
@@ -273,6 +273,6 @@ public class PublicKeyChecker {
             throw new BadCertTemplateException(
                     "invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         } // end switch
-    }
+    } // method checkECSubjectPublicKeyInfo
 
 }

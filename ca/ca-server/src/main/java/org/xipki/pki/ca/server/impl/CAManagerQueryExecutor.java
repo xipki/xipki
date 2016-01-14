@@ -132,7 +132,7 @@ class CAManagerQueryExecutor {
         } catch (CertificateException | IOException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method generateCert
 
     private Statement createStatement()
     throws CAMgmtException {
@@ -148,7 +148,7 @@ class CAManagerQueryExecutor {
         } catch (DataAccessException e) {
             throw new CAMgmtException("could not create statement", e);
         }
-    }
+    } // method createStatement
 
     private PreparedStatement prepareFetchFirstStatement(
             final String sql)
@@ -171,7 +171,7 @@ class CAManagerQueryExecutor {
         } catch (DataAccessException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
-    }
+    } // method prepareStatement
 
     SystemEvent getSystemEvent(
             final String eventName)
@@ -198,7 +198,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method getSystemEvent
 
     void deleteSystemEvent(
             final String eventName)
@@ -216,7 +216,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method deleteSystemEvent
 
     void addSystemEvent(
             final SystemEvent systemEvent)
@@ -238,7 +238,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addSystemEvent
 
     boolean changeSystemEvent(
             final SystemEvent systemEvent)
@@ -272,7 +272,7 @@ class CAManagerQueryExecutor {
         }
 
         return map;
-    }
+    } // method createEnvParameters
 
     Map<String, String> createCaAliases()
     throws CAMgmtException {
@@ -299,7 +299,7 @@ class CAManagerQueryExecutor {
         }
 
         return map;
-    }
+    } // method createCaAliases
 
     CertprofileEntry createCertprofile(
             final String name)
@@ -326,7 +326,7 @@ class CAManagerQueryExecutor {
         }
 
         return null;
-    }
+    } // method createCertprofile
 
     List<String> getNamesFromTable(
             final String table)
@@ -362,7 +362,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method getNamesFromTable
 
     PublisherEntry createPublisher(
             final String name)
@@ -389,7 +389,7 @@ class CAManagerQueryExecutor {
         }
 
         return null;
-    }
+    } // method createPublisher
 
     CmpRequestorEntry createRequestor(
             final String name)
@@ -415,7 +415,7 @@ class CAManagerQueryExecutor {
         }
 
         return null;
-    }
+    } // method createRequestor
 
     X509CrlSignerEntry createCrlSigner(
             final String name)
@@ -447,7 +447,7 @@ class CAManagerQueryExecutor {
             dataSource.releaseResources(stmt, rs);
         }
         return null;
-    }
+    } // method createCrlSigner
 
     CmpControlEntry createCmpControl(
             final String name)
@@ -473,7 +473,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method createCmpControl
 
     CmpResponderEntry createResponder(
             final String name)
@@ -501,7 +501,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method createResponder
 
     X509CAInfo createCAInfo(
             final String name,
@@ -645,7 +645,7 @@ class CAManagerQueryExecutor {
                 } catch (OperationException e) {
                     throw new CAMgmtException(e.getMessage(), e);
                 }
-            }
+            } // end if(rs.next())
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
@@ -654,7 +654,7 @@ class CAManagerQueryExecutor {
         }
 
         return null;
-    }
+    } // method createCAInfo
 
     Set<CAHasRequestorEntry> createCAhasRequestors(
             final String caName)
@@ -695,7 +695,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method createCAhasRequestors
 
     Map<String, String> createCAhasProfiles(
             final String caName)
@@ -724,7 +724,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method createCAhasProfiles
 
     Set<String> createCAhasPublishers(
             final String caName)
@@ -759,7 +759,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    }
+    } // method createCAhasNames
 
     boolean deleteRowWithName(
             final String name,
@@ -779,7 +779,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method deleteRowWithName
 
     boolean deleteRows(
             final String table)
@@ -796,7 +796,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, null);
         }
-    }
+    } // method deleteRows
 
     void addCA(
             final CAEntry caEntry)
@@ -878,7 +878,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCA
 
     void addCaAlias(
             final String aliasName,
@@ -899,7 +899,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCaAlias
 
     void addCertprofile(
             final CertprofileEntry dbEntry)
@@ -925,7 +925,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCertprofile
 
     void addCertprofileToCA(
             final String profileName,
@@ -949,7 +949,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCertprofileToCA
 
     void addCmpControl(
             final CmpControlEntry dbEntry)
@@ -973,7 +973,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCmpControl
 
     void addCmpRequestor(
             final CmpRequestorEntry dbEntry)
@@ -999,7 +999,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCmpRequestor
 
     void addCmpRequestorToCA(
             final CAHasRequestorEntry requestor,
@@ -1034,7 +1034,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCmpRequestorToCA
 
     void addCrlSigner(
             final X509CrlSignerEntry dbEntry)
@@ -1079,7 +1079,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCrlSigner
 
     void addEnvParam(
             final String name,
@@ -1100,7 +1100,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addEnvParam
 
     void addPublisher(
             final PublisherEntry dbEntry)
@@ -1124,7 +1124,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addPublisher
 
     void addPublisherToCA(
             final String publisherName,
@@ -1144,7 +1144,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addPublisherToCA
 
     boolean changeCA(
             final ChangeCAEntry changeCAEntry,
@@ -1232,7 +1232,7 @@ class CAManagerQueryExecutor {
             } finally {
                 dataSource.releaseResources(stmt, rs);
             }
-        }
+        } // end if
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CA SET ");
@@ -1431,7 +1431,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeCA
 
     IdentifiedX509Certprofile changeCertprofile(
             final String name,
@@ -1511,7 +1511,7 @@ class CAManagerQueryExecutor {
                 profile.shutdown();
             }
         }
-    }
+    } // method changeCertprofile
 
     CmpControl changeCmpControl(
             final String name,
@@ -1545,7 +1545,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeCmpControl
 
     CmpRequestorEntryWrapper changeCmpRequestor(
             final String name,
@@ -1581,7 +1581,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeCmpRequestor
 
     CmpResponderEntryWrapper changeCmpResponder(
             final String name,
@@ -1673,7 +1673,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeCmpResponder
 
     X509CrlSignerEntryWrapper changeCrlSigner(
             final String name,
@@ -1795,7 +1795,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeCrlSigner
 
     Scep changeScep(
             final String caName,
@@ -1908,7 +1908,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeScep
 
     boolean changeEnvParam(
             final String name,
@@ -1934,7 +1934,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeEnvParam
 
     IdentifiedX509CertPublisher changePublisher(
             final String name,
@@ -2001,7 +2001,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changePublisher
 
     boolean removeCA(
             final String caName)
@@ -2019,7 +2019,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeCA
 
     boolean removeCaAlias(
             final String aliasName)
@@ -2041,7 +2041,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeCaAlias
 
     boolean removeCertprofileFromCA(
             final String profileLocalName,
@@ -2064,7 +2064,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeCertprofileFromCA
 
     boolean removeCmpRequestorFromCA(
             final String requestorName,
@@ -2087,7 +2087,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeCmpRequestorFromCA
 
     boolean removePublisherFromCA(
             final String publisherName,
@@ -2110,7 +2110,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removePublisherFromCA
 
     boolean revokeCa(
             final String caName,
@@ -2141,7 +2141,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method revokeCa
 
     void addCmpResponder(
             final CmpResponderEntry dbEntry)
@@ -2175,7 +2175,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method addCmpResponder
 
     boolean unlockCA()
     throws DataAccessException, CAMgmtException {
@@ -2190,7 +2190,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, null);
         }
-    }
+    } // method unlockCA
 
     boolean unrevokeCa(
             final String caName)
@@ -2214,7 +2214,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method unrevokeCa
 
     boolean addUser(
             final AddUserEntry userEntry)
@@ -2243,7 +2243,7 @@ class CAManagerQueryExecutor {
         LOG.info("added user '{}'", name);
 
         return true;
-    }
+    } // method addUser
 
     private Integer executeGetUserIdSql(
             final String user)
@@ -2267,7 +2267,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method executeGetUserIdSql
 
     private void executeAddUserSql(
             final int id,
@@ -2292,7 +2292,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method executeAddUserSql
 
     boolean removeUser(
             final String userName)
@@ -2310,7 +2310,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeUser
 
     boolean changeUser(
             final String username,
@@ -2368,7 +2368,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method changeUser
 
     UserEntry getUser(
             final String username)
@@ -2395,7 +2395,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method getUser
 
     boolean addScep(
             final ScepEntry scepEntry)
@@ -2422,7 +2422,7 @@ class CAManagerQueryExecutor {
         }
 
         return true;
-    }
+    } // method addScep
 
     boolean removeScep(
             final String name)
@@ -2440,7 +2440,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    }
+    } // method removeScep
 
     ScepEntry getScep(
             final String caName)
@@ -2477,7 +2477,7 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-    }
+    } // method getScep
 
     private static void setBoolean(
             final PreparedStatement ps,
@@ -2525,7 +2525,7 @@ class CAManagerQueryExecutor {
         }
 
         return permissions;
-    }
+    } // method getPermissions
 
     private static String toString(
             final Collection<String> tokens,

@@ -157,6 +157,6 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
 
         out("checking CA requestor CA='" + caName +  "', requestor='" + requestorName + "'");
         return null;
-    }
+    } // method doExecute
 
 }

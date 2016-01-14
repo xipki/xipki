@@ -238,8 +238,7 @@ public class RequestOptions {
         }
 
         return new AlgorithmIdentifier(algOid, params);
-
-    }
+    } // method createAlgId
 
     static public RSASSAPSSparams createPSSRSAParams(
             final ASN1ObjectIdentifier digestAlgOID) {
@@ -264,6 +263,6 @@ public class RequestOptions {
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize),
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
-    }
+    } // method createPSSRSAParams
 
 }

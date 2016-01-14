@@ -98,6 +98,6 @@ public class ProfileInfoCmd extends CaCommandSupport {
 
         out(sb.toString());
         return null;
-    }
+    } // method doExecute
 
 }

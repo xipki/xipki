@@ -100,6 +100,6 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
             out("unrevoked certificate");
         }
         return null;
-    }
+    } // method doExecute
 
 }

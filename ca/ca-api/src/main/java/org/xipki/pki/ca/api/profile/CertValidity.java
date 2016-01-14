@@ -105,7 +105,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             throw new IllegalArgumentException("invalid validityS: " + validityS);
         }
         return new CertValidity(validity, unit);
-    }
+    } // method getInstance
 
     public CertValidity(
             final int validity,
@@ -157,7 +157,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         default:
             throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
         }
-    }
+    } // method add
 
     private int getApproxHours() {
         switch (unit) {

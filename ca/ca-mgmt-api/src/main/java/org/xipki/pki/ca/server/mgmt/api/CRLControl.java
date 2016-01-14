@@ -332,7 +332,7 @@ public class CRLControl implements Serializable {
         }
 
         validate();
-    }
+    } // constructor
 
     public String getConf() {
         ConfPairs pairs = new ConfPairs();
@@ -367,7 +367,7 @@ public class CRLControl implements Serializable {
         }
 
         return pairs.getEncoded();
-    }
+    } // method getConf
 
     @Override
     public String toString() {
@@ -514,7 +514,7 @@ public class CRLControl implements Serializable {
         }
 
         return true;
-    }
+    } // method equals
 
     private static int getInteger(
             final ConfPairs props,

@@ -117,7 +117,7 @@ public class AuthorityCertStore {
         }
 
         return new AuthorityCertStore(cACert, signatureCert, encryptionCert);
-    }
+    } // method getInstance
 
     private static boolean hasKeyusage(
             final boolean[] keyusage,

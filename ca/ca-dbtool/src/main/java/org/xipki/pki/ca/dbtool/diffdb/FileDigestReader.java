@@ -154,7 +154,7 @@ public class FileDigestReader implements DigestReader {
         return (k == 0)
                 ? null
                 : new CertsBundle(numSkipped, certs, serialNumbers);
-    }
+    } // method nextCerts
 
     private DbDigestEntry nextCert()
     throws IOException {

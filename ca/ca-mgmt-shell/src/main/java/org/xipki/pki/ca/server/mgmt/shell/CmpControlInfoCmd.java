@@ -96,6 +96,6 @@ public class CmpControlInfoCmd extends CaCommandSupport {
 
         out(sb.toString());
         return null;
-    }
+    } // method doExecute
 
 }

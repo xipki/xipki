@@ -266,7 +266,7 @@ public class CAEntry {
         sb.append("extraControl: ").append(extraControl).append('\n');
 
         return sb.toString();
-    }
+    } // method toString
 
     protected static String toString(
             final Collection<? extends Object> tokens) {

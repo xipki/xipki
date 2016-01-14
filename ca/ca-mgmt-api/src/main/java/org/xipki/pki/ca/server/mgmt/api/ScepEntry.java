@@ -189,6 +189,6 @@ public class ScepEntry implements Serializable {
         }
 
         return sb.toString();
-    }
+    } // method toString
 
 }

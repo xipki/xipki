@@ -122,7 +122,7 @@ class X509CrlSignerEntryWrapper {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");
         }
-    }
+    } // method initSigner
 
     public X509CrlSignerEntry getDbEntry() {
         return dbEntry;

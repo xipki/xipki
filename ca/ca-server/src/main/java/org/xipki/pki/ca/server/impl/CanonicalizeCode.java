@@ -130,7 +130,7 @@ public class CanonicalizeCode {
                 canonicalizeFile(file);
             }
         }
-    }
+    } // method canonicalizeDir
 
     private void canonicalizeFile(
             final File file)
@@ -184,7 +184,7 @@ public class CanonicalizeCode {
                     writer.write(canonicalizedLine.getBytes());
                     writer.write('\n');
                 }
-            }
+            } // end while
         } finally {
             writer.close();
             reader.close();
@@ -198,7 +198,7 @@ public class CanonicalizeCode {
             newFile.renameTo(file);
             System.out.println(file.getPath().substring(baseDirLen));
         }
-    }
+    } // method canonicalizeFile
 
     private void checkWarnings()
     throws Exception {
@@ -219,7 +219,7 @@ public class CanonicalizeCode {
                 checkWarningsInFile(file);
             }
         }
-    }
+    } // method checkWarningsInDir
 
     private void checkWarningsInFile(
             final File file)
@@ -285,7 +285,7 @@ public class CanonicalizeCode {
                     }
 
                     continue;
-                }
+                } // end if (idx == -1)
 
                 if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"') {
                     lastLine = line;
@@ -314,7 +314,7 @@ public class CanonicalizeCode {
                 }
 
                 lastLine = line;
-            }
+            } // end while
         } finally {
             reader.close();
         }
@@ -328,8 +328,7 @@ public class CanonicalizeCode {
             System.out.println("Please check file " + file.getPath().substring(baseDirLen)
                     + ": no authors line");
         }
-
-    }
+    } // method checkWarningsInFile
 
     /**
      * replace tab by 4 spaces, delete white spaces at the end
@@ -370,7 +369,7 @@ public class CanonicalizeCode {
         }
 
         return sb.toString();
-    }
+    } // end canonicalizeLine
 
     private static String removeTrailingSpaces(
             final String line) {
@@ -387,6 +386,6 @@ public class CanonicalizeCode {
         } else {
             return line.substring(0, i + 1);
         }
-    }
+    } // method removeTrailingSpaces
 
 }

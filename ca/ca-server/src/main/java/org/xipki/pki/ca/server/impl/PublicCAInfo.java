@@ -121,7 +121,7 @@ class PublicCAInfo {
                         "invalid SubjectAltName extension in CA certificate");
             }
         }
-    }
+    } // constructor
 
     public PublicCAInfo(
             final X500Name subject,
@@ -158,7 +158,7 @@ class PublicCAInfo {
         this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
         this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
-    }
+    } // constructor
 
     public List<String> getCaCertUris() {
         return caCertUris;

@@ -114,6 +114,6 @@ public class CaUsersReader extends DbiXmlReader {
         } // end while
 
         return null;
-    }
+    } // method retrieveNext
 
 }

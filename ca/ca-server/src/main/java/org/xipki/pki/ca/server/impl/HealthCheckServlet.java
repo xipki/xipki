@@ -145,7 +145,7 @@ public class HealthCheckServlet extends HttpServlet {
         }
 
         response.flushBuffer();
-    }
+    } // method doGet
 
     public void setResponderManager(
             final CmpResponderManager responderManager) {

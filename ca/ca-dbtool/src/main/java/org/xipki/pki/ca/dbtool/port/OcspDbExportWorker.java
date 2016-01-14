@@ -130,7 +130,7 @@ public class OcspDbExportWorker extends DbPortWorker {
         this.destFolder = destFolder;
         this.numCertsInBundle = numCertsInBundle;
         this.numCertsPerSelect = numCertsPerSelect;
-    }
+    } // constructor
 
     @Override
     public void doRun(

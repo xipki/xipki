@@ -133,7 +133,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
                     + masterPasswordCallback
                     + ", " + e.getClass().getName() + ": " + e.getMessage());
         }
-    }
+    } // method setMasterPasswordCallback
 
     public static char[] resolvePassword(
             final char[] masterPassword,
@@ -163,7 +163,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         }
 
         return ret;
-    }
+    } // method resolvePassword
 
     public static String encryptPassword(
             final char[] masterPassword,
