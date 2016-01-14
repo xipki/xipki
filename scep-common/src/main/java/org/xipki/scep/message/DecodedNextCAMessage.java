@@ -220,7 +220,7 @@ public class DecodedNextCAMessage {
                         + " the same digestAlgorithm");
                 return ret;
             }
-        }
+        } // end if
 
         X509CertificateHolder _signerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
@@ -310,7 +310,7 @@ public class DecodedNextCAMessage {
             } else {
                 rACerts.add(c);
             }
-        }
+        } // end for
 
         if (cACert == null) {
             final String msg = "no CA certificate is returned";
@@ -330,6 +330,6 @@ public class DecodedNextCAMessage {
         ret.setAuthorityCertStore(authorityCertStore);
 
         return ret;
-    }
+    } // method decode
 
 }

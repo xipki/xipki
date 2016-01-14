@@ -358,7 +358,7 @@ public class PkiMessage {
         } catch (Exception e) {
             throw new MessageEncodingException(e);
         }
-    }
+    } // method encode
 
     private CMSEnvelopedData encrypt(
             final X509Certificate recipient,

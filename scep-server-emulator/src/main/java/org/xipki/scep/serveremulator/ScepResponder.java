@@ -211,7 +211,7 @@ public class ScepResponder {
         } catch (Exception e) {
             throw new CAException(e);
         }
-    }
+    } // method servicePkiOperation
 
     public ContentInfo encode(
             final NextCAMessage nextCAMsg)
@@ -310,8 +310,8 @@ public class ScepResponder {
                 LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
-            }
-        }
+            } // end if
+        } // end if
 
         // check the content encryption algorithm
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
@@ -458,7 +458,7 @@ public class ScepResponder {
         } // end switch
 
         return rep;
-    }
+    } // method doServicePkiOperation
 
     private ContentInfo createSignedData(
             final CertificateList crl)
