@@ -230,20 +230,29 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
             if (!tbsSigAlgId.equals(sigAlgId)) {
                 issue.setFailureMessage(
                         "Certificate.tbsCertificate.signature != Certificate.signatureAlgorithm");
-            } else {
-                try {
-                    String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+            }
+
+            try {
+
+                String sigAlgo = AlgorithmUtil.getSignatureAlgoName(sigAlgId);
+                if (!issue.isFailed()) {
                     if (!signatureAlgorithms.contains(sigAlgo)) {
                         issue.setFailureMessage("signatureAlgorithm '" + sigAlgo
                                 + "' is not allowed");
                     }
-                } catch (NoSuchAlgorithmException e) {
-                    issue.setFailureMessage("unsupported signature algorithm "
-                            + sigAlgId.getAlgorithm().getId());
                 }
-            }
 
-            //TODO: check the parameters
+                // check parameters
+                if (!issue.isFailed()) {
+                    AlgorithmIdentifier expSigAlgId = AlgorithmUtil.getSignatureAlgoId(sigAlgo);
+                    if (expSigAlgId.equals(sigAlgId)) {
+                        issue.setFailureMessage("invalid parameters");
+                    }
+                }
+            } catch (NoSuchAlgorithmException e) {
+                issue.setFailureMessage("unsupported signature algorithm "
+                        + sigAlgId.getAlgorithm().getId());
+            }
         }
 
         // notBefore encoding
@@ -274,16 +283,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         issue = new ValidationIssue("X509.VALIDITY", "cert validity");
         resultIssues.add(issue);
 
-        Date expectedNotAfter = validity.add(cert.getNotBefore());
-        if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
-            expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+        if (cert.getNotAfter().before(cert.getNotBefore())) {
+            issue.setFailureMessage("notAfter could not be before notBefore");
         }
 
-        if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
-            issue.setFailureMessage("cert validity is not within " + validity.toString());
+        if (!issue.isFailed()) {
+            Date expectedNotAfter = validity.add(cert.getNotBefore());
+            if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
+                expectedNotAfter = new Date(MAX_CERT_TIME_MS);
+            }
+
+            if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
+                issue.setFailureMessage("cert validity is not within " + validity.toString());
+            }
         }
 
-        // public key
+        // subjectPublicKeyInfo
         resultIssues.addAll(publicKeyChecker.checkPublicKey(bcCert.getSubjectPublicKeyInfo(),
                 requestedPublicKey));
 
