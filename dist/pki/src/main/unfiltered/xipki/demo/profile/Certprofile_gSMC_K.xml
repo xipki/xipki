@@ -70,7 +70,7 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject duplicateSubjectPermitted="true" duplicateCNPermitted="true">
+  <subject duplicateSubjectPermitted="true">
     <dnBackwards>false</dnBackwards>
     <incSerialNumber>false</incSerialNumber>
     <rdn minOccurs="1" maxOccurs="1">
