@@ -1,2 +1,3 @@
 1. oracle
   The CLOB columns should be the last ones in the INSERT statement
+2. http://www.cypherpunks.to/~peter/T2a_X509_Certs.pdf

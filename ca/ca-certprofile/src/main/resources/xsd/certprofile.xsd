@@ -442,6 +442,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="tlsFeature">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="feature" type="intWithDescType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:complexType name="qCStatementType">
     <xs:sequence>
       <xs:element name="statementId" type="oidWithDescType"/>

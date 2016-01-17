@@ -87,6 +87,7 @@ public class ExtensionNameCompleter extends AbstractEnumCompleter {
         oids.add(Extension.subjectInfoAccess);
         oids.add(Extension.subjectKeyIdentifier);
         oids.add(Extension.targetInformation);
+        oids.add(ObjectIdentifiers.id_pe_tlsfeature);
 
         StringBuilder enums = new StringBuilder();
 

@@ -122,6 +122,7 @@ class IdentifiedX509Certprofile {
         criticalOnlyExtensionTypes.add(Extension.nameConstraints);
         criticalOnlyExtensionTypes.add(Extension.policyConstraints);
         criticalOnlyExtensionTypes.add(Extension.inhibitAnyPolicy);
+        criticalOnlyExtensionTypes.add(ObjectIdentifiers.id_pe_tlsfeature);
 
         noncriticalOnlyExtensionTypes = new HashSet<>();
         noncriticalOnlyExtensionTypes.add(Extension.authorityKeyIdentifier);
