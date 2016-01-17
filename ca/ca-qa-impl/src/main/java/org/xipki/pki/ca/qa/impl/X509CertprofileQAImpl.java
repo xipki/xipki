@@ -245,7 +245,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
                 // check parameters
                 if (!issue.isFailed()) {
                     AlgorithmIdentifier expSigAlgId = AlgorithmUtil.getSignatureAlgoId(sigAlgo);
-                    if (expSigAlgId.equals(sigAlgId)) {
+                    if (!expSigAlgId.equals(sigAlgId)) {
                         issue.setFailureMessage("invalid parameters");
                     }
                 }
