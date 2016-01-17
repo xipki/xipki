@@ -175,11 +175,6 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Completion(DuplicationModeCompleter.class)
     private String duplicateSubjectS;
 
-    @Option(name = "--duplicate-cn",
-            description = "mode of duplicate CN")
-    @Completion(DuplicationModeCompleter.class)
-    private String duplicateCNS;
-
     @Option(name = "--validity-mode",
             description = "mode of valditity")
     @Completion(ValidityModeCompleter.class)
@@ -242,14 +237,6 @@ public class CaUpdateCmd extends CaCommandSupport {
                 throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
             }
             entry.setDuplicateSubjectMode(duplicateMode);
-        }
-
-        if (duplicateCNS != null) {
-            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateCNS);
-            if (duplicateMode == null) {
-                throw new IllegalCmdParamException("invalid duplication mode " + duplicateCNS);
-            }
-            entry.setDuplicateCNMode(duplicateMode);
         }
 
         if (permissions != null && permissions.size() > 0) {

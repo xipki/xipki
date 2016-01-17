@@ -102,10 +102,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private static final String SQL_ADD_CERT =
             "INSERT INTO CERT "
-            + "(ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_CN, FP_RS," // 8
+            + "(ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_RS," // 8
             + " NBEFORE, NAFTER, REV, RR, RT, RIT, PID, CA_ID," // 8
             + " RID, UNAME, FP_K, EE, RTYPE, TID)" + // 6
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_CRAW =
             "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
@@ -872,14 +872,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     long fpSubject = X509Util.fp_canonicalized_name(c.getSubject());
                     ps_cert.setLong(idx++, fpSubject);
 
-                    String cn = X509Util.getCommonName(c.getSubject());
-                    if (StringUtil.isNotBlank(cn)) {
-                        long fpCn = FpIdCalculator.hash(cn);
-                        ps_cert.setLong(idx++, fpCn);
-                    } else {
-                        ps_cert.setNull(idx++, Types.BIGINT);
-                    }
-
                     if (cert.getFpRs() != null) {
                         ps_cert.setLong(idx++, cert.getFpRs());
                     } else {
@@ -998,7 +990,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         dataSource.dropIndex(null, "CERT", "IDX_FPK");
         dataSource.dropIndex(null, "CERT", "IDX_FPS");
-        dataSource.dropIndex(null, "CERT", "IDX_FPCN");
         dataSource.dropIndex(null, "CERT", "IDX_FPRS");
 
         dataSource.dropForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT");
@@ -1033,7 +1024,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         dataSource.createIndex(null, "IDX_FPK", "CERT", "FP_K");
         dataSource.createIndex(null, "IDX_FPS", "CERT", "FP_S");
-        dataSource.createIndex(null, "IDX_FPCN", "CERT", "FP_CN");
         dataSource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
 
         long duration = (System.currentTimeMillis() - start) / 1000;

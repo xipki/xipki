@@ -174,11 +174,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Completion(DuplicationModeCompleter.class)
     private String duplicateSubjectS = "permitted";
 
-    @Option(name = "--duplicate-cn",
-            description = "mode of duplicateCN")
-    @Completion(DuplicationModeCompleter.class)
-    private String duplicateCNS = "permitted";
-
     @Option(name = "--validity-mode",
             description = "mode of valditity")
     @Completion(ValidityModeCompleter.class)
@@ -237,12 +232,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid duplication mode: " + duplicateSubjectS);
         }
         entry.setDuplicateSubjectMode(duplicateSubject);
-
-        DuplicationMode duplicateCN = DuplicationMode.getInstance(duplicateCNS);
-        if (duplicateCN == null) {
-            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateCNS);
-        }
-        entry.setDuplicateCNMode(duplicateCN);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if (validityMode == null) {

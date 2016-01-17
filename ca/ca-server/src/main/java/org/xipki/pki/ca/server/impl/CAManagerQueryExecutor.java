@@ -510,7 +510,7 @@ class CAManagerQueryExecutor {
     throws CAMgmtException {
         final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY"
                 + ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME"
-                + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS, NUM_CRLS"
+                + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS"
                 + ", KEEP_EXPIRED_CERT_DAYS, EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
                 + ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF"
                 + " FROM CA WHERE NAME=?";
@@ -545,7 +545,6 @@ class CAManagerQueryExecutor {
                 String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
                 int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
                 int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
-                int duplicateCNI = rs.getInt("DUPLICATE_CN");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
                 int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
@@ -621,7 +620,6 @@ class CAManagerQueryExecutor {
 
                 entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
                 entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
-                entry.setDuplicateCNMode(DuplicationMode.getInstance(duplicateCNI));
                 entry.setPermissions(permissions);
                 entry.setRevocationInfo(revocationInfo);
 
@@ -814,10 +812,10 @@ class CAManagerQueryExecutor {
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
         sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
-        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, DUPLICATE_CN, PERMISSIONS");
+        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS");
         sqlBuilder.append(", NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS");
         sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
         sqlBuilder.append(", ?, ?, ?, ?, ?, ?, ?, ?)");
         final String sql = sqlBuilder.toString();
 
@@ -851,7 +849,6 @@ class CAManagerQueryExecutor {
             ps.setString(idx++, entry.getCmpControlName());
             ps.setInt(idx++, entry.getDuplicateKeyMode().getMode());
             ps.setInt(idx++, entry.getDuplicateSubjectMode().getMode());
-            ps.setInt(idx++, entry.getDuplicateCNMode().getMode());
             ps.setString(idx++, Permission.toString(entry.getPermissions()));
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
@@ -1171,7 +1168,6 @@ class CAManagerQueryExecutor {
         String cmpcontrol_name = entry.getCmpControlName();
         DuplicationMode duplicate_key = entry.getDuplicateKeyMode();
         DuplicationMode duplicate_subject = entry.getDuplicateSubjectMode();
-        DuplicationMode duplicate_CN = entry.getDuplicateCNMode();
         Set<Permission> permissions = entry.getPermissions();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
@@ -1260,8 +1256,6 @@ class CAManagerQueryExecutor {
                 addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
         Integer iDuplicate_subject =
                 addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
-        Integer iDuplicate_CN =
-                addToSqlIfNotNull(sqlBuilder, index, duplicate_CN, "DUPLICATE_CN");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer iExpiration_period =
@@ -1374,12 +1368,6 @@ class CAManagerQueryExecutor {
                 int mode = duplicate_subject.getMode();
                 m.append("duplicateSubject: '").append(mode).append("'; ");
                 ps.setInt(iDuplicate_subject, mode);
-            }
-
-            if (iDuplicate_CN != null) {
-                int mode = duplicate_CN.getMode();
-                m.append("duplicateCN: '").append(mode).append("'; ");
-                ps.setInt(iDuplicate_CN, mode);
             }
 
             if (iPermissions != null) {

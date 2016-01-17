@@ -63,8 +63,6 @@ public class X509ChangeCAEntry extends ChangeCAEntry implements Serializable {
 
     private String extraControl;
 
-    private DuplicationMode duplicateCNMode;
-
     public X509ChangeCAEntry(
             final String name)
     throws CAMgmtException {
@@ -141,15 +139,6 @@ public class X509ChangeCAEntry extends ChangeCAEntry implements Serializable {
     public void setExtraControl(
             final String extraControl) {
         this.extraControl = extraControl;
-    }
-
-    public DuplicationMode getDuplicateCNMode() {
-        return duplicateCNMode;
-    }
-
-    public void setDuplicateCNMode(
-            final DuplicationMode duplicateCNMode) {
-        this.duplicateCNMode = duplicateCNMode;
     }
 
 }

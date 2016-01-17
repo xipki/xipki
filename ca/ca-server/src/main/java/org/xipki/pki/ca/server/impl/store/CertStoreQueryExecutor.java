@@ -204,9 +204,9 @@ class CertStoreQueryExecutor {
             final X500Name reqSubject)
     throws DataAccessException, OperationException {
         final String SQL_ADD_CERT =
-                "INSERT INTO CERT (ID, ART, LUPDATE, SN, SUBJECT, FP_CN, FP_S, FP_RS, "
+                "INSERT INTO CERT (ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_RS, "
                 + "NBEFORE, NAFTER, REV, PID, CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)"
-                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_CRAW =
                 "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
@@ -226,11 +226,6 @@ class CertStoreQueryExecutor {
 
         long fpPK = FpIdCalculator.hash(encodedSubjectPublicKey);
         String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
-        String cn = X509Util.getCommonName(certificate.getSubjectAsX500Name());
-        long fpCn = 0;
-        if (StringUtil.isNotBlank(cn)) {
-            fpCn = FpIdCalculator.hash(cn);
-        }
         long fpSubject = X509Util.fp_canonicalized_name(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
@@ -266,11 +261,6 @@ class CertStoreQueryExecutor {
             ps_addcert.setLong(idx++, System.currentTimeMillis() / 1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
             ps_addcert.setString(idx++, subjectText);
-            if (fpCn != 0) {
-                ps_addcert.setLong(idx++, fpCn);
-            } else {
-                ps_addcert.setNull(idx++, Types.BIGINT);
-            }
             ps_addcert.setLong(idx++, fpSubject);
             if (fpReqSubject != null) {
                 ps_addcert.setLong(idx++, fpReqSubject);
@@ -1852,14 +1842,6 @@ class CertStoreQueryExecutor {
             final String profile)
     throws DataAccessException {
         return isCertIssuedForColumn("FP_K", caCert, keyFp, profile);
-    }
-
-    boolean isCertForCNIssued(
-            final X509Cert caCert,
-            final long cnFp,
-            final String profile)
-    throws DataAccessException {
-        return isCertIssuedForColumn("FP_CN", caCert, cnFp, profile);
     }
 
     private boolean isCertIssuedForColumn(

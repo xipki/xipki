@@ -642,28 +642,6 @@ public class CertificateStore {
         }
     }
 
-    public boolean isCertForCNIssued(
-            final X509Cert caCert,
-            final long cnFp)
-    throws OperationException {
-        return isCertForCNIssued(caCert, cnFp, null);
-    }
-
-    public boolean isCertForCNIssued(
-            final X509Cert caCert,
-            final long cnFp,
-            final String profile)
-    throws OperationException {
-        try {
-            return queryExecutor.isCertForCNIssued(caCert, cnFp, profile);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
-        }
-    }
-
     public X509CertificateInfo getCertificateInfoForId(
             final X509Cert caCert,
             final int certId)
