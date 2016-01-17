@@ -180,8 +180,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private boolean duplicateSubjectPermitted;
 
-    private boolean duplicateCNPermitted;
-
     private boolean serialNumberInReqPermitted;
 
     private boolean notBeforeMidnight;
@@ -244,7 +242,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         ca = false;
         duplicateKeyPermitted = true;
         duplicateSubjectPermitted = true;
-        duplicateCNPermitted = true;
         serialNumberInReqPermitted = true;
         pathLen = null;
         aIAControl = null;
@@ -365,11 +362,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         Boolean b = subject.isDuplicateSubjectPermitted();
         if (b != null) {
             duplicateSubjectPermitted = b.booleanValue();
-        }
-
-        b = subject.isDuplicateCNPermitted();
-        if (b != null) {
-            duplicateCNPermitted = b.booleanValue();
         }
 
         Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
@@ -1213,11 +1205,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public boolean isDuplicateSubjectPermitted() {
         return duplicateSubjectPermitted;
-    }
-
-    @Override
-    public boolean isDuplicateCNPermitted() {
-        return duplicateCNPermitted;
     }
 
     @Override

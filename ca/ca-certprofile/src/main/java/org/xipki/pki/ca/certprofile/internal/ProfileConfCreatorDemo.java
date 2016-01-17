@@ -255,7 +255,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -299,7 +298,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -346,7 +344,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -396,7 +393,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -570,7 +566,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -889,7 +884,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -946,7 +940,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -1429,7 +1422,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = new Subject();
-        subject.setDuplicateCNPermitted(true);
         subject.setDuplicateSubjectPermitted(false);
         profile.setSubject(subject);
 
@@ -1593,7 +1585,6 @@ public class ProfileConfCreatorDemo {
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
@@ -1693,7 +1684,6 @@ public class ProfileConfCreatorDemo {
         // Subject
         Subject subject = profile.getSubject();
         subject.setDuplicateSubjectPermitted(false);
-        subject.setDuplicateCNPermitted(false);
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();

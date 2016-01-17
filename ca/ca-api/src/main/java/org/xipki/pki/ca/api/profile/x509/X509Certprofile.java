@@ -117,10 +117,6 @@ public abstract class X509Certprofile {
         return true;
     }
 
-    public boolean isDuplicateCNPermitted() {
-        return true;
-    }
-
     /**
      * Whether the subject attribute serialNumber in request is permitted
      */
