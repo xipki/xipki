@@ -121,6 +121,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ExtensionsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.pki.ca.certprofile.x509.jaxb.IntWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameValueType;
@@ -137,6 +138,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
@@ -226,6 +228,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private BiometricInfoOption biometricDataOption;
 
+    private ExtensionValue tlsFeature;
+
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
     private void reset() {
@@ -262,6 +266,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         qcStatementsOption = null;
         authorizationTemplate = null;
         biometricDataOption = null;
+        tlsFeature = null;
         constantExtensions = null;
     } // method reset
 
@@ -725,7 +730,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                     }
 
                     this.qcStatementsOption.add(qcStatementOption);
-                }
+                } // end for
 
                 if (!requireInfoFromReq) {
                     ASN1EncodableVector v = new ASN1EncodableVector();
@@ -767,6 +772,27 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 v.add(new DEROctetString(extConf.getAccessRights().getValue()));
                 ASN1Encodable extValue = new DERSequence(v);
                 authorizationTemplate =
+                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+            }
+        }
+
+        // tlsFeature
+        type = ObjectIdentifiers.id_pe_tlsfeature;
+        if (extensionControls.containsKey(type)) {
+            TlsFeature extConf = (TlsFeature) getExtensionValue(
+                    type, extensionsType, TlsFeature.class);
+            if (extConf != null) {
+                ASN1EncodableVector v = new ASN1EncodableVector();
+                for (IntWithDescType m : extConf.getFeature()) {
+                    int value = m.getValue();
+                    if (value < 0 || value > 65535) {
+                        throw new CertprofileException(
+                                "invalid TLS feature (extensionType) " + value);
+                    }
+                    v.add(new ASN1Integer(value));
+                }
+                ASN1Encodable extValue = new DERSequence(v);
+                tlsFeature =
                         new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
             }
         }
@@ -1070,6 +1096,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             ExtensionValue extValue = new ExtensionValue(
                         extensionControls.get(type).isCritical(), new DERSequence(v));
             values.addExtension(type, extValue);
+        }
+
+        // tlsFeature
+        type = ObjectIdentifiers.id_pe_tlsfeature;
+        if (tlsFeature != null && occurences.remove(type) != null) {
+            values.addExtension(type, tlsFeature);
         }
 
         // authorizationTemplate

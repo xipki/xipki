@@ -293,14 +293,14 @@ public class ObjectIdentifiers {
      * Key usage bits that may be consistent: digitalSignature,
      * nonRepudiation, and/or (keyEncipherment or keyAgreement)
      */
-    public static final ASN1ObjectIdentifier id_kp_emailProtection        = id_kp.branch("4");
+    public static final ASN1ObjectIdentifier id_kp_emailProtection    = id_kp.branch("4");
 
     /**
      * Binding the hash of an object to a time
      * Key usage bits that may be consistent: digitalSignature
      * and/or nonRepudiation
      */
-    public static final ASN1ObjectIdentifier id_kp_timeStamping        = id_kp.branch("8");
+    public static final ASN1ObjectIdentifier id_kp_timeStamping       = id_kp.branch("8");
 
     /**
      * Signing OCSP responses
@@ -366,6 +366,10 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcRetentionPeriod
         = id_etsi_qcs.branch("3");
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
+
+    // RFC 7633: X.509v3 Transport Layer Security (TLS) Feature Extension
+    private static final ASN1ObjectIdentifier id_pe = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.1");
+    public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
 
     private static final List<ASN1ObjectIdentifier> forwardDNs;
     private static final List<ASN1ObjectIdentifier> backwardDNs;
@@ -482,6 +486,8 @@ public class ObjectIdentifiers {
         oidNameMap.put(id_etsi_qcs_QcLimitValue, "etsi-qcs-QcLimitValue");
         oidNameMap.put(id_etsi_qcs_QcRetentionPeriod, "etsi-qcs-QcRetentionPeriod");
         oidNameMap.put(id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
+
+        oidNameMap.put(id_pe_tlsfeature, "tlsFeature");
     }
 
     private ObjectIdentifiers() {

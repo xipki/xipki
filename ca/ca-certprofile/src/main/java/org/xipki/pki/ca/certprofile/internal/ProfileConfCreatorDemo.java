@@ -115,6 +115,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.pki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
@@ -124,6 +125,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.SignatureAlgorithms;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.security.api.ObjectIdentifiers;
+import org.xipki.security.api.TLSExtensionType;
 import org.xipki.security.api.util.SecurityUtil;
 import org.xml.sax.SAXException;
 
@@ -661,6 +663,12 @@ public class ProfileConfCreatorDemo {
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+        // Extensions - tlsFeature
+        extensionValue = createTlsFeature(
+                new TLSExtensionType[]{TLSExtensionType.status_request,
+                        TLSExtensionType.client_certificate_url});
+        list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
         // Admission - just DEMO, does not belong to TLS certificate
         extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
@@ -1576,6 +1584,17 @@ public class ProfileConfCreatorDemo {
         KeyParametersType ret = new KeyParametersType();
         ret.setAny(object);
         return ret;
+    }
+
+    private static ExtensionValueType createTlsFeature(TLSExtensionType[] features) {
+        TlsFeature tlsFeature = new TlsFeature();
+        for (TLSExtensionType m : features) {
+            IntWithDescType k = new IntWithDescType();
+            k.setValue(m.getCode());
+            k.setDescription(m.getName());
+            tlsFeature.getFeature().add(k);
+        }
+        return createExtensionValueType(tlsFeature);
     }
 
     private static X509ProfileType Certprofile_EE_complex()

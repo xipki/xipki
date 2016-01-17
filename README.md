@@ -49,6 +49,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
     - SHA384withDSA
     - SHA512withDSA
  - Native support of X.509 extensions
+    - TLSFeature (RFC 7633)
     - AuthorityKeyIdentifier
     - SubjectKeyIdentifier
     - KeyUsage

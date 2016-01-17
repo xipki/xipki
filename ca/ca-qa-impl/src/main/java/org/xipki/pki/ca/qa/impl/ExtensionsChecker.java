@@ -145,6 +145,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
@@ -165,6 +166,7 @@ import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifiers;
+import org.xipki.pki.ca.qa.impl.internal.QaTlsFeature;
 import org.xipki.security.api.ExtensionExistence;
 import org.xipki.security.api.HashCalculator;
 import org.xipki.security.api.KeyUsage;
@@ -243,6 +245,8 @@ public class ExtensionsChecker {
     private BiometricInfoOption biometricInfo;
 
     private QaAuthorizationTemplate authorizationTemplate;
+
+    private QaTlsFeature tlsFeature;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -490,6 +494,16 @@ public class ExtensionsChecker {
                 }
             }
 
+            // tlsFeature
+            type = ObjectIdentifiers.id_pe_tlsfeature;
+            if (extensionControls.containsKey(type)) {
+                TlsFeature extConf = (TlsFeature) getExtensionValue(
+                        type, extensionsType, TlsFeature.class);
+                if (extConf != null) {
+                    tlsFeature = new QaTlsFeature(extConf);
+                }
+            }
+
             // AuthorizationTemplate
             type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
             if (extensionControls.containsKey(type)) {
@@ -663,6 +677,10 @@ public class ExtensionsChecker {
                 } else if (Extension.biometricInfo.equals(oid)) {
                     // biometricInfo
                     checkExtensionBiometricInfo(failureMsg, extensionValue, requestExtensions,
+                            extControl);
+                } else if (ObjectIdentifiers.id_pe_tlsfeature.equals(oid)) {
+                    // tlsFeature
+                    checkExtensionTlsFeature(failureMsg, extensionValue, requestExtensions,
                             extControl);
                 } else if (ObjectIdentifiers.id_xipki_ext_authorizationTemplate.equals(oid)) {
                     // authorizationTemplate
@@ -1396,6 +1414,59 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
     } // method checkExtensionExtendedKeyUsage
+
+    private void checkExtensionTlsFeature(
+            final StringBuilder failureMsg,
+            final byte[] extensionValue,
+            final Extensions requestExtensions,
+            final ExtensionControl extControl) {
+        QaTlsFeature conf = tlsFeature;
+        if (conf == null) {
+            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_pe_tlsfeature,
+                    requestExtensions, extControl);
+            if (!Arrays.equals(expected, extensionValue)) {
+                failureMsg.append("extension valus is '")
+                    .append(hex(extensionValue));
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null)
+                        ? "not present"
+                        : hex(expected));
+                failureMsg.append("'");
+                failureMsg.append("; ");
+            }
+            return;
+        }
+
+        Set<String> isFeatures = new HashSet<>();
+        ASN1Sequence seq =
+                ASN1Sequence.getInstance(extensionValue);
+        final int n = seq.size();
+        for (int i = 0; i < n; i++) {
+            ASN1Integer asn1Feature = ASN1Integer.getInstance(seq.getObjectAt(i));
+            isFeatures.add(asn1Feature.getPositiveValue().toString());
+        }
+
+        Set<String> expFeatures = new HashSet<>();
+        for (Integer m : conf.getFeatures()) {
+            expFeatures.add(m.toString());
+        }
+
+        Set<String> diffs = str_in_b_not_in_a(expFeatures, isFeatures);
+        if (CollectionUtil.isNotEmpty(diffs)) {
+            failureMsg.append("features ")
+                .append(diffs.toString())
+                .append(" are present but not expected");
+            failureMsg.append("; ");
+        }
+
+        diffs = str_in_b_not_in_a(isFeatures, expFeatures);
+        if (CollectionUtil.isNotEmpty(diffs)) {
+            failureMsg.append("features ")
+                .append(diffs.toString())
+                .append(" are absent but are required");
+            failureMsg.append("; ");
+        }
+    } // method checkExtensionTlsFeature
 
     private void checkExtensionCertificatePolicies(
             final StringBuilder failureMsg,
