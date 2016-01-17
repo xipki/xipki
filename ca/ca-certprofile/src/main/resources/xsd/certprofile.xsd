@@ -89,7 +89,6 @@
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
           </xs:sequence>
           <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="optional"/>
-          <xs:attribute name="duplicateCNPermitted" type="xs:boolean" use="optional"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="extensions" type="extensionsType"/>
