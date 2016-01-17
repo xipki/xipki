@@ -156,10 +156,6 @@
           remarks="whether duplicate subject is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="3" name="DUPLICATE_CN" type="SMALLINT"
-          remarks="whether duplicate common name is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
-        <constraints nullable="false"/>
-      </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
       <column name="PERMISSIONS" type="VARCHAR(200)">
         <constraints nullable="false"/>
@@ -372,9 +368,6 @@
           remarks="first 8 bytes of the SHA1 sum of the public key">
         <constraints nullable="false"/>
       </column>
-      <column name="FP_CN" type="BIGINT"
-          remarks="first 8 bytes of the SHA1 sum of the public key">
-      </column>
       <column name="LUPDATE" type="BIGINT"
           remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
@@ -418,9 +411,6 @@
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FPS">
       <column name="FP_S"/>
-    </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FPCN">
-      <column name="FP_CN"/>
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FPRS">
       <column name="FP_RS"/>

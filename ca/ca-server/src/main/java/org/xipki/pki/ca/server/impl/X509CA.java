@@ -1933,17 +1933,6 @@ public class X509CA {
             subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
-        DuplicationMode cnMode = caInfo.getDuplicateCNMode();
-        if (cnMode == DuplicationMode.PERMITTED && !certprofile.isDuplicateCNPermitted()) {
-            cnMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
-        }
-
-        long fpCn = 0;
-        String cn = X509Util.getCommonName(grantedSubject);
-
-        if (StringUtil.isNotBlank(cn)) {
-            fpCn = FpIdCalculator.hash(cn);
-        }
         long fpSubject = X509Util.fp_canonicalized_name(grantedSubject);
         String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
 
@@ -2012,25 +2001,6 @@ public class X509CA {
                             + keyMode);
                 }
             } // end if (keyMode)
-
-            if (cnMode != DuplicationMode.PERMITTED && StringUtil.isNotBlank(cn)) {
-                if (cnMode == DuplicationMode.FORBIDDEN) {
-                    if (fpCn != 0 && certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn)) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given CN already issued");
-                    }
-                } else if (cnMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE) {
-                    if (fpCn != 0 && certstore.isCertForCNIssued(caInfo.getCertificate(), fpCn,
-                            certprofileName)) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given CN and profile " + certprofileName
-                                + " already issued");
-                    }
-                } else {
-                    throw new RuntimeException("should not reach here, unknown CN DuplicationMode "
-                            + keyMode);
-                }
-            } // end if (cnMode)
 
             if (subjectMode != DuplicationMode.PERMITTED) {
                 final boolean incSerial = certprofile.incSerialNumberIfSubjectExists();
