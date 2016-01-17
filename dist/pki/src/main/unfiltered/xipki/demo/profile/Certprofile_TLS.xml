@@ -144,7 +144,7 @@
     </extension>
     <extension required="true" permittedInRequest="false">
       <type description="tlsFeature">1.3.6.1.5.5.7.1.24</type>
-      <critical>false</critical>
+      <critical>true</critical>
       <value>
         <tlsFeature>
           <feature description="status_request">5</feature>
