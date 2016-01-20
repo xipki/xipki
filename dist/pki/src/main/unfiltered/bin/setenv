@@ -53,7 +53,7 @@
 # XiPKI configuration
 #
 
-export JAVA_MAX_MEM = 2048M
+export JAVA_MAX_MEM=2048M
 
 UNAME=`uname -s`_`uname -m`
 UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`

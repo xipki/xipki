@@ -67,7 +67,7 @@ rem
 rem XiPKI configuration
 rem
 
-SET JAVA_MAX_MEM = 2048M
+SET JAVA_MAX_MEM=2048M
 if "%PROCESSOR_ARCHITECTURE%"=="x86" goto 32BIT
 SET NATIVE_LIB=xipki\native-lib\windows\win_x64
 goto OS_END
