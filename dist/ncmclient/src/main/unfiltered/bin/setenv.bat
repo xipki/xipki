@@ -62,23 +62,7 @@ goto OS_END
 SET NATIVE_LIB=native-lib\windows\win_x86
 :OS_END
 
-rem prevent from regenerating the host key for SSH server on every newstart of karaf
-SET KARAF_OPTS=%KARAF_OPTS% -Dorg.apache.sshd.registerBouncyCastle=false
-
 SET PATH = %PATH% %NATIVE_LIB%
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox
 SET KARAF_OPTS=KARAF_OPTS% -Djava.library.path=%NATIVE_LIB%
-rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.signservice.timeout=10000
-SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=console
-rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=gui
-SET KARAF_OPTS=%KARAF_OPTS% -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1
-SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.trustStore=etc\tlskeys\tls-client-truststore.jks
-SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.trustStorePassword=1234
-SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.keyStore=etc\tlskeys\tls-client-keystore.jks
-SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.keyStorePassword=1234
-SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
-SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultConnectTimeout=60000
-SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultReadTimeout=60000
-rem SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.debug=all
-SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.ignore.regex=\..*
