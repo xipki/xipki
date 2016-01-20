@@ -66,8 +66,8 @@ public class Range {
             throw new IllegalArgumentException("min and max cannot be both null");
         }
         if (min != null && max != null && min > max) {
-            throw new IllegalArgumentException("min cannot be greater than max: "
-                    + min + " > " + max);
+            throw new IllegalArgumentException(
+                String.format("min cannot be greater than max: %d > %d", min, max));
         }
         this.min = min;
         this.max = max;

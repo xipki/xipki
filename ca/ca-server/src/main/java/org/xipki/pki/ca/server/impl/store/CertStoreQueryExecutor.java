@@ -170,7 +170,7 @@ class CertStoreQueryExecutor {
     private NameIdStore initNameIdStore(
             final String tableName)
     throws DataAccessException {
-        final String sql = new StringBuilder("SELECT ID, NAME FROM ").append(tableName).toString();
+        final String sql = "SELECT ID, NAME FROM " + tableName;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -451,7 +451,8 @@ class CertStoreQueryExecutor {
             final X509Cert caCert,
             final String publisherName)
     throws OperationException, DataAccessException {
-        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM PUBLISHQUEUE");
+        StringBuilder sqlBuilder = new StringBuilder(80);
+        sqlBuilder.append("DELETE FROM PUBLISHQUEUE");
 
         if (caCert != null || publisherName != null) {
             sqlBuilder.append(" WHERE");

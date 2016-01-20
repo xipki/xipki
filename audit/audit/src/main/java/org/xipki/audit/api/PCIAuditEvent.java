@@ -56,13 +56,13 @@ public class PCIAuditEvent {
 
     private static final String UNDEFINED = "undefined";
 
-    private static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
-
-    private static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
-
     private static final char DEFAULT_DELIMITER = ' ';
 
     private static final String DEFAULT_REPLACE_DELIMITER = "_";
+
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+
+    private static final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 
     /**
      * 10.3.1 "User Identification"
@@ -106,8 +106,14 @@ public class PCIAuditEvent {
 
     public PCIAuditEvent(
             final Date date) {
-        this.date = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(date);
-        this.time = new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(date);
+        synchronized (dateFormatter) {
+            this.date = dateFormatter.format(date);
+        }
+
+        synchronized (timeFormatter) {
+            this.time = timeFormatter.format(date);
+        }
+
         this.level = AuditLevel.INFO;
     }
 
@@ -195,7 +201,7 @@ public class PCIAuditEvent {
 
     public CharArrayWriter toCharArrayWriter(
             final String prefix) {
-        CharArrayWriter buffer = new CharArrayWriter();
+        CharArrayWriter buffer = new CharArrayWriter(100);
 
         final char delimiter = DEFAULT_DELIMITER;
         final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;

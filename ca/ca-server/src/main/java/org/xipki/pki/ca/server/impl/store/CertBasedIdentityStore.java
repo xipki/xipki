@@ -68,7 +68,8 @@ class CertBasedIdentityStore {
         for (CertBasedIdentityEntry existingEntry : entries) {
             if (existingEntry.getId() == entry.getId()) {
                 throw new IllegalArgumentException(
-                        table + " with the same id " + entry.getId() + " already available");
+                    String.format("%s with the same id %d already available",
+                        table, entry.getId()));
             }
         }
 

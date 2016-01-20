@@ -388,8 +388,8 @@ public class SubjectDNSpec {
         if (stringType != null) {
             if (stringTypeSets.containsKey(type)
                     && !stringTypeSets.get(type).contains(stringType)) {
-                throw new CertprofileException(stringType.name() + " is not allowed "
-                        + type.getId());
+                throw new CertprofileException(
+                    String.format("%s is not allowed %s", stringType.name(), type.getId()));
             }
         } else {
             StringType specStrType = defaultStringTypes.get(type);
