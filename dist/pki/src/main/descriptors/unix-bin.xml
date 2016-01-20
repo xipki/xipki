@@ -29,6 +29,7 @@
         <include>**/*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
+      <lineEnding>unix</lineEnding>
       <filtered>false</filtered>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
@@ -50,6 +51,7 @@
         <include>**/*.sh</include>
       </includes>
       <outputDirectory>.</outputDirectory>
+      <lineEnding>unix</lineEnding>
       <filtered>false</filtered>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
@@ -90,6 +92,7 @@
         <include>**/*.sh</include>
       </includes>
       <outputDirectory>xipki</outputDirectory>
+      <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
