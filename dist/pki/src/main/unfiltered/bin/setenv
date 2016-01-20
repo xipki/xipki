@@ -36,7 +36,10 @@
 # karaf scripts
 #
 # export JAVA_MIN_MEM # Minimum memory for the JVM
-# export JAVA_MAX_MEM # Maximum memory for the JVM
+
+# Maximum memory for the JVM
+export JAVA_MAX_MEM = 2048M
+
 # export JAVA_PERM_MEM # Minimum perm memory for the JVM
 # export JAVA_MAX_PERM_MEM # Maximum memory for the JVM
 # export KARAF_HOME # Karaf home folder
@@ -49,24 +52,8 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="xipki/native-lib/unix/$UNAME"
 
-# prevent from regenerating the host key for SSH server on every newstart of karaf
-KARAF_OPTS="$KARAF_OPTS -Dorg.apache.sshd.registerBouncyCastle=false"
-
 #KARAF_OPTS="$KARAF_OPTS -DNSSLIB=/point/to/firefox"
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
-#KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.signservice.timeout=10000"
-KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.console.passwordui=console"
-#KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.console.passwordui=gui"
-KARAF_OPTS="$KARAF_OPTS -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
-KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStore=etc/tlskeys/tls-client-truststore.jks"
-KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStorePassword=1234"
-KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStore=etc/tlskeys/tls-client-keystore.jks"
-KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStorePassword=1234"
-KARAF_OPTS="$KARAF_OPTS -Dsun.net.http.errorstream.enableBuffering=true"
-KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultConnectTimeout=60000"
-KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultReadTimeout=60000"
-#KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
-KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.console.ignore.regex=\..*"
 
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
 export KARAF_OPTS
