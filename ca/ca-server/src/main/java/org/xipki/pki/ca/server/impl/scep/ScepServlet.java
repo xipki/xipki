@@ -38,7 +38,6 @@ package org.xipki.pki.ca.server.impl.scep;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.cms.CMSSignedData;
@@ -154,7 +154,7 @@ public class ScepServlet extends HttpServlet {
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
-        OutputStream respStream = response.getOutputStream();
+        //OutputStream respStream = response.getOutputStream();
 
         try {
             if (responderManager == null) {
@@ -249,21 +249,23 @@ public class ScepServlet extends HttpServlet {
                     auditStatus = AuditStatus.FAILED;
                     return;
                 }
-                byte[] respBytes = ci.getEncoded();
                 response.setContentType(CT_RESPONSE);
-                response.setContentLength(respBytes.length);
-                respStream.write(respBytes);
+
+                ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
+                asn1Out.writeObject(ci);
+                asn1Out.flush();
             } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_text_palin);
                 byte[] caCapsBytes = responder.getCaCaps().getBytes();
-                respStream.write(caCapsBytes);
+
+                response.getOutputStream().write(caCapsBytes);
             } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 byte[] respBytes = responder.getCACertResp().getBytes();
                 response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
                 response.setContentLength(respBytes.length);
-                respStream.write(respBytes);
+                response.getOutputStream().write(respBytes);
             } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentLength(0);

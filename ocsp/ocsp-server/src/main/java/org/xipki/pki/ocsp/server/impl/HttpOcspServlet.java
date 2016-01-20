@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.cert.ocsp.OCSPReq;
@@ -245,12 +246,12 @@ public class HttpOcspServlet extends HttpServlet {
                 auditStatus = AuditStatus.FAILED;
             } else {
                 OCSPResp resp = ocspRespWithCacheInfo.getResponse();
-                byte[] encodedOcspResp = resp.getEncoded();
+                byte[] encodedOcspResp = null;
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentLength(encodedOcspResp.length);
 
                 ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
                 if (getMethod && cacheInfo != null) {
+                    encodedOcspResp = resp.getEncoded();
                     long now = System.currentTimeMillis();
                     // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
                     // the HTTP response.
@@ -286,7 +287,14 @@ public class HttpOcspServlet extends HttpServlet {
                     response.setHeader("Cache-Control", "max-age=" + maxAge
                             + ",public,no-transform,must-revalidate");
                 } // end if (getMethod && cacheInfo != null)
-                response.getOutputStream().write(encodedOcspResp);
+
+                if(encodedOcspResp != null) {
+                    response.getOutputStream().write(encodedOcspResp);
+                } else {
+                    ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
+                    asn1Out.writeObject(resp.toASN1Structure());
+                    asn1Out.flush();
+                }
             } // end if (ocspRespWithCacheInfo)
         } catch (EOFException e) {
             final String message = "Connection reset by peer";
