@@ -802,13 +802,15 @@ public class Scep {
             final AuditEvent audit,
             final String name,
             final String value) {
-        if (audit != null) {
-            audit.addEventData(
-                    new AuditEventData(name,
-                            (value == null)
-                                ? "null"
-                                : value));
+        if (audit == null) {
+            return;
         }
+
+        audit.addEventData(
+            new AuditEventData(name,
+                (value == null)
+                    ? "null"
+                    : value));
     } // method audit
 
 }

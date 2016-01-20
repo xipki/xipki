@@ -95,14 +95,16 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             unit = Unit.DAY;
             numValdityS = validityS;
         } else {
-            throw new IllegalArgumentException("invalid validityS: " + validityS);
+            throw new IllegalArgumentException(
+                String.format("invalid validityS: %s", validityS));
         }
 
         int validity;
         try {
             validity = Integer.parseInt(numValdityS);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("invalid validityS: " + validityS);
+            throw new IllegalArgumentException(
+                    String.format("invalid validityS: ", validityS));
         }
         return new CertValidity(validity, unit);
     } // method getInstance
@@ -155,7 +157,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
             return c.getTime();
         default:
-            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
+            throw new RuntimeException(
+                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
         }
     } // method add
 
@@ -168,7 +171,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         case YEAR:
             return (365 * validity + validity / 4) * 24;
         default:
-            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
+            throw new RuntimeException(
+                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 
@@ -222,7 +226,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         case YEAR:
             return validity + "y";
         default:
-            throw new RuntimeException("should not reach here, unknown CertValidity.Unit " + unit);
+            throw new RuntimeException(
+                String.format("should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 

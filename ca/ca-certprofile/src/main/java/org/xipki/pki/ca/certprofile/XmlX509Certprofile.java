@@ -306,7 +306,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             int intVersion = conf.getVersion().intValue();
             this.version = X509CertVersion.getInstance(intVersion);
             if (this.version == null) {
-                throw new CertprofileException("invalid version " + intVersion);
+                throw new CertprofileException(
+                    String.format("invalid version %s", intVersion));
             }
         } else {
             this.version = X509CertVersion.V3;

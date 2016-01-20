@@ -105,7 +105,8 @@ public abstract class X509Certprofile {
                     : Integer.parseInt(currentSerialNumber.trim());
             return Integer.toString(currentSN + 1);
         } catch (NumberFormatException e) {
-            throw new BadFormatException("invalid serialNumber attribute " + currentSerialNumber);
+            throw new BadFormatException(
+                String.format("invalid serialNumber attribute %s", currentSerialNumber));
         }
     }
 

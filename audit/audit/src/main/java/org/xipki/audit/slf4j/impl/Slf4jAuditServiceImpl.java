@@ -110,10 +110,6 @@ public class Slf4jAuditServiceImpl implements AuditService {
 
     private static String createMessage(
             final AuditEvent event) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(event.getLevel().getAlignedText()).append(" | ");
-
         String applicationName = event.getApplicationName();
         if (applicationName == null) {
             applicationName = "undefined";
@@ -124,6 +120,9 @@ public class Slf4jAuditServiceImpl implements AuditService {
             name = "undefined";
         }
 
+        StringBuilder sb = new StringBuilder(150);
+
+        sb.append(event.getLevel().getAlignedText()).append(" | ");
         sb.append(applicationName).append(" - ").append(name);
 
         AuditStatus status = event.getStatus();
