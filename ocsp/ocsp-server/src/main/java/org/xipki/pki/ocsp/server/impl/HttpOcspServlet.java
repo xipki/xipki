@@ -288,7 +288,7 @@ public class HttpOcspServlet extends HttpServlet {
                             + ",public,no-transform,must-revalidate");
                 } // end if (getMethod && cacheInfo != null)
 
-                if(encodedOcspResp != null) {
+                if (encodedOcspResp != null) {
                     response.getOutputStream().write(encodedOcspResp);
                 } else {
                     ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
