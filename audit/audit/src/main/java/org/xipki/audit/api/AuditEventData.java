@@ -73,7 +73,8 @@ public class AuditEventData {
             final String parameterName,
             final Object parameter) {
         if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+            throw new IllegalArgumentException(
+                String.format("%s could not be null", parameterName));
         }
     }
 
@@ -81,11 +82,13 @@ public class AuditEventData {
             final String parameterName,
             final String parameter) {
         if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+            throw new IllegalArgumentException(
+                    String.format("%s could not be null", parameterName));
         }
 
         if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
+            throw new IllegalArgumentException(
+                    String.format("%s could not be empty", parameterName));
         }
     }
 
