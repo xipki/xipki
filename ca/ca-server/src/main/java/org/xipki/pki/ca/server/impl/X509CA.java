@@ -2184,6 +2184,15 @@ public class X509CA {
                 }
 
                 byte[] encodedCert = bcCert.getEncoded();
+                int maxCertSize = certprofile.getMaxCertSize();
+                if (maxCertSize > 0) {
+                    int certSize = encodedCert.length;
+                    if (certSize > maxCertSize) {
+                        throw new OperationException(ErrorCode.NOT_PERMITTED,
+                            String.format("certificate exceeds the maximal allowed size: %d > %d",
+                                certSize, maxCertSize));
+                    }
+                }
 
                 X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(
                         new ByteArrayInputStream(encodedCert));

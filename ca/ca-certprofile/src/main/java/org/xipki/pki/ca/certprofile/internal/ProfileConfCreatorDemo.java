@@ -1404,6 +1404,7 @@ public class ProfileConfCreatorDemo {
 
         profile.setAppInfo(createDescription(description));
         profile.setCa(ca);
+        profile.setMaxSize(5000);
         profile.setVersion(3);
         profile.setValidity(validity);
         profile.setNotBeforeTime(useMidnightNotBefore

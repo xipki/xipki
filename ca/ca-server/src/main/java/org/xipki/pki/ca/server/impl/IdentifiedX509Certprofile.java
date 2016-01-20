@@ -634,6 +634,10 @@ class IdentifiedX509Certprofile {
         return certprofile.getExtendedKeyUsages();
     }
 
+    public int getMaxCertSize() {
+        return certprofile.getMaxCertSize();
+    }
+
     public void validate()
     throws CertprofileException {
         StringBuilder msg = new StringBuilder();

@@ -191,4 +191,11 @@ public abstract class X509Certprofile {
 
     public abstract boolean incSerialNumberIfSubjectExists();
 
+    /**
+     * @return maximal size of the certificate, 0 or negative value indicates accepting all sizes.
+     */
+    public int getMaxCertSize() {
+        return 0;
+    }
+
 }
