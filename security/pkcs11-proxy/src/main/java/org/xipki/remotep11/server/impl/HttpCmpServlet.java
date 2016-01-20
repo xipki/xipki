@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,12 +140,12 @@ public class HttpCmpServlet extends HttpServlet {
 
             PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool,
                     moduleName, pkiReq);
-            byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(HttpCmpServlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentLength(pkiRespBytes.length);
-            response.getOutputStream().write(pkiRespBytes);
+            ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
+            asn1Out.writeObject(pkiResp);
+            asn1Out.flush();
         } catch (EOFException e) {
             final String message = "connection reset by peer";
             LOG.error(message + ". {}: {}", e.getClass().getName(), e.getMessage());
