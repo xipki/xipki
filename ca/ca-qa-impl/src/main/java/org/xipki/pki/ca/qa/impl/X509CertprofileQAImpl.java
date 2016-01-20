@@ -196,7 +196,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         ValidationIssue issue;
 
         // certificate size
-        issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
+        issue = new ValidationIssue("X509.SIZE", "certificate size");
         resultIssues.add(issue);
         if (maxSize > 0) {
             int size = certBytes.length;
