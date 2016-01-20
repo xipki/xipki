@@ -132,7 +132,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             return;
         }
 
-        CharArrayWriter sb = new CharArrayWriter();
+        CharArrayWriter sb = new CharArrayWriter(150);
         if (notEmpty(prefix)) {
             sb.append(prefix);
         }
@@ -183,7 +183,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         try {
             syslog.sendMessage(sm);
         } catch (IOException e) {
-            LOG.error("Could not send syslog message: " + e.getMessage());
+            LOG.error("Could not send syslog message: {}", e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
     } // method logEvent(AuditEvent)
@@ -220,7 +220,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         try {
             syslog.sendMessage(sm);
         } catch (IOException e) {
-            LOG.error("Could not send syslog message: " + e.getMessage());
+            LOG.error("Could not send syslog message: {}", e.getMessage());
             LOG.debug("Could not send syslog message", e);
         }
     } // method logEvent(PCIAuditEvent)
@@ -272,7 +272,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             }
 
             if (sysFacility == null) {
-                LOG.warn("unknown facility, use the default one '" + DFLT_SYSLOG_FACILITY);
+                LOG.warn("unknown facility, use the default one '{}'", DFLT_SYSLOG_FACILITY);
                 sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
             }
 
@@ -286,7 +286,7 @@ public class SyslogAuditServiceImpl implements AuditService {
             this.initialized = true;
             LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
         } catch (Exception e) {
-            LOG.error("error while configuring syslog sender: "  + e.toString());
+            LOG.error("error while configuring syslog sender: {}", e.getMessage());
         }
     } // method init
 
@@ -376,7 +376,8 @@ public class SyslogAuditServiceImpl implements AuditService {
         case ERROR:
             return Severity.ERROR;
         default:
-            throw new RuntimeException("unknown auditLevel '" + auditLevel + "'");
+            throw new RuntimeException(
+                String.format("unknown auditLevel '%s'", auditLevel));
         }
     }
 
