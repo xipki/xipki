@@ -230,6 +230,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue tlsFeature;
 
+    private Integer maxSize;
+
     private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
     private void reset() {
@@ -268,6 +270,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         biometricDataOption = null;
         tlsFeature = null;
         constantExtensions = null;
+        maxSize = null;
     } // method reset
 
     @Override
@@ -327,6 +330,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         this.raOnly = conf.isRaOnly();
+
+        this.maxSize = conf.getMaxSize();
 
         this.validity = CertValidity.getInstance(conf.getValidity());
         this.ca = conf.isCa();
@@ -1167,6 +1172,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public boolean isOnlyForRA() {
         return raOnly;
+    }
+
+    @Override
+    public int getMaxCertSize() {
+        return (maxSize == null)
+                ? super.getMaxCertSize()
+                : maxSize;
     }
 
     @Override

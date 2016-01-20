@@ -117,6 +117,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
 
     private final boolean notBeforeMidnight;
 
+    private final int maxSize;
+
     private static final long _2050010100_EPOCHTIME = 2524608000L;
 
     public X509CertprofileQAImpl(
@@ -136,6 +138,11 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
             if (this.version == null) {
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }
+
+            Integer i = conf.getMaxSize();
+            this.maxSize = (i == null)
+                    ? 0
+                    : i;
 
             if (conf.getSignatureAlgorithms() == null) {
                 this.signatureAlgorithms = null;
@@ -186,9 +193,22 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
         Certificate bcCert;
         TBSCertificate tbsCert;
         X509Certificate cert;
+        ValidationIssue issue;
+
+        // certificate size
+        issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
+        resultIssues.add(issue);
+        if (maxSize > 0) {
+            int size = certBytes.length;
+            if (size > maxSize) {
+                issue.setFailureMessage(
+                    String.format("certificate exceeds the maximal allowed size: %d > %d",
+                            size, maxSize));
+            }
+        }
 
         // certificate encoding
-        ValidationIssue issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
+        issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
         resultIssues.add(issue);
         try {
             bcCert = Certificate.getInstance(certBytes);

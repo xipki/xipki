@@ -95,6 +95,7 @@
       <xs:any namespace="##other" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="raOnly" type="xs:boolean" default="false" use="optional"/>
+    <xs:attribute name="maxSize" type="xs:int" use="optional"/>
   </xs:complexType>
   <xs:complexType name="anyType">
     <xs:sequence>
