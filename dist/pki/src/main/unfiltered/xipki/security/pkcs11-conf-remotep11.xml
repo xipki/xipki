@@ -2,7 +2,7 @@
 <PKCS11Conf xmlns="http://xipki.org/xipki/pkcs11/conf/v1">
   <modules defaultModule="abc">
     <module name="abc">
-      <nativeLibraries>        
+      <nativeLibraries>
         <nativeLibrary>
           <path>url=https://localhost:9443/p11proxy</path>
         </nativeLibrary>
