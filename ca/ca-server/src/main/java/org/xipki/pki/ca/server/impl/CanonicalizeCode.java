@@ -89,10 +89,13 @@ public class CanonicalizeCode {
 
     private final static String THROWS_PREFIX = "    ";
 
-    private static final List<String> textFileExtensions = Arrays.asList("");
-    
+    private static final List<String> textFileExtensions = Arrays.asList(
+            "txt", "properties", "cfg", "md", "xml", "xsd", "script",
+            "properties-db2", "properties-h2", "properties-hsqldb",
+            "properties-mysql", "properties-oracle", "properties-postgres");
+
     private final String baseDir;
-    
+
     private final int baseDirLen;
 
     public static void main(
@@ -130,18 +133,18 @@ public class CanonicalizeCode {
                     canonicalizeDir(file);
                 }
             } else {
-            	String filename = file.getName();
-            	
-            	int idx = filename.lastIndexOf('.');
-            	String extension = (idx == -1)
-            			? filename
-            			: filename.substring(idx + 1);
-            	extension = extension.toLowerCase();
-            	
-                if (filename.equals("java")) {
-                	canonicalizeJavaFile(file);
+                String filename = file.getName();
+
+                int idx = filename.lastIndexOf('.');
+                String extension = (idx == -1)
+                        ? filename
+                        : filename.substring(idx + 1);
+                extension = extension.toLowerCase();
+
+                if (extension.equals("java")) {
+                    canonicalizeJavaFile(file);
                 } else if(textFileExtensions.contains(extension)) {
-                	canonicalizeFile(file);
+                    canonicalizeFile(file);
                 }
             }
         }
@@ -260,8 +263,20 @@ public class CanonicalizeCode {
                         && !file.getName().equals("tbd")) {
                     checkWarningsInDir(file);
                 }
-            } else if (file.isFile() && file.getName().endsWith(".java")) {
-                checkWarningsInFile(file);
+
+                continue;
+            } else {
+                String filename = file.getName();
+
+                int idx = filename.lastIndexOf('.');
+                String extension = (idx == -1)
+                        ? filename
+                        : filename.substring(idx + 1);
+                extension = extension.toLowerCase();
+
+                if (extension.equals("java")) {
+                    checkWarningsInFile(file);
+                }
             }
         }
     } // method checkWarningsInDir
@@ -373,7 +388,7 @@ public class CanonicalizeCode {
             System.out.println("Please check file " + file.getPath().substring(baseDirLen)
                     + ": no authors line");
         }
-    } // method checkWarningsInFile
+    } // method checkWarningsInJavaFile
 
     /**
      * replace tab by 4 spaces, delete white spaces at the end

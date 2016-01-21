@@ -2,7 +2,7 @@ http://www.critiqueslibres.com/blog/?p=1603
 
 
 MySQL slow performance with updates
-Publié le 30 août 2012 par Pierre	
+Publié le 30 août 2012 par Pierre    
 
 This week-end I moved the site to a new server at my hoster (www.ovh.net). After five years, it was a serious hardware upgrade, going from 2G of RAM to 16G of RAM for example and from a pentium dual core to a i3 quad core machine. But I was very disappointed by the performance of the new server and by looking in the slow query log I could see that MySQL was the culprit.
 

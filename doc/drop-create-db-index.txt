@@ -24,8 +24,8 @@
       referencedTableName="CERT"/>
     <addForeignKeyConstraint constraintName="FK_CRAW_CERT1"
       deferrable="false" initiallyDeferred="false"
-    		baseTableName="CRAW" baseColumnNames="CID" 
-    		onDelete="CASCADE"
+            baseTableName="CRAW" baseColumnNames="CID" 
+            onDelete="CASCADE"
             onUpdate="NO ACTION"
             referencedColumnNames="ID"
             referencedTableName="CERT"/>
