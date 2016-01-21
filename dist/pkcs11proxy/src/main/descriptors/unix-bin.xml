@@ -5,9 +5,7 @@
     <format>tar.gz</format>
   </formats>
   <fileSets>
-    <!--
-        Copy TLS keys
-    -->
+    <!-- Copy TLS keys -->
     <fileSet>
       <directory>${project.basedir}/../demo-tlskeys</directory>
       <outputDirectory>etc/tlskeys</outputDirectory>
@@ -18,62 +16,34 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy over everything that needs to get unix line endings -->
     <fileSet>
-      <directory>${project.build.directory}/classes/etc</directory>
-      <outputDirectory>etc/</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- Copy over everything unfiltered ressources -->
-    <fileSet>
-      <directory>${project.basedir}/src/main/unfiltered</directory>
-      <outputDirectory>.</outputDirectory>
-      <filtered>false</filtered>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/features-repo</directory>
-      <outputDirectory>system</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${shared.dir}/unfiltered</directory>
+      <directory>${output.directory}</directory>
       <includes>
-        <include>**/*.sh</include>
+        <include>bin/**</include>
       </includes>
-      <outputDirectory>.</outputDirectory>
+      <excludes>
+        <exclude>bin/*.bat</exclude>
+      </excludes>
+      <outputDirectory>/</outputDirectory>
       <lineEnding>unix</lineEnding>
-      <filtered>false</filtered>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${shared.dir}/unfiltered</directory>
+      <directory>${output.directory}</directory>
       <excludes>
-        <exclude>**/*.sh</exclude>
-        <exclude>**/*.bat</exclude>
+        <exclude>bin/**</exclude>
       </excludes>
-      <outputDirectory>.</outputDirectory>
-      <filtered>false</filtered>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
-      <!-- in case we replace them with updated scripts
-      <directory>${project.basedir}/src/main/bin/unix</directory>
-      -->
-      <directory>${project.build.directory}/dependencies/apache-karaf-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <excludes>
+        <exclude>*.bat</exclude>
+      </excludes>
       <outputDirectory>bin/</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -81,14 +51,13 @@
     </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
-      <directory>${project.build.directory}/dependencies/apache-karaf-${karaf.version}</directory>
+      <directory>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
-        <!--
-            exclude files and directories without replacement
-        -->
+        <exclude>bin/**</exclude>
         <exclude>**/demos/**</exclude>
         <exclude>deploy/README</exclude>
+        <exclude>README</exclude>
         <exclude>LICENSE</exclude>
         <exclude>NOTICE</exclude>
         <exclude>RELEASE-NOTES</exclude>
@@ -100,18 +69,22 @@
   </fileSets>
   <files>
     <file>
+      <source>${project.basedir}/../../README.md</source>
+      <outputDirectory>xipki</outputDirectory>
+      <destName>README.md</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.basedir}/../../LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>xipki-LICENSE</destName>
       <fileMode>0644</fileMode>
-      <lineEnding>unix</lineEnding>
     </file>
     <file>
-      <source>${project.build.directory}/dependencies/apache-karaf-${karaf.version}/LICENSE</source>
+      <source>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}/LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>
-      <lineEnding>unix</lineEnding>
     </file>
   </files>
 </assembly>

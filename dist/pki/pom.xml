@@ -11,13 +11,14 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>PKI</app.name>
+    <features.artifactId>pki</features.artifactId>
     <assembly.finalName>xipki-pki</assembly.finalName>
     <boot.features>http-whiteboard, xipki-caserver</boot.features>
-    <shared.dir>${project.basedir}/../shared</shared.dir>
-    <features.repo>${project.build.directory}/features-repo</features.repo>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.185</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
+    <output.directory>${project.build.directory}/classes</output.directory>
+    <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
   <dependencies>
     <dependency>
@@ -47,8 +48,22 @@
         </includes>
       </resource>
       <resource>
+        <directory>src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
         <directory>${shared.dir}/filtered</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${shared.dir}/unfiltered</directory>
+        <filtering>false</filtering>
         <includes>
           <include>**/*</include>
         </includes>
@@ -87,14 +102,14 @@
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>target/dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/unix-karaf</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/windows-dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/windows-karaf</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -113,7 +128,7 @@
                   <artifactId>pkcs11-wrapper-native</artifactId>
                   <version>${pkcs11-wrapper.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/xipki/native-lib</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki/native-lib</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -133,7 +148,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>sql/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -153,7 +168,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -161,7 +176,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -169,7 +184,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -177,7 +192,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -185,7 +200,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -193,7 +208,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -201,7 +216,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -221,7 +236,7 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>target/xipki</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -233,7 +248,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/jdbc</outputDirectory>
+              <outputDirectory>${output.directory}/lib/ext</outputDirectory>
               <!-- Define here the JDBC drivers -->
               <artifactItems>
                 <artifactItem>
@@ -269,14 +284,7 @@
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <!-- where to put the artifacts -->
-              <repository>${features.repo}</repository>
-              <!--
-                  Feature Descriptors (Karaf core features are available by default)
-
-                  NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
-                  to make them visible after deployment.
-              -->
+              <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</descriptor>
               </descriptors>

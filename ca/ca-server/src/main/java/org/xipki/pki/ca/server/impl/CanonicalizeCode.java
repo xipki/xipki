@@ -89,7 +89,10 @@ public class CanonicalizeCode {
 
     private final static String THROWS_PREFIX = "    ";
 
+    private static final List<String> textFileExtensions = Arrays.asList("");
+    
     private final String baseDir;
+    
     private final int baseDirLen;
 
     public static void main(
@@ -126,13 +129,25 @@ public class CanonicalizeCode {
                         && !file.getName().equals("tbd")) {
                     canonicalizeDir(file);
                 }
-            } else if (file.isFile() && file.getName().endsWith(".java")) {
-                canonicalizeFile(file);
+            } else {
+            	String filename = file.getName();
+            	
+            	int idx = filename.lastIndexOf('.');
+            	String extension = (idx == -1)
+            			? filename
+            			: filename.substring(idx + 1);
+            	extension = extension.toLowerCase();
+            	
+                if (filename.equals("java")) {
+                	canonicalizeJavaFile(file);
+                } else if(textFileExtensions.contains(extension)) {
+                	canonicalizeFile(file);
+                }
             }
         }
     } // method canonicalizeDir
 
-    private void canonicalizeFile(
+    private void canonicalizeJavaFile(
             final File file)
     throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -168,7 +183,7 @@ public class CanonicalizeCode {
                     continue;
                 }
 
-                String canonicalizedLine = canonicalizeLine(line);
+                String canonicalizedLine = canonicalizeJavaLine(line);
                 boolean addThisLine = true;
                 if (canonicalizedLine.isEmpty()) {
                     if (!lastLineEmpty) {
@@ -184,6 +199,36 @@ public class CanonicalizeCode {
                     writer.write(canonicalizedLine.getBytes());
                     writer.write('\n');
                 }
+            } // end while
+        } finally {
+            writer.close();
+            reader.close();
+        }
+
+        byte[] oldBytes = IoUtil.read(file);
+        byte[] newBytes = writer.toByteArray();
+        if (!Arrays.equals(oldBytes, newBytes)) {
+            File newFile = new File(file.getPath() + "-new");
+            IoUtil.save(file, newBytes);
+            newFile.renameTo(file);
+            System.out.println(file.getPath().substring(baseDirLen));
+        }
+    } // method canonicalizeJavaFile
+
+    private void canonicalizeFile(
+            final File file)
+    throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+
+        try {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String canonicalizedLine = line.replaceAll("\t", "    ");
+                writer.write(canonicalizedLine.getBytes());
+                writer.write('\n');
             } // end while
         } finally {
             writer.close();
@@ -335,7 +380,7 @@ public class CanonicalizeCode {
      * @param line
      * @return
      */
-    private static String canonicalizeLine(
+    private static String canonicalizeJavaLine(
             final String line) {
         if (line.trim().startsWith("//")) {
             // comments
@@ -369,7 +414,7 @@ public class CanonicalizeCode {
         }
 
         return sb.toString();
-    } // end canonicalizeLine
+    } // end canonicalizeJavaLine
 
     private static String removeTrailingSpaces(
             final String line) {

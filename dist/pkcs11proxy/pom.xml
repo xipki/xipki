@@ -11,10 +11,11 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>PKCS#11 proxy</app.name>
+    <features.artifactId>pkcs11proxy</features.artifactId>
     <assembly.finalName>xipki-pkcs11proxy</assembly.finalName>
     <boot.features>http-whiteboard, xipki-pkcs11-proxy</boot.features>
+    <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <features.repo>${project.build.directory}/features-repo</features.repo>
   </properties>
   <dependencies>
     <dependency>
@@ -44,8 +45,22 @@
         </includes>
       </resource>
       <resource>
+        <directory>src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
         <directory>${shared.dir}/filtered</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${shared.dir}/unfiltered</directory>
+        <filtering>false</filtering>
         <includes>
           <include>**/*</include>
         </includes>
@@ -84,14 +99,14 @@
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>target/dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/unix-karaf</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/windows-dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/windows-karaf</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -110,7 +125,7 @@
                   <artifactId>pkcs11-wrapper-native</artifactId>
                   <version>${pkcs11-wrapper.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/xipki/native-lib</outputDirectory>
+                  <outputDirectory>${output.directory}/xipki/native-lib</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -131,12 +146,7 @@
             </goals>
             <configuration>
               <!-- where to put the artifacts -->
-              <repository>${features.repo}</repository>
-              <!--
-                  Feature Descriptors (Karaf core features are available by default)
-                  NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
-                  to make them visible after deployment.
-               -->
+              <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.pki.features/pkcs11proxy/${project.version}/xml/features</descriptor>
               </descriptors>
