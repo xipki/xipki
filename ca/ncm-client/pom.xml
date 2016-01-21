@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>ca-group</artifactId>
@@ -29,21 +31,21 @@
         <configuration>
           <instructions>
             <Import-Package>
-	com.caucho.burlap.client;resolution:=optional,
-	com.caucho.burlap.io;resolution:=optional,
-	com.caucho.hessian;resolution:=optional,
-	com.caucho.hessian.client;resolution:=optional,
-	com.caucho.hessian.io;resolution:=optional,
-	com.caucho.hessian.jmx;resolution:=optional,
-	com.caucho.hessian.micro;resolution:=optional,
-	com.caucho.hessian.mux;resolution:=optional,
-	com.caucho.hessian.security;resolution:=optional,
-	com.caucho.hessian.util;resolution:=optional,
-	com.caucho.services.client;resolution:=optional,
-	com.caucho.services.message;resolution:=optional,
-	com.caucho.services.name;resolution:=optional,
-	org.xipki.pki.ca.api.profile;resolution:=optional,
-	*
+    com.caucho.burlap.client;resolution:=optional,
+    com.caucho.burlap.io;resolution:=optional,
+    com.caucho.hessian;resolution:=optional,
+    com.caucho.hessian.client;resolution:=optional,
+    com.caucho.hessian.io;resolution:=optional,
+    com.caucho.hessian.jmx;resolution:=optional,
+    com.caucho.hessian.micro;resolution:=optional,
+    com.caucho.hessian.mux;resolution:=optional,
+    com.caucho.hessian.security;resolution:=optional,
+    com.caucho.hessian.util;resolution:=optional,
+    com.caucho.services.client;resolution:=optional,
+    com.caucho.services.message;resolution:=optional,
+    com.caucho.services.name;resolution:=optional,
+    org.xipki.pki.ca.api.profile;resolution:=optional,
+    *
             </Import-Package>
           </instructions>
         </configuration>

@@ -472,11 +472,11 @@
   </xs:complexType>
   <xs:element name="authorizationTemplate">
     <xs:complexType>
-	  <xs:sequence>
-	    <xs:element name="type" type="oidWithDescType"/>
-	    <xs:element name="accessRights" type="constantValueType"/>
-	  </xs:sequence>
-	</xs:complexType>
+      <xs:sequence>
+        <xs:element name="type" type="oidWithDescType"/>
+        <xs:element name="accessRights" type="constantValueType"/>
+      </xs:sequence>
+    </xs:complexType>
   </xs:element>
   <xs:element name="biometricInfo">
     <xs:complexType>
