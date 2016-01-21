@@ -11,13 +11,14 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>DB-Tool</app.name>
+    <features.artifactId>dbtool</features.artifactId>
     <assembly.finalName>xipki-dbtool</assembly.finalName>
     <boot.features>xipki-database-tool</boot.features>
-    <shared.dir>${project.basedir}/../shared</shared.dir>
-    <features.repo>${project.build.directory}/features-repo</features.repo>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.185</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
+    <shared.dir>${project.basedir}/../shared</shared.dir>
+    <output.directory>${project.build.directory}/classes</output.directory>
   </properties>
   <dependencies>
     <dependency>
@@ -47,8 +48,22 @@
         </includes>
       </resource>
       <resource>
+        <directory>src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
         <directory>${shared.dir}/filtered</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${shared.dir}/unfiltered</directory>
+        <filtering>false</filtering>
         <includes>
           <include>**/*</include>
         </includes>
@@ -87,14 +102,14 @@
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>target/dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/unix-karaf</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>zip</type>
-                  <outputDirectory>target/windows-dependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/windows-karaf</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -115,13 +130,7 @@
             </goals>
             <configuration>
               <!-- where to put the artifacts -->
-              <repository>${features.repo}</repository>
-              <!--
-                  Feature Descriptors (Karaf core features are available by default)
-
-                  NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
-                  to make them visible after deployment.
-              -->
+              <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.pki.features/dbtool/${project.version}/xml/features</descriptor>
               </descriptors>
