@@ -168,7 +168,7 @@ class RequestOption {
             hashAlgos.addAll(supportedHashAlgorithms);
         }
 
-        // certpath validiation
+        // certpath validation
         CertpathValidation certpathConf = conf.getCertpathValidation();
         if (certpathConf == null) {
             if (validateSignature) {
