@@ -46,10 +46,9 @@
     <liquibase.version>3.4.1</liquibase.version>
     <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
-    <!-- required by hikaricp -->
     <hikaricp.version>2.4.3</hikaricp.version>
     <syslog-java-client.version>1.0.7</syslog-java-client.version>
-    <jsr305.version>3.0.0_1 </jsr305.version>
+    <jsr305.version>3.0.0_1</jsr305.version>
   </properties>
   <modules>
     <module>shell-base</module>
@@ -280,28 +279,6 @@
     </profile>
   </profiles>
   <repositories>
-    <repository>
-      <id>com.springsource.repository.bundles.external</id>
-      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>http://repository.springsource.com/maven/bundles/external</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>com.springsource.repository.bundles.release</id>
-      <name>SpringSource Enterprise Bundle Repository - Release Bundles</name>
-      <url>http://repository.springsource.com/maven/bundles/release</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
     <repository>
       <id>jetty-releases</id>
       <name>Jetty Releases</name>
