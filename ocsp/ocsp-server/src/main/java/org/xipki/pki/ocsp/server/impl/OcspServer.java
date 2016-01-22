@@ -108,7 +108,6 @@ import org.xipki.audit.api.AuditService;
 import org.xipki.audit.api.AuditServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.common.ConfPairs;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.util.CollectionUtil;
@@ -486,14 +485,11 @@ public class OcspServer {
             } // end for
         } // end if
 
-        // stores
-        for (StoreType m : conf.getStores().getStore()) {
-            CertStatusStore store = initStore(m, datasources);
-            stores.put(m.getName(), store);
-        }
+        // responders
+        Map<String, Set<HashAlgoType>> storeCertHashAlgoSet = new HashMap<>();
 
         Map<String, ResponderOption> responderOptions = new HashMap<>();
-        // responders
+
         for (ResponderType m : conf.getResponders().getResponder()) {
             ResponderOption option = new ResponderOption(m);
             String n = option.getAuditOptionName();
@@ -506,29 +502,73 @@ public class OcspServer {
                 throw new InvalidConfException("no certprofileOption named '" + n + "' is defined");
             }
 
-            n = option.getRequestOptionName();
-            if (!requestOptions.containsKey(n)) {
-                throw new InvalidConfException("no requestOption named '" + n + "' is defined");
-            }
-
-            n = option.getResponseOptionName();
-            if (!responseOptions.containsKey(n)) {
-                throw new InvalidConfException("no responseOption named '" + n + "' is defined");
-            }
-
             n = option.getSignerName();
             if (!signers.containsKey(n)) {
                 throw new InvalidConfException("no signer named '" + n + "' is defined");
             }
 
-            List<String> names = option.getStoreNames();
-            for (String name : names) {
-                if (!stores.containsKey(name)) {
-                    throw new InvalidConfException("no store named '" + name + "' is defined");
+            String reqOptName = option.getRequestOptionName();
+            if (!requestOptions.containsKey(reqOptName)) {
+                throw new InvalidConfException(
+                        "no requestOption named '" + reqOptName + "' is defined");
+            }
+
+            String respOptName = option.getResponseOptionName();
+            if (!responseOptions.containsKey(respOptName)) {
+                throw new InvalidConfException(
+                        "no responseOption named '" + respOptName + "' is defined");
+            }
+
+            // required HashAlgorithms for certificate
+            ResponseOption respOpt = responseOptions.get(respOptName);
+            Set<HashAlgoType> certHashAlgos = new HashSet<>(5);
+            if (respOpt.isIncludeCerthash()) {
+                if (respOpt.getCertHashAlgo() != null) {
+                    certHashAlgos.add(respOpt.getCertHashAlgo());
+                } else {
+                    RequestOption reqOpt = requestOptions.get(reqOptName);
+                    Set<HashAlgoType> algs = reqOpt.getHashAlgos();
+                    if (!CollectionUtil.isEmpty(algs)) {
+                        certHashAlgos.addAll(algs);
+                    } else {
+                        for (HashAlgoType algo : HashAlgoType.values()) {
+                            certHashAlgos.add(algo);
+                        }
+                    }
                 }
             }
+
+            List<String> names = option.getStoreNames();
+
+            List<StoreType> storeDefs = conf.getStores().getStore();
+            Set<String> storeNames = new HashSet<>(storeDefs.size());
+            for (StoreType storeDef : storeDefs) {
+                storeNames.add(storeDef.getName());
+            }
+
+            for (String name : names) {
+                if (!storeNames.contains(name)) {
+                    throw new InvalidConfException("no store named '" + name + "' is defined");
+                }
+
+                Set<HashAlgoType> _set = storeCertHashAlgoSet.get(name);
+                if (_set == null) {
+                    _set = new HashSet<>(5);
+                    storeCertHashAlgoSet.put(name, _set);
+                }
+
+                _set.addAll(certHashAlgos);
+            }
+
             responderOptions.put(m.getName(), option);
         } // end for
+
+        // stores
+        for (StoreType m : conf.getStores().getStore()) {
+            CertStatusStore store = initStore(m, datasources,
+                    storeCertHashAlgoSet.get(m.getName()));
+            stores.put(m.getName(), store);
+        }
 
         // sort the servlet paths
         Set<String> pathTexts = new HashSet<>();
@@ -705,7 +745,7 @@ public class OcspServer {
                     LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
                     if (childAuditEvent != null) {
                         fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
-                                "CertID.hashAlgorithm " + certIdHashAlgo + " not allowed");
+                                "not allowed CertID.hashAlgorithm " + certIdHashAlgo);
                     }
                     return createUnsuccessfulOCSPResp(OcspResponseStatus.malformedRequest);
                 }
@@ -924,7 +964,7 @@ public class OcspServer {
                 }
 
                 if (LOG.isDebugEnabled()) {
-                    StringBuilder sb = new StringBuilder();
+                    StringBuilder sb = new StringBuilder(250);
                     sb.append("certHashAlgo: ").append(certID.getHashAlgOID().getId()).append(", ");
 
                     String hexCertHash = null;
@@ -1156,8 +1196,7 @@ public class OcspServer {
             try {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                         responderSignerType,
-                        "algo" + ConfPairs.NAME_TERM + sigAlgo + ConfPairs.TOKEN_TERM
-                            + responderKeyConf,
+                        "algo=" + sigAlgo + "," + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
             } catch (SignerException e) {
@@ -1174,7 +1213,8 @@ public class OcspServer {
 
     private CertStatusStore initStore(
             final StoreType conf,
-            final Map<String, DataSourceWrapper> datasources)
+            final Map<String, DataSourceWrapper> datasources,
+            final Set<HashAlgoType> certHashAlgos)
     throws InvalidConfException {
         String name = conf.getName();
 
@@ -1228,7 +1268,8 @@ public class OcspServer {
             CrlCertStatusStore crlStore = new CrlCertStatusStore(name,
                     crlStoreConf.getCrlFile(), crlStoreConf.getDeltaCrlFile(),
                     caCert, crlIssuerCert, crlStoreConf.getCrlUrl(),
-                    crlStoreConf.getCertsDir());
+                    crlStoreConf.getCertsDir(),
+                    certHashAlgos);
             store = crlStore;
 
             crlStore.setUseUpdateDatesFromCRL(

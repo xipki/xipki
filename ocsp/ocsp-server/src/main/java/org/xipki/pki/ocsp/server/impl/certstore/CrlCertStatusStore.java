@@ -173,6 +173,10 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private Date nextUpdate;
 
+    private BigInteger crlNumber;
+
+    private final Set<HashAlgoType> certHashAlgos;
+
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
             new ConcurrentHashMap<>();
 
@@ -188,8 +192,10 @@ public class CrlCertStatusStore extends CertStatusStore {
             final String deltaCrlFile,
             final X509Certificate caCert,
             final String crlUrl,
-            final String certsDirname) {
-        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl, certsDirname);
+            final String certsDirname,
+            final Set<HashAlgoType> certHashAlgos) {
+        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl,
+                certsDirname, certHashAlgos);
     }
 
     public CrlCertStatusStore(
@@ -199,10 +205,12 @@ public class CrlCertStatusStore extends CertStatusStore {
             final X509Certificate caCert,
             final X509Certificate issuerCert,
             final String crlUrl,
-            final String certsDirname) {
+            final String certsDirname,
+            final Set<HashAlgoType> certHashAlgos) {
         super(name);
         ParamUtil.assertNotBlank("crlFile", crlFilename);
         ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("certHashAlgos", certHashAlgos);
 
         this.crlFilename = IoUtil.expandFilepath(crlFilename);
         this.deltaCrlFilename = (deltaCrlFilename == null)
@@ -214,6 +222,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         this.caNotBefore = caCert.getNotBefore();
         this.certsDirname = certsDirname;
 
+        this.certHashAlgos = certHashAlgos;
         this.sha1 = new SHA1Digest();
     }
 
@@ -294,13 +303,19 @@ public class CrlCertStatusStore extends CertStatusStore {
             updateCRLSuccessful = false;
 
             X509CRL crl = X509Util.parseCRL(crlFilename);
-            BigInteger crlNumber;
+
             byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
-            if (octetString != null) {
-                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-            } else {
-                crlNumber = null;
+            if (octetString == null) {
+                throw new CertStatusStoreException("CRL withour CRLNumber is not supported");
+            }
+            BigInteger newCrlNumber = ASN1Integer.getInstance(
+                    DEROctetString.getInstance(octetString).getOctets())
+                    .getPositiveValue();
+
+            if (crlNumber != null && newCrlNumber.compareTo(crlNumber) <= 0) {
+                throw new CertStatusStoreException(
+                        String.format("CRLNumber of new CRL (%s) <= current CRL (%s)",
+                            newCrlNumber, crlNumber));
             }
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -331,7 +346,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             BigInteger baseCrlNumber = null;
 
             if (deltaCrlExists) {
-                if (crlNumber == null) {
+                if (newCrlNumber == null) {
                     throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
                 }
 
@@ -344,7 +359,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                 } else {
                     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                     baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-                    if (!baseCrlNumber.equals(crlNumber)) {
+                    if (!baseCrlNumber.equals(newCrlNumber)) {
                         deltaCrl = null;
                         LOG.info("{} is not a deltaCRL for the CRL {}, ignore it",
                                 deltaCrlFilename, crlFilename);
@@ -365,7 +380,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
             if (deltaCrl != null) {
                 LOG.info("try to update CRL with CRLNumber={} and DeltaCRL with CRLNumber={}",
-                        crlNumber, deltaCrlNumber);
+                        newCrlNumber, deltaCrlNumber);
                 newThisUpdate = deltaCrl.getThisUpdate();
                 newNextUpdate = deltaCrl.getNextUpdate();
             } else {
@@ -625,6 +640,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             this.certStatusInfoMap.putAll(newCertStatusInfoMap);
             this.thisUpdate = newThisUpdate;
             this.nextUpdate = newNextUpdate;
+            this.crlNumber = newCrlNumber;
 
             this.initializationFailed = false;
             this.initialized = true;
@@ -968,9 +984,13 @@ public class CrlCertStatusStore extends CertStatusStore {
         return caRevInfo;
     }
 
-    private static Map<HashAlgoType, byte[]> getCertHashes(
+    private Map<HashAlgoType, byte[]> getCertHashes(
             final Certificate cert)
     throws CertStatusStoreException {
+        if (certHashAlgos.isEmpty()) {
+            return null;
+        }
+
         byte[] encodedCert;
         try {
             encodedCert = cert.getEncoded();
@@ -979,7 +999,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
-        for (HashAlgoType hashAlgo : HashAlgoType.values()) {
+        for (HashAlgoType hashAlgo : certHashAlgos) {
             byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);
             certHashes.put(hashAlgo, certHash);
         }
