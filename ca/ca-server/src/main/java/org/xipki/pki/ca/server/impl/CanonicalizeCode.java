@@ -143,7 +143,7 @@ public class CanonicalizeCode {
 
                 if (extension.equals("java")) {
                     canonicalizeJavaFile(file);
-                } else if(textFileExtensions.contains(extension)) {
+                } else if (textFileExtensions.contains(extension)) {
                     canonicalizeFile(file);
                 }
             }
