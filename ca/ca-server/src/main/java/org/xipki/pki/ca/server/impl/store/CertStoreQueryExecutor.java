@@ -1399,6 +1399,39 @@ class CertStoreQueryExecutor {
         return null;
     } // method getCertificateInfo
 
+    String getCertProfileForSerial(
+            final X509Cert caCert,
+            final BigInteger serial)
+    throws OperationException, DataAccessException {
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("serial", serial);
+
+        int caId = getCaId(caCert);
+
+        final String sql = dataSource.createFetchFirstSelectSQL(
+                "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setLong(idx++, serial.longValue());
+            ps.setInt(idx++, caId);
+
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            } else {
+                int profileId = rs.getInt("PID");
+                return certprofileStore.getName(profileId);
+            }
+        } catch (SQLException e) {
+            throw dataSource.translate(sql, e);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    } // method getCertProfileForSerial
+
     /**
      *
      * @param subjectName Subject of Certificate or requested Subject

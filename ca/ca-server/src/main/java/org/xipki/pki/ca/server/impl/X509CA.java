@@ -170,7 +170,7 @@ public class X509CA {
                 try {
                     caInfo.commitNextSerial();
                 } catch (Throwable t) {
-                    final String message = "could not commit the next_serial";
+                    final String message = "could not commit the NEXT_SN";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 t.getClass().getName(), t.getMessage());
@@ -181,7 +181,7 @@ public class X509CA {
                 try {
                     caInfo.commitNextCrlNo();
                 } catch (Throwable t) {
-                    final String message = "could not commit the next_crlno";
+                    final String message = "could not commit the NEXT_CRLNO";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
                                 t.getClass().getName(), t.getMessage());
@@ -908,7 +908,7 @@ public class X509CA {
             }
 
             startSerial = BigInteger.ONE;
-            if (!deltaCRL && control.isEmbedsCerts()) { // XiPKI extension
+            if (!deltaCRL && control.isXipkiCertsetIncluded()) { // XiPKI extension
                 /*
                  * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
                  *
@@ -933,26 +933,38 @@ public class X509CA {
                             maxSerial = serial;
                         }
 
-                        X509CertificateInfo certInfo;
-                        try {
-                            certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
-                        } catch (CertificateException e) {
-                            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                    "CertificateException: " + e.getMessage());
+                        ASN1EncodableVector v = new ASN1EncodableVector();
+                        v.add(new ASN1Integer(serial));
+
+                        String profileName = null;
+
+                        if (control.isXipkiCertsetCertIncluded()) {
+                            X509CertificateInfo certInfo;
+                            try {
+                                certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
+                            } catch (CertificateException e) {
+                                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                                        "CertificateException: " + e.getMessage());
+                            }
+
+                            Certificate cert = Certificate.getInstance(
+                                    certInfo.getCert().getEncodedCert());
+
+                            v.add(new DERTaggedObject(true, 0, cert));
+
+                            if (control.isXipkiCertsetProfilenameIncluded()) {
+                                profileName = certInfo.getProfileName();
+                            }
+                        } else if (control.isXipkiCertsetProfilenameIncluded()) {
+                            profileName = certstore.getCertProfileForSerial(caCert, serial);
                         }
 
-                        Certificate cert = Certificate.getInstance(
-                                certInfo.getCert().getEncodedCert());
-
-                        ASN1EncodableVector v = new ASN1EncodableVector();
-                        v.add(cert.getTBSCertificate().getSerialNumber());
-                        v.add(new DERTaggedObject(true, 0, cert));
-                        String profileName = certInfo.getProfileName();
                         if (StringUtil.isNotBlank(profileName)) {
                             v.add(
                                     new DERTaggedObject(
-                                            true, 1, new DERUTF8String(certInfo.getProfileName())));
+                                            true, 1, new DERUTF8String(profileName)));
                         }
+
                         ASN1Sequence certWithInfo = new DERSequence(v);
 
                         vector.add(certWithInfo);
