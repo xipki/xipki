@@ -57,8 +57,15 @@ import org.xipki.common.util.StringUtil;
  * # Whether expired certificates are considered. Default is false
  * expiredCerts.included=&lt;'true'|'false'>
  *
- * # Whether certificates are embedded in CRL, XiPKI-customized extension. Default is false
- * certs.embedded=&lt;'true'|'false'>
+ * # Whether XiPKI-customized extension xipki-CrlCertSet is included. Default is false
+ * xipki.certset=&lt;'true'|'false'>
+ *
+ * # Whether the extension xipki-CrlCertSet contains the raw certificates. Default is true
+ * xipki.certset.certs=&lt;'true'|'false'>
+ *
+ * # Whether the extension xipki-CrlCertSet contains the profile name of the certificate.
+ * # Default is true
+ * xipki.certset.profilename=&lt;'true'|'false'>
  *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
@@ -201,7 +208,11 @@ public class CRLControl implements Serializable {
 
     public static final String KEY_expiredCerts_included = "expiredCerts.included";
 
-    public static final String KEY_certs_embedded = "certs.embedded";
+    public static final String KEY_xipki_certset = "xipki.certset";
+
+    public static final String KEY_xipki_certset_certs = "xipki.certset.certs";
+
+    public static final String KEY_xipki_certset_profilename = "xipki.certset.profilename";
 
     public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
 
@@ -225,7 +236,11 @@ public class CRLControl implements Serializable {
 
     private UpdateMode updateMode = UpdateMode.interval;
 
-    private boolean embedsCerts = false;
+    private boolean xipkiCertsetIncluded = false;
+
+    private boolean xipkiCertsetCertIncluded = true;
+
+    private boolean xipkiCertsetProfilenameIncluded = true;
 
     private boolean includeExpiredCerts = false;
 
@@ -278,7 +293,13 @@ public class CRLControl implements Serializable {
         }
 
         this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
-        this.embedsCerts = getBoolean(props, KEY_certs_embedded, false);
+
+        this.xipkiCertsetIncluded = getBoolean(props, KEY_xipki_certset, false);
+
+        this.xipkiCertsetCertIncluded = getBoolean(props, KEY_xipki_certset_certs, true);
+
+        this.xipkiCertsetProfilenameIncluded = getBoolean(props,
+                KEY_xipki_certset_profilename, true);
 
         s = props.getValue(KEY_extensions);
         if (s == null) {
@@ -338,7 +359,9 @@ public class CRLControl implements Serializable {
         ConfPairs pairs = new ConfPairs();
         pairs.putPair(KEY_updateMode, updateMode.name());
         pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
-        pairs.putPair(KEY_certs_embedded, Boolean.toString(embedsCerts));
+        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
+        pairs.putPair(KEY_xipki_certset_certs, Boolean.toString(xipkiCertsetCertIncluded));
+        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
         pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
         pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
         pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
@@ -378,8 +401,16 @@ public class CRLControl implements Serializable {
         return updateMode;
     }
 
-    public boolean isEmbedsCerts() {
-        return embedsCerts;
+    public boolean isXipkiCertsetIncluded() {
+        return xipkiCertsetIncluded;
+    }
+
+    public boolean isXipkiCertsetCertIncluded() {
+        return xipkiCertsetCertIncluded;
+    }
+
+    public boolean isXipkiCertsetProfilenameIncluded() {
+        return xipkiCertsetProfilenameIncluded;
     }
 
     public boolean isIncludeExpiredCerts() {
@@ -472,7 +503,9 @@ public class CRLControl implements Serializable {
 
         CRLControl b = (CRLControl) obj;
         if (deltaCRLIntervals != b.deltaCRLIntervals
-                || embedsCerts != b.embedsCerts
+                || xipkiCertsetIncluded != b.xipkiCertsetIncluded
+                || xipkiCertsetCertIncluded != b.xipkiCertsetCertIncluded
+                || xipkiCertsetProfilenameIncluded != b.xipkiCertsetProfilenameIncluded
                 || extendedNextUpdate != b.extendedNextUpdate
                 || fullCRLIntervals != b.fullCRLIntervals
                 || includeExpiredCerts != b.includeExpiredCerts

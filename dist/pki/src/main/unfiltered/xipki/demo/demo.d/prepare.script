@@ -103,4 +103,4 @@ xipki-ca:requestor-add \
 xipki-ca:crlsigner-add \
   --name CASIGN.CRLSIGNER \
   --signer-type CA \
-  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
+  --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false

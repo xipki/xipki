@@ -510,6 +510,20 @@ public class CertificateStore {
         }
     }
 
+    public String getCertProfileForSerial(
+            final X509Cert caCert,
+            final BigInteger serial)
+    throws OperationException {
+        try {
+            return queryExecutor.getCertProfileForSerial(caCert, serial);
+        } catch (DataAccessException e) {
+            LOG.debug("DataAccessException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        }
+    }
+
     public List<X509Certificate> getCertificate(
             final X500Name subjectName,
             final byte[] transactionId)
