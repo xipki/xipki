@@ -48,11 +48,10 @@ import org.xipki.security.api.BadASN1ObjectException;
 /**
  *
  * <pre>
- * PSOTemplate ::= SEQUENCE
- * {
+ * PSOTemplate ::= SEQUENCE {
  *     slotAndKeyIdentifier   SlotAndKeyIdentifer
  *     message                OCTET STRING,
- * }
+ *     }
  * </pre>
  *
  * @author Lijun Liao
