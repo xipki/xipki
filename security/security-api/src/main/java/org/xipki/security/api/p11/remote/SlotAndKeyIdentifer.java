@@ -47,11 +47,10 @@ import org.xipki.security.api.BadASN1ObjectException;
 /**
  *
  * <pre>
- * SlotAndKeyIdentifer ::= SEQUENCE
- * {
+ * SlotAndKeyIdentifer ::= SEQUENCE {
  *     slotIdentifier   SlotIdentifier,
- *     keyIdentifier    KeyIdentifier,
- * }
+ *     keyIdentifier    KeyIdentifier
+ *     }
  * </pre>
  *
  * @author Lijun Liao

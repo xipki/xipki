@@ -49,11 +49,10 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
 /**
  *
  * <pre>
- * SlotIdentifier ::= CHOICE
- * {
+ * SlotIdentifier ::= CHOICE {
  *     keyLabel   UTF8STRING,
  *     keyId      OCTET STRING
- * }
+ *     }
  * </pre>
  *
  * @author Lijun Liao

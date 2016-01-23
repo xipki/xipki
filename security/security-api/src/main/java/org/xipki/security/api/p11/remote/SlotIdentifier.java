@@ -52,11 +52,11 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 /**
  *
  * <pre>
- * SlotIdentifier ::= SEQUENCE
- * {
- *     slotIndex   INTEGER OPTIONAL,-- At least one of slotIndex and slotId must present.
+ * SlotIdentifier ::= SEQUENCE {
+ *     slotIndex       INTEGER OPTIONAL,
+ *                     -- At least one of slotIndex and slotId must present.
  *     slotId      [1] EXPLICIT INTEGER OPTIONAL
- * }
+ *     }
  * </pre>
  *
  * @author Lijun Liao
