@@ -75,6 +75,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -908,6 +909,15 @@ public class X509CA {
 
             startSerial = BigInteger.ONE;
             if (!deltaCRL && control.isEmbedsCerts()) { // XiPKI extension
+                /*
+                 * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
+                 *
+                 * Xipki-CrlCert ::= SEQUENCE {
+                 *         serial          INTEGER
+                 *         cert        [0] EXPLICIT  Certificate OPTIONAL
+                 *         profileName [1] EXPLICIT  UTF8String  OPTIONAL
+                 *         }
+                 */
                 ASN1EncodableVector vector = new ASN1EncodableVector();
 
                 List<BigInteger> serials;
@@ -935,10 +945,13 @@ public class X509CA {
                                 certInfo.getCert().getEncodedCert());
 
                         ASN1EncodableVector v = new ASN1EncodableVector();
-                        v.add(cert);
+                        v.add(cert.getTBSCertificate().getSerialNumber());
+                        v.add(new DERTaggedObject(true, 0, cert));
                         String profileName = certInfo.getProfileName();
                         if (StringUtil.isNotBlank(profileName)) {
-                            v.add(new DERUTF8String(certInfo.getProfileName()));
+                            v.add(
+                                    new DERTaggedObject(
+                                            true, 1, new DERUTF8String(certInfo.getProfileName())));
                         }
                         ASN1Sequence certWithInfo = new DERSequence(v);
 
