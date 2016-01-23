@@ -46,7 +46,6 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,6 +66,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
@@ -108,23 +108,6 @@ import org.xipki.security.api.util.X509Util;
  */
 
 public class CrlCertStatusStore extends CertStatusStore {
-
-    private static class CertWithInfo {
-
-        private Certificate cert;
-
-        private String profileName;
-
-        public CertWithInfo(
-                final Certificate cert,
-                final String profileName) {
-            ParamUtil.assertNotNull("cert", cert);
-            ParamUtil.assertNotBlank("profileName", profileName);
-            this.cert = cert;
-            this.profileName = profileName;
-        }
-
-    } // class CertWithInfo
 
     private class StoreUpdateService implements Runnable {
 
@@ -436,46 +419,68 @@ public class CrlCertStatusStore extends CertStatusStore {
             X500Name caName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
             // extract the certificate, only in full CRL, not in delta CRL
-            boolean certsIncluded = false;
-            Set<CertWithInfo> certs = new HashSet<>();
+            boolean certsConsidered = false;
+            Map<BigInteger, CertWithInfo> certsMap = new HashMap<>();
             String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
-            if (extnValue == null) {
-                // try the legacy OID
-                extnValue = crl.getExtensionValue("1.3.6.1.4.1.12655.100");
-            }
 
             if (extnValue != null) {
                 extnValue = removeTagAndLenFromExtensionValue(extnValue);
-                certsIncluded = true;
+                certsConsidered = true;
                 ASN1Set asn1Set = DERSet.getInstance(extnValue);
                 int n = asn1Set.size();
                 for (int i = 0; i < n; i++) {
                     ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-                    Certificate bcCert;
+
+                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                    BigInteger serialNumber = ASN1Integer.getInstance(
+                            seq.getObjectAt(0)).getValue();
+
+                    Certificate bcCert = null;
                     String profileName = null;
 
-                    try {
-                        ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                        bcCert = Certificate.getInstance(seq.getObjectAt(0));
-                        if (seq.size() > 1) {
+                    final int size = seq.size();
+                    for (int j = 1; j < size; j++) {
+                        ASN1TaggedObject taggedObj = DERTaggedObject.getInstance(
+                                seq.getObjectAt(j));
+                        int tagNo = taggedObj.getTagNo();
+                        switch (tagNo) {
+                        case 0:
+                            bcCert = Certificate.getInstance(taggedObj.getObject());
+                            break;
+                        case 1:
                             profileName = DERUTF8String.getInstance(
-                                    seq.getObjectAt(1)).getString();
+                                    taggedObj.getObject()).getString();
+                            break;
+                        default:
+                            break;
                         }
-                    } catch (IllegalArgumentException e) {
-                        // backwards compatibility
-                        bcCert = Certificate.getInstance(asn1);
                     }
 
-                    if (!caName.equals(bcCert.getIssuer())) {
-                        throw new CertStatusStoreException("invalid entry in CRL Extension certs");
+                    if (bcCert != null) {
+                        if (!caName.equals(bcCert.getIssuer())) {
+                            throw new CertStatusStoreException(
+                                "issuer not match (serial=" + serialNumber
+                                + ") in CRL Extension Xipki-CertSet");
+                        }
+
+                        if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
+                            throw new CertStatusStoreException(
+                                    "serialNumber not match (serial=" + serialNumber
+                                    + ") in CRL Extension Xipki-CertSet");
+                            }
                     }
 
                     if (profileName == null) {
                         profileName = "UNKNOWN";
                     }
 
-                    certs.add(new CertWithInfo(bcCert, profileName));
+                    CertWithInfo entry = new CertWithInfo(serialNumber);
+                    entry.setProfileName(profileName);
+                    if (!certHashAlgos.isEmpty()) {
+                        entry.setCert(bcCert);
+                    }
+                    certsMap.put(serialNumber, entry);
                 } // end for
             } // end if (extnValue != null)
 
@@ -484,9 +489,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                     LOG.warn("ignore certsDir '{}', since certificates are included in {}",
                             certsDirname, " CRL Extension certs");
                 } else {
-                    certsIncluded = true;
-                    Set<CertWithInfo> tmpCerts = readCertWithInfosFromDir(caCert, certsDirname);
-                    certs.addAll(tmpCerts);
+                    certsConsidered = true;
+                    readCertWithInfosFromDir(caCert, certsDirname, certsMap);
                 }
             }
 
@@ -581,34 +585,25 @@ public class CrlCertStatusStore extends CertStatusStore {
                     }
 
                     CertWithInfo cert = null;
-                    if (certsIncluded) {
-                        for (CertWithInfo bcCert : certs) {
-                            if (bcCert.cert.getIssuer().equals(caName)
-                                    && bcCert.cert.getSerialNumber().getPositiveValue().equals(
-                                            serialNumber)) {
-                                cert = bcCert;
-                                break;
-                            }
-                        }
-
+                    if (certsConsidered) {
+                        cert = certsMap.remove(serialNumber);
                         if (cert == null) {
-                            LOG.info("could not find certificate (issuer='{}', serialNumber='{}'",
-                                    X509Util.getRFC4519Name(caName), serialNumber);
-                        } else {
-                            certs.remove(cert);
+                            LOG.info("could not find certificate (serialNumber='{}')",
+                                    serialNumber);
                         }
                     }
 
-                    Map<HashAlgoType, byte[]> certHashes = (cert == null)
-                            ? null
-                            : getCertHashes(cert.cert);
+                    Map<HashAlgoType, byte[]> certHashes =
+                            (cert == null || cert.getCert() == null)
+                                ? null
+                                : getCertHashes(cert.getCert());
 
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime,
                             invalidityTime);
 
                     String profileName = (cert == null)
                             ? null
-                            : cert.profileName;
+                            : cert.getProfileName();
 
                     CrlCertStatusInfo crlCertStatusInfo =
                             CrlCertStatusInfo.getRevokedCertStatusInfo(
@@ -619,11 +614,14 @@ public class CrlCertStatusStore extends CertStatusStore {
                 } // end while (it.hasNext())
             } // end if (it)
 
-            for (CertWithInfo cert : certs) {
-                Map<HashAlgoType, byte[]> certHashes = getCertHashes(cert.cert);
+            for (BigInteger serialNumber : certsMap.keySet()) {
+                CertWithInfo cert = certsMap.get(serialNumber);
+                Map<HashAlgoType, byte[]> certHashes = (cert.getCert() == null)
+                        ? null
+                        : getCertHashes(cert.getCert());
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
-                        cert.profileName, certHashes);
-                newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(),
+                        cert.getProfileName(), certHashes);
+                newCertStatusInfoMap.put(cert.getSerialNumber(),
                         crlCertStatusInfo);
             }
 
@@ -838,25 +836,26 @@ public class CrlCertStatusStore extends CertStatusStore {
         this.useUpdateDatesFromCRL = useUpdateDatesFromCRL;
     }
 
-    private Set<CertWithInfo> readCertWithInfosFromDir(
+    private void readCertWithInfosFromDir(
             final X509Certificate caCert,
-            final String certsDirname)
+            final String certsDirname,
+            final Map<BigInteger, CertWithInfo> certsMap)
     throws CertificateEncodingException {
         File certsDir = new File(certsDirname);
 
         if (!certsDir.exists()) {
             LOG.warn("the folder " + certsDirname + " does not exist, ignore it");
-            return Collections.emptySet();
+            return;
         }
 
         if (!certsDir.isDirectory()) {
             LOG.warn("the path " + certsDirname + " does not point to a folder, ignore it");
-            return Collections.emptySet();
+            return;
         }
 
         if (!certsDir.canRead()) {
             LOG.warn("the folder " + certsDirname + " could not be read, ignore it");
-            return Collections.emptySet();
+            return;
         }
 
         File[] certFiles = certsDir.listFiles(new FilenameFilter() {
@@ -869,15 +868,15 @@ public class CrlCertStatusStore extends CertStatusStore {
         });
 
         if (certFiles == null || certFiles.length == 0) {
-            return Collections.emptySet();
+            return;
         }
 
         X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
         byte[] issuerSKI = X509Util.extractSKI(caCert);
 
-        Set<CertWithInfo> certs = new HashSet<>();
-
         final String profileName = "UNKNOWN";
+        final boolean needsCert = !certHashAlgos.isEmpty();
+
         for (File certFile : certFiles) {
             Certificate bcCert;
 
@@ -886,6 +885,11 @@ public class CrlCertStatusStore extends CertStatusStore {
                 bcCert = Certificate.getInstance(encoded);
             } catch (IllegalArgumentException | IOException e) {
                 LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
+                continue;
+            }
+
+            BigInteger serialNumber = bcCert.getSerialNumber().getValue();
+            if (certsMap.containsKey(serialNumber)) {
                 continue;
             }
 
@@ -912,10 +916,13 @@ public class CrlCertStatusStore extends CertStatusStore {
                 }
             } // end if
 
-            certs.add(new CertWithInfo(bcCert, profileName));
+            CertWithInfo entry = new CertWithInfo(serialNumber);
+            entry.setProfileName(profileName);
+            if (needsCert) {
+                entry.setCert(bcCert);
+            }
+            certsMap.put(serialNumber, entry);
         } // end for
-
-        return certs;
     } // method readCertWithInfosFromDir
 
     private byte[] sha1Fp(
