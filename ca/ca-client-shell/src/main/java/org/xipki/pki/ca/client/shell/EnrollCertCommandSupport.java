@@ -269,9 +269,8 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         // ExtendedKeyusage
         if (isNotEmpty(extkeyusages)) {
-            Set<ASN1ObjectIdentifier> oids = new HashSet<>(
+            ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
-            ExtendedKeyUsage extValue = X509Util.createExtendedUsage(oids);
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());

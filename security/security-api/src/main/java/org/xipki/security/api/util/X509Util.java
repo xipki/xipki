@@ -52,6 +52,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -492,19 +493,41 @@ public class X509Util {
     }
 
     public static ExtendedKeyUsage createExtendedUsage(
-            final Set<ASN1ObjectIdentifier> usages) {
+            final Collection<ASN1ObjectIdentifier> usages) {
         if (CollectionUtil.isEmpty(usages)) {
             return null;
         }
 
-        KeyPurposeId[] kps = new KeyPurposeId[usages.size()];
+        List<ASN1ObjectIdentifier> l = new ArrayList<>(usages);
+        List<ASN1ObjectIdentifier> sortedUsages = sortOIDList(l);
+        KeyPurposeId[] kps = new KeyPurposeId[sortedUsages.size()];
 
         int i = 0;
-        for (ASN1ObjectIdentifier oid : usages) {
+        for (ASN1ObjectIdentifier oid : sortedUsages) {
             kps[i++] = KeyPurposeId.getInstance(oid);
         }
 
         return new ExtendedKeyUsage(kps);
+    }
+
+    // sort the list and remove duplicated OID.
+    public static List<ASN1ObjectIdentifier> sortOIDList(
+            List<ASN1ObjectIdentifier> oids) {
+        List<String> l = new ArrayList<>(oids.size());
+        for (ASN1ObjectIdentifier m : oids) {
+            l.add(m.getId());
+        }
+        Collections.sort(l);
+
+        List<ASN1ObjectIdentifier> sorted = new ArrayList<>(oids.size());
+        for (String m : l) {
+            for (ASN1ObjectIdentifier n : oids) {
+                if (m.equals(n.getId()) && !sorted.contains(n)) {
+                    sorted.add(n);
+                }
+            }
+        }
+        return sorted;
     }
 
     public static boolean hasKeyusage(

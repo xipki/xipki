@@ -39,6 +39,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +129,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.security.api.ObjectIdentifiers;
 import org.xipki.security.api.TLSExtensionType;
 import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**
@@ -1121,13 +1124,17 @@ public class ProfileConfCreatorDemo {
             final ASN1ObjectIdentifier[] optionalUsages) {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
         if (requiredUsages != null) {
-            for (ASN1ObjectIdentifier usage : requiredUsages) {
+            List<ASN1ObjectIdentifier> l = Arrays.asList(requiredUsages);
+            l = X509Util.sortOIDList(l);
+            for (ASN1ObjectIdentifier usage : l) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
             }
         }
 
         if (optionalUsages != null) {
-            for (ASN1ObjectIdentifier usage : optionalUsages) {
+            List<ASN1ObjectIdentifier> l = Arrays.asList(optionalUsages);
+            l = X509Util.sortOIDList(l);
+            for (ASN1ObjectIdentifier usage : l) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
             }
         }
@@ -1588,8 +1595,11 @@ public class ProfileConfCreatorDemo {
     }
 
     private static ExtensionValueType createTlsFeature(TLSExtensionType[] features) {
+        List<TLSExtensionType> l = Arrays.asList(features);
+        Collections.sort(l);
+
         TlsFeature tlsFeature = new TlsFeature();
-        for (TLSExtensionType m : features) {
+        for (TLSExtensionType m : l) {
             IntWithDescType k = new IntWithDescType();
             k.setValue(m.getCode());
             k.setDescription(m.getName());

@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -458,7 +459,7 @@ class IdentifiedX509Certprofile {
         extControl = controls.remove(extType);
         if (extControl != null
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
-            Set<ASN1ObjectIdentifier> usages = new HashSet<>();
+            List<ASN1ObjectIdentifier> usages = new LinkedList<>();
             Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
             for (ExtKeyUsageControl k : usageOccs) {
                 if (k.isRequired()) {
@@ -916,7 +917,7 @@ class IdentifiedX509Certprofile {
     } // method addRequestedKeyusage
 
     private static void addRequestedExtKeyusage(
-            final Set<ASN1ObjectIdentifier> usages,
+            final List<ASN1ObjectIdentifier> usages,
             final Extensions requestExtensions,
             final Set<ExtKeyUsageControl> usageOccs) {
         Extension extension = requestExtensions.getExtension(Extension.extendedKeyUsage);

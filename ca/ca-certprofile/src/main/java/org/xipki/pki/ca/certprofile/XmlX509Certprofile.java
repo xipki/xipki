@@ -787,15 +787,22 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         if (extensionControls.containsKey(type)) {
             TlsFeature extConf = (TlsFeature) getExtensionValue(
                     type, extensionsType, TlsFeature.class);
+
+            List<Integer> features = new ArrayList<>(extConf.getFeature().size());
+            for (IntWithDescType m : extConf.getFeature()) {
+                int value = m.getValue();
+                if (value < 0 || value > 65535) {
+                    throw new CertprofileException(
+                            "invalid TLS feature (extensionType) " + value);
+                }
+                features.add(value);
+            }
+            Collections.sort(features);
+
             if (extConf != null) {
                 ASN1EncodableVector v = new ASN1EncodableVector();
-                for (IntWithDescType m : extConf.getFeature()) {
-                    int value = m.getValue();
-                    if (value < 0 || value > 65535) {
-                        throw new CertprofileException(
-                                "invalid TLS feature (extensionType) " + value);
-                    }
-                    v.add(new ASN1Integer(value));
+                for (Integer m : features) {
+                    v.add(new ASN1Integer(m));
                 }
                 ASN1Encodable extValue = new DERSequence(v);
                 tlsFeature =
