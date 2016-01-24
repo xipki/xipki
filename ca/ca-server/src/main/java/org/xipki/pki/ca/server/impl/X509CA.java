@@ -1808,7 +1808,7 @@ public class X509CA {
             SubjectPublicKeyInfo publicKeyInfo,
             Date notBefore,
             Date notAfter,
-            final org.bouncycastle.asn1.x509.Extensions extensions,
+            final Extensions extensions,
             final boolean keyUpdate,
             final RequestType reqType,
             final byte[] transactionId)

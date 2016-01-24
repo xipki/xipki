@@ -147,8 +147,8 @@
       <critical>true</critical>
       <value>
         <tlsFeature>
-          <feature description="status_request">5</feature>
           <feature description="client_certificate_url">2</feature>
+          <feature description="status_request">5</feature>
         </tlsFeature>
       </value>
     </extension>
