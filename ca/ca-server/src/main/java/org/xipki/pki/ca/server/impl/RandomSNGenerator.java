@@ -42,13 +42,13 @@ import java.security.SecureRandom;
  * @author Lijun Liao
  */
 
-class RandomSerialNumberGenerator {
+class RandomSNGenerator {
 
     private final SecureRandom random;
 
-    private static RandomSerialNumberGenerator instance = null;
+    private static RandomSNGenerator instance = null;
 
-    private RandomSerialNumberGenerator() {
+    private RandomSNGenerator() {
         this.random = new SecureRandom();
     }
 
@@ -69,9 +69,9 @@ class RandomSerialNumberGenerator {
         }
     }
 
-    public static synchronized RandomSerialNumberGenerator getInstance() {
+    public static synchronized RandomSNGenerator getInstance() {
         if (instance == null) {
-            instance = new RandomSerialNumberGenerator();
+            instance = new RandomSNGenerator();
         }
         return instance;
     }

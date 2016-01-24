@@ -881,59 +881,42 @@ public class X509CACmpResponder extends CmpResponder {
                 LOG.warn("{} certificate, OperationException: code={}, message={}",
                         new Object[]{permission.name(), code.name(), e.getErrorMessage()});
 
-                String auditMessage;
-
                 int failureInfo;
                 switch (code) {
                 case BAD_REQUEST:
                     failureInfo = PKIFailureInfo.badRequest;
-                    auditMessage = "BAD_REQUEST";
                     break;
                 case CERT_REVOKED:
                     failureInfo = PKIFailureInfo.certRevoked;
-                    auditMessage = "CERT_REVOKED";
                     break;
                 case CERT_UNREVOKED:
+                case INSUFFICIENT_PERMISSION:
+                case NOT_PERMITTED:
                     failureInfo = PKIFailureInfo.notAuthorized;
-                    auditMessage = "CERT_UNREVOKED";
                     break;
                 case DATABASE_FAILURE:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditMessage = "DATABASE_FAILURE";
                     break;
                 case INVALID_EXTENSION:
                     failureInfo = PKIFailureInfo.unacceptedExtension;
-                    auditMessage = "INVALID_EXTENSION";
-                    break;
-                case INSUFFICIENT_PERMISSION:
-                    failureInfo = PKIFailureInfo.notAuthorized;
-                    auditMessage = "INSUFFICIENT_PERMISSION";
-                    break;
-                case NOT_PERMITTED:
-                    failureInfo = PKIFailureInfo.notAuthorized;
-                    auditMessage = "NOT_PERMITTED";
                     break;
                 case SYSTEM_FAILURE:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditMessage = "System_Failure";
                     break;
                 case SYSTEM_UNAVAILABLE:
                     failureInfo = PKIFailureInfo.systemUnavail;
-                    auditMessage = "System_Unavailable";
                     break;
                 case UNKNOWN_CERT:
                     failureInfo = PKIFailureInfo.badCertId;
-                    auditMessage = "UNKNOWN_CERT";
                     break;
                 default:
                     failureInfo = PKIFailureInfo.systemFailure;
-                    auditMessage = "InternalErrorCode " + e.getErrorCode();
                     break;
                 } // end switch (code)
 
                 if (childAuditEvent != null) {
                     childAuditEvent.setStatus(AuditStatus.FAILED);
-                    childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
+                    childAuditEvent.addEventData(new AuditEventData("message", code.name()));
                 }
 
                 String errorMessage;
@@ -1132,7 +1115,7 @@ public class X509CACmpResponder extends CmpResponder {
             final Set<Integer> acceptVersions)
     throws OperationException {
         X509CA ca = getCA();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(2000);
         // current maximal support version is 2
         int version = 2;
         if (CollectionUtil.isNotEmpty(acceptVersions) && !acceptVersions.contains(version)) {

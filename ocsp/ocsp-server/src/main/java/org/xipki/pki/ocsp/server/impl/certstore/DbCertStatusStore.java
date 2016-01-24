@@ -212,7 +212,7 @@ public class DbCertStatusStore extends CertStatusStore {
                 } finally {
                     releaseDbResources(ps, rs);
                 }
-            } // end if(initialized) {
+            } // end if(initialized)
 
             HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224,
                     HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};

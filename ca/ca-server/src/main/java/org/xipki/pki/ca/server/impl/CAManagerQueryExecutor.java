@@ -1647,7 +1647,6 @@ class CAManagerQueryExecutor {
             }
 
             ps.setString(index.get(), name);
-
             ps.executeUpdate();
 
             if (m.length() > 0) {
@@ -1759,7 +1758,6 @@ class CAManagerQueryExecutor {
                     }
                 }
                 m.append("signerCert: '").append(subject).append("'; ");
-
                 ps.setString(iSigner_cert, txt);
             }
 
@@ -1769,7 +1767,6 @@ class CAManagerQueryExecutor {
             }
 
             ps.setString(index.get(), name);
-
             ps.executeUpdate();
 
             if (m.length() > 0) {
@@ -1882,7 +1879,6 @@ class CAManagerQueryExecutor {
             }
 
             ps.setString(index.get(), caName);
-
             ps.executeUpdate();
 
             if (m.length() > 0) {
@@ -2149,9 +2145,7 @@ class CAManagerQueryExecutor {
                 b64Cert = Base64.toBase64String(dbEntry.getCertificate().getEncoded());
             }
             ps.setString(idx++, b64Cert);
-
             ps.setString(idx++, dbEntry.getConf());
-
             ps.executeUpdate();
 
             LOG.info("changed responder: {}", dbEntry.toString(false, true));
@@ -2245,11 +2239,10 @@ class CAManagerQueryExecutor {
             int idx = 1;
             ps.setString(idx++, user);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("ID");
-            } else {
+            if (!rs.next()) {
                 return null;
             }
+            return rs.getInt("ID");
         } catch (SQLException e) {
             throw new CAMgmtException(dataSource.translate(sql, e));
         } finally {
@@ -2371,13 +2364,13 @@ class CAManagerQueryExecutor {
             int idx = 1;
             ps.setString(idx++, username);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                String hashedPassword = rs.getString("PASSWORD");
-                String cnRegex = rs.getString("CN_REGEX");
-                return new UserEntry(username, hashedPassword, cnRegex);
-            } else {
+            if (!rs.next()) {
                 return null;
             }
+
+            String hashedPassword = rs.getString("PASSWORD");
+            String cnRegex = rs.getString("CN_REGEX");
+            return new UserEntry(username, hashedPassword, cnRegex);
         } catch (SQLException e) {
             throw new CAMgmtException(dataSource.translate(sql, e));
         } finally {
@@ -2444,20 +2437,19 @@ class CAManagerQueryExecutor {
             int idx = 1;
             ps.setString(idx++, caName);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                String control = rs.getString("CONTROL");
-                String type = rs.getString("RESPONDER_TYPE");
-                String conf = rs.getString("RESPONDER_CONF");
-                String cert = rs.getString("RESPONDER_CERT");
-                if (StringUtil.isBlank(cert)) {
-                    cert = null;
-                }
-
-                ScepEntry entry = new ScepEntry(caName, type, conf, cert, control);
-                return entry;
-            } else {
+            if (!rs.next()) {
                 return null;
             }
+
+            String control = rs.getString("CONTROL");
+            String type = rs.getString("RESPONDER_TYPE");
+            String conf = rs.getString("RESPONDER_CONF");
+            String cert = rs.getString("RESPONDER_CERT");
+            if (StringUtil.isBlank(cert)) {
+                cert = null;
+            }
+
+            return new ScepEntry(caName, type, conf, cert, control);
         } catch (SQLException e) {
             throw new CAMgmtException(dataSource.translate(sql, e));
         } catch (InvalidConfException e) {

@@ -85,7 +85,6 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -906,21 +905,17 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         requestorDbEntries.clear();
         requestors.clear();
         List<String> names = queryExecutor.getNamesFromTable("REQUESTOR");
-
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
-                if (requestorDbEntry == null) {
-                    continue;
-                }
-
-                requestorDbEntries.put(name, requestorDbEntry);
-                CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
-                requestor.setDbEntry(requestorDbEntry);
-                requestors.put(name, requestor);
+        for (String name : names) {
+            CmpRequestorEntry requestorDbEntry = queryExecutor.createRequestor(name);
+            if (requestorDbEntry == null) {
+                continue;
             }
-        }
 
+            requestorDbEntries.put(name, requestorDbEntry);
+            CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
+            requestor.setDbEntry(requestorDbEntry);
+            requestors.put(name, requestor);
+        }
         requestorsInitialized = true;
     } // method initRequestors
 
@@ -934,25 +929,21 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         responders.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("RESPONDER");
+        for (String name : names) {
+            CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
+            if (dbEntry == null) {
+                continue;
+            }
 
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
-                if (dbEntry == null) {
-                    continue;
-                }
+            dbEntry.setConfFaulty(true);
+            responderDbEntries.put(name, dbEntry);
 
-                dbEntry.setConfFaulty(true);
-                responderDbEntries.put(name, dbEntry);
-
-                CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
-                if (responder != null) {
-                    dbEntry.setConfFaulty(false);
-                    responders.put(name, responder);
-                }
+            CmpResponderEntryWrapper responder = createCmpResponder(dbEntry);
+            if (responder != null) {
+                dbEntry.setConfFaulty(false);
+                responders.put(name, responder);
             }
         }
-
         responderInitialized = true;
     } // method initResponders
 
@@ -999,20 +990,17 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         certprofiles.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("PROFILE");
+        for (String name : names) {
+            CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
+            if (dbEntry != null) {
+                dbEntry.setFaulty(true);
+                certprofileDbEntries.put(name, dbEntry);
+            }
 
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
-                if (dbEntry != null) {
-                    dbEntry.setFaulty(true);
-                    certprofileDbEntries.put(name, dbEntry);
-                }
-
-                IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
-                if (profile != null) {
-                    dbEntry.setFaulty(false);
-                    certprofiles.put(name, profile);
-                }
+            IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
+            if (profile != null) {
+                dbEntry.setFaulty(false);
+                certprofiles.put(name, profile);
             }
         }
 
@@ -1032,22 +1020,19 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         publisherDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("PUBLISHER");
+        for (String name : names) {
+            PublisherEntry dbEntry = queryExecutor.createPublisher(name);
+            if (dbEntry == null) {
+                continue;
+            }
 
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                PublisherEntry dbEntry = queryExecutor.createPublisher(name);
-                if (dbEntry == null) {
-                    continue;
-                }
+            dbEntry.setFaulty(true);
+            publisherDbEntries.put(name, dbEntry);
 
-                dbEntry.setFaulty(true);
-                publisherDbEntries.put(name, dbEntry);
-
-                IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
-                if (publisher != null) {
-                    dbEntry.setFaulty(false);
-                    publishers.put(name, publisher);
-                }
+            IdentifiedX509CertPublisher publisher = createPublisher(dbEntry);
+            if (publisher != null) {
+                dbEntry.setFaulty(false);
+                publishers.put(name, publisher);
             }
         }
 
@@ -1063,18 +1048,15 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         crlSignerDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CRLSIGNER");
-
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
-                if (dbEntry == null) {
-                    continue;
-                }
-
-                crlSignerDbEntries.put(name, dbEntry);
-                X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
-                crlSigners.put(name, crlSigner);
+        for (String name : names) {
+            X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
+            if (dbEntry == null) {
+                continue;
             }
+
+            crlSignerDbEntries.put(name, dbEntry);
+            X509CrlSignerEntryWrapper crlSigner = createX509CrlSigner(dbEntry);
+            crlSigners.put(name, crlSigner);
         }
 
         crlSignersInitialized = true;
@@ -1090,31 +1072,28 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         cmpControlDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CMPCONTROL");
+        for (String name : names) {
+            CmpControlEntry cmpControlDb = queryExecutor.createCmpControl(name);
+            if (cmpControlDb == null) {
+                continue;
+            }
 
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                CmpControlEntry cmpControlDb = queryExecutor.createCmpControl(name);
-                if (cmpControlDb == null) {
-                    continue;
+            cmpControlDb.setFaulty(true);
+            cmpControlDbEntries.put(name, cmpControlDb);
+
+            CmpControl cmpControl;
+            try {
+                cmpControl = new CmpControl(cmpControlDb);
+                cmpControlDb.setFaulty(false);
+                cmpControls.put(name, cmpControl);
+            } catch (InvalidConfException e) {
+                final String message = "could not initialize CMP control " + name
+                        + ", ignore it";
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
-
-                cmpControlDb.setFaulty(true);
-                cmpControlDbEntries.put(name, cmpControlDb);
-
-                CmpControl cmpControl;
-                try {
-                    cmpControl = new CmpControl(cmpControlDb);
-                    cmpControlDb.setFaulty(false);
-                    cmpControls.put(name, cmpControl);
-                } catch (InvalidConfException e) {
-                    final String message = "could not initialize CMP control " + name
-                            + ", ignore it";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
+                LOG.debug(message, e);
             }
         }
 
@@ -1131,33 +1110,29 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         scepDbEntries.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("SCEP", "CA_NAME");
+        for (String name : names) {
+            ScepEntry scepDb = queryExecutor.getScep(name);
+            if (scepDb == null) {
+                continue;
+            }
 
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                ScepEntry scepDb = queryExecutor.getScep(name);
-                if (scepDb == null) {
-                    continue;
+            scepDb.setConfFaulty(true);
+            scepDbEntries.put(name, scepDb);
+
+            try {
+                Scep scep = new Scep(scepDb, this);
+                scepDb.setConfFaulty(false);
+                sceps.put(name, scep);
+            } catch (CAMgmtException e) {
+                final String message = "could not initialize SCEP entry " + name
+                        + ", ignore it";
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
                 }
-
-                scepDb.setConfFaulty(true);
-                scepDbEntries.put(name, scepDb);
-
-                try {
-                    Scep scep = new Scep(scepDb, this);
-                    scepDb.setConfFaulty(false);
-                    sceps.put(name, scep);
-                } catch (CAMgmtException e) {
-                    final String message = "could not initialize SCEP entry " + name
-                            + ", ignore it";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
+                LOG.debug(message, e);
             }
         }
-
         scepsInitialized = true;
     } // method initSceps
 
@@ -1173,12 +1148,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
         ca_has_profiles.clear();
 
         List<String> names = queryExecutor.getNamesFromTable("CA");
-        if (CollectionUtil.isNotEmpty(names)) {
-            for (String name : names) {
-                createCA(name);
-            }
+        for (String name : names) {
+            createCA(name);
         }
-
         cAsInitialized = true;
     } // method initCAs
 
@@ -2632,7 +2604,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             nextSerial++;
         } else {
             serialOfThisCert =
-                    RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
+                    RandomSNGenerator.getInstance().getSerialNumber().longValue();
         }
 
         GenerateSelfSignedResult result;
