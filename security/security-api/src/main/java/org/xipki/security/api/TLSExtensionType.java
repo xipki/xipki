@@ -39,7 +39,7 @@ package org.xipki.security.api;
  * @author Lijun Liao
  */
 
-public class TLSExtensionType {
+public class TLSExtensionType implements Comparable<TLSExtensionType> {
 
     public static final TLSExtensionType server_name
             = new TLSExtensionType(0, "server_name");
@@ -70,6 +70,11 @@ public class TLSExtensionType {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int compareTo(TLSExtensionType o) {
+        return Integer.valueOf(code).compareTo(o.code);
     }
 
 }
