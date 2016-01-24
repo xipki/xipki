@@ -1937,13 +1937,13 @@ class CertStoreQueryExecutor {
     throws OperationException {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer id =  caInfoStore.getCaIdForCert(encodedCert);
-        if (id == null) {
-            throw new IllegalStateException("could not find CA with subject  '"
-                    + caCert.getSubject()
-                    + "' in table " + caInfoStore.getTable()
-                    + ", please start XiPKI in master mode first the restart this XiPKI system");
+        if (id != null) {
+            return id.intValue();
         }
-        return id.intValue();
+
+        throw new IllegalStateException("could not find CA with subject  '" + caCert.getSubject()
+                + "' in table " + caInfoStore.getTable()
+                + ", please start XiPKI in master mode first the restart this XiPKI system");
     }
 
     void addCa(
@@ -2026,12 +2026,13 @@ class CertStoreQueryExecutor {
             final String name,
             final NameIdStore store) {
         Integer id = store.getId(name);
-        if (id == null) {
-            throw new IllegalStateException("could not find entry named " + name + " in table "
-                + store.getTable()
-                + ", please start XiPKI in master mode first and then restart this XiPKI system");
+        if (id != null) {
+            return id.intValue();
         }
-        return id.intValue();
+
+        throw new IllegalStateException("could not find entry named " + name
+                + " in table " + store.getTable()
+                + ", please start XiPKI in master mode first and then restart this XiPKI system");
     }
 
     private void addName(
@@ -2111,11 +2112,11 @@ class CertStoreQueryExecutor {
             ps = dataSource.prepareStatement(c, sqlQuery);
         }
 
-        if (ps == null) {
-            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
+        if (ps != null) {
+            return ps;
         }
 
-        return ps;
+        throw new DataAccessException("could not create prepared statement for " + sqlQuery);
     } // method borrowPreparedStatement
 
     private void releaseDbResources(
@@ -2179,9 +2180,9 @@ class CertStoreQueryExecutor {
                 RDN[] rdns = lastName.getRDNs(ObjectIdentifiers.DN_SERIALNUMBER);
                 if (rdns == null || rdns.length == 0) {
                     return null;
-                } else {
-                    return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
                 }
+
+                return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
             }
         } catch (SQLException e) {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -2247,11 +2248,10 @@ class CertStoreQueryExecutor {
             ps = borrowPreparedStatement(sql);
             ps.setInt(1, caId);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                maxSerial = rs.getLong(1);
-            } else {
+            if (!rs.next()) {
                 return;
             }
+            maxSerial = rs.getLong(1);
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {

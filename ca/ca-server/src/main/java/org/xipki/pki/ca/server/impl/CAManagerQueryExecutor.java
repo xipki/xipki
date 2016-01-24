@@ -185,13 +185,13 @@ class CAManagerQueryExecutor {
             ps.setString(1, eventName);
             rs = ps.executeQuery();
 
-            if (rs.next()) {
-                long eventTime = rs.getLong("EVENT_TIME");
-                String eventOwner = rs.getString("EVENT_OWNER");
-                return new SystemEvent(eventName, eventOwner, eventTime);
-            } else {
+            if (!rs.next()) {
                 return null;
             }
+
+            long eventTime = rs.getLong("EVENT_TIME");
+            String eventOwner = rs.getString("EVENT_OWNER");
+            return new SystemEvent(eventName, eventOwner, eventTime);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
@@ -312,20 +312,20 @@ class CAManagerQueryExecutor {
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String type = rs.getString("TYPE");
-                String conf = rs.getString("CONF");
-
-                return new CertprofileEntry(name, type, conf);
+            if (!rs.next()) {
+                return null;
             }
+
+            String type = rs.getString("TYPE");
+            String conf = rs.getString("CONF");
+
+            return new CertprofileEntry(name, type, conf);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-
-        return null;
     } // method createCertprofile
 
     List<String> getNamesFromTable(
@@ -375,20 +375,19 @@ class CAManagerQueryExecutor {
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String type = rs.getString("TYPE");
-                String conf = rs.getString("CONF");
-
-                return new PublisherEntry(name, type, conf);
+            if (!rs.next()) {
+                return null;
             }
+
+            String type = rs.getString("TYPE");
+            String conf = rs.getString("CONF");
+            return new PublisherEntry(name, type, conf);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-
-        return null;
     } // method createPublisher
 
     CmpRequestorEntry createRequestor(
@@ -403,18 +402,18 @@ class CAManagerQueryExecutor {
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String b64Cert = rs.getString("CERT");
-                return new CmpRequestorEntry(name, b64Cert);
+            if (!rs.next()) {
+                return null;
             }
+
+            String b64Cert = rs.getString("CERT");
+            return new CmpRequestorEntry(name, b64Cert);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-
-        return null;
     } // method createRequestor
 
     X509CrlSignerEntry createCrlSigner(
@@ -430,14 +429,16 @@ class CAManagerQueryExecutor {
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                String signer_type = rs.getString("SIGNER_TYPE");
-                String signer_conf = rs.getString("SIGNER_CONF");
-                String signer_cert = rs.getString("SIGNER_CERT");
-                String crlControlConf = rs.getString("CRL_CONTROL");
-                return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert,
-                        crlControlConf);
+            if (!rs.next()) {
+                return null;
             }
+
+            String signer_type = rs.getString("SIGNER_TYPE");
+            String signer_conf = rs.getString("SIGNER_CONF");
+            String signer_cert = rs.getString("SIGNER_CERT");
+            String crlControlConf = rs.getString("CRL_CONTROL");
+            return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert,
+                    crlControlConf);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
@@ -446,7 +447,6 @@ class CAManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-        return null;
     } // method createCrlSigner
 
     CmpControlEntry createCmpControl(
@@ -521,137 +521,137 @@ class CAManagerQueryExecutor {
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                int artCode = rs.getInt("ART");
-                if (artCode != CertArt.X509PKC.getCode()) {
-                    throw new CAMgmtException(
-                            "CA " + name + " is not X509CA, and is not supported");
+            if (!rs.next()) {
+                return null;
+            }
+
+            int artCode = rs.getInt("ART");
+            if (artCode != CertArt.X509PKC.getCode()) {
+                throw new CAMgmtException(
+                        "CA " + name + " is not X509CA, and is not supported");
+            }
+
+            long next_serial = rs.getLong("NEXT_SN");
+            int next_crlNo = rs.getInt("NEXT_CRLNO");
+            String status = rs.getString("STATUS");
+            String crl_uris = rs.getString("CRL_URIS");
+            String delta_crl_uris = rs.getString("DELTACRL_URIS");
+            String ocsp_uris = rs.getString("OCSP_URIS");
+            String cacert_uris = rs.getString("CACERT_URIS");
+            String max_validityS = rs.getString("MAX_VALIDITY");
+            CertValidity max_validity = CertValidity.getInstance(max_validityS);
+            String b64cert = rs.getString("CERT");
+            String signer_type = rs.getString("SIGNER_TYPE");
+            String signer_conf = rs.getString("SIGNER_CONF");
+            String crlsigner_name = rs.getString("CRLSIGNER_NAME");
+            String responder_name = rs.getString("RESPONDER_NAME");
+            String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
+            int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
+            int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
+            int numCrls = rs.getInt("NUM_CRLS");
+            int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+            int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
+            String extra_control = rs.getString("EXTRA_CONTROL");
+
+            CertRevocationInfo revocationInfo = null;
+            boolean revoked = rs.getBoolean("REV");
+            if (revoked) {
+                int rev_reason = rs.getInt("RR");
+                long rev_time = rs.getInt("RT");
+                long rev_invalidity_time = rs.getInt("RIT");
+                Date revInvTime = (rev_invalidity_time == 0)
+                        ? null
+                        : new Date(rev_invalidity_time * 1000);
+                revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
+                        revInvTime);
+            }
+
+            String s = rs.getString("PERMISSIONS");
+            Set<Permission> permissions = getPermissions(s);
+
+            List<String> lCrlUris = null;
+            if (StringUtil.isNotBlank(crl_uris)) {
+                lCrlUris = StringUtil.split(crl_uris, " \t");
+            }
+
+            List<String> lDeltaCrlUris = null;
+            if (StringUtil.isNotBlank(delta_crl_uris)) {
+                lDeltaCrlUris = StringUtil.split(delta_crl_uris, " \t");
+            }
+
+            List<String> lOcspUris = null;
+            if (StringUtil.isNotBlank(ocsp_uris)) {
+                lOcspUris = StringUtil.split(ocsp_uris, " \t");
+            }
+
+            List<String> lCacertUris = null;
+            if (StringUtil.isNotBlank(cacert_uris)) {
+                lCacertUris = StringUtil.split(cacert_uris, " \t");
+            }
+
+            X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo,
+                    signer_type, signer_conf,
+                    lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris,
+                    numCrls, expirationPeriod);
+            X509Certificate cert = generateCert(b64cert);
+            entry.setCertificate(cert);
+
+            CAStatus caStatus = CAStatus.getCAStatus(status);
+            if (caStatus == null) {
+                caStatus = CAStatus.INACTIVE;
+            }
+            entry.setStatus(caStatus);
+
+            entry.setMaxValidity(max_validity);
+            entry.setKeepExpiredCertInDays(keepExpiredCertDays);
+
+            if (crlsigner_name != null) {
+                entry.setCrlSignerName(crlsigner_name);
+            }
+
+            if (responder_name != null) {
+                entry.setResponderName(responder_name);
+            }
+
+            if (extra_control != null) {
+                entry.setExtraControl(extra_control);
+            }
+
+            if (cmpcontrol_name != null) {
+                entry.setCmpControlName(cmpcontrol_name);
+            }
+
+            entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
+            entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
+            entry.setPermissions(permissions);
+            entry.setRevocationInfo(revocationInfo);
+
+            String validityModeS = rs.getString("VALIDITY_MODE");
+            ValidityMode validityMode = null;
+            if (validityModeS != null) {
+                validityMode = ValidityMode.getInstance(validityModeS);
+            }
+            if (validityMode == null) {
+                validityMode = ValidityMode.STRICT;
+            }
+            entry.setValidityMode(validityMode);
+
+            try {
+                if (masterMode) {
+                    X509Cert cm = new X509Cert(entry.getCertificate());
+                    certstore.addCa(cm);
                 }
 
-                long next_serial = rs.getLong("NEXT_SN");
-                int next_crlNo = rs.getInt("NEXT_CRLNO");
-                String status = rs.getString("STATUS");
-                String crl_uris = rs.getString("CRL_URIS");
-                String delta_crl_uris = rs.getString("DELTACRL_URIS");
-                String ocsp_uris = rs.getString("OCSP_URIS");
-                String cacert_uris = rs.getString("CACERT_URIS");
-                String max_validityS = rs.getString("MAX_VALIDITY");
-                CertValidity max_validity = CertValidity.getInstance(max_validityS);
-                String b64cert = rs.getString("CERT");
-                String signer_type = rs.getString("SIGNER_TYPE");
-                String signer_conf = rs.getString("SIGNER_CONF");
-                String crlsigner_name = rs.getString("CRLSIGNER_NAME");
-                String responder_name = rs.getString("RESPONDER_NAME");
-                String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
-                int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
-                int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
-                int numCrls = rs.getInt("NUM_CRLS");
-                int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
-                int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
-                String extra_control = rs.getString("EXTRA_CONTROL");
-
-                CertRevocationInfo revocationInfo = null;
-                boolean revoked = rs.getBoolean("REV");
-                if (revoked) {
-                    int rev_reason = rs.getInt("RR");
-                    long rev_time = rs.getInt("RT");
-                    long rev_invalidity_time = rs.getInt("RIT");
-                    Date revInvTime = (rev_invalidity_time == 0)
-                            ? null
-                            : new Date(rev_invalidity_time * 1000);
-                    revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
-                            revInvTime);
-                }
-
-                String s = rs.getString("PERMISSIONS");
-                Set<Permission> permissions = getPermissions(s);
-
-                List<String> lCrlUris = null;
-                if (StringUtil.isNotBlank(crl_uris)) {
-                    lCrlUris = StringUtil.split(crl_uris, " \t");
-                }
-
-                List<String> lDeltaCrlUris = null;
-                if (StringUtil.isNotBlank(delta_crl_uris)) {
-                    lDeltaCrlUris = StringUtil.split(delta_crl_uris, " \t");
-                }
-
-                List<String> lOcspUris = null;
-                if (StringUtil.isNotBlank(ocsp_uris)) {
-                    lOcspUris = StringUtil.split(ocsp_uris, " \t");
-                }
-
-                List<String> lCacertUris = null;
-                if (StringUtil.isNotBlank(cacert_uris)) {
-                    lCacertUris = StringUtil.split(cacert_uris, " \t");
-                }
-
-                X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo,
-                        signer_type, signer_conf,
-                        lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris,
-                        numCrls, expirationPeriod);
-                X509Certificate cert = generateCert(b64cert);
-                entry.setCertificate(cert);
-
-                CAStatus caStatus = CAStatus.getCAStatus(status);
-                if (caStatus == null) {
-                    caStatus = CAStatus.INACTIVE;
-                }
-                entry.setStatus(caStatus);
-
-                entry.setMaxValidity(max_validity);
-                entry.setKeepExpiredCertInDays(keepExpiredCertDays);
-
-                if (crlsigner_name != null) {
-                    entry.setCrlSignerName(crlsigner_name);
-                }
-
-                if (responder_name != null) {
-                    entry.setResponderName(responder_name);
-                }
-
-                if (extra_control != null) {
-                    entry.setExtraControl(extra_control);
-                }
-
-                if (cmpcontrol_name != null) {
-                    entry.setCmpControlName(cmpcontrol_name);
-                }
-
-                entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
-                entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
-                entry.setPermissions(permissions);
-                entry.setRevocationInfo(revocationInfo);
-
-                String validityModeS = rs.getString("VALIDITY_MODE");
-                ValidityMode validityMode = null;
-                if (validityModeS != null) {
-                    validityMode = ValidityMode.getInstance(validityModeS);
-                }
-                if (validityMode == null) {
-                    validityMode = ValidityMode.STRICT;
-                }
-                entry.setValidityMode(validityMode);
-
-                try {
-                    if (masterMode) {
-                        X509Cert cm = new X509Cert(entry.getCertificate());
-                        certstore.addCa(cm);
-                    }
-
-                    return new X509CAInfo(entry, certstore);
-                } catch (OperationException e) {
-                    throw new CAMgmtException(e.getMessage(), e);
-                }
-            } // end if(rs.next())
+                return new X509CAInfo(entry, certstore);
+            } catch (OperationException e) {
+                throw new CAMgmtException(e.getMessage(), e);
+            }
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
             throw new CAMgmtException(tEx.getMessage(), tEx);
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-
-        return null;
     } // method createCAInfo
 
     Set<CAHasRequestorEntry> createCAhasRequestors(
