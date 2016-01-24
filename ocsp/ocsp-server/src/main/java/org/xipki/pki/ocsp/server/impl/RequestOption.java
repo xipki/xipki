@@ -177,42 +177,43 @@ class RequestOption {
             trustAnchors = null;
             certs = null;
             certpathValidationModel = CertpathValidationModel.PKIX;
-        } else {
-            switch (certpathConf.getValidationModel()) {
-            case CHAIN:
-                certpathValidationModel = CertpathValidationModel.CHAIN;
-                break;
-            case PKIX:
-                certpathValidationModel = CertpathValidationModel.PKIX;
-                break;
-            default:
-                throw new RuntimeException("should not reach here, unknown ValidaitonModel "
-                        + certpathConf.getValidationModel());
-            } // end switch
+            return;
+        }
 
+        switch (certpathConf.getValidationModel()) {
+        case CHAIN:
+            certpathValidationModel = CertpathValidationModel.CHAIN;
+            break;
+        case PKIX:
+            certpathValidationModel = CertpathValidationModel.PKIX;
+            break;
+        default:
+            throw new RuntimeException("should not reach here, unknown ValidaitonModel "
+                    + certpathConf.getValidationModel());
+        } // end switch
+
+        try {
+            Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
+            trustAnchors = new HashSet<>(tmpCerts.size());
+            for (X509Certificate m : tmpCerts) {
+                trustAnchors.add(new CertWithEncoded(m));
+            }
+        } catch (Exception e) {
+            throw new InvalidConfException(
+                    "error while initializing the trustAnchors: " + e.getMessage(), e);
+        }
+
+        CertCollectionType certsType = certpathConf.getCerts();
+        if (certsType == null) {
+            this.certs = null;
+        } else {
             try {
-                Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
-                trustAnchors = new HashSet<>(tmpCerts.size());
-                for (X509Certificate m : tmpCerts) {
-                    trustAnchors.add(new CertWithEncoded(m));
-                }
+                this.certs = getCerts(certsType);
             } catch (Exception e) {
                 throw new InvalidConfException(
-                        "error while initializing the trustAnchors: " + e.getMessage(), e);
+                        "error while initializing the certs: " + e.getMessage(), e);
             }
-
-            CertCollectionType certsType = certpathConf.getCerts();
-            if (certsType == null) {
-                this.certs = null;
-            } else {
-                try {
-                    this.certs = getCerts(certsType);
-                } catch (Exception e) {
-                    throw new InvalidConfException(
-                            "error while initializing the certs: " + e.getMessage(), e);
-                }
-            } // end if
-        } // end if (certpathConf == null) {
+        } // end if
     } // constructor
 
     public Set<HashAlgoType> getHashAlgos() {
