@@ -246,8 +246,8 @@ public class DbCertStatusStore extends CertStatusStore {
                         if (h == HashAlgoType.SHA1) {
                             for (IssuerEntry existingIssuer : caInfos) {
                                 if (existingIssuer.matchHash(h, hashNameBytes, hashKeyBytes)) {
-                                    throw new Exception("found at least two issuers with the"
-                                            + " same subject and key");
+                                    throw new Exception(
+                                        "found at least two issuers with the same subject and key");
                                 }
                             }
                         }
@@ -400,8 +400,8 @@ public class DbCertStatusStore extends CertStatusStore {
 
             if (isIncludeArchiveCutoff()) {
                 int retentionInterval = getRetentionInterval();
-                Date t;
                 if (retentionInterval != 0) {
+                    Date t;
                     // expired certificate remains in status store for ever
                     if (retentionInterval < 0) {
                         t = issuer.getNotBefore();
