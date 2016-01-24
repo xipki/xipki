@@ -96,7 +96,7 @@ public class X509CAInfo {
 
     private boolean useRandomSerialNumber;
 
-    private RandomSerialNumberGenerator randomSNGenerator;
+    private RandomSNGenerator randomSNGenerator;
 
     private Map<String, ConcurrentContentSigner> signers;
 
@@ -138,7 +138,7 @@ public class X509CAInfo {
 
         this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
         if (this.useRandomSerialNumber) {
-            randomSNGenerator = RandomSerialNumberGenerator.getInstance();
+            randomSNGenerator = RandomSNGenerator.getInstance();
             return;
         }
 
