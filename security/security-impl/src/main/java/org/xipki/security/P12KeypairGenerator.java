@@ -40,6 +40,7 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
@@ -153,9 +154,10 @@ public abstract class P12KeypairGenerator {
                 final char[] password,
                 final String subject,
                 final Integer keyUsage,
-                final List<ASN1ObjectIdentifier> extendedKeyUsage)
+                final List<ASN1ObjectIdentifier> extendedKeyUsage,
+                final SecureRandom random)
         throws Exception {
-            super(password, subject, keyUsage, extendedKeyUsage);
+            super(password, subject, keyUsage, extendedKeyUsage, random);
 
             boolean isOid;
             try {
@@ -181,7 +183,7 @@ public abstract class P12KeypairGenerator {
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception {
-            KeyPair kp = KeyUtil.generateECKeypair(this.curveOid);
+            KeyPair kp = KeyUtil.generateECKeypair(this.curveOid, random);
 
             AlgorithmIdentifier algId = new AlgorithmIdentifier(
                     X9ObjectIdentifiers.id_ecPublicKey, this.curveOid);
@@ -211,9 +213,10 @@ public abstract class P12KeypairGenerator {
                 final char[] password,
                 final String subject,
                 final Integer keyUsage,
-                final List<ASN1ObjectIdentifier> extendedKeyUsage)
+                final List<ASN1ObjectIdentifier> extendedKeyUsage,
+                final SecureRandom random)
         throws Exception {
-            super(password, subject, keyUsage, extendedKeyUsage);
+            super(password, subject, keyUsage, extendedKeyUsage, random);
 
             this.keysize = keysize;
             this.publicExponent = publicExponent;
@@ -222,7 +225,7 @@ public abstract class P12KeypairGenerator {
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception {
-            KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent);
+            KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
             java.security.interfaces.RSAPublicKey rsaPubKey =
                     (java.security.interfaces.RSAPublicKey) kp.getPublic();
 
@@ -251,9 +254,10 @@ public abstract class P12KeypairGenerator {
                 final char[] password,
                 final String subject,
                 final Integer keyUsage,
-                final List<ASN1ObjectIdentifier> extendedKeyUsage)
+                final List<ASN1ObjectIdentifier> extendedKeyUsage,
+                final SecureRandom random)
         throws Exception {
-            super(password, subject, keyUsage, extendedKeyUsage);
+            super(password, subject, keyUsage, extendedKeyUsage, random);
 
             this.pLength = pLength;
             this.qLength = qLength;
@@ -262,7 +266,7 @@ public abstract class P12KeypairGenerator {
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception {
-            KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength);
+            KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength, random);
             SubjectPublicKeyInfo spki = KeyUtil.creatDSASubjectPublicKeyInfo(
                     (DSAPublicKey) kp.getPublic());
             return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
@@ -291,6 +295,8 @@ public abstract class P12KeypairGenerator {
 
     private List<ASN1ObjectIdentifier> extendedKeyUsage;
 
+    protected final SecureRandom random;
+
     protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
     throws Exception;
 
@@ -300,7 +306,8 @@ public abstract class P12KeypairGenerator {
             final char[] password,
             final String subject,
             final Integer keyUsage,
-            final List<ASN1ObjectIdentifier> extendedKeyUsage)
+            final List<ASN1ObjectIdentifier> extendedKeyUsage,
+            final SecureRandom random)
     throws Exception {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -310,6 +317,7 @@ public abstract class P12KeypairGenerator {
         this.subject = subject;
         this.keyUsage = keyUsage;
         this.extendedKeyUsage = extendedKeyUsage;
+        this.random = random;
     }
 
     public P12KeypairGenerationResult generateIdentity()

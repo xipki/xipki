@@ -43,6 +43,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
@@ -382,7 +383,8 @@ public class SoftTokenContentSignerBuilder {
 
     public ConcurrentContentSigner createSigner(
             final AlgorithmIdentifier signatureAlgId,
-            final int parallelism)
+            final int parallelism,
+            final SecureRandom random)
     throws OperatorCreationException, NoSuchPaddingException {
         if (parallelism < 1) {
             throw new IllegalArgumentException("non-positive parallelism is not allowed: "
@@ -454,6 +456,10 @@ public class SoftTokenContentSignerBuilder {
             }
 
             for (int i = 0; i < parallelism; i++) {
+                if (random != null) {
+                    signerBuilder.setSecureRandom(random);
+                }
+
                 ContentSigner signer = signerBuilder.build(keyparam);
                 signers.add(signer);
             }

@@ -142,14 +142,16 @@ public class KeyUtil {
     }
 
     public static KeyPair generateRSAKeypair(
-            final int keysize)
+            final int keysize,
+            final SecureRandom random)
     throws Exception {
-        return generateRSAKeypair(keysize, null);
+        return generateRSAKeypair(keysize, (BigInteger) null, random);
     }
 
     public static KeyPair generateRSAKeypair(
             final int keysize,
-            BigInteger publicExponent)
+            BigInteger publicExponent,
+            final SecureRandom random)
     throws Exception {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
@@ -157,41 +159,52 @@ public class KeyUtil {
             publicExponent = RSAKeyGenParameterSpec.F4;
         }
         AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, publicExponent);
-        kpGen.initialize(params);
+        if (random == null) {
+            kpGen.initialize(params);
+        } else {
+            kpGen.initialize(params, random);
+        }
         return kpGen.generateKeyPair();
     }
 
     public static KeyPair generateDSAKeypair(
             final int pLength,
-            final int qLength)
+            final int qLength,
+            final SecureRandom random)
     throws Exception {
-        return generateDSAKeypair(pLength, qLength, 80);
+        return generateDSAKeypair(pLength, qLength, 80, random);
     }
 
     public static KeyPair generateDSAKeypair(
             final int pLength,
             final int qLength,
-            final int certainty)
+            final int certainty,
+            final SecureRandom random)
     throws Exception {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                pLength, qLength, certainty, new SecureRandom());
+                pLength, qLength, certainty, random);
         paramGen.init(genParams);
         DSAParameters dsaParams = paramGen.generateParameters();
 
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
         DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG());
-        kpGen.initialize(dsaParamSpec, new SecureRandom());
+        kpGen.initialize(dsaParamSpec, random);
         return kpGen.generateKeyPair();
     }
 
     public static KeyPair generateECKeypair(
-            final ASN1ObjectIdentifier curveId)
+            final ASN1ObjectIdentifier curveId,
+            final SecureRandom random)
     throws Exception {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
-        kpGen.initialize(spec);
+        if (random == null) {
+            kpGen.initialize(spec);
+        } else {
+            kpGen.initialize(spec, random);
+        }
         return kpGen.generateKeyPair();
     }
 

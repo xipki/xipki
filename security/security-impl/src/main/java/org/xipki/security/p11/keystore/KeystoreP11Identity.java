@@ -40,6 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -88,11 +89,13 @@ public class KeystoreP11Identity extends P11Identity {
             final P11KeyIdentifier keyId,
             final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
-            final int maxSessions)
+            final int maxSessions,
+            final SecureRandom random4Sign)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
         ParamUtil.assertNotNull("privateKey", privateKey);
         ParamUtil.assertNotBlank("sha1sum", sha1sum);
+        ParamUtil.assertNotNull("random4Sign", random4Sign);
 
         if (certificateChain == null
                 || certificateChain.length < 1
@@ -102,6 +105,7 @@ public class KeystoreP11Identity extends P11Identity {
 
         this.privateKey = privateKey;
         this.sha1sum = sha1sum;
+
         if (this.publicKey instanceof RSAPublicKey) {
             String providerName;
             if (Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
@@ -148,7 +152,7 @@ public class KeystoreP11Identity extends P11Identity {
 
             for (int i = 0; i < maxSessions; i++) {
                 Signature dsaSignature = Signature.getInstance(algorithm, "BC");
-                dsaSignature.initSign(privateKey);
+                dsaSignature.initSign(privateKey, random4Sign);
                 dsaSignatures.add(dsaSignature);
             }
         }

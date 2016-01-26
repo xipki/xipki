@@ -37,6 +37,7 @@ package org.xipki.security.speed.p12;
 
 import org.xipki.security.P12RawKeypairGenerator;
 import org.xipki.security.P12RawKeypairGenerator.DSAKeypairGenerator;
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -48,11 +49,13 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
     public P12DSAKeyGenLoadTest(
             final int pLength,
-            final int qLength)
+            final int qLength,
+            final SecurityFactory securityFactory)
     throws Exception {
         super("PKCS#12 DSA key generation\n"
                 + "pLength: " + pLength + "\n"
-                + "qLength: " + qLength);
+                + "qLength: " + qLength,
+                securityFactory);
         this.kpGen = new DSAKeypairGenerator(pLength, qLength);
     }
 
