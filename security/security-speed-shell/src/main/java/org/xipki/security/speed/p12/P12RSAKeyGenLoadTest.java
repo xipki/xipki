@@ -39,6 +39,7 @@ import java.math.BigInteger;
 
 import org.xipki.security.P12RawKeypairGenerator;
 import org.xipki.security.P12RawKeypairGenerator.RSAKeypairGenerator;
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -50,11 +51,13 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
     public P12RSAKeyGenLoadTest(
             final int keysize,
-            final BigInteger publicExponent)
+            final BigInteger publicExponent,
+            final SecurityFactory securityFactory)
     throws Exception {
         super("PKCS#12 RSA key generation\n"
                 + "keysize: " + keysize + "\n"
-                + "public exponent: " + publicExponent);
+                + "public exponent: " + publicExponent,
+                securityFactory);
 
         this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
     }

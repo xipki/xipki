@@ -41,6 +41,7 @@ import java.util.Set;
 
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -58,11 +59,14 @@ public class P11ModuleConf {
 
     private final P11PasswordRetriever passwordRetriever;
 
+    private final SecurityFactory securityFactory;
+
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
-            final P11PasswordRetriever passwordRetriever) {
-        this(name, nativeLibrary, passwordRetriever, null, null);
+            final P11PasswordRetriever passwordRetriever,
+            final SecurityFactory securityFactory) {
+        this(name, nativeLibrary, passwordRetriever, null, null, securityFactory);
     }
 
     public P11ModuleConf(
@@ -70,12 +74,15 @@ public class P11ModuleConf {
             final String nativeLibrary,
             final P11PasswordRetriever passwordRetriever,
             final Set<P11SlotIdentifier> includeSlots,
-            final Set<P11SlotIdentifier> excludeSlots) {
+            final Set<P11SlotIdentifier> excludeSlots,
+            final SecurityFactory securityFactory) {
         ParamUtil.assertNotBlank("name", name);
         ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
 
         this.name = name.toLowerCase();
         this.nativeLibrary = nativeLibrary;
+        this.securityFactory = securityFactory;
         this.passwordRetriever = (passwordRetriever == null)
                 ? P11NullPasswordRetriever.INSTANCE
                 : passwordRetriever;
@@ -99,6 +106,10 @@ public class P11ModuleConf {
 
     public String getNativeLibrary() {
         return nativeLibrary;
+    }
+
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
     }
 
     public Set<P11SlotIdentifier> getExcludeSlots() {

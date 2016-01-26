@@ -68,7 +68,7 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedCommandSupport {
             }
         }
 
-        return new P12DSAKeyGenLoadTest(pLen, qLen);
+        return new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory);
     }
 
 }

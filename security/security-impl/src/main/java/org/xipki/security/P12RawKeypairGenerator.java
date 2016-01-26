@@ -37,6 +37,7 @@ package org.xipki.security;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.Security;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -81,9 +82,10 @@ public abstract class P12RawKeypairGenerator {
         }
 
         @Override
-        public KeyPair genKeypair()
+        public KeyPair genKeypair(
+                final SecureRandom random)
         throws Exception {
-            return KeyUtil.generateECKeypair(this.curveOid);
+            return KeyUtil.generateECKeypair(this.curveOid, random);
         }
 
     } // class ECKeypairGenerator
@@ -105,9 +107,10 @@ public abstract class P12RawKeypairGenerator {
         }
 
         @Override
-        public KeyPair genKeypair()
+        public KeyPair genKeypair(
+                final SecureRandom random)
         throws Exception {
-            return KeyUtil.generateRSAKeypair(keysize, publicExponent);
+            return KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
         }
 
     } // class RSAKeypairGenerator
@@ -129,14 +132,15 @@ public abstract class P12RawKeypairGenerator {
         }
 
         @Override
-        public KeyPair genKeypair()
+        public KeyPair genKeypair(
+                final SecureRandom random)
         throws Exception {
-            return KeyUtil.generateDSAKeypair(pLength, qLength);
+            return KeyUtil.generateDSAKeypair(pLength, qLength, random);
         }
 
     } // class DSAKeypairGenerator
 
-    public abstract KeyPair genKeypair()
+    public abstract KeyPair genKeypair(SecureRandom random)
     throws Exception;
 
     public P12RawKeypairGenerator()

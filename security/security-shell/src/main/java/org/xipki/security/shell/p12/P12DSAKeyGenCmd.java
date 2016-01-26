@@ -76,7 +76,8 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
 
         P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
                 pLen, qLen, getPassword(), subject,
-                getKeyUsage(), getExtendedKeyUsage());
+                getKeyUsage(), getExtendedKeyUsage(),
+                securityFactory.getSecureRandom4KeyGen());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
         saveKeyAndCert(keyAndCert);

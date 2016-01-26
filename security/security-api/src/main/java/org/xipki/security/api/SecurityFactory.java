@@ -37,6 +37,7 @@ package org.xipki.security.api;
 
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
@@ -127,5 +128,9 @@ public interface SecurityFactory {
     throws InvalidKeyException;
 
     String getPkcs11Provider();
+
+    SecureRandom getSecureRandom4Sign();
+
+    SecureRandom getSecureRandom4KeyGen();
 
 }
