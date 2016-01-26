@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 
@@ -215,7 +216,7 @@ public abstract class KeyEntry {
                     qLength = 160;
                 }
 
-                KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength, 10);
+                KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength, 10, new SecureRandom());
                 DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 
                 init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(),

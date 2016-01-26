@@ -62,7 +62,7 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
             int qLen = pqLens[i + 1];
 
             ret.add(
-                    new P12DSAKeyGenLoadTest(pLen, qLen));
+                    new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory));
         }
 
         return ret;

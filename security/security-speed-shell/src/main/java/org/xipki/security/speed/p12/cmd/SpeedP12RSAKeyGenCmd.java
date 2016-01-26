@@ -60,7 +60,7 @@ public class SpeedP12RSAKeyGenCmd extends SingleSpeedCommandSupport {
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent));
+        return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent), securityFactory);
     }
 
 }

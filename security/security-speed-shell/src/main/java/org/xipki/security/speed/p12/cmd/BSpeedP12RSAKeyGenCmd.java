@@ -59,7 +59,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
         for (int keysize : keysizes) {
             ret.add(
-                    new P12RSAKeyGenLoadTest(keysize, new BigInteger("0x10001")));
+                    new P12RSAKeyGenLoadTest(keysize, new BigInteger("0x10001"), securityFactory));
         }
         return ret;
     }
