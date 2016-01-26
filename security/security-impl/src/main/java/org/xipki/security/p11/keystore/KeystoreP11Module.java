@@ -62,7 +62,7 @@ public class KeystoreP11Module implements P11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
-    private P11ModuleConf moduleConf;
+    private final P11ModuleConf moduleConf;
 
     private Map<P11SlotIdentifier, KeystoreP11Slot> slots = new HashMap<>();
 
@@ -71,6 +71,7 @@ public class KeystoreP11Module implements P11Module {
     public KeystoreP11Module(
             final P11ModuleConf moduleConf) {
         ParamUtil.assertNotNull("moduleConf", moduleConf);
+
         this.moduleConf = moduleConf;
 
         final String nativeLib = moduleConf.getNativeLibrary();
@@ -170,7 +171,7 @@ public class KeystoreP11Module implements P11Module {
         File slotDir = new File(moduleConf.getNativeLibrary(), _slotId.getSlotIndex() + "-"
                 + _slotId.getSlotId());
 
-        extSlot = new KeystoreP11Slot(slotDir, _slotId, pwd);
+        extSlot = new KeystoreP11Slot(slotDir, _slotId, pwd, moduleConf.getSecurityFactory());
 
         slots.put(_slotId, extSlot);
         return extSlot;

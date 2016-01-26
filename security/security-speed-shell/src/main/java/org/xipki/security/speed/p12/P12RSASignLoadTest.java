@@ -36,6 +36,7 @@
 package org.xipki.security.speed.p12;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.SecurityFactory;
@@ -66,7 +67,8 @@ public class P12RSASignLoadTest extends P12SignLoadTest {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
         if (keystoreBytes == null) {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
-                    keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null);
+                    keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null,
+                    new SecureRandom());
             keystoreBytes = kpGen.generateIdentity().getKeystore();
         }
         return keystoreBytes;

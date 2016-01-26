@@ -51,6 +51,7 @@ import java.security.spec.PSSParameterSpec;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.jcajce.provider.util.DigestFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.security.p11.P11PlainRSASigner;
@@ -273,7 +274,11 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(
                 signingKey.getP11CryptService(),
                 signingKey.getSlotId(), signingKey.getKeyId());
-        pss.init(true, p11RSAKeyParam);
+        if (random == null) {
+            pss.init(true, p11RSAKeyParam);
+        } else {
+            pss.init(true, new ParametersWithRandom(p11RSAKeyParam, random));
+        }
     }
 
     protected void engineInitSign(
@@ -321,7 +326,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
                 if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(),
                         newParamSpec.getDigestAlgorithm())) {
                     throw new InvalidParameterException("parameter must be using "
-                + originalSpec.getDigestAlgorithm());
+                            + originalSpec.getDigestAlgorithm());
                 }
             }
             if (!newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1")

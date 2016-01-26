@@ -58,6 +58,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -76,19 +77,25 @@ public class P11ContentSignerBuilder {
 
     private final P11CryptService cryptService;
 
+    private final SecurityFactory securityFactory;
+
     private final P11SlotIdentifier slot;
 
     private final P11KeyIdentifier keyId;
 
     public P11ContentSignerBuilder(
             final P11CryptService cryptService,
+            final SecurityFactory securityFactory,
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain)
     throws SignerException {
         ParamUtil.assertNotNull("cryptService", cryptService);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
         ParamUtil.assertNotNull("slot", slot);
         ParamUtil.assertNotNull("keyId", keyId);
+
+        this.securityFactory = securityFactory;
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
         boolean keyExists = (signerCertInP11 != null);
@@ -174,7 +181,7 @@ public class P11ContentSignerBuilder {
                 if (publicKey instanceof RSAPublicKey) {
                     if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
                         signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
+                                signatureAlgId, securityFactory.getSecureRandom4Sign());
                     } else {
                         signer = new P11RSAContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);

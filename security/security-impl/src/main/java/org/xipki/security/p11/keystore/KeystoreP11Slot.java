@@ -99,12 +99,17 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private final char[] password;
 
+    private final SecurityFactory securityFactory;
+
     public KeystoreP11Slot(
             final File slotDir,
             final P11SlotIdentifier slotId,
-            final List<char[]> password) {
+            final List<char[]> password,
+            final SecurityFactory securityFactory) {
         ParamUtil.assertNotNull("slotDir", slotDir);
         ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
+
         if (password == null) {
             throw new IllegalArgumentException("no password is configured");
         } else if (password.size() != 1) {
@@ -114,6 +119,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         this.slotDir = slotDir;
         this.slotId = slotId;
+        this.securityFactory = securityFactory;
         this.password = password.get(0);
 
         refresh();
@@ -192,7 +198,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 X509Certificate[] certificateChain = X509Util.buildCertPath(cert, caCerts);
                 KeystoreP11Identity p11Identity = new KeystoreP11Identity(
                         sha1sum, slotId,
-                        keyId, privKey, certificateChain, 20);
+                        keyId, privKey, certificateChain, 20,
+                        securityFactory.getSecureRandom4Sign());
                 currentIdentifies.add(p11Identity);
             } catch (Throwable t) {
                 final String message = "could not initialize key " + file.getPath();
@@ -383,7 +390,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
                 keySize, publicExponent, password, subject,
-                keyUsage, extendedKeyusage);
+                keyUsage, extendedKeyusage,
+                securityFactory.getSecureRandom4KeyGen());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
@@ -431,7 +439,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
                 pLength, qLength, password, subject,
-                keyUsage, extendedKeyusage);
+                keyUsage, extendedKeyusage,
+                securityFactory.getSecureRandom4KeyGen());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
@@ -469,7 +478,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
         }
 
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveNameOrOid, password, subject, keyUsage, extendedKeyusage);
+                curveNameOrOid, password, subject, keyUsage, extendedKeyusage,
+                securityFactory.getSecureRandom4KeyGen());
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File file = new File(slotDir, label + ".p12");

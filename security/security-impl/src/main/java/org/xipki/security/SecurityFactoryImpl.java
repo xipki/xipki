@@ -46,6 +46,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
@@ -70,6 +71,7 @@ import javax.xml.validation.SchemaFactory;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
@@ -91,6 +93,7 @@ import org.xipki.security.api.AbstractSecurityFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.KeyCertPair;
 import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignatureAlgoControl;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Control;
@@ -141,12 +144,34 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private String pkcs11ConfFile;
 
+    private boolean strongSecureRandom4Keygen = true;
+
+    private boolean strongSecureRandom4Sign = true;
+
     private final Map<String, String> signerTypeMapping = new HashMap<>();
 
     public SecurityFactoryImpl() {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
+    }
+
+    public boolean isStrongSecureRandom4Keygen() {
+        return strongSecureRandom4Keygen;
+    }
+
+    public void setStrongSecureRandom4Keygen(
+            final boolean strongSecureRandom4Keygen) {
+        this.strongSecureRandom4Keygen = strongSecureRandom4Keygen;
+    }
+
+    public boolean isStrongSecureRandom4Sign() {
+        return strongSecureRandom4Sign;
+    }
+
+    public void setStrongSecureRandom4Sign(
+            final boolean strongSecureRandom4Sign) {
+        this.strongSecureRandom4Sign = strongSecureRandom4Sign;
     }
 
     @Override
@@ -254,7 +279,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
                 P11CryptService p11CryptService = getP11CryptService(pkcs11Module);
                 P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                            p11CryptService, slot, keyIdentifier, certificateChain);
+                        p11CryptService, (SecurityFactory) this,
+                        slot, keyIdentifier, certificateChain);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
@@ -276,7 +302,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                         | NoSuchAlgorithmException e) {
                     throw new SignerException(e.getMessage(), e);
                 }
-
             } else {
                 String passwordHint = keyValues.getValue("password");
                 char[] password;
@@ -327,7 +352,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     }
 
                     return signerBuilder.createSigner(
-                            signatureAlgId, parallelism);
+                            signatureAlgId, parallelism, getSecureRandom4Sign());
                 } catch (OperatorCreationException | NoSuchPaddingException
                         | NoSuchAlgorithmException e) {
                     throw new SignerException(String.format("%s: %s",
@@ -564,7 +589,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
 
                 P11ModuleConf conf = new P11ModuleConf(name,
-                        nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
+                        nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots,
+                        (SecurityFactory) this);
                 confs.put(name, conf);
             } // end for (ModuleType moduleType
 
@@ -738,6 +764,29 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         // TODO: validiate whether private key and certificate match
         return keycertPair;
     } // method createPrivateKeyAndCert
+
+    @Override
+    public SecureRandom getSecureRandom4Sign() {
+        return getSecureRandom(strongSecureRandom4Sign);
+    }
+
+    @Override
+    public SecureRandom getSecureRandom4KeyGen() {
+        return getSecureRandom(strongSecureRandom4Keygen);
+    }
+
+    private static SecureRandom getSecureRandom(boolean strong) {
+        if (!strong) {
+            return new SecureRandom();
+        }
+
+        try {
+            return SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeCryptoException(
+                    "error while getting strong SecureRandom: " + e.getMessage());
+        }
+    }
 
     private static void validateSigner(
             final ConcurrentContentSigner signer,

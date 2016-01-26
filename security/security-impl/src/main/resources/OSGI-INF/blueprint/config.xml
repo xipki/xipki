@@ -4,6 +4,8 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <cm:property-placeholder persistent-id="org.xipki.security" update-strategy="reload">
     <cm:default-properties>
+      <cm:property name="strongSecureRandom4Keygen" value="true"/>
+      <cm:property name="strongSecureRandom4Sign" value="true"/>
       <cm:property name="hostnameVerifier.enabled" value="false"/>
       <cm:property name="hostnameVerifier.trustAll" value="false"/>
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
@@ -20,6 +22,8 @@
       init-method="regist" destroy-method="unregist"/>
 
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
+    <property name="strongSecureRandom4Keygen" value="${strongSecureRandom4Keygen}"/>
+    <property name="strongSecureRandom4Sign" value="${strongSecureRandom4Sign}"/>
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
     <property name="defaultParallelism" value="${defaultParallelism}"/>
     <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
