@@ -181,7 +181,7 @@ public class P11ContentSignerBuilder {
                 if (publicKey instanceof RSAPublicKey) {
                     if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
                         signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
-                                signatureAlgId, securityFactory.getSecureRandom4Sign());
+                                signatureAlgId, securityFactory.getRandom4Sign());
                     } else {
                         signer = new P11RSAContentSigner(cryptService, slot, keyId,
                                 signatureAlgId);

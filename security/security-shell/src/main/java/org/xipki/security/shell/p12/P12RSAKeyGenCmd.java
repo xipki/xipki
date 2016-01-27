@@ -70,7 +70,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
                 keysize, toBigInt(publicExponent),
                 getPassword(), subject,
                 getKeyUsage(), getExtendedKeyUsage(),
-                securityFactory.getSecureRandom4KeyGen());
+                securityFactory.getRandom4Key());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
         saveKeyAndCert(keyAndCert);

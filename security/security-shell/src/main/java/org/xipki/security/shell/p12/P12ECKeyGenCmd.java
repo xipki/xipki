@@ -65,7 +65,7 @@ public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
     throws Exception {
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage(),
-                securityFactory.getSecureRandom4KeyGen());
+                securityFactory.getRandom4Key());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
         saveKeyAndCert(keyAndCert);
