@@ -144,9 +144,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private String pkcs11ConfFile;
 
-    private boolean strongSecureRandom4Keygen = true;
+    private boolean strongRandom4KeyEnabled = true;
 
-    private boolean strongSecureRandom4Sign = true;
+    private boolean strongRandom4SignEnabled = true;
 
     private final Map<String, String> signerTypeMapping = new HashMap<>();
 
@@ -156,22 +156,22 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
     }
 
-    public boolean isStrongSecureRandom4Keygen() {
-        return strongSecureRandom4Keygen;
+    public boolean isStrongRandom4KeyEnabled() {
+        return strongRandom4KeyEnabled;
     }
 
-    public void setStrongSecureRandom4Keygen(
-            final boolean strongSecureRandom4Keygen) {
-        this.strongSecureRandom4Keygen = strongSecureRandom4Keygen;
+    public void setStrongRandom4KeyEnabled(
+            final boolean strongRandom4KeyEnabled) {
+        this.strongRandom4KeyEnabled = strongRandom4KeyEnabled;
     }
 
-    public boolean isStrongSecureRandom4Sign() {
-        return strongSecureRandom4Sign;
+    public boolean isStrongRandom4SignEnabled() {
+        return strongRandom4SignEnabled;
     }
 
-    public void setStrongSecureRandom4Sign(
-            final boolean strongSecureRandom4Sign) {
-        this.strongSecureRandom4Sign = strongSecureRandom4Sign;
+    public void setStrongRandom4SignEnabled(
+            final boolean strongRandom4SignEnabled) {
+        this.strongRandom4SignEnabled = strongRandom4SignEnabled;
     }
 
     @Override
@@ -352,7 +352,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     }
 
                     return signerBuilder.createSigner(
-                            signatureAlgId, parallelism, getSecureRandom4Sign());
+                            signatureAlgId, parallelism, getRandom4Sign());
                 } catch (OperatorCreationException | NoSuchPaddingException
                         | NoSuchAlgorithmException e) {
                     throw new SignerException(String.format("%s: %s",
@@ -766,13 +766,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     } // method createPrivateKeyAndCert
 
     @Override
-    public SecureRandom getSecureRandom4Sign() {
-        return getSecureRandom(strongSecureRandom4Sign);
+    public SecureRandom getRandom4Key() {
+        return getSecureRandom(strongRandom4KeyEnabled);
     }
 
     @Override
-    public SecureRandom getSecureRandom4KeyGen() {
-        return getSecureRandom(strongSecureRandom4Keygen);
+    public SecureRandom getRandom4Sign() {
+        return getSecureRandom(strongRandom4SignEnabled);
     }
 
     private static SecureRandom getSecureRandom(boolean strong) {

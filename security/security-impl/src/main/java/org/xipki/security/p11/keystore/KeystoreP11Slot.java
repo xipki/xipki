@@ -199,7 +199,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 KeystoreP11Identity p11Identity = new KeystoreP11Identity(
                         sha1sum, slotId,
                         keyId, privKey, certificateChain, 20,
-                        securityFactory.getSecureRandom4Sign());
+                        securityFactory.getRandom4Sign());
                 currentIdentifies.add(p11Identity);
             } catch (Throwable t) {
                 final String message = "could not initialize key " + file.getPath();
@@ -391,7 +391,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
                 keySize, publicExponent, password, subject,
                 keyUsage, extendedKeyusage,
-                securityFactory.getSecureRandom4KeyGen());
+                securityFactory.getRandom4Key());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
@@ -440,7 +440,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
                 pLength, qLength, password, subject,
                 keyUsage, extendedKeyusage,
-                securityFactory.getSecureRandom4KeyGen());
+                securityFactory.getRandom4Key());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
@@ -479,7 +479,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveNameOrOid, password, subject, keyUsage, extendedKeyusage,
-                securityFactory.getSecureRandom4KeyGen());
+                securityFactory.getRandom4Key());
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File file = new File(slotDir, label + ".p12");
