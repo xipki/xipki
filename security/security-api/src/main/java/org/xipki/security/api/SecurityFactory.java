@@ -129,8 +129,8 @@ public interface SecurityFactory {
 
     String getPkcs11Provider();
 
-    SecureRandom getSecureRandom4Sign();
+    SecureRandom getRandom4Sign();
 
-    SecureRandom getSecureRandom4KeyGen();
+    SecureRandom getRandom4Key();
 
 }

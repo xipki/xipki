@@ -53,7 +53,7 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
             P12RawKeypairGenerator kpGen = getKeypairGenerator();
             while (!stop() && getErrorAccout() < 1) {
                 try {
-                    kpGen.genKeypair(securityFactory.getSecureRandom4KeyGen());
+                    kpGen.genKeypair(securityFactory.getRandom4Key());
                     account(1, 0);
                 } catch (Exception e) {
                     account(1, 1);
