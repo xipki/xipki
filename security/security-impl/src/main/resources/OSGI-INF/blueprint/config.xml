@@ -5,7 +5,7 @@
   <cm:property-placeholder persistent-id="org.xipki.security" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="key.strongrandom.enabled" value="true"/>
-      <cm:property name="sign.strongrandom.enabled" value="true"/>
+      <cm:property name="sign.strongrandom.enabled" value="false"/>
       <cm:property name="hostnameVerifier.enabled" value="false"/>
       <cm:property name="hostnameVerifier.trustAll" value="false"/>
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
