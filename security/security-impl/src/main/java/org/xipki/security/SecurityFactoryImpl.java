@@ -146,7 +146,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private boolean strongRandom4KeyEnabled = true;
 
-    private boolean strongRandom4SignEnabled = true;
+    private boolean strongRandom4SignEnabled = false;
 
     private final Map<String, String> signerTypeMapping = new HashMap<>();
 
