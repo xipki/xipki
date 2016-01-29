@@ -74,6 +74,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
     - PrivateKeyUsagePeriod
     - QCStatements
     - BiometricInfo
+    - SMIMECapabilities
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
