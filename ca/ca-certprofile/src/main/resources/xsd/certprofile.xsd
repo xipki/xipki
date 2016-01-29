@@ -478,6 +478,21 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="SMIMECapabilities">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="SMIMECapability" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SMIMECapability">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="capabilityID" type="oidWithDescType"/>
+        <xs:element name="parameters" type="base64BinaryWithDescType" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="biometricInfo">
     <xs:complexType>
       <xs:sequence>
@@ -495,13 +510,19 @@
   </xs:complexType>
   <xs:element name="constantExtValue">
     <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:base64Binary">
-          <xs:attribute name="description" type="xs:string" use="optional"/>
-        </xs:extension>
-      </xs:simpleContent>
+      <xs:complexContent>
+         <xs:extension base="base64BinaryWithDescType"/>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  
+  <xs:complexType name="base64BinaryWithDescType">
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attribute name="description" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
   <!-- general types -->
   <xs:complexType name="range2Type">
     <xs:attribute name="min" type="xs:int" use="required"/>
