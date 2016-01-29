@@ -51,6 +51,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.validation.SchemaFactory;
 
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -71,6 +72,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.AnyType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
+import org.xipki.pki.ca.certprofile.x509.jaxb.Base64BinaryWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BiometricTypeType;
@@ -115,6 +117,8 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
@@ -673,6 +677,11 @@ public class ProfileConfCreatorDemo {
                         TLSExtensionType.client_certificate_url});
         list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
+        // Extensions - SMIMECapabilities
+        extensionValue = createSMIMECapabilities();
+        list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
+                extensionValue));
+
         // Admission - just DEMO, does not belong to TLS certificate
         extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
         list.add(createExtension(ObjectIdentifiers.id_extension_admission,
@@ -991,6 +1000,154 @@ public class ProfileConfCreatorDemo {
 
         return profile;
     } // method Certprofile_MultipleValuedRDN
+
+    private static X509ProfileType Certprofile_EE_complex()
+    throws Exception {
+        X509ProfileType profile = getBaseProfile("Certprofile EE complex", false, "5y", true,
+                new String[]{"SHA1"});
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - controls
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        // Extensions - extenedKeyUsage
+        extensionValue = createExtendedKeyUsage(
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+        // Admission
+        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission,
+                true, false, extensionValue));
+
+        // restriction
+        extensionValue = createRestriction(DirectoryStringType.UTF_8_STRING, "demo restriction");
+        list.add(createExtension(ObjectIdentifiers.id_extension_restriction,
+                true, false, extensionValue));
+
+        // additionalInformation
+        extensionValue = createAdditionalInformation(DirectoryStringType.UTF_8_STRING,
+                "demo additional information");
+        list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation,
+                true, false, extensionValue));
+
+        // validationModel
+        extensionValue = createConstantExtValue(
+                new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
+        list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
+                true, false, extensionValue));
+
+        // privateKeyUsagePeriod
+        extensionValue = createPrivateKeyUsagePeriod("3y");
+        list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
+
+        // QcStatements
+        extensionValue = createQcStatements();
+        list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
+
+        // biometricInfo
+        extensionValue = createBiometricInfo();
+        list.add(createExtension(Extension.biometricInfo, true, false, extensionValue));
+
+        // authorizationTemplate
+        extensionValue = createAuthorizationTemplate();
+        list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
+                true, false, extensionValue));
+
+        return profile;
+    } // method  Certprofile_EE_complex
+
+    private static X509ProfileType Certprofile_MaxTime()
+    throws Exception {
+        X509ProfileType profile = getBaseProfile("Certprofile MaxTime", false, "9999y", false,
+                new String[]{"SHA1"});
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setDuplicateSubjectPermitted(false);
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1,
+                new String[]{REGEX_FQDN}, null, null));
+
+        // Extensions
+        ExtensionsType extensions = profile.getExtensions();
+        List<ExtensionType> list = extensions.getExtension();
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        return profile;
+    } // method Certprofile_MaxTime
 
     private static RdnType createRDN(
             final ASN1ObjectIdentifier type,
@@ -1608,153 +1765,29 @@ public class ProfileConfCreatorDemo {
         return createExtensionValueType(tlsFeature);
     }
 
-    private static X509ProfileType Certprofile_EE_complex()
-    throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile EE complex", false, "5y", true,
-                new String[]{"SHA1"});
+    private static ExtensionValueType createSMIMECapabilities() {
+        SMIMECapabilities caps = new SMIMECapabilities();
 
-        // Subject
-        Subject subject = profile.getSubject();
-        subject.setIncSerialNumber(false);
+        SMIMECapability cap = new SMIMECapability();
+        cap.setCapabilityID(createOidType(
+                new ASN1ObjectIdentifier("1.2.3.4"), "dummy SMIMECap1"));
+        caps.getSMIMECapability().add(cap);
 
-        List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
+        cap = new SMIMECapability();
+        cap.setCapabilityID(createOidType(
+                new ASN1ObjectIdentifier("2.3.4.5"), "dummy SMIMECap2"));
+        Base64BinaryWithDescType binary = new Base64BinaryWithDescType();
+        try {
+            binary.setValue(new ASN1Integer(100).getEncoded());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        cap.setParameters(binary);
 
-        // Extensions
-        // Extensions - general
-        ExtensionsType extensions = profile.getExtensions();
+        caps.getSMIMECapability().add(cap);
 
-        // Extensions - controls
-        List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-        list.add(createExtension(Extension.freshestCRL, false, false, null));
-
-        // Extensions - basicConstraints
-        ExtensionValueType extensionValue = null;
-        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
-
-        // Extensions - AuthorityInfoAccess
-        extensionValue = createAuthorityInfoAccess();
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
-
-        // Extensions - AuthorityKeyIdentifier
-        extensionValue = createAuthorityKeyIdentifier(true);
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
-
-        // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
-                null);
-        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
-
-        // Extensions - extenedKeyUsage
-        extensionValue = createExtendedKeyUsage(
-                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
-                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
-        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
-
-        // Admission
-        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission,
-                true, false, extensionValue));
-
-        // restriction
-        extensionValue = createRestriction(DirectoryStringType.UTF_8_STRING, "demo restriction");
-        list.add(createExtension(ObjectIdentifiers.id_extension_restriction,
-                true, false, extensionValue));
-
-        // additionalInformation
-        extensionValue = createAdditionalInformation(DirectoryStringType.UTF_8_STRING,
-                "demo additional information");
-        list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation,
-                true, false, extensionValue));
-
-        // validationModel
-        extensionValue = createConstantExtValue(
-                new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
-        list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
-                true, false, extensionValue));
-
-        // privateKeyUsagePeriod
-        extensionValue = createPrivateKeyUsagePeriod("3y");
-        list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
-
-        // QcStatements
-        extensionValue = createQcStatements();
-        list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
-
-        // biometricInfo
-        extensionValue = createBiometricInfo();
-        list.add(createExtension(Extension.biometricInfo, true, false, extensionValue));
-
-        // authorizationTemplate
-        extensionValue = createAuthorizationTemplate();
-        list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
-                true, false, extensionValue));
-
-        return profile;
-    } // method  Certprofile_EE_complex
-
-    private static X509ProfileType Certprofile_MaxTime()
-    throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile MaxTime", false, "9999y", false,
-                new String[]{"SHA1"});
-
-        // Subject
-        Subject subject = profile.getSubject();
-        subject.setDuplicateSubjectPermitted(false);
-        subject.setIncSerialNumber(false);
-
-        List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1,
-                new String[]{REGEX_FQDN}, null, null));
-
-        // Extensions
-        ExtensionsType extensions = profile.getExtensions();
-        List<ExtensionType> list = extensions.getExtension();
-
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-        list.add(createExtension(Extension.freshestCRL, false, false, null));
-
-        // Extensions - basicConstraints
-        ExtensionValueType extensionValue = null;
-        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
-
-        // Extensions - AuthorityInfoAccess
-        extensionValue = createAuthorityInfoAccess();
-        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
-
-        // Extensions - AuthorityKeyIdentifier
-        extensionValue = createAuthorityKeyIdentifier(true);
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
-
-        // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
-                null);
-        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
-
-        return profile;
-    } // method Certprofile_MaxTime
+        return createExtensionValueType(caps);
+    }
 
     private ProfileConfCreatorDemo() {
     }

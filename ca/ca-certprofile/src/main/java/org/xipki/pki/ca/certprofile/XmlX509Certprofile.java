@@ -136,10 +136,12 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
-import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
@@ -229,6 +231,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     private BiometricInfoOption biometricDataOption;
 
     private ExtensionValue tlsFeature;
+
+    private ExtensionValue smimeCapatibilities;
 
     private Integer maxSize;
 
@@ -810,6 +814,31 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
+        // SMIMECapatibilities
+        type = ObjectIdentifiers.id_smimeCapabilities;
+        if (extensionControls.containsKey(type)) {
+            SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
+                    type, extensionsType, SMIMECapabilities.class);
+            List<SMIMECapability> list = extConf.getSMIMECapability();
+
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            for (SMIMECapability m : list) {
+                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
+                        m.getCapabilityID().getValue());
+                ASN1Encodable params = null;
+                if (m.getParameters() != null) {
+                    params = readASN1Encodable(m.getParameters().getValue());
+                }
+                org.bouncycastle.asn1.smime.SMIMECapability cap =
+                        new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+                v.add(cap);
+            }
+
+            ASN1Encodable extValue = new DERSequence(v);
+            smimeCapatibilities =
+                    new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+        }
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     } // method doInitialize
@@ -1123,6 +1152,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             values.addExtension(type, authorizationTemplate);
         }
 
+        // SMIME
+        type = ObjectIdentifiers.id_smimeCapabilities;
+        if (smimeCapatibilities != null && occurences.remove(type) != null) {
+            values.addExtension(type, smimeCapatibilities);
+        }
+
         // constant extensions
         if (constantExtensions != null) {
             for (ASN1ObjectIdentifier m : constantExtensions.keySet()) {
@@ -1325,5 +1360,16 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         throw new RuntimeException("should not reach here: undefined extension "
                 + ObjectIdentifiers.oidToDisplayName(type));
     } // method getExtensionValue
+
+    private static ASN1Encodable readASN1Encodable(
+            final byte[] encoded)
+    throws CertprofileException {
+        ASN1StreamParser parser = new ASN1StreamParser(encoded);
+        try {
+            return parser.readObject();
+        } catch (IOException e) {
+            throw new CertprofileException("could not parse the constant extension value", e);
+        }
+    }
 
 }

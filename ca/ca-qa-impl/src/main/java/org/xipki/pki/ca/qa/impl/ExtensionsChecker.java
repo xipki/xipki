@@ -143,10 +143,12 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
-import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
@@ -247,6 +249,8 @@ public class ExtensionsChecker {
     private QaAuthorizationTemplate authorizationTemplate;
 
     private QaTlsFeature tlsFeature;
+
+    private QaExtensionValue smimeCapabilities;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -514,6 +518,36 @@ public class ExtensionsChecker {
                 }
             }
 
+            // SMIMECapabilities
+            type = ObjectIdentifiers.id_smimeCapabilities;
+            if (extensionControls.containsKey(type)) {
+                SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
+                        type, extensionsType, SMIMECapabilities.class);
+                List<SMIMECapability> list = extConf.getSMIMECapability();
+
+                ASN1EncodableVector v = new ASN1EncodableVector();
+                for (SMIMECapability m : list) {
+                    ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
+                            m.getCapabilityID().getValue());
+                    ASN1Encodable params = null;
+                    if (m.getParameters() != null) {
+                        params = readASN1Encodable(m.getParameters().getValue());
+                    }
+                    org.bouncycastle.asn1.smime.SMIMECapability cap =
+                            new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+                    v.add(cap);
+                }
+
+                DERSequence extValue = new DERSequence(v);
+                try {
+                    smimeCapabilities = new QaExtensionValue(
+                            extensionControls.get(type).isCritical(), extValue.getEncoded());
+                } catch (IOException e) {
+                    throw new CertprofileException(
+                            "Cannot encode SMIMECapabilities: " + e.getMessage());
+                }
+            }
+
             // constant extensions
             this.constantExtensions = buildConstantExtesions(extensionsType);
         } catch (RuntimeException e) {
@@ -687,7 +721,14 @@ public class ExtensionsChecker {
                     checkExtensionAuthorizationTemplate(failureMsg, extensionValue,
                             requestExtensions, extControl);
                 } else {
-                    byte[] expected = getExpectedExtValue(oid, requestExtensions, extControl);
+                    byte[] expected;
+                    if (ObjectIdentifiers.id_smimeCapabilities.equals(oid)) {
+                        // SMIMECapabilities
+                        expected = smimeCapabilities.getValue();
+                    } else {
+                        expected = getExpectedExtValue(oid, requestExtensions, extControl);
+                    }
+
                     if (!Arrays.equals(expected, extensionValue)) {
                         failureMsg.append("extension valus is '")
                             .append(hex(extensionValue));
@@ -2817,6 +2858,16 @@ public class ExtensionsChecker {
         return Collections.unmodifiableMap(map);
     } // method buildConstantExtesions
 
+    private static ASN1Encodable readASN1Encodable(
+            final byte[] encoded)
+    throws CertprofileException {
+        ASN1StreamParser parser = new ASN1StreamParser(encoded);
+        try {
+            return parser.readObject();
+        } catch (IOException e) {
+            throw new CertprofileException("could not parse the constant extension value", e);
+        }
+    }
     private static String hex(
             final byte[] bytes) {
         return Hex.toHexString(bytes);
