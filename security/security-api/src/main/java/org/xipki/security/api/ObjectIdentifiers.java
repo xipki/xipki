@@ -375,6 +375,10 @@ public class ObjectIdentifiers {
     private static final List<ASN1ObjectIdentifier> backwardDNs;
     private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
+    // RFC 4262: SMIMECapatibilities
+    public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
+            "1.2.840.113549.1.9.15");
+
     static {
         List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
 
@@ -488,6 +492,7 @@ public class ObjectIdentifiers {
         oidNameMap.put(id_etsi_qcs_QcSSCD, "etsi-qcs-QcSSCD");
 
         oidNameMap.put(id_pe_tlsfeature, "tlsFeature");
+        oidNameMap.put(id_smimeCapabilities, "SMIMECapatibilities");
     }
 
     private ObjectIdentifiers() {

@@ -153,6 +153,21 @@
       </value>
     </extension>
     <extension required="true" permittedInRequest="false">
+      <type description="SMIMECapatibilities">1.2.840.113549.1.9.15</type>
+      <critical>false</critical>
+      <value>
+        <SMIMECapabilities>
+          <SMIMECapability>
+            <capabilityID description="dummy SMIMECap1">1.2.3.4</capabilityID>
+          </SMIMECapability>
+          <SMIMECapability>
+            <capabilityID description="dummy SMIMECap2">2.3.4.5</capabilityID>
+            <parameters>AgFk</parameters>
+          </SMIMECapability>
+        </SMIMECapabilities>
+      </value>
+    </extension>
+    <extension required="true" permittedInRequest="false">
       <type description="admission">1.3.36.8.3.3</type>
       <critical>false</critical>
       <value>
