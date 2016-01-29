@@ -22,7 +22,7 @@
       init-method="regist" destroy-method="unregist"/>
 
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
-    <property name="strongRandom4KeyEnabled" value="{key.strongrandom.enabled}"/>
+    <property name="strongRandom4KeyEnabled" value="${key.strongrandom.enabled}"/>
     <property name="strongRandom4SignEnabled" value="${sign.strongrandom.enabled}"/>
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
     <property name="defaultParallelism" value="${defaultParallelism}"/>
