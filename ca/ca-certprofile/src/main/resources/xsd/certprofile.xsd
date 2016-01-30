@@ -489,7 +489,14 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="capabilityID" type="oidWithDescType"/>
-        <xs:element name="parameters" type="base64BinaryWithDescType" minOccurs="0"/>
+        <xs:element name="parameters" minOccurs="0">
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="integer" type="xs:integer"/>
+              <xs:element name="base64Binary"  type="base64BinaryWithDescType"/>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -158,11 +158,19 @@
       <value>
         <SMIMECapabilities>
           <SMIMECapability>
-            <capabilityID description="dummy SMIMECap1">1.2.3.4</capabilityID>
+            <capabilityID description="DES-EDE3-CBC">1.2.840.113549.3.7</capabilityID>
           </SMIMECapability>
           <SMIMECapability>
-            <capabilityID description="dummy SMIMECap2">2.3.4.5</capabilityID>
-            <parameters>AgFk</parameters>
+            <capabilityID description="RC2-CBC">1.2.840.113549.3.2</capabilityID>
+            <parameters>
+              <integer>128</integer>
+            </parameters>
+          </SMIMECapability>
+          <SMIMECapability>
+            <capabilityID description="RC2-CBC">1.2.840.113549.3.2</capabilityID>
+            <parameters>
+              <base64Binary description="INTEGER 64">AgFA</base64Binary>
+            </parameters>
           </SMIMECapability>
         </SMIMECapabilities>
       </value>
