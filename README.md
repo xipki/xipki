@@ -23,58 +23,38 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Embedded support of publisher for OCSP responder
   - Signature algorithms of certificates
-    - SHA1withRSA
-    - SHA224withRSA
-    - SHA256withRSA
-    - SHA384withRSA
-    - SHA512withRSA
-    - SHA1withRSAandMGF1
-    - SHA224withRSAandMGF1
-    - SHA256withRSAandMGF1
-    - SHA384withRSAandMGF1
-    - SHA512withRSAandMGF1
-    - SHA1withECDSA
-    - SHA224withECDSA
-    - SHA256withECDSA
-    - SHA384withECDSA
-    - SHA512withECDSA
-    - SHA1withPlainECDSA
-    - SHA224withPlainECDSA
-    - SHA256withPlainECDSA
-    - SHA384withPlainECDSA
-    - SHA512withPlainECDSA
-    - SHA1withDSA
-    - SHA224withDSA
-    - SHA256withDSA
-    - SHA384withDSA
-    - SHA512withDSA
+    - SHA*withRSA: where * is 1, 224, 256, 384 and 512
+    - SHA*withRSAandMGF1: : where * is 1, 224, 256, 384 and 512
+    - SHA*withECDSA: : where * is 1, 224, 256, 384 and 512
+    - SHA*withPlainECDSA: : where * is 1, 224, 256, 384 and 512
+    - SHA*withDSA: : where * is 1, 224, 256, 384 and 512
  - Native support of X.509 extensions
-    - TLSFeature (RFC 7633)
-    - AuthorityKeyIdentifier
-    - SubjectKeyIdentifier
-    - KeyUsage
-    - CertificatePolicies
-    - PolicyMappings
-    - SubjectAltName
-    - IssuerAltName
-    - BasicConstraints
-    - NameConstraints
-    - PolicyConstrains
-    - ExtendedKeyUsage
-    - CRLDistributionPoints
-    - InhibitAnyPolicy
-    - FreshestCRL
-    - AuthorityInformationAccess
-    - SubjectInfoAccess
-    - Admission
-    - OcspNoCheck
-    - Restriction
     - AdditionalInformation
-    - ValidityModel
+    - Admission
+    - AuthorityInformationAccess
+    - AuthorityKeyIdentifier
+    - BasicConstraints
+    - BiometricInfo
+    - CertificatePolicies
+    - CRLDistributionPoints
+    - ExtendedKeyUsage
+    - FreshestCRL
+    - InhibitAnyPolicy
+    - IssuerAltName
+    - KeyUsage
+    - NameConstraints
+    - OcspNoCheck
+    - PolicyConstrains
+    - PolicyMappings
     - PrivateKeyUsagePeriod
     - QCStatements
-    - BiometricInfo
+    - Restriction
     - SMIMECapabilities
+    - SubjectAltName
+    - SubjectInfoAccess
+    - SubjectKeyIdentifier
+    - TLSFeature (RFC 7633)
+    - ValidityModel
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
