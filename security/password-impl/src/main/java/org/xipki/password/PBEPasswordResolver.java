@@ -38,8 +38,8 @@ package org.xipki.password;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.StringUtil;
 import org.xipki.password.api.PasswordCallback;
 import org.xipki.password.api.PasswordResolverException;
@@ -139,7 +139,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
             final char[] masterPassword,
             final String passwordHint)
     throws PasswordResolverException {
-        byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()), Base64.DEFAULT);
+        byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
         int n = bytes.length;
         if (n <= 16 && n != 0) {
             throw new PasswordResolverException("invalid length of the encrypted password");
@@ -184,7 +184,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         byte[] encryptedWithSalt = new byte[salt.length + encrypted.length];
         System.arraycopy(salt, 0, encryptedWithSalt, 0, salt.length);
         System.arraycopy(encrypted, 0, encryptedWithSalt, salt.length, encrypted.length);
-        String pbeText = "PBE:" + Base64.encodeToString(encryptedWithSalt, Base64.NO_WRAP);
+        String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
         return pbeText;
     }
 

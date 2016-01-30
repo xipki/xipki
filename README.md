@@ -70,6 +70,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Management of multiple certificate status sources
   - Embedded support of certificate status source published by XiPKI CA
   - Embedded support of certificate status source CRL and DeltaCRL
+  - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP signer and certificate status sources.
   - Supported databases
