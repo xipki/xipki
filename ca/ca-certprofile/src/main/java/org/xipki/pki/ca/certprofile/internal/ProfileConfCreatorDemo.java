@@ -38,6 +38,7 @@ package org.xipki.pki.ca.certprofile.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1768,23 +1769,35 @@ public class ProfileConfCreatorDemo {
     private static ExtensionValueType createSMIMECapabilities() {
         SMIMECapabilities caps = new SMIMECapabilities();
 
+        // DES-EDE3-CBC
         SMIMECapability cap = new SMIMECapability();
-        cap.setCapabilityID(createOidType(
-                new ASN1ObjectIdentifier("1.2.3.4"), "dummy SMIMECap1"));
         caps.getSMIMECapability().add(cap);
-
-        cap = new SMIMECapability();
         cap.setCapabilityID(createOidType(
-                new ASN1ObjectIdentifier("2.3.4.5"), "dummy SMIMECap2"));
+                new ASN1ObjectIdentifier("1.2.840.113549.3.7"), "DES-EDE3-CBC"));
+
+        // RC2-CBC keysize 128
+        cap = new SMIMECapability();
+        caps.getSMIMECapability().add(cap);
+        cap.setCapabilityID(createOidType(
+                new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+        cap.setParameters(new org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
+        cap.getParameters().setInteger(BigInteger.valueOf(128));
+
+        // RC2-CBC keysize 64
+        cap = new SMIMECapability();
+        caps.getSMIMECapability().add(cap);
+        cap.setCapabilityID(createOidType(
+                new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+        cap.setParameters(new org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
+
         Base64BinaryWithDescType binary = new Base64BinaryWithDescType();
         try {
-            binary.setValue(new ASN1Integer(100).getEncoded());
+            binary.setValue(new ASN1Integer(64).getEncoded());
+            binary.setDescription("INTEGER 64");
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        cap.setParameters(binary);
-
-        caps.getSMIMECapability().add(cap);
+        cap.getParameters().setBase64Binary(binary);
 
         return createExtensionValueType(caps);
     }
