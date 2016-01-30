@@ -826,8 +826,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
                         m.getCapabilityID().getValue());
                 ASN1Encodable params = null;
-                if (m.getParameters() != null) {
-                    params = readASN1Encodable(m.getParameters().getValue());
+                org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
+                        m.getParameters();
+                if (capParams != null) {
+                    if (capParams.getInteger() != null) {
+                        params = new ASN1Integer(capParams.getInteger());
+                    } else if (capParams.getBase64Binary() != null) {
+                        params = readASN1Encodable(capParams.getBase64Binary().getValue());
+                    }
                 }
                 org.bouncycastle.asn1.smime.SMIMECapability cap =
                         new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
