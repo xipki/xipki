@@ -24,37 +24,37 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Embedded support of publisher for OCSP responder
   - Signature algorithms of certificates
     - SHA*withRSA: where * is 1, 224, 256, 384 and 512
-    - SHA*withRSAandMGF1: : where * is 1, 224, 256, 384 and 512
-    - SHA*withECDSA: : where * is 1, 224, 256, 384 and 512
-    - SHA*withPlainECDSA: : where * is 1, 224, 256, 384 and 512
-    - SHA*withDSA: : where * is 1, 224, 256, 384 and 512
+    - SHA*withRSAandMGF1: where * is 1, 224, 256, 384 and 512
+    - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
+    - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
+    - SHA*withDSA: where * is 1, 224, 256, 384 and 512
  - Native support of X.509 extensions
-    - AdditionalInformation
-    - Admission
-    - AuthorityInformationAccess
-    - AuthorityKeyIdentifier
-    - BasicConstraints
-    - BiometricInfo
-    - CertificatePolicies
-    - CRLDistributionPoints
-    - ExtendedKeyUsage
-    - FreshestCRL
-    - InhibitAnyPolicy
-    - IssuerAltName
-    - KeyUsage
-    - NameConstraints
-    - OcspNoCheck
-    - PolicyConstrains
-    - PolicyMappings
-    - PrivateKeyUsagePeriod
-    - QCStatements
-    - Restriction
-    - SMIMECapabilities
-    - SubjectAltName
-    - SubjectInfoAccess
-    - SubjectKeyIdentifier
+    - AdditionalInformation (German national standard CommonPKI)
+    - Admission (German national standard CommonPKI)
+    - AuthorityInformationAccess (RFC 5280)
+    - AuthorityKeyIdentifier (RFC 5280)
+    - BasicConstraints (RFC 5280)
+    - BiometricInfo (RFC 3739)
+    - CertificatePolicies (RFC 5280)
+    - CRLDistributionPoints (RFC 5280)
+    - ExtendedKeyUsage (RFC 5280)
+    - FreshestCRL (RFC 5280)
+    - InhibitAnyPolicy (RFC 5280)
+    - IssuerAltName (RFC 5280)
+    - KeyUsage (RFC 5280)
+    - NameConstraints (RFC 5280)
+    - OcspNoCheck (RFC 6960)
+    - PolicyConstrains (RFC 5280)
+    - PolicyMappings (RFC 5280)
+    - PrivateKeyUsagePeriod (RFC 5280)
+    - QCStatements (RFC 3739)
+    - Restriction (German national standard CommonPKI)
+    - SMIMECapabilities (RFC 4262)
+    - SubjectAltName (RFC 5280)
+    - SubjectInfoAccess (RFC 5280)
+    - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
-    - ValidityModel
+    - ValidityModel (German national standard CommonPKI)
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
@@ -71,7 +71,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Embedded support of certificate status source published by XiPKI CA
   - Embedded support of certificate status source CRL and DeltaCRL
   - Support of both unsigned and signed OCSP requests
-  - Multiple software instances (all can be in active mode) for the same OCSP signer and certifcate status sources.
+  - Multiple software instances (all can be in active mode) for the same OCSP signer and certificate status sources.
   - Supported databases
     - Oracle
     - DB2
@@ -83,11 +83,11 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Embedded client to send OCSP request
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
-  - Generation of keypairs and self-signed certificates of RSA, EC and DSA in token
-  - Deletation of keypairs and certificates from token
-  - Update of certificates in token
-  - Generation of PKCS#10 request
-  - Export of certificate from token
+  - Generating keypairs and self-signed certificates of RSA, EC and DSA in token
+  - Deleting keypairs and certificates from token
+  - Updating certificates in token
+  - Generating PKCS#10 request
+  - Exporting certificate from token
 
 - For both CA and OCSP Responder
   - Support of PKCS#12 and JKS keystore
@@ -140,9 +140,11 @@ Tested Platforms
 * HSM
  * Thales nCipher Solo (PCI Card)
  * Thales nCipher Connect (network)
+ * Utimaco Se
+ * Utimaco CSe
 
 * JVM
- * OpenJDK JRE/JDK 8
+ * OpenJDK 8
  * Oracle JRE/JDK 8
  * IBM J9 JRE/JDK 8
 * OS
@@ -159,7 +161,7 @@ Build and Assembly from Source Code
 ------------------
 * Get a copy of XiPKI code
   ```sh
-  git clone git://github.com/xipki/xipki xipki
+  git clone git://github.com/xipki/xipki
   ```
 
 * Prepare
