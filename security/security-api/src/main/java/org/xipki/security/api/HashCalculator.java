@@ -35,6 +35,7 @@
 
 package org.xipki.security.api;
 
+import java.util.Base64;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -48,7 +49,6 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -149,7 +149,7 @@ public class HashCalculator {
         byte[] bytes = hash(hashAlgoType, data);
         return (bytes == null)
                 ? null
-                : Base64.encodeToString(bytes, Base64.NO_WRAP);
+                : Base64.getEncoder().encodeToString(bytes);
     }
 
     public static byte[] hash(
