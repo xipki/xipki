@@ -47,6 +47,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -242,7 +243,7 @@ public class IoUtil {
             final byte[] data,
             final boolean withLineBreak) {
 
-        String b64Str = Base64.encodeToString(data, Base64.NO_WRAP);
+        String b64Str = Base64.getEncoder().encodeToString(data);
         if (!withLineBreak) {
             return b64Str;
         }
