@@ -116,9 +116,9 @@ public class HealthCheckResult {
             final int level,
             final boolean pretty) {
         // Non root check requires always a name
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(1000);
         if (pretty) {
-            sb.append(getIndent(level));
+            addIndent(sb, level);
         }
         if (level > 0) {
             sb.append("\"").append(name).append("\":");
@@ -146,7 +146,7 @@ public class HealthCheckResult {
         if (CollectionUtil.isNotEmpty(childChecks)) {
             if (pretty) {
                 sb.append("\n");
-                sb.append(getIndent(level + 1));
+                addIndent(sb, level + 1);
             }
 
             sb.append("\"checks\":{");
@@ -168,14 +168,14 @@ public class HealthCheckResult {
 
             if (pretty) {
                 sb.append("\n");
-                sb.append(getIndent(level + 1));
+                addIndent(sb, level + 1);
             }
             sb.append("}");
         }
 
         if (pretty) {
             sb.append("\n");
-            sb.append(getIndent(level));
+            addIndent(sb, level);
         }
         sb.append("}");
         return sb.toString();
@@ -190,7 +190,7 @@ public class HealthCheckResult {
             final boolean lastElement) {
         if (pretty) {
             sb.append("\n");
-            sb.append(getIndent(level));
+            addIndent(sb, level);
         }
         sb.append("\"").append(name).append("\":");
 
@@ -209,17 +209,16 @@ public class HealthCheckResult {
         }
     } // method append
 
-    private static String getIndent(
+    private static void addIndent(
+            final StringBuilder buffer,
             final int level) {
         if (level == 0) {
-            return "";
+            return;
         }
 
-        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < level; i++) {
-            sb.append("  ");
+            buffer.append("  ");
         }
-        return sb.toString();
     }
 
     public static HealthCheckResult getInstanceFromJsonMessage(
