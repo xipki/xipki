@@ -41,9 +41,9 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;

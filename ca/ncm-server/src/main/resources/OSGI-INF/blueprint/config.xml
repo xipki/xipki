@@ -18,7 +18,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
-  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <!-- create the servlet and inject our own app factory -->
   <bean id="serverServlet" class="org.xipki.pki.ca.ncm.server.impl.CAManagerServlet" init-method="initialize" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>

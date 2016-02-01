@@ -65,17 +65,17 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.qa.ValidationResult;
+import org.xipki.commons.common.qa.ValidationIssue;
+import org.xipki.commons.common.qa.ValidationResult;
+import org.xipki.commons.security.KeyUtil;
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.qa.api.Occurrence;
 import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
 import org.xipki.pki.ocsp.qa.api.OcspError;
 import org.xipki.pki.ocsp.qa.api.OcspQA;
 import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
-import org.xipki.security.KeyUtil;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.util.AlgorithmUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

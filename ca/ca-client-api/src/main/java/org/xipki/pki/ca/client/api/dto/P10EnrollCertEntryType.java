@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.client.api.dto;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

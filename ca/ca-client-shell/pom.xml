@@ -21,17 +21,17 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>datasource-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>security-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>shell-base</artifactId>
       <version>${project.version}</version>
     </dependency>

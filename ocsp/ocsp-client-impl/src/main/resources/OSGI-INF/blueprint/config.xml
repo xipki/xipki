@@ -9,7 +9,7 @@
       <cm:property name="signer.cert" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="ocspRequestor" class="org.xipki.pki.ocsp.client.impl.DefaultHttpOCSPRequestor">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="signerType" value="${signer.type}"/>

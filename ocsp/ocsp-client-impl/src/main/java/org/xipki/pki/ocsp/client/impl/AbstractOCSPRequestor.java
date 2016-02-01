@@ -67,10 +67,14 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.NoIdleSignerException;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.client.api.InvalidOCSPResponseException;
 import org.xipki.pki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.pki.ocsp.client.api.OCSPRequestor;
@@ -79,10 +83,6 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 import org.xipki.pki.ocsp.client.api.OCSPTargetUnmatchedException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.api.ResponderUnreachableException;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

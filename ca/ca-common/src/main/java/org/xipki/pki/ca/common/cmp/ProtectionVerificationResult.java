@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ca.common.cmp;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

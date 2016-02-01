@@ -38,7 +38,7 @@ package org.xipki.pki.ca.client.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

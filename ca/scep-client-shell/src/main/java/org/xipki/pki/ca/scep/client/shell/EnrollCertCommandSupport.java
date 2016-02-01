@@ -42,12 +42,12 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.ScepClient;
-import org.xipki.scep.client.exception.ScepClientException;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.scep.client.EnrolmentResponse;
+import org.xipki.pki.scep.client.ScepClient;
+import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao

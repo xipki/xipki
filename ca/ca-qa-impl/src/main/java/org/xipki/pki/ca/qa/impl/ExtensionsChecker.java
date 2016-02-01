@@ -106,10 +106,16 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.qa.ValidationIssue;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.ExtensionExistence;
+import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -169,12 +175,6 @@ import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQua
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifiers;
 import org.xipki.pki.ca.qa.impl.internal.QaTlsFeature;
-import org.xipki.security.api.ExtensionExistence;
-import org.xipki.security.api.HashCalculator;
-import org.xipki.security.api.KeyUsage;
-import org.xipki.security.api.ObjectIdentifiers;
-import org.xipki.security.api.util.AlgorithmUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

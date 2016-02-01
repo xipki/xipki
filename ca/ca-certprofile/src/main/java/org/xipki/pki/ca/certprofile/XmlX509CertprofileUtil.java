@@ -69,8 +69,10 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.XMLUtil;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.DirectoryStringType;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
@@ -112,8 +114,6 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.RangesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.UsageType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.security.api.KeyUsage;
-import org.xipki.security.api.util.X509Util;
 import org.xml.sax.SAXException;
 
 /**
