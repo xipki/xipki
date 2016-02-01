@@ -108,9 +108,6 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.p11.P11ContentSignerBuilder;
 import org.xipki.commons.security.p11.P11PasswordRetrieverImpl;
-import org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory;
-import org.xipki.commons.security.p11.keystore.KeystoreP11CryptServiceFactory;
-import org.xipki.commons.security.p11.remote.RemoteP11CryptServiceFactory;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
 import org.xipki.commons.security.p11.conf.jaxb.ModulesType;
 import org.xipki.commons.security.p11.conf.jaxb.NativeLibraryType;
@@ -120,6 +117,9 @@ import org.xipki.commons.security.p11.conf.jaxb.PasswordType;
 import org.xipki.commons.security.p11.conf.jaxb.PasswordsType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotsType;
+import org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory;
+import org.xipki.commons.security.p11.keystore.KeystoreP11CryptServiceFactory;
+import org.xipki.commons.security.p11.remote.RemoteP11CryptServiceFactory;
 import org.xml.sax.SAXException;
 
 /**
