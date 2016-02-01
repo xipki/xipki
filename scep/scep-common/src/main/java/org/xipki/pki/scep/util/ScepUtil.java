@@ -231,7 +231,7 @@ public class ScepUtil {
      * The first one is a non-CA certificate if there exists one non-CA certificate
      * @param certBytes
      * @return
-     * @throws MessageDecodingException
+     * @throws CertificateException
      */
     public static List<X509Certificate> getCertsFromSignedData(
             final SignedData signedData)
