@@ -56,7 +56,6 @@ public abstract class FingerprintCertificateValidator implements CACertValidator
 
     public void setHashAlgo(
             final HashAlgoType hashAlgo) {
-
         this.hashAlgo = hashAlgo;
     }
 

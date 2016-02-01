@@ -732,7 +732,9 @@ public class X509Util {
         return null;
     }
 
-    public static String cutText(String text, int maxLen) {
+    public static String cutText(
+            final String text,
+            final int maxLen) {
         if (text.length() <= maxLen) {
             return text;
         }
@@ -742,12 +744,16 @@ public class X509Util {
         return sb.toString();
     }
 
-    public static String cutX500Name(X500Name name, int maxLen) {
+    public static String cutX500Name(
+            final X500Name name,
+            final int maxLen) {
         String text = getRFC4519Name(name);
         return cutText(text, maxLen);
     }
 
-    public static String cutX500Name(X500Principal name, int maxLen) {
+    public static String cutX500Name(
+            final X500Principal name,
+            final int maxLen) {
         String text = getRFC4519Name(name);
         return cutText(text, maxLen);
     }

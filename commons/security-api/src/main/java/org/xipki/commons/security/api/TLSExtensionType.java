@@ -73,7 +73,8 @@ public class TLSExtensionType implements Comparable<TLSExtensionType> {
     }
 
     @Override
-    public int compareTo(TLSExtensionType o) {
+    public int compareTo(
+            final TLSExtensionType o) {
         return Integer.valueOf(code).compareTo(o.code);
     }
 

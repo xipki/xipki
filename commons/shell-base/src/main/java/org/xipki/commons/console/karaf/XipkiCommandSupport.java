@@ -299,7 +299,8 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected boolean confirm(
-            final String prompt, int maxTries)
+            final String prompt,
+            final int maxTries)
     throws IOException {
         String tPrompt = prompt;
         if (prompt != null && !prompt.endsWith("\n")) {
