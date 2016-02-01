@@ -110,7 +110,7 @@ public class SignerUtil {
 
     static public PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId,
-            AsymmetricBlockCipher cipher)
+            final  AsymmetricBlockCipher cipher)
     throws OperatorCreationException {
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
@@ -125,9 +125,6 @@ public class SignerUtil {
             throw new OperatorCreationException(e.getMessage(), e);
         }
         Digest dig = digestProvider.get(digAlgId);
-        if (cipher == null) {
-            cipher = new RSABlindedEngine();
-        }
 
         RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
 
@@ -138,7 +135,11 @@ public class SignerUtil {
         int saltSize = param.getSaltLength().intValue();
         int trailerField = param.getTrailerField().intValue();
 
-        return new PSSSigner(cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
+        AsymmetricBlockCipher _cipher = (cipher == null)
+                ? new RSABlindedEngine()
+                : cipher;
+
+        return new PSSSigner(_cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
 
     static private byte getTrailer(

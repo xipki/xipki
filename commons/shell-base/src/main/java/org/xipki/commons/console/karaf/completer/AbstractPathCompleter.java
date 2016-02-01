@@ -60,7 +60,7 @@ abstract class AbstractPathCompleter implements Completer {
 
     @Override
     public int complete(
-            Session session,
+            final Session session,
             final CommandLine commandLine,
             final List<String> candidates) {
         // buffer can be null

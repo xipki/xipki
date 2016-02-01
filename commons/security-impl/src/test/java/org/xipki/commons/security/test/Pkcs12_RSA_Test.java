@@ -112,7 +112,8 @@ public abstract class Pkcs12_RSA_Test {
         Assert.assertTrue("Signature invalid", signatureValid);
     }
 
-    protected byte[] sign(byte[] data)
+    protected byte[] sign(
+            final byte[] data)
     throws Exception {
         ConcurrentContentSigner signer = getSigner();
         ContentSigner cSigner = signer.borrowContentSigner();
