@@ -45,11 +45,11 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.ScepClient;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.scep.client.EnrolmentResponse;
+import org.xipki.pki.scep.client.ScepClient;
 
 /**
  * @author Lijun Liao

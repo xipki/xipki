@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.common.util.IoUtil;
+import org.xipki.commons.common.util.IoUtil;
 
 /**
  * @author Lijun Liao

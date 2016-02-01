@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <!--
+        Properties
+        Note: Don't include a "-" in the persistent-id, or the config admin will
+        interpret it as a service-factory.
+  -->
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <cm:property-placeholder persistent-id="org.xipki.commons.audit.syslog" update-strategy="reload">
+    <cm:default-properties>
+      <!--  the default facility for syslog message -->
+      <cm:property name="facility" value="USER"/>
+      <!--  the default syslog host -->
+      <cm:property name="host" value="127.0.0.1"/>
+      <!-- prefix of the syslog message, a space will be added if not empty -->
+      <cm:property name="prefix" value=""/>
+      <!-- enable this if the default hostname of the sending side should be avoided. -->
+      <cm:property name="localname" value=""/>
+      <cm:property name="maxMessageLength" value="1024"/>
+      <!-- the default port for the syslog host -->
+      <cm:property name="port" value="514"/>
+      <!--  the default protocol for the syslog host -->
+      <cm:property name="protocol" value="udp"/>
+      <!--  if a write to syslog host fails, how many retries should be done, not applied to UDP -->
+      <cm:property name="writeRetries" value="5"/>
+      <!-- whether uses SSL to secure the communication, not applied to UDP -->
+      <cm:property name="ssl" value="false"/>
+      <!-- message format, RFC_3164 or RFC_5424 -->
+      <cm:property name="messageFormat" value="rfc_5424"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+  <bean id="syslogAuditServiceImpl" class="org.xipki.commons.audit.syslog.impl.SyslogAuditServiceImpl"
+     init-method="init" destroy-method="destroy">
+    <property name="facility" value="${facility}"/>
+    <property name="host" value="${host}"/>
+    <property name="prefix" value="${prefix}"/>
+    <property name="localname" value="${localname}"/>
+    <property name="maxMessageLength" value="${maxMessageLength}"/>
+    <property name="port" value="${port}"/>
+    <property name="protocol" value="${protocol}"/>
+    <property name="writeRetries" value="${writeRetries}"/>
+    <property name="ssl" value="${ssl}"/>
+    <property name="messageFormat" value="${messageFormat}"/>
+  </bean>
+  <service ref="syslogAuditServiceImpl" interface="org.xipki.commons.audit.api.AuditService"/>
+</blueprint>

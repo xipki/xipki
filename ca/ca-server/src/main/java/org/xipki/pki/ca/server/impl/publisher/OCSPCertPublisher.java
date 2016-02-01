@@ -42,25 +42,25 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditEvent;
-import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditService;
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.commons.audit.api.AuditEvent;
+import org.xipki.commons.audit.api.AuditEventData;
+import org.xipki.commons.audit.api.AuditLevel;
+import org.xipki.commons.audit.api.AuditService;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

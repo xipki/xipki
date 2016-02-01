@@ -37,7 +37,7 @@ package org.xipki.pki.ocsp.server.impl;
 
 import java.util.List;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ocsp.api.CertStatusStore;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 

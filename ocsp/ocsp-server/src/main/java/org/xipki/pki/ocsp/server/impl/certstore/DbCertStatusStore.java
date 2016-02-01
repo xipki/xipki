@@ -54,10 +54,12 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
 import org.xipki.pki.ocsp.api.CertStatusStore;
 import org.xipki.pki.ocsp.api.CertStatusStoreException;
@@ -65,8 +67,6 @@ import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.pki.ocsp.server.impl.IssuerEntry;
 import org.xipki.pki.ocsp.server.impl.IssuerStore;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

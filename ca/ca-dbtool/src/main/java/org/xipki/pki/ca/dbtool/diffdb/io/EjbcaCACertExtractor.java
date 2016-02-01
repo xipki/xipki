@@ -38,7 +38,7 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 import java.io.ByteArrayInputStream;
 import java.security.cert.X509Certificate;
 
-import org.xipki.security.api.util.X509Util;
+import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

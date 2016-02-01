@@ -38,7 +38,7 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

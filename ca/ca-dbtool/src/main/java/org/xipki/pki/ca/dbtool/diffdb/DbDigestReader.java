@@ -55,9 +55,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.EndOfQueue;
 import org.xipki.pki.ca.dbtool.IDRange;
@@ -67,7 +68,6 @@ import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

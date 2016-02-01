@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;

@@ -38,12 +38,12 @@ package org.xipki.pki.ca.api.publisher;
 import java.security.cert.CertificateEncodingException;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
-import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

@@ -37,10 +37,10 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.ConfPairs;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 
 /**
  *

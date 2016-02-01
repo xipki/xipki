@@ -39,8 +39,8 @@ import java.security.cert.X509CRL;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.shell.ClientCommandSupport;

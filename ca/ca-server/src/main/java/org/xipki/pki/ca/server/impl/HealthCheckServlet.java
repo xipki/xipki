@@ -46,8 +46,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.HealthCheckResult;
-import org.xipki.common.util.LogUtil;
+import org.xipki.commons.common.HealthCheckResult;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
 

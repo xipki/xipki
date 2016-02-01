@@ -48,13 +48,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XMLUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.dbtool.InvalidInputException;
-import org.xipki.password.api.PasswordResolverException;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.dbtool.InvalidInputException;
+import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;
@@ -82,7 +83,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

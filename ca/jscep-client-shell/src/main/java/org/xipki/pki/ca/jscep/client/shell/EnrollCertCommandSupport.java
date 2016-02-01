@@ -46,9 +46,9 @@ import org.jscep.client.Client;
 import org.jscep.client.ClientException;
 import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionException;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao

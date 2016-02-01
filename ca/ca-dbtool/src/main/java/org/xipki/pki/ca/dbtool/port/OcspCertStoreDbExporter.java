@@ -55,12 +55,13 @@ import javax.xml.stream.XMLStreamException;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ProcessLog;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XMLUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.ProcessLog;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
@@ -68,7 +69,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertType;
 import org.xipki.pki.ca.dbtool.xmlio.OcspCertsWriter;
-import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao

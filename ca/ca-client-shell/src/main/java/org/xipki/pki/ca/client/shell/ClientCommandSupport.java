@@ -40,11 +40,11 @@ import java.io.IOException;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CAClient;
 
 /**

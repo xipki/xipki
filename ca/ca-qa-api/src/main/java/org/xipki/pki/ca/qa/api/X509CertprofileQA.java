@@ -38,7 +38,7 @@ package org.xipki.pki.ca.qa.api;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.common.qa.ValidationResult;
+import org.xipki.commons.common.qa.ValidationResult;
 
 /**
  * @author Lijun Liao

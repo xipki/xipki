@@ -61,14 +61,17 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.ProcessLog;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.XMLUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.dbtool.InvalidInputException;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.ProcessLog;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.dbtool.InvalidInputException;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaType;
@@ -79,9 +82,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.NameIdType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
-import org.xipki.security.api.HashAlgoType;
-import org.xipki.security.api.HashCalculator;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

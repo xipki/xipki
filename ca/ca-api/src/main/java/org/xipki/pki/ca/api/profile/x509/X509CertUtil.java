@@ -57,7 +57,7 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.pki.ca.api.CertprofileException;
 
 /**

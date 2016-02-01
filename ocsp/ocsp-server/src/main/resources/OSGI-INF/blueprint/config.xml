@@ -18,9 +18,9 @@
       <cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
-  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditServiceRegister"/>
+  <reference id="dataSourceFactory" interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+  <reference id="auditServiceRegister" interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>

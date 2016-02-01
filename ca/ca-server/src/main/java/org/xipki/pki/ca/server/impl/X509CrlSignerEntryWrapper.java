@@ -42,16 +42,16 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.xipki.common.InvalidConfException;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.server.mgmt.api.CRLControl;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.KeyUsage;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -52,19 +52,19 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LoadExecutor;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.pki.ca.client.api.CAClient;
 import org.xipki.pki.ca.client.api.CAClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao

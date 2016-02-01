@@ -39,10 +39,10 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerException;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao

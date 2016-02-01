@@ -56,13 +56,13 @@ import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditEvent;
-import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditService;
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.util.LogUtil;
+import org.xipki.commons.audit.api.AuditEvent;
+import org.xipki.commons.audit.api.AuditEventData;
+import org.xipki.commons.audit.api.AuditLevel;
+import org.xipki.commons.audit.api.AuditService;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.util.LogUtil;
 
 /**
  * @author Lijun Liao

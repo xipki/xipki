@@ -63,8 +63,11 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.LruCache;
-import org.xipki.common.util.CollectionUtil;
+import org.xipki.commons.common.LruCache;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
@@ -76,9 +79,6 @@ import org.xipki.pki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.pki.ca.api.profile.RDNControl;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.StringType;
-import org.xipki.security.api.ObjectIdentifiers;
-import org.xipki.security.api.util.SecurityUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -36,9 +36,9 @@
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
+import org.xipki.commons.security.api.CRLReason;
 import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
-import org.xipki.security.api.CRLReason;
 
 /**
  * @author Lijun Liao

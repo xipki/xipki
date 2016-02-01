@@ -61,11 +61,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.util.PasswordHash;
+import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -96,12 +102,6 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.util.PasswordHash;
-import org.xipki.security.api.util.SecurityUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

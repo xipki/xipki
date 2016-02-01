@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.api.profile.x509;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

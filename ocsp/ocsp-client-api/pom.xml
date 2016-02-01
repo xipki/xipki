@@ -13,7 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>

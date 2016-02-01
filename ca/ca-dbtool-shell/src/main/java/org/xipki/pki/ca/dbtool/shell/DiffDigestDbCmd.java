@@ -43,9 +43,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.DirPathCompleter;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.DirPathCompleter;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 

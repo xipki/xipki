@@ -39,7 +39,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.pki.ca.qa.api.QASystemManager;
 
 /**

@@ -41,11 +41,11 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BiometricTypeType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
-import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

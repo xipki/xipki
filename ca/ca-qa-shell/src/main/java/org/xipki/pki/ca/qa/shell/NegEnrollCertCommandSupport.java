@@ -48,19 +48,19 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerException;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignatureAlgoControl;
-import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao

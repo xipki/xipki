@@ -38,8 +38,8 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.util.Collection;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 /**

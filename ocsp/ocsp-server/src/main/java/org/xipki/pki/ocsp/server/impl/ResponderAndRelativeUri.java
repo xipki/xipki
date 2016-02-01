@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ocsp.server.impl;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

@@ -42,9 +42,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.StopMe;
@@ -53,8 +55,6 @@ import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
 import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCACertExtractor;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
-import org.xipki.security.api.HashCalculator;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

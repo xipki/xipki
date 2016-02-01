@@ -56,8 +56,11 @@ import javax.servlet.ServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.pki.ca.ncm.common.HessianCAManager;
 import org.xipki.pki.ca.ncm.common.HessianCAMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
@@ -78,9 +81,6 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.SecurityFactory;
 
 import com.caucho.hessian.server.HessianServlet;
 

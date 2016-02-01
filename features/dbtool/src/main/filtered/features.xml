@@ -2,22 +2,22 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="dbtool-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
-  <repository>mvn:org.xipki.pki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
+  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
   <feature name="xipki-database-tool" version="${project.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.pki/password-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/password-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/security-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security-impl/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.xipki.pki/datasource-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/datasource-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/datasource-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
-    <bundle>mvn:org.xipki.pki/database-tool/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/database-tool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>

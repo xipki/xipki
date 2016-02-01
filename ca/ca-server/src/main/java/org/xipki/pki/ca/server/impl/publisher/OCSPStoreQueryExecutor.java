@@ -54,19 +54,19 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.LogUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.datasource.api.springframework.jdbc.DuplicateKeyException;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyException;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.HashAlgoType;
-import org.xipki.security.api.HashCalculator;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

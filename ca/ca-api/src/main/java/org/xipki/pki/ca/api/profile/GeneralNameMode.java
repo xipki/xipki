@@ -38,7 +38,7 @@ package org.xipki.pki.ca.api.profile;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
