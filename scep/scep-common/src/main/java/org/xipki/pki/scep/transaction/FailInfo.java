@@ -69,7 +69,8 @@ public enum FailInfo {
 
     private final int code;
 
-    private FailInfo(int code) {
+    private FailInfo(
+            final int code) {
         this.code = code;
     }
 

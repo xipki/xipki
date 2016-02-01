@@ -775,7 +775,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return getSecureRandom(strongRandom4SignEnabled);
     }
 
-    private static SecureRandom getSecureRandom(boolean strong) {
+    private static SecureRandom getSecureRandom(
+            final boolean strong) {
         if (!strong) {
             return new SecureRandom();
         }
