@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <cm:property-placeholder persistent-id="org.xipki.commons.password" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="masterPassword.callback" value="org.xipki.commons.password.GuiPasswordCallback"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <bean id="passwordResolver" class="org.xipki.commons.password.PasswordResolverImpl"/>
+  <reference-list id="singlePasswordResolvers" interface="org.xipki.commons.password.api.SinglePasswordResolver" availability="optional">
+    <reference-listener ref="passwordResolver" bind-method="bindService" unbind-method="unbindService"/>
+  </reference-list>
+  <service ref="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
+
+  <bean id="obfPasswordResolver" class="org.xipki.commons.password.OBFPasswordResolver"/>
+  <service ref="obfPasswordResolver" interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
+
+  <bean id="pbePasswordResolver" class="org.xipki.commons.password.PBEPasswordResolver">
+    <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
+  </bean>
+  <service ref="pbePasswordResolver" interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
+</blueprint>
