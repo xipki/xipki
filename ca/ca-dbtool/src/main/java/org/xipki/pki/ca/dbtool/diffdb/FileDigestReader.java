@@ -49,12 +49,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

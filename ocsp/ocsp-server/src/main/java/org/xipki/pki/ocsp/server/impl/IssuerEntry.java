@@ -40,11 +40,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

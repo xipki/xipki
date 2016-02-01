@@ -37,7 +37,7 @@ package org.xipki.pki.ca.certprofile.internal;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

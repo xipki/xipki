@@ -51,9 +51,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
-import org.xipki.console.karaf.XipkiCommandSupport;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.api.util.X509Util;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

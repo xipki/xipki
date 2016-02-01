@@ -44,9 +44,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.jscep.client.Client;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.security.api.util.X509Util;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

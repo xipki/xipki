@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.client.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.pki.ca.client.api.CAClient;
 
 /**

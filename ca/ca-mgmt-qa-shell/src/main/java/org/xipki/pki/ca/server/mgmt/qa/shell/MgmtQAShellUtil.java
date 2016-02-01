@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import java.util.Collection;
 
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 /**

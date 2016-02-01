@@ -42,16 +42,16 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CAManager;
 import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

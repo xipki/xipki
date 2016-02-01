@@ -40,7 +40,7 @@ import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

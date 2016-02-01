@@ -39,8 +39,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

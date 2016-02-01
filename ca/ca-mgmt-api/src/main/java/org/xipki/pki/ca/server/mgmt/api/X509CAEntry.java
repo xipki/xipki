@@ -42,11 +42,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.IoUtil;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.KeyUsage;
-import org.xipki.security.api.util.X509Util;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

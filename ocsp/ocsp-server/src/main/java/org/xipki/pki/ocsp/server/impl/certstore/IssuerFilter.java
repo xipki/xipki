@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao

@@ -38,12 +38,12 @@ package org.xipki.pki.ocsp.api;
 import java.math.BigInteger;
 import java.util.Set;
 
-import org.xipki.audit.api.AuditService;
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.HashAlgoType;
+import org.xipki.commons.audit.api.AuditService;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao

@@ -45,12 +45,12 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.DateUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.common.util.DateUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CACRLReasonCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

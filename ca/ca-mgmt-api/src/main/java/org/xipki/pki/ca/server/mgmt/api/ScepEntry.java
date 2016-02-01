@@ -42,10 +42,10 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.security.api.util.SecurityUtil;
-import org.xipki.security.api.util.X509Util;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

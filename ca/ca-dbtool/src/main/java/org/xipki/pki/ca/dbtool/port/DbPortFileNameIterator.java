@@ -40,7 +40,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

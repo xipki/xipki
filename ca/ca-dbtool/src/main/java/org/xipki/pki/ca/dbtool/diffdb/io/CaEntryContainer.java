@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**

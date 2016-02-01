@@ -42,7 +42,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.commons.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao

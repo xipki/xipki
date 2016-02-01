@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.qa.shell.cert;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.shell.cert.EnrollCertCmd;
 
 /**

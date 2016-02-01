@@ -44,13 +44,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.datasource.api.DataSourceFactory;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestRevoke;
-import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao

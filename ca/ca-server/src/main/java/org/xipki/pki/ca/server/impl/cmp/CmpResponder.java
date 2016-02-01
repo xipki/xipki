@@ -64,22 +64,22 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditEvent;
-import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.audit.api.AuditEvent;
+import org.xipki.commons.audit.api.AuditEventData;
+import org.xipki.commons.audit.api.AuditLevel;
+import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

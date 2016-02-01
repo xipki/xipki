@@ -72,23 +72,23 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.NoIdleSignerException;
+import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.PKIErrorException;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.PKIResponse;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.ObjectIdentifiers;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.util.SecurityUtil;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

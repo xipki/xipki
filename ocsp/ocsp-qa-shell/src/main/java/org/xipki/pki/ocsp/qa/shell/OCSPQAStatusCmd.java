@@ -47,12 +47,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.qa.ValidationIssue;
-import org.xipki.common.qa.ValidationResult;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.HashAlgCompleter;
-import org.xipki.console.karaf.completer.SigAlgCompleter;
+import org.xipki.commons.common.qa.ValidationIssue;
+import org.xipki.commons.common.qa.ValidationResult;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ocsp.client.shell.BaseOCSPStatusCommandSupport;
 import org.xipki.pki.ocsp.qa.api.Occurrence;
 import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
@@ -62,7 +63,6 @@ import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
 import org.xipki.pki.ocsp.qa.shell.completer.CertStatusCompleter;
 import org.xipki.pki.ocsp.qa.shell.completer.OccurrenceCompleter;
 import org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter;
-import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

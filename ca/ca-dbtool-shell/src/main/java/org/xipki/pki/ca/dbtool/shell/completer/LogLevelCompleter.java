@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.dbtool.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.console.karaf.AbstractEnumCompleter;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao

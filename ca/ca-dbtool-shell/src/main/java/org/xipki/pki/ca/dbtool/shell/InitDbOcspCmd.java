@@ -39,7 +39,7 @@ import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
+import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao

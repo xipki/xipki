@@ -48,13 +48,13 @@ import java.util.Properties;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.XipkiCommandSupport;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
-import org.xipki.dbtool.LiquibaseMain;
-import org.xipki.password.api.PasswordResolver;
-import org.xipki.password.api.PasswordResolverException;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
+import org.xipki.commons.dbtool.LiquibaseMain;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.shell.completer.LogLevelCompleter;
 
 /**

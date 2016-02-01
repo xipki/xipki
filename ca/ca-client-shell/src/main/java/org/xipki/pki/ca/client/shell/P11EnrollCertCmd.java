@@ -42,14 +42,14 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.security.SecurityFactoryImpl;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
-import org.xipki.security.SecurityFactoryImpl;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignatureAlgoControl;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao

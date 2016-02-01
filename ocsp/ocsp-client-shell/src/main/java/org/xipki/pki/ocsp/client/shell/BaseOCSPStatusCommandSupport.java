@@ -48,14 +48,14 @@ import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.RequestResponseDebug;
-import org.xipki.common.RequestResponsePair;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

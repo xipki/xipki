@@ -55,20 +55,20 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditEvent;
-import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditService;
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.LogUtil;
+import org.xipki.commons.audit.api.AuditEvent;
+import org.xipki.commons.audit.api.AuditEventData;
+import org.xipki.commons.audit.api.AuditLevel;
+import org.xipki.commons.audit.api.AuditService;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.server.impl.CAManagerImpl;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
-import org.xipki.scep.exception.MessageDecodingException;
-import org.xipki.scep.transaction.Operation;
-import org.xipki.scep.util.ScepConstants;
+import org.xipki.pki.scep.exception.MessageDecodingException;
+import org.xipki.pki.scep.transaction.Operation;
+import org.xipki.pki.scep.util.ScepConstants;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.ext

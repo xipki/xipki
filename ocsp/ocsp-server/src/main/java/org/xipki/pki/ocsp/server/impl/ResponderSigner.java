@@ -50,8 +50,8 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.ConcurrentContentSigner;
 
 /**
  * @author Lijun Liao

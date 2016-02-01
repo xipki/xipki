@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
-import org.xipki.common.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

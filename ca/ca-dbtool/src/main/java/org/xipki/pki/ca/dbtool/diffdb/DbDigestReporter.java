@@ -43,9 +43,9 @@ import java.io.Writer;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 
 /**

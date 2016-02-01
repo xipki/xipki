@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.common.qa.ValidationResult;
+import org.xipki.commons.common.qa.ValidationResult;
 
 /**
  * @author Lijun Liao

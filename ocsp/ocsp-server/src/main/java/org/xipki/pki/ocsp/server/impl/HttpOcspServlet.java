@@ -55,16 +55,16 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditEvent;
-import org.xipki.audit.api.AuditEventData;
-import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditService;
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.audit.api.AuditEvent;
+import org.xipki.commons.audit.api.AuditEventData;
+import org.xipki.commons.audit.api.AuditLevel;
+import org.xipki.commons.audit.api.AuditService;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao

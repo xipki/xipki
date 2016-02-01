@@ -44,13 +44,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
-import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

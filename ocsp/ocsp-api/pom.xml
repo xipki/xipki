@@ -13,17 +13,17 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>audit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>datasource-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.commons</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
     </dependency>

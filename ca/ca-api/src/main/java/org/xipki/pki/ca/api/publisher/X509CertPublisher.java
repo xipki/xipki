@@ -38,14 +38,14 @@ package org.xipki.pki.ca.api.publisher;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import org.xipki.audit.api.AuditServiceRegister;
-import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDBCertId;
-import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

@@ -41,12 +41,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.security.api.util.AlgorithmUtil;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

@@ -39,11 +39,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.common.InvalidConfException;
-import org.xipki.common.util.IoUtil;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.console.karaf.completer.SignerTypeCompleter;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 

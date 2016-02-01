@@ -43,11 +43,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.RDNControl;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.StringType;
-import org.xipki.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

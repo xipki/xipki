@@ -41,9 +41,9 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.scep.client.EnrolmentResponse;
-import org.xipki.scep.client.ScepClient;
-import org.xipki.scep.client.exception.ScepClientException;
+import org.xipki.pki.scep.client.EnrolmentResponse;
+import org.xipki.pki.scep.client.ScepClient;
+import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao

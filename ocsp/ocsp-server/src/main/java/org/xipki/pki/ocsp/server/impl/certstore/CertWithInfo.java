@@ -38,8 +38,8 @@ package org.xipki.pki.ocsp.server.impl.certstore;
 import java.math.BigInteger;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

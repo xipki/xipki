@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
@@ -59,8 +61,6 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.security.api.CRLReason;
-import org.xipki.security.api.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

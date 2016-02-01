@@ -36,11 +36,11 @@
 package org.xipki.pki.ca.server.mgmt.shell;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.ConfPairs;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.password.api.PasswordResolver;
-import org.xipki.security.api.util.SecurityUtil;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao

@@ -49,11 +49,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.util.IoUtil;
-import org.xipki.common.util.StringUtil;
-import org.xipki.console.karaf.IllegalCmdParamException;
-import org.xipki.console.karaf.completer.FilePathCompleter;
-import org.xipki.password.api.PasswordResolver;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CAStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
@@ -61,8 +63,6 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.security.api.CertRevocationInfo;
-import org.xipki.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao

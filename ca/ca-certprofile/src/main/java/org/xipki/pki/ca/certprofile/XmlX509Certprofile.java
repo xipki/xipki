@@ -80,10 +80,12 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.CollectionUtil;
-import org.xipki.common.util.LogUtil;
-import org.xipki.common.util.ParamUtil;
-import org.xipki.common.util.StringUtil;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -147,8 +149,6 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.security.api.ObjectIdentifiers;
-import org.xipki.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

@@ -47,8 +47,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.console.karaf.CmdFailure;
-import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CAEntry;
 
 /**
