@@ -63,7 +63,7 @@ public abstract class AbstractEnumCompleter implements Completer {
 
     @Override
     public int complete(
-            Session session,
+            final Session session,
             final CommandLine commandLine,
             final List<String> candidates) {
         StringsCompleter delegate = new StringsCompleter();

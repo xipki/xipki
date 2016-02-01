@@ -32,7 +32,7 @@ public class DSAPlainDigestSigner implements Signer {
     private int keyBitLen;
 
     public DSAPlainDigestSigner(
-            final DSA    signer,
+            final DSA signer,
             final Digest digest) {
         this.digest = digest;
         this.dsaSigner = signer;

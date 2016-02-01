@@ -115,7 +115,8 @@ public class FpIdCalculator {
         }
     }
 
-    private static long bytesToLong(byte[] bytes) {
+    private static long bytesToLong(
+            final byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.put(bytes, 0, 8);
         buffer.flip(); //need flip
