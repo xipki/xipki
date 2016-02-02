@@ -761,7 +761,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
         KeyCertPair keycertPair = new KeyCertPair(
                 signerBuilder.getKey(), signerBuilder.getCert());
-        // TODO: validiate whether private key and certificate match
         return keycertPair;
     } // method createPrivateKeyAndCert
 

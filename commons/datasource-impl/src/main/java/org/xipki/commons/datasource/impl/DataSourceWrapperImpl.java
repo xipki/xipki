@@ -1043,7 +1043,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
     } // method columnExists
 
-    // TODO: 2016-01-19 till here StringBuilder initial size check
     @Override
     public boolean tableHasColumn(
             final Connection conn,
