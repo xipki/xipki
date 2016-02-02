@@ -2,10 +2,12 @@ XiPKI
 =========
 eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 
+Highly scalable and high-performance open source PKI (Certification Authority and OCSP responder), especially suitable for IoT, M2M and V2X.
+
 - CA (Certification Authority)
 
-  - X.509 Certificate v3 (RFC5280)
-  - X.509 CRL v2 (RFC5280)
+  - X.509 Certificate v3 (RFC 5280)
+  - X.509 CRL v2 (RFC 5280)
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
   - Supported databases
     - Oracle
