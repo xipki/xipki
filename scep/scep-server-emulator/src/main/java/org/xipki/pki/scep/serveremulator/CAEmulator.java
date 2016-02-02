@@ -61,6 +61,7 @@ import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.Arrays;
+import org.xipki.commons.security.SignerUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
@@ -135,7 +136,9 @@ public class CAEmulator {
     public Certificate generateCert(
             final CertificationRequest p10ReqInfo)
     throws Exception {
-        // TODO: verify the PKCS#10 request
+        if (!SignerUtil.verifyPOP(p10ReqInfo)) {
+            throw new Exception("PKCS#10 request invalid");
+        }
         CertificationRequestInfo reqInfo = p10ReqInfo.getCertificationRequestInfo();
         return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
     }
