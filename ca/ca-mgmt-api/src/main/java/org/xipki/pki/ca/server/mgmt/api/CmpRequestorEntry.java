@@ -100,7 +100,7 @@ public class CmpRequestorEntry implements Serializable {
 
     public String toString(
             final boolean verbose) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(500);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(cert == null).append('\n');
 

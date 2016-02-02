@@ -159,7 +159,7 @@ public class X509CrlSignerEntry implements Serializable {
     public String toString(
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');

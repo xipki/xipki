@@ -216,7 +216,7 @@ public class X509CAEntry extends CAEntry implements Serializable {
     public String toString(
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(1000);
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
         if (sb.charAt(sb.length() - 1) != '\n') {
             sb.append('\n');

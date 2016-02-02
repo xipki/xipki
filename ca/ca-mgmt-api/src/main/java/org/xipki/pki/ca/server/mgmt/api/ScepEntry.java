@@ -156,7 +156,7 @@ public class ScepEntry implements Serializable {
     public String toString(
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(100);
         sb.append("caName: ").append(caName).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');

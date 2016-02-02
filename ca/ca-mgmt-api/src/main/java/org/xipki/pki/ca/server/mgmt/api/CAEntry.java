@@ -222,7 +222,7 @@ public class CAEntry {
     public String toString(
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(500);
         sb.append("name: ").append(name).append('\n');
         sb.append("status: ");
         sb.append(
