@@ -215,7 +215,7 @@ public class FileUtils {
             fos = new FileOutputStream(destFile);
             input = fis.getChannel();
             output = fos.getChannel();
-            final long size = input.size(); // TODO See IO-386
+            final long size = input.size(); // See IO-386
             long pos = 0;
             long count = 0;
             while (pos < size) {
@@ -234,8 +234,8 @@ public class FileUtils {
             closeQuietly(output, fos, input, fis);
         }
 
-        final long srcLen = srcFile.length(); // TODO See IO-386
-        final long dstLen = destFile.length(); // TODO See IO-386
+        final long srcLen = srcFile.length(); // See IO-386
+        final long dstLen = destFile.length(); // See IO-386
         if (srcLen != dstLen) {
             throw new IOException("Failed to copy full contents from '"
                     + srcFile + "' to '" + destFile + "' Expected length: " + srcLen
