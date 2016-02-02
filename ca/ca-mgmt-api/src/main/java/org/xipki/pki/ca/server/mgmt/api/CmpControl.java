@@ -222,7 +222,7 @@ public class CmpControl {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(500);
         sb.append("               name: ").append(dbEntry.getName()).append('\n');
         sb.append("        confirmCert: ").append(getYesNo(confirmCert)).append('\n');
         sb.append("         sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");

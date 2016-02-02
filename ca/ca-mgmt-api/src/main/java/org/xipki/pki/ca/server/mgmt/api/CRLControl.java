@@ -170,7 +170,7 @@ public class CRLControl implements Serializable {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(100);
             if (hour < 10) {
                 sb.append("0");
             }
@@ -381,7 +381,7 @@ public class CRLControl implements Serializable {
         }
 
         if (CollectionUtil.isNotEmpty(extensionOIDs)) {
-            StringBuilder extensionsSb = new StringBuilder();
+            StringBuilder extensionsSb = new StringBuilder(200);
             for (String oid : extensionOIDs) {
                 extensionsSb.append(oid).append(",");
             }

@@ -101,7 +101,7 @@ public class CAHasRequestorEntry implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("requestor: ").append(requestorName).append(", ");
         sb.append("ra: ").append(ra).append(", ");
         sb.append("profiles: ").append(profiles).append(", ");

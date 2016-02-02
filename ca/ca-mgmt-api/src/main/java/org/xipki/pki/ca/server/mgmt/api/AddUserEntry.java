@@ -81,7 +81,7 @@ public class AddUserEntry implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("name: ").append(name).append('\n');
         sb.append("password: ").append(password).append("\n");
         sb.append("cnRegex: ").append(cnRegex);
