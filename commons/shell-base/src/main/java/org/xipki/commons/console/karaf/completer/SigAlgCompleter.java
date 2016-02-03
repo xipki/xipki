@@ -40,22 +40,23 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class SigAlgCompleter extends AbstractEnumCompleter {
 
-    public SigAlgCompleter() {
-        String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
-        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
-        StringBuilder enums = new StringBuilder(200);
-        for (String encAlg : encAlgs) {
-            for (String hashAlg : hashAlgs) {
-                enums.append(hashAlg).append("with").append(encAlg).append(",");
-            }
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+  public SigAlgCompleter() {
+    String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
+    String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+    StringBuilder enums = new StringBuilder(200);
+    for (String encAlg : encAlgs) {
+      for (String hashAlg : hashAlgs) {
+        enums.append(hashAlg).append("with").append(encAlg).append(",");
+      }
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

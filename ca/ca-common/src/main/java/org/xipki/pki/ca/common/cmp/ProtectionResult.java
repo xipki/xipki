@@ -37,14 +37,15 @@ package org.xipki.pki.ca.common.cmp;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum ProtectionResult {
 
-    VALID,
-    INVALID,
-    SIGALGO_FORBIDDEN,
-    NOT_SIGNATURE_BASED,
-    SENDER_NOT_AUTHORIZED;
+  VALID,
+  INVALID,
+  SIGALGO_FORBIDDEN,
+  NOT_SIGNATURE_BASED,
+  SENDER_NOT_AUTHORIZED;
 
 }

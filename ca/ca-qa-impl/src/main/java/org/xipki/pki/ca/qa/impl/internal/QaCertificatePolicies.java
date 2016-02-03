@@ -45,63 +45,64 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaCertificatePolicies extends QaExtension {
 
-    public static class QaCertificatePolicyInformation {
+  public static class QaCertificatePolicyInformation {
 
-        private final String policyId;
+    private final String policyId;
 
-        private final QaPolicyQualifiers policyQualifiers;
+    private final QaPolicyQualifiers policyQualifiers;
 
-        public QaCertificatePolicyInformation(
-                final CertificatePolicyInformationType jaxb) {
-            ParamUtil.assertNotNull("jaxb", jaxb);
-            this.policyId = jaxb.getPolicyIdentifier().getValue();
-            if (jaxb.getPolicyQualifiers() == null) {
-                this.policyQualifiers = null;
-            } else {
-                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
-            }
-        }
-
-        public String getPolicyId() {
-            return policyId;
-        }
-
-        public QaPolicyQualifiers getPolicyQualifiers() {
-            return policyQualifiers;
-        }
-
-    } // class QaCertificatePolicyInformation
-
-    private final List<QaCertificatePolicyInformation> policyInformations;
-
-    public QaCertificatePolicies(
-            final CertificatePolicies jaxb) {
-        List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
-        List<QaCertificatePolicyInformation> list = new LinkedList<>();
-        for (CertificatePolicyInformationType type : types) {
-            list.add(new QaCertificatePolicyInformation(type));
-        }
-
-        this.policyInformations = Collections.unmodifiableList(list);
+    public QaCertificatePolicyInformation(
+        final CertificatePolicyInformationType jaxb) {
+      ParamUtil.assertNotNull("jaxb", jaxb);
+      this.policyId = jaxb.getPolicyIdentifier().getValue();
+      if (jaxb.getPolicyQualifiers() == null) {
+        this.policyQualifiers = null;
+      } else {
+        this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
+      }
     }
 
-    public List<QaCertificatePolicyInformation> getPolicyInformations() {
-        return policyInformations;
+    public String getPolicyId() {
+      return policyId;
     }
 
-    public QaCertificatePolicyInformation getPolicyInformation(
-            final String policyId) {
-        for (QaCertificatePolicyInformation entry : policyInformations) {
-            if (entry.getPolicyId().equals(policyId)) {
-                return entry;
-            }
-        }
-
-        return null;
+    public QaPolicyQualifiers getPolicyQualifiers() {
+      return policyQualifiers;
     }
+
+  } // class QaCertificatePolicyInformation
+
+  private final List<QaCertificatePolicyInformation> policyInformations;
+
+  public QaCertificatePolicies(
+      final CertificatePolicies jaxb) {
+    List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
+    List<QaCertificatePolicyInformation> list = new LinkedList<>();
+    for (CertificatePolicyInformationType type : types) {
+      list.add(new QaCertificatePolicyInformation(type));
+    }
+
+    this.policyInformations = Collections.unmodifiableList(list);
+  }
+
+  public List<QaCertificatePolicyInformation> getPolicyInformations() {
+    return policyInformations;
+  }
+
+  public QaCertificatePolicyInformation getPolicyInformation(
+      final String policyId) {
+    for (QaCertificatePolicyInformation entry : policyInformations) {
+      if (entry.getPolicyId().equals(policyId)) {
+        return entry;
+      }
+    }
+
+    return null;
+  }
 
 }

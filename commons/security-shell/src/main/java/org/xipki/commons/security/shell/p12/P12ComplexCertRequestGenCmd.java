@@ -63,110 +63,111 @@ import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",
-        description = "generate complex PKCS#10 request with PKCS#12 keystore")
+    description = "generate complex PKCS#10 request with PKCS#12 keystore")
 @Service
 public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 keystore file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p12File;
+  @Option(name = "--p12",
+      required = true,
+      description = "PKCS#12 keystore file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  private String password;
 
-    private char[] getPassword() {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+  private char[] getPassword() {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
+    }
+    return pwdInChar;
+  }
+
+  public KeyStore getKeyStore()
+  throws Exception {
+    KeyStore ks;
+
+    FileInputStream fIn = null;
+    try {
+      fIn = new FileInputStream(expandFilepath(p12File));
+      ks = KeyStore.getInstance("PKCS12", "BC");
+      ks.load(fIn, getPassword());
+    } finally {
+      if (fIn != null) {
+        fIn.close();
+      }
     }
 
-    public KeyStore getKeyStore()
-    throws Exception {
-        KeyStore ks;
+    return ks;
+  }
 
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
-        }
+  @Override
+  protected ConcurrentContentSigner getSigner(
+      final String hashAlgo,
+      final SignatureAlgoControl signatureAlgoControl)
+  throws Exception {
+    char[] pwd = getPassword();
 
-        return ks;
+    String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
+        p12File, new String(pwd), 1);
+    return securityFactory.createSigner(
+        "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
+  }
+
+  @Override
+  protected X500Name getSubject(
+      final String subject) {
+    X500Name name = new X500Name(subject);
+    List<RDN> l = new LinkedList<>();
+    RDN[] rs = name.getRDNs();
+    for (RDN m : rs) {
+      l.add(m);
     }
 
-    @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
-    throws Exception {
-        char[] pwd = getPassword();
+    ASN1ObjectIdentifier id;
 
-        String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-                p12File, new String(pwd), 1);
-        return securityFactory.createSigner(
-                "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
+    // dateOfBirth
+    id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
+    RDN[] rdns = name.getRDNs(id);
+
+    if (rdns == null || rdns.length == 0) {
+      ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
+      RDN rdn = new RDN(id, atvValue);
+      l.add(rdn);
     }
 
-    @Override
-    protected X500Name getSubject(
-            final String subject) {
-        X500Name name = new X500Name(subject);
-        List<RDN> l = new LinkedList<>();
-        RDN[] rs = name.getRDNs();
-        for (RDN m : rs) {
-            l.add(m);
-        }
+    // postalAddress
+    id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
+    rdns = name.getRDNs(id);
 
-        ASN1ObjectIdentifier id;
+    if (rdns == null || rdns.length == 0) {
+      ASN1EncodableVector v = new ASN1EncodableVector();
+      v.add(new DERUTF8String("my street 1"));
+      v.add(new DERUTF8String("12345 Germany"));
 
-        // dateOfBirth
-        id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
-        RDN[] rdns = name.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-            ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
-            RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
-        }
-
-        // postalAddress
-        id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
-        rdns = name.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new DERUTF8String("my street 1"));
-            v.add(new DERUTF8String("12345 Germany"));
-
-            ASN1Sequence atvValue = new DERSequence(v);
-            RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
-        }
-
-        // DN_UNIQUE_IDENTIFIER
-        id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
-        rdns = name.getRDNs(id);
-
-        if (rdns == null || rdns.length == 0) {
-            DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
-            RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
-        }
-
-        return new X500Name(l.toArray(new RDN[0]));
+      ASN1Sequence atvValue = new DERSequence(v);
+      RDN rdn = new RDN(id, atvValue);
+      l.add(rdn);
     }
+
+    // DN_UNIQUE_IDENTIFIER
+    id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
+    rdns = name.getRDNs(id);
+
+    if (rdns == null || rdns.length == 0) {
+      DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
+      RDN rdn = new RDN(id, atvValue);
+      l.add(rdn);
+    }
+
+    return new X500Name(l.toArray(new RDN[0]));
+  }
 
 }

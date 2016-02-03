@@ -44,17 +44,18 @@ import org.xipki.pki.ca.client.api.CAClient;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    protected CAClient caClient;
+  @Reference
+  protected CAClient caClient;
 
-    @Override
-    protected Set<String> getEnums() {
-        return caClient.getCaNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return caClient.getCaNames();
+  }
 
 }

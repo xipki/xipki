@@ -45,38 +45,39 @@ import org.bouncycastle.operator.DigestCalculator;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class AbstractDigestCalculator implements DigestCalculator {
 
-    private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+  private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-    protected abstract ASN1ObjectIdentifier getObjectIdentifier();
+  protected abstract ASN1ObjectIdentifier getObjectIdentifier();
 
-    protected abstract Digest getDigester();
+  protected abstract Digest getDigester();
 
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return new AlgorithmIdentifier(getObjectIdentifier());
-    }
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return new AlgorithmIdentifier(getObjectIdentifier());
+  }
 
-    public OutputStream getOutputStream() {
-        return bOut;
-    }
+  public OutputStream getOutputStream() {
+    return bOut;
+  }
 
-    public byte[] getDigest() {
-        byte[] bytes = bOut.toByteArray();
+  public byte[] getDigest() {
+    byte[] bytes = bOut.toByteArray();
 
-        bOut.reset();
+    bOut.reset();
 
-        Digest digester = getDigester();
+    Digest digester = getDigester();
 
-        digester.update(bytes, 0, bytes.length);
+    digester.update(bytes, 0, bytes.length);
 
-        byte[] digest = new byte[digester.getDigestSize()];
+    byte[] digest = new byte[digester.getDigestSize()];
 
-        digester.doFinal(digest, 0);
+    digester.doFinal(digest, 0);
 
-        return digest;
-    }
+    return digest;
+  }
 
 }

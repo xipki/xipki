@@ -118,577 +118,578 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class XmlX509CertprofileUtil {
 
-    private final static Object jaxbUnmarshallerLock = new Object();
+  private final static Object jaxbUnmarshallerLock = new Object();
 
-    private static Unmarshaller jaxbUnmarshaller;
+  private static Unmarshaller jaxbUnmarshaller;
 
-    public static X509ProfileType parse(
-            final InputStream xmlConfStream)
-    throws CertprofileException {
-        synchronized (jaxbUnmarshallerLock) {
-            JAXBElement<?> rootElement;
-            try {
-                if (jaxbUnmarshaller == null) {
-                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                    jaxbUnmarshaller = context.createUnmarshaller();
+  public static X509ProfileType parse(
+      final InputStream xmlConfStream)
+  throws CertprofileException {
+    synchronized (jaxbUnmarshallerLock) {
+      JAXBElement<?> rootElement;
+      try {
+        if (jaxbUnmarshaller == null) {
+          JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+          jaxbUnmarshaller = context.createUnmarshaller();
 
-                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = XmlX509CertprofileUtil.class.getResource("/xsd/certprofile.xsd");
-                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-                }
-
-                rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(xmlConfStream);
-                try {
-                    xmlConfStream.close();
-                } catch (IOException e) {
-                }
-            } catch (SAXException e) {
-                throw new CertprofileException(
-                        "parse profile failed, message: " + e.getMessage(), e);
-            } catch (JAXBException e) {
-                throw new CertprofileException(
-                        "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
-                        e);
-            }
-
-            Object rootType = rootElement.getValue();
-            if (rootType instanceof X509ProfileType) {
-                return (X509ProfileType) rootElement.getValue();
-            } else {
-                throw new CertprofileException("invalid root element type");
-            }
-        }
-    } // method parse
-
-    public static List<CertificatePolicyInformation> buildCertificatePolicies(
-            final CertificatePolicies type) {
-        List<CertificatePolicyInformationType> policyPairs =
-                type.getCertificatePolicyInformation();
-        if (CollectionUtil.isEmpty(policyPairs)) {
-            return null;
+          final SchemaFactory schemaFact = SchemaFactory.newInstance(
+              javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+          URL url = XmlX509CertprofileUtil.class.getResource("/xsd/certprofile.xsd");
+          jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }
 
-        List<CertificatePolicyInformation> policies =
-                new ArrayList<CertificatePolicyInformation>(policyPairs.size());
-        for (CertificatePolicyInformationType policyPair : policyPairs) {
-            List<CertificatePolicyQualifier> qualifiers = null;
-
-            PolicyQualifiers policyQualifiers = policyPair.getPolicyQualifiers();
-            if (policyQualifiers != null) {
-                List<JAXBElement<String>> cpsUriOrUserNotice =
-                        policyQualifiers.getCpsUriOrUserNotice();
-
-                qualifiers = new ArrayList<CertificatePolicyQualifier>(cpsUriOrUserNotice.size());
-                for (JAXBElement<String> element : cpsUriOrUserNotice) {
-                    String elementValue = element.getValue();
-                    CertificatePolicyQualifier qualifier = null;
-                    String elementName = element.getName().getLocalPart();
-                    if ("cpsUri".equals(elementName)) {
-                        qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
-                    } else {
-                        qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(
-                                elementValue);
-                    }
-                    qualifiers.add(qualifier);
-                }
-            }
-
-            CertificatePolicyInformation cpi = new CertificatePolicyInformation(
-                    policyPair.getPolicyIdentifier().getValue(), qualifiers);
-
-            policies.add(cpi);
+        rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(xmlConfStream);
+        try {
+          xmlConfStream.close();
+        } catch (IOException e) {
         }
+      } catch (SAXException e) {
+        throw new CertprofileException(
+            "parse profile failed, message: " + e.getMessage(), e);
+      } catch (JAXBException e) {
+        throw new CertprofileException(
+            "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
+            e);
+      }
 
-        return policies;
-    } // method buildCertificatePolicies
+      Object rootType = rootElement.getValue();
+      if (rootType instanceof X509ProfileType) {
+        return (X509ProfileType) rootElement.getValue();
+      } else {
+        throw new CertprofileException("invalid root element type");
+      }
+    }
+  } // method parse
 
-    public static PolicyMappings buildPolicyMappings(
-            final org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings type) {
-        List<PolicyIdMappingType> mappings = type.getMapping();
-        final int n = mappings.size();
-
-        CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
-        CertPolicyId[] subjectDomainPolicy = new CertPolicyId[n];
-
-        for (int i = 0; i < n; i++) {
-            PolicyIdMappingType mapping = mappings.get(i);
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
-                    mapping.getIssuerDomainPolicy().getValue());
-            issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
-
-            oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getValue());
-            subjectDomainPolicy[i] = CertPolicyId.getInstance(oid);
-        }
-
-        return new PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
-    } // method buildPolicyMappings
-
-    public static NameConstraints buildNameConstrains(
-            final org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints type)
-    throws CertprofileException {
-        GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
-        GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
-        if (permitted == null && excluded == null) {
-            return null;
-        }
-        return new NameConstraints(permitted, excluded);
-    } // method buildNameConstrains
-
-    private static GeneralSubtree[] buildGeneralSubtrees(
-            final GeneralSubtreesType subtrees)
-    throws CertprofileException {
-        if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
-            return null;
-        }
-
-        List<GeneralSubtreeBaseType> list = subtrees.getBase();
-        final int n = list.size();
-        GeneralSubtree[] ret = new GeneralSubtree[n];
-        for (int i = 0; i < n; i++) {
-            ret[i] = buildGeneralSubtree(list.get(i));
-        }
-
-        return ret;
-    } // method buildGeneralSubtrees
-
-    private static GeneralSubtree buildGeneralSubtree(
-            final GeneralSubtreeBaseType type)
-    throws CertprofileException {
-        GeneralName base = null;
-        if (type.getDirectoryName() != null) {
-            base = new GeneralName(X509Util.reverse(
-                    new X500Name(type.getDirectoryName())));
-        } else if (type.getDNSName() != null) {
-            base = new GeneralName(GeneralName.dNSName, type.getDNSName());
-        } else if (type.getIpAddress() != null) {
-            base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
-        } else if (type.getRfc822Name() != null) {
-            base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
-        } else if (type.getUri() != null) {
-            base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
-        } else {
-            throw new RuntimeException(
-                    "should not reach here, unknown child of GeneralSubtreeBaseType");
-        }
-
-        Integer i = type.getMinimum();
-        if (i != null && i < 0) {
-            throw new CertprofileException("negative minimum is not allowed: " + i);
-        }
-
-        BigInteger minimum = (i == null)
-                ? null
-                : BigInteger.valueOf(i.intValue());
-
-        i = type.getMaximum();
-        if (i != null && i < 0) {
-            throw new CertprofileException("negative maximum is not allowed: " + i);
-        }
-
-        BigInteger maximum = (i == null)
-                ? null
-                : BigInteger.valueOf(i.intValue());
-
-        return new GeneralSubtree(base, minimum, maximum);
-    } // method buildGeneralSubtree
-
-    public static ASN1Sequence buildPolicyConstrains(
-            final PolicyConstraints type)
-    throws CertprofileException {
-        Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
-        if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
-            throw new CertprofileException(
-                    "negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
-        }
-
-        Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
-        if (inhibitPolicyMapping != null && inhibitPolicyMapping < 0) {
-            throw new CertprofileException(
-                    "negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
-        }
-
-        if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
-            return null;
-        }
-
-        final boolean explicit = false;
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        if (requireExplicitPolicy != null) {
-            vec.add(new DERTaggedObject(explicit, 0,
-                    new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
-        }
-
-        if (inhibitPolicyMapping != null) {
-            vec.add(new DERTaggedObject(explicit, 1,
-                    new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
-        }
-
-        return new DERSequence(vec);
-    } //method buildPolicyConstrains
-
-    public static Set<GeneralNameMode> buildGeneralNameMode(
-            final GeneralNameType name) {
-        Set<GeneralNameMode> ret = new HashSet<>();
-        if (name.getOtherName() != null) {
-            List<OidWithDescType> list = name.getOtherName().getType();
-            Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for (OidWithDescType entry : list) {
-                set.add(new ASN1ObjectIdentifier(entry.getValue()));
-            }
-            ret.add(new GeneralNameMode(GeneralNameTag.otherName, set));
-        }
-
-        if (name.getRfc822Name() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
-        }
-
-        if (name.getDNSName() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
-        }
-
-        if (name.getDirectoryName() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.directoryName));
-        }
-
-        if (name.getEdiPartyName() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
-        }
-
-        if (name.getUniformResourceIdentifier() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
-        }
-
-        if (name.getIPAddress() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
-        }
-
-        if (name.getRegisteredID() != null) {
-            ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
-        }
-
-        return ret;
-    } // method buildGeneralNameMode
-
-    private static Set<Range> buildParametersMap(
-            final RangesType ranges) {
-        if (ranges == null) {
-            return null;
-        }
-
-        Set<Range> ret = new HashSet<>();
-        for (RangeType range : ranges.getRange()) {
-            if (range.getMin() != null || range.getMax() != null) {
-                ret.add(new Range(range.getMin(), range.getMax()));
-            }
-        }
-        return ret;
+  public static List<CertificatePolicyInformation> buildCertificatePolicies(
+      final CertificatePolicies type) {
+    List<CertificatePolicyInformationType> policyPairs =
+        type.getCertificatePolicyInformation();
+    if (CollectionUtil.isEmpty(policyPairs)) {
+      return null;
     }
 
-    public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
-            final KeyAlgorithms keyAlgos)
-    throws CertprofileException {
-        Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
-        for (AlgorithmType type : keyAlgos.getAlgorithm()) {
-            List<OidWithDescType> algIds = type.getAlgorithm();
-            List<ASN1ObjectIdentifier> oids = new ArrayList<>(algIds.size());
-            for (OidWithDescType algId : algIds) {
-                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
-                if (keyAlgorithms.containsKey(oid)) {
-                    throw new CertprofileException(
-                            "duplicate definition of keyAlgorithm " + oid.getId());
-                }
-                oids.add(oid);
-            }
+    List<CertificatePolicyInformation> policies =
+        new ArrayList<CertificatePolicyInformation>(policyPairs.size());
+    for (CertificatePolicyInformationType policyPair : policyPairs) {
+      List<CertificatePolicyQualifier> qualifiers = null;
 
-            KeyParametersOption keyParamsOption = convertKeyParametersOption(type);
-            for (ASN1ObjectIdentifier oid : oids) {
-                keyAlgorithms.put(oid, keyParamsOption);
-            }
+      PolicyQualifiers policyQualifiers = policyPair.getPolicyQualifiers();
+      if (policyQualifiers != null) {
+        List<JAXBElement<String>> cpsUriOrUserNotice =
+            policyQualifiers.getCpsUriOrUserNotice();
+
+        qualifiers = new ArrayList<CertificatePolicyQualifier>(cpsUriOrUserNotice.size());
+        for (JAXBElement<String> element : cpsUriOrUserNotice) {
+          String elementValue = element.getValue();
+          CertificatePolicyQualifier qualifier = null;
+          String elementName = element.getName().getLocalPart();
+          if ("cpsUri".equals(elementName)) {
+            qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
+          } else {
+            qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(
+                elementValue);
+          }
+          qualifiers.add(qualifier);
         }
-        return CollectionUtil.unmodifiableMap(keyAlgorithms, false, true);
-    } // method buildKeyAlgorithms
+      }
 
-    public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
-        // Extension controls
-        Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
-        for (ExtensionType m : extensionsType.getExtension()) {
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if (controls.containsKey(oid)) {
-                throw new CertprofileException(
-                        "duplicated definition of extension " + oid.getId());
-            }
-            controls.put(oid,
-                    new ExtensionControl(
-                            m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
-        }
+      CertificatePolicyInformation cpi = new CertificatePolicyInformation(
+          policyPair.getPolicyIdentifier().getValue(), qualifiers);
 
-        return Collections.unmodifiableMap(controls);
-    } // method buildExtensionControls
-
-    public static List<ASN1ObjectIdentifier> toOIDList(
-            final List<OidWithDescType> oidWithDescTypes) {
-        if (CollectionUtil.isEmpty(oidWithDescTypes)) {
-            return null;
-        }
-
-        List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-        for (OidWithDescType type : oidWithDescTypes) {
-            oids.add(new ASN1ObjectIdentifier(type.getValue()));
-        }
-        return Collections.unmodifiableList(oids);
-    } // method toOIDList
-
-    public static Set<KeyUsageControl> buildKeyUsageOptions(
-            final org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf) {
-        List<UsageType> usages = extConf.getUsage();
-        Set<KeyUsageControl> controls = new HashSet<>();
-
-        for (UsageType m : usages) {
-            boolean required = m.isRequired();
-            switch (m.getValue()) {
-            case C_RL_SIGN:
-                controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
-                break;
-            case DATA_ENCIPHERMENT:
-                controls.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
-                break;
-            case CONTENT_COMMITMENT:
-                controls.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
-                break;
-            case DECIPHER_ONLY:
-                controls.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
-                break;
-            case ENCIPHER_ONLY:
-                controls.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
-                break;
-            case DIGITAL_SIGNATURE:
-                controls.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
-                break;
-            case KEY_AGREEMENT:
-                controls.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
-                break;
-            case KEY_CERT_SIGN:
-                controls.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
-                break;
-            case KEY_ENCIPHERMENT:
-                controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
-                break;
-            default:
-                throw new RuntimeException(
-                        "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
-            }
-        }
-
-        return Collections.unmodifiableSet(controls);
-    } // method buildKeyUsageOptions
-
-    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
-            final ExtendedKeyUsage extConf) {
-        List<Usage> usages = extConf.getUsage();
-        Set<ExtKeyUsageControl> controls = new HashSet<>();
-
-        for (Usage m : usages) {
-            ExtKeyUsageControl usage = new ExtKeyUsageControl(
-                    new ASN1ObjectIdentifier(m.getValue()), m.isRequired());
-            controls.add(usage);
-        }
-
-        return Collections.unmodifiableSet(controls);
-    } // method buildExtKeyUsageOptions
-
-    public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
-        if (extensionsType == null) {
-            return null;
-        }
-
-        Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
-
-        for (ExtensionType m : extensionsType.getExtension()) {
-            if (m.getValue() == null
-                    || !(m.getValue().getAny() instanceof ConstantExtValue)) {
-                continue;
-            }
-
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
-            if (Extension.subjectAlternativeName.equals(oid)
-                    || Extension.subjectInfoAccess.equals(oid)
-                    || Extension.biometricInfo.equals(oid)) {
-                continue;
-            }
-
-            ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
-            byte[] encodedValue = extConf.getValue();
-            ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
-            ASN1Encodable value;
-            try {
-                value = parser.readObject();
-            } catch (IOException e) {
-                throw new CertprofileException("could not parse the constant extension value", e);
-            }
-            ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
-            map.put(oid, extension);
-        }
-
-        if (CollectionUtil.isEmpty(map)) {
-            return null;
-        }
-
-        return Collections.unmodifiableMap(map);
-    } // buildConstantExtesions
-
-    public static Set<ASN1ObjectIdentifier> toOIDSet(
-            final List<OidWithDescType> oidWithDescTypes) {
-        if (CollectionUtil.isEmpty(oidWithDescTypes)) {
-            return null;
-        }
-
-        Set<ASN1ObjectIdentifier> oids = new HashSet<>();
-        for (OidWithDescType type : oidWithDescTypes) {
-            oids.add(new ASN1ObjectIdentifier(type.getValue()));
-        }
-        return Collections.unmodifiableSet(oids);
+      policies.add(cpi);
     }
 
-    private static KeyParametersOption convertKeyParametersOption(
-            final AlgorithmType type)
-    throws CertprofileException {
-        if (type.getParameters() == null || type.getParameters().getAny() == null) {
-            return KeyParametersOption.allowAll;
-        }
+    return policies;
+  } // method buildCertificatePolicies
 
-        Object paramsObj = type.getParameters().getAny();
-        if (paramsObj instanceof ECParameters) {
-            ECParameters params = (ECParameters) paramsObj;
-            KeyParametersOption.ECParamatersOption option =
-                    new KeyParametersOption.ECParamatersOption();
+  public static PolicyMappings buildPolicyMappings(
+      final org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings type) {
+    List<PolicyIdMappingType> mappings = type.getMapping();
+    final int n = mappings.size();
 
-            if (params.getCurves() != null) {
-                Curves curves = params.getCurves();
-                Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
-                option.setCurveOids(curveOids);
-            }
+    CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
+    CertPolicyId[] subjectDomainPolicy = new CertPolicyId[n];
 
-            if (params.getPointEncodings() != null) {
-                List<Byte> bytes = params.getPointEncodings().getPointEncoding();
-                Set<Byte> pointEncodings = new HashSet<>(bytes);
-                option.setPointEncodings(pointEncodings);
-            }
+    for (int i = 0; i < n; i++) {
+      PolicyIdMappingType mapping = mappings.get(i);
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
+          mapping.getIssuerDomainPolicy().getValue());
+      issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
 
-            return option;
-        } else if (paramsObj instanceof RSAParameters) {
-            RSAParameters params = (RSAParameters) paramsObj;
-            KeyParametersOption.RSAParametersOption option =
-                    new KeyParametersOption.RSAParametersOption();
-
-            Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
-            option.setModulusLengths(modulusLengths);
-
-            return option;
-        } else if (paramsObj instanceof RSAPSSParameters) {
-            RSAPSSParameters params = (RSAPSSParameters) paramsObj;
-            KeyParametersOption.RSAPSSParametersOption option =
-                    new KeyParametersOption.RSAPSSParametersOption();
-
-            Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
-            option.setModulusLengths(modulusLengths);
-
-            return option;
-        } else if (paramsObj instanceof DSAParameters) {
-            DSAParameters params = (DSAParameters) paramsObj;
-            KeyParametersOption.DSAParametersOption option =
-                    new KeyParametersOption.DSAParametersOption();
-
-            Set<Range> pLengths = buildParametersMap(params.getPLength());
-            option.setPLengths(pLengths);
-
-            Set<Range> qLengths = buildParametersMap(params.getQLength());
-            option.setQLengths(qLengths);
-
-            return option;
-        } else if (paramsObj instanceof DHParameters) {
-            DHParameters params = (DHParameters) paramsObj;
-            KeyParametersOption.DHParametersOption option =
-                    new KeyParametersOption.DHParametersOption();
-
-            Set<Range> pLengths = buildParametersMap(params.getPLength());
-            option.setPLengths(pLengths);
-
-            Set<Range> qLengths = buildParametersMap(params.getQLength());
-            option.setQLengths(qLengths);
-
-            return option;
-        } else if (paramsObj instanceof GostParameters) {
-            GostParameters params = (GostParameters) paramsObj;
-            KeyParametersOption.GostParametersOption option =
-                    new KeyParametersOption.GostParametersOption();
-
-            Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
-            option.setPublicKeyParamSets(set);
-
-            set = toOIDSet(params.getDigestParamSet());
-            option.setDigestParamSets(set);
-
-            set = toOIDSet(params.getEncryptionParamSet());
-            option.setEncryptionParamSets(set);
-
-            return option;
-        } else {
-            throw new CertprofileException(
-                    "unknown public key parameters type " + paramsObj.getClass().getName());
-        }
-    } // method convertKeyParametersOption
-
-    public static final DirectoryStringType convertDirectoryStringType(
-            final org.xipki.pki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType) {
-        if (jaxbType == null) {
-            return null;
-        }
-        switch (jaxbType) {
-        case BMP_STRING:
-            return DirectoryStringType.bmpString;
-        case PRINTABLE_STRING:
-            return DirectoryStringType.printableString;
-        case TELETEX_STRING:
-            return DirectoryStringType.teletexString;
-        case UTF_8_STRING:
-            return DirectoryStringType.utf8String;
-        default:
-            throw new RuntimeException(
-                    "should not reach here, undefined DirectoryStringType " + jaxbType);
-        }
+      oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getValue());
+      subjectDomainPolicy[i] = CertPolicyId.getInstance(oid);
     }
 
-    public static final StringType convertStringType(
-            final org.xipki.pki.ca.certprofile.x509.jaxb.StringType jaxbType) {
-        if (jaxbType == null) {
-            return null;
-        }
-        switch (jaxbType) {
-        case BMP_STRING:
-            return StringType.bmpString;
-        case PRINTABLE_STRING:
-            return StringType.printableString;
-        case TELETEX_STRING:
-            return StringType.teletexString;
-        case UTF_8_STRING:
-            return StringType.utf8String;
-        case IA_5_STRING:
-            return StringType.ia5String;
-        default:
-            throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
-        }
+    return new PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
+  } // method buildPolicyMappings
+
+  public static NameConstraints buildNameConstrains(
+      final org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints type)
+  throws CertprofileException {
+    GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
+    GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
+    if (permitted == null && excluded == null) {
+      return null;
+    }
+    return new NameConstraints(permitted, excluded);
+  } // method buildNameConstrains
+
+  private static GeneralSubtree[] buildGeneralSubtrees(
+      final GeneralSubtreesType subtrees)
+  throws CertprofileException {
+    if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
+      return null;
     }
 
-    private XmlX509CertprofileUtil() {
+    List<GeneralSubtreeBaseType> list = subtrees.getBase();
+    final int n = list.size();
+    GeneralSubtree[] ret = new GeneralSubtree[n];
+    for (int i = 0; i < n; i++) {
+      ret[i] = buildGeneralSubtree(list.get(i));
     }
+
+    return ret;
+  } // method buildGeneralSubtrees
+
+  private static GeneralSubtree buildGeneralSubtree(
+      final GeneralSubtreeBaseType type)
+  throws CertprofileException {
+    GeneralName base = null;
+    if (type.getDirectoryName() != null) {
+      base = new GeneralName(X509Util.reverse(
+          new X500Name(type.getDirectoryName())));
+    } else if (type.getDNSName() != null) {
+      base = new GeneralName(GeneralName.dNSName, type.getDNSName());
+    } else if (type.getIpAddress() != null) {
+      base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
+    } else if (type.getRfc822Name() != null) {
+      base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
+    } else if (type.getUri() != null) {
+      base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
+    } else {
+      throw new RuntimeException(
+          "should not reach here, unknown child of GeneralSubtreeBaseType");
+    }
+
+    Integer i = type.getMinimum();
+    if (i != null && i < 0) {
+      throw new CertprofileException("negative minimum is not allowed: " + i);
+    }
+
+    BigInteger minimum = (i == null)
+        ? null
+        : BigInteger.valueOf(i.intValue());
+
+    i = type.getMaximum();
+    if (i != null && i < 0) {
+      throw new CertprofileException("negative maximum is not allowed: " + i);
+    }
+
+    BigInteger maximum = (i == null)
+        ? null
+        : BigInteger.valueOf(i.intValue());
+
+    return new GeneralSubtree(base, minimum, maximum);
+  } // method buildGeneralSubtree
+
+  public static ASN1Sequence buildPolicyConstrains(
+      final PolicyConstraints type)
+  throws CertprofileException {
+    Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
+    if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
+      throw new CertprofileException(
+          "negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
+    }
+
+    Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
+    if (inhibitPolicyMapping != null && inhibitPolicyMapping < 0) {
+      throw new CertprofileException(
+          "negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
+    }
+
+    if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
+      return null;
+    }
+
+    final boolean explicit = false;
+    ASN1EncodableVector vec = new ASN1EncodableVector();
+    if (requireExplicitPolicy != null) {
+      vec.add(new DERTaggedObject(explicit, 0,
+          new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
+    }
+
+    if (inhibitPolicyMapping != null) {
+      vec.add(new DERTaggedObject(explicit, 1,
+          new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
+    }
+
+    return new DERSequence(vec);
+  } //method buildPolicyConstrains
+
+  public static Set<GeneralNameMode> buildGeneralNameMode(
+      final GeneralNameType name) {
+    Set<GeneralNameMode> ret = new HashSet<>();
+    if (name.getOtherName() != null) {
+      List<OidWithDescType> list = name.getOtherName().getType();
+      Set<ASN1ObjectIdentifier> set = new HashSet<>();
+      for (OidWithDescType entry : list) {
+        set.add(new ASN1ObjectIdentifier(entry.getValue()));
+      }
+      ret.add(new GeneralNameMode(GeneralNameTag.otherName, set));
+    }
+
+    if (name.getRfc822Name() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
+    }
+
+    if (name.getDNSName() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
+    }
+
+    if (name.getDirectoryName() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.directoryName));
+    }
+
+    if (name.getEdiPartyName() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
+    }
+
+    if (name.getUniformResourceIdentifier() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
+    }
+
+    if (name.getIPAddress() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
+    }
+
+    if (name.getRegisteredID() != null) {
+      ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
+    }
+
+    return ret;
+  } // method buildGeneralNameMode
+
+  private static Set<Range> buildParametersMap(
+      final RangesType ranges) {
+    if (ranges == null) {
+      return null;
+    }
+
+    Set<Range> ret = new HashSet<>();
+    for (RangeType range : ranges.getRange()) {
+      if (range.getMin() != null || range.getMax() != null) {
+        ret.add(new Range(range.getMin(), range.getMax()));
+      }
+    }
+    return ret;
+  }
+
+  public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
+      final KeyAlgorithms keyAlgos)
+  throws CertprofileException {
+    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
+    for (AlgorithmType type : keyAlgos.getAlgorithm()) {
+      List<OidWithDescType> algIds = type.getAlgorithm();
+      List<ASN1ObjectIdentifier> oids = new ArrayList<>(algIds.size());
+      for (OidWithDescType algId : algIds) {
+        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
+        if (keyAlgorithms.containsKey(oid)) {
+          throw new CertprofileException(
+              "duplicate definition of keyAlgorithm " + oid.getId());
+        }
+        oids.add(oid);
+      }
+
+      KeyParametersOption keyParamsOption = convertKeyParametersOption(type);
+      for (ASN1ObjectIdentifier oid : oids) {
+        keyAlgorithms.put(oid, keyParamsOption);
+      }
+    }
+    return CollectionUtil.unmodifiableMap(keyAlgorithms, false, true);
+  } // method buildKeyAlgorithms
+
+  public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
+      final ExtensionsType extensionsType)
+  throws CertprofileException {
+    // Extension controls
+    Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
+    for (ExtensionType m : extensionsType.getExtension()) {
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+      if (controls.containsKey(oid)) {
+        throw new CertprofileException(
+            "duplicated definition of extension " + oid.getId());
+      }
+      controls.put(oid,
+          new ExtensionControl(
+              m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
+    }
+
+    return Collections.unmodifiableMap(controls);
+  } // method buildExtensionControls
+
+  public static List<ASN1ObjectIdentifier> toOIDList(
+      final List<OidWithDescType> oidWithDescTypes) {
+    if (CollectionUtil.isEmpty(oidWithDescTypes)) {
+      return null;
+    }
+
+    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+    for (OidWithDescType type : oidWithDescTypes) {
+      oids.add(new ASN1ObjectIdentifier(type.getValue()));
+    }
+    return Collections.unmodifiableList(oids);
+  } // method toOIDList
+
+  public static Set<KeyUsageControl> buildKeyUsageOptions(
+      final org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf) {
+    List<UsageType> usages = extConf.getUsage();
+    Set<KeyUsageControl> controls = new HashSet<>();
+
+    for (UsageType m : usages) {
+      boolean required = m.isRequired();
+      switch (m.getValue()) {
+      case C_RL_SIGN:
+        controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
+        break;
+      case DATA_ENCIPHERMENT:
+        controls.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
+        break;
+      case CONTENT_COMMITMENT:
+        controls.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
+        break;
+      case DECIPHER_ONLY:
+        controls.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
+        break;
+      case ENCIPHER_ONLY:
+        controls.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
+        break;
+      case DIGITAL_SIGNATURE:
+        controls.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
+        break;
+      case KEY_AGREEMENT:
+        controls.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
+        break;
+      case KEY_CERT_SIGN:
+        controls.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
+        break;
+      case KEY_ENCIPHERMENT:
+        controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
+        break;
+      default:
+        throw new RuntimeException(
+            "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
+      }
+    }
+
+    return Collections.unmodifiableSet(controls);
+  } // method buildKeyUsageOptions
+
+  public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
+      final ExtendedKeyUsage extConf) {
+    List<Usage> usages = extConf.getUsage();
+    Set<ExtKeyUsageControl> controls = new HashSet<>();
+
+    for (Usage m : usages) {
+      ExtKeyUsageControl usage = new ExtKeyUsageControl(
+          new ASN1ObjectIdentifier(m.getValue()), m.isRequired());
+      controls.add(usage);
+    }
+
+    return Collections.unmodifiableSet(controls);
+  } // method buildExtKeyUsageOptions
+
+  public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
+      final ExtensionsType extensionsType)
+  throws CertprofileException {
+    if (extensionsType == null) {
+      return null;
+    }
+
+    Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
+
+    for (ExtensionType m : extensionsType.getExtension()) {
+      if (m.getValue() == null
+          || !(m.getValue().getAny() instanceof ConstantExtValue)) {
+        continue;
+      }
+
+      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+      if (Extension.subjectAlternativeName.equals(oid)
+          || Extension.subjectInfoAccess.equals(oid)
+          || Extension.biometricInfo.equals(oid)) {
+        continue;
+      }
+
+      ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
+      byte[] encodedValue = extConf.getValue();
+      ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
+      ASN1Encodable value;
+      try {
+        value = parser.readObject();
+      } catch (IOException e) {
+        throw new CertprofileException("could not parse the constant extension value", e);
+      }
+      ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
+      map.put(oid, extension);
+    }
+
+    if (CollectionUtil.isEmpty(map)) {
+      return null;
+    }
+
+    return Collections.unmodifiableMap(map);
+  } // buildConstantExtesions
+
+  public static Set<ASN1ObjectIdentifier> toOIDSet(
+      final List<OidWithDescType> oidWithDescTypes) {
+    if (CollectionUtil.isEmpty(oidWithDescTypes)) {
+      return null;
+    }
+
+    Set<ASN1ObjectIdentifier> oids = new HashSet<>();
+    for (OidWithDescType type : oidWithDescTypes) {
+      oids.add(new ASN1ObjectIdentifier(type.getValue()));
+    }
+    return Collections.unmodifiableSet(oids);
+  }
+
+  private static KeyParametersOption convertKeyParametersOption(
+      final AlgorithmType type)
+  throws CertprofileException {
+    if (type.getParameters() == null || type.getParameters().getAny() == null) {
+      return KeyParametersOption.allowAll;
+    }
+
+    Object paramsObj = type.getParameters().getAny();
+    if (paramsObj instanceof ECParameters) {
+      ECParameters params = (ECParameters) paramsObj;
+      KeyParametersOption.ECParamatersOption option =
+          new KeyParametersOption.ECParamatersOption();
+
+      if (params.getCurves() != null) {
+        Curves curves = params.getCurves();
+        Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
+        option.setCurveOids(curveOids);
+      }
+
+      if (params.getPointEncodings() != null) {
+        List<Byte> bytes = params.getPointEncodings().getPointEncoding();
+        Set<Byte> pointEncodings = new HashSet<>(bytes);
+        option.setPointEncodings(pointEncodings);
+      }
+
+      return option;
+    } else if (paramsObj instanceof RSAParameters) {
+      RSAParameters params = (RSAParameters) paramsObj;
+      KeyParametersOption.RSAParametersOption option =
+          new KeyParametersOption.RSAParametersOption();
+
+      Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+      option.setModulusLengths(modulusLengths);
+
+      return option;
+    } else if (paramsObj instanceof RSAPSSParameters) {
+      RSAPSSParameters params = (RSAPSSParameters) paramsObj;
+      KeyParametersOption.RSAPSSParametersOption option =
+          new KeyParametersOption.RSAPSSParametersOption();
+
+      Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+      option.setModulusLengths(modulusLengths);
+
+      return option;
+    } else if (paramsObj instanceof DSAParameters) {
+      DSAParameters params = (DSAParameters) paramsObj;
+      KeyParametersOption.DSAParametersOption option =
+          new KeyParametersOption.DSAParametersOption();
+
+      Set<Range> pLengths = buildParametersMap(params.getPLength());
+      option.setPLengths(pLengths);
+
+      Set<Range> qLengths = buildParametersMap(params.getQLength());
+      option.setQLengths(qLengths);
+
+      return option;
+    } else if (paramsObj instanceof DHParameters) {
+      DHParameters params = (DHParameters) paramsObj;
+      KeyParametersOption.DHParametersOption option =
+          new KeyParametersOption.DHParametersOption();
+
+      Set<Range> pLengths = buildParametersMap(params.getPLength());
+      option.setPLengths(pLengths);
+
+      Set<Range> qLengths = buildParametersMap(params.getQLength());
+      option.setQLengths(qLengths);
+
+      return option;
+    } else if (paramsObj instanceof GostParameters) {
+      GostParameters params = (GostParameters) paramsObj;
+      KeyParametersOption.GostParametersOption option =
+          new KeyParametersOption.GostParametersOption();
+
+      Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
+      option.setPublicKeyParamSets(set);
+
+      set = toOIDSet(params.getDigestParamSet());
+      option.setDigestParamSets(set);
+
+      set = toOIDSet(params.getEncryptionParamSet());
+      option.setEncryptionParamSets(set);
+
+      return option;
+    } else {
+      throw new CertprofileException(
+          "unknown public key parameters type " + paramsObj.getClass().getName());
+    }
+  } // method convertKeyParametersOption
+
+  public static final DirectoryStringType convertDirectoryStringType(
+      final org.xipki.pki.ca.certprofile.x509.jaxb.DirectoryStringType jaxbType) {
+    if (jaxbType == null) {
+      return null;
+    }
+    switch (jaxbType) {
+    case BMP_STRING:
+      return DirectoryStringType.bmpString;
+    case PRINTABLE_STRING:
+      return DirectoryStringType.printableString;
+    case TELETEX_STRING:
+      return DirectoryStringType.teletexString;
+    case UTF_8_STRING:
+      return DirectoryStringType.utf8String;
+    default:
+      throw new RuntimeException(
+          "should not reach here, undefined DirectoryStringType " + jaxbType);
+    }
+  }
+
+  public static final StringType convertStringType(
+      final org.xipki.pki.ca.certprofile.x509.jaxb.StringType jaxbType) {
+    if (jaxbType == null) {
+      return null;
+    }
+    switch (jaxbType) {
+    case BMP_STRING:
+      return StringType.bmpString;
+    case PRINTABLE_STRING:
+      return StringType.printableString;
+    case TELETEX_STRING:
+      return StringType.teletexString;
+    case UTF_8_STRING:
+      return StringType.utf8String;
+    case IA_5_STRING:
+      return StringType.ia5String;
+    default:
+      throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
+    }
+  }
+
+  private XmlX509CertprofileUtil() {
+  }
 
 }

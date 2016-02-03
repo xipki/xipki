@@ -62,94 +62,95 @@ import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile {
 
-    private final CertValidity validity;
+  private final CertValidity validity;
 
-    private final Set<KeyUsageControl> keyUsage;
+  private final Set<KeyUsageControl> keyUsage;
 
-    private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
+  private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
-    private final SubjectControl subjectControl;
+  private final SubjectControl subjectControl;
 
-    public DemoEE1X509Certprofile() {
-        validity = new CertValidity(10, Unit.YEAR);
+  public DemoEE1X509Certprofile() {
+    validity = new CertValidity(10, Unit.YEAR);
 
-        Set<KeyUsageControl> _keyUsage = new HashSet<>();
-        _keyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
-        _keyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
-        keyUsage = Collections.unmodifiableSet(_keyUsage);
+    Set<KeyUsageControl> _keyUsage = new HashSet<>();
+    _keyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
+    _keyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
+    keyUsage = Collections.unmodifiableSet(_keyUsage);
 
-        extensionControls = new HashMap<>();
-        extensionControls.put(Extension.authorityKeyIdentifier,
-                new ExtensionControl(false, true, false));
-        extensionControls.put(Extension.freshestCRL,
-                new ExtensionControl(false, false, false));
-        extensionControls.put(Extension.issuerAlternativeName,
-                new ExtensionControl(false, false, false));
-        extensionControls.put(Extension.subjectKeyIdentifier,
-                new ExtensionControl(false, true, false));
-        extensionControls.put(Extension.cRLDistributionPoints,
-                new ExtensionControl(false, false, false));
-        extensionControls.put(Extension.authorityKeyIdentifier,
-                new ExtensionControl(false, true, false));
-        extensionControls.put(Extension.authorityInfoAccess,
-                new ExtensionControl(false, false, false));
-        extensionControls.put(Extension.basicConstraints,
-                new ExtensionControl(true, true, false));
-        extensionControls.put(Extension.keyUsage,
-                new ExtensionControl(true, true, true));
+    extensionControls = new HashMap<>();
+    extensionControls.put(Extension.authorityKeyIdentifier,
+        new ExtensionControl(false, true, false));
+    extensionControls.put(Extension.freshestCRL,
+        new ExtensionControl(false, false, false));
+    extensionControls.put(Extension.issuerAlternativeName,
+        new ExtensionControl(false, false, false));
+    extensionControls.put(Extension.subjectKeyIdentifier,
+        new ExtensionControl(false, true, false));
+    extensionControls.put(Extension.cRLDistributionPoints,
+        new ExtensionControl(false, false, false));
+    extensionControls.put(Extension.authorityKeyIdentifier,
+        new ExtensionControl(false, true, false));
+    extensionControls.put(Extension.authorityInfoAccess,
+        new ExtensionControl(false, false, false));
+    extensionControls.put(Extension.basicConstraints,
+        new ExtensionControl(true, true, false));
+    extensionControls.put(Extension.keyUsage,
+        new ExtensionControl(true, true, true));
 
-        Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
+    Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
 
-        ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_O;
-        controls.put(oid, new RDNControl(oid, 1, 1));
+    ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_O;
+    controls.put(oid, new RDNControl(oid, 1, 1));
 
-        oid = ObjectIdentifiers.DN_OU;
-        controls.put(oid, new RDNControl(oid, 0, 1));
+    oid = ObjectIdentifiers.DN_OU;
+    controls.put(oid, new RDNControl(oid, 0, 1));
 
-        oid = ObjectIdentifiers.DN_C;
-        controls.put(oid, new RDNControl(oid, 1, 1));
+    oid = ObjectIdentifiers.DN_C;
+    controls.put(oid, new RDNControl(oid, 1, 1));
 
-        subjectControl = new SubjectControl(false, controls);
-    } // constructor
+    subjectControl = new SubjectControl(false, controls);
+  } // constructor
 
-    @Override
-    public Set<KeyUsageControl> getKeyUsage() {
-        return keyUsage;
-    }
+  @Override
+  public Set<KeyUsageControl> getKeyUsage() {
+    return keyUsage;
+  }
 
-    @Override
-    public CertValidity getValidity() {
-        return validity;
-    }
+  @Override
+  public CertValidity getValidity() {
+    return validity;
+  }
 
-    @Override
-    public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
-        return extensionControls;
-    }
+  @Override
+  public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
+    return extensionControls;
+  }
 
-    @Override
-    public ExtensionValues getExtensions(
-            final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            final X500Name requestedSubject,
-            final Extensions requestedExtensions,
-            final Date notBefore,
-            final Date notAfter)
-    throws CertprofileException, BadCertTemplateException {
-        return null;
-    }
+  @Override
+  public ExtensionValues getExtensions(
+      final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+      final X500Name requestedSubject,
+      final Extensions requestedExtensions,
+      final Date notBefore,
+      final Date notAfter)
+  throws CertprofileException, BadCertTemplateException {
+    return null;
+  }
 
-    @Override
-    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
-        return null;
-    }
+  @Override
+  protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
+    return null;
+  }
 
-    @Override
-    protected SubjectControl getSubjectControl() {
-        return subjectControl;
-    }
+  @Override
+  protected SubjectControl getSubjectControl() {
+    return subjectControl;
+  }
 
 }

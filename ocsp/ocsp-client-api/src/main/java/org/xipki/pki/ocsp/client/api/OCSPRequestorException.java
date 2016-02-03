@@ -37,29 +37,30 @@ package org.xipki.pki.ocsp.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OCSPRequestorException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public OCSPRequestorException() {
-    }
+  public OCSPRequestorException() {
+  }
 
-    public OCSPRequestorException(
-            final String message) {
-        super(message);
-    }
+  public OCSPRequestorException(
+      final String message) {
+    super(message);
+  }
 
-    public OCSPRequestorException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public OCSPRequestorException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public OCSPRequestorException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public OCSPRequestorException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

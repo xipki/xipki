@@ -44,33 +44,34 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11RSASignLoadTest extends P11SignLoadTest {
 
-    public P11RSASignLoadTest(
-            final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
-            final String signatureAlgorithm,
-            final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
-        super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, keysize, publicExponent),
-                "PKCS#11 RSA signature creation\n"
-                        + "keysize: " + keysize + "\n"
-                        + "public exponent: " + publicExponent);
-    }
+  public P11RSASignLoadTest(
+      final SecurityFactory securityFactory,
+      final P11WritableSlot slot,
+      final String signatureAlgorithm,
+      final int keysize,
+      final BigInteger publicExponent)
+  throws Exception {
+    super(securityFactory, slot, signatureAlgorithm,
+        generateKey(slot, keysize, publicExponent),
+        "PKCS#11 RSA signature creation\n"
+            + "keysize: " + keysize + "\n"
+            + "public exponent: " + publicExponent);
+  }
 
-    private static P11KeyIdentifier generateKey(
-            final P11WritableSlot slot,
-            final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
-        P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
-                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
-                null, null, null);
-        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
-    }
+  private static P11KeyIdentifier generateKey(
+      final P11WritableSlot slot,
+      final int keysize,
+      final BigInteger publicExponent)
+  throws Exception {
+    P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
+        keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
+        null, null, null);
+    return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+  }
 
 }

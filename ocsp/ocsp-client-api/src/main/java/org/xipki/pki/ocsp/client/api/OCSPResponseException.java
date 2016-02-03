@@ -37,29 +37,30 @@ package org.xipki.pki.ocsp.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class OCSPResponseException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public OCSPResponseException() {
-    }
+  public OCSPResponseException() {
+  }
 
-    public OCSPResponseException(
-            final String message) {
-        super(message);
-    }
+  public OCSPResponseException(
+      final String message) {
+    super(message);
+  }
 
-    public OCSPResponseException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public OCSPResponseException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public OCSPResponseException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public OCSPResponseException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

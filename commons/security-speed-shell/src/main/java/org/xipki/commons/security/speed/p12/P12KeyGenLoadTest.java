@@ -42,43 +42,44 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P12KeyGenLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            P12RawKeypairGenerator kpGen = getKeypairGenerator();
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    kpGen.genKeypair(securityFactory.getRandom4Key());
-                    account(1, 0);
-                } catch (Exception e) {
-                    account(1, 1);
-                }
-            }
-        }
-
-    } // class Testor
-
-    private final SecurityFactory securityFactory;
-
-    public P12KeyGenLoadTest(
-            final String description,
-            final SecurityFactory securityFactory) {
-        super(description);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        this.securityFactory = securityFactory;
-    }
-
-    protected abstract P12RawKeypairGenerator getKeypairGenerator();
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
+    public void run() {
+      P12RawKeypairGenerator kpGen = getKeypairGenerator();
+      while (!stop() && getErrorAccout() < 1) {
+        try {
+          kpGen.genKeypair(securityFactory.getRandom4Key());
+          account(1, 0);
+        } catch (Exception e) {
+          account(1, 1);
+        }
+      }
     }
+
+  } // class Testor
+
+  private final SecurityFactory securityFactory;
+
+  public P12KeyGenLoadTest(
+      final String description,
+      final SecurityFactory securityFactory) {
+    super(description);
+    ParamUtil.assertNotNull("securityFactory", securityFactory);
+    this.securityFactory = securityFactory;
+  }
+
+  protected abstract P12RawKeypairGenerator getKeypairGenerator();
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
 
 }

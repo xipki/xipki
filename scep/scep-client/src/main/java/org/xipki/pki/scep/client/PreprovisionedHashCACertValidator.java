@@ -46,52 +46,53 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public final class PreprovisionedHashCACertValidator implements CACertValidator {
 
-    private final HashAlgoType hashAlgo;
+  private final HashAlgoType hashAlgo;
 
-    private final Set<byte[]> hashValues;
+  private final Set<byte[]> hashValues;
 
-    public PreprovisionedHashCACertValidator(
-        final HashAlgoType hashAlgo,
-        final Set<byte[]> hashValues) {
-        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
-        ParamUtil.assertNotEmpty("hashValues", hashValues);
+  public PreprovisionedHashCACertValidator(
+    final HashAlgoType hashAlgo,
+    final Set<byte[]> hashValues) {
+    ParamUtil.assertNotNull("hashAlgo", hashAlgo);
+    ParamUtil.assertNotEmpty("hashValues", hashValues);
 
-        final int hLen = hashAlgo.getLength();
-        for (byte[] m : hashValues) {
-            if (m.length != hLen) {
-                throw new IllegalArgumentException("invalid the length of hashValue: "
-                        + m.length + " != " + hLen);
-            }
-        }
-
-        this.hashAlgo = hashAlgo;
-        this.hashValues = new HashSet<byte[]>(hashValues.size());
-        for (byte[] m : hashValues) {
-            this.hashValues.add(Arrays.copyOf(m, m.length));
-        }
+    final int hLen = hashAlgo.getLength();
+    for (byte[] m : hashValues) {
+      if (m.length != hLen) {
+        throw new IllegalArgumentException("invalid the length of hashValue: "
+            + m.length + " != " + hLen);
+      }
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        byte[] actual;
-        try {
-            actual = hashAlgo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
-
-        for (byte[] m : hashValues) {
-            if (Arrays.equals(actual, m)) {
-                return true;
-            }
-        }
-
-        return false;
+    this.hashAlgo = hashAlgo;
+    this.hashValues = new HashSet<byte[]>(hashValues.size());
+    for (byte[] m : hashValues) {
+      this.hashValues.add(Arrays.copyOf(m, m.length));
     }
+  }
+
+  @Override
+  public boolean isTrusted(
+      final X509Certificate cert) {
+    byte[] actual;
+    try {
+      actual = hashAlgo.digest(cert.getEncoded());
+    } catch (CertificateEncodingException e) {
+      return false;
+    }
+
+    for (byte[] m : hashValues) {
+      if (Arrays.equals(actual, m)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
 }

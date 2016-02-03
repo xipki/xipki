@@ -43,30 +43,31 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11ECSignLoadTest extends P11SignLoadTest {
 
-    public P11ECSignLoadTest(
-            final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
-            final String signatureAlgorithm,
-            final String curveNameOrOid)
-    throws Exception {
-        super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, curveNameOrOid),
-                "PKCS#11 EC signature creation\n"
-                        + "curve: " + curveNameOrOid);
-    }
+  public P11ECSignLoadTest(
+      final SecurityFactory securityFactory,
+      final P11WritableSlot slot,
+      final String signatureAlgorithm,
+      final String curveNameOrOid)
+  throws Exception {
+    super(securityFactory, slot, signatureAlgorithm,
+        generateKey(slot, curveNameOrOid),
+        "PKCS#11 EC signature creation\n"
+            + "curve: " + curveNameOrOid);
+  }
 
-    private static P11KeyIdentifier generateKey(
-            final P11WritableSlot slot,
-            final String curveNameOrOid)
-    throws Exception {
-        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-        P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
-                curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);
-        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
-    }
+  private static P11KeyIdentifier generateKey(
+      final P11WritableSlot slot,
+      final String curveNameOrOid)
+  throws Exception {
+    ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
+    P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
+        curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);
+    return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+  }
 
 }

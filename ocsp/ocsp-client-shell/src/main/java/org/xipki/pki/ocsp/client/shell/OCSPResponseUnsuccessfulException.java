@@ -39,43 +39,44 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class OCSPResponseUnsuccessfulException extends OCSPResponseException {
 
-    private int status;
+  private int status;
 
-    public OCSPResponseUnsuccessfulException(
-            final int status) {
-        super(getOCSPResponseStatus(status));
-        this.status = status;
-    }
+  public OCSPResponseUnsuccessfulException(
+      final int status) {
+    super(getOCSPResponseStatus(status));
+    this.status = status;
+  }
 
-    public int getStatus() {
-        return status;
-    }
+  public int getStatus() {
+    return status;
+  }
 
-    public String getStatusText() {
-        return getOCSPResponseStatus(status);
-    }
+  public String getStatusText() {
+    return getOCSPResponseStatus(status);
+  }
 
-    private static String getOCSPResponseStatus(
-            final int statusCode) {
-        switch (statusCode) {
-        case 1:
-            return "malformedRequest";
-        case 2:
-            return "internalError";
-        case 3:
-            return "tryLater";
-        case 5:
-            return "sigRequired";
-        case 6:
-            return "unauthorized";
-        default:
-            return "undefined";
-        }
+  private static String getOCSPResponseStatus(
+      final int statusCode) {
+    switch (statusCode) {
+    case 1:
+      return "malformedRequest";
+    case 2:
+      return "internalError";
+    case 3:
+      return "tryLater";
+    case 5:
+      return "sigRequired";
+    case 6:
+      return "unauthorized";
+    default:
+      return "undefined";
     }
+  }
 
 }

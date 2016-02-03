@@ -37,27 +37,28 @@ package org.xipki.commons.common.qa;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class MeasurePoint {
 
-    private final long measureTime;
+  private final long measureTime;
 
-    private final long measureAccount;
+  private final long measureAccount;
 
-    public MeasurePoint(
-            final long measureTime,
-            final long measureAccount) {
-        this.measureTime = measureTime;
-        this.measureAccount = measureAccount;
-    }
+  public MeasurePoint(
+      final long measureTime,
+      final long measureAccount) {
+    this.measureTime = measureTime;
+    this.measureAccount = measureAccount;
+  }
 
-    public long getMeasureTime() {
-        return measureTime;
-    }
+  public long getMeasureTime() {
+    return measureTime;
+  }
 
-    public long getMeasureAccount() {
-        return measureAccount;
-    }
+  public long getMeasureAccount() {
+    return measureAccount;
+  }
 
 }

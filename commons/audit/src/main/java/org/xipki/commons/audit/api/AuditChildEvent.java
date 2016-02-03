@@ -41,81 +41,82 @@ import java.util.List;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class AuditChildEvent {
 
-    /**
-     * The data array belonging to the event.
-     */
-    private final List<AuditEventData> eventDatas = new LinkedList<>();
+  /**
+   * The data array belonging to the event.
+   */
+  private final List<AuditEventData> eventDatas = new LinkedList<>();
 
-    /**
-     * The AuditLevel this Event belongs to.
-     */
-    private AuditLevel level;
+  /**
+   * The AuditLevel this Event belongs to.
+   */
+  private AuditLevel level;
 
-    private AuditStatus status;
+  private AuditStatus status;
 
-    public AuditChildEvent() {
-        this.level = AuditLevel.INFO;
+  public AuditChildEvent() {
+    this.level = AuditLevel.INFO;
+  }
+
+  public AuditLevel getLevel() {
+    return level;
+  }
+
+  public void setLevel(
+      AuditLevel level) {
+    this.level = level;
+  }
+
+  public List<AuditEventData> getEventDatas() {
+    return Collections.unmodifiableList(eventDatas);
+  }
+
+  public AuditEventData removeEventData(
+      final String eventDataName) {
+    AuditEventData tbr = null;
+    for (AuditEventData ed : eventDatas) {
+      if (ed.getName().equals(eventDataName)) {
+        tbr = ed;
+      }
     }
 
-    public AuditLevel getLevel() {
-        return level;
+    if (tbr != null) {
+      eventDatas.remove(tbr);
     }
 
-    public void setLevel(
-            AuditLevel level) {
-        this.level = level;
+    return tbr;
+  }
+
+  public AuditEventData addEventData(
+      final AuditEventData eventData) {
+    int idx = -1;
+    for (int i = 0; i < eventDatas.size(); i++) {
+      AuditEventData ed = eventDatas.get(i);
+      if (ed.getName().equals(eventData.getName())) {
+        idx = i;
+        break;
+      }
     }
 
-    public List<AuditEventData> getEventDatas() {
-        return Collections.unmodifiableList(eventDatas);
+    AuditEventData ret = null;
+    if (idx != -1) {
+      ret = eventDatas.get(idx);
     }
+    eventDatas.add(eventData);
+    return ret;
+  }
 
-    public AuditEventData removeEventData(
-            final String eventDataName) {
-        AuditEventData tbr = null;
-        for (AuditEventData ed : eventDatas) {
-            if (ed.getName().equals(eventDataName)) {
-                tbr = ed;
-            }
-        }
+  public AuditStatus getStatus() {
+    return status;
+  }
 
-        if (tbr != null) {
-            eventDatas.remove(tbr);
-        }
-
-        return tbr;
-    }
-
-    public AuditEventData addEventData(
-            final AuditEventData eventData) {
-        int idx = -1;
-        for (int i = 0; i < eventDatas.size(); i++) {
-            AuditEventData ed = eventDatas.get(i);
-            if (ed.getName().equals(eventData.getName())) {
-                idx = i;
-                break;
-            }
-        }
-
-        AuditEventData ret = null;
-        if (idx != -1) {
-            ret = eventDatas.get(idx);
-        }
-        eventDatas.add(eventData);
-        return ret;
-    }
-
-    public AuditStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(
-            final AuditStatus status) {
-        this.status = status;
-    }
+  public void setStatus(
+      final AuditStatus status) {
+    this.status = status;
+  }
 
 }

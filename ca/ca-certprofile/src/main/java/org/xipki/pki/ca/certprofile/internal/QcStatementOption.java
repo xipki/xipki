@@ -41,44 +41,45 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QcStatementOption {
 
-    private final QCStatement statement;
+  private final QCStatement statement;
 
-    private final ASN1ObjectIdentifier statementId;
+  private final ASN1ObjectIdentifier statementId;
 
-    private final MonetaryValueOption monetaryValueOption;
+  private final MonetaryValueOption monetaryValueOption;
 
-    public QcStatementOption(
-            final QCStatement statement) {
-        ParamUtil.assertNotNull("statement", statement);
-        this.statement = statement;
-        this.statementId = null;
-        this.monetaryValueOption = null;
-    }
+  public QcStatementOption(
+      final QCStatement statement) {
+    ParamUtil.assertNotNull("statement", statement);
+    this.statement = statement;
+    this.statementId = null;
+    this.monetaryValueOption = null;
+  }
 
-    public QcStatementOption(
-            final ASN1ObjectIdentifier statementId,
-            final MonetaryValueOption monetaryValueOption) {
-        ParamUtil.assertNotNull("statementId", statementId);
-        ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
-        this.statement = null;
-        this.statementId = statementId;
-        this.monetaryValueOption = monetaryValueOption;
-    }
+  public QcStatementOption(
+      final ASN1ObjectIdentifier statementId,
+      final MonetaryValueOption monetaryValueOption) {
+    ParamUtil.assertNotNull("statementId", statementId);
+    ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
+    this.statement = null;
+    this.statementId = statementId;
+    this.monetaryValueOption = monetaryValueOption;
+  }
 
-    public QCStatement getStatement() {
-        return statement;
-    }
+  public QCStatement getStatement() {
+    return statement;
+  }
 
-    public ASN1ObjectIdentifier getStatementId() {
-        return statementId;
-    }
+  public ASN1ObjectIdentifier getStatementId() {
+    return statementId;
+  }
 
-    public MonetaryValueOption getMonetaryValueOption() {
-        return monetaryValueOption;
-    }
+  public MonetaryValueOption getMonetaryValueOption() {
+    return monetaryValueOption;
+  }
 
 }

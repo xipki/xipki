@@ -41,11 +41,12 @@ import org.xipki.pki.ca.client.api.CAClient;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class CALoadTestCommandSupport extends XipkiCommandSupport {
 
-    @Reference
-    protected CAClient caClient;
+  @Reference
+  protected CAClient caClient;
 
 }

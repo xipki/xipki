@@ -49,89 +49,90 @@ import org.xipki.pki.ca.client.api.CAClient;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
-    @Option(name = "--req-out",
-            description = "where to save the request")
-    @Completion(FilePathCompleter.class)
-    private String reqout;
+  @Option(name = "--req-out",
+      description = "where to save the request")
+  @Completion(FilePathCompleter.class)
+  private String reqout;
 
-    @Option(name = "--resp-out",
-            description = "where to save the response")
-    @Completion(FilePathCompleter.class)
-    private String respout;
+  @Option(name = "--resp-out",
+      description = "where to save the response")
+  @Completion(FilePathCompleter.class)
+  private String respout;
 
-    @Reference
-    protected CAClient caClient;
+  @Reference
+  protected CAClient caClient;
 
-    protected RequestResponseDebug getRequestResponseDebug() {
-        boolean saveReq = isNotBlank(reqout);
-        boolean saveResp = isNotBlank(respout);
-        if (saveReq || saveResp) {
-            return new RequestResponseDebug();
-        }
-        return null;
+  protected RequestResponseDebug getRequestResponseDebug() {
+    boolean saveReq = isNotBlank(reqout);
+    boolean saveResp = isNotBlank(respout);
+    if (saveReq || saveResp) {
+      return new RequestResponseDebug();
+    }
+    return null;
+  }
+
+  protected void saveRequestResponse(
+      final RequestResponseDebug debug) {
+    boolean saveReq = isNotBlank(reqout);
+    boolean saveResp = isNotBlank(respout);
+    if (!saveReq && !saveResp) {
+      return;
     }
 
-    protected void saveRequestResponse(
-            final RequestResponseDebug debug) {
-        boolean saveReq = isNotBlank(reqout);
-        boolean saveResp = isNotBlank(respout);
-        if (!saveReq && !saveResp) {
-            return;
-        }
-
-        if (debug == null || debug.size() == 0) {
-            return;
-        }
-
-        final int n = debug.size();
-        for (int i = 0; i < n; i++) {
-            RequestResponsePair reqResp = debug.get(i);
-            if (saveReq) {
-                byte[] bytes = reqResp.getRequest();
-                if (bytes != null) {
-                    String fn = (n == 1)
-                            ? reqout
-                            : appendIndex(reqout, i);
-                    try {
-                        IoUtil.save(fn, bytes);
-                    } catch (IOException e) {
-                        System.err.println("IOException: " + e.getMessage());
-                    }
-                }
-            }
-
-            if (saveResp) {
-                byte[] bytes = reqResp.getResponse();
-                if (bytes != null) {
-                    String fn = (n == 1)
-                            ? respout
-                            : appendIndex(respout, i);
-                    try {
-                        IoUtil.save(fn, bytes);
-                    } catch (IOException e) {
-                        System.err.println("IOException: " + e.getMessage());
-                    }
-                }
-            }
-        }
-    } // method saveRequestResponse
-
-    private static String appendIndex(
-            final String filename,
-            final int index) {
-        int idx = filename.lastIndexOf('.');
-        if (idx == -1 || idx == filename.length() - 1) {
-            return filename + "-" + index;
-        }
-
-        StringBuilder sb = new StringBuilder(filename);
-        sb.insert(idx, index);
-        sb.insert(idx, '-');
-        return sb.toString();
+    if (debug == null || debug.size() == 0) {
+      return;
     }
+
+    final int n = debug.size();
+    for (int i = 0; i < n; i++) {
+      RequestResponsePair reqResp = debug.get(i);
+      if (saveReq) {
+        byte[] bytes = reqResp.getRequest();
+        if (bytes != null) {
+          String fn = (n == 1)
+              ? reqout
+              : appendIndex(reqout, i);
+          try {
+            IoUtil.save(fn, bytes);
+          } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+          }
+        }
+      }
+
+      if (saveResp) {
+        byte[] bytes = reqResp.getResponse();
+        if (bytes != null) {
+          String fn = (n == 1)
+              ? respout
+              : appendIndex(respout, i);
+          try {
+            IoUtil.save(fn, bytes);
+          } catch (IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+          }
+        }
+      }
+    }
+  } // method saveRequestResponse
+
+  private static String appendIndex(
+      final String filename,
+      final int index) {
+    int idx = filename.lastIndexOf('.');
+    if (idx == -1 || idx == filename.length() - 1) {
+      return filename + "-" + index;
+    }
+
+    StringBuilder sb = new StringBuilder(filename);
+    sb.insert(idx, index);
+    sb.insert(idx, '-');
+    return sb.toString();
+  }
 
 }

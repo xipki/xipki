@@ -53,72 +53,73 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "p10-enroll",
-        description = "enroll certificate via PKCS#10 request")
+    description = "enroll certificate via PKCS#10 request")
 @Service
 public class P10EnrollCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--p10",
-            required = true,
-            description = "PKCS#10 request file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10File;
+  @Option(name = "--p10",
+      required = true,
+      description = "PKCS#10 request file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p10File;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
-    private String profile;
+  @Option(name = "--profile", aliases = "-p",
+      required = true,
+      description = "certificate profile\n"
+          + "(required)")
+  private String profile;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the certificate\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
+  @Option(name = "--user",
+      description = "username")
+  private String user;
 
-    @Option(name = "--ca",
-            description = "CA name\n"
-                    + "(required if the profile is supported by more than one CA)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      description = "CA name\n"
+          + "(required if the profile is supported by more than one CA)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        CertificationRequest p10Req = CertificationRequest.getInstance(
-                IoUtil.read(p10File));
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    CertificationRequest p10Req = CertificationRequest.getInstance(
+        IoUtil.read(p10File));
 
-        EnrollCertResult result;
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            result = caClient.requestCert(p10Req, profile, caName, user, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
-
-        X509Certificate cert = null;
-        if (result != null) {
-            String id = result.getAllIds().iterator().next();
-            CertOrError certOrError = result.getCertificateOrError(id);
-            cert = (X509Certificate) certOrError.getCertificate();
-        }
-
-        if (cert == null) {
-            throw new CmdFailure("no certificate received from the server");
-        }
-
-        File certFile = new File(outputFile);
-        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
-
-        return null;
+    EnrollCertResult result;
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      result = caClient.requestCert(p10Req, profile, caName, user, debug);
+    } finally {
+      saveRequestResponse(debug);
     }
+
+    X509Certificate cert = null;
+    if (result != null) {
+      String id = result.getAllIds().iterator().next();
+      CertOrError certOrError = result.getCertificateOrError(id);
+      cert = (X509Certificate) certOrError.getCertificate();
+    }
+
+    if (cert == null) {
+      throw new CmdFailure("no certificate received from the server");
+    }
+
+    File certFile = new File(outputFile);
+    saveVerbose("certificate saved to file", certFile, cert.getEncoded());
+
+    return null;
+  }
 
 }

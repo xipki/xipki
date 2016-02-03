@@ -39,48 +39,49 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ValidationIssue {
 
-    private final String code;
+  private final String code;
 
-    private final String description;
+  private final String description;
 
-    private boolean failed;
+  private boolean failed;
 
-    private String message;
+  private String message;
 
-    public ValidationIssue(
-            final String code,
-            final String description) {
-        ParamUtil.assertNotBlank("code", code);
-        ParamUtil.assertNotBlank("description", description);
-        this.code = code;
-        this.description = description;
-        this.failed = false;
-    }
+  public ValidationIssue(
+      final String code,
+      final String description) {
+    ParamUtil.assertNotBlank("code", code);
+    ParamUtil.assertNotBlank("description", description);
+    this.code = code;
+    this.description = description;
+    this.failed = false;
+  }
 
-    public boolean isFailed() {
-        return failed;
-    }
+  public boolean isFailed() {
+    return failed;
+  }
 
-    public String getMessage() {
-        return message;
-    }
+  public String getMessage() {
+    return message;
+  }
 
-    public void setFailureMessage(
-            final String message) {
-        this.failed = true;
-        this.message = message;
-    }
+  public void setFailureMessage(
+      final String message) {
+    this.failed = true;
+    this.message = message;
+  }
 
-    public String getCode() {
-        return code;
-    }
+  public String getCode() {
+    return code;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
 }

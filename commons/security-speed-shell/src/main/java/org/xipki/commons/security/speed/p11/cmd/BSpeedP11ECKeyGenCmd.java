@@ -48,25 +48,26 @@ import org.xipki.commons.security.speed.p11.P11ECKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen",
-        description = "performance test of PKCS#11 EC key generation (batch)")
+    description = "performance test of PKCS#11 EC key generation (batch)")
 public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (String curveName : curveNameOidMap.keySet()) {
-            ret.add(new P11ECKeyGenLoadTest(slot, curveName));
-        }
-
-        return ret;
+    for (String curveName : curveNameOidMap.keySet()) {
+      ret.add(new P11ECKeyGenLoadTest(slot, curveName));
     }
+
+    return ret;
+  }
 
 }

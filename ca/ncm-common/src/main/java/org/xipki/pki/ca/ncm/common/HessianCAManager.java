@@ -64,325 +64,326 @@ import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface HessianCAManager {
 
-    String getAttribute(
-            String attributeKey);
+  String getAttribute(
+      String attributeKey);
 
-    CASystemStatus getCASystemStatus();
+  CASystemStatus getCASystemStatus();
 
-    boolean unlockCA();
+  boolean unlockCA();
 
-    boolean publishRootCA(
-            String caName,
-            String certprofile)
-    throws HessianCAMgmtException;
+  boolean publishRootCA(
+      String caName,
+      String certprofile)
+  throws HessianCAMgmtException;
 
-    boolean republishCertificates(
-            String caName,
-            List<String> publisherNames)
-    throws HessianCAMgmtException;
+  boolean republishCertificates(
+      String caName,
+      List<String> publisherNames)
+  throws HessianCAMgmtException;
 
-    boolean clearPublishQueue(
-            String caName,
-            List<String> publisherNames)
-    throws HessianCAMgmtException;
+  boolean clearPublishQueue(
+      String caName,
+      List<String> publisherNames)
+  throws HessianCAMgmtException;
 
-    boolean removeCA(String caName)
-    throws HessianCAMgmtException;
+  boolean removeCA(String caName)
+  throws HessianCAMgmtException;
 
-    boolean restartCaSystem();
+  boolean restartCaSystem();
 
-    boolean notifyCAChange()
-    throws HessianCAMgmtException;
+  boolean notifyCAChange()
+  throws HessianCAMgmtException;
 
-    boolean addCaAlias(
-            String aliasName,
-            String caName)
-    throws HessianCAMgmtException;
+  boolean addCaAlias(
+      String aliasName,
+      String caName)
+  throws HessianCAMgmtException;
 
-    boolean removeCaAlias(
-            String aliasName)
-    throws HessianCAMgmtException;
+  boolean removeCaAlias(
+      String aliasName)
+  throws HessianCAMgmtException;
 
-    Set<String> getAliasesForCA(
-            String caName);
+  Set<String> getAliasesForCA(
+      String caName);
 
-    String getCaName(
-            String aliasName);
+  String getCaName(
+      String aliasName);
 
-    Set<String> getCaAliasNames();
+  Set<String> getCaAliasNames();
 
-    Set<String> getCertprofileNames();
+  Set<String> getCertprofileNames();
 
-    Set<String> getPublisherNames();
+  Set<String> getPublisherNames();
 
-    Set<String> getCmpRequestorNames();
+  Set<String> getCmpRequestorNames();
 
-    Set<String> getCmpResponderNames();
+  Set<String> getCmpResponderNames();
 
-    Set<String> getCrlSignerNames();
+  Set<String> getCrlSignerNames();
 
-    Set<String> getCmpControlNames();
+  Set<String> getCmpControlNames();
 
-    Set<String> getCaNames();
+  Set<String> getCaNames();
 
-    boolean addCA(
-            CAEntry newCaDbEntry)
-    throws HessianCAMgmtException;
+  boolean addCA(
+      CAEntry newCaDbEntry)
+  throws HessianCAMgmtException;
 
-    CAEntry getCA(String caName);
+  CAEntry getCA(String caName);
 
-    boolean changeCA(
-            ChangeCAEntry changeCAEntry)
-    throws HessianCAMgmtException;
+  boolean changeCA(
+      ChangeCAEntry changeCAEntry)
+  throws HessianCAMgmtException;
 
-    boolean removeCertprofileFromCA(
-            String profileName,
-            String caName)
-    throws HessianCAMgmtException;
+  boolean removeCertprofileFromCA(
+      String profileName,
+      String caName)
+  throws HessianCAMgmtException;
 
-    boolean addCertprofileToCA(
-            String profileName,
-            String profileLocalname,
-            String caName)
-    throws HessianCAMgmtException;
+  boolean addCertprofileToCA(
+      String profileName,
+      String profileLocalname,
+      String caName)
+  throws HessianCAMgmtException;
 
-    boolean removePublisherFromCA(
-            String publisherName,
-            String caName)
-    throws HessianCAMgmtException;
+  boolean removePublisherFromCA(
+      String publisherName,
+      String caName)
+  throws HessianCAMgmtException;
 
-    boolean addPublisherToCA(
-            String publisherName,
-            String caName)
-    throws HessianCAMgmtException;
+  boolean addPublisherToCA(
+      String publisherName,
+      String caName)
+  throws HessianCAMgmtException;
 
-    Map<String, String> getCertprofilesForCA(
-            String caName);
+  Map<String, String> getCertprofilesForCA(
+      String caName);
 
-    Set<CAHasRequestorEntry> getCmpRequestorsForCA(
-            String caName);
+  Set<CAHasRequestorEntry> getCmpRequestorsForCA(
+      String caName);
 
-    CmpRequestorEntry getCmpRequestor(
-            String name);
+  CmpRequestorEntry getCmpRequestor(
+      String name);
 
-    boolean addCmpRequestor(
-            CmpRequestorEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    boolean removeCmpRequestor(
-            String requestorName)
-    throws HessianCAMgmtException;
-
-    boolean changeCmpRequestor(
-            String name,
-            String base64Cert)
-    throws HessianCAMgmtException;
-
-    boolean removeCmpRequestorFromCA(
-            String requestorName,
-            String caName)
-    throws HessianCAMgmtException;
-
-    boolean addCmpRequestorToCA(
-            CAHasRequestorEntry requestor,
-            String caName)
-    throws HessianCAMgmtException;
-
-    CertprofileEntry getCertprofile(
-            String profileName);
-
-    boolean removeCertprofile(
-            String profileName)
-    throws HessianCAMgmtException;
-
-    boolean changeCertprofile(
-            String name,
-            String type,
-            String conf)
-    throws HessianCAMgmtException;
-
-    boolean addCertprofile(
-            CertprofileEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    boolean addCmpResponder(
-            CmpResponderEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    boolean removeCmpResponder(
-            String name)
-    throws HessianCAMgmtException;
-
-    boolean changeCmpResponder(
-            String name,
-            String type,
-            String conf,
-            String base64Cert)
-    throws HessianCAMgmtException;
-
-    CmpResponderEntry getCmpResponder(
-            String name);
-
-    boolean addCrlSigner(
-            X509CrlSignerEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    boolean removeCrlSigner(
-            String crlSignerName)
-    throws HessianCAMgmtException;
-
-    boolean changeCrlSigner(
-            X509ChangeCrlSignerEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    X509CrlSignerEntry getCrlSigner(
-            String name);
-
-    boolean addPublisher(
-            PublisherEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    List<PublisherEntry> getPublishersForCA(
-            String caName);
-
-    PublisherEntry getPublisher(
-            String publisherName);
-
-    boolean removePublisher(
-            String publisherName)
-    throws HessianCAMgmtException;
-
-    boolean changePublisher(
-            String name,
-            String type,
-            String conf)
-    throws HessianCAMgmtException;
-
-    CmpControlEntry getCmpControl(
-            String name);
-
-    boolean addCmpControl(
-            CmpControlEntry dbEntry)
-    throws HessianCAMgmtException;
-
-    boolean removeCmpControl(
-            String name)
-    throws HessianCAMgmtException;
-
-    boolean changeCmpControl(
-            String name,
-            String conf)
-    throws HessianCAMgmtException;
-
-    Set<String> getEnvParamNames();
-
-    String getEnvParam(
-            String name);
-
-    boolean addEnvParam(
-            String name,
-            String value)
-    throws HessianCAMgmtException;
-
-    boolean removeEnvParam(
-            String envParamName)
-    throws HessianCAMgmtException;
-
-    boolean changeEnvParam(
-            String name,
-            String value)
-    throws HessianCAMgmtException;
-
-    boolean revokeCa(
-            String caName,
-            CertRevocationInfo revocationInfo)
-    throws HessianCAMgmtException;
-
-    boolean unrevokeCa(
-            String caName)
-    throws HessianCAMgmtException;
-
-    boolean revokeCertificate(
-            String caName,
-            BigInteger serialNumber,
-            CRLReason reason,
-            Date invalidityTime)
-    throws HessianCAMgmtException;
-
-    boolean unrevokeCertificate(
-            String caName,
-            BigInteger serialNumber)
-    throws HessianCAMgmtException;
-
-    boolean removeCertificate(
-            String caName,
-            BigInteger serialNumber)
-    throws HessianCAMgmtException;
-
-    byte[] generateCertificate(
-            String caName,
-            String profileName,
-            String user,
-            byte[] encodedPkcs10Request)
-    throws HessianCAMgmtException;
-
-    X509Certificate generateSelfSignedCA(
-            X509CAEntry caEntry,
-            String certprofileName,
-            byte[] p10Req)
-    throws HessianCAMgmtException;
-
-    boolean addUser(
-            AddUserEntry userEntry)
-    throws HessianCAMgmtException;
-
-    boolean changeUser(
-            String username,
-            String password,
-            String cnRegex)
-    throws HessianCAMgmtException;
-
-    boolean removeUser(
-            final String username)
-    throws HessianCAMgmtException;
-
-    UserEntry getUser(
-            String username)
-    throws HessianCAMgmtException;
-
-    X509CRL generateCRLonDemand(
-            String caName)
-    throws HessianCAMgmtException;
-
-    X509CRL getCRL(
-            String caName,
-            BigInteger crlNumber)
-    throws HessianCAMgmtException;
-
-    X509CRL getCurrentCRL(
-            String caName)
-    throws HessianCAMgmtException;
-
-    boolean addScep(
-            ScepEntry scepEntry)
-    throws HessianCAMgmtException;
-
-    boolean removeScep(
-            String name)
-    throws HessianCAMgmtException;
-
-    boolean changeScep(
-            ChangeScepEntry scepEntry)
-    throws HessianCAMgmtException;
-
-    Set<String> getScepNames();
-
-    ScepEntry getScepEntry(
-            String name)
-    throws HessianCAMgmtException;
+  boolean addCmpRequestor(
+      CmpRequestorEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  boolean removeCmpRequestor(
+      String requestorName)
+  throws HessianCAMgmtException;
+
+  boolean changeCmpRequestor(
+      String name,
+      String base64Cert)
+  throws HessianCAMgmtException;
+
+  boolean removeCmpRequestorFromCA(
+      String requestorName,
+      String caName)
+  throws HessianCAMgmtException;
+
+  boolean addCmpRequestorToCA(
+      CAHasRequestorEntry requestor,
+      String caName)
+  throws HessianCAMgmtException;
+
+  CertprofileEntry getCertprofile(
+      String profileName);
+
+  boolean removeCertprofile(
+      String profileName)
+  throws HessianCAMgmtException;
+
+  boolean changeCertprofile(
+      String name,
+      String type,
+      String conf)
+  throws HessianCAMgmtException;
+
+  boolean addCertprofile(
+      CertprofileEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  boolean addCmpResponder(
+      CmpResponderEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  boolean removeCmpResponder(
+      String name)
+  throws HessianCAMgmtException;
+
+  boolean changeCmpResponder(
+      String name,
+      String type,
+      String conf,
+      String base64Cert)
+  throws HessianCAMgmtException;
+
+  CmpResponderEntry getCmpResponder(
+      String name);
+
+  boolean addCrlSigner(
+      X509CrlSignerEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  boolean removeCrlSigner(
+      String crlSignerName)
+  throws HessianCAMgmtException;
+
+  boolean changeCrlSigner(
+      X509ChangeCrlSignerEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  X509CrlSignerEntry getCrlSigner(
+      String name);
+
+  boolean addPublisher(
+      PublisherEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  List<PublisherEntry> getPublishersForCA(
+      String caName);
+
+  PublisherEntry getPublisher(
+      String publisherName);
+
+  boolean removePublisher(
+      String publisherName)
+  throws HessianCAMgmtException;
+
+  boolean changePublisher(
+      String name,
+      String type,
+      String conf)
+  throws HessianCAMgmtException;
+
+  CmpControlEntry getCmpControl(
+      String name);
+
+  boolean addCmpControl(
+      CmpControlEntry dbEntry)
+  throws HessianCAMgmtException;
+
+  boolean removeCmpControl(
+      String name)
+  throws HessianCAMgmtException;
+
+  boolean changeCmpControl(
+      String name,
+      String conf)
+  throws HessianCAMgmtException;
+
+  Set<String> getEnvParamNames();
+
+  String getEnvParam(
+      String name);
+
+  boolean addEnvParam(
+      String name,
+      String value)
+  throws HessianCAMgmtException;
+
+  boolean removeEnvParam(
+      String envParamName)
+  throws HessianCAMgmtException;
+
+  boolean changeEnvParam(
+      String name,
+      String value)
+  throws HessianCAMgmtException;
+
+  boolean revokeCa(
+      String caName,
+      CertRevocationInfo revocationInfo)
+  throws HessianCAMgmtException;
+
+  boolean unrevokeCa(
+      String caName)
+  throws HessianCAMgmtException;
+
+  boolean revokeCertificate(
+      String caName,
+      BigInteger serialNumber,
+      CRLReason reason,
+      Date invalidityTime)
+  throws HessianCAMgmtException;
+
+  boolean unrevokeCertificate(
+      String caName,
+      BigInteger serialNumber)
+  throws HessianCAMgmtException;
+
+  boolean removeCertificate(
+      String caName,
+      BigInteger serialNumber)
+  throws HessianCAMgmtException;
+
+  byte[] generateCertificate(
+      String caName,
+      String profileName,
+      String user,
+      byte[] encodedPkcs10Request)
+  throws HessianCAMgmtException;
+
+  X509Certificate generateSelfSignedCA(
+      X509CAEntry caEntry,
+      String certprofileName,
+      byte[] p10Req)
+  throws HessianCAMgmtException;
+
+  boolean addUser(
+      AddUserEntry userEntry)
+  throws HessianCAMgmtException;
+
+  boolean changeUser(
+      String username,
+      String password,
+      String cnRegex)
+  throws HessianCAMgmtException;
+
+  boolean removeUser(
+      final String username)
+  throws HessianCAMgmtException;
+
+  UserEntry getUser(
+      String username)
+  throws HessianCAMgmtException;
+
+  X509CRL generateCRLonDemand(
+      String caName)
+  throws HessianCAMgmtException;
+
+  X509CRL getCRL(
+      String caName,
+      BigInteger crlNumber)
+  throws HessianCAMgmtException;
+
+  X509CRL getCurrentCRL(
+      String caName)
+  throws HessianCAMgmtException;
+
+  boolean addScep(
+      ScepEntry scepEntry)
+  throws HessianCAMgmtException;
+
+  boolean removeScep(
+      String name)
+  throws HessianCAMgmtException;
+
+  boolean changeScep(
+      ChangeScepEntry scepEntry)
+  throws HessianCAMgmtException;
+
+  Set<String> getScepNames();
+
+  ScepEntry getScepEntry(
+      String name)
+  throws HessianCAMgmtException;
 
 }

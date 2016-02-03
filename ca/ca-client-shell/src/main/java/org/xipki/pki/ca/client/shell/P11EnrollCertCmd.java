@@ -53,59 +53,60 @@ import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "enroll",
-        description = "enroll certificate (PKCS#11 token)")
+    description = "enroll certificate (PKCS#11 token)")
 @Service
 public class P11EnrollCertCmd extends EnrollCertCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot",
+      required = true,
+      description = "slot index\n"
+          + "(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--key-id",
-            description = "id of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    private String keyId;
+  @Option(name = "--key-id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  private String keyId;
 
-    @Option(name = "--key-label",
-            description = "label of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    private String keyLabel;
+  @Option(name = "--key-label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  private String keyLabel;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
-    throws SignerException {
-        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+  @Override
+  protected ConcurrentContentSigner getSigner(
+      final String hashAlgo,
+      final SignatureAlgoControl signatureAlgoControl)
+  throws SignerException {
+    P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
+    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
-        String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
-                moduleName, slotIdentifier, keyIdentifier, 1);
-        return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+    String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
+        moduleName, slotIdentifier, keyIdentifier, 1);
+    return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
+        signatureAlgoControl, (X509Certificate[]) null);
+  }
+
+  private P11KeyIdentifier getKeyIdentifier()
+  throws SignerException {
+    P11KeyIdentifier keyIdentifier;
+    if (keyId != null && keyLabel == null) {
+      keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+    } else if (keyId == null && keyLabel != null) {
+      keyIdentifier = new P11KeyIdentifier(keyLabel);
+    } else {
+      throw new SignerException("exactly one of keyId or keyLabel should be specified");
     }
-
-    private P11KeyIdentifier getKeyIdentifier()
-    throws SignerException {
-        P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null) {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else {
-            throw new SignerException("exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
-    }
+    return keyIdentifier;
+  }
 
 }

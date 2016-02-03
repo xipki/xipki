@@ -37,6 +37,7 @@ package org.xipki.pki.ca.qa.impl.internal;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class QaExtension {

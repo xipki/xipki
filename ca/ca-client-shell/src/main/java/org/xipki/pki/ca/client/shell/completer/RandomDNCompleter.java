@@ -41,19 +41,20 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class RandomDNCompleter extends AbstractEnumCompleter {
 
-    public RandomDNCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public RandomDNCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (RandomDN dn : RandomDN.values()) {
+      enums.append(dn.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

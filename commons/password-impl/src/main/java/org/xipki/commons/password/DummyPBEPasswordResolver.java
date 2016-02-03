@@ -41,25 +41,26 @@ import org.xipki.commons.password.api.PasswordResolverException;
  * SHOULD NOT BE USED IN PRODUCTION ENVIRONMENT. ONLY FOR TEST PURPOSE
  *
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DummyPBEPasswordResolver extends PBEPasswordResolver {
 
-    private char[] masterPassword;
+  private char[] masterPassword;
 
-    @Override
-    protected char[] getMasterPassword()
-    throws PasswordResolverException {
-        if (masterPassword != null) {
-            return masterPassword;
-        }
-
-        return super.getMasterPassword();
+  @Override
+  protected char[] getMasterPassword()
+  throws PasswordResolverException {
+    if (masterPassword != null) {
+      return masterPassword;
     }
 
-    public void setMasterPassword(
-            final char[] masterPassword) {
-        this.masterPassword = masterPassword;
-    }
+    return super.getMasterPassword();
+  }
+
+  public void setMasterPassword(
+      final char[] masterPassword) {
+    this.masterPassword = masterPassword;
+  }
 
 }

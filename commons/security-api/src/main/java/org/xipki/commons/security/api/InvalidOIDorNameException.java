@@ -37,14 +37,15 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class InvalidOIDorNameException extends Exception {
 
-    public InvalidOIDorNameException(
-            final String declaredOidOrName) {
-        super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
-    }
+  public InvalidOIDorNameException(
+      final String declaredOidOrName) {
+    super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
+  }
 
 }

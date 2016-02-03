@@ -48,39 +48,40 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "rm-cert",
-        description = "remove certificate from PKCS#11 device")
+    description = "remove certificate from PKCS#11 device")
 @Service
 public class P11CertDeleteCmd extends SecurityCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot",
+      required = true,
+      description = "slot index\n"
+          + "(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--key-id",
-            required = true,
-            description = "id of the certificate in the PKCS#11 device\n"
-                    + "(required)")
-    private String keyId;
+  @Option(name = "--key-id",
+      required = true,
+      description = "id of the certificate in the PKCS#11 device\n"
+          + "(required)")
+  private String keyId;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);
-        slot.removeCerts(keyIdentifier);
-        securityFactory.getP11CryptService(moduleName).refresh();
-        out("deleted certificates");
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);
+    slot.removeCerts(keyIdentifier);
+    securityFactory.getP11CryptService(moduleName).refresh();
+    out("deleted certificates");
+    return null;
+  }
 
 }

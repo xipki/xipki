@@ -41,32 +41,33 @@ import java.util.Set;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EnrollCertResult {
 
-    private final Certificate caCertificate;
+  private final Certificate caCertificate;
 
-    private final Map<String, CertOrError> certificatesOrErrors;
+  private final Map<String, CertOrError> certificatesOrErrors;
 
-    public EnrollCertResult(
-            final Certificate caCertificate,
-            final Map<String, CertOrError> certificatesOrErrors) {
-        this.caCertificate = caCertificate;
-        this.certificatesOrErrors = certificatesOrErrors;
-    }
+  public EnrollCertResult(
+      final Certificate caCertificate,
+      final Map<String, CertOrError> certificatesOrErrors) {
+    this.caCertificate = caCertificate;
+    this.certificatesOrErrors = certificatesOrErrors;
+  }
 
-    public Certificate getCaCertificate() {
-        return caCertificate;
-    }
+  public Certificate getCaCertificate() {
+    return caCertificate;
+  }
 
-    public CertOrError getCertificateOrError(
-            final String id) {
-        return certificatesOrErrors.get(id);
-    }
+  public CertOrError getCertificateOrError(
+      final String id) {
+    return certificatesOrErrors.get(id);
+  }
 
-    public Set<String> getAllIds() {
-        return certificatesOrErrors.keySet();
-    }
+  public Set<String> getAllIds() {
+    return certificatesOrErrors.keySet();
+  }
 
 }

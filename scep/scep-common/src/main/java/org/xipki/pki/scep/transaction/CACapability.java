@@ -37,39 +37,40 @@ package org.xipki.pki.scep.transaction;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum CACapability {
 
-    AES ("AES"),
-    DES3 ("DES3"),
-    GetNextCACert ("GetNextCACert"),
-    POSTPKIOperation ("POSTPKIOperation"),
-    Renewal ("Renewal"),
-    SHA1 ("SHA-1"),
-    SHA256 ("SHA-256"),
-    SHA512 ("SHA-512"),
-    Update ("Update");
+  AES ("AES"),
+  DES3 ("DES3"),
+  GetNextCACert ("GetNextCACert"),
+  POSTPKIOperation ("POSTPKIOperation"),
+  Renewal ("Renewal"),
+  SHA1 ("SHA-1"),
+  SHA256 ("SHA-256"),
+  SHA512 ("SHA-512"),
+  Update ("Update");
 
-    private String text;
+  private String text;
 
-    private CACapability(
-            final String text) {
-        this.text = text;
+  private CACapability(
+      final String text) {
+    this.text = text;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public static CACapability valueForText(
+      final String text) {
+    for (CACapability m : values()) {
+      if (m.text.equalsIgnoreCase(text)) {
+        return m;
+      }
     }
-
-    public String getText() {
-        return text;
-    }
-
-    public static CACapability valueForText(
-            final String text) {
-        for (CACapability m : values()) {
-            if (m.text.equalsIgnoreCase(text)) {
-                return m;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
 }

@@ -39,26 +39,27 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaAuthorizationTemplate extends QaExtension {
 
-    private final String type;
+  private final String type;
 
-    private final byte[] accessRights;
+  private final byte[] accessRights;
 
-    public QaAuthorizationTemplate(
-            final AuthorizationTemplate jaxb) {
-        this.type = jaxb.getType().getValue();
-        this.accessRights = jaxb.getAccessRights().getValue();
-    }
+  public QaAuthorizationTemplate(
+      final AuthorizationTemplate jaxb) {
+    this.type = jaxb.getType().getValue();
+    this.accessRights = jaxb.getAccessRights().getValue();
+  }
 
-    public String getType() {
-        return type;
-    }
+  public String getType() {
+    return type;
+  }
 
-    public byte[] getAccessRights() {
-        return accessRights;
-    }
+  public byte[] getAccessRights() {
+    return accessRights;
+  }
 
 }

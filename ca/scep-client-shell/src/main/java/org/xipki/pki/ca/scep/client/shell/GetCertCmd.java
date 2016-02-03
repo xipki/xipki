@@ -51,41 +51,42 @@ import org.xipki.pki.scep.client.ScepClient;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "scep", name = "getcert",
-        description = "download certificate")
+    description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumber;
+  @Option(name = "--serial", aliases = "-s",
+      required = true,
+      description = "serial number\n"
+          + "(required)")
+  private String serialNumber;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the certificate\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        ScepClient client = getScepClient();
-        BigInteger serial = toBigInt(serialNumber);
-        X509Certificate caCert = client.getAuthorityCertStore().getCACert();
-        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
-                caSubject, serial);
-        if (certs == null || certs.isEmpty()) {
-            throw new CmdFailure("received no certficate from server");
-        }
-
-        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    ScepClient client = getScepClient();
+    BigInteger serial = toBigInt(serialNumber);
+    X509Certificate caCert = client.getAuthorityCertStore().getCACert();
+    X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+    List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
+        caSubject, serial);
+    if (certs == null || certs.isEmpty()) {
+      throw new CmdFailure("received no certficate from server");
     }
+
+    saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+    return null;
+  }
 
 }

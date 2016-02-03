@@ -46,34 +46,35 @@ import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cmd", name = "mkdir",
-        description = "make directories")
+    description = "make directories")
 @Service
 public class MkdirCmd extends XipkiCommandSupport {
 
-    @Argument(index = 0, name = "directory_name",
-            required = true,
-            description = "directory\n"
-                    + "(required)")
-    @Completion(DirPathCompleter.class)
-    private String dirName;
+  @Argument(index = 0, name = "directory_name",
+      required = true,
+      description = "directory\n"
+          + "(required)")
+  @Completion(DirPathCompleter.class)
+  private String dirName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        File target = new File(expandFilepath(dirName));
-        if (target.exists()) {
-            if (!target.isDirectory()) {
-                System.err.println(dirName + " exists but is not a directory, cannot override it");
-                return null;
-            }
-        } else {
-            target.mkdirs();
-        }
-
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    File target = new File(expandFilepath(dirName));
+    if (target.exists()) {
+      if (!target.isDirectory()) {
+        System.err.println(dirName + " exists but is not a directory, cannot override it");
         return null;
+      }
+    } else {
+      target.mkdirs();
     }
+
+    return null;
+  }
 
 }

@@ -45,52 +45,53 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaNameConstraints extends QaExtension {
 
-    private final List<QaGeneralSubtree> permittedSubtrees;
+  private final List<QaGeneralSubtree> permittedSubtrees;
 
-    private final List<QaGeneralSubtree> excludedSubtrees;
+  private final List<QaGeneralSubtree> excludedSubtrees;
 
-    public QaNameConstraints(
-            final NameConstraints jaxb) {
-        if (jaxb.getPermittedSubtrees() != null
-                && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase())) {
-            List<QaGeneralSubtree> list = new LinkedList<>();
-            List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
-            for (GeneralSubtreeBaseType base : bases) {
-                list.add(new QaGeneralSubtree(base));
-            }
-            this.permittedSubtrees = Collections.unmodifiableList(list);
-        } else {
-            permittedSubtrees = null;
-        }
-
-        if (jaxb.getExcludedSubtrees() != null
-                && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase())) {
-            List<QaGeneralSubtree> list = new LinkedList<>();
-            List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
-            for (GeneralSubtreeBaseType base : bases) {
-                list.add(new QaGeneralSubtree(base));
-            }
-            this.excludedSubtrees = Collections.unmodifiableList(list);
-        } else {
-            excludedSubtrees = null;
-        }
-
-        if (permittedSubtrees == null && excludedSubtrees == null) {
-            throw new IllegalArgumentException(
-                    "at least one of permittedSubtrees and excludesSubtrees should be non-null");
-        }
+  public QaNameConstraints(
+      final NameConstraints jaxb) {
+    if (jaxb.getPermittedSubtrees() != null
+        && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase())) {
+      List<QaGeneralSubtree> list = new LinkedList<>();
+      List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
+      for (GeneralSubtreeBaseType base : bases) {
+        list.add(new QaGeneralSubtree(base));
+      }
+      this.permittedSubtrees = Collections.unmodifiableList(list);
+    } else {
+      permittedSubtrees = null;
     }
 
-    public List<QaGeneralSubtree> getPermittedSubtrees() {
-        return permittedSubtrees;
+    if (jaxb.getExcludedSubtrees() != null
+        && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase())) {
+      List<QaGeneralSubtree> list = new LinkedList<>();
+      List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
+      for (GeneralSubtreeBaseType base : bases) {
+        list.add(new QaGeneralSubtree(base));
+      }
+      this.excludedSubtrees = Collections.unmodifiableList(list);
+    } else {
+      excludedSubtrees = null;
     }
 
-    public List<QaGeneralSubtree> getExcludedSubtrees() {
-        return excludedSubtrees;
+    if (permittedSubtrees == null && excludedSubtrees == null) {
+      throw new IllegalArgumentException(
+          "at least one of permittedSubtrees and excludesSubtrees should be non-null");
     }
+  }
+
+  public List<QaGeneralSubtree> getPermittedSubtrees() {
+    return permittedSubtrees;
+  }
+
+  public List<QaGeneralSubtree> getExcludedSubtrees() {
+    return excludedSubtrees;
+  }
 
 }

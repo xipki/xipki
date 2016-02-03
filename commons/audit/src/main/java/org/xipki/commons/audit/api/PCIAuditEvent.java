@@ -50,250 +50,251 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PCIAuditEvent {
 
-    private static final String UNDEFINED = "undefined";
+  private static final String UNDEFINED = "undefined";
 
-    private static final char DEFAULT_DELIMITER = ' ';
+  private static final char DEFAULT_DELIMITER = ' ';
 
-    private static final String DEFAULT_REPLACE_DELIMITER = "_";
+  private static final String DEFAULT_REPLACE_DELIMITER = "_";
 
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+  private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
 
-    private static final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+  private static final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 
-    /**
-     * 10.3.1 "User Identification"
-     */
-    private String userId = UNDEFINED;
+  /**
+   * 10.3.1 "User Identification"
+   */
+  private String userId = UNDEFINED;
 
-    /**
-     * 10.3.2 "Type of event"
-     */
-    private String eventType = UNDEFINED;
+  /**
+   * 10.3.2 "Type of event"
+   */
+  private String eventType = UNDEFINED;
 
-    /**
-     * 10.3.3 "Date and time" (date)
-     */
-    private final String date;
+  /**
+   * 10.3.3 "Date and time" (date)
+   */
+  private final String date;
 
-    /**
-     * 10.3.3 "Date and time" (time)
-     */
-    private final String time;
+  /**
+   * 10.3.3 "Date and time" (time)
+   */
+  private final String time;
 
-    /**
-     * 10.3.4 "Success or failure indication"
-     */
-    private String status = UNDEFINED;
+  /**
+   * 10.3.4 "Success or failure indication"
+   */
+  private String status = UNDEFINED;
 
-    /**
-     * 10.3.5 "Origination of Event"
-     */
-    private String origination = null;
+  /**
+   * 10.3.5 "Origination of Event"
+   */
+  private String origination = null;
 
-    /**
-     * 10.3.6 "Identity or name of affected data, system component, or resource"
-     */
-    private String affectedResource = UNDEFINED;
+  /**
+   * 10.3.6 "Identity or name of affected data, system component, or resource"
+   */
+  private String affectedResource = UNDEFINED;
 
-    /**
-     * The AuditLevel this Event belongs to.
-     */
-    private AuditLevel level;
+  /**
+   * The AuditLevel this Event belongs to.
+   */
+  private AuditLevel level;
 
-    public PCIAuditEvent(
-            final Date date) {
-        synchronized (dateFormatter) {
-            this.date = dateFormatter.format(date);
+  public PCIAuditEvent(
+      final Date date) {
+    synchronized (dateFormatter) {
+      this.date = dateFormatter.format(date);
+    }
+
+    synchronized (timeFormatter) {
+      this.time = timeFormatter.format(date);
+    }
+
+    this.level = AuditLevel.INFO;
+  }
+
+  public AuditLevel getLevel() {
+    return level;
+  }
+
+  public void setLevel(
+      final AuditLevel level) {
+    this.level = level;
+  }
+
+  public String getUserId() {
+    if (isBlank(this.userId)) {
+      return UNDEFINED;
+    }
+
+    return this.userId;
+  }
+
+  public void setUserId(
+      final String userId) {
+    this.userId = userId;
+  }
+
+  public String getEventType() {
+    if (isBlank(this.eventType)) {
+      return UNDEFINED;
+    }
+
+    return this.eventType;
+  }
+
+  public void setEventType(
+      final String eventType) {
+    this.eventType = eventType;
+  }
+
+  public String getDate() {
+    return date;
+  }
+
+  public String getTime() {
+    return time;
+  }
+
+  public String getStatus() {
+    if (isBlank(this.status)) {
+      return UNDEFINED;
+    }
+
+    return this.status;
+  }
+
+  public void setStatus(
+      final String status) {
+    this.status = status;
+  }
+
+  public String getOrigination() {
+    if (isBlank(origination)) {
+      origination = getHostAddress();
+    }
+
+    return origination;
+  }
+
+  public void setOrigination(
+      final String origination) {
+    this.origination = origination;
+  }
+
+  public String getAffectedResource() {
+    if (isBlank(this.affectedResource)) {
+      return UNDEFINED;
+    }
+
+    return this.affectedResource;
+  }
+
+  public void setAffectedResource(
+      final String affectedResource) {
+    this.affectedResource = affectedResource;
+  }
+
+  public CharArrayWriter toCharArrayWriter(
+      final String prefix) {
+    CharArrayWriter buffer = new CharArrayWriter(100);
+
+    final char delimiter = DEFAULT_DELIMITER;
+    final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+
+    if (prefix != null && !prefix.isEmpty()) {
+      buffer.append(prefix);
+    }
+
+    buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter));
+    buffer.append(delimiter);
+    buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
+
+    return buffer;
+  }
+
+  private static boolean isBlank(
+      final CharSequence cs) {
+    int strLen;
+    if (cs == null || (strLen = cs.length()) == 0) {
+      return true;
+    }
+    for (int i = 0; i < strLen; i++) {
+      if (!Character.isWhitespace(cs.charAt(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static String replaceDelimiter(
+      final String fieldValue,
+      final char delimiter,
+      final String replaceDelimiter) {
+    if (replaceDelimiter == null || replaceDelimiter.length() < 1
+        || fieldValue == null || fieldValue.length() < 1) {
+      return fieldValue;
+    }
+
+    return fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
+  }
+
+  private static String getHostAddress() {
+    List<String> addresses = new LinkedList<>();
+
+    Enumeration<NetworkInterface> interfaces;
+    try {
+      interfaces = NetworkInterface.getNetworkInterfaces();
+    } catch (SocketException e) {
+      return "UNKNOWN";
+    }
+    while (interfaces.hasMoreElements()) {
+      NetworkInterface n = (NetworkInterface) interfaces.nextElement();
+      Enumeration<InetAddress> ee = n.getInetAddresses();
+      while (ee.hasMoreElements()) {
+        InetAddress i = (InetAddress) ee.nextElement();
+        if (i instanceof Inet4Address) {
+          addresses.add(((Inet4Address) i).getHostAddress());
         }
-
-        synchronized (timeFormatter) {
-            this.time = timeFormatter.format(date);
-        }
-
-        this.level = AuditLevel.INFO;
+      }
     }
 
-    public AuditLevel getLevel() {
-        return level;
+    for (String addr : addresses) {
+      if (!addr.startsWith("192.") && !addr.startsWith("127.")) {
+        return addr;
+      }
     }
 
-    public void setLevel(
-            final AuditLevel level) {
-        this.level = level;
+    for (String addr : addresses) {
+      if (!addr.startsWith("127.")) {
+        return addr;
+      }
     }
 
-    public String getUserId() {
-        if (isBlank(this.userId)) {
-            return UNDEFINED;
-        }
-
-        return this.userId;
+    if (addresses.size() > 0) {
+      return addresses.get(0);
+    } else {
+      try {
+        return InetAddress.getLocalHost().getHostAddress();
+      } catch (UnknownHostException e) {
+        return "UNKNOWN";
+      }
     }
-
-    public void setUserId(
-            final String userId) {
-        this.userId = userId;
-    }
-
-    public String getEventType() {
-        if (isBlank(this.eventType)) {
-            return UNDEFINED;
-        }
-
-        return this.eventType;
-    }
-
-    public void setEventType(
-            final String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getStatus() {
-        if (isBlank(this.status)) {
-            return UNDEFINED;
-        }
-
-        return this.status;
-    }
-
-    public void setStatus(
-            final String status) {
-        this.status = status;
-    }
-
-    public String getOrigination() {
-        if (isBlank(origination)) {
-            origination = getHostAddress();
-        }
-
-        return origination;
-    }
-
-    public void setOrigination(
-            final String origination) {
-        this.origination = origination;
-    }
-
-    public String getAffectedResource() {
-        if (isBlank(this.affectedResource)) {
-            return UNDEFINED;
-        }
-
-        return this.affectedResource;
-    }
-
-    public void setAffectedResource(
-            final String affectedResource) {
-        this.affectedResource = affectedResource;
-    }
-
-    public CharArrayWriter toCharArrayWriter(
-            final String prefix) {
-        CharArrayWriter buffer = new CharArrayWriter(100);
-
-        final char delimiter = DEFAULT_DELIMITER;
-        final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
-
-        if (prefix != null && !prefix.isEmpty()) {
-            buffer.append(prefix);
-        }
-
-        buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
-
-        return buffer;
-    }
-
-    private static boolean isBlank(
-            final CharSequence cs) {
-        int strLen;
-        if (cs == null || (strLen = cs.length()) == 0) {
-            return true;
-        }
-        for (int i = 0; i < strLen; i++) {
-            if (!Character.isWhitespace(cs.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static String replaceDelimiter(
-            final String fieldValue,
-            final char delimiter,
-            final String replaceDelimiter) {
-        if (replaceDelimiter == null || replaceDelimiter.length() < 1
-                || fieldValue == null || fieldValue.length() < 1) {
-            return fieldValue;
-        }
-
-        return fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
-    }
-
-    private static String getHostAddress() {
-        List<String> addresses = new LinkedList<>();
-
-        Enumeration<NetworkInterface> interfaces;
-        try {
-            interfaces = NetworkInterface.getNetworkInterfaces();
-        } catch (SocketException e) {
-            return "UNKNOWN";
-        }
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface n = (NetworkInterface) interfaces.nextElement();
-            Enumeration<InetAddress> ee = n.getInetAddresses();
-            while (ee.hasMoreElements()) {
-                InetAddress i = (InetAddress) ee.nextElement();
-                if (i instanceof Inet4Address) {
-                    addresses.add(((Inet4Address) i).getHostAddress());
-                }
-            }
-        }
-
-        for (String addr : addresses) {
-            if (!addr.startsWith("192.") && !addr.startsWith("127.")) {
-                return addr;
-            }
-        }
-
-        for (String addr : addresses) {
-            if (!addr.startsWith("127.")) {
-                return addr;
-            }
-        }
-
-        if (addresses.size() > 0) {
-            return addresses.get(0);
-        } else {
-            try {
-                return InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                return "UNKNOWN";
-            }
-        }
-    }
+  }
 
 }

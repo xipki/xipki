@@ -41,77 +41,78 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OcspResponseOption {
 
-    private X509Certificate respIssuer;
+  private X509Certificate respIssuer;
 
-    private Occurrence nonceOccurrence;
+  private Occurrence nonceOccurrence;
 
-    private Occurrence certhashOccurrence;
+  private Occurrence certhashOccurrence;
 
-    private Occurrence nextUpdateOccurrence;
+  private Occurrence nextUpdateOccurrence;
 
-    private ASN1ObjectIdentifier certhashAlgId;
+  private ASN1ObjectIdentifier certhashAlgId;
 
-    private String signatureAlgName;
+  private String signatureAlgName;
 
-    public OcspResponseOption() {
-    }
+  public OcspResponseOption() {
+  }
 
-    public X509Certificate getRespIssuer() {
-        return respIssuer;
-    }
+  public X509Certificate getRespIssuer() {
+    return respIssuer;
+  }
 
-    public void setRespIssuer(
-            final X509Certificate respIssuer) {
-        this.respIssuer = respIssuer;
-    }
+  public void setRespIssuer(
+      final X509Certificate respIssuer) {
+    this.respIssuer = respIssuer;
+  }
 
-    public Occurrence getNonceOccurrence() {
-        return nonceOccurrence;
-    }
+  public Occurrence getNonceOccurrence() {
+    return nonceOccurrence;
+  }
 
-    public void setNonceOccurrence(
-            final Occurrence nonceOccurrence) {
-        this.nonceOccurrence = nonceOccurrence;
-    }
+  public void setNonceOccurrence(
+      final Occurrence nonceOccurrence) {
+    this.nonceOccurrence = nonceOccurrence;
+  }
 
-    public Occurrence getCerthashOccurrence() {
-        return certhashOccurrence;
-    }
+  public Occurrence getCerthashOccurrence() {
+    return certhashOccurrence;
+  }
 
-    public void setCerthashOccurrence(
-            final Occurrence certhashOccurrence) {
-        this.certhashOccurrence = certhashOccurrence;
-    }
+  public void setCerthashOccurrence(
+      final Occurrence certhashOccurrence) {
+    this.certhashOccurrence = certhashOccurrence;
+  }
 
-    public Occurrence getNextUpdateOccurrence() {
-        return nextUpdateOccurrence;
-    }
+  public Occurrence getNextUpdateOccurrence() {
+    return nextUpdateOccurrence;
+  }
 
-    public void setNextUpdateOccurrence(
-            final Occurrence nextUpdateOccurrence) {
-        this.nextUpdateOccurrence = nextUpdateOccurrence;
-    }
+  public void setNextUpdateOccurrence(
+      final Occurrence nextUpdateOccurrence) {
+    this.nextUpdateOccurrence = nextUpdateOccurrence;
+  }
 
-    public ASN1ObjectIdentifier getCerthashAlgId() {
-        return certhashAlgId;
-    }
+  public ASN1ObjectIdentifier getCerthashAlgId() {
+    return certhashAlgId;
+  }
 
-    public void setCerthashAlgId(
-            final ASN1ObjectIdentifier certhashAlgId) {
-        this.certhashAlgId = certhashAlgId;
-    }
+  public void setCerthashAlgId(
+      final ASN1ObjectIdentifier certhashAlgId) {
+    this.certhashAlgId = certhashAlgId;
+  }
 
-    public String getSignatureAlgName() {
-        return signatureAlgName;
-    }
+  public String getSignatureAlgName() {
+    return signatureAlgName;
+  }
 
-    public void setSignatureAlgName(
-            final String signatureAlgName) {
-        this.signatureAlgName = signatureAlgName;
-    }
+  public void setSignatureAlgName(
+      final String signatureAlgName) {
+    this.signatureAlgName = signatureAlgName;
+  }
 
 }

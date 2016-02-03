@@ -45,23 +45,24 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "gencrl",
-        description = "generate CRL")
+    description = "generate CRL")
 @Service
 public class GenCRLCmd extends CRLCommandSupport {
 
-    @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
-    throws CAClientException, PKIErrorException {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            return caClient.generateCRL(caName, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+  @Override
+  protected X509CRL retrieveCRL(
+      final String caName)
+  throws CAClientException, PKIErrorException {
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      return caClient.generateCRL(caName, debug);
+    } finally {
+      saveRequestResponse(debug);
     }
+  }
 
 }

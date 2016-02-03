@@ -71,180 +71,181 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QASystemManagerImpl implements QASystemManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(QASystemManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(QASystemManagerImpl.class);
 
-    private String confFile;
+  private String confFile;
 
-    public String getConfFile() {
-        return confFile;
+  public String getConfFile() {
+    return confFile;
+  }
+
+  public void setConfFile(
+      final String confFile) {
+    this.confFile = confFile;
+  }
+
+  private Map<String, X509CertprofileQAImpl> x509ProfileMap = new HashMap<>();
+
+  private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+
+  private static Unmarshaller jaxbUnmarshaller;
+
+  public QASystemManagerImpl() {
+  }
+
+  public void init() {
+    if (StringUtil.isBlank(confFile)) {
+      LOG.error("confFile could not be null and empty");
+      return;
     }
 
-    public void setConfFile(
-            final String confFile) {
-        this.confFile = confFile;
+    QAConfType qaConf;
+    try {
+      FileInputStream issuerConfStream = new FileInputStream(confFile);
+      qaConf = parseQAConf(issuerConfStream);
+    } catch (IOException | JAXBException | SAXException e) {
+      final String message = "could not parse the QA configuration";
+      String exceptionMessage;
+      if (e instanceof JAXBException) {
+        exceptionMessage = XMLUtil.getMessage((JAXBException) e);
+      } else {
+        exceptionMessage = e.getMessage();
+      }
+      if (LOG.isErrorEnabled()) {
+        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            exceptionMessage);
+      }
+      LOG.debug(message, e);
+      return;
     }
 
-    private Map<String, X509CertprofileQAImpl> x509ProfileMap = new HashMap<>();
-
-    private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
-
-    private static Unmarshaller jaxbUnmarshaller;
-
-    public QASystemManagerImpl() {
-    }
-
-    public void init() {
-        if (StringUtil.isBlank(confFile)) {
-            LOG.error("confFile could not be null and empty");
-            return;
-        }
-
-        QAConfType qaConf;
+    if (qaConf.getX509Issuers() != null) {
+      List<X509IssuerType> x509IssuerTypes = qaConf.getX509Issuers().getX509Issuer();
+      for (X509IssuerType issuerType : x509IssuerTypes) {
+        byte[] certBytes;
         try {
-            FileInputStream issuerConfStream = new FileInputStream(confFile);
-            qaConf = parseQAConf(issuerConfStream);
-        } catch (IOException | JAXBException | SAXException e) {
-            final String message = "could not parse the QA configuration";
-            String exceptionMessage;
-            if (e instanceof JAXBException) {
-                exceptionMessage = XMLUtil.getMessage((JAXBException) e);
-            } else {
-                exceptionMessage = e.getMessage();
-            }
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        exceptionMessage);
-            }
-            LOG.debug(message, e);
-            return;
+          certBytes = readData(issuerType.getCert());
+        } catch (IOException e) {
+          final String message = "could not read the certificate bytes of issuer "
+              + issuerType.getName();
+          if (LOG.isErrorEnabled()) {
+            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                e.getMessage());
+          }
+          LOG.debug(message, e);
+          continue;
         }
 
-        if (qaConf.getX509Issuers() != null) {
-            List<X509IssuerType> x509IssuerTypes = qaConf.getX509Issuers().getX509Issuer();
-            for (X509IssuerType issuerType : x509IssuerTypes) {
-                byte[] certBytes;
-                try {
-                    certBytes = readData(issuerType.getCert());
-                } catch (IOException e) {
-                    final String message = "could not read the certificate bytes of issuer "
-                            + issuerType.getName();
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    continue;
-                }
-
-                X509IssuerInfo issuerInfo;
-                try {
-                    issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
-                            issuerType.getOcspUrl(),
-                            issuerType.getCrlUrl(),
-                            issuerType.getDeltaCrlUrl(), certBytes);
-                } catch (CertificateException e) {
-                    final String message =
-                            "could not parse certificate of issuer " + issuerType.getName();
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    continue;
-                }
-
-                x509IssuerInfoMap.put(issuerType.getName(), issuerInfo);
-                LOG.info("configured X509 issuer {}", issuerType.getName());
-            }
-        }
-
-        if (qaConf.getX509Certprofiles() != null) {
-            List<X509CertprofileType> certprofileTypes =
-                    qaConf.getX509Certprofiles().getX509Certprofile();
-            for (X509CertprofileType type : certprofileTypes) {
-                String name = type.getName();
-                try {
-                    byte[] content = readData(type);
-                    x509ProfileMap.put(name, new X509CertprofileQAImpl(content));
-                    LOG.info("configured X509 certificate profile {}", name);
-                } catch (IOException | CertprofileException e) {
-                    final String message = "could not parse QA certificate profile " + name;
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    continue;
-                }
-            }
-        }
-    } // method init
-
-    public void shutdown() {
-    }
-
-    @Override
-    public Set<String> getIssuerNames() {
-        return Collections.unmodifiableSet(x509IssuerInfoMap.keySet());
-    }
-
-    @Override
-    public X509IssuerInfo getIssuer(
-            final String issuerName) {
-        return x509IssuerInfoMap.get(issuerName);
-    }
-
-    @Override
-    public Set<String> getCertprofileNames() {
-        return Collections.unmodifiableSet(x509ProfileMap.keySet());
-    }
-
-    @Override
-    public X509CertprofileQA getCertprofile(
-            final String certprofileName) {
-        return x509ProfileMap.get(certprofileName);
-    }
-
-    private static QAConfType parseQAConf(
-            final InputStream confStream)
-    throws IOException, JAXBException, SAXException {
-        JAXBElement<?> rootElement;
+        X509IssuerInfo issuerInfo;
         try {
-            if (jaxbUnmarshaller == null) {
-                JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                jaxbUnmarshaller = context.createUnmarshaller();
-
-                final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                URL url = QASystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
-                jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-            }
-
-            rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(confStream);
-        } finally {
-            confStream.close();
+          issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
+              issuerType.getOcspUrl(),
+              issuerType.getCrlUrl(),
+              issuerType.getDeltaCrlUrl(), certBytes);
+        } catch (CertificateException e) {
+          final String message =
+              "could not parse certificate of issuer " + issuerType.getName();
+          if (LOG.isErrorEnabled()) {
+            LOG.error(LogUtil.buildExceptionLogFormat(message),
+                e.getClass().getName(), e.getMessage());
+          }
+          LOG.debug(message, e);
+          continue;
         }
 
-        Object rootType = rootElement.getValue();
-        if (rootType instanceof QAConfType) {
-            return (QAConfType) rootElement.getValue();
-        } else {
-            throw new SAXException("invalid root element type");
-        }
+        x509IssuerInfoMap.put(issuerType.getName(), issuerInfo);
+        LOG.info("configured X509 issuer {}", issuerType.getName());
+      }
     }
 
-    private static byte[] readData(
-            final FileOrValueType fileOrValue)
-    throws IOException {
-        byte[] data = fileOrValue.getValue();
-        if (data == null) {
-            data = IoUtil.read(fileOrValue.getFile());
+    if (qaConf.getX509Certprofiles() != null) {
+      List<X509CertprofileType> certprofileTypes =
+          qaConf.getX509Certprofiles().getX509Certprofile();
+      for (X509CertprofileType type : certprofileTypes) {
+        String name = type.getName();
+        try {
+          byte[] content = readData(type);
+          x509ProfileMap.put(name, new X509CertprofileQAImpl(content));
+          LOG.info("configured X509 certificate profile {}", name);
+        } catch (IOException | CertprofileException e) {
+          final String message = "could not parse QA certificate profile " + name;
+          if (LOG.isErrorEnabled()) {
+            LOG.error(LogUtil.buildExceptionLogFormat(message),
+                e.getClass().getName(), e.getMessage());
+          }
+          LOG.debug(message, e);
+          continue;
         }
-        return data;
+      }
     }
+  } // method init
+
+  public void shutdown() {
+  }
+
+  @Override
+  public Set<String> getIssuerNames() {
+    return Collections.unmodifiableSet(x509IssuerInfoMap.keySet());
+  }
+
+  @Override
+  public X509IssuerInfo getIssuer(
+      final String issuerName) {
+    return x509IssuerInfoMap.get(issuerName);
+  }
+
+  @Override
+  public Set<String> getCertprofileNames() {
+    return Collections.unmodifiableSet(x509ProfileMap.keySet());
+  }
+
+  @Override
+  public X509CertprofileQA getCertprofile(
+      final String certprofileName) {
+    return x509ProfileMap.get(certprofileName);
+  }
+
+  private static QAConfType parseQAConf(
+      final InputStream confStream)
+  throws IOException, JAXBException, SAXException {
+    JAXBElement<?> rootElement;
+    try {
+      if (jaxbUnmarshaller == null) {
+        JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+        jaxbUnmarshaller = context.createUnmarshaller();
+
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(
+            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        URL url = QASystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
+        jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
+      }
+
+      rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(confStream);
+    } finally {
+      confStream.close();
+    }
+
+    Object rootType = rootElement.getValue();
+    if (rootType instanceof QAConfType) {
+      return (QAConfType) rootElement.getValue();
+    } else {
+      throw new SAXException("invalid root element type");
+    }
+  }
+
+  private static byte[] readData(
+      final FileOrValueType fileOrValue)
+  throws IOException {
+    byte[] data = fileOrValue.getValue();
+    if (data == null) {
+      data = IoUtil.read(fileOrValue.getFile());
+    }
+    return data;
+  }
 
 }

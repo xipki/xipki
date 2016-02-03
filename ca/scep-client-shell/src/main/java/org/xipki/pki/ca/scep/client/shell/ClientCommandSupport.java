@@ -55,93 +55,94 @@ import org.xipki.pki.scep.client.ScepClient;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
-    @Option(name = "--url",
-            required = true,
-            description = "URL of the SCEP server\n"
-                    + "(required)")
-    private String url;
+  @Option(name = "--url",
+      required = true,
+      description = "URL of the SCEP server\n"
+          + "(required)")
+  private String url;
 
-    @Option(name = "--ca-id",
-            description = "CA identifier")
-    private String caId;
+  @Option(name = "--ca-id",
+      description = "CA identifier")
+  private String caId;
 
-    @Option(name = "--ca-cert",
-            required = true,
-            description = "CA certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String caCertFile;
+  @Option(name = "--ca-cert",
+      required = true,
+      description = "CA certificate\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String caCertFile;
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 keystore file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p12File;
+  @Option(name = "--p12",
+      required = true,
+      description = "PKCS#12 keystore file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  private String password;
 
-    private ScepClient scepClient;
-    private PrivateKey identityKey;
-    private X509Certificate identityCert;
+  private ScepClient scepClient;
+  private PrivateKey identityKey;
+  private X509Certificate identityCert;
 
-    protected ScepClient getScepClient()
-    throws CertificateException, IOException {
-        if (scepClient == null) {
-            X509Certificate caCert = X509Util.parseCert(caCertFile);
-            CAIdentifier _caId = new CAIdentifier(url, caId);
-            CACertValidator cACertValidator = new PreprovisionedCACertValidator(caCert);
-            scepClient = new ScepClient(_caId, cACertValidator);
-        }
-        return scepClient;
+  protected ScepClient getScepClient()
+  throws CertificateException, IOException {
+    if (scepClient == null) {
+      X509Certificate caCert = X509Util.parseCert(caCertFile);
+      CAIdentifier _caId = new CAIdentifier(url, caId);
+      CACertValidator cACertValidator = new PreprovisionedCACertValidator(caCert);
+      scepClient = new ScepClient(_caId, cACertValidator);
+    }
+    return scepClient;
+  }
+
+  protected PrivateKey getIdentityKey()
+  throws Exception {
+    if (identityKey == null) {
+      readIdentity();
+    }
+    return identityKey;
+  }
+
+  protected X509Certificate getIdentityCert()
+  throws Exception {
+    if (identityCert == null) {
+      readIdentity();
     }
 
-    protected PrivateKey getIdentityKey()
-    throws Exception {
-        if (identityKey == null) {
-            readIdentity();
-        }
-        return identityKey;
+    return identityCert;
+  }
+
+  private void readIdentity()
+  throws Exception {
+    char[] pwd = readPasswordIfNotSet(password);
+
+    KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+    ks.load(new FileInputStream(p12File), pwd);
+
+    String keyname = null;
+    Enumeration<String> aliases = ks.aliases();
+    while (aliases.hasMoreElements()) {
+      String alias = aliases.nextElement();
+      if (ks.isKeyEntry(alias)) {
+        keyname = alias;
+        break;
+      }
     }
 
-    protected X509Certificate getIdentityCert()
-    throws Exception {
-        if (identityCert == null) {
-            readIdentity();
-        }
-
-        return identityCert;
+    if (keyname == null) {
+      throw new Exception("no key entry is contained in the keystore");
     }
 
-    private void readIdentity()
-    throws Exception {
-        char[] pwd = readPasswordIfNotSet(password);
-
-        KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-        ks.load(new FileInputStream(p12File), pwd);
-
-        String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (ks.isKeyEntry(alias)) {
-                keyname = alias;
-                break;
-            }
-        }
-
-        if (keyname == null) {
-            throw new Exception("no key entry is contained in the keystore");
-        }
-
-        this.identityKey = (PrivateKey) ks.getKey(keyname, pwd);
-        this.identityCert = (X509Certificate) ks.getCertificate(keyname);
-    }
+    this.identityKey = (PrivateKey) ks.getKey(keyname, pwd);
+    this.identityCert = (X509Certificate) ks.getCertificate(keyname);
+  }
 
 }

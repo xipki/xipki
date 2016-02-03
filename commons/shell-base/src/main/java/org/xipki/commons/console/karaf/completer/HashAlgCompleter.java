@@ -40,13 +40,14 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class HashAlgCompleter extends AbstractEnumCompleter {
 
-    public HashAlgCompleter() {
-        setTokens("SHA1,SHA224,SHA256,SHA384,SHA512");
-    }
+  public HashAlgCompleter() {
+    setTokens("SHA1,SHA224,SHA256,SHA384,SHA512");
+  }
 
 }

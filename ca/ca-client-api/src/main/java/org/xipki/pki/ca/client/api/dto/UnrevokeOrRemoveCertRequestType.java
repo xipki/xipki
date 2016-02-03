@@ -41,25 +41,26 @@ import java.util.List;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class UnrevokeOrRemoveCertRequestType {
 
-    private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
+  private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(
-            final IssuerSerialEntryType requestEntry) {
-        for (IssuerSerialEntryType re : requestEntries) {
-            if (re.getId().equals(requestEntry.getId())) {
-                return false;
-            }
-        }
-
-        requestEntries.add(requestEntry);
-        return true;
+  public boolean addRequestEntry(
+      final IssuerSerialEntryType requestEntry) {
+    for (IssuerSerialEntryType re : requestEntries) {
+      if (re.getId().equals(requestEntry.getId())) {
+        return false;
+      }
     }
 
-    public List<IssuerSerialEntryType> getRequestEntries() {
-        return Collections.unmodifiableList(requestEntries);
-    }
+    requestEntries.add(requestEntry);
+    return true;
+  }
+
+  public List<IssuerSerialEntryType> getRequestEntries() {
+    return Collections.unmodifiableList(requestEntries);
+  }
 }

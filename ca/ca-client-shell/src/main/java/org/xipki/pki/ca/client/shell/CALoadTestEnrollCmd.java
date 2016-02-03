@@ -53,109 +53,110 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-enroll",
-        description = "CA Client Enroll Load test")
+    description = "CA Client Enroll Load test")
 @Service
 public class CALoadTestEnrollCmd extends CALoadTestCommandSupport {
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
-    private String certprofile;
+  @Option(name = "--profile", aliases = "-p",
+      required = true,
+      description = "certificate profile\n"
+          + "(required)")
+  private String certprofile;
 
-    @Option(name = "--subject", aliases = "-s",
-            required = true,
-            description = "subject template\n"
-                    + "(required)")
-    private String subjectTemplate;
+  @Option(name = "--subject", aliases = "-s",
+      required = true,
+      description = "subject template\n"
+          + "(required)")
+  private String subjectTemplate;
 
-    @Option(name = "--random-dn",
-            description = "DN name to be incremented")
-    @Completion(RandomDNCompleter.class)
-    private String randomDNStr = "O";
+  @Option(name = "--random-dn",
+      description = "DN name to be incremented")
+  @Completion(RandomDNCompleter.class)
+  private String randomDNStr = "O";
 
-    @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+  @Option(name = "--duration",
+      description = "duration in seconds")
+  private Integer durationInSecond = 30;
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    @Option(name = "--key-type",
-            description = "key type to be requested")
-    private String keyType = "RSA";
+  @Option(name = "--key-type",
+      description = "key type to be requested")
+  private String keyType = "RSA";
 
-    @Option(name = "--key-size",
-            description = "modulus length of RSA key or p length of DSA key")
-    private Integer keysize = 2048;
+  @Option(name = "--key-size",
+      description = "modulus length of RSA key or p length of DSA key")
+  private Integer keysize = 2048;
 
-    @Option(name = "--curve",
-            description = "EC curve name or OID of EC key")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      description = "EC curve name or OID of EC key")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Option(name = "-n",
-            description = "number of certificates to be requested in one request")
-    private Integer n = 1;
+  @Option(name = "-n",
+      description = "number of certificates to be requested in one request")
+  private Integer n = 1;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (numThreads < 1) {
-            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (numThreads < 1) {
+      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+    }
 
-        if (durationInSecond < 1) {
-            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
-        }
+    if (durationInSecond < 1) {
+      throw new IllegalCmdParamException("invalid duration " + durationInSecond);
+    }
 
-        if ("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName)) {
-            throw new IllegalCmdParamException("curveName is not specified");
-        }
+    if ("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName)) {
+      throw new IllegalCmdParamException("curveName is not specified");
+    }
 
-        StringBuilder description = new StringBuilder();
-        description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
-        description.append("profile: ").append(certprofile).append("\n");
-        description.append("keyType: ").append(keyType).append("\n");
-        description.append("#certs/req: ").append(n).append("\n");
-        description.append("unit: ").append(n).append(" certificate");
-        if (n > 1) {
-            description.append("s");
-        }
+    StringBuilder description = new StringBuilder();
+    description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
+    description.append("profile: ").append(certprofile).append("\n");
+    description.append("keyType: ").append(keyType).append("\n");
+    description.append("#certs/req: ").append(n).append("\n");
+    description.append("unit: ").append(n).append(" certificate");
+    if (n > 1) {
+      description.append("s");
+    }
 
-        RandomDN randomDN = null;
-        if (randomDNStr != null) {
-            randomDN = RandomDN.getInstance(randomDNStr);
-            if (randomDN == null) {
-                throw new IllegalCmdParamException("invalid randomDN " + randomDNStr);
-            }
-        }
+    RandomDN randomDN = null;
+    if (randomDNStr != null) {
+      randomDN = RandomDN.getInstance(randomDNStr);
+      if (randomDN == null) {
+        throw new IllegalCmdParamException("invalid randomDN " + randomDNStr);
+      }
+    }
 
-        KeyEntry keyEntry;
-        if ("EC".equalsIgnoreCase(keyType)) {
-            keyEntry = new ECKeyEntry(curveName);
-        } else if ("RSA".equalsIgnoreCase(keyType)) {
-            keyEntry = new RSAKeyEntry(keysize.intValue());
-        } else if ("DSA".equalsIgnoreCase(keyType)) {
-            keyEntry = new DSAKeyEntry(keysize.intValue());
-        } else {
-            throw new IllegalCmdParamException("invalid keyType " + keyType);
-        }
+    KeyEntry keyEntry;
+    if ("EC".equalsIgnoreCase(keyType)) {
+      keyEntry = new ECKeyEntry(curveName);
+    } else if ("RSA".equalsIgnoreCase(keyType)) {
+      keyEntry = new RSAKeyEntry(keysize.intValue());
+    } else if ("DSA".equalsIgnoreCase(keyType)) {
+      keyEntry = new DSAKeyEntry(keysize.intValue());
+    } else {
+      throw new IllegalCmdParamException("invalid keyType " + keyType);
+    }
 
-        LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
-                subjectTemplate, randomDN);
-        CALoadTestEnroll loadTest = new CALoadTestEnroll(caClient, loadtestEntry,
-                n, description.toString());
+    LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
+        subjectTemplate, randomDN);
+    CALoadTestEnroll loadTest = new CALoadTestEnroll(caClient, loadtestEntry,
+        n, description.toString());
 
-        loadTest.setDuration(durationInSecond);
-        loadTest.setThreads(numThreads);
-        loadTest.test();
+    loadTest.setDuration(durationInSecond);
+    loadTest.setThreads(numThreads);
+    loadTest.test();
 
-        return null;
-    } // method doExecute
+    return null;
+  } // method doExecute
 
 }

@@ -43,85 +43,86 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IaikP11Util {
 
-    private IaikP11Util() {
+  private IaikP11Util() {
+  }
+
+  public static byte[] generateKeyID(
+      final Session session)
+  throws Exception {
+    SecureRandom random = new SecureRandom();
+    byte[] keyID = null;
+    do {
+      keyID = new byte[8];
+      random.nextBytes(keyID);
+    } while (idExists(session, keyID));
+
+    return keyID;
+  }
+
+  public static boolean idExists(
+      final Session session, final byte[] keyID)
+  throws Exception {
+    Key k = new Key();
+    k.getId().setByteArrayValue(keyID);
+
+    session.findObjectsInit(k);
+    Object[] objects = session.findObjects(1);
+    session.findObjectsFinal();
+    if (objects.length > 0) {
+      return true;
     }
 
-    public static byte[] generateKeyID(
-            final Session session)
-    throws Exception {
-        SecureRandom random = new SecureRandom();
-        byte[] keyID = null;
-        do {
-            keyID = new byte[8];
-            random.nextBytes(keyID);
-        } while (idExists(session, keyID));
+    X509PublicKeyCertificate c = new X509PublicKeyCertificate();
+    c.getId().setByteArrayValue(keyID);
 
-        return keyID;
+    session.findObjectsInit(c);
+    objects = session.findObjects(1);
+    session.findObjectsFinal();
+
+    return objects.length > 0;
+  }
+
+  public static boolean labelExists(
+      final Session session,
+      final String keyLabel)
+  throws Exception {
+    Key k = new Key();
+    k.getLabel().setCharArrayValue(keyLabel.toCharArray());
+
+    session.findObjectsInit(k);
+    Object[] objects = session.findObjects(1);
+    session.findObjectsFinal();
+    if (objects.length > 0) {
+      return true;
     }
 
-    public static boolean idExists(
-            final Session session, final byte[] keyID)
-    throws Exception {
-        Key k = new Key();
-        k.getId().setByteArrayValue(keyID);
+    X509PublicKeyCertificate c = new X509PublicKeyCertificate();
+    c.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
-        session.findObjectsInit(k);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0) {
-            return true;
-        }
+    session.findObjectsInit(c);
+    objects = session.findObjects(1);
+    session.findObjectsFinal();
 
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getId().setByteArrayValue(keyID);
+    return objects.length > 0;
+  }
 
-        session.findObjectsInit(c);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
-
-        return objects.length > 0;
+  static String eraseSensitiveInfo(
+      final String data) {
+    int index = data.indexOf("password");
+    if (index == -1) {
+      return data;
     }
 
-    public static boolean labelExists(
-            final Session session,
-            final String keyLabel)
-    throws Exception {
-        Key k = new Key();
-        k.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-        session.findObjectsInit(k);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0) {
-            return true;
-        }
-
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-        session.findObjectsInit(c);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
-
-        return objects.length > 0;
+    if (index > 1 && data.charAt(index - 1) == '%') {
+      return data.substring(0, index - 1);
+    } else {
+      return data.substring(0, index);
     }
-
-    static String eraseSensitiveInfo(
-            final String data) {
-        int index = data.indexOf("password");
-        if (index == -1) {
-            return data;
-        }
-
-        if (index > 1 && data.charAt(index - 1) == '%') {
-            return data.substring(0, index - 1);
-        } else {
-            return data.substring(0, index);
-        }
-    }
+  }
 
 }

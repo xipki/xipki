@@ -40,54 +40,55 @@ import java.util.Map;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ParamUtil {
 
-    private ParamUtil() {
+  private ParamUtil() {
+  }
+  public static void assertNotNull(
+      final String parameterName,
+      final Object parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(parameterName + " could not be null");
     }
-    public static void assertNotNull(
-            final String parameterName,
-            final Object parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-    }
+  }
 
-    public static void assertNotBlank(
-            final String parameterName,
-            final String parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be blank");
-        }
+  public static void assertNotBlank(
+      final String parameterName,
+      final String parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(parameterName + " could not be null");
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Collection<?> parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
+    if (parameter.isEmpty()) {
+      throw new IllegalArgumentException(parameterName + " could not be blank");
+    }
+  }
 
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+  public static void assertNotEmpty(
+      final String parameterName,
+      final Collection<?> parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(parameterName + " could not be null");
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Map<?, ?> parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
-        }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+    if (parameter.isEmpty()) {
+      throw new IllegalArgumentException(parameterName + " could not be empty");
     }
+  }
+
+  public static void assertNotEmpty(
+      final String parameterName,
+      final Map<?, ?> parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(parameterName + " could not be null");
+    }
+
+    if (parameter.isEmpty()) {
+      throw new IllegalArgumentException(parameterName + " could not be empty");
+    }
+  }
 
 }

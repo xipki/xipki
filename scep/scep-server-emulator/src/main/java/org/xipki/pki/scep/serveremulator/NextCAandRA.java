@@ -40,28 +40,29 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class NextCAandRA {
 
-    private final Certificate cACert;
+  private final Certificate cACert;
 
-    private final Certificate rACert;
+  private final Certificate rACert;
 
-    public NextCAandRA(
-            final Certificate cACert,
-            final Certificate rACert) {
-        ParamUtil.assertNotNull("cACert", cACert);
-        this.cACert = cACert;
-        this.rACert = rACert;
-    }
+  public NextCAandRA(
+      final Certificate cACert,
+      final Certificate rACert) {
+    ParamUtil.assertNotNull("cACert", cACert);
+    this.cACert = cACert;
+    this.rACert = rACert;
+  }
 
-    public Certificate getCACert() {
-        return cACert;
-    }
+  public Certificate getCACert() {
+    return cACert;
+  }
 
-    public Certificate getRACert() {
-        return rACert;
-    }
+  public Certificate getRACert() {
+    return rACert;
+  }
 
 }

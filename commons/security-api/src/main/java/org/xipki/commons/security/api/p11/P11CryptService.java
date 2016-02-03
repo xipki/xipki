@@ -42,69 +42,70 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface P11CryptService {
 
-    void refresh()
-    throws SignerException;
+  void refresh()
+  throws SignerException;
 
-    byte[] CKM_RSA_PKCS(
-            byte[] encodedDigestInfo,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_RSA_PKCS(
+      byte[] encodedDigestInfo,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    byte[] CKM_RSA_X509(
-            byte[] hash,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_RSA_X509(
+      byte[] hash,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    byte[] CKM_ECDSA_Plain(
-            byte[] hash,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_ECDSA_Plain(
+      byte[] hash,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    byte[] CKM_ECDSA_X962(
-            byte[] hash,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_ECDSA_X962(
+      byte[] hash,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    byte[] CKM_DSA_Plain(
-            byte[] hash,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_DSA_Plain(
+      byte[] hash,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    byte[] CKM_DSA_X962(
-            byte[] hash,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  byte[] CKM_DSA_X962(
+      byte[] hash,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    PublicKey getPublicKey(
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  PublicKey getPublicKey(
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    X509Certificate getCertificate(
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  X509Certificate getCertificate(
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    X509Certificate[] getCertificates(
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws SignerException;
+  X509Certificate[] getCertificates(
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws SignerException;
 
-    P11SlotIdentifier[] getSlotIdentifiers()
-    throws SignerException;
+  P11SlotIdentifier[] getSlotIdentifiers()
+  throws SignerException;
 
-    String[] getKeyLabels(
-            P11SlotIdentifier slotId)
-    throws SignerException;
+  String[] getKeyLabels(
+      P11SlotIdentifier slotId)
+  throws SignerException;
 
 }

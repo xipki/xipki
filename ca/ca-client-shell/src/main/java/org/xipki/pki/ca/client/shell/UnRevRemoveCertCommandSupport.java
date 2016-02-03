@@ -52,64 +52,65 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--cert", aliases = "-c",
-            description = "certificate file")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert", aliases = "-c",
+      description = "certificate file")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Option(name = "--issuer", aliases = "-i",
-            description = "issuer certificate file")
-    @Completion(FilePathCompleter.class)
-    protected String issuerCertFile;
+  @Option(name = "--issuer", aliases = "-i",
+      description = "issuer certificate file")
+  @Completion(FilePathCompleter.class)
+  protected String issuerCertFile;
 
-    @Option(name = "--serial", aliases = "-s",
-            description = "serial number")
-    private String serialNumberS;
+  @Option(name = "--serial", aliases = "-s",
+      description = "serial number")
+  private String serialNumberS;
 
-    private BigInteger serialNumber;
+  private BigInteger serialNumber;
 
-    protected BigInteger getSerialNumber() {
-        if (serialNumber == null) {
-            if (isNotBlank(serialNumberS)) {
-                this.serialNumber = toBigInt(serialNumberS);
-            }
-        }
-        return serialNumber;
+  protected BigInteger getSerialNumber() {
+    if (serialNumber == null) {
+      if (isNotBlank(serialNumberS)) {
+        this.serialNumber = toBigInt(serialNumberS);
+      }
+    }
+    return serialNumber;
+  }
+
+  protected String checkCertificate(
+      final X509Certificate cert,
+      final X509Certificate caCert)
+  throws CertificateEncodingException {
+    if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
+      return "the given certificate is not issued by the given issuer";
     }
 
-    protected String checkCertificate(
-            final X509Certificate cert,
-            final X509Certificate caCert)
-    throws CertificateEncodingException {
-        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
-            return "the given certificate is not issued by the given issuer";
-        }
-
-        byte[] caSki = X509Util.extractSKI(caCert);
-        byte[] aki = X509Util.extractAKI(cert);
-        if (caSki != null && aki != null) {
-            if (!Arrays.equals(aki, caSki)) {
-                return "the given certificate is not issued by the given issuer";
-            }
-        }
-
-        try {
-            cert.verify(caCert.getPublicKey(), "BC");
-        } catch (SignatureException e) {
-            return "could not verify the signaure of given certificate by the issuer";
-        } catch (InvalidKeyException
-                | CertificateException
-                | NoSuchAlgorithmException
-                | NoSuchProviderException e) {
-            return "could not verify the signaure of given certificate by the issuer: "
-                    + e.getMessage();
-        }
-
-        return null;
+    byte[] caSki = X509Util.extractSKI(caCert);
+    byte[] aki = X509Util.extractAKI(cert);
+    if (caSki != null && aki != null) {
+      if (!Arrays.equals(aki, caSki)) {
+        return "the given certificate is not issued by the given issuer";
+      }
     }
+
+    try {
+      cert.verify(caCert.getPublicKey(), "BC");
+    } catch (SignatureException e) {
+      return "could not verify the signaure of given certificate by the issuer";
+    } catch (InvalidKeyException
+        | CertificateException
+        | NoSuchAlgorithmException
+        | NoSuchProviderException e) {
+      return "could not verify the signaure of given certificate by the issuer: "
+          + e.getMessage();
+    }
+
+    return null;
+  }
 
 }

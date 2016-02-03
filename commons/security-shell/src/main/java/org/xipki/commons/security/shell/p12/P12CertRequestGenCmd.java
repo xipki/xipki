@@ -51,61 +51,62 @@ import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "req-p12",
-        description = "generate PKCS#10 request with PKCS#12 keystore")
+    description = "generate PKCS#10 request with PKCS#12 keystore")
 @Service
 public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 keystore file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p12File;
+  @Option(name = "--p12",
+      required = true,
+      description = "PKCS#12 keystore file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  private String password;
 
-    private char[] getPassword() {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+  private char[] getPassword() {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
+    }
+    return pwdInChar;
+  }
+
+  public KeyStore getKeyStore()
+  throws Exception {
+    KeyStore ks;
+
+    FileInputStream fIn = null;
+    try {
+      fIn = new FileInputStream(expandFilepath(p12File));
+      ks = KeyStore.getInstance("PKCS12", "BC");
+      ks.load(fIn, getPassword());
+    } finally {
+      if (fIn != null) {
+        fIn.close();
+      }
     }
 
-    public KeyStore getKeyStore()
-    throws Exception {
-        KeyStore ks;
+    return ks;
+  }
 
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
-        }
+  @Override
+  protected ConcurrentContentSigner getSigner(
+      final String hashAlgo,
+      final SignatureAlgoControl signatureAlgoControl)
+  throws Exception {
+    char[] pwd = getPassword();
 
-        return ks;
-    }
-
-    @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
-    throws Exception {
-        char[] pwd = getPassword();
-
-        String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-                p12File, new String(pwd), 1);
-        return securityFactory.createSigner(
-                "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
-    }
+    String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
+        p12File, new String(pwd), 1);
+    return securityFactory.createSigner(
+        "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
+  }
 
 }

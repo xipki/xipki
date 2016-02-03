@@ -51,50 +51,51 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--p10",
-            required = true,
-            description = "PKCS#10 request file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10File;
+  @Option(name = "--p10",
+      required = true,
+      description = "PKCS#10 request file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p10File;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the certificate\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    protected abstract EnrolmentResponse requestCertificate(
-            ScepClient client,
-            CertificationRequest csr,
-            PrivateKey identityKey,
-            X509Certificate identityCert)
-    throws ScepClientException;
+  protected abstract EnrolmentResponse requestCertificate(
+      ScepClient client,
+      CertificationRequest csr,
+      PrivateKey identityKey,
+      X509Certificate identityCert)
+  throws ScepClientException;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        ScepClient client = getScepClient();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    ScepClient client = getScepClient();
 
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
-        EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-                getIdentityCert());
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
-        }
-
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        X509Certificate cert = resp.getCertificates().get(0);
-        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
+    EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
+        getIdentityCert());
+    if (resp.isFailure()) {
+      throw new CmdFailure("server returned 'failure'");
     }
+
+    if (resp.isPending()) {
+      throw new CmdFailure("server returned 'pending'");
+    }
+
+    X509Certificate cert = resp.getCertificates().get(0);
+    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

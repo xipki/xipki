@@ -40,55 +40,56 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PKIErrorException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final int status;
+  private final int status;
 
-    private final int pkiFailureInfo;
+  private final int pkiFailureInfo;
 
-    private final String statusMessage;
+  private final String statusMessage;
 
-    public PKIErrorException(
-            final PKIStatusInfo statusInfo) {
-        this(new org.xipki.pki.ca.common.cmp.PKIStatusInfo(statusInfo));
-    }
+  public PKIErrorException(
+      final PKIStatusInfo statusInfo) {
+    this(new org.xipki.pki.ca.common.cmp.PKIStatusInfo(statusInfo));
+  }
 
-    public PKIErrorException(
-            final org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo) {
-        this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
-    }
+  public PKIErrorException(
+      final org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo) {
+    this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
+  }
 
-    public PKIErrorException(
-            final int status,
-            final int pkiFailureInfo,
-            final String statusMessage) {
-        super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
-        this.status = status;
-        this.pkiFailureInfo = pkiFailureInfo;
-        this.statusMessage = statusMessage;
-    }
+  public PKIErrorException(
+      final int status,
+      final int pkiFailureInfo,
+      final String statusMessage) {
+    super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
+    this.status = status;
+    this.pkiFailureInfo = pkiFailureInfo;
+    this.statusMessage = statusMessage;
+  }
 
-    public PKIErrorException(
-            final int status) {
-        this.status = status;
-        this.pkiFailureInfo = 0;
-        this.statusMessage = null;
-    }
+  public PKIErrorException(
+      final int status) {
+    this.status = status;
+    this.pkiFailureInfo = 0;
+    this.statusMessage = null;
+  }
 
-    public int getStatus() {
-        return status;
-    }
+  public int getStatus() {
+    return status;
+  }
 
-    public int getPkiFailureInfo() {
-        return pkiFailureInfo;
-    }
+  public int getPkiFailureInfo() {
+    return pkiFailureInfo;
+  }
 
-    public String getStatusMessage() {
-        return statusMessage;
-    }
+  public String getStatusMessage() {
+    return statusMessage;
+  }
 
 }
