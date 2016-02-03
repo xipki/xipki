@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.pki.ca.api.profile.RDNControl;
+import org.xipki.pki.ca.api.profile.RdnControl;
 
 /**
  * @author Lijun Liao
@@ -56,7 +56,7 @@ import org.xipki.pki.ca.api.profile.RDNControl;
 
 public class SubjectControl {
 
-  private final Map<ASN1ObjectIdentifier, RDNControl> controls;
+  private final Map<ASN1ObjectIdentifier, RdnControl> controls;
 
   private final Map<ASN1ObjectIdentifier, String> typeGroups;
 
@@ -68,23 +68,23 @@ public class SubjectControl {
 
   public SubjectControl(
       final boolean backwardsSubject,
-      final Map<ASN1ObjectIdentifier, RDNControl> pControls) {
-    ParamUtil.assertNotEmpty("pControls", pControls);
+      final Map<ASN1ObjectIdentifier, RdnControl> controls) {
+    ParamUtil.assertNotEmpty("controls", controls);
 
-    this.controls = pControls;
+    this.controls = controls;
     this.typeGroups = new HashMap<>();
-    Set<ASN1ObjectIdentifier> oids = controls.keySet();
+    Set<ASN1ObjectIdentifier> oidSet = controls.keySet();
     List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-    List<ASN1ObjectIdentifier> _oids = backwardsSubject
+    List<ASN1ObjectIdentifier> oids = backwardsSubject
         ? ObjectIdentifiers.getBackwardDNs()
         : ObjectIdentifiers.getForwardDNs();
-    for (ASN1ObjectIdentifier oid : _oids) {
-      if (oids.contains(oid)) {
+    for (ASN1ObjectIdentifier oid : oids) {
+      if (oidSet.contains(oid)) {
         sortedOids.add(oid);
       }
     }
 
-    for (ASN1ObjectIdentifier oid : oids) {
+    for (ASN1ObjectIdentifier oid : oidSet) {
       if (!sortedOids.contains(oid)) {
         sortedOids.add(oid);
       }
@@ -114,10 +114,10 @@ public class SubjectControl {
     this.groups = Collections.unmodifiableSet(groups);
   } // constructor
 
-  public RDNControl getControl(
+  public RdnControl getControl(
       final ASN1ObjectIdentifier type) {
     return controls.isEmpty()
-        ? SubjectDNSpec.getRDNControl(type)
+        ? SubjectDnSpec.getRDNControl(type)
         : controls.get(type);
   }
 

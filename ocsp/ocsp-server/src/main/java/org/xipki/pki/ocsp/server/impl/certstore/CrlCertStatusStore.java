@@ -84,7 +84,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PCIAuditEvent;
+import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
@@ -795,7 +795,7 @@ public class CrlCertStatusStore extends CertStatusStore {
       return;
     }
 
-    PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+    PciAuditEvent auditEvent = new PciAuditEvent(new Date());
     auditEvent.setUserId("SYSTEM");
     auditEvent.setEventType(eventType);
     auditEvent.setAffectedResource("CRL-Updater");

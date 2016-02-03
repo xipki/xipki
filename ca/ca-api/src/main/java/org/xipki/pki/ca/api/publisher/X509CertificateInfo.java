@@ -43,7 +43,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
  * @author Lijun Liao
@@ -54,7 +54,7 @@ public class X509CertificateInfo {
 
   private final byte[] subjectPublicKey;
 
-  private final X509CertWithDBCertId cert;
+  private final X509CertWithDbId cert;
 
   private final X509Cert issuerCert;
 
@@ -77,7 +77,7 @@ public class X509CertificateInfo {
   private boolean alreadyIssued;
 
   public X509CertificateInfo(
-      final X509CertWithDBCertId cert,
+      final X509CertWithDbId cert,
       final X509Cert issuerCert,
       final byte[] subjectPublicKey,
       final String profileName)
@@ -98,7 +98,7 @@ public class X509CertificateInfo {
     return subjectPublicKey;
   }
 
-  public X509CertWithDBCertId getCert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 

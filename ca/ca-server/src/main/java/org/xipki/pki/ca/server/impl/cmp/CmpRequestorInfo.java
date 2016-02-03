@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.impl.cmp;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.RequestorInfo;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 /**
@@ -49,11 +49,11 @@ public class CmpRequestorInfo implements RequestorInfo {
 
   private final CAHasRequestorEntry caHasRequestor;
 
-  private final X509CertWithDBCertId cert;
+  private final X509CertWithDbId cert;
 
   public CmpRequestorInfo(
       final CAHasRequestorEntry caHasRequestor,
-      final X509CertWithDBCertId cert) {
+      final X509CertWithDbId cert) {
     ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
     ParamUtil.assertNotNull("cert", cert);
     this.caHasRequestor = caHasRequestor;
@@ -64,7 +64,7 @@ public class CmpRequestorInfo implements RequestorInfo {
     return caHasRequestor;
   }
 
-  public X509CertWithDBCertId getCert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 
@@ -74,7 +74,7 @@ public class CmpRequestorInfo implements RequestorInfo {
   }
 
   @Override
-  public boolean isRA() {
+  public boolean isRa() {
     return caHasRequestor.isRa();
   }
 

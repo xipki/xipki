@@ -56,7 +56,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
@@ -205,14 +205,14 @@ public class CertificateStore {
     }
   } // method revokeCertificate
 
-  public X509CertWithDBCertId unrevokeCertificate(
+  public X509CertWithDbId unrevokeCertificate(
       final X509Cert caCert,
       final BigInteger serialNumber,
       final boolean force,
       final boolean publishToDeltaCRLCache)
   throws OperationException {
     try {
-      X509CertWithDBCertId unrevokedCert = queryExecutor.unrevokeCert(
+      X509CertWithDbId unrevokedCert = queryExecutor.unrevokeCert(
           caCert, serialNumber, force, publishToDeltaCRLCache);
       if (unrevokedCert == null) {
         LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
@@ -231,7 +231,7 @@ public class CertificateStore {
     }
   }
 
-  X509CertWithDBCertId getCert(
+  X509CertWithDbId getCert(
       final X509Cert caCert,
       final BigInteger serialNumber)
   throws OperationException {
@@ -671,7 +671,7 @@ public class CertificateStore {
     }
   }
 
-  public X509CertWithDBCertId getCertForId(
+  public X509CertWithDbId getCertForId(
       final int certId)
   throws OperationException {
     try {

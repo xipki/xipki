@@ -331,7 +331,7 @@ class IdentifiedX509Certprofile {
       byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
       AuthorityKeyIdentifier value = null;
       if (ikiValue != null) {
-        if (certprofile.includeIssuerAndSerialInAKI()) {
+        if (certprofile.includeIssuerAndSerialInAki()) {
           GeneralNames x509CaSubject = new GeneralNames(
               new GeneralName(publicCaInfo.getX500Subject()));
           value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject,
@@ -360,7 +360,7 @@ class IdentifiedX509Certprofile {
     extControl = controls.remove(extType);
     if (extControl != null
         && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
-      AuthorityInfoAccessControl aiaControl = certprofile.getAIAControl();
+      AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
 
       List<String> caIssuers = null;
       if (aiaControl == null || aiaControl.includesCaIssuers()) {
@@ -394,7 +394,7 @@ class IdentifiedX509Certprofile {
           && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
         CRLDistPoint value;
         try {
-          value = X509CertUtil.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
+          value = X509CertUtil.createCrlDistributionPoints(publicCaInfo.getCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         } catch (IOException e) {
           throw new CertprofileException(e.getMessage(), e);
@@ -410,7 +410,7 @@ class IdentifiedX509Certprofile {
           && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
         CRLDistPoint value;
         try {
-          value = X509CertUtil.createCRLDistributionPoints(
+          value = X509CertUtil.createCrlDistributionPoints(
               publicCaInfo.getDeltaCrlUris(),
               x500CaPrincipal, crlSignerSubject);
         } catch (IOException e) {
@@ -594,7 +594,7 @@ class IdentifiedX509Certprofile {
   }
 
   public boolean includeIssuerAndSerialInAKI() {
-    return certprofile.includeIssuerAndSerialInAKI();
+    return certprofile.includeIssuerAndSerialInAki();
   }
 
   public String incSerialNumber(

@@ -58,7 +58,7 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 
@@ -152,7 +152,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
   public boolean certificateAdded(
       final X509CertificateInfo certInfo) {
     X509Cert caCert = certInfo.getIssuerCert();
-    X509CertWithDBCertId cert = certInfo.getCert();
+    X509CertWithDbId cert = certInfo.getCert();
 
     try {
       queryExecutor.addCert(caCert, cert, certInfo.getProfileName(),
@@ -167,7 +167,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
   @Override
   public boolean certificateRevoked(
       final X509Cert caCert,
-      final X509CertWithDBCertId cert,
+      final X509CertWithDbId cert,
       final String certprofile,
       final CertRevocationInfo revInfo) {
     try {
@@ -182,7 +182,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
   @Override
   public boolean certificateUnrevoked(
       final X509Cert caCert,
-      final X509CertWithDBCertId cert) {
+      final X509CertWithDbId cert) {
     try {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
@@ -219,8 +219,8 @@ public class OCSPCertPublisher extends X509CertPublisher {
     auditEvent.setName("SYSTEM");
     auditEvent.setLevel(AuditLevel.ERROR);
     auditEvent.setStatus(AuditStatus.FAILED);
-    if (cert instanceof X509CertWithDBCertId) {
-      Integer certId = ((X509CertWithDBCertId) cert).getCertId();
+    if (cert instanceof X509CertWithDbId) {
+      Integer certId = ((X509CertWithDbId) cert).getCertId();
       if (certId != null) {
         auditEvent.addEventData(new AuditEventData("id", certId.toString()));
       }
@@ -281,7 +281,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
   @Override
   public boolean certificateRemoved(
       final X509Cert issuerCert,
-      final X509CertWithDBCertId cert) {
+      final X509CertWithDbId cert) {
     try {
       queryExecutor.removeCert(issuerCert, cert);
       return true;

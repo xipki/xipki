@@ -87,13 +87,12 @@ public abstract class X509Certprofile {
   /**
    * Whether include subject and serial number of the issuer certificate in the
    * AuthorityKeyIdentifier extension.
-   * @return
    */
-  public boolean includeIssuerAndSerialInAKI() {
+  public boolean includeIssuerAndSerialInAki() {
     return false;
   }
 
-  public AuthorityInfoAccessControl getAIAControl() {
+  public AuthorityInfoAccessControl getAiaControl() {
     return null;
   }
 
@@ -149,7 +148,6 @@ public abstract class X509Certprofile {
 
   /**
    * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
-   * @return
    */
   public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
     return null;

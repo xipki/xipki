@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 /**
@@ -47,7 +47,7 @@ public class CmpRequestorEntryWrapper {
 
   private CmpRequestorEntry dbEntry;
 
-  private X509CertWithDBCertId cert;
+  private X509CertWithDbId cert;
 
   public CmpRequestorEntryWrapper() {
   }
@@ -56,10 +56,10 @@ public class CmpRequestorEntryWrapper {
       final CmpRequestorEntry dbEntry) {
     this.dbEntry = dbEntry;
     cert = null;
-    cert = new X509CertWithDBCertId(dbEntry.getCert());
+    cert = new X509CertWithDbId(dbEntry.getCert());
   }
 
-  public X509CertWithDBCertId getCert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 

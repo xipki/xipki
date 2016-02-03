@@ -75,20 +75,18 @@ public class Range {
   }
 
   public boolean match(
-      final int i) {
-    if (min != null && i < min) {
+      final int val) {
+    if (min != null && val < min) {
       return false;
     }
-    if (max != null && i > max) {
+    if (max != null && val > max) {
       return false;
     }
 
     return true;
   }
 
-  /**
-   * @Override
-   */
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("[");

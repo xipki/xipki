@@ -101,11 +101,11 @@ public class CALoadTestEnroll extends LoadExecutor {
 
         result = caClient.requestCerts(request, null,
             userPrefix + System.currentTimeMillis(), null);
-      } catch (CAClientException | PKIErrorException e) {
-        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+      } catch (CAClientException | PKIErrorException ex) {
+        LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
         return false;
-      } catch (Throwable t) {
-        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+      } catch (Throwable th) {
+        LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
         return false;
       }
 

@@ -47,7 +47,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.publisher.OCSPCertPublisher;
@@ -117,7 +117,7 @@ class IdentifiedX509CertPublisher {
 
   public boolean certificateRevoked(
       final X509Cert issuerCert,
-      final X509CertWithDBCertId cert,
+      final X509CertWithDbId cert,
       final String certprofile,
       final CertRevocationInfo revInfo) {
     return certPublisher.certificateRevoked(issuerCert, cert, certprofile, revInfo);
@@ -159,13 +159,13 @@ class IdentifiedX509CertPublisher {
 
   public boolean certificateUnrevoked(
       final X509Cert issuerCert,
-      final X509CertWithDBCertId cert) {
+      final X509CertWithDbId cert) {
     return certPublisher.certificateUnrevoked(issuerCert, cert);
   }
 
   public boolean certificateRemoved(
       final X509Cert issuerCert,
-      final X509CertWithDBCertId cert) {
+      final X509CertWithDbId cert) {
     return certPublisher.certificateRemoved(issuerCert, cert);
   }
 

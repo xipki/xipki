@@ -71,7 +71,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
 
     try {
       this.serverUrl = new URL(serverUrl);
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException ex) {
       throw new IllegalArgumentException("invalid url: " + serverUrl);
     }
   }
@@ -87,7 +87,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
 
     try {
       this.serverUrl = new URL(serverUrl);
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException ex) {
       throw new IllegalArgumentException("invalid url: " + serverUrl);
     }
   }

@@ -40,7 +40,7 @@ package org.xipki.pki.ca.api.profile.x509;
  * @since 2.0
  */
 
-public abstract class AbstractEEX509Certprofile extends BaseX509Certprofile {
+public abstract class AbstractEeX509Certprofile extends BaseX509Certprofile {
 
   @Override
   public boolean isCA() {

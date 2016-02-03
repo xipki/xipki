@@ -45,7 +45,7 @@ import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PCIAuditEvent;
+import org.xipki.commons.audit.api.PciAuditEvent;
 
 /**
  * @author Lijun Liao
@@ -77,15 +77,15 @@ public class Slf4jAuditServiceImpl implements AuditService {
           LOG.info("{}", createMessage(event));
           break;
       } // end switch
-    } catch (Throwable t) {
+    } catch (Throwable th) {
       LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-          AuditLevel.ERROR.getAlignedText(), t.getMessage());
+          AuditLevel.ERROR.getAlignedText(), th.getMessage());
     }
   }
 
   @Override
   public void logEvent(
-      final PCIAuditEvent event) {
+      final PciAuditEvent event) {
     if (event == null) {
       return;
     }
@@ -103,9 +103,9 @@ public class Slf4jAuditServiceImpl implements AuditService {
           LOG.info("{} | {}", al.getAlignedText(), msg);
           break;
       } // end switch
-    } catch (Throwable t) {
+    } catch (Throwable th) {
       LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-          AuditLevel.ERROR.getAlignedText(), t.getMessage());
+          AuditLevel.ERROR.getAlignedText(), th.getMessage());
     }
   }
 
