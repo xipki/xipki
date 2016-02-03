@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.pki.ca.api.CertprofileException;
-import org.xipki.pki.ca.api.profile.RDNControl;
+import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.StringType;
 
@@ -53,11 +53,10 @@ import org.xipki.pki.ca.api.profile.StringType;
  * @author Lijun Liao
  * @since 2.0
  */
-
-public class SubjectDNSpec {
+public class SubjectDnSpec {
 
   /**
-   * ranges
+   * ranges.
    */
   private static final Range r_64 = new Range(1, 64);
 
@@ -101,7 +100,7 @@ public class SubjectDNSpec {
 
   private static final Map<ASN1ObjectIdentifier, Pattern> patterns = new HashMap<>();
 
-  private static final Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, RdnControl> controls = new HashMap<>();
 
   private static final Map<ASN1ObjectIdentifier, Set<StringType>> stringTypeSets =
       new HashMap<>();
@@ -331,17 +330,17 @@ public class SubjectDNSpec {
     defaultStringTypes.put(id, StringType.utf8String);
 
     for (ASN1ObjectIdentifier type : ids) {
-      Pattern pattern = patterns.get(type);
       StringType stringType = defaultStringTypes.get(type);
       if (stringType == null) {
         stringType = StringType.utf8String;
       }
-      RDNControl control = new RDNControl(type,
+      RdnControl control = new RdnControl(type,
           0, // minOccurs
           9 //maxOccurs
           );
       control.setStringType(stringType);
       control.setStringLengthRange(ranges.get(type));
+      Pattern pattern = patterns.get(type);
       if (pattern != null) {
         control.setPatterns(Arrays.asList(pattern));
       }
@@ -349,7 +348,7 @@ public class SubjectDNSpec {
     }
   }
 
-  private SubjectDNSpec() {
+  private SubjectDnSpec() {
   }
 
   public static Range getStringLengthRange(
@@ -367,11 +366,11 @@ public class SubjectDNSpec {
     return defaultStringTypes.get(rdnType);
   }
 
-  public static RDNControl getRDNControl(
+  public static RdnControl getRDNControl(
       final ASN1ObjectIdentifier rdnType) {
-    RDNControl control = controls.get(rdnType);
+    RdnControl control = controls.get(rdnType);
     if (control == null) {
-      control = new RDNControl(rdnType,
+      control = new RdnControl(rdnType,
           0, // minOccurs
           9 // maxOccurs
           );
@@ -381,7 +380,7 @@ public class SubjectDNSpec {
   } // static
 
   public static void fixRDNControl(
-      final RDNControl control)
+      final RdnControl control)
   throws CertprofileException {
     ASN1ObjectIdentifier type = control.getType();
 

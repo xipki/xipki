@@ -88,7 +88,7 @@ import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
@@ -195,7 +195,7 @@ class CertStoreQueryExecutor {
 
   void addCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId certificate,
+      final X509CertWithDbId certificate,
       final byte[] encodedSubjectPublicKey,
       final String certprofileName,
       final RequestorInfo requestor,
@@ -715,7 +715,7 @@ class CertStoreQueryExecutor {
     return certWithRevInfo;
   } // method revokeCert
 
-  X509CertWithDBCertId unrevokeCert(
+  X509CertWithDbId unrevokeCert(
       final X509Cert caCert,
       final BigInteger serialNumber,
       final boolean force,
@@ -804,7 +804,7 @@ class CertStoreQueryExecutor {
     }
   } // method publishToDeltaCRLCache
 
-  X509CertWithDBCertId getCert(
+  X509CertWithDbId getCert(
       final X509Cert caCert,
       final BigInteger serialNumber)
   throws OperationException, DataAccessException {
@@ -1188,7 +1188,7 @@ class CertStoreQueryExecutor {
       int certprofile_id = rs.getInt("PID");
       String certprofileName = certprofileStore.getName(certprofile_id);
 
-      X509CertWithDBCertId certWithMeta = new X509CertWithDBCertId(cert, encodedCert);
+      X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
 
       X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
           caCert, cert.getPublicKey().getEncoded(), certprofileName);
@@ -1220,7 +1220,7 @@ class CertStoreQueryExecutor {
     }
   } // method getCertForId
 
-  X509CertWithDBCertId getCertForId(
+  X509CertWithDbId getCertForId(
       final int certId)
   throws DataAccessException, OperationException {
     final String sql = dataSource.createFetchFirstSelectSQL("CERT FROM CRAW WHERE CID=?", 1);
@@ -1251,7 +1251,7 @@ class CertStoreQueryExecutor {
         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
             "IOException: " + e.getMessage());
       }
-      return new X509CertWithDBCertId(cert, encodedCert);
+      return new X509CertWithDbId(cert, encodedCert);
     } catch (SQLException e) {
       throw dataSource.translate(sql, e);
     } finally {
@@ -1313,7 +1313,7 @@ class CertStoreQueryExecutor {
             invalidityTime);
       }
 
-      X509CertWithDBCertId certWithMeta = new X509CertWithDBCertId(cert, certBytes);
+      X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, certBytes);
       certWithMeta.setCertId(certId);
 
       int certprofileId = rs.getInt("PID");
@@ -1363,7 +1363,7 @@ class CertStoreQueryExecutor {
       int certprofile_id = rs.getInt("PID");
       String certprofileName = certprofileStore.getName(certprofile_id);
 
-      X509CertWithDBCertId certWithMeta = new X509CertWithDBCertId(cert, encodedCert);
+      X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
 
       byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert)
           .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
@@ -1475,7 +1475,7 @@ class CertStoreQueryExecutor {
 
       List<X509Certificate> certs = new ArrayList<X509Certificate>(certIds.size());
       for (Integer certId : certIds) {
-        X509CertWithDBCertId cert = getCertForId(certId);
+        X509CertWithDbId cert = getCertForId(certId);
         if (cert != null) {
           certs.add(cert.getCert());
         }

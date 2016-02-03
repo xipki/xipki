@@ -107,7 +107,7 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PCIAuditEvent;
+import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -1150,7 +1150,7 @@ public class OcspServer {
         ? null
         : auditServiceRegister.getAuditService();
     if (auditService != null) {
-      PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+      PciAuditEvent auditEvent = new PciAuditEvent(new Date());
       auditEvent.setUserId("OCSP-SYSTEM");
       auditEvent.setEventType(eventType);
       auditEvent.setAffectedResource("CORE");

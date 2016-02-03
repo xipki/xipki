@@ -99,8 +99,8 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
       } else {
         LOG.debug("no AuditService binding found to remove for '{}'", service);
       }
-    } catch (Exception e) {
-      LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
+    } catch (Exception ex) {
+      LOG.debug("caught Exception({}). service is probably destroyed.", ex.getMessage());
     }
   }
 

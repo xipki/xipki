@@ -35,7 +35,7 @@
 
 package org.xipki.pki.ca.server.impl.store;
 
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
  * @author Lijun Liao
@@ -44,18 +44,18 @@ import org.xipki.pki.ca.api.X509CertWithDBCertId;
 
 public class X509CertWithRevokedInfo {
 
-  private final X509CertWithDBCertId cert;
+  private final X509CertWithDbId cert;
 
   private final boolean revoked;
 
   public X509CertWithRevokedInfo(
-      final X509CertWithDBCertId cert,
+      final X509CertWithDbId cert,
       final boolean revoked) {
     this.cert = cert;
     this.revoked = revoked;
   }
 
-  public X509CertWithDBCertId getCert() {
+  public X509CertWithDbId getCert() {
     return cert;
   }
 

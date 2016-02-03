@@ -46,6 +46,6 @@ public interface AuditService {
       AuditEvent event);
 
   void logEvent(
-      PCIAuditEvent event);
+      PciAuditEvent event);
 
 }

@@ -65,7 +65,7 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 
 /**
@@ -151,7 +151,7 @@ class OCSPStoreQueryExecutor {
    */
   void addCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId certificate,
+      final X509CertWithDbId certificate,
       final String certprofile)
   throws DataAccessException, CertificateEncodingException, OperationException {
     addCert(issuer, certificate, certprofile, null);
@@ -159,7 +159,7 @@ class OCSPStoreQueryExecutor {
 
   void addCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId certificate,
+      final X509CertWithDbId certificate,
       final String certprofile,
       final CertRevocationInfo revInfo)
   throws DataAccessException, CertificateEncodingException, OperationException {
@@ -168,7 +168,7 @@ class OCSPStoreQueryExecutor {
 
   private void addOrUpdateCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId certificate,
+      final X509CertWithDbId certificate,
       final String certprofile,
       final CertRevocationInfo revInfo)
   throws DataAccessException, CertificateEncodingException, OperationException {
@@ -346,7 +346,7 @@ class OCSPStoreQueryExecutor {
 
   void revokeCert(
       final X509Cert caCert,
-      final X509CertWithDBCertId cert,
+      final X509CertWithDbId cert,
       final String certprofile,
       final CertRevocationInfo revInfo)
   throws DataAccessException, CertificateEncodingException, OperationException {
@@ -355,7 +355,7 @@ class OCSPStoreQueryExecutor {
 
   void unrevokeCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId cert)
+      final X509CertWithDbId cert)
   throws DataAccessException {
     Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
     if (issuerId == null) {
@@ -409,7 +409,7 @@ class OCSPStoreQueryExecutor {
 
   void removeCert(
       final X509Cert issuer,
-      final X509CertWithDBCertId cert)
+      final X509CertWithDbId cert)
   throws DataAccessException {
     Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
     if (issuerId == null) {

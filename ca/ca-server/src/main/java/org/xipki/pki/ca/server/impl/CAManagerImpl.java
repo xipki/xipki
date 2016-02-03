@@ -82,7 +82,7 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PCIAuditEvent;
+import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.IoUtil;
@@ -108,7 +108,7 @@ import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
@@ -2206,7 +2206,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
     X509Cert certInfo = ca.getCAInfo().getCertificate();
 
-    X509CertWithDBCertId certInfoWithId = new X509CertWithDBCertId(certInfo.getCert());
+    X509CertWithDbId certInfoWithId = new X509CertWithDbId(certInfo.getCert());
     if (!certInfo.getCert().getSubjectX500Principal().equals(
         certInfo.getCert().getIssuerX500Principal())) {
       throw new CAMgmtException("CA named " + caName + " is not a self-signed CA");
@@ -2359,7 +2359,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
       return;
     }
 
-    PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+    PciAuditEvent auditEvent = new PciAuditEvent(new Date());
     auditEvent.setUserId("CA-SYSTEM");
     auditEvent.setEventType(eventType);
     auditEvent.setAffectedResource("CORE");
@@ -2382,7 +2382,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
 
     if (caName == null) {
       try {
-        certstore.clearPublishQueue((X509CertWithDBCertId) null, (String) null);
+        certstore.clearPublishQueue((X509CertWithDbId) null, (String) null);
         return true;
       } catch (OperationException e) {
         throw new CAMgmtException(e.getMessage(), e);

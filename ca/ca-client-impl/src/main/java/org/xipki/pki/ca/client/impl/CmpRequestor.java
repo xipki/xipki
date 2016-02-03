@@ -187,8 +187,8 @@ public abstract class CmpRequestor {
 
     try {
       return CmpUtil.addProtection(request, requestor, sender, sendRequestorCert);
-    } catch (CMPException | NoIdleSignerException e) {
-      throw new CmpRequestorException("could not sign the request", e);
+    } catch (CMPException | NoIdleSignerException ex) {
+      throw new CmpRequestorException("could not sign the request", ex);
     }
   }
 
@@ -210,9 +210,9 @@ public abstract class CmpRequestor {
     byte[] encodedRequest;
     try {
       encodedRequest = _request.getEncoded();
-    } catch (IOException e) {
+    } catch (IOException ex) {
       LOG.error("error while encode the PKI request {}", _request);
-      throw new CmpRequestorException(e.getMessage(), e);
+      throw new CmpRequestorException(ex.getMessage(), ex);
     }
 
     RequestResponsePair reqResp = null;
@@ -225,9 +225,9 @@ public abstract class CmpRequestor {
     byte[] encodedResponse;
     try {
       encodedResponse = send(encodedRequest);
-    } catch (IOException e) {
+    } catch (IOException ex) {
       LOG.error("error while send the PKI request {} to server", _request);
-      throw new CmpRequestorException("TRANSPORT_ERROR", e);
+      throw new CmpRequestorException("TRANSPORT_ERROR", ex);
     }
 
     if (reqResp != null) {
@@ -237,12 +237,12 @@ public abstract class CmpRequestor {
     GeneralPKIMessage response;
     try {
       response = new GeneralPKIMessage(encodedResponse);
-    } catch (IOException e) {
+    } catch (IOException ex) {
       if (LOG.isErrorEnabled()) {
         LOG.error("error while decode the received PKI message: {}",
             Hex.toHexString(encodedResponse));
       }
-      throw new CmpRequestorException(e.getMessage(), e);
+      throw new CmpRequestorException(ex.getMessage(), ex);
     }
 
     PKIHeader respHeader = response.getHeader();
@@ -258,8 +258,8 @@ public abstract class CmpRequestor {
         ProtectionVerificationResult verifyProtection = verifyProtection(
             Hex.toHexString(tid.getOctets()), response, responderCert);
         ret.setProtectionVerificationResult(verifyProtection);
-      } catch (InvalidKeyException | OperatorCreationException | CMPException e) {
-        throw new CmpRequestorException(e.getMessage(), e);
+      } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
+        throw new CmpRequestorException(ex.getMessage(), ex);
       }
     } else if (signRequest) {
       PKIBody respBody = response.getBody();
@@ -295,7 +295,7 @@ public abstract class CmpRequestor {
     ASN1Sequence seq;
     try {
       seq = ASN1Sequence.getInstance(itvValue);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException ex) {
       throw new CmpRequestorException("invalid syntax of the response");
     }
     int n = seq.size();
@@ -306,7 +306,7 @@ public abstract class CmpRequestor {
     int _action;
     try {
       _action = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException ex) {
       throw new CmpRequestorException("invalid syntax of the response");
     }
 

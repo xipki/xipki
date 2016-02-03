@@ -225,9 +225,9 @@ public class PublicKeyChecker {
         throw new BadCertTemplateException("illegal Dss-Parms");
       }
 
-      boolean match = dsaOption.allowsPLength(pLength);
+      boolean match = dsaOption.allowsPlength(pLength);
       if (match) {
-        match = dsaOption.allowsQLength(qLength);
+        match = dsaOption.allowsQlength(qLength);
       }
 
       if (match) {

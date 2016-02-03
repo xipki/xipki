@@ -64,11 +64,11 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
-import org.xipki.pki.ca.api.profile.RDNControl;
+import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.StringType;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
-import org.xipki.pki.ca.api.profile.x509.SubjectDNSpec;
+import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
@@ -92,7 +92,7 @@ public class SubjectChecker {
 
     Subject subject = conf.getSubject();
 
-    Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
+    Map<ASN1ObjectIdentifier, RdnControl> subjectDNControls = new HashMap<>();
 
     for (RdnType t : subject.getRdn()) {
       StringType stringType = XmlX509CertprofileUtil.convertStringType(
@@ -109,7 +109,7 @@ public class SubjectChecker {
       }
 
       if (patterns == null) {
-        Pattern pattern = SubjectDNSpec.getPattern(type);
+        Pattern pattern = SubjectDnSpec.getPattern(type);
         if (pattern != null) {
           patterns = Arrays.asList(pattern);
         }
@@ -122,14 +122,14 @@ public class SubjectChecker {
         range = null;
       }
 
-      RDNControl rdnControl = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs());
+      RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
       rdnControl.setStringType(stringType);
       rdnControl.setStringLengthRange(range);
       rdnControl.setPatterns(patterns);
       rdnControl.setPrefix(t.getPrefix());
       rdnControl.setSuffix(t.getSuffix());
       rdnControl.setGroup(t.getGroup());
-      SubjectDNSpec.fixRDNControl(rdnControl);
+      SubjectDnSpec.fixRDNControl(rdnControl);
 
       subjectDNControls.put(type, rdnControl);
     }
@@ -229,7 +229,7 @@ public class SubjectChecker {
     // control
     int minOccurs;
     int maxOccurs;
-    RDNControl rdnControl = subjectControl.getControl(type);
+    RdnControl rdnControl = subjectControl.getControl(type);
     if (rdnControl == null) {
       minOccurs = 0;
       maxOccurs = 0;
@@ -316,7 +316,7 @@ public class SubjectChecker {
     // control
     int minOccurs;
     int maxOccurs;
-    RDNControl rdnControl = subjectControl.getControl(type);
+    RdnControl rdnControl = subjectControl.getControl(type);
     if (rdnControl == null) {
       minOccurs = 0;
       maxOccurs = 0;
@@ -402,14 +402,14 @@ public class SubjectChecker {
       final String name,
       final ASN1ObjectIdentifier type,
       final String _atvTextValue,
-      final RDNControl rdnControl,
+      final RdnControl rdnControl,
       final List<String> requestedCoreAtvTextValues,
       final int index,
       final StringBuilder failureMsg)
   throws BadCertTemplateException {
     String atvTextValue = _atvTextValue;
     if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-      if (!SubjectDNSpec.p_dateOfBirth.matcher(atvTextValue).matches()) {
+      if (!SubjectDnSpec.p_dateOfBirth.matcher(atvTextValue).matches()) {
         throw new BadCertTemplateException(
             "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
       }

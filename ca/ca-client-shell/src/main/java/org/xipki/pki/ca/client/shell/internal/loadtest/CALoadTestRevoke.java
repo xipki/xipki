@@ -81,7 +81,7 @@ public class CALoadTestRevoke extends LoadExecutor {
         List<Long> serialNumbers;
         try {
           serialNumbers = nextSerials();
-        } catch (DataAccessException e) {
+        } catch (DataAccessException ex) {
           account(1, 1);
           break;
         }

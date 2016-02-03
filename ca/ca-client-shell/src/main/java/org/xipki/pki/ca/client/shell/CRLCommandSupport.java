@@ -97,8 +97,8 @@ public abstract class CRLCommandSupport extends ClientCommandSupport {
     X509CRL crl = null;
     try {
       crl = retrieveCRL(caName);
-    } catch (PKIErrorException e) {
-      throw new CmdFailure("received no CRL from server: " + e.getMessage());
+    } catch (PKIErrorException ex) {
+      throw new CmdFailure("received no CRL from server: " + ex.getMessage());
     }
 
     if (crl == null) {

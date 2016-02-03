@@ -128,7 +128,7 @@ import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
@@ -1516,7 +1516,7 @@ public class X509CA {
     return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
   } // method revokeCertificate
 
-  public X509CertWithDBCertId unrevokeCertificate(
+  public X509CertWithDbId unrevokeCertificate(
       final BigInteger serialNumber)
   throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
@@ -1527,7 +1527,7 @@ public class X509CA {
     return do_unrevokeCertificate(serialNumber, false);
   } // method unrevokeCertificate
 
-  public X509CertWithDBCertId removeCertificate(
+  public X509CertWithDbId removeCertificate(
       final BigInteger serialNumber)
   throws OperationException {
     if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
@@ -1538,7 +1538,7 @@ public class X509CA {
     return do_removeCertificate(serialNumber);
   } // method removeCertificate
 
-  private X509CertWithDBCertId do_removeCertificate(
+  private X509CertWithDbId do_removeCertificate(
       final BigInteger serialNumber)
   throws OperationException {
     X509CertWithRevocationInfo certWithRevInfo =
@@ -1548,7 +1548,7 @@ public class X509CA {
     }
 
     boolean successful = true;
-    X509CertWithDBCertId certToRemove = certWithRevInfo.getCert();
+    X509CertWithDbId certToRemove = certWithRevInfo.getCert();
     for (IdentifiedX509CertPublisher publisher : getPublishers()) {
       boolean singleSuccessful;
       try {
@@ -1657,14 +1657,14 @@ public class X509CA {
     return revokedCert;
   } // method do_revokeCertificate
 
-  private X509CertWithDBCertId do_unrevokeCertificate(
+  private X509CertWithDbId do_unrevokeCertificate(
       final BigInteger serialNumber,
       final boolean force)
   throws OperationException {
     LOG.info("   START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(),
         serialNumber);
 
-    X509CertWithDBCertId unrevokedCert = null;
+    X509CertWithDbId unrevokedCert = null;
 
     unrevokedCert = certstore.unrevokeCertificate(
         caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCRLCache());
@@ -1987,7 +1987,7 @@ public class X509CA {
         if (bundle.isRevoked()) {
           throw new OperationException(ErrorCode.CERT_REVOKED);
         } else {
-          X509CertWithDBCertId issuedCert = certstore.getCertForId(bundle.getCertId());
+          X509CertWithDbId issuedCert = certstore.getCertForId(bundle.getCertId());
           if (issuedCert == null) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
               "could not find certificate in table CRAW for CID "
@@ -2227,7 +2227,7 @@ public class X509CA {
               "could not verify the signature of generated certificate");
         }
 
-        X509CertWithDBCertId certWithMeta = new X509CertWithDBCertId(cert, encodedCert);
+        X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
 
         ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
             subjectPublicKeyData, certprofileName);

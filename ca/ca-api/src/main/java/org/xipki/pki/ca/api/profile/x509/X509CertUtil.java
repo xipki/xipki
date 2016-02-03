@@ -111,7 +111,7 @@ public class X509CertUtil {
     return AuthorityInformationAccess.getInstance(seq);
   }
 
-  public static CRLDistPoint createCRLDistributionPoints(
+  public static CRLDistPoint createCrlDistributionPoints(
       final List<String> crlUris,
       final X500Name caSubject,
       final X500Name crlSignerSubject)

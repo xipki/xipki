@@ -255,8 +255,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
     X509CRL crl;
     try {
       crl = new X509CRLObject(certList);
-    } catch (CRLException e) {
-      throw new CmpRequestorException("returned CRL is invalid: " + e.getMessage());
+    } catch (CRLException ex) {
+      throw new CmpRequestorException("returned CRL is invalid: " + ex.getMessage());
     }
 
     CRLResultType result = new CRLResultType();
@@ -391,14 +391,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     int exptectedBodyType;
     switch (req.getType()) {
-    case CERT_REQ:
-      exptectedBodyType = PKIBody.TYPE_CERT_REP;
-      break;
-    case KEY_UPDATE:
-      exptectedBodyType = PKIBody.TYPE_KEY_UPDATE_REP;
-      break;
-    default:
-      exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
+      case CERT_REQ:
+        exptectedBodyType = PKIBody.TYPE_CERT_REP;
+        break;
+      case KEY_UPDATE:
+        exptectedBodyType = PKIBody.TYPE_KEY_UPDATE_REP;
+        break;
+      default:
+        exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
     }
 
     return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
@@ -483,7 +483,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
           X509CertificateHolder certHolder = null;
           try {
             certHolder = new X509CertificateHolder(cmpCert.getEncoded());
-          } catch (IOException e) {
+          } catch (IOException ex) {
             resultEntry = new ErrorResultEntryType(thisId,
                 ClientErrorCode.PKIStatus_RESPONSE_ERROR,
                 PKIFailureInfo.systemFailure,
@@ -541,8 +541,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
     CertificateConfirmationContent certConfirm;
     try {
       certConfirm = certConfirmBuilder.build(digesetCalculatorProvider);
-    } catch (CMPException e) {
-      throw new CmpRequestorException(e.getMessage(), e);
+    } catch (CMPException ex) {
+      throw new CmpRequestorException(ex.getMessage(), ex);
     }
     PKIBody body = new PKIBody(PKIBody.TYPE_CERT_CONFIRM, certConfirm.toASN1Structure());
     return new PKIMessage(header, body);
@@ -576,8 +576,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
           extensions[1] = new Extension(Extension.invalidityDate,
             true, new DEROctetString(time.getEncoded()));
         }
-      } catch (IOException e) {
-        throw new CmpRequestorException(e.getMessage(), e);
+      } catch (IOException ex) {
+        throw new CmpRequestorException(ex.getMessage(), ex);
       }
       Extensions exts = new Extensions(extensions);
 
@@ -609,8 +609,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
         ASN1Enumerated reason = new ASN1Enumerated(reasonCode);
         extensions[0] = new Extension(Extension.reasonCode,
             true, new DEROctetString(reason.getEncoded()));
-      } catch (IOException e) {
-        throw new CmpRequestorException(e.getMessage(), e);
+      } catch (IOException ex) {
+        throw new CmpRequestorException(ex.getMessage(), ex);
       }
       Extensions exts = new Extensions(extensions);
 
@@ -662,14 +662,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     int bodyType;
     switch (req.getType()) {
-    case CERT_REQ:
-      bodyType = PKIBody.TYPE_CERT_REQ;
-      break;
-    case KEY_UPDATE:
-      bodyType = PKIBody.TYPE_KEY_UPDATE_REQ;
-      break;
-    default:
-      bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
+      case CERT_REQ:
+        bodyType = PKIBody.TYPE_CERT_REQ;
+        break;
+      case KEY_UPDATE:
+        bodyType = PKIBody.TYPE_KEY_UPDATE_REQ;
+        break;
+      default:
+        bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
     }
 
     PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));
@@ -731,9 +731,9 @@ abstract class X509CmpRequestor extends CmpRequestor {
     Document doc;
     try {
       doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
-    } catch (SAXException | IOException e) {
+    } catch (SAXException | IOException ex) {
       throw new CmpRequestorException("could not parse the returned systemInfo for CA "
-          + caName + ": " + e.getMessage(), e);
+          + caName + ": " + ex.getMessage(), ex);
     }
 
     final String namespace = null;
@@ -753,8 +753,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
       String b64CACert = XMLUtil.getValueOfFirstElementChild(root, namespace, "CACert");
       try {
         caCert = X509Util.parseBase64EncodedCert(b64CACert);
-      } catch (CertificateException | IOException e) {
-        throw new CmpRequestorException("could no parse the CA certificate", e);
+      } catch (CertificateException | IOException ex) {
+        throw new CmpRequestorException("could no parse the CA certificate", ex);
       }
 
       Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certprofiles");
@@ -794,8 +794,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
     dbf.setNamespaceAware(true);
     try {
       return dbf.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      throw new RuntimeException("could not create XML document builder", e);
+    } catch (ParserConfigurationException ex) {
+      throw new RuntimeException("could not create XML document builder", ex);
     }
   }
 

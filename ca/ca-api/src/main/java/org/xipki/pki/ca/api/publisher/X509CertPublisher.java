@@ -45,7 +45,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509Cert;
-import org.xipki.pki.ca.api.X509CertWithDBCertId;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
  * @author Lijun Liao
@@ -78,17 +78,17 @@ public abstract class X509CertPublisher {
 
   public abstract boolean certificateRevoked(
       X509Cert issuerCert,
-      X509CertWithDBCertId cert,
+      X509CertWithDbId cert,
       String certprofile,
       CertRevocationInfo revInfo);
 
   public abstract boolean certificateUnrevoked(
       X509Cert issuerCert,
-      X509CertWithDBCertId cert);
+      X509CertWithDbId cert);
 
   public abstract boolean certificateRemoved(
       X509Cert issuerCert,
-      X509CertWithDBCertId cert);
+      X509CertWithDbId cert);
 
   public abstract boolean crlAdded(
       X509Cert issuerCert,

@@ -47,7 +47,7 @@ import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PCIAuditEvent;
+import org.xipki.commons.audit.api.PciAuditEvent;
 
 import com.cloudbees.syslog.Facility;
 import com.cloudbees.syslog.MessageFormat;
@@ -87,12 +87,12 @@ public class SyslogAuditServiceImpl implements AuditService {
   public static final String DFLT_SYSLOG_HOST = "localhost";
 
   /**
-   * The default message format is rfc_5424
+   * The default message format is rfc_5424.
    */
   public static final String DFLT_MESSAGE_FORMAT = "rfc_5424";
 
   /**
-   * The syslog4j client instance
+   * The syslog4j client instance.
    */
   protected AbstractSyslogMessageSender syslog = null;
 
@@ -183,15 +183,15 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     try {
       syslog.sendMessage(sm);
-    } catch (IOException e) {
-      LOG.error("Could not send syslog message: {}", e.getMessage());
-      LOG.debug("Could not send syslog message", e);
+    } catch (IOException ex) {
+      LOG.error("Could not send syslog message: {}", ex.getMessage());
+      LOG.debug("Could not send syslog message", ex);
     }
   } // method logEvent(AuditEvent)
 
   @Override
   public void logEvent(
-      final PCIAuditEvent event) {
+      final PciAuditEvent event) {
     if (event == null) {
       return;
     }
@@ -220,9 +220,9 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     try {
       syslog.sendMessage(sm);
-    } catch (IOException e) {
-      LOG.error("Could not send syslog message: {}", e.getMessage());
-      LOG.debug("Could not send syslog message", e);
+    } catch (IOException ex) {
+      LOG.error("Could not send syslog message: {}", ex.getMessage());
+      LOG.debug("Could not send syslog message", ex);
     }
   } // method logEvent(PCIAuditEvent)
 
@@ -234,17 +234,17 @@ public class SyslogAuditServiceImpl implements AuditService {
     LOG.info("initializing: {}", SyslogAuditServiceImpl.class);
 
     try {
-      MessageFormat _messageFormat;
+      MessageFormat msgFormat;
       if ("rfc3164".equalsIgnoreCase(messageFormat)
           || "rfc_3164".equalsIgnoreCase(messageFormat)) {
-        _messageFormat = MessageFormat.RFC_3164;
+        msgFormat = MessageFormat.RFC_3164;
       } else if ("rfc5424".equalsIgnoreCase(messageFormat)
           || "rfc_5424".equalsIgnoreCase(messageFormat)) {
-        _messageFormat = MessageFormat.RFC_5424;
+        msgFormat = MessageFormat.RFC_5424;
       } else {
         LOG.warn("invalid message format '{}', use the default one '{}'",
             messageFormat, DFLT_MESSAGE_FORMAT);
-        _messageFormat = MessageFormat.RFC_5424;
+        msgFormat = MessageFormat.RFC_5424;
       }
 
       if ("udp".equalsIgnoreCase(protocol)) {
@@ -265,7 +265,7 @@ public class SyslogAuditServiceImpl implements AuditService {
       }
 
       syslog.setDefaultMessageHostname(host);
-      syslog.setMessageFormat(_messageFormat);
+      syslog.setMessageFormat(msgFormat);
 
       Facility sysFacility = null;
       if (notEmpty(facility)) {
@@ -286,8 +286,8 @@ public class SyslogAuditServiceImpl implements AuditService {
       // after we're finished set initialized to true
       this.initialized = true;
       LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
-    } catch (Exception e) {
-      LOG.error("error while configuring syslog sender: {}", e.getMessage());
+    } catch (Exception ex) {
+      LOG.error("error while configuring syslog sender: {}", ex.getMessage());
     }
   } // method init
 
@@ -368,17 +368,17 @@ public class SyslogAuditServiceImpl implements AuditService {
     }
 
     switch (auditLevel) {
-    case DEBUG:
-      return Severity.DEBUG;
-    case INFO:
-      return Severity.INFORMATIONAL;
-    case WARN:
-      return Severity.WARNING;
-    case ERROR:
-      return Severity.ERROR;
-    default:
-      throw new RuntimeException(
-        String.format("unknown auditLevel '%s'", auditLevel));
+      case DEBUG:
+        return Severity.DEBUG;
+      case INFO:
+        return Severity.INFORMATIONAL;
+      case WARN:
+        return Severity.WARNING;
+      case ERROR:
+        return Severity.ERROR;
+      default:
+        throw new RuntimeException(
+          String.format("unknown auditLevel '%s'", auditLevel));
     }
   }
 

@@ -172,39 +172,39 @@ public class KeyParametersOption {
 
   public static class DSAParametersOption extends KeyParametersOption {
 
-    private Set<Range> pLengths;
+    private Set<Range> plengths;
 
-    private Set<Range> qLengths;
+    private Set<Range> qlengths;
 
     public DSAParametersOption() {
     }
 
-    public void setPLengths(
-        final Set<Range> pLengths) {
-      if (CollectionUtil.isEmpty(pLengths)) {
-        this.pLengths = null;
+    public void setPlengths(
+        final Set<Range> plengths) {
+      if (CollectionUtil.isEmpty(plengths)) {
+        this.plengths = null;
       } else {
-        this.pLengths = new HashSet<>(pLengths);
+        this.plengths = new HashSet<>(plengths);
       }
     }
 
-    public void setQLengths(
-        final Set<Range> qLengths) {
-      if (CollectionUtil.isEmpty(qLengths)) {
-        this.qLengths = null;
+    public void setQlengths(
+        final Set<Range> qlengths) {
+      if (CollectionUtil.isEmpty(qlengths)) {
+        this.qlengths = null;
       } else {
-        this.qLengths = new HashSet<>(qLengths);
+        this.qlengths = new HashSet<>(qlengths);
       }
     }
 
-    public boolean allowsPLength(
-        final int pLength) {
-      if (pLengths == null) {
+    public boolean allowsPlength(
+        final int plength) {
+      if (plengths == null) {
         return true;
       }
 
-      for (Range range : pLengths) {
-        if (range.match(pLength)) {
+      for (Range range : plengths) {
+        if (range.match(plength)) {
           return true;
         }
       }
@@ -212,14 +212,14 @@ public class KeyParametersOption {
       return false;
     }
 
-    public boolean allowsQLength(
-        final int qLength) {
-      if (qLengths == null) {
+    public boolean allowsQlength(
+        final int qlength) {
+      if (qlengths == null) {
         return true;
       }
 
-      for (Range range : qLengths) {
-        if (range.match(qLength)) {
+      for (Range range : qlengths) {
+        if (range.match(qlength)) {
           return true;
         }
       }

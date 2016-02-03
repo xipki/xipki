@@ -46,7 +46,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0
  */
 
-public class RDNControl {
+public class RdnControl {
 
   private final int minOccurs;
 
@@ -66,12 +66,12 @@ public class RDNControl {
 
   private String group;
 
-  public RDNControl(
+  public RdnControl(
       final ASN1ObjectIdentifier type) {
     this(type, 1, 1);
   }
 
-  public RDNControl(
+  public RdnControl(
       final ASN1ObjectIdentifier type,
       final int minOccurs,
       final int maxOccurs) {

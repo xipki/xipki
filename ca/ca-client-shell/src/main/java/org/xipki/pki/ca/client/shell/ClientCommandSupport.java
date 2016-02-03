@@ -99,8 +99,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
               : appendIndex(reqout, i);
           try {
             IoUtil.save(fn, bytes);
-          } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+          } catch (IOException ex) {
+            System.err.println("IOException: " + ex.getMessage());
           }
         }
       }
@@ -113,8 +113,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
               : appendIndex(respout, i);
           try {
             IoUtil.save(fn, bytes);
-          } catch (IOException e) {
-            System.err.println("IOException: " + e.getMessage());
+          } catch (IOException ex) {
+            System.err.println("IOException: " + ex.getMessage());
           }
         }
       }

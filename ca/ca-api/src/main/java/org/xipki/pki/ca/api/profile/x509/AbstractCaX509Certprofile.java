@@ -46,11 +46,11 @@ import org.xipki.commons.security.api.KeyUsage;
  * @since 2.0
  */
 
-public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile {
+public abstract class AbstractCaX509Certprofile extends BaseX509Certprofile {
 
   protected Set<KeyUsageControl> keyUsages;
 
-  public AbstractCAX509Certprofile() {
+  public AbstractCaX509Certprofile() {
     Set<KeyUsageControl> keyUsages = new HashSet<>();
     keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
     keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));

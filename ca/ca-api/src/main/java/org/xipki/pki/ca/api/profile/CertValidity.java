@@ -103,7 +103,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     int validity;
     try {
       validity = Integer.parseInt(numValdityS);
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException ex) {
       throw new IllegalArgumentException(
           String.format("invalid validityS: ", validityS));
     }
@@ -132,47 +132,47 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
   public Date add(
       final Date referenceDate) {
     switch (unit) {
-    case HOUR:
-      return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
-    case DAY:
-      return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
-    case YEAR:
-      Calendar c = Calendar.getInstance(utc);
-      c.setTime(referenceDate);
-      c.add(Calendar.YEAR, validity);
-      c.add(Calendar.SECOND, -1);
+      case HOUR:
+        return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
+      case DAY:
+        return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
+      case YEAR:
+        Calendar cal = Calendar.getInstance(utc);
+        cal.setTime(referenceDate);
+        cal.add(Calendar.YEAR, validity);
+        cal.add(Calendar.SECOND, -1);
 
-      int month = c.get(Calendar.MONTH);
-      // february
-      if (month == 1) {
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        if (day > 28) {
-          int year = c.get(Calendar.YEAR);
-          if (isLeapYear(year)) {
-            day = 29;
-          } else {
-            day = 28;
+        int month = cal.get(Calendar.MONTH);
+        // february
+        if (month == 1) {
+          int day = cal.get(Calendar.DAY_OF_MONTH);
+          if (day > 28) {
+            int year = cal.get(Calendar.YEAR);
+            if (isLeapYear(year)) {
+              day = 29;
+            } else {
+              day = 28;
+            }
           }
         }
-      }
 
-      return c.getTime();
-    default:
-      throw new RuntimeException(
+        return cal.getTime();
+      default:
+        throw new RuntimeException(
           String.format("should not reach here, unknown CertValidity.Unit %s", unit));
     }
   } // method add
 
   private int getApproxHours() {
     switch (unit) {
-    case HOUR:
-      return validity;
-    case DAY:
-      return 24 * validity;
-    case YEAR:
-      return (365 * validity + validity / 4) * 24;
-    default:
-      throw new RuntimeException(
+      case HOUR:
+        return validity;
+      case DAY:
+        return 24 * validity;
+      case YEAR:
+        return (365 * validity + validity / 4) * 24;
+      default:
+        throw new RuntimeException(
           String.format("should not reach here, unknown CertValidity.Unit %s", unit));
     }
   }
@@ -184,18 +184,18 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
   @Override
   public int compareTo(
-      final CertValidity o) {
-    if (unit == o.unit) {
-      if (validity == o.validity) {
+      final CertValidity obj) {
+    if (unit == obj.unit) {
+      if (validity == obj.validity) {
         return 0;
       }
 
-      return (validity < o.validity)
+      return (validity < obj.validity)
           ? -1
           : 1;
     } else {
       int thisHours = getApproxHours();
-      int thatHours = o.getApproxHours();
+      int thatHours = obj.getApproxHours();
       if (thisHours == thatHours) {
         return 0;
       } else {
@@ -213,22 +213,22 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
       return false;
     }
 
-    CertValidity b = (CertValidity) obj;
-    return unit == b.unit && validity == b.validity;
+    CertValidity other = (CertValidity) obj;
+    return unit == other.unit && validity == other.validity;
   }
 
   @Override
   public String toString() {
     switch (unit) {
-    case HOUR:
-      return validity + "h";
-    case DAY:
-      return validity + "d";
-    case YEAR:
-      return validity + "y";
-    default:
-      throw new RuntimeException(
-        String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+      case HOUR:
+        return validity + "h";
+      case DAY:
+        return validity + "d";
+      case YEAR:
+        return validity + "y";
+      default:
+        throw new RuntimeException(
+          String.format("should not reach here, unknown CertValidity.Unit %s", unit));
     }
   }
 
