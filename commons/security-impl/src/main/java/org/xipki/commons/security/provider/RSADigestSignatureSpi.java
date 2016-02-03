@@ -64,193 +64,194 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class RSADigestSignatureSpi extends SignatureSpi {
 
-    static public class SHA1 extends RSADigestSignatureSpi {
+  static public class SHA1 extends RSADigestSignatureSpi {
 
-        public SHA1() {
-            super(OIWObjectIdentifiers.idSHA1, new SHA1Digest());
-        }
-
-    } // class SHA1
-
-    static public class SHA224 extends RSADigestSignatureSpi {
-
-        public SHA224() {
-            super(NISTObjectIdentifiers.id_sha224, new SHA224Digest());
-        }
-
-    } // class SHA224
-
-    static public class SHA256 extends RSADigestSignatureSpi {
-
-        public SHA256() {
-            super(NISTObjectIdentifiers.id_sha256, new SHA256Digest());
-        }
-
-    } // class SHA256
-
-    static public class SHA384 extends RSADigestSignatureSpi {
-
-        public SHA384() {
-            super(NISTObjectIdentifiers.id_sha384, new SHA384Digest());
-        }
-
-    } // class SHA384
-
-    static public class SHA512 extends RSADigestSignatureSpi {
-
-        public SHA512() {
-            super(NISTObjectIdentifiers.id_sha512, new SHA512Digest());
-        }
-
-    } // class SHA512
-
-    static public class RIPEMD160 extends RSADigestSignatureSpi {
-
-        public RIPEMD160() {
-            super(TeleTrusTObjectIdentifiers.ripemd160, new RIPEMD160Digest());
-        }
-
-    } // class RIPEMD160
-
-    static public class RIPEMD256 extends RSADigestSignatureSpi {
-
-        public RIPEMD256() {
-            super(TeleTrusTObjectIdentifiers.ripemd256, new RIPEMD256Digest());
-        }
-
-    } // class RIPEMD256
-
-    static public class NoneRSA extends RSADigestSignatureSpi {
-
-        public NoneRSA() {
-            super(new NullDigest());
-        }
-
-    } // class NoneRSA
-
-    private Digest digest;
-
-    private AlgorithmIdentifier algId;
-
-    private P11PrivateKey signingKey;
-
-    // care - this constructor is actually used by outside organisations
-    protected RSADigestSignatureSpi(
-            final Digest digest) {
-        this.digest = digest;
-        this.algId = null;
+    public SHA1() {
+      super(OIWObjectIdentifiers.idSHA1, new SHA1Digest());
     }
 
-    // care - this constructor is actually used by outside organisations
-    protected RSADigestSignatureSpi(
-            final ASN1ObjectIdentifier objId,
-            final Digest digest) {
-        this.digest = digest;
-        this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
+  } // class SHA1
+
+  static public class SHA224 extends RSADigestSignatureSpi {
+
+    public SHA224() {
+      super(NISTObjectIdentifiers.id_sha224, new SHA224Digest());
     }
 
-    protected void engineInitVerify(
-            final PublicKey publicKey)
-    throws InvalidKeyException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
+  } // class SHA224
+
+  static public class SHA256 extends RSADigestSignatureSpi {
+
+    public SHA256() {
+      super(NISTObjectIdentifiers.id_sha256, new SHA256Digest());
     }
 
-    protected void engineInitSign(
-            final PrivateKey privateKey)
-    throws InvalidKeyException {
-        if (!(privateKey instanceof P11PrivateKey)) {
-            throw new InvalidKeyException("privateKey is not instanceof "
-                    + P11PrivateKey.class.getName());
-        }
+  } // class SHA256
 
-        String algo = privateKey.getAlgorithm();
-        if (!"RSA".equals(algo)) {
-            throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
-        }
+  static public class SHA384 extends RSADigestSignatureSpi {
 
-        digest.reset();
-        this.signingKey = (P11PrivateKey) privateKey;
+    public SHA384() {
+      super(NISTObjectIdentifiers.id_sha384, new SHA384Digest());
     }
 
-    protected void engineUpdate(
-            final byte b)
-    throws SignatureException {
-        digest.update(b);
+  } // class SHA384
+
+  static public class SHA512 extends RSADigestSignatureSpi {
+
+    public SHA512() {
+      super(NISTObjectIdentifiers.id_sha512, new SHA512Digest());
     }
 
-    protected void engineUpdate(
-            final byte[] b,
-            final int off,
-            final int len)
-    throws SignatureException {
-        digest.update(b, off, len);
+  } // class SHA512
+
+  static public class RIPEMD160 extends RSADigestSignatureSpi {
+
+    public RIPEMD160() {
+      super(TeleTrusTObjectIdentifiers.ripemd160, new RIPEMD160Digest());
     }
 
-    protected byte[] engineSign()
-    throws SignatureException {
-        byte[]  hash = new byte[digest.getDigestSize()];
+  } // class RIPEMD160
 
-        digest.doFinal(hash, 0);
+  static public class RIPEMD256 extends RSADigestSignatureSpi {
 
-        try {
-            byte[]  bytes = derEncode(hash);
-
-            return signingKey.CKM_RSA_PKCS(bytes);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new SignatureException("key too small for signature type");
-        } catch (Exception e) {
-            throw new SignatureException(e.getMessage(), e);
-        }
+    public RIPEMD256() {
+      super(TeleTrusTObjectIdentifiers.ripemd256, new RIPEMD256Digest());
     }
 
-    protected boolean engineVerify(
-            final byte[] sigBytes)
-    throws SignatureException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
+  } // class RIPEMD256
+
+  static public class NoneRSA extends RSADigestSignatureSpi {
+
+    public NoneRSA() {
+      super(new NullDigest());
     }
 
-    protected void engineSetParameter(
-            final AlgorithmParameterSpec params) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+  } // class NoneRSA
+
+  private Digest digest;
+
+  private AlgorithmIdentifier algId;
+
+  private P11PrivateKey signingKey;
+
+  // care - this constructor is actually used by outside organisations
+  protected RSADigestSignatureSpi(
+      final Digest digest) {
+    this.digest = digest;
+    this.algId = null;
+  }
+
+  // care - this constructor is actually used by outside organisations
+  protected RSADigestSignatureSpi(
+      final ASN1ObjectIdentifier objId,
+      final Digest digest) {
+    this.digest = digest;
+    this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
+  }
+
+  protected void engineInitVerify(
+      final PublicKey publicKey)
+  throws InvalidKeyException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
+
+  protected void engineInitSign(
+      final PrivateKey privateKey)
+  throws InvalidKeyException {
+    if (!(privateKey instanceof P11PrivateKey)) {
+      throw new InvalidKeyException("privateKey is not instanceof "
+          + P11PrivateKey.class.getName());
     }
 
-    /**
-     * @deprecated replaced with
-     *  <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-     */
-    protected void engineSetParameter(
-            final String param,
-            final Object value) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+    String algo = privateKey.getAlgorithm();
+    if (!"RSA".equals(algo)) {
+      throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
     }
 
-    /**
-     * @deprecated
-     */
-    protected Object engineGetParameter(
-            final String param) {
-        return null;
+    digest.reset();
+    this.signingKey = (P11PrivateKey) privateKey;
+  }
+
+  protected void engineUpdate(
+      final byte b)
+  throws SignatureException {
+    digest.update(b);
+  }
+
+  protected void engineUpdate(
+      final byte[] b,
+      final int off,
+      final int len)
+  throws SignatureException {
+    digest.update(b, off, len);
+  }
+
+  protected byte[] engineSign()
+  throws SignatureException {
+    byte[]  hash = new byte[digest.getDigestSize()];
+
+    digest.doFinal(hash, 0);
+
+    try {
+      byte[]  bytes = derEncode(hash);
+
+      return signingKey.CKM_RSA_PKCS(bytes);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new SignatureException("key too small for signature type");
+    } catch (Exception e) {
+      throw new SignatureException(e.getMessage(), e);
+    }
+  }
+
+  protected boolean engineVerify(
+      final byte[] sigBytes)
+  throws SignatureException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
+
+  protected void engineSetParameter(
+      final AlgorithmParameterSpec params) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
+
+  /**
+   * @deprecated replaced with
+   *  <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+   */
+  protected void engineSetParameter(
+      final String param,
+      final Object value) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
+
+  /**
+   * @deprecated
+   */
+  protected Object engineGetParameter(
+      final String param) {
+    return null;
+  }
+
+  protected AlgorithmParameters engineGetParameters() {
+    return null;
+  }
+
+  private byte[] derEncode(
+      final byte[] hash)
+  throws IOException {
+    if (algId == null) {
+      // For raw RSA, the DigestInfo must be prepared externally
+      return hash;
     }
 
-    protected AlgorithmParameters engineGetParameters() {
-        return null;
-    }
+    DigestInfo dInfo = new DigestInfo(algId, hash);
 
-    private byte[] derEncode(
-            final byte[] hash)
-    throws IOException {
-        if (algId == null) {
-            // For raw RSA, the DigestInfo must be prepared externally
-            return hash;
-        }
-
-        DigestInfo dInfo = new DigestInfo(algId, hash);
-
-        return dInfo.getEncoded(ASN1Encoding.DER);
-    }
+    return dInfo.getEncoded(ASN1Encoding.DER);
+  }
 
 }

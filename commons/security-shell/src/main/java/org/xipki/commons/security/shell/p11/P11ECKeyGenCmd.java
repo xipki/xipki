@@ -46,34 +46,35 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "ec",
-        description = "generate EC keypair in PKCS#11 device")
+    description = "generate EC keypair in PKCS#11 device")
 @Service
 public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      required = true,
+      description = "EC curve name\n"
+          + "(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if (noCert) {
-            P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
-            finalize(keyId);
-        } else {
-            P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
-                    curveName, label, getSubject(),
-                    getKeyUsage(), getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    if (noCert) {
+      P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
+      finalize(keyId);
+    } else {
+      P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
+          curveName, label, getSubject(),
+          getKeyUsage(), getExtendedKeyUsage());
+      finalize(keyAndCert);
     }
+    return null;
+  }
 
 }

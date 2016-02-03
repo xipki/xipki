@@ -46,50 +46,51 @@ import org.xipki.commons.security.shell.KeyGenCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
 
-    @Option(name = "--subject", aliases = "-s",
-            required = true,
-            description = "subject in the self-signed certificate\n"
-                    + "(required)")
-    protected String subject;
+  @Option(name = "--subject", aliases = "-s",
+      required = true,
+      description = "subject in the self-signed certificate\n"
+          + "(required)")
+  protected String subject;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the key\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String keyOutFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the key\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String keyOutFile;
 
-    @Option(name = "--cert-out",
-            description = "where to save the self-signed certificate")
-    @Completion(FilePathCompleter.class)
-    protected String certOutFile;
+  @Option(name = "--cert-out",
+      description = "where to save the self-signed certificate")
+  @Completion(FilePathCompleter.class)
+  protected String certOutFile;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    protected String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  protected String password;
 
-    protected void saveKeyAndCert(
-            final P12KeypairGenerationResult keyAndCert)
-    throws IOException {
-        File p12File = new File(keyOutFile);
-        saveVerbose("saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
-        if (certOutFile != null) {
-            File certFile = new File(certOutFile);
-            saveVerbose("saved self-signed certificate to file", certFile,
-                    keyAndCert.getCertificate().getEncoded());
-        }
+  protected void saveKeyAndCert(
+      final P12KeypairGenerationResult keyAndCert)
+  throws IOException {
+    File p12File = new File(keyOutFile);
+    saveVerbose("saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
+    if (certOutFile != null) {
+      File certFile = new File(certOutFile);
+      saveVerbose("saved self-signed certificate to file", certFile,
+          keyAndCert.getCertificate().getEncoded());
     }
+  }
 
-    protected char[] getPassword() {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+  protected char[] getPassword() {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
     }
+    return pwdInChar;
+  }
 
 }

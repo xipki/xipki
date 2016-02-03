@@ -49,67 +49,68 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PasswordBasedEncryption {
 
-    private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
+  private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
-    private static AtomicBoolean initialized = new AtomicBoolean(false);
+  private static AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private PasswordBasedEncryption() {
+  private PasswordBasedEncryption() {
+  }
+
+  private static void init() {
+    synchronized (initialized) {
+      if (initialized.get()) {
+        return;
+      }
+
+      if (Security.getProperty("BC") == null) {
+        Security.addProvider(new BouncyCastleProvider());
+      }
+
+      initialized.set(true);
     }
+  }
 
-    private static void init() {
-        synchronized (initialized) {
-            if (initialized.get()) {
-                return;
-            }
+  public static byte[] encrypt(
+      final byte[] plaintext,
+      final char[] password,
+      final int iterationCount,
+      final byte[] salt)
+  throws GeneralSecurityException {
+    init();
+    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
 
-            if (Security.getProperty("BC") == null) {
-                Security.addProvider(new BouncyCastleProvider());
-            }
+    PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
+    SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
-            initialized.set(true);
-        }
-    }
+    Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
+    PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+    cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
+    pbeKeySpec.clearPassword();
 
-    public static byte[] encrypt(
-            final byte[] plaintext,
-            final char[] password,
-            final int iterationCount,
-            final byte[] salt)
-    throws GeneralSecurityException {
-        init();
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+    return cipher.doFinal(plaintext);
+  }
 
-        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
-        SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
+  public static byte[] decrypt(
+      final byte[] cipherText,
+      final char[] password,
+      final int iterationCount,
+      byte[] salt)
+  throws GeneralSecurityException {
+    init();
+    PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
-        cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
-        pbeKeySpec.clearPassword();
+    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+    SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
-        return cipher.doFinal(plaintext);
-    }
-
-    public static byte[] decrypt(
-            final byte[] cipherText,
-            final char[] password,
-            final int iterationCount,
-            byte[] salt)
-    throws GeneralSecurityException {
-        init();
-        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
-
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
-        SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
-
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
-        cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
-        return cipher.doFinal(cipherText);
-    }
+    Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
+    PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+    cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
+    return cipher.doFinal(cipherText);
+  }
 
 }

@@ -37,30 +37,31 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CryptException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CryptException() {
-        super();
-    }
+  public CryptException() {
+    super();
+  }
 
-    public CryptException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CryptException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public CryptException(
-            final String message) {
-        super(message);
-    }
+  public CryptException(
+      final String message) {
+    super(message);
+  }
 
-    public CryptException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CryptException(
+      final Throwable cause) {
+    super(cause);
+  }
 
 }

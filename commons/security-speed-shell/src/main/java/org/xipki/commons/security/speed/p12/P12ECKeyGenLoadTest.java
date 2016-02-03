@@ -41,26 +41,27 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final ECKeypairGenerator kpGen;
+  private final ECKeypairGenerator kpGen;
 
-    public P12ECKeyGenLoadTest(
-            final String curveNameOrOid,
-            final SecurityFactory securityFactory)
-    throws Exception {
-        super("PKCS#12 EC key generation\n"
-                + "curve: " + curveNameOrOid,
-                securityFactory);
+  public P12ECKeyGenLoadTest(
+      final String curveNameOrOid,
+      final SecurityFactory securityFactory)
+  throws Exception {
+    super("PKCS#12 EC key generation\n"
+        + "curve: " + curveNameOrOid,
+        securityFactory);
 
-        this.kpGen = new ECKeypairGenerator(curveNameOrOid);
-    }
+    this.kpGen = new ECKeypairGenerator(curveNameOrOid);
+  }
 
-    @Override
-    protected P12RawKeypairGenerator getKeypairGenerator() {
-        return kpGen;
-    }
+  @Override
+  protected P12RawKeypairGenerator getKeypairGenerator() {
+    return kpGen;
+  }
 
 }

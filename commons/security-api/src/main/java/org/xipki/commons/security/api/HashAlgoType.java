@@ -37,69 +37,70 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum HashAlgoType {
 
-    SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
-    SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
-    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
-    SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
+  SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
+  SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
+  SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
+  SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
+  SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
 
-    private final int length;
+  private final int length;
 
-    private final String oid;
+  private final String oid;
 
-    private final String name;
+  private final String name;
 
-    private final String shortName;
+  private final String shortName;
 
-    private HashAlgoType(
-            final int length,
-            final String oid,
-            final String name,
-            final String shortName) {
-        this.length = length;
-        this.oid = oid;
-        this.name = name;
-        this.shortName = shortName;
+  private HashAlgoType(
+      final int length,
+      final String oid,
+      final String name,
+      final String shortName) {
+    this.length = length;
+    this.oid = oid;
+    this.name = name;
+    this.shortName = shortName;
+  }
+
+  public int getLength() {
+    return length;
+  }
+
+  public String getOid() {
+    return oid;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getShortName() {
+    return shortName;
+  }
+
+  public static HashAlgoType getHashAlgoType(
+      String nameOrOid) {
+    for (HashAlgoType hashAlgo : values()) {
+      if (hashAlgo.oid.equals(nameOrOid)) {
+        return hashAlgo;
+      }
+
+      if (nameOrOid.indexOf('-') != -1) {
+        nameOrOid = nameOrOid.replace("-", "");
+      }
+
+      if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
+          || hashAlgo.shortName.equalsIgnoreCase(nameOrOid)) {
+        return hashAlgo;
+      }
     }
 
-    public int getLength() {
-        return length;
-    }
-
-    public String getOid() {
-        return oid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public static HashAlgoType getHashAlgoType(
-            String nameOrOid) {
-        for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(nameOrOid)) {
-                return hashAlgo;
-            }
-
-            if (nameOrOid.indexOf('-') != -1) {
-                nameOrOid = nameOrOid.replace("-", "");
-            }
-
-            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
-                    || hashAlgo.shortName.equalsIgnoreCase(nameOrOid)) {
-                return hashAlgo;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

@@ -37,36 +37,37 @@ package org.xipki.commons.dbtool;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class InvalidInputException extends Exception {
 
-    public InvalidInputException() {
-    }
+  public InvalidInputException() {
+  }
 
-    public InvalidInputException(
-            final String message) {
-        super(message);
-    }
+  public InvalidInputException(
+      final String message) {
+    super(message);
+  }
 
-    public InvalidInputException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public InvalidInputException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public InvalidInputException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public InvalidInputException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public InvalidInputException(
-            final String message,
-            final Throwable cause,
-            final boolean enableSuppression,
-            final boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+  public InvalidInputException(
+      final String message,
+      final Throwable cause,
+      final boolean enableSuppression,
+      final boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 
 }

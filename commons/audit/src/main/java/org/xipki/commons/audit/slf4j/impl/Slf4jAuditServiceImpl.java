@@ -49,105 +49,106 @@ import org.xipki.commons.audit.api.PCIAuditEvent;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class Slf4jAuditServiceImpl implements AuditService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
 
-    public Slf4jAuditServiceImpl() {
+  public Slf4jAuditServiceImpl() {
+  }
+
+  @Override
+  public void logEvent(
+      final AuditEvent event) {
+    if (event == null) {
+      return;
     }
 
-    @Override
-    public void logEvent(
-            final AuditEvent event) {
-        if (event == null) {
-            return;
-        }
+    try {
+      switch (event.getLevel()) {
+        case DEBUG:
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("{}", createMessage(event));
+          }
+          break;
+        default:
+          LOG.info("{}", createMessage(event));
+          break;
+      } // end switch
+    } catch (Throwable t) {
+      LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
+          AuditLevel.ERROR.getAlignedText(), t.getMessage());
+    }
+  }
 
-        try {
-            switch (event.getLevel()) {
-            case DEBUG:
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{}", createMessage(event));
-                }
-                break;
-            default:
-                LOG.info("{}", createMessage(event));
-                break;
-            } // end switch
-        } catch (Throwable t) {
-            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
-        }
+  @Override
+  public void logEvent(
+      final PCIAuditEvent event) {
+    if (event == null) {
+      return;
     }
 
-    @Override
-    public void logEvent(
-            final PCIAuditEvent event) {
-        if (event == null) {
-            return;
-        }
+    try {
+      CharArrayWriter msg = event.toCharArrayWriter("");
+      AuditLevel al = event.getLevel();
+      switch (al) {
+        case DEBUG:
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("{} | {}", al.getAlignedText(), msg);
+          }
+          break;
+        default:
+          LOG.info("{} | {}", al.getAlignedText(), msg);
+          break;
+      } // end switch
+    } catch (Throwable t) {
+      LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
+          AuditLevel.ERROR.getAlignedText(), t.getMessage());
+    }
+  }
 
-        try {
-            CharArrayWriter msg = event.toCharArrayWriter("");
-            AuditLevel al = event.getLevel();
-            switch (al) {
-            case DEBUG:
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{} | {}", al.getAlignedText(), msg);
-                }
-                break;
-            default:
-                LOG.info("{} | {}", al.getAlignedText(), msg);
-                break;
-            } // end switch
-        } catch (Throwable t) {
-            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-                    AuditLevel.ERROR.getAlignedText(), t.getMessage());
-        }
+  private static String createMessage(
+      final AuditEvent event) {
+    String applicationName = event.getApplicationName();
+    if (applicationName == null) {
+      applicationName = "undefined";
     }
 
-    private static String createMessage(
-            final AuditEvent event) {
-        String applicationName = event.getApplicationName();
-        if (applicationName == null) {
-            applicationName = "undefined";
-        }
-
-        String name = event.getName();
-        if (name == null) {
-            name = "undefined";
-        }
-
-        StringBuilder sb = new StringBuilder(150);
-
-        sb.append(event.getLevel().getAlignedText()).append(" | ");
-        sb.append(applicationName).append(" - ").append(name);
-
-        AuditStatus status = event.getStatus();
-        if (status == null) {
-            status = AuditStatus.UNDEFINED;
-        }
-        sb.append(":\tstatus: ").append(status.name());
-        List<AuditEventData> eventDataArray = event.getEventDatas();
-
-        long duration = event.getDuration();
-        if (duration >= 0) {
-            sb.append("\tduration: ").append(duration);
-        }
-
-        if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
-            for (AuditEventData m : eventDataArray) {
-                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
-                    continue;
-                }
-
-                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
-            }
-        }
-
-        return sb.toString();
+    String name = event.getName();
+    if (name == null) {
+      name = "undefined";
     }
+
+    StringBuilder sb = new StringBuilder(150);
+
+    sb.append(event.getLevel().getAlignedText()).append(" | ");
+    sb.append(applicationName).append(" - ").append(name);
+
+    AuditStatus status = event.getStatus();
+    if (status == null) {
+      status = AuditStatus.UNDEFINED;
+    }
+    sb.append(":\tstatus: ").append(status.name());
+    List<AuditEventData> eventDataArray = event.getEventDatas();
+
+    long duration = event.getDuration();
+    if (duration >= 0) {
+      sb.append("\tduration: ").append(duration);
+    }
+
+    if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
+      for (AuditEventData m : eventDataArray) {
+        if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+          continue;
+        }
+
+        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+      }
+    }
+
+    return sb.toString();
+  }
 
 }

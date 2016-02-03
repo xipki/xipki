@@ -47,22 +47,23 @@ import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-sign-p12",
-        description = "performance test of PKCS#12 EC signature creation (batch)")
+    description = "performance test of PKCS#12 EC signature creation (batch)")
 public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
-        for (String curveName : curveNameOidMap.keySet()) {
-            ret.add(new P12ECSignLoadTest(securityFactory, sigAlgo, curveName));
-        }
-
-        return ret;
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+    for (String curveName : curveNameOidMap.keySet()) {
+      ret.add(new P12ECSignLoadTest(securityFactory, sigAlgo, curveName));
     }
+
+    return ret;
+  }
 
 }

@@ -44,53 +44,54 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IssuerAndSubject extends ASN1Object {
 
-    private X500Name issuer;
+  private X500Name issuer;
 
-    private X500Name subject;
+  private X500Name subject;
 
-    private IssuerAndSubject(
-            final ASN1Sequence seq) {
-        this.issuer = X500Name.getInstance(seq.getObjectAt(0));
-        this.subject = X500Name.getInstance(seq.getObjectAt(1));
+  private IssuerAndSubject(
+      final ASN1Sequence seq) {
+    this.issuer = X500Name.getInstance(seq.getObjectAt(0));
+    this.subject = X500Name.getInstance(seq.getObjectAt(1));
+  }
+
+  public IssuerAndSubject(
+      final X500Name issuer,
+      final X500Name subject) {
+    this.issuer = issuer;
+    this.subject = subject;
+  }
+
+  public X500Name getIssuer() {
+    return issuer;
+  }
+
+  public X500Name getSubject() {
+    return subject;
+  }
+
+  public ASN1Primitive toASN1Primitive() {
+    ASN1EncodableVector  v = new ASN1EncodableVector();
+
+    v.add(issuer);
+    v.add(subject);
+
+    return new DERSequence(v);
+  }
+
+  public static IssuerAndSubject getInstance(
+      final Object obj) {
+    if (obj instanceof IssuerAndSubject) {
+      return (IssuerAndSubject) obj;
+    } else if (obj != null) {
+      return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
     }
 
-    public IssuerAndSubject(
-            final X500Name issuer,
-            final X500Name subject) {
-        this.issuer = issuer;
-        this.subject = subject;
-    }
-
-    public X500Name getIssuer() {
-        return issuer;
-    }
-
-    public X500Name getSubject() {
-        return subject;
-    }
-
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector    v = new ASN1EncodableVector();
-
-        v.add(issuer);
-        v.add(subject);
-
-        return new DERSequence(v);
-    }
-
-    public static IssuerAndSubject getInstance(
-            final Object obj) {
-        if (obj instanceof IssuerAndSubject) {
-            return (IssuerAndSubject) obj;
-        } else if (obj != null) {
-            return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

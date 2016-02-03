@@ -37,26 +37,27 @@ package org.xipki.pki.scep.exception;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class MessageDecodingException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public MessageDecodingException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public MessageDecodingException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public MessageDecodingException(
-            final String message) {
-        super(message);
-    }
+  public MessageDecodingException(
+      final String message) {
+    super(message);
+  }
 
-    public MessageDecodingException(
-            final Throwable cause) {
-        super(cause.getMessage(), cause);
-    }
+  public MessageDecodingException(
+      final Throwable cause) {
+    super(cause.getMessage(), cause);
+  }
 
 }

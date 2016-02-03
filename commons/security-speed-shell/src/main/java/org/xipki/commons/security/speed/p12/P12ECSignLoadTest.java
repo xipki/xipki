@@ -42,32 +42,33 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
-    public P12ECSignLoadTest(
-            final SecurityFactory securityFactory,
-            final String signatureAlgorithm,
-            final String curveNameOrOid)
-    throws Exception {
-        super(securityFactory, signatureAlgorithm,
-                generateKeystore(curveNameOrOid),
-                "PKCS#12 EC signature creation\n"
-                        + "curve: " + curveNameOrOid);
-    }
+  public P12ECSignLoadTest(
+      final SecurityFactory securityFactory,
+      final String signatureAlgorithm,
+      final String curveNameOrOid)
+  throws Exception {
+    super(securityFactory, signatureAlgorithm,
+        generateKeystore(curveNameOrOid),
+        "PKCS#12 EC signature creation\n"
+            + "curve: " + curveNameOrOid);
+  }
 
-    private static byte[] generateKeystore(
-            final String curveNameOrOid)
-    throws Exception {
-        byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-        if (keystoreBytes == null) {
-            P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveNameOrOid, password.toCharArray(), "CN=dummy", null, null,
-                new SecureRandom());
-            keystoreBytes = kpGen.generateIdentity().getKeystore();
-        }
-        return keystoreBytes;
+  private static byte[] generateKeystore(
+      final String curveNameOrOid)
+  throws Exception {
+    byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+    if (keystoreBytes == null) {
+      P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+        curveNameOrOid, password.toCharArray(), "CN=dummy", null, null,
+        new SecureRandom());
+      keystoreBytes = kpGen.generateIdentity().getKeystore();
     }
+    return keystoreBytes;
+  }
 
 }

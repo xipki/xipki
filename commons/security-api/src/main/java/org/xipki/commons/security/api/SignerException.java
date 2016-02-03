@@ -37,30 +37,31 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class SignerException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public SignerException() {
-        super();
-    }
+  public SignerException() {
+    super();
+  }
 
-    public SignerException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public SignerException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public SignerException(
-            final String message) {
-        super(message);
-    }
+  public SignerException(
+      final String message) {
+    super(message);
+  }
 
-    public SignerException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public SignerException(
+      final Throwable cause) {
+    super(cause);
+  }
 
 }

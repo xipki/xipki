@@ -44,26 +44,27 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
 
-    protected Integer getKeyUsage()
-    throws Exception {
-        return KeyUsage.cRLSign
-                | KeyUsage.dataEncipherment
-                | KeyUsage.digitalSignature
-                | KeyUsage.keyAgreement
-                | KeyUsage.keyCertSign
-                | KeyUsage.keyEncipherment;
-    }
+  protected Integer getKeyUsage()
+  throws Exception {
+    return KeyUsage.cRLSign
+        | KeyUsage.dataEncipherment
+        | KeyUsage.digitalSignature
+        | KeyUsage.keyAgreement
+        | KeyUsage.keyCertSign
+        | KeyUsage.keyEncipherment;
+  }
 
-    protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
-    throws Exception {
-        return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
-                ObjectIdentifiers.id_kp_serverAuth,
-                ObjectIdentifiers.id_kp_emailProtection,
-                ObjectIdentifiers.id_kp_OCSPSigning);
-    }
+  protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
+  throws Exception {
+    return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
+        ObjectIdentifiers.id_kp_serverAuth,
+        ObjectIdentifiers.id_kp_emailProtection,
+        ObjectIdentifiers.id_kp_OCSPSigning);
+  }
 
 }

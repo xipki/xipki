@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,33 +37,33 @@ import org.xipki.commons.datasource.api.springframework.dao.InvalidDataAccessRes
 @SuppressWarnings("serial")
 public class BadSqlGrammarException extends InvalidDataAccessResourceUsageException {
 
-    private String sql;
+  private String sql;
 
-    /**
-     * Constructor for BadSqlGrammarException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
-     */
-    public BadSqlGrammarException(
-            final String sql,
-            final SQLException ex) {
-        super("bad SQL grammar [" + sql + "]", ex);
-        this.sql = sql;
-    }
+  /**
+   * Constructor for BadSqlGrammarException.
+   * @param task name of current task
+   * @param sql the offending SQL statement
+   * @param ex the root cause
+   */
+  public BadSqlGrammarException(
+      final String sql,
+      final SQLException ex) {
+    super("bad SQL grammar [" + sql + "]", ex);
+    this.sql = sql;
+  }
 
-    /**
-     * Return the wrapped SQLException.
-     */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
+  /**
+   * Return the wrapped SQLException.
+   */
+  public SQLException getSQLException() {
+    return (SQLException) getCause();
+  }
 
-    /**
-     * Return the SQL that caused the problem.
-     */
-    public String getSql() {
-        return this.sql;
-    }
+  /**
+   * Return the SQL that caused the problem.
+   */
+  public String getSql() {
+    return this.sql;
+  }
 
 }

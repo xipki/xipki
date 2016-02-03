@@ -54,83 +54,84 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public final class EnrolmentResponse {
 
-    private PkiMessage pkcsRep;
+  private PkiMessage pkcsRep;
 
-    private List<X509Certificate> certificates;
+  private List<X509Certificate> certificates;
 
-    public EnrolmentResponse(
-            final PkiMessage pkcsRep)
-    throws ScepClientException {
-        ParamUtil.assertNotNull("pkcsRep", pkcsRep);
-        MessageType messageType = pkcsRep.getMessageType();
-        if (MessageType.CertRep != messageType) {
-            throw new ScepClientException(
-                    "messageType could not be other than CertRep: " + messageType);
-        }
-        this.pkcsRep = pkcsRep;
+  public EnrolmentResponse(
+      final PkiMessage pkcsRep)
+  throws ScepClientException {
+    ParamUtil.assertNotNull("pkcsRep", pkcsRep);
+    MessageType messageType = pkcsRep.getMessageType();
+    if (MessageType.CertRep != messageType) {
+      throw new ScepClientException(
+          "messageType could not be other than CertRep: " + messageType);
+    }
+    this.pkcsRep = pkcsRep;
 
-        if (PkiStatus.SUCCESS != pkcsRep.getPkiStatus()) {
-            return;
-        }
-
-        ASN1Encodable messageData = pkcsRep.getMessageData();
-        if (!(messageData instanceof ContentInfo)) {
-            throw new ScepClientException("pkcsRep is not a ContentInfo");
-        }
-
-        ContentInfo ci = (ContentInfo) messageData;
-        SignedData sd = SignedData.getInstance(ci.getContent());
-        ASN1Set asn1Certs = sd.getCertificates();
-        if (asn1Certs == null | asn1Certs.size() == 0) {
-            throw new ScepClientException("no certificate is embedded in pkcsRep");
-        }
-
-        List<X509Certificate> certs;
-        try {
-            certs = ScepUtil.getCertsFromSignedData(sd);
-        } catch (CertificateException e) {
-            throw new ScepClientException(e.getMessage(), e);
-        }
-        this.certificates = Collections.unmodifiableList(certs);
+    if (PkiStatus.SUCCESS != pkcsRep.getPkiStatus()) {
+      return;
     }
 
-    /**
-     * Returns <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
-     *
-     * @return <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
-     */
-    public boolean isPending() {
-        return pkcsRep.getPkiStatus() == PkiStatus.PENDING;
+    ASN1Encodable messageData = pkcsRep.getMessageData();
+    if (!(messageData instanceof ContentInfo)) {
+      throw new ScepClientException("pkcsRep is not a ContentInfo");
     }
 
-    public boolean isFailure() {
-        return pkcsRep.getPkiStatus() == PkiStatus.FAILURE;
+    ContentInfo ci = (ContentInfo) messageData;
+    SignedData sd = SignedData.getInstance(ci.getContent());
+    ASN1Set asn1Certs = sd.getCertificates();
+    if (asn1Certs == null | asn1Certs.size() == 0) {
+      throw new ScepClientException("no certificate is embedded in pkcsRep");
     }
 
-    public boolean isSuccess() {
-        return pkcsRep.getPkiStatus() == PkiStatus.SUCCESS;
+    List<X509Certificate> certs;
+    try {
+      certs = ScepUtil.getCertsFromSignedData(sd);
+    } catch (CertificateException e) {
+      throw new ScepClientException(e.getMessage(), e);
     }
+    this.certificates = Collections.unmodifiableList(certs);
+  }
 
-    public List<X509Certificate> getCertificates() {
-        if (isSuccess()) {
-            return certificates;
-        }
-        throw new IllegalStateException();
-    }
+  /**
+   * Returns <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
+   *
+   * @return <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
+   */
+  public boolean isPending() {
+    return pkcsRep.getPkiStatus() == PkiStatus.PENDING;
+  }
 
-    public FailInfo getFailInfo() {
-        if (isFailure()) {
-            return pkcsRep.getFailInfo();
-        }
-        throw new IllegalStateException();
-    }
+  public boolean isFailure() {
+    return pkcsRep.getPkiStatus() == PkiStatus.FAILURE;
+  }
 
-    public PkiMessage getPkcsRep() {
-        return pkcsRep;
+  public boolean isSuccess() {
+    return pkcsRep.getPkiStatus() == PkiStatus.SUCCESS;
+  }
+
+  public List<X509Certificate> getCertificates() {
+    if (isSuccess()) {
+      return certificates;
     }
+    throw new IllegalStateException();
+  }
+
+  public FailInfo getFailInfo() {
+    if (isFailure()) {
+      return pkcsRep.getFailInfo();
+    }
+    throw new IllegalStateException();
+  }
+
+  public PkiMessage getPkcsRep() {
+    return pkcsRep;
+  }
 
 }

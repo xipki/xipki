@@ -40,20 +40,21 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class NopPasswordResolver implements PasswordResolver {
 
-    public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
+  public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
 
-    private NopPasswordResolver() {
-    }
+  private NopPasswordResolver() {
+  }
 
-    @Override
-    public char[] resolvePassword(
-            final String passwordHint)
-    throws PasswordResolverException {
-        return passwordHint.toCharArray();
-    }
+  @Override
+  public char[] resolvePassword(
+      final String passwordHint)
+  throws PasswordResolverException {
+    return passwordHint.toCharArray();
+  }
 
 }

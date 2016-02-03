@@ -44,49 +44,50 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class AbstractSecurityFactory implements SecurityFactory {
 
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final String conf,
-            final X509Certificate cert)
-    throws SignerException {
-        X509Certificate[] certs = (cert == null)
-                ? null
-                : new X509Certificate[]{cert};
-        return createSigner(type, conf, certs);
-    }
+  @Override
+  public ConcurrentContentSigner createSigner(
+      final String type,
+      final String conf,
+      final X509Certificate cert)
+  throws SignerException {
+    X509Certificate[] certs = (cert == null)
+        ? null
+        : new X509Certificate[]{cert};
+    return createSigner(type, conf, certs);
+  }
 
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate cert)
-    throws SignerException {
-        X509Certificate[] certs = (cert == null)
-                ? null
-                : new X509Certificate[]{cert};
-        return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certs);
-    }
+  @Override
+  public ConcurrentContentSigner createSigner(
+      final String type,
+      final String confWithoutAlgo,
+      final String hashAlgo,
+      final SignatureAlgoControl sigAlgoControl,
+      final X509Certificate cert)
+  throws SignerException {
+    X509Certificate[] certs = (cert == null)
+        ? null
+        : new X509Certificate[]{cert};
+    return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certs);
+  }
 
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509Certificate cert)
-    throws InvalidKeyException {
-        return getContentVerifierProvider(cert.getPublicKey());
-    }
+  @Override
+  public ContentVerifierProvider getContentVerifierProvider(
+      final X509Certificate cert)
+  throws InvalidKeyException {
+    return getContentVerifierProvider(cert.getPublicKey());
+  }
 
-    @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509CertificateHolder cert)
-    throws InvalidKeyException {
-        PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
-        return getContentVerifierProvider(publicKey);
-    }
+  @Override
+  public ContentVerifierProvider getContentVerifierProvider(
+      final X509CertificateHolder cert)
+  throws InvalidKeyException {
+    PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());
+    return getContentVerifierProvider(publicKey);
+  }
 
 }

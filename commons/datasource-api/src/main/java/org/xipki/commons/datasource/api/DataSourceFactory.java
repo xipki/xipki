@@ -45,26 +45,27 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface DataSourceFactory {
 
-    DataSourceWrapper createDataSource(
-            String name,
-            InputStream conf,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+  DataSourceWrapper createDataSource(
+      String name,
+      InputStream conf,
+      PasswordResolver passwordResolver)
+  throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(
-            String name,
-            String confFile,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+  DataSourceWrapper createDataSourceForFile(
+      String name,
+      String confFile,
+      PasswordResolver passwordResolver)
+  throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSource(
-            String name,
-            Properties conf,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+  DataSourceWrapper createDataSource(
+      String name,
+      Properties conf,
+      PasswordResolver passwordResolver)
+  throws DataAccessException, PasswordResolverException, IOException;
 
 }

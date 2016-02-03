@@ -43,35 +43,36 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P12RSASignLoadTest extends P12SignLoadTest {
 
-    public P12RSASignLoadTest(
-            final SecurityFactory securityFactory,
-            final String signatureAlgorithm,
-            final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
-        super(securityFactory, signatureAlgorithm,
-                generateKeystore(keysize, publicExponent),
-                "PKCS#12 RSA signature creation\n"
-                        + "keysize: " + keysize + "\n"
-                        + "public exponent: " + publicExponent);
-    }
+  public P12RSASignLoadTest(
+      final SecurityFactory securityFactory,
+      final String signatureAlgorithm,
+      final int keysize,
+      final BigInteger publicExponent)
+  throws Exception {
+    super(securityFactory, signatureAlgorithm,
+        generateKeystore(keysize, publicExponent),
+        "PKCS#12 RSA signature creation\n"
+            + "keysize: " + keysize + "\n"
+            + "public exponent: " + publicExponent);
+  }
 
-    private static byte[] generateKeystore(
-            final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
-        byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
-        if (keystoreBytes == null) {
-            P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
-                    keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null,
-                    new SecureRandom());
-            keystoreBytes = kpGen.generateIdentity().getKeystore();
-        }
-        return keystoreBytes;
+  private static byte[] generateKeystore(
+      final int keysize,
+      final BigInteger publicExponent)
+  throws Exception {
+    byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
+    if (keystoreBytes == null) {
+      P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
+          keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null,
+          new SecureRandom());
+      keystoreBytes = kpGen.generateIdentity().getKeystore();
     }
+    return keystoreBytes;
+  }
 
 }

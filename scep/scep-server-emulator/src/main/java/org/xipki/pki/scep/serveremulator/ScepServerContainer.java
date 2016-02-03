@@ -44,51 +44,52 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ScepServerContainer {
 
-    private Server server;
+  private Server server;
 
-    public ScepServerContainer(
-            final int port,
-            final ScepServer scepServer)
-    throws Exception {
-        this(port, Arrays.asList(scepServer));
+  public ScepServerContainer(
+      final int port,
+      final ScepServer scepServer)
+  throws Exception {
+    this(port, Arrays.asList(scepServer));
+  }
+
+  public ScepServerContainer(
+      final int port,
+      final List<ScepServer> scepServers)
+  throws Exception {
+    Server server = new Server(port);
+
+    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+    context.setContextPath("/");
+    server.setHandler(context);
+
+    for (ScepServer m : scepServers) {
+      String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
+      ScepServlet servlet = m.getServlet();
+      context.addServlet(new ServletHolder(servlet), servletPattern);
     }
 
-    public ScepServerContainer(
-            final int port,
-            final List<ScepServer> scepServers)
-    throws Exception {
-        Server server = new Server(port);
+    this.server = server;
+  }
 
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-
-        for (ScepServer m : scepServers) {
-            String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
-            ScepServlet servlet = m.getServlet();
-            context.addServlet(new ServletHolder(servlet), servletPattern);
-        }
-
-        this.server = server;
+  public void start()
+  throws Exception {
+    try {
+      server.start();
+    } catch (Exception e) {
+      server.stop();
+      throw e;
     }
+  }
 
-    public void start()
-    throws Exception {
-        try {
-            server.start();
-        } catch (Exception e) {
-            server.stop();
-            throw e;
-        }
-    }
-
-    public void stop()
-    throws Exception {
-        server.stop();
-    }
+  public void stop()
+  throws Exception {
+    server.stop();
+  }
 
 }

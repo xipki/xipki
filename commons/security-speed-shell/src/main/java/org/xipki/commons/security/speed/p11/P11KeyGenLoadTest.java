@@ -43,49 +43,50 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    genKeypair();
-                    account(1, 0);
-                } catch (Exception e) {
-                    account(1, 1);
-                }
-            }
-        }
-
-    } // class Testor
-
-    protected final P11WritableSlot slot;
-
-    private AtomicLong l = new AtomicLong(System.currentTimeMillis());
-
-    protected abstract void genKeypair()
-    throws Exception;
-
-    public P11KeyGenLoadTest(
-            final P11WritableSlot slot,
-            final String description) {
-        super(description);
-        ParamUtil.assertNotNull("slot", slot);
-        this.slot = slot;
-    }
-
-    protected String getDummyLabel() {
-        return "loadtest-" + l.getAndIncrement();
-    }
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        try {
+          genKeypair();
+          account(1, 0);
+        } catch (Exception e) {
+          account(1, 1);
+        }
+      }
     }
+
+  } // class Testor
+
+  protected final P11WritableSlot slot;
+
+  private AtomicLong l = new AtomicLong(System.currentTimeMillis());
+
+  protected abstract void genKeypair()
+  throws Exception;
+
+  public P11KeyGenLoadTest(
+      final P11WritableSlot slot,
+      final String description) {
+    super(description);
+    ParamUtil.assertNotNull("slot", slot);
+    this.slot = slot;
+  }
+
+  protected String getDummyLabel() {
+    return "loadtest-" + l.getAndIncrement();
+  }
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
 
 }

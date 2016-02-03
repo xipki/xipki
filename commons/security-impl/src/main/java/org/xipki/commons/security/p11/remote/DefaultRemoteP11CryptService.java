@@ -51,102 +51,103 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class DefaultRemoteP11CryptService extends RemoteP11CryptService {
 
-    private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
+  private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
 
-    private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
+  private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
-    private URL _serverUrl;
+  private URL _serverUrl;
 
-    private final String serverUrl;
+  private final String serverUrl;
 
-    DefaultRemoteP11CryptService(
-            final P11ModuleConf moduleConf) {
-        super(moduleConf);
+  DefaultRemoteP11CryptService(
+      final P11ModuleConf moduleConf) {
+    super(moduleConf);
 
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
+    ParamUtil.assertNotNull("moduleConf", moduleConf);
 
-        ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
-        serverUrl = conf.getValue("url");
-        if (StringUtil.isBlank(serverUrl)) {
-            throw new IllegalArgumentException("url is not specified");
-        }
-
-        try {
-            _serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("invalid url: " + serverUrl);
-        }
+    ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
+    serverUrl = conf.getValue("url");
+    if (StringUtil.isBlank(serverUrl)) {
+      throw new IllegalArgumentException("url is not specified");
     }
 
-    @Override
-    public byte[] send(
-            final byte[] request)
-    throws IOException {
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();
-        httpUrlConnection.setDoOutput(true);
-        httpUrlConnection.setUseCaches(false);
+    try {
+      _serverUrl = new URL(serverUrl);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException("invalid url: " + serverUrl);
+    }
+  }
 
-        int size = request.length;
+  @Override
+  public byte[] send(
+      final byte[] request)
+  throws IOException {
+    HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();
+    httpUrlConnection.setDoOutput(true);
+    httpUrlConnection.setUseCaches(false);
 
-        httpUrlConnection.setRequestMethod("POST");
-        httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
-        httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
-        OutputStream outputstream = httpUrlConnection.getOutputStream();
-        outputstream.write(request);
-        outputstream.flush();
+    int size = request.length;
 
-        InputStream inputstream = null;
-        try {
-            inputstream = httpUrlConnection.getInputStream();
-        } catch (IOException e) {
-            InputStream errStream = httpUrlConnection.getErrorStream();
-            if (errStream != null) {
-                errStream.close();
-            }
-            throw e;
-        }
+    httpUrlConnection.setRequestMethod("POST");
+    httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
+    httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
+    OutputStream outputstream = httpUrlConnection.getOutputStream();
+    outputstream.write(request);
+    outputstream.flush();
 
-        try {
-            String responseContentType = httpUrlConnection.getContentType();
-            boolean isValidContentType = false;
-            if (responseContentType != null) {
-                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
-                    isValidContentType = true;
-                }
-            }
-            if (!isValidContentType) {
-                throw new IOException("bad response: mime type "
-                        + responseContentType
-                        + " not supported!");
-            }
-
-            byte[] buf = new byte[4096];
-            ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-            do {
-                int j = inputstream.read(buf);
-                if (j == -1) {
-                    break;
-                }
-                bytearrayoutputstream.write(buf, 0, j);
-            } while (true);
-
-            return bytearrayoutputstream.toByteArray();
-        } finally {
-            inputstream.close();
-        }
-    } // method send
-
-    @Override
-    public void refresh()
-    throws SignerException {
+    InputStream inputstream = null;
+    try {
+      inputstream = httpUrlConnection.getInputStream();
+    } catch (IOException e) {
+      InputStream errStream = httpUrlConnection.getErrorStream();
+      if (errStream != null) {
+        errStream.close();
+      }
+      throw e;
     }
 
-    public String getServerUrl() {
-        return serverUrl;
+    try {
+      String responseContentType = httpUrlConnection.getContentType();
+      boolean isValidContentType = false;
+      if (responseContentType != null) {
+        if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
+          isValidContentType = true;
+        }
+      }
+      if (!isValidContentType) {
+        throw new IOException("bad response: mime type "
+            + responseContentType
+            + " not supported!");
+      }
+
+      byte[] buf = new byte[4096];
+      ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
+      do {
+        int j = inputstream.read(buf);
+        if (j == -1) {
+          break;
+        }
+        bytearrayoutputstream.write(buf, 0, j);
+      } while (true);
+
+      return bytearrayoutputstream.toByteArray();
+    } finally {
+      inputstream.close();
     }
+  } // method send
+
+  @Override
+  public void refresh()
+  throws SignerException {
+  }
+
+  public String getServerUrl() {
+    return serverUrl;
+  }
 
 }

@@ -46,31 +46,32 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "ec-p12",
-        description = "generate EC keypair in PKCS#12 keystore")
+    description = "generate EC keypair in PKCS#12 keystore")
 @Service
 public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name or OID\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      required = true,
+      description = "EC curve name or OID\n"
+          + "(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage(),
-                securityFactory.getRandom4Key());
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+        curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage(),
+        securityFactory.getRandom4Key());
 
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-        saveKeyAndCert(keyAndCert);
+    P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+    saveKeyAndCert(keyAndCert);
 
-        return null;
-    }
+    return null;
+  }
 
 }

@@ -40,14 +40,15 @@ import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class BSpeedP12SignCommandSupport extends BatchSpeedCommandSupport {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+  @Option(name = "--sig-algo",
+      required = true,
+      description = "signature algorithm\n"
+          + "(required)")
+  protected String sigAlgo;
 
 }

@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,36 +33,36 @@ import org.xipki.commons.datasource.api.springframework.dao.UncategorizedDataAcc
 @SuppressWarnings("serial")
 public class UncategorizedSQLException extends UncategorizedDataAccessException {
 
-    /** SQL that led to the problem */
-    private final String sql;
+  /** SQL that led to the problem */
+  private final String sql;
 
-    /**
-     * Constructor for UncategorizedSQLException.
-     * @param task name of current task
-     * @param sql the offending SQL statement
-     * @param ex the root cause
-     */
-    public UncategorizedSQLException(
-            final String sql,
-            final SQLException ex) {
-        super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
-                + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
-                + ex.getMessage(), ex);
-        this.sql = sql;
-    }
+  /**
+   * Constructor for UncategorizedSQLException.
+   * @param task name of current task
+   * @param sql the offending SQL statement
+   * @param ex the root cause
+   */
+  public UncategorizedSQLException(
+      final String sql,
+      final SQLException ex) {
+    super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
+        + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
+        + ex.getMessage(), ex);
+    this.sql = sql;
+  }
 
-    /**
-     * Return the underlying SQLException.
-     */
-    public SQLException getSQLException() {
-        return (SQLException) getCause();
-    }
+  /**
+   * Return the underlying SQLException.
+   */
+  public SQLException getSQLException() {
+    return (SQLException) getCause();
+  }
 
-    /**
-     * Return the SQL that led to the problem.
-     */
-    public String getSql() {
-        return this.sql;
-    }
+  /**
+   * Return the SQL that led to the problem.
+   */
+  public String getSql() {
+    return this.sql;
+  }
 
 }

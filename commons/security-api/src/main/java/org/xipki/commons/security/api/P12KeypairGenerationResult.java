@@ -41,32 +41,33 @@ import org.bouncycastle.cert.X509CertificateHolder;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P12KeypairGenerationResult extends KeypairGenerationResult {
 
-    private final byte[] keystore;
+  private final byte[] keystore;
 
-    private KeyStore keystoreObject;
+  private KeyStore keystoreObject;
 
-    public P12KeypairGenerationResult(
-            final byte[] keystore,
-            final X509CertificateHolder certificate) {
-        super(certificate);
-        this.keystore = keystore;
-    }
+  public P12KeypairGenerationResult(
+      final byte[] keystore,
+      final X509CertificateHolder certificate) {
+    super(certificate);
+    this.keystore = keystore;
+  }
 
-    public byte[] getKeystore() {
-        return keystore;
-    }
+  public byte[] getKeystore() {
+    return keystore;
+  }
 
-    public KeyStore getKeystoreObject() {
-        return keystoreObject;
-    }
+  public KeyStore getKeystoreObject() {
+    return keystoreObject;
+  }
 
-    public void setKeystoreObject(
-            final KeyStore keystoreObject) {
-        this.keystoreObject = keystoreObject;
-    }
+  public void setKeystoreObject(
+      final KeyStore keystoreObject) {
+    this.keystoreObject = keystoreObject;
+  }
 
 }

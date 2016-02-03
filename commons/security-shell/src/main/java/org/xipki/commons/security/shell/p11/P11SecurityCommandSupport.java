@@ -46,43 +46,44 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    protected Integer slotIndex;
+  @Option(name = "--slot",
+      required = true,
+      description = "slot index\n"
+          + "(required)")
+  protected Integer slotIndex;
 
-    @Option(name = "--key-id",
-            description = "id of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    protected String keyId;
+  @Option(name = "--key-id",
+      description = "id of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String keyId;
 
-    @Option(name = "--key-label",
-            description = "label of the private key in the PKCS#11 device\n"
-                    + "either keyId or keyLabel must be specified")
-    protected String keyLabel;
+  @Option(name = "--key-label",
+      description = "label of the private key in the PKCS#11 device\n"
+          + "either keyId or keyLabel must be specified")
+  protected String keyLabel;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module")
+  @Completion(P11ModuleNameCompleter.class)
+  protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    public P11KeyIdentifier getKeyIdentifier()
-    throws IllegalCmdParamException {
-        P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null) {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else {
-            throw new IllegalCmdParamException(
-                    "exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
+  public P11KeyIdentifier getKeyIdentifier()
+  throws IllegalCmdParamException {
+    P11KeyIdentifier keyIdentifier;
+    if (keyId != null && keyLabel == null) {
+      keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+    } else if (keyId == null && keyLabel != null) {
+      keyIdentifier = new P11KeyIdentifier(keyLabel);
+    } else {
+      throw new IllegalCmdParamException(
+          "exactly one of keyId or keyLabel should be specified");
     }
+    return keyIdentifier;
+  }
 
 }

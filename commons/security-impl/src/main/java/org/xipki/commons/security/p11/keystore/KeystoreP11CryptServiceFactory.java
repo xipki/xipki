@@ -45,39 +45,40 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
 
-    private P11Control p11Control;
+  private P11Control p11Control;
 
-    @Override
-    public void init(
-            final P11Control p11Control) {
-        ParamUtil.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
-        KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
+  @Override
+  public void init(
+      final P11Control p11Control) {
+    ParamUtil.assertNotNull("p11Control", p11Control);
+    this.p11Control = p11Control;
+    KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
+  }
+
+  @Override
+  public P11CryptService createP11CryptService(
+      String moduleName)
+  throws SignerException {
+    ParamUtil.assertNotNull("moduleName", moduleName);
+    if (p11Control == null) {
+      throw new IllegalStateException("please call init() first");
     }
 
-    @Override
-    public P11CryptService createP11CryptService(
-            String moduleName)
-    throws SignerException {
-        ParamUtil.assertNotNull("moduleName", moduleName);
-        if (p11Control == null) {
-            throw new IllegalStateException("please call init() first");
-        }
-
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            moduleName = p11Control.getDefaultModuleName();
-        }
-
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if (conf == null) {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
-        }
-
-        return KeystoreP11CryptService.getInstance(conf);
+    if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
+      moduleName = p11Control.getDefaultModuleName();
     }
+
+    P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+    if (conf == null) {
+      throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
+    }
+
+    return KeystoreP11CryptService.getInstance(conf);
+  }
 
 }

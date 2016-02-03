@@ -43,23 +43,24 @@ import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    protected Integer slotIndex;
+  @Option(name = "--slot",
+      required = true,
+      description = "slot index\n"
+          + "(required)")
+  protected Integer slotIndex;
 
-    @Option(name = "--module",
-            description = "Name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "Name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11SlotIdentifier getSlotId() {
-        return new P11SlotIdentifier(slotIndex, null);
-    }
+  protected P11SlotIdentifier getSlotId() {
+    return new P11SlotIdentifier(slotIndex, null);
+  }
 
 }

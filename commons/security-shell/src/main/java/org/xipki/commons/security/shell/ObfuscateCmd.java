@@ -41,21 +41,22 @@ import org.xipki.commons.password.OBFPasswordResolver;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "obfuscate",
-        description = "obfuscate password")
+    description = "obfuscate password")
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        char[] password = readPassword("Please enter the password");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    char[] password = readPassword("Please enter the password");
 
-        String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
-        out("the obfuscated password is: '" + passwordHint + "'");
-        return null;
-    }
+    String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
+    out("the obfuscated password is: '" + passwordHint + "'");
+    return null;
+  }
 
 }

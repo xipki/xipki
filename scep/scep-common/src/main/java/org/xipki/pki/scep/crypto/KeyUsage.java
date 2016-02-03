@@ -37,93 +37,94 @@ package org.xipki.pki.scep.crypto;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum KeyUsage {
 
-    digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
-            "digitalSignature"),
-    contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
-            "contentCommitment", "nonRepudiation"),
-    keyEncipherment   (2, org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment,
-            "keyEncipherment"),
-    dataEncipherment  (3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment,
-            "dataEncipherment"),
-    keyAgreement      (4, org.bouncycastle.asn1.x509.KeyUsage.keyAgreement,
-            "keyAgreement"),
-    keyCertSign       (5, org.bouncycastle.asn1.x509.KeyUsage.keyCertSign,
-            "keyCertSign"),
-    cRLSign           (6, org.bouncycastle.asn1.x509.KeyUsage.cRLSign,
-            "cRLSign"),
-    encipherOnly      (7, org.bouncycastle.asn1.x509.KeyUsage.encipherOnly,
-            "encipherOnly"),
-    decipherOnly      (8, org.bouncycastle.asn1.x509.KeyUsage.decipherOnly,
-            "decipherOnly");
+  digitalSignature  (0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
+      "digitalSignature"),
+  contentCommitment (1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
+      "contentCommitment", "nonRepudiation"),
+  keyEncipherment   (2, org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment,
+      "keyEncipherment"),
+  dataEncipherment  (3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment,
+      "dataEncipherment"),
+  keyAgreement    (4, org.bouncycastle.asn1.x509.KeyUsage.keyAgreement,
+      "keyAgreement"),
+  keyCertSign     (5, org.bouncycastle.asn1.x509.KeyUsage.keyCertSign,
+      "keyCertSign"),
+  cRLSign       (6, org.bouncycastle.asn1.x509.KeyUsage.cRLSign,
+      "cRLSign"),
+  encipherOnly    (7, org.bouncycastle.asn1.x509.KeyUsage.encipherOnly,
+      "encipherOnly"),
+  decipherOnly    (8, org.bouncycastle.asn1.x509.KeyUsage.decipherOnly,
+      "decipherOnly");
 
-    private int bit;
+  private int bit;
 
-    private int bcUsage;
+  private int bcUsage;
 
-    private String[] names;
+  private String[] names;
 
-    private KeyUsage(
-            final int bit,
-            final int bcUsage,
-            final String... names) {
-        this.bit = bit;
-        this.bcUsage = bcUsage;
-        this.names = names;
+  private KeyUsage(
+      final int bit,
+      final int bcUsage,
+      final String... names) {
+    this.bit = bit;
+    this.bcUsage = bcUsage;
+    this.names = names;
+  }
+
+  public int getBit() {
+    return bit;
+  }
+
+  public int getBcUsage() {
+    return bcUsage;
+  }
+
+  public String getName() {
+    return names[0];
+  }
+
+  public static KeyUsage getKeyUsage(
+      final String usage) {
+    if (usage == null) {
+      return null;
     }
 
-    public int getBit() {
-        return bit;
-    }
-
-    public int getBcUsage() {
-        return bcUsage;
-    }
-
-    public String getName() {
-        return names[0];
-    }
-
-    public static KeyUsage getKeyUsage(
-            final String usage) {
-        if (usage == null) {
-            return null;
+    for (KeyUsage ku : KeyUsage.values()) {
+      for (String name : ku.names) {
+        if (name.equals(usage)) {
+          return ku;
         }
-
-        for (KeyUsage ku : KeyUsage.values()) {
-            for (String name : ku.names) {
-                if (name.equals(usage)) {
-                    return ku;
-                }
-            }
-        }
-
-        return null;
+      }
     }
 
-    public static KeyUsage getKeyUsage(
-            final int bit) {
-        for (KeyUsage ku : KeyUsage.values()) {
-            if (ku.bit == bit) {
-                return ku;
-            }
-        }
+    return null;
+  }
 
-        return null;
+  public static KeyUsage getKeyUsage(
+      final int bit) {
+    for (KeyUsage ku : KeyUsage.values()) {
+      if (ku.bit == bit) {
+        return ku;
+      }
     }
 
-    public static KeyUsage getKeyUsageFromBcUsage(
-            final int bcUsage) {
-        for (KeyUsage ku : KeyUsage.values()) {
-            if (ku.bcUsage == bcUsage) {
-                return ku;
-            }
-        }
+    return null;
+  }
 
-        return null;
+  public static KeyUsage getKeyUsageFromBcUsage(
+      final int bcUsage) {
+    for (KeyUsage ku : KeyUsage.values()) {
+      if (ku.bcUsage == bcUsage) {
+        return ku;
+      }
     }
+
+    return null;
+  }
 
 }

@@ -48,132 +48,133 @@ import org.xipki.commons.console.karaf.intern.MyFilenameFilter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 abstract class AbstractPathCompleter implements Completer {
 
-    protected abstract boolean isDirOnly();
+  protected abstract boolean isDirOnly();
 
-    private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
+  private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
 
-    private static final FilenameFilter filenameFilter = new MyFilenameFilter();
+  private static final FilenameFilter filenameFilter = new MyFilenameFilter();
 
-    @Override
-    public int complete(
-            final Session session,
-            final CommandLine commandLine,
-            final List<String> candidates) {
-        // buffer can be null
-        if (candidates == null) {
-            return 0;
+  @Override
+  public int complete(
+      final Session session,
+      final CommandLine commandLine,
+      final List<String> candidates) {
+    // buffer can be null
+    if (candidates == null) {
+      return 0;
+    }
+
+    String buffer = commandLine.getCursorArgument();
+    buffer = (buffer != null)
+        ? buffer.substring(0, commandLine.getArgumentPosition())
+        : "";
+
+    if (OS_IS_WINDOWS) {
+      buffer = buffer.replace('/', '\\');
+    }
+
+    String translated = buffer;
+
+    File homeDir = getUserHome();
+
+    // Special character: ~ maps to the user's home directory
+    if (translated.startsWith("~" + separator())) {
+      translated = homeDir.getPath() + translated.substring(1);
+    } else if (translated.startsWith("~")) {
+      translated = homeDir.getParentFile().getAbsolutePath();
+    } else if (!(new File(translated).isAbsolute())) {
+      String cwd = getUserDir().getAbsolutePath();
+      translated = cwd + separator() + translated;
+    }
+
+    File file = new File(translated);
+    final File dir;
+
+    if (translated.endsWith(separator())) {
+      dir = file;
+    } else {
+      dir = file.getParentFile();
+    }
+
+    File[] entries = (dir == null)
+        ? new File[0]
+        : dir.listFiles(filenameFilter);
+    if (isDirOnly()
+        && entries != null
+        && entries.length > 0) {
+      List<File> list = new LinkedList<File>();
+      for (File f : entries) {
+        if (f.isDirectory()) {
+          list.add(f);
         }
+      }
+      entries = list.toArray(new File[0]);
+    }
 
-        String buffer = commandLine.getCursorArgument();
-        buffer = (buffer != null)
-                ? buffer.substring(0, commandLine.getArgumentPosition())
-                : "";
+    return matchFiles(buffer, translated, entries, candidates)
+        + commandLine.getBufferPosition()
+        - commandLine.getArgumentPosition();
+  }
 
-        if (OS_IS_WINDOWS) {
-            buffer = buffer.replace('/', '\\');
-        }
+  protected String separator() {
+    return File.separator;
+  }
 
-        String translated = buffer;
+  protected File getUserHome() {
+    return Configuration.getUserHome();
+  }
 
-        File homeDir = getUserHome();
+  protected File getUserDir() {
+    return new File(".");
+  }
 
-        // Special character: ~ maps to the user's home directory
-        if (translated.startsWith("~" + separator())) {
-            translated = homeDir.getPath() + translated.substring(1);
-        } else if (translated.startsWith("~")) {
-            translated = homeDir.getParentFile().getAbsolutePath();
-        } else if (!(new File(translated).isAbsolute())) {
-            String cwd = getUserDir().getAbsolutePath();
-            translated = cwd + separator() + translated;
-        }
+  protected int matchFiles(
+      final String buffer,
+      final String translated,
+      final File[] files,
+      final List<String> candidates) {
+    if (files == null) {
+      return -1;
+    }
 
-        File file = new File(translated);
-        final File dir;
+    int matches = 0;
 
-        if (translated.endsWith(separator())) {
-            dir = file;
+    // first pass: just count the matches
+    for (File file : files) {
+      if (file.getAbsolutePath().startsWith(translated)) {
+        matches++;
+      }
+    }
+
+    String sep = separator();
+    for (File file : files) {
+      if (file.getAbsolutePath().startsWith(translated)) {
+        String name = file.getName();
+        if (matches == 1 && file.isDirectory()) {
+          name += sep;
+          // this line prevent from appending whitespace
+          candidates.add(render(file, name).toString());
         } else {
-            dir = file.getParentFile();
+          name += " ";
         }
-
-        File[] entries = (dir == null)
-                ? new File[0]
-                : dir.listFiles(filenameFilter);
-        if (isDirOnly()
-                && entries != null
-                && entries.length > 0) {
-            List<File> list = new LinkedList<File>();
-            for (File f : entries) {
-                if (f.isDirectory()) {
-                    list.add(f);
-                }
-            }
-            entries = list.toArray(new File[0]);
-        }
-
-        return matchFiles(buffer, translated, entries, candidates)
-                + commandLine.getBufferPosition()
-                - commandLine.getArgumentPosition();
+        candidates.add(render(file, name).toString());
+      }
     }
 
-    protected String separator() {
-        return File.separator;
-    }
+    final int index = buffer.lastIndexOf(sep);
 
-    protected File getUserHome() {
-        return Configuration.getUserHome();
-    }
+    return index + sep.length();
+  }
 
-    protected File getUserDir() {
-        return new File(".");
-    }
-
-    protected int matchFiles(
-            final String buffer,
-            final String translated,
-            final File[] files,
-            final List<String> candidates) {
-        if (files == null) {
-            return -1;
-        }
-
-        int matches = 0;
-
-        // first pass: just count the matches
-        for (File file : files) {
-            if (file.getAbsolutePath().startsWith(translated)) {
-                matches++;
-            }
-        }
-
-        String sep = separator();
-        for (File file : files) {
-            if (file.getAbsolutePath().startsWith(translated)) {
-                String name = file.getName();
-                if (matches == 1 && file.isDirectory()) {
-                    name += sep;
-                    // this line prevent from appending whitespace
-                    candidates.add(render(file, name).toString());
-                } else {
-                    name += " ";
-                }
-                candidates.add(render(file, name).toString());
-            }
-        }
-
-        final int index = buffer.lastIndexOf(sep);
-
-        return index + sep.length();
-    }
-
-    protected CharSequence render(
-            final File file,
-            final CharSequence name) {
-        return name;
-    }
+  protected CharSequence render(
+      final File file,
+      final CharSequence name) {
+    return name;
+  }
 
 }
