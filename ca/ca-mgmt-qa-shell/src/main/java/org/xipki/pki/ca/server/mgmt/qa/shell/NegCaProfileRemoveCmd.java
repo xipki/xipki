@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaProfileRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-caprofile-rm",
-        description = "remove certificate profile from CA (negative, QA)")
+    description = "remove certificate profile from CA (negative, QA)")
 @Service
 public class NegCaProfileRemoveCmd extends CaProfileRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-caprofile-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-caprofile-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

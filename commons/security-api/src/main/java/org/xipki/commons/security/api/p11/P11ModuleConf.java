@@ -45,115 +45,116 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11ModuleConf {
 
-    private final String name;
+  private final String name;
 
-    private final String nativeLibrary;
+  private final String nativeLibrary;
 
-    private final Set<P11SlotIdentifier> excludeSlots;
+  private final Set<P11SlotIdentifier> excludeSlots;
 
-    private final Set<P11SlotIdentifier> includeSlots;
+  private final Set<P11SlotIdentifier> includeSlots;
 
-    private final P11PasswordRetriever passwordRetriever;
+  private final P11PasswordRetriever passwordRetriever;
 
-    private final SecurityFactory securityFactory;
+  private final SecurityFactory securityFactory;
 
-    public P11ModuleConf(
-            final String name,
-            final String nativeLibrary,
-            final P11PasswordRetriever passwordRetriever,
-            final SecurityFactory securityFactory) {
-        this(name, nativeLibrary, passwordRetriever, null, null, securityFactory);
+  public P11ModuleConf(
+      final String name,
+      final String nativeLibrary,
+      final P11PasswordRetriever passwordRetriever,
+      final SecurityFactory securityFactory) {
+    this(name, nativeLibrary, passwordRetriever, null, null, securityFactory);
+  }
+
+  public P11ModuleConf(
+      final String name,
+      final String nativeLibrary,
+      final P11PasswordRetriever passwordRetriever,
+      final Set<P11SlotIdentifier> includeSlots,
+      final Set<P11SlotIdentifier> excludeSlots,
+      final SecurityFactory securityFactory) {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
+    ParamUtil.assertNotNull("securityFactory", securityFactory);
+
+    this.name = name.toLowerCase();
+    this.nativeLibrary = nativeLibrary;
+    this.securityFactory = securityFactory;
+    this.passwordRetriever = (passwordRetriever == null)
+        ? P11NullPasswordRetriever.INSTANCE
+        : passwordRetriever;
+
+    Set<P11SlotIdentifier> set = new HashSet<>();
+    if (includeSlots != null) {
+      set.addAll(includeSlots);
     }
+    this.includeSlots = Collections.unmodifiableSet(set);
 
-    public P11ModuleConf(
-            final String name,
-            final String nativeLibrary,
-            final P11PasswordRetriever passwordRetriever,
-            final Set<P11SlotIdentifier> includeSlots,
-            final Set<P11SlotIdentifier> excludeSlots,
-            final SecurityFactory securityFactory) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
+    set = new HashSet<>();
+    if (excludeSlots != null) {
+      set.addAll(excludeSlots);
+    }
+    this.excludeSlots = Collections.unmodifiableSet(set);
+  }
 
-        this.name = name.toLowerCase();
-        this.nativeLibrary = nativeLibrary;
-        this.securityFactory = securityFactory;
-        this.passwordRetriever = (passwordRetriever == null)
-                ? P11NullPasswordRetriever.INSTANCE
-                : passwordRetriever;
+  public String getName() {
+    return name;
+  }
 
-        Set<P11SlotIdentifier> set = new HashSet<>();
-        if (includeSlots != null) {
-            set.addAll(includeSlots);
+  public String getNativeLibrary() {
+    return nativeLibrary;
+  }
+
+  public SecurityFactory getSecurityFactory() {
+    return securityFactory;
+  }
+
+  public Set<P11SlotIdentifier> getExcludeSlots() {
+    return excludeSlots;
+  }
+
+  public Set<P11SlotIdentifier> getIncludeSlots() {
+    return includeSlots;
+  }
+
+  public P11PasswordRetriever getPasswordRetriever() {
+    return passwordRetriever;
+  }
+
+  public boolean isSlotIncluded(
+      final P11SlotIdentifier slot) {
+    boolean included;
+    if (CollectionUtil.isEmpty(includeSlots)) {
+      included = true;
+    } else {
+      included = false;
+      for (P11SlotIdentifier _slot : includeSlots) {
+        if (_slot.equals(slot)) {
+          included = true;
+          break;
         }
-        this.includeSlots = Collections.unmodifiableSet(set);
-
-        set = new HashSet<>();
-        if (excludeSlots != null) {
-            set.addAll(excludeSlots);
-        }
-        this.excludeSlots = Collections.unmodifiableSet(set);
+      }
     }
 
-    public String getName() {
-        return name;
+    if (!included) {
+      return false;
     }
 
-    public String getNativeLibrary() {
-        return nativeLibrary;
+    if (CollectionUtil.isEmpty(excludeSlots)) {
+      return included;
     }
 
-    public SecurityFactory getSecurityFactory() {
-        return securityFactory;
+    for (P11SlotIdentifier _slot : excludeSlots) {
+      if (_slot.equals(slot)) {
+        return false;
+      }
     }
 
-    public Set<P11SlotIdentifier> getExcludeSlots() {
-        return excludeSlots;
-    }
-
-    public Set<P11SlotIdentifier> getIncludeSlots() {
-        return includeSlots;
-    }
-
-    public P11PasswordRetriever getPasswordRetriever() {
-        return passwordRetriever;
-    }
-
-    public boolean isSlotIncluded(
-            final P11SlotIdentifier slot) {
-        boolean included;
-        if (CollectionUtil.isEmpty(includeSlots)) {
-            included = true;
-        } else {
-            included = false;
-            for (P11SlotIdentifier _slot : includeSlots) {
-                if (_slot.equals(slot)) {
-                    included = true;
-                    break;
-                }
-            }
-        }
-
-        if (!included) {
-            return false;
-        }
-
-        if (CollectionUtil.isEmpty(excludeSlots)) {
-            return included;
-        }
-
-        for (P11SlotIdentifier _slot : excludeSlots) {
-            if (_slot.equals(slot)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    return true;
+  }
 
 }

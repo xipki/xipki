@@ -41,25 +41,26 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class XipkiProviderRegister {
 
-    public void regist() {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new XipkiProvider());
-        }
+  public void regist() {
+    if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
+      Security.addProvider(new XipkiProvider());
     }
+  }
 
-    public void unregist() {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
-            Security.removeProvider(XipkiProvider.PROVIDER_NAME);
-        }
+  public void unregist() {
+    if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
+      Security.removeProvider(XipkiProvider.PROVIDER_NAME);
     }
+  }
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
-    }
+  public void setSecurityFactory(
+      final SecurityFactory securityFactory) {
+    XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
+  }
 
 }

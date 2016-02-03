@@ -43,34 +43,35 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-db", name = "initdb",
-        description = "reset and initialize the CA and OCSP databases")
+    description = "reset and initialize the CA and OCSP databases")
 @Service
 public class InitDbAllCmd extends LiquibaseCommandSupport {
 
-    private static final String ca_schemaFile = "xipki/sql/ca-init.xml";
+  private static final String ca_schemaFile = "xipki/sql/ca-init.xml";
 
-    private static final String ocsp_schemaFile = "xipki/sql/ocsp-init.xml";
+  private static final String ocsp_schemaFile = "xipki/sql/ocsp-init.xml";
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        resetAndInit(dbConf, ca_schemaFile);
+    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+    resetAndInit(dbConf, ca_schemaFile);
 
-        for (String dbName : dbConfs.keySet()) {
-            if (!dbName.toLowerCase().contains("ocsp")) {
-                continue;
-            }
+    for (String dbName : dbConfs.keySet()) {
+      if (!dbName.toLowerCase().contains("ocsp")) {
+        continue;
+      }
 
-            dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, ocsp_schemaFile);
-        }
-        return null;
+      dbConf = dbConfs.get(dbName);
+      resetAndInit(dbConf, ocsp_schemaFile);
     }
+    return null;
+  }
 
 }

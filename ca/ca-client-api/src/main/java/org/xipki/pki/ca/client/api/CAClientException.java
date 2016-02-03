@@ -37,29 +37,30 @@ package org.xipki.pki.ca.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CAClientException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CAClientException() {
-    }
+  public CAClientException() {
+  }
 
-    public CAClientException(
-            final String message) {
-        super(message);
-    }
+  public CAClientException(
+      final String message) {
+    super(message);
+  }
 
-    public CAClientException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CAClientException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public CAClientException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CAClientException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

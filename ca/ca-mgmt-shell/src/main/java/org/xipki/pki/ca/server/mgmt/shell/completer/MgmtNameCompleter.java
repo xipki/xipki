@@ -40,15 +40,16 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class MgmtNameCompleter extends AbstractDynamicEnumCompleter {
 
-    protected CAManager caManager;
+  protected CAManager caManager;
 
-    public void setCaManager(
-            final CAManager caManager) {
-        this.caManager = caManager;
-    }
+  public void setCaManager(
+      final CAManager caManager) {
+    this.caManager = caManager;
+  }
 
 }

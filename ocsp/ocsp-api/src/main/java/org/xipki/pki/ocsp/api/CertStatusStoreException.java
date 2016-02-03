@@ -37,29 +37,30 @@ package org.xipki.pki.ocsp.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertStatusStoreException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CertStatusStoreException() {
-    }
+  public CertStatusStoreException() {
+  }
 
-    public CertStatusStoreException(
-            final String message) {
-        super(message);
-    }
+  public CertStatusStoreException(
+      final String message) {
+    super(message);
+  }
 
-    public CertStatusStoreException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CertStatusStoreException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public CertStatusStoreException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CertStatusStoreException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

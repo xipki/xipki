@@ -49,98 +49,99 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class SignatureSigner implements ContentSigner {
 
-    private class SignatureStream extends OutputStream {
+  private class SignatureStream extends OutputStream {
 
-        public byte[] getSignature()
-        throws SignatureException {
-            return signer.sign();
-        }
-
-        @Override
-        public void write(
-                final int b)
-        throws IOException {
-            try {
-                signer.update((byte) b);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void write(
-                final byte[] b)
-        throws IOException {
-            try {
-                signer.update(b);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public void write(
-                final byte[] b,
-                final int off,
-                final int len)
-        throws IOException {
-            try {
-                signer.update(b, off, len);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-        }
-
-    } // class SignatureStream
-
-    private final AlgorithmIdentifier sigAlgId;
-
-    private final Signature signer;
-
-    private final SignatureStream stream = new SignatureStream();
-
-    private final PrivateKey key;
-
-    public SignatureSigner(
-            final AlgorithmIdentifier sigAlgId,
-            final Signature signer,
-            final PrivateKey key) {
-        ParamUtil.assertNotNull("sigAlgId", sigAlgId);
-        ParamUtil.assertNotNull("signer", signer);
-        ParamUtil.assertNotNull("key", key);
-
-        this.sigAlgId = sigAlgId;
-        this.signer = signer;
-        this.key = key;
+    public byte[] getSignature()
+    throws SignatureException {
+      return signer.sign();
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return sigAlgId;
+    public void write(
+        final int b)
+    throws IOException {
+      try {
+        signer.update((byte) b);
+      } catch (SignatureException e) {
+        throw new IOException(e.getMessage(), e);
+      }
     }
 
     @Override
-    public OutputStream getOutputStream() {
-        try {
-            signer.initSign(key);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeOperatorException("could not initSign", e);
-        }
-        return stream;
+    public void write(
+        final byte[] b)
+    throws IOException {
+      try {
+        signer.update(b);
+      } catch (SignatureException e) {
+        throw new IOException(e.getMessage(), e);
+      }
     }
 
     @Override
-    public byte[] getSignature() {
-        try {
-            return stream.getSignature();
-        } catch (SignatureException e) {
-            throw new RuntimeOperatorException(
-                    "exception obtaining signature: " + e.getMessage(), e);
-        }
+    public void write(
+        final byte[] b,
+        final int off,
+        final int len)
+    throws IOException {
+      try {
+        signer.update(b, off, len);
+      } catch (SignatureException e) {
+        throw new IOException(e.getMessage(), e);
+      }
     }
+
+  } // class SignatureStream
+
+  private final AlgorithmIdentifier sigAlgId;
+
+  private final Signature signer;
+
+  private final SignatureStream stream = new SignatureStream();
+
+  private final PrivateKey key;
+
+  public SignatureSigner(
+      final AlgorithmIdentifier sigAlgId,
+      final Signature signer,
+      final PrivateKey key) {
+    ParamUtil.assertNotNull("sigAlgId", sigAlgId);
+    ParamUtil.assertNotNull("signer", signer);
+    ParamUtil.assertNotNull("key", key);
+
+    this.sigAlgId = sigAlgId;
+    this.signer = signer;
+    this.key = key;
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return sigAlgId;
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    try {
+      signer.initSign(key);
+    } catch (InvalidKeyException e) {
+      throw new RuntimeOperatorException("could not initSign", e);
+    }
+    return stream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    try {
+      return stream.getSignature();
+    } catch (SignatureException e) {
+      throw new RuntimeOperatorException(
+          "exception obtaining signature: " + e.getMessage(), e);
+    }
+  }
 
 }

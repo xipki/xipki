@@ -41,28 +41,29 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
 
-    private final String curveNameOrOid;
+  private final String curveNameOrOid;
 
-    public P11ECKeyGenLoadTest(
-            final P11WritableSlot slot,
-            final String curveNameOrOid)
-    throws Exception {
-        super(slot,
-                "PKCS#11 EC key generation\n"
-                        + "curve: " + curveNameOrOid);
-        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-        this.curveNameOrOid = curveNameOrOid;
-    }
+  public P11ECKeyGenLoadTest(
+      final P11WritableSlot slot,
+      final String curveNameOrOid)
+  throws Exception {
+    super(slot,
+        "PKCS#11 EC key generation\n"
+            + "curve: " + curveNameOrOid);
+    ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
+    this.curveNameOrOid = curveNameOrOid;
+  }
 
-    @Override
-    protected void genKeypair()
-    throws Exception {
-        P11KeyIdentifier keyId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
-        slot.removeKey(keyId);
-    }
+  @Override
+  protected void genKeypair()
+  throws Exception {
+    P11KeyIdentifier keyId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
+    slot.removeKey(keyId);
+  }
 
 }

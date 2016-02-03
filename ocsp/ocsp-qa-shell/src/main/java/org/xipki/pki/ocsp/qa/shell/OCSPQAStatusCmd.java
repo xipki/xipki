@@ -66,184 +66,185 @@ import org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "ocsp-status",
-        description = "request certificate status (QA)")
+    description = "request certificate status (QA)")
 @Service
 public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
 
-    @Option(name = "--exp-error",
-            description = "expected error")
-    @Completion(OcspErrorCompleter.class)
-    private String errorText;
+  @Option(name = "--exp-error",
+      description = "expected error")
+  @Completion(OcspErrorCompleter.class)
+  private String errorText;
 
-    @Option(name = "--exp-status",
-            multiValued = true,
-            description = "expected status\n"
-                    + "(multi-valued)")
-    @Completion(CertStatusCompleter.class)
-    private List<String> statusTexts;
+  @Option(name = "--exp-status",
+      multiValued = true,
+      description = "expected status\n"
+          + "(multi-valued)")
+  @Completion(CertStatusCompleter.class)
+  private List<String> statusTexts;
 
-    @Option(name = "--exp-sig-alg",
-            description = "expected signature algorithm")
-    @Completion(SigAlgCompleter.class)
-    private String sigAlg;
+  @Option(name = "--exp-sig-alg",
+      description = "expected signature algorithm")
+  @Completion(SigAlgCompleter.class)
+  private String sigAlg;
 
-    @Option(name = "--exp-nextupdate",
-            description = "occurence of nextUpdate")
-    @Completion(OccurrenceCompleter.class)
-    private String nextUpdateOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-nextupdate",
+      description = "occurence of nextUpdate")
+  @Completion(OccurrenceCompleter.class)
+  private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "--exp-certhash",
-            description = "occurence of certHash")
-    @Completion(OccurrenceCompleter.class)
-    private String certhashOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-certhash",
+      description = "occurence of certHash")
+  @Completion(OccurrenceCompleter.class)
+  private String certhashOccurrenceText = Occurrence.optional.name();
 
-    @Option(name = "--exp-certhash-alg",
-            description = "occurence of certHash")
-    @Completion(HashAlgCompleter.class)
-    private String certhashAlg;
+  @Option(name = "--exp-certhash-alg",
+      description = "occurence of certHash")
+  @Completion(HashAlgCompleter.class)
+  private String certhashAlg;
 
-    @Option(name = "--exp-nonce",
-            description = "occurence of nonce")
-    @Completion(OccurrenceCompleter.class)
-    private String nonceOccurrenceText = Occurrence.optional.name();
+  @Option(name = "--exp-nonce",
+      description = "occurence of nonce")
+  @Completion(OccurrenceCompleter.class)
+  private String nonceOccurrenceText = Occurrence.optional.name();
 
-    @Reference
-    private OcspQA ocspQA;
+  @Reference
+  private OcspQA ocspQA;
 
-    private OcspError expectedOcspError;
+  private OcspError expectedOcspError;
 
-    private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
+  private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
 
-    private Occurrence expectedNextUpdateOccurrence;
+  private Occurrence expectedNextUpdateOccurrence;
 
-    private Occurrence expectedCerthashOccurrence;
+  private Occurrence expectedCerthashOccurrence;
 
-    private Occurrence expectedNonceOccurrence;
+  private Occurrence expectedNonceOccurrence;
 
-    @Override
-    protected void checkParameters(
-            final X509Certificate respIssuer,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception {
-        if (isBlank(errorText) && isEmpty(statusTexts)) {
-            throw new IllegalArgumentException(
-                    "neither expError nor expStatus is set, this is not permitted");
-        }
-
-        if (isNotBlank(errorText) && isNotEmpty(statusTexts)) {
-            throw new IllegalArgumentException(
-                    "both expError and expStatus are set, this is not permitted");
-        }
-
-        if (isNotBlank(errorText)) {
-            expectedOcspError = OcspError.getInstance(errorText);
-            if (expectedOcspError == null) {
-                throw new IllegalArgumentException("invalid OCSP error status '" + errorText + "'");
-            }
-        }
-
-        if (isNotEmpty(statusTexts)) {
-            if (statusTexts.size() != serialNumbers.size()) {
-                throw new IllegalArgumentException("number of expStatus is invalid: "
-                        + (statusTexts.size())
-                        + ", it should be " + serialNumbers.size());
-            }
-
-            expectedStatuses = new HashMap<>();
-            final int n = serialNumbers.size();
-
-            for (int i = 0; i < n; i++) {
-                String expectedStatusText = statusTexts.get(i);
-                OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
-                if (certStatus == null) {
-                    throw new IllegalArgumentException(
-                            "invalid cert status '" + expectedStatusText + "'");
-                }
-                expectedStatuses.put(serialNumbers.get(i), certStatus);
-            }
-        }
-
-        expectedCerthashOccurrence = getOccurrence(certhashOccurrenceText);
-        expectedNextUpdateOccurrence = getOccurrence(nextUpdateOccurrenceText);
-        expectedNonceOccurrence = getOccurrence(nonceOccurrenceText);
-    } // method checkParameters
-
-    @Override
-    protected Object processResponse(
-            final OCSPResp response,
-            final X509Certificate respIssuer,
-            final X509Certificate issuer,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception {
-        OcspResponseOption responseOption = new OcspResponseOption();
-        responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
-        responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
-        responseOption.setNonceOccurrence(expectedNonceOccurrence);
-        responseOption.setRespIssuer(respIssuer);
-        responseOption.setSignatureAlgName(sigAlg);
-        if (isNotBlank(certhashAlg)) {
-            responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
-        }
-
-        ValidationResult result = ocspQA.checkOCSP(response,
-                issuer,
-                serialNumbers,
-                encodedCerts,
-                expectedOcspError,
-                expectedStatuses,
-                responseOption);
-
-        StringBuilder sb = new StringBuilder(50);
-        sb.append("OCSP response is ");
-        String txt = result.isAllSuccessful()
-                ? "valid"
-                : "invalid";
-        sb.append(txt);
-
-        if (verbose.booleanValue()) {
-            for (ValidationIssue issue : result.getValidationIssues()) {
-                sb.append("\n");
-                format(issue, "    ", sb);
-            }
-        }
-
-        out(sb.toString());
-        if (!result.isAllSuccessful()) {
-            throw new CmdFailure("OCSP response is invalid");
-        }
-        return null;
-    } // method processResponse
-
-    private static void format(
-            final ValidationIssue issue,
-            final String prefix,
-            final StringBuilder sb) {
-        sb.append(prefix);
-        sb.append(issue.getCode());
-        sb.append(", ").append(issue.getDescription());
-        sb.append(", ");
-        String txt = issue.isFailed()
-                ? "failed"
-                : "successful";
-        sb.append(txt);
-        if (issue.getMessage() != null) {
-            sb.append(", ").append(issue.getMessage());
-        }
+  @Override
+  protected void checkParameters(
+      final X509Certificate respIssuer,
+      final List<BigInteger> serialNumbers,
+      final Map<BigInteger, byte[]> encodedCerts)
+  throws Exception {
+    if (isBlank(errorText) && isEmpty(statusTexts)) {
+      throw new IllegalArgumentException(
+          "neither expError nor expStatus is set, this is not permitted");
     }
 
-    private static Occurrence getOccurrence(
-            final String text)
-    throws IllegalCmdParamException {
-        Occurrence ret = Occurrence.getInstance(text);
-        if (ret == null) {
-            throw new IllegalCmdParamException("invalid occurrence '" + text + "'");
-        }
-        return ret;
+    if (isNotBlank(errorText) && isNotEmpty(statusTexts)) {
+      throw new IllegalArgumentException(
+          "both expError and expStatus are set, this is not permitted");
     }
+
+    if (isNotBlank(errorText)) {
+      expectedOcspError = OcspError.getInstance(errorText);
+      if (expectedOcspError == null) {
+        throw new IllegalArgumentException("invalid OCSP error status '" + errorText + "'");
+      }
+    }
+
+    if (isNotEmpty(statusTexts)) {
+      if (statusTexts.size() != serialNumbers.size()) {
+        throw new IllegalArgumentException("number of expStatus is invalid: "
+            + (statusTexts.size())
+            + ", it should be " + serialNumbers.size());
+      }
+
+      expectedStatuses = new HashMap<>();
+      final int n = serialNumbers.size();
+
+      for (int i = 0; i < n; i++) {
+        String expectedStatusText = statusTexts.get(i);
+        OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
+        if (certStatus == null) {
+          throw new IllegalArgumentException(
+              "invalid cert status '" + expectedStatusText + "'");
+        }
+        expectedStatuses.put(serialNumbers.get(i), certStatus);
+      }
+    }
+
+    expectedCerthashOccurrence = getOccurrence(certhashOccurrenceText);
+    expectedNextUpdateOccurrence = getOccurrence(nextUpdateOccurrenceText);
+    expectedNonceOccurrence = getOccurrence(nonceOccurrenceText);
+  } // method checkParameters
+
+  @Override
+  protected Object processResponse(
+      final OCSPResp response,
+      final X509Certificate respIssuer,
+      final X509Certificate issuer,
+      final List<BigInteger> serialNumbers,
+      final Map<BigInteger, byte[]> encodedCerts)
+  throws Exception {
+    OcspResponseOption responseOption = new OcspResponseOption();
+    responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
+    responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
+    responseOption.setNonceOccurrence(expectedNonceOccurrence);
+    responseOption.setRespIssuer(respIssuer);
+    responseOption.setSignatureAlgName(sigAlg);
+    if (isNotBlank(certhashAlg)) {
+      responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
+    }
+
+    ValidationResult result = ocspQA.checkOCSP(response,
+        issuer,
+        serialNumbers,
+        encodedCerts,
+        expectedOcspError,
+        expectedStatuses,
+        responseOption);
+
+    StringBuilder sb = new StringBuilder(50);
+    sb.append("OCSP response is ");
+    String txt = result.isAllSuccessful()
+        ? "valid"
+        : "invalid";
+    sb.append(txt);
+
+    if (verbose.booleanValue()) {
+      for (ValidationIssue issue : result.getValidationIssues()) {
+        sb.append("\n");
+        format(issue, "  ", sb);
+      }
+    }
+
+    out(sb.toString());
+    if (!result.isAllSuccessful()) {
+      throw new CmdFailure("OCSP response is invalid");
+    }
+    return null;
+  } // method processResponse
+
+  private static void format(
+      final ValidationIssue issue,
+      final String prefix,
+      final StringBuilder sb) {
+    sb.append(prefix);
+    sb.append(issue.getCode());
+    sb.append(", ").append(issue.getDescription());
+    sb.append(", ");
+    String txt = issue.isFailed()
+        ? "failed"
+        : "successful";
+    sb.append(txt);
+    if (issue.getMessage() != null) {
+      sb.append(", ").append(issue.getMessage());
+    }
+  }
+
+  private static Occurrence getOccurrence(
+      final String text)
+  throws IllegalCmdParamException {
+    Occurrence ret = Occurrence.getInstance(text);
+    if (ret == null) {
+      throw new IllegalCmdParamException("invalid occurrence '" + text + "'");
+    }
+    return ret;
+  }
 
 }

@@ -42,66 +42,67 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class IssuerStore {
 
-    private final List<IssuerEntry> entries;
+  private final List<IssuerEntry> entries;
 
-    IssuerStore(
-            final List<IssuerEntry> entries) {
-        this.entries = new ArrayList<>(entries.size());
+  IssuerStore(
+      final List<IssuerEntry> entries) {
+    this.entries = new ArrayList<>(entries.size());
 
-        for (IssuerEntry entry : entries) {
-            addIdentityEntry(entry);
-        }
+    for (IssuerEntry entry : entries) {
+      addIdentityEntry(entry);
+    }
+  }
+
+  void addIdentityEntry(
+      final IssuerEntry entry) {
+    ParamUtil.assertNotNull("entry", entry);
+
+    for (IssuerEntry existingEntry : entries) {
+      if (existingEntry.getId() == entry.getId()) {
+        throw new IllegalArgumentException(
+            "issuer with the same id " + entry.getId() + " already available");
+      }
     }
 
-    void addIdentityEntry(
-            final IssuerEntry entry) {
-        ParamUtil.assertNotNull("entry", entry);
+    entries.add(entry);
+  }
 
-        for (IssuerEntry existingEntry : entries) {
-            if (existingEntry.getId() == entry.getId()) {
-                throw new IllegalArgumentException(
-                        "issuer with the same id " + entry.getId() + " already available");
-            }
-        }
-
-        entries.add(entry);
+  Integer getIdForSubject(
+      final String subject) {
+    for (IssuerEntry entry : entries) {
+      if (entry.getSubject().equals(subject)) {
+        return entry.getId();
+      }
     }
 
-    Integer getIdForSubject(
-            final String subject) {
-        for (IssuerEntry entry : entries) {
-            if (entry.getSubject().equals(subject)) {
-                return entry.getId();
-            }
-        }
+    return null;
+  }
 
-        return null;
+  Integer getIdForSha1Fp(
+      final byte[] sha1Fp_cert) {
+    for (IssuerEntry entry : entries) {
+      if (entry.matchSha1Fp(sha1Fp_cert)) {
+        return entry.getId();
+      }
     }
 
-    Integer getIdForSha1Fp(
-            final byte[] sha1Fp_cert) {
-        for (IssuerEntry entry : entries) {
-            if (entry.matchSha1Fp(sha1Fp_cert)) {
-                return entry.getId();
-            }
-        }
+    return null;
+  }
 
-        return null;
+  Integer getIdForCert(
+      final byte[] encodedCert) {
+    for (IssuerEntry entry : entries) {
+      if (entry.matchCert(encodedCert)) {
+        return entry.getId();
+      }
     }
 
-    Integer getIdForCert(
-            final byte[] encodedCert) {
-        for (IssuerEntry entry : entries) {
-            if (entry.matchCert(encodedCert)) {
-                return entry.getId();
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

@@ -54,55 +54,56 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--cert", aliases = "-c",
-            description = "certificate file"
-                    + "(either cert or serial must be specified)")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert", aliases = "-c",
+      description = "certificate file"
+          + "(either cert or serial must be specified)")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Option(name = "--serial", aliases = "-s",
-            description = "serial number\n"
-                    + "(either cert or serial must be specified)")
-    private String serialNumberS;
+  @Option(name = "--serial", aliases = "-s",
+      description = "serial number\n"
+          + "(either cert or serial must be specified)")
+  private String serialNumberS;
 
-    protected BigInteger getSerialNumber()
-    throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
-        CAEntry ca = caManager.getCA(caName);
-        if (ca == null) {
-            throw new UnexpectedException("CA " + caName + " not available");
-        }
-
-        if (!(ca instanceof X509CAEntry)) {
-            throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
-        }
-
-        BigInteger serialNumber;
-        if (serialNumberS != null) {
-            serialNumber = toBigInt(serialNumberS);
-        } else if (certFile != null) {
-            X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
-            X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
-            if (!X509Util.issues(caCert, cert)) {
-                throw new UnexpectedException(
-                        "certificate '" + certFile + "' is not issued by CA " + caName);
-            }
-            serialNumber = cert.getSerialNumber();
-        } else {
-            throw new IllegalCmdParamException("neither serialNumber nor certFile is specified");
-        }
-
-        return serialNumber;
+  protected BigInteger getSerialNumber()
+  throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
+    CAEntry ca = caManager.getCA(caName);
+    if (ca == null) {
+      throw new UnexpectedException("CA " + caName + " not available");
     }
+
+    if (!(ca instanceof X509CAEntry)) {
+      throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
+    }
+
+    BigInteger serialNumber;
+    if (serialNumberS != null) {
+      serialNumber = toBigInt(serialNumberS);
+    } else if (certFile != null) {
+      X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
+      X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
+      if (!X509Util.issues(caCert, cert)) {
+        throw new UnexpectedException(
+            "certificate '" + certFile + "' is not issued by CA " + caName);
+      }
+      serialNumber = cert.getSerialNumber();
+    } else {
+      throw new IllegalCmdParamException("neither serialNumber nor certFile is specified");
+    }
+
+    return serialNumber;
+  }
 
 }

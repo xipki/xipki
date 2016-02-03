@@ -37,59 +37,60 @@ package org.xipki.commons.audit.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class AuditEventData {
 
-    private final String name;
+  private final String name;
 
-    private final String value;
+  private final String value;
 
-    public AuditEventData(
-            final String name,
-            final String value) {
-        assertNotEmpty("name", name);
-        assertNotNull("value", value);
-        this.name = name;
-        this.value = value;
+  public AuditEventData(
+      final String name,
+      final String value) {
+    assertNotEmpty("name", name);
+    assertNotNull("value", value);
+    this.name = name;
+    this.value = value;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name).append(": ").append(value);
+    return sb.toString();
+  }
+
+  private static void assertNotNull(
+      final String parameterName,
+      final Object parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(
+        String.format("%s could not be null", parameterName));
+    }
+  }
+
+  private static void assertNotEmpty(
+      final String parameterName,
+      final String parameter) {
+    if (parameter == null) {
+      throw new IllegalArgumentException(
+          String.format("%s could not be null", parameterName));
     }
 
-    public String getName() {
-        return name;
+    if (parameter.isEmpty()) {
+      throw new IllegalArgumentException(
+          String.format("%s could not be empty", parameterName));
     }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name).append(": ").append(value);
-        return sb.toString();
-    }
-
-    private static void assertNotNull(
-            final String parameterName,
-            final Object parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(
-                String.format("%s could not be null", parameterName));
-        }
-    }
-
-    private static void assertNotEmpty(
-            final String parameterName,
-            final String parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(
-                    String.format("%s could not be null", parameterName));
-        }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(
-                    String.format("%s could not be empty", parameterName));
-        }
-    }
+  }
 
 }

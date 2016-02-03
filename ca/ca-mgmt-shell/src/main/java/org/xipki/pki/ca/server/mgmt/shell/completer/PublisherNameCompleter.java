@@ -41,13 +41,14 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class PublisherNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        return caManager.getPublisherNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return caManager.getPublisherNames();
+  }
 }

@@ -40,20 +40,21 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "unrevoke-cert",
-        description = "unrevoke certificate")
+    description = "unrevoke certificate")
 @Service
 public class UnrevokeCertCmd extends UnRevRmCertCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
-        output(successful, "unrevoked", "could not unrevoke", "certificate");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
+    output(successful, "unrevoked", "could not unrevoke", "certificate");
 
-        return null;
-    }
+    return null;
+  }
 
 }

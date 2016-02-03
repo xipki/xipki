@@ -41,25 +41,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "user-rm",
-        description = "remove user")
+    description = "remove user")
 @Service
 public class UserRemoveCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "user Name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "user Name\n"
+          + "(required)")
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeUser(name);
-        output(b, "removed", "could not remove", "user " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeUser(name);
+    output(b, "removed", "could not remove", "user " + name);
+    return null;
+  }
 
 }

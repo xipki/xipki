@@ -53,67 +53,68 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "careq-add",
-        description = "add requestor to CA")
+    description = "add requestor to CA")
 @Service
 public class CaRequestorAddCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--requestor",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
-    @Completion(RequestorNameCompleter.class)
-    private String requestorName;
+  @Option(name = "--requestor",
+      required = true,
+      description = "requestor name\n"
+          + "(required)")
+  @Completion(RequestorNameCompleter.class)
+  private String requestorName;
 
-    @Option(name = "--ra",
-            description = "whether as RA")
-    @Completion(YesNoCompleter.class)
-    private String raS = "no";
+  @Option(name = "--ra",
+      description = "whether as RA")
+  @Completion(YesNoCompleter.class)
+  private String raS = "no";
 
-    @Option(name = "--permission",
-            required = true, multiValued = true,
-            description = "permission\n"
-                    + "(required, multi-valued)")
-    @Completion(PermissionCompleter.class)
-    private Set<String> permissions;
+  @Option(name = "--permission",
+      required = true, multiValued = true,
+      description = "permission\n"
+          + "(required, multi-valued)")
+  @Completion(PermissionCompleter.class)
+  private Set<String> permissions;
 
-    @Option(name = "--profile",
-            multiValued = true,
-            description = "profile name or 'all' for all profiles\n"
-                    + "(required, multi-valued)")
-    @Completion(ProfileNameAndAllCompleter.class)
-    private Set<String> profiles;
+  @Option(name = "--profile",
+      multiValued = true,
+      description = "profile name or 'all' for all profiles\n"
+          + "(required, multi-valued)")
+  @Completion(ProfileNameAndAllCompleter.class)
+  private Set<String> profiles;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean ra = isEnabled(raS, false, "ra");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean ra = isEnabled(raS, false, "ra");
 
-        CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
-        entry.setRa(ra);
-        entry.setProfiles(profiles);
-        Set<Permission> _permissions = new HashSet<>();
-        for (String permission : permissions) {
-            Permission _permission = Permission.getPermission(permission);
-            if (_permission == null) {
-                throw new IllegalCmdParamException("invalid permission: " + permission);
-            }
-            _permissions.add(_permission);
-        }
-        entry.setPermissions(_permissions);
-
-        boolean b = caManager.addCmpRequestorToCA(entry, caName);
-        output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
-        return null;
+    CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
+    entry.setRa(ra);
+    entry.setProfiles(profiles);
+    Set<Permission> _permissions = new HashSet<>();
+    for (String permission : permissions) {
+      Permission _permission = Permission.getPermission(permission);
+      if (_permission == null) {
+        throw new IllegalCmdParamException("invalid permission: " + permission);
+      }
+      _permissions.add(_permission);
     }
+    entry.setPermissions(_permissions);
+
+    boolean b = caManager.addCmpRequestorToCA(entry, caName);
+    output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
+    return null;
+  }
 
 }

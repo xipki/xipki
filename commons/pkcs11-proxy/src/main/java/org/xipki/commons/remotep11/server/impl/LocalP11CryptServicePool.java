@@ -48,73 +48,74 @@ import org.xipki.commons.security.api.p11.P11CryptService;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class LocalP11CryptServicePool {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
-    public static final int version = 2;
+  public static final int version = 2;
 
-    private SecurityFactory securityFactory;
+  private SecurityFactory securityFactory;
 
-    private String defaultPkcs11ModuleName;
+  private String defaultPkcs11ModuleName;
 
-    private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
+  private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
-    public LocalP11CryptServicePool() {
+  public LocalP11CryptServicePool() {
+  }
+
+  public void setSecurityFactory(
+      final SecurityFactory securityFactory) {
+    this.securityFactory = securityFactory;
+  }
+
+  private boolean initialized = false;
+  public void init()
+  throws Exception {
+    if (initialized) {
+      return;
     }
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
+    if (Security.getProvider("BC") == null) {
+      Security.addProvider(new BouncyCastleProvider());
     }
 
-    private boolean initialized = false;
-    public void init()
-    throws Exception {
-        if (initialized) {
-            return;
+    try {
+      if (securityFactory == null) {
+        throw new IllegalStateException("securityFactory is not configured");
+      }
+
+      this.defaultPkcs11ModuleName = securityFactory.getDefaultPkcs11ModuleName();
+      Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
+      for (String moduleName : moduleNames) {
+        P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+        if (p11Service != null) {
+          p11CryptServices.put(moduleName, p11Service);
         }
+      }
 
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-
-        try {
-            if (securityFactory == null) {
-                throw new IllegalStateException("securityFactory is not configured");
-            }
-
-            this.defaultPkcs11ModuleName = securityFactory.getDefaultPkcs11ModuleName();
-            Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
-            for (String moduleName : moduleNames) {
-                P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
-                if (p11Service != null) {
-                    p11CryptServices.put(moduleName, p11Service);
-                }
-            }
-
-            initialized = true;
-        } catch (Exception e) {
-            LOG.error("exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("exception thrown", e);
-            throw e;
-        }
+      initialized = true;
+    } catch (Exception e) {
+      LOG.error("exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
+      LOG.debug("exception thrown", e);
+      throw e;
     }
+  }
 
-    public P11CryptService getP11CryptService(
-            String moduleName) {
-        if (moduleName == null
-                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName)) {
-            moduleName = defaultPkcs11ModuleName;
-        }
-        P11CryptService p11Service = p11CryptServices.get(moduleName);
-        return p11Service;
+  public P11CryptService getP11CryptService(
+      String moduleName) {
+    if (moduleName == null
+        || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName)) {
+      moduleName = defaultPkcs11ModuleName;
     }
+    P11CryptService p11Service = p11CryptServices.get(moduleName);
+    return p11Service;
+  }
 
-    public int getVersion() {
-        return version;
-    }
+  public int getVersion() {
+    return version;
+  }
 
 }

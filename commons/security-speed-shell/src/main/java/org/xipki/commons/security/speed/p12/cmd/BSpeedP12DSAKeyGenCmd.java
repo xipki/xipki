@@ -45,27 +45,28 @@ import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen-p12",
-        description = "performance test of PKCS#12 DSA key generation (batch)")
+    description = "performance test of PKCS#12 DSA key generation (batch)")
 public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
+    for (int i = 0; i < pqLens.length; i += 2) {
+      int pLen = pqLens[i];
+      int qLen = pqLens[i + 1];
 
-            ret.add(
-                    new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory));
-        }
-
-        return ret;
+      ret.add(
+          new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory));
     }
+
+    return ret;
+  }
 
 }

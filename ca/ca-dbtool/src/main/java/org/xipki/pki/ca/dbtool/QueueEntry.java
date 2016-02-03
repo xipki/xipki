@@ -37,6 +37,7 @@ package org.xipki.pki.ca.dbtool;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface QueueEntry {

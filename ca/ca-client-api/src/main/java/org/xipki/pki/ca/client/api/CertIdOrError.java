@@ -41,36 +41,37 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertIdOrError {
 
-    private final CertId certId;
+  private final CertId certId;
 
-    private final PKIStatusInfo error;
+  private final PKIStatusInfo error;
 
-    public CertIdOrError(
-            final CertId certId) {
-        ParamUtil.assertNotNull("certId", certId);
+  public CertIdOrError(
+      final CertId certId) {
+    ParamUtil.assertNotNull("certId", certId);
 
-        this.certId = certId;
-        this.error = null;
-    }
+    this.certId = certId;
+    this.error = null;
+  }
 
-    public CertIdOrError(
-            final PKIStatusInfo error) {
-        ParamUtil.assertNotNull("error", error);
+  public CertIdOrError(
+      final PKIStatusInfo error) {
+    ParamUtil.assertNotNull("error", error);
 
-        this.certId = null;
-        this.error = error;
-    }
+    this.certId = null;
+    this.error = error;
+  }
 
-    public CertId getCertId() {
-        return certId;
-    }
+  public CertId getCertId() {
+    return certId;
+  }
 
-    public PKIStatusInfo getError() {
-        return error;
-    }
+  public PKIStatusInfo getError() {
+    return error;
+  }
 
 }

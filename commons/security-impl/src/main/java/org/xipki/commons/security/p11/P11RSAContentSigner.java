@@ -61,87 +61,88 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11RSAContentSigner implements ContentSigner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
 
-    private final AlgorithmIdentifier algorithmIdentifier;
+  private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final DigestOutputStream outputStream;
+  private final DigestOutputStream outputStream;
 
-    private final P11CryptService cryptService;
+  private final P11CryptService cryptService;
 
-    private final P11SlotIdentifier slot;
+  private final P11SlotIdentifier slot;
 
-    private final P11KeyIdentifier keyId;
+  private final P11KeyIdentifier keyId;
 
-    private final AlgorithmIdentifier digAlgId;
+  private final AlgorithmIdentifier digAlgId;
 
-    public P11RSAContentSigner(
-            final P11CryptService cryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
-            final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("cryptService", cryptService);
-        ParamUtil.assertNotNull("keyId", keyId);
-        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
+  public P11RSAContentSigner(
+      final P11CryptService cryptService,
+      final P11SlotIdentifier slot,
+      final P11KeyIdentifier keyId,
+      final AlgorithmIdentifier signatureAlgId)
+  throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
+    ParamUtil.assertNotNull("slot", slot);
+    ParamUtil.assertNotNull("cryptService", cryptService);
+    ParamUtil.assertNotNull("keyId", keyId);
+    ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
 
-        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-            throw new IllegalArgumentException("unsupported signature algorithm "
-                    + signatureAlgId.getAlgorithm());
-        }
-
-        this.slot = slot;
-        this.algorithmIdentifier = signatureAlgId;
-        this.keyId = keyId;
-
-        this.digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
-        Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
-
-        this.cryptService = cryptService;
-        this.outputStream = new DigestOutputStream(digest);
+    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
+      throw new IllegalArgumentException("unsupported signature algorithm "
+          + signatureAlgId.getAlgorithm());
     }
 
-    @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
+    this.slot = slot;
+    this.algorithmIdentifier = signatureAlgId;
+    this.keyId = keyId;
+
+    this.digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
+    Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+
+    this.cryptService = cryptService;
+    this.outputStream = new DigestOutputStream(digest);
+  }
+
+  @Override
+  public AlgorithmIdentifier getAlgorithmIdentifier() {
+    return algorithmIdentifier;
+  }
+
+  @Override
+  public OutputStream getOutputStream() {
+    outputStream.reset();
+    return outputStream;
+  }
+
+  @Override
+  public byte[] getSignature() {
+    byte[] hashValue = outputStream.digest();
+    DigestInfo digestInfo = new DigestInfo(digAlgId, hashValue);
+    byte[] encodedDigestInfo;
+
+    try {
+      encodedDigestInfo = digestInfo.getEncoded();
+    } catch (IOException e) {
+      LOG.warn("IOException: {}", e.getMessage());
+      LOG.debug("IOException", e);
+      throw new RuntimeCryptoException("IOException: " + e.getMessage());
     }
 
-    @Override
-    public OutputStream getOutputStream() {
-        outputStream.reset();
-        return outputStream;
+    try {
+      return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
+    } catch (SignerException e) {
+      final String message = "SignerException";
+      if (LOG.isErrorEnabled()) {
+        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      throw new RuntimeCryptoException("SignerException: " + e.getMessage());
     }
-
-    @Override
-    public byte[] getSignature() {
-        byte[] hashValue = outputStream.digest();
-        DigestInfo digestInfo = new DigestInfo(digAlgId, hashValue);
-        byte[] encodedDigestInfo;
-
-        try {
-            encodedDigestInfo = digestInfo.getEncoded();
-        } catch (IOException e) {
-            LOG.warn("IOException: {}", e.getMessage());
-            LOG.debug("IOException", e);
-            throw new RuntimeCryptoException("IOException: " + e.getMessage());
-        }
-
-        try {
-            return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
-        } catch (SignerException e) {
-            final String message = "SignerException";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-        }
-    }
+  }
 
 }

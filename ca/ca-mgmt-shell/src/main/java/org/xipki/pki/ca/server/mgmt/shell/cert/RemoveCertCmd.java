@@ -40,20 +40,21 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "remove-cert",
-        description = "remove certificate")
+    description = "remove certificate")
 @Service
 public class RemoveCertCmd extends UnRevRmCertCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean successful =
-                caManager.removeCertificate(caName, getSerialNumber());
-        output(successful, "removed", "could not remove", "certificate");
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean successful =
+        caManager.removeCertificate(caName, getSerialNumber());
+    output(successful, "removed", "could not remove", "certificate");
+    return null;
+  }
 
 }

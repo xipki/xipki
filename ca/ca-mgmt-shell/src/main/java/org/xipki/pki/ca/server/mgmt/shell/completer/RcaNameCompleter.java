@@ -45,26 +45,27 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class RcaNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>();
-        for (String name : caManager.getCaNames()) {
-            CAEntry caEntry = caManager.getCA(name);
-            if (!(caEntry instanceof X509CAEntry)) {
-                continue;
-            }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>();
+    for (String name : caManager.getCaNames()) {
+      CAEntry caEntry = caManager.getCA(name);
+      if (!(caEntry instanceof X509CAEntry)) {
+        continue;
+      }
 
-            X509Certificate cert = ((X509CAEntry) caEntry).getCertificate();
-            if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
-                ret.add(name);
-            }
-        }
-        return ret;
+      X509Certificate cert = ((X509CAEntry) caEntry).getCertificate();
+      if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+        ret.add(name);
+      }
     }
+    return ret;
+  }
 
 }

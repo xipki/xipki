@@ -48,22 +48,23 @@ import org.xipki.commons.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen-p12",
-        description = "performance test of PKCS#12 EC key generation (batch)")
+    description = "performance test of PKCS#12 EC key generation (batch)")
 public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
-        for (String curveName : curveNameOidMap.keySet()) {
-            ret.add(new P12ECKeyGenLoadTest(curveName, securityFactory));
-        }
-
-        return ret;
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+    for (String curveName : curveNameOidMap.keySet()) {
+      ret.add(new P12ECKeyGenLoadTest(curveName, securityFactory));
     }
+
+    return ret;
+  }
 
 }

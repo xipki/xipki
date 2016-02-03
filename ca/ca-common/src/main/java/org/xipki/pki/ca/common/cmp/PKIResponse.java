@@ -39,34 +39,35 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PKIResponse {
 
-    private final GeneralPKIMessage pkiMessage;
+  private final GeneralPKIMessage pkiMessage;
 
-    private ProtectionVerificationResult protectionVerificationResult;
+  private ProtectionVerificationResult protectionVerificationResult;
 
-    public PKIResponse(
-            final GeneralPKIMessage pkiMessage) {
-        this.pkiMessage = pkiMessage;
-    }
+  public PKIResponse(
+      final GeneralPKIMessage pkiMessage) {
+    this.pkiMessage = pkiMessage;
+  }
 
-    public boolean hasProtection() {
-        return pkiMessage.hasProtection();
-    }
+  public boolean hasProtection() {
+    return pkiMessage.hasProtection();
+  }
 
-    public GeneralPKIMessage getPkiMessage() {
-        return pkiMessage;
-    }
+  public GeneralPKIMessage getPkiMessage() {
+    return pkiMessage;
+  }
 
-    public ProtectionVerificationResult getProtectionVerificationResult() {
-        return protectionVerificationResult;
-    }
+  public ProtectionVerificationResult getProtectionVerificationResult() {
+    return protectionVerificationResult;
+  }
 
-    public void setProtectionVerificationResult(
-            final ProtectionVerificationResult protectionVerificationResult) {
-        this.protectionVerificationResult = protectionVerificationResult;
-    }
+  public void setProtectionVerificationResult(
+      final ProtectionVerificationResult protectionVerificationResult) {
+    this.protectionVerificationResult = protectionVerificationResult;
+  }
 
 }

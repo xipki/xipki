@@ -51,86 +51,87 @@ import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class HealthCheckServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private static final String CT_RESPONSE = "application/json";
+  private static final String CT_RESPONSE = "application/json";
 
-    private OcspServer server;
+  private OcspServer server;
 
-    public HealthCheckServlet() {
+  public HealthCheckServlet() {
+  }
+
+  public void setServer(
+      final OcspServer server) {
+    this.server = server;
+  }
+
+  @Override
+  protected void doGet(
+      final HttpServletRequest request,
+      final HttpServletResponse response)
+  throws ServletException, IOException {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    try {
+      if (server == null) {
+        LOG.error("server in servlet not configured");
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setContentLength(0);
+        return;
+      }
+
+      ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+      if (r == null) {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        return;
+      }
+
+      if (StringUtil.isNotBlank(r.getRelativeUri())) {
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        return;
+      }
+
+      Responder responder = r.getResponder();
+
+      HealthCheckResult healthResult = server.healthCheck(responder);
+      if (healthResult.isHealthy()) {
+        response.setStatus(HttpServletResponse.SC_OK);
+      } else {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+
+      response.setContentType(HealthCheckServlet.CT_RESPONSE);
+      byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+      response.setContentLength(respBytes.length);
+      response.getOutputStream().write(respBytes);
+    } catch (EOFException e) {
+      final String message = "connection reset by peer";
+      if (LOG.isErrorEnabled()) {
+        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.setContentLength(0);
+    } catch (Throwable t) {
+      final String message = "Throwable thrown, this should not happen";
+      if (LOG.isErrorEnabled()) {
+        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+            t.getMessage());
+      }
+      LOG.debug(message, t);
+      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      response.setContentLength(0);
     }
 
-    public void setServer(
-            final OcspServer server) {
-        this.server = server;
-    }
-
-    @Override
-    protected void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        try {
-            if (server == null) {
-                LOG.error("server in servlet not configured");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setContentLength(0);
-                return;
-            }
-
-            ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-            if (r == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            if (StringUtil.isNotBlank(r.getRelativeUri())) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            Responder responder = r.getResponder();
-
-            HealthCheckResult healthResult = server.healthCheck(responder);
-            if (healthResult.isHealthy()) {
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
-
-            response.setContentType(HealthCheckServlet.CT_RESPONSE);
-            byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
-            response.setContentLength(respBytes.length);
-            response.getOutputStream().write(respBytes);
-        } catch (EOFException e) {
-            final String message = "connection reset by peer";
-            if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
-        } catch (Throwable t) {
-            final String message = "Throwable thrown, this should not happen";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
-            }
-            LOG.debug(message, t);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
-        }
-
-        response.flushBuffer();
-    } // method doGet
+    response.flushBuffer();
+  } // method doGet
 
 }

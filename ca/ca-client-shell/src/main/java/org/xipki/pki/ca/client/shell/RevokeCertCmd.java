@@ -55,84 +55,85 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "revoke",
-        description = "revoke certificate")
+    description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
-    @Option(name = "--reason", aliases = "-r",
-            required = true,
-            description = "CRL reason\n"
-                    + "(required)")
-    @Completion(ClientCRLReasonCompleter.class)
-    private String reason;
+  @Option(name = "--reason", aliases = "-r",
+      required = true,
+      description = "CRL reason\n"
+          + "(required)")
+  @Completion(ClientCRLReasonCompleter.class)
+  private String reason;
 
-    @Option(name = "--inv-date",
-            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
-    private String invalidityDateS;
+  @Option(name = "--inv-date",
+      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  private String invalidityDateS;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
+      throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
+    }
+
+    CRLReason crlReason = CRLReason.getInstance(reason);
+    if (crlReason == null) {
+      throw new IllegalCmdParamException("invalid reason " + reason);
+    }
+
+    if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+      throw new IllegalCmdParamException("reason " + reason + " is not permitted");
+    }
+
+    CertIdOrError certIdOrError;
+    X509Certificate caCert = null;
+    if (issuerCertFile != null) {
+      caCert = X509Util.parseCert(issuerCertFile);
+    }
+
+    Date invalidityDate = null;
+    if (isNotBlank(invalidityDateS)) {
+      invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+    }
+
+    if (certFile != null) {
+      X509Certificate cert = X509Util.parseCert(certFile);
+      if (caCert != null) {
+        String errorMsg = checkCertificate(cert, caCert);
+        if (errorMsg != null) {
+          throw new CmdFailure(errorMsg);
         }
+      }
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.revokeCert(cert, crlReason.getCode(), invalidityDate,
+            debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    } else {
+      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
+            invalidityDate, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
 
-        CRLReason crlReason = CRLReason.getInstance(reason);
-        if (crlReason == null) {
-            throw new IllegalCmdParamException("invalid reason " + reason);
-        }
-
-        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
-        }
-
-        CertIdOrError certIdOrError;
-        X509Certificate caCert = null;
-        if (issuerCertFile != null) {
-            caCert = X509Util.parseCert(issuerCertFile);
-        }
-
-        Date invalidityDate = null;
-        if (isNotBlank(invalidityDateS)) {
-            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
-        }
-
-        if (certFile != null) {
-            X509Certificate cert = X509Util.parseCert(certFile);
-            if (caCert != null) {
-                String errorMsg = checkCertificate(cert, caCert);
-                if (errorMsg != null) {
-                    throw new CmdFailure(errorMsg);
-                }
-            }
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.revokeCert(cert, crlReason.getCode(), invalidityDate,
-                        debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        } else {
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
-                        invalidityDate, debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        }
-
-        if (certIdOrError.getError() != null) {
-            PKIStatusInfo error = certIdOrError.getError();
-            throw new CmdFailure("revocation failed: " + error);
-        } else {
-            out("revoked certificate");
-        }
-        return null;
-    } // method doExecute
+    if (certIdOrError.getError() != null) {
+      PKIStatusInfo error = certIdOrError.getError();
+      throw new CmdFailure("revocation failed: " + error);
+    } else {
+      out("revoked certificate");
+    }
+    return null;
+  } // method doExecute
 
 }

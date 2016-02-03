@@ -41,18 +41,19 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ValidityModeCompleter extends AbstractEnumCompleter {
 
-    public ValidityModeCompleter() {
-        StringBuilder enums = new StringBuilder();
-        for (ValidityMode mode : ValidityMode.values()) {
-            enums.append(mode.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+  public ValidityModeCompleter() {
+    StringBuilder enums = new StringBuilder();
+    for (ValidityMode mode : ValidityMode.values()) {
+      enums.append(mode.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

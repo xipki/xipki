@@ -41,42 +41,43 @@ import org.xipki.commons.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EjbcaCaInfo {
 
-    private final int caId;
+  private final int caId;
 
-    private final X500Name subject;
+  private final X500Name subject;
 
-    private final String hexSha1;
+  private final String hexSha1;
 
-    private final String caDirname;
+  private final String caDirname;
 
-    public EjbcaCaInfo(
-            final int caId,
-            final byte[] certBytes,
-            final String caDirname) {
-        this.caId = caId;
-        this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
-        this.subject = Certificate.getInstance(certBytes).getSubject();
-        this.caDirname = caDirname;
-    }
+  public EjbcaCaInfo(
+      final int caId,
+      final byte[] certBytes,
+      final String caDirname) {
+    this.caId = caId;
+    this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
+    this.subject = Certificate.getInstance(certBytes).getSubject();
+    this.caDirname = caDirname;
+  }
 
-    public int getCaId() {
-        return caId;
-    }
+  public int getCaId() {
+    return caId;
+  }
 
-    public X500Name getSubject() {
-        return subject;
-    }
+  public X500Name getSubject() {
+    return subject;
+  }
 
-    public String getHexSha1() {
-        return hexSha1;
-    }
+  public String getHexSha1() {
+    return hexSha1;
+  }
 
-    public String getCaDirname() {
-        return caDirname;
-    }
+  public String getCaDirname() {
+    return caDirname;
+  }
 
 }

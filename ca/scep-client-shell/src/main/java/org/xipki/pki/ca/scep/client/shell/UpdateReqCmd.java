@@ -47,21 +47,22 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "scep", name = "update-req",
-        description = "enroll certificate via messageType UpdateReq")
+    description = "enroll certificate via messageType UpdateReq")
 @Service
 public class UpdateReqCmd extends EnrollCertCommandSupport {
 
-    @Override
-    protected EnrolmentResponse requestCertificate(
-            final ScepClient client,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ScepClientException {
-        return client.scepUpdateReq(csr, identityKey, identityCert);
-    }
+  @Override
+  protected EnrolmentResponse requestCertificate(
+      final ScepClient client,
+      final CertificationRequest csr,
+      final PrivateKey identityKey,
+      final X509Certificate identityCert)
+  throws ScepClientException {
+    return client.scepUpdateReq(csr, identityKey, identityCert);
+  }
 
 }

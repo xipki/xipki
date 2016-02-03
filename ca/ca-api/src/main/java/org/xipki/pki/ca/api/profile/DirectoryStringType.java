@@ -43,29 +43,30 @@ import org.bouncycastle.asn1.DERUTF8String;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum DirectoryStringType {
 
-    teletexString,
-    printableString,
-    utf8String,
-    bmpString;
+  teletexString,
+  printableString,
+  utf8String,
+  bmpString;
 
-    public ASN1Encodable createDirectoryString(
-            final String text) {
-        if (teletexString == this) {
-            return new DERT61String(text);
-        } else if (printableString == this) {
-            return new DERPrintableString(text);
-        } else if (utf8String == this) {
-            return new DERUTF8String(text);
-        } else if (bmpString == this) {
-            return new DERBMPString(text);
-        } else {
-            throw new RuntimeException("should not reach here, unkown DirectoryStringType '"
-                    + text + "'");
-        }
+  public ASN1Encodable createDirectoryString(
+      final String text) {
+    if (teletexString == this) {
+      return new DERT61String(text);
+    } else if (printableString == this) {
+      return new DERPrintableString(text);
+    } else if (utf8String == this) {
+      return new DERUTF8String(text);
+    } else if (bmpString == this) {
+      return new DERBMPString(text);
+    } else {
+      throw new RuntimeException("should not reach here, unkown DirectoryStringType '"
+          + text + "'");
     }
+  }
 
 }

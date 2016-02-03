@@ -42,26 +42,27 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "delete-key",
-        description = "generate EC keypair in PKCS#11 device")
+    description = "generate EC keypair in PKCS#11 device")
 @Service
 public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
-        if (deleted) {
-            securityFactory.getP11CryptService(moduleName).refresh();
-            out("deleted key and certificates");
-        } else {
-            out("could not delete key and certificate that do not exist");
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+    boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
+    if (deleted) {
+      securityFactory.getP11CryptService(moduleName).refresh();
+      out("deleted key and certificates");
+    } else {
+      out("could not delete key and certificate that do not exist");
     }
+    return null;
+  }
 
 }

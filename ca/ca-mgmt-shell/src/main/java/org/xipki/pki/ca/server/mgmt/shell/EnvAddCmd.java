@@ -41,31 +41,32 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "env-add",
-        description = "add CA environment parameter")
+    description = "add CA environment parameter")
 @Service
 public class EnvAddCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "parameter Name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "parameter Name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--value",
-            required = true,
-            description = "environment paremter value\n"
-                    + "(required)")
-    private String value;
+  @Option(name = "--value",
+      required = true,
+      description = "environment paremter value\n"
+          + "(required)")
+  private String value;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.addEnvParam(name, value);
-        output(b, "added", "could not add", "environment parameter " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.addEnvParam(name, value);
+    output(b, "added", "could not add", "environment parameter " + name);
+    return null;
+  }
 
 }

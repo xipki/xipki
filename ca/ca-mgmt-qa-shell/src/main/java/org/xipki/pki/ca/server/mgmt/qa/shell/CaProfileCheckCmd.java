@@ -49,56 +49,57 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "caprofile-check",
-        description = "check information of certificate profiles in given CA (QA)")
+    description = "check information of certificate profiles in given CA (QA)")
 @Service
 public class CaProfileCheckCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile profileName\n"
-                + "(required)")
-    @Completion(ProfileNameCompleter.class)
-    private String profileName;
+  @Option(name = "--profile",
+      required = true,
+      description = "profile profileName\n"
+        + "(required)")
+  @Completion(ProfileNameCompleter.class)
+  private String profileName;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+  @Option(name = "--local-name",
+      required = false,
+      description = "profile localname")
+  private String profileLocalname;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking CA profile CA='" + caName +  "', profile='" + profileName + "'");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking CA profile CA='" + caName +  "', profile='" + profileName + "'");
 
-        if (caManager.getCA(caName) == null) {
-            throw new UnexpectedException("could not find CA '" + caName + "'");
-        }
-
-        if (profileLocalname == null) {
-            profileLocalname = profileName;
-        }
-        Map<String, String> entries = caManager.getCertprofilesForCA(caName);
-        if (!entries.containsKey(profileLocalname)) {
-            throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
-        }
-
-        String name = entries.get(profileLocalname);
-        if (!profileName.equals(name)) {
-            throw new CmdFailure(
-                    "Profile name is '" + name + "', but expected '" + profileName + "'");
-        }
-        out(" checked CA profile CA='" + caName +  "', profile='" + profileName + "'");
-        return null;
+    if (caManager.getCA(caName) == null) {
+      throw new UnexpectedException("could not find CA '" + caName + "'");
     }
+
+    if (profileLocalname == null) {
+      profileLocalname = profileName;
+    }
+    Map<String, String> entries = caManager.getCertprofilesForCA(caName);
+    if (!entries.containsKey(profileLocalname)) {
+      throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
+    }
+
+    String name = entries.get(profileLocalname);
+    if (!profileName.equals(name)) {
+      throw new CmdFailure(
+          "Profile name is '" + name + "', but expected '" + profileName + "'");
+    }
+    out(" checked CA profile CA='" + caName +  "', profile='" + profileName + "'");
+    return null;
+  }
 
 }

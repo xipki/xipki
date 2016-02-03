@@ -43,32 +43,33 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-up",
-        description = "update CMP control")
+    description = "update CMP control")
 @Service
 public class CmpControlUpdateCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CMP control name\n"
-                    + "(required)")
-    @Completion(CmpControlNameCompleter.class)
-    protected String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "CMP control name\n"
+          + "(required)")
+  @Completion(CmpControlNameCompleter.class)
+  protected String name;
 
-    @Option(name = "--conf",
-            required = true,
-            description = "CMP control configuration\n"
-                    + "(required)")
-    protected String conf;
+  @Option(name = "--conf",
+      required = true,
+      description = "CMP control configuration\n"
+          + "(required)")
+  protected String conf;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.changeCmpControl(name, conf);
-        output(b, "updated", "could not update", "CMP control " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.changeCmpControl(name, conf);
+    output(b, "updated", "could not update", "CMP control " + name);
+    return null;
+  }
 
 }

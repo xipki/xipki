@@ -49,24 +49,24 @@ import org.xipki.commons.datasource.api.springframework.dao.DataIntegrityViolati
 @SuppressWarnings("serial")
 public class DuplicateKeyException extends DataIntegrityViolationException {
 
-    /**
-     * Constructor for DuplicateKeyException.
-     * @param msg the detail message
-     */
-    public DuplicateKeyException(
-            final String msg) {
-        super(msg);
-    }
+  /**
+   * Constructor for DuplicateKeyException.
+   * @param msg the detail message
+   */
+  public DuplicateKeyException(
+      final String msg) {
+    super(msg);
+  }
 
-    /**
-     * Constructor for DuplicateKeyException.
-     * @param msg the detail message
-     * @param cause the root cause from the data access API in use
-     */
-    public DuplicateKeyException(
-            final String msg,
-            final Throwable cause) {
-        super(msg, cause);
-    }
+  /**
+   * Constructor for DuplicateKeyException.
+   * @param msg the detail message
+   * @param cause the root cause from the data access API in use
+   */
+  public DuplicateKeyException(
+      final String msg,
+      final Throwable cause) {
+    super(msg, cause);
+  }
 
 }

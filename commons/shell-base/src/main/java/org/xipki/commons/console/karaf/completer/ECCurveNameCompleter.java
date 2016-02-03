@@ -48,35 +48,36 @@ import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> curveNames = new HashSet<>();
-        Enumeration<?> names = X962NamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            curveNames.add((String) names.nextElement());
-        }
-
-        names = SECNamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            curveNames.add((String) names.nextElement());
-        }
-
-        names = TeleTrusTNamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            curveNames.add((String) names.nextElement());
-        }
-
-        names = NISTNamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            curveNames.add((String) names.nextElement());
-        }
-
-        return curveNames;
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> curveNames = new HashSet<>();
+    Enumeration<?> names = X962NamedCurves.getNames();
+    while (names.hasMoreElements()) {
+      curveNames.add((String) names.nextElement());
     }
+
+    names = SECNamedCurves.getNames();
+    while (names.hasMoreElements()) {
+      curveNames.add((String) names.nextElement());
+    }
+
+    names = TeleTrusTNamedCurves.getNames();
+    while (names.hasMoreElements()) {
+      curveNames.add((String) names.nextElement());
+    }
+
+    names = NISTNamedCurves.getNames();
+    while (names.hasMoreElements()) {
+      curveNames.add((String) names.nextElement());
+    }
+
+    return curveNames;
+  }
 
 }

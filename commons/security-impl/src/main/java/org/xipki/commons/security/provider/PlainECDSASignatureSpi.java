@@ -46,69 +46,70 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
-    static public class SHA1 extends PlainECDSASignatureSpi {
+  static public class SHA1 extends PlainECDSASignatureSpi {
 
-        public SHA1() {
-            super(new SHA1Digest());
-        }
-
-    } // class SHA1
-
-    static public class NONE extends PlainECDSASignatureSpi {
-
-        public NONE() {
-            super(new NullDigest());
-        }
-
-    } // class NONE
-
-    static public class SHA224 extends PlainECDSASignatureSpi {
-
-        public SHA224() {
-            super(new SHA224Digest());
-        }
-
-    } // class SHA224
-
-    static public class SHA256 extends PlainECDSASignatureSpi {
-
-        public SHA256() {
-            super(new SHA256Digest());
-        }
-
-    } // class SHA256
-
-    static public class SHA384 extends PlainECDSASignatureSpi {
-
-        public SHA384() {
-            super(new SHA384Digest());
-        }
-
-    } // class SHA384
-
-    static public class SHA512 extends PlainECDSASignatureSpi {
-
-        public SHA512() {
-            super(new SHA512Digest());
-        }
-
+    public SHA1() {
+      super(new SHA1Digest());
     }
 
-    static public class RIPEMD160 extends PlainECDSASignatureSpi {
+  } // class SHA1
 
-        public RIPEMD160() {
-            super(new RIPEMD160Digest());
-        }
+  static public class NONE extends PlainECDSASignatureSpi {
 
-    } // class SHA512
-
-    PlainECDSASignatureSpi(
-            final Digest digest) {
-        super(digest, false);
+    public NONE() {
+      super(new NullDigest());
     }
+
+  } // class NONE
+
+  static public class SHA224 extends PlainECDSASignatureSpi {
+
+    public SHA224() {
+      super(new SHA224Digest());
+    }
+
+  } // class SHA224
+
+  static public class SHA256 extends PlainECDSASignatureSpi {
+
+    public SHA256() {
+      super(new SHA256Digest());
+    }
+
+  } // class SHA256
+
+  static public class SHA384 extends PlainECDSASignatureSpi {
+
+    public SHA384() {
+      super(new SHA384Digest());
+    }
+
+  } // class SHA384
+
+  static public class SHA512 extends PlainECDSASignatureSpi {
+
+    public SHA512() {
+      super(new SHA512Digest());
+    }
+
+  }
+
+  static public class RIPEMD160 extends PlainECDSASignatureSpi {
+
+    public RIPEMD160() {
+      super(new RIPEMD160Digest());
+    }
+
+  } // class SHA512
+
+  PlainECDSASignatureSpi(
+      final Digest digest) {
+    super(digest, false);
+  }
 
 }

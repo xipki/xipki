@@ -49,49 +49,50 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class CRLCommandSupport extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    protected String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  protected String caName;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the CRL\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String outFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the CRL\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String outFile;
 
-    protected abstract X509CRL retrieveCRL(
-            String caName)
-    throws Exception;
+  protected abstract X509CRL retrieveCRL(
+      String caName)
+  throws Exception;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        CAEntry ca = caManager.getCA(caName);
-        if (ca == null) {
-            throw new UnexpectedException("CA " + caName + " not available");
-        }
-
-        X509CRL crl = null;
-        try {
-            crl = retrieveCRL(caName);
-        } catch (Exception e) {
-            throw new CmdFailure("received no CRL from server: " + e.getMessage());
-        }
-
-        if (crl == null) {
-            throw new CmdFailure("received no CRL from server");
-        }
-
-        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    CAEntry ca = caManager.getCA(caName);
+    if (ca == null) {
+      throw new UnexpectedException("CA " + caName + " not available");
     }
+
+    X509CRL crl = null;
+    try {
+      crl = retrieveCRL(caName);
+    } catch (Exception e) {
+      throw new CmdFailure("received no CRL from server: " + e.getMessage());
+    }
+
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
+    }
+
+    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+    return null;
+  }
 
 }

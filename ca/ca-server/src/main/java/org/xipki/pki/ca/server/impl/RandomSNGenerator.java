@@ -40,40 +40,41 @@ import java.security.SecureRandom;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class RandomSNGenerator {
 
-    private final SecureRandom random;
+  private final SecureRandom random;
 
-    private static RandomSNGenerator instance = null;
+  private static RandomSNGenerator instance = null;
 
-    private RandomSNGenerator() {
-        this.random = new SecureRandom();
+  private RandomSNGenerator() {
+    this.random = new SecureRandom();
+  }
+
+  public BigInteger getSerialNumber() {
+    while (true) {
+      byte[] rdnBytes = new byte[8];
+      random.nextBytes(rdnBytes);
+      byte[] positiveRdnBytes = new byte[9];
+      System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
+      BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
+      if (serial.testBit(63)) {
+        serial = serial.clearBit(63);
+      }
+      // make sure serial != 0
+      if (serial.bitLength() != 0) {
+        return serial;
+      }
     }
+  }
 
-    public BigInteger getSerialNumber() {
-        while (true) {
-            byte[] rdnBytes = new byte[8];
-            random.nextBytes(rdnBytes);
-            byte[] positiveRdnBytes = new byte[9];
-            System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
-            BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
-            if (serial.testBit(63)) {
-                serial = serial.clearBit(63);
-            }
-            // make sure serial != 0
-            if (serial.bitLength() != 0) {
-                return serial;
-            }
-        }
+  public static synchronized RandomSNGenerator getInstance() {
+    if (instance == null) {
+      instance = new RandomSNGenerator();
     }
-
-    public static synchronized RandomSNGenerator getInstance() {
-        if (instance == null) {
-            instance = new RandomSNGenerator();
-        }
-        return instance;
-    }
+    return instance;
+  }
 
 }

@@ -43,29 +43,30 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-db", name = "updatedb-ocsp",
-        description = "update the OCSP database schema")
+    description = "update the OCSP database schema")
 @Service
 public class UpdateDbOcspCmd extends LiquibaseCommandSupport {
 
-    private static final String schemaFile = "xipki/sql/ocsp-init.xml";
+  private static final String schemaFile = "xipki/sql/ocsp-init.xml";
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        for (String dbName : dbConfs.keySet()) {
-            if (!dbName.toLowerCase().contains("ocsp")) {
-                continue;
-            }
+    for (String dbName : dbConfs.keySet()) {
+      if (!dbName.toLowerCase().contains("ocsp")) {
+        continue;
+      }
 
-            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            update(dbConf, schemaFile);
-        }
-        return null;
+      LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
+      update(dbConf, schemaFile);
     }
+    return null;
+  }
 
 }

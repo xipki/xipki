@@ -40,19 +40,20 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "notify-change",
-        description = "notify the change of CA system")
+    description = "notify the change of CA system")
 @Service
 public class CaSystemNotifyChangeCmd extends CaCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.notifyCAChange();
-        output(b, "notified", "could not notify", "the change of CA system");
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.notifyCAChange();
+    output(b, "notified", "could not notify", "the change of CA system");
+    return null;
+  }
 
 }

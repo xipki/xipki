@@ -49,42 +49,43 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "publisher-export",
-        description = "export publisher configuration")
+    description = "export publisher configuration")
 @Service
 public class PublisherExportCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "publisher name\n"
-                    + "(required)")
-    @Completion(PublisherNameCompleter.class)
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "publisher name\n"
+          + "(required)")
+  @Completion(PublisherNameCompleter.class)
+  private String name;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the publisher configuration\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String confFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the publisher configuration\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String confFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        PublisherEntry entry = caManager.getPublisher(name);
-        if (entry == null) {
-            throw new IllegalCmdParamException("no publisher named " + name + " is defined");
-        }
-
-        if (StringUtil.isBlank(entry.getConf())) {
-            out("publisher does not have conf");
-        } else {
-            saveVerbose("saved publisher configuration to", new File(confFile),
-                    entry.getConf().getBytes("UTF-8"));
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    PublisherEntry entry = caManager.getPublisher(name);
+    if (entry == null) {
+      throw new IllegalCmdParamException("no publisher named " + name + " is defined");
     }
+
+    if (StringUtil.isBlank(entry.getConf())) {
+      out("publisher does not have conf");
+    } else {
+      saveVerbose("saved publisher configuration to", new File(confFile),
+          entry.getConf().getBytes("UTF-8"));
+    }
+    return null;
+  }
 
 }

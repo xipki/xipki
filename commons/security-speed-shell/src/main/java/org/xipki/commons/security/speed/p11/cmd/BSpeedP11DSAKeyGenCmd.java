@@ -45,29 +45,30 @@ import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
-        description = "performance test of PKCS#11 DSA key generation (batch)")
+    description = "performance test of PKCS#11 DSA key generation (batch)")
 public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
+    for (int i = 0; i < pqLens.length; i += 2) {
+      int pLen = pqLens[i];
+      int qLen = pqLens[i + 1];
 
-            ret.add(
-                    new P11DSAKeyGenLoadTest(slot, pLen, qLen));
-        }
-
-        return ret;
+      ret.add(
+          new P11DSAKeyGenLoadTest(slot, pLen, qLen));
     }
+
+    return ret;
+  }
 
 }

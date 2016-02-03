@@ -37,51 +37,52 @@ package org.xipki.pki.ca.server.impl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class SubjectKeyProfileBundle {
 
-    private final int certId;
+  private final int certId;
 
-    private final long subjectFp;
+  private final long subjectFp;
 
-    private final long keyFp;
+  private final long keyFp;
 
-    private final String profile;
+  private final String profile;
 
-    private final boolean revoked;
+  private final boolean revoked;
 
-    public SubjectKeyProfileBundle(
-            final int certId,
-            final long subjectFp,
-            final long keyFp,
-            final String profile,
-            final boolean revoked) {
-        super();
-        this.certId = certId;
-        this.subjectFp = subjectFp;
-        this.keyFp = keyFp;
-        this.profile = profile;
-        this.revoked = revoked;
-    }
+  public SubjectKeyProfileBundle(
+      final int certId,
+      final long subjectFp,
+      final long keyFp,
+      final String profile,
+      final boolean revoked) {
+    super();
+    this.certId = certId;
+    this.subjectFp = subjectFp;
+    this.keyFp = keyFp;
+    this.profile = profile;
+    this.revoked = revoked;
+  }
 
-    public int getCertId() {
-        return certId;
-    }
+  public int getCertId() {
+    return certId;
+  }
 
-    public long getSubjectFp() {
-        return subjectFp;
-    }
+  public long getSubjectFp() {
+    return subjectFp;
+  }
 
-    public long getKeyFp() {
-        return keyFp;
-    }
+  public long getKeyFp() {
+    return keyFp;
+  }
 
-    public String getProfile() {
-        return profile;
-    }
+  public String getProfile() {
+    return profile;
+  }
 
-    public boolean isRevoked() {
-        return revoked;
-    }
+  public boolean isRevoked() {
+    return revoked;
+  }
 }

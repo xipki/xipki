@@ -50,50 +50,51 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  * org.bouncycastle.crypto counterparts.
  *
  * @author Lijun Liao
+ * @since 2.0
  */
 public class RSAUtil {
 
-    public static final ASN1ObjectIdentifier[] rsaOids = {
-        PKCSObjectIdentifiers.rsaEncryption,
-        X509ObjectIdentifiers.id_ea_rsa,
-        PKCSObjectIdentifiers.id_RSAES_OAEP,
-        PKCSObjectIdentifiers.id_RSASSA_PSS
-    };
+  public static final ASN1ObjectIdentifier[] rsaOids = {
+    PKCSObjectIdentifiers.rsaEncryption,
+    X509ObjectIdentifiers.id_ea_rsa,
+    PKCSObjectIdentifiers.id_RSAES_OAEP,
+    PKCSObjectIdentifiers.id_RSASSA_PSS
+  };
 
-    private RSAUtil() {
+  private RSAUtil() {
+  }
+
+  public static boolean isRsaOid(
+      final ASN1ObjectIdentifier algOid) {
+    for (int i = 0; i != rsaOids.length; i++) {
+      if (algOid.equals(rsaOids[i])) {
+        return true;
+      }
     }
 
-    public static boolean isRsaOid(
-            final ASN1ObjectIdentifier algOid) {
-        for (int i = 0; i != rsaOids.length; i++) {
-            if (algOid.equals(rsaOids[i])) {
-                return true;
-            }
-        }
+    return false;
+  }
 
-        return false;
+  static RSAKeyParameters generatePublicKeyParameter(
+      final RSAPublicKey key) {
+    return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
+
+  }
+
+  static RSAKeyParameters generatePrivateKeyParameter(
+      final RSAPrivateKey key) {
+    if (key instanceof RSAPrivateCrtKey) {
+      RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
+
+      return new RSAPrivateCrtKeyParameters(k.getModulus(),
+        k.getPublicExponent(), k.getPrivateExponent(),
+        k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
+        k.getCrtCoefficient());
+    } else {
+      RSAPrivateKey k = key;
+
+      return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
     }
-
-    static RSAKeyParameters generatePublicKeyParameter(
-            final RSAPublicKey key) {
-        return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
-
-    }
-
-    static RSAKeyParameters generatePrivateKeyParameter(
-            final RSAPrivateKey key) {
-        if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
-
-            return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
-                k.getCrtCoefficient());
-        } else {
-            RSAPrivateKey k = key;
-
-            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
-        }
-    }
+  }
 
 }

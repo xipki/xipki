@@ -42,16 +42,17 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class CaNamePlusAllCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>(caManager.getCaNames());
-        ret.add("all");
-        return ret;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>(caManager.getCaNames());
+    ret.add("all");
+    return ret;
+  }
 
 }

@@ -48,46 +48,47 @@ import org.xipki.commons.security.api.CRLReason;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "revoke-cert",
-        description = "revoke certificate")
+    description = "revoke certificate")
 @Service
 public class RevokeCertCmd extends UnRevRmCertCommandSupport {
 
-    @Option(name = "--reason", aliases = "-r",
-            required = true,
-            description = "CRL reason\n"
-                    + "(required)")
-    @Completion(ClientCRLReasonCompleter.class)
-    private String reason;
+  @Option(name = "--reason", aliases = "-r",
+      required = true,
+      description = "CRL reason\n"
+          + "(required)")
+  @Completion(ClientCRLReasonCompleter.class)
+  private String reason;
 
-    @Option(name = "--inv-date",
-            description = "invalidity date, UTC time of format yyyyMMddHHmmss")
-    private String invalidityDateS;
+  @Option(name = "--inv-date",
+      description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+  private String invalidityDateS;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        CRLReason crlReason = CRLReason.getInstance(reason);
-        if (crlReason == null) {
-            throw new InvalidConfException("invalid reason " + reason);
-        }
-
-        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-            throw new InvalidConfException("reason " + reason + " is not permitted");
-        }
-
-        Date invalidityDate = null;
-        if (isNotBlank(invalidityDateS)) {
-            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
-        }
-
-        boolean successful = caManager.revokeCertificate(caName, getSerialNumber(),
-                crlReason, invalidityDate);
-        output(successful, "revoked", "could not revoke", "certificate");
-
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    CRLReason crlReason = CRLReason.getInstance(reason);
+    if (crlReason == null) {
+      throw new InvalidConfException("invalid reason " + reason);
     }
+
+    if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+      throw new InvalidConfException("reason " + reason + " is not permitted");
+    }
+
+    Date invalidityDate = null;
+    if (isNotBlank(invalidityDateS)) {
+      invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+    }
+
+    boolean successful = caManager.revokeCertificate(caName, getSerialNumber(),
+        crlReason, invalidityDate);
+    output(successful, "revoked", "could not revoke", "certificate");
+
+    return null;
+  }
 
 }

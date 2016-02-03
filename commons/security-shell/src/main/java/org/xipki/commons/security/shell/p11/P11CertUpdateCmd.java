@@ -50,44 +50,45 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 //FIXME: use different label if CA key label already exists.
 @Command(scope = "xipki-tk", name = "update-cert",
-        description = "update certificate in PKCS#11 device")
+    description = "update certificate in PKCS#11 device")
 @Service
 public class P11CertUpdateCmd extends P11SecurityCommandSupport {
 
-    @Option(name = "--cert",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      required = true,
+      description = "certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--ca-cert",
-            multiValued = true,
-            description = "CA Certificate files\n"
-                    + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private Set<String> caCertFiles;
+  @Option(name = "--ca-cert",
+      multiValued = true,
+      description = "CA Certificate files\n"
+          + "(multi-valued)")
+  @Completion(FilePathCompleter.class)
+  private Set<String> caCertFiles;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        X509Certificate newCert = X509Util.parseCert(certFile);
-        Set<X509Certificate> caCerts = new HashSet<>();
-        if (isNotEmpty(caCertFiles)) {
-            for (String caCertFile : caCertFiles) {
-                caCerts.add(X509Util.parseCert(caCertFile));
-            }
-        }
-
-        slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
-        securityFactory.getP11CryptService(moduleName).refresh();
-        out("updated certificate");
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+    X509Certificate newCert = X509Util.parseCert(certFile);
+    Set<X509Certificate> caCerts = new HashSet<>();
+    if (isNotEmpty(caCertFiles)) {
+      for (String caCertFile : caCertFiles) {
+        caCerts.add(X509Util.parseCert(caCertFile));
+      }
     }
+
+    slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
+    securityFactory.getP11CryptService(moduleName).refresh();
+    out("updated certificate");
+    return null;
+  }
 
 }

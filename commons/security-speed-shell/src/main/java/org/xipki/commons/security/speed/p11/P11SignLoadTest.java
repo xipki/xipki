@@ -52,81 +52,82 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P11SignLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            ContentSigner singleSigner;
-            try {
-                singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e) {
-                account(1, 1);
-                return;
-            }
-
-            while (!stop() && getErrorAccout() < 1) {
-                try {
-                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-                    singleSigner.getSignature();
-                    account(1, 0);
-                } catch (Exception e) {
-                    account(1, 1);
-                }
-            }
-
-            signer.returnContentSigner(singleSigner);
-            close();
-        }
-
-    } // class Testor
-
-    private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
-
-    private final P11WritableSlot slot;
-
-    private final ConcurrentContentSigner signer;
-
-    private final P11KeyIdentifier keyId;
-
-    public P11SignLoadTest(
-            final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
-            final String signatureAlgorithm,
-            final P11KeyIdentifier keyId,
-            final String description)
-    throws SignerException {
-        super(description + "\nsignature algorithm: " + signatureAlgorithm);
-
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.assertNotNull("keyId", keyId);
-
-        this.slot = slot;
-        this.keyId = keyId;
-
-        String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
-                null, slot.getSlotIdentifier(), keyId, signatureAlgorithm, 20);
-        this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
-
-    }
-
-    private void close() {
-        try {
-            slot.removeKeyAndCerts(keyId);
-        } catch (Exception e) {
-            LOG.error("could not delete PKCS#11 key {}", keyId);
-        }
-    }
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
+    public void run() {
+      ContentSigner singleSigner;
+      try {
+        singleSigner = signer.borrowContentSigner();
+      } catch (NoIdleSignerException e) {
+        account(1, 1);
+        return;
+      }
+
+      while (!stop() && getErrorAccout() < 1) {
+        try {
+          singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
+          singleSigner.getSignature();
+          account(1, 0);
+        } catch (Exception e) {
+          account(1, 1);
+        }
+      }
+
+      signer.returnContentSigner(singleSigner);
+      close();
     }
+
+  } // class Testor
+
+  private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
+
+  private final P11WritableSlot slot;
+
+  private final ConcurrentContentSigner signer;
+
+  private final P11KeyIdentifier keyId;
+
+  public P11SignLoadTest(
+      final SecurityFactory securityFactory,
+      final P11WritableSlot slot,
+      final String signatureAlgorithm,
+      final P11KeyIdentifier keyId,
+      final String description)
+  throws SignerException {
+    super(description + "\nsignature algorithm: " + signatureAlgorithm);
+
+    ParamUtil.assertNotNull("securityFactory", securityFactory);
+    ParamUtil.assertNotNull("slot", slot);
+    ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
+    ParamUtil.assertNotNull("keyId", keyId);
+
+    this.slot = slot;
+    this.keyId = keyId;
+
+    String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
+        null, slot.getSlotIdentifier(), keyId, signatureAlgorithm, 20);
+    this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
+
+  }
+
+  private void close() {
+    try {
+      slot.removeKeyAndCerts(keyId);
+    } catch (Exception e) {
+      LOG.error("could not delete PKCS#11 key {}", keyId);
+    }
+  }
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
 
 }

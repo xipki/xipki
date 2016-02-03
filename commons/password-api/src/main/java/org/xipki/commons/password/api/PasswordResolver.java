@@ -37,12 +37,13 @@ package org.xipki.commons.password.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface PasswordResolver {
 
-    char[] resolvePassword(
-            String passwordHint)
-    throws PasswordResolverException;
+  char[] resolvePassword(
+      String passwordHint)
+  throws PasswordResolverException;
 
 }

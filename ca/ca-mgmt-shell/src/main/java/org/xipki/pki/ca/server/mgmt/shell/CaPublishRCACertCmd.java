@@ -44,29 +44,30 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "publish-self",
-        description = "publish the certificate of root CA")
+    description = "publish the certificate of root CA")
 @Service
 public class CaPublishRCACertCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "CA name", required = true)
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Argument(index = 0, name = "name", description = "CA name", required = true)
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "certificate profile name\n"
-                    + "(required)")
-    private String certprofile;
+  @Option(name = "--profile",
+      required = true,
+      description = "certificate profile name\n"
+          + "(required)")
+  private String certprofile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.publishRootCA(caName, certprofile);
-        output(b, "published", "could not publish", "CA certificate of root CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.publishRootCA(caName, certprofile);
+    output(b, "published", "could not publish", "CA certificate of root CA " + caName);
+    return null;
+  }
 
 }

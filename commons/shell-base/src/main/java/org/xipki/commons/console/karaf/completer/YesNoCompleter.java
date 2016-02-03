@@ -40,13 +40,14 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class YesNoCompleter extends AbstractEnumCompleter {
 
-    public YesNoCompleter() {
-        setTokens("yes, no");
-    }
+  public YesNoCompleter() {
+    setTokens("yes, no");
+  }
 
 }

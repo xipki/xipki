@@ -43,111 +43,112 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class RDNControl {
 
-    private final int minOccurs;
+  private final int minOccurs;
 
-    private final int maxOccurs;
+  private final int maxOccurs;
 
-    private final ASN1ObjectIdentifier type;
+  private final ASN1ObjectIdentifier type;
 
-    private List<Pattern> patterns;
+  private List<Pattern> patterns;
 
-    private StringType stringType;
+  private StringType stringType;
 
-    private Range stringLengthRange;
+  private Range stringLengthRange;
 
-    private String prefix;
+  private String prefix;
 
-    private String suffix;
+  private String suffix;
 
-    private String group;
+  private String group;
 
-    public RDNControl(
-            final ASN1ObjectIdentifier type) {
-        this(type, 1, 1);
+  public RDNControl(
+      final ASN1ObjectIdentifier type) {
+    this(type, 1, 1);
+  }
+
+  public RDNControl(
+      final ASN1ObjectIdentifier type,
+      final int minOccurs,
+      final int maxOccurs) {
+    ParamUtil.assertNotNull("type", type);
+    if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
+      throw new IllegalArgumentException(
+          String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
     }
+    this.type = type;
+    this.minOccurs = minOccurs;
+    this.maxOccurs = maxOccurs;
+  }
 
-    public RDNControl(
-            final ASN1ObjectIdentifier type,
-            final int minOccurs,
-            final int maxOccurs) {
-        ParamUtil.assertNotNull("type", type);
-        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
-            throw new IllegalArgumentException(
-                    String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
-        }
-        this.type = type;
-        this.minOccurs = minOccurs;
-        this.maxOccurs = maxOccurs;
-    }
+  public int getMinOccurs() {
+    return minOccurs;
+  }
 
-    public int getMinOccurs() {
-        return minOccurs;
-    }
+  public int getMaxOccurs() {
+    return maxOccurs;
+  }
 
-    public int getMaxOccurs() {
-        return maxOccurs;
-    }
+  public ASN1ObjectIdentifier getType() {
+    return type;
+  }
 
-    public ASN1ObjectIdentifier getType() {
-        return type;
-    }
+  public StringType getStringType() {
+    return stringType;
+  }
 
-    public StringType getStringType() {
-        return stringType;
-    }
+  public List<Pattern> getPatterns() {
+    return patterns;
+  }
 
-    public List<Pattern> getPatterns() {
-        return patterns;
-    }
+  public Range getStringLengthRange() {
+    return stringLengthRange;
+  }
 
-    public Range getStringLengthRange() {
-        return stringLengthRange;
-    }
+  public void setStringType(
+      final StringType stringType) {
+    this.stringType = stringType;
+  }
 
-    public void setStringType(
-            final StringType stringType) {
-        this.stringType = stringType;
-    }
+  public void setStringLengthRange(
+      final Range stringLengthRange) {
+    this.stringLengthRange = stringLengthRange;
+  }
 
-    public void setStringLengthRange(
-            final Range stringLengthRange) {
-        this.stringLengthRange = stringLengthRange;
-    }
+  public void setPatterns(
+      final List<Pattern> patterns) {
+    this.patterns = patterns;
+  }
 
-    public void setPatterns(
-            final List<Pattern> patterns) {
-        this.patterns = patterns;
-    }
+  public String getPrefix() {
+    return prefix;
+  }
 
-    public String getPrefix() {
-        return prefix;
-    }
+  public void setPrefix(
+      final String prefix) {
+    this.prefix = prefix;
+  }
 
-    public void setPrefix(
-            final String prefix) {
-        this.prefix = prefix;
-    }
+  public String getSuffix() {
+    return suffix;
+  }
 
-    public String getSuffix() {
-        return suffix;
-    }
+  public void setSuffix(
+      final String suffix) {
+    this.suffix = suffix;
+  }
 
-    public void setSuffix(
-            final String suffix) {
-        this.suffix = suffix;
-    }
+  public String getGroup() {
+    return group;
+  }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(
-            final String group) {
-        this.group = group;
-    }
+  public void setGroup(
+      final String group) {
+    this.group = group;
+  }
 
 }

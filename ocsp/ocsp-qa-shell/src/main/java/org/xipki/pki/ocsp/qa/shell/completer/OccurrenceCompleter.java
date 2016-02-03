@@ -41,18 +41,19 @@ import org.xipki.pki.ocsp.qa.api.Occurrence;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 @Service
 public class OccurrenceCompleter extends AbstractEnumCompleter {
 
-    public OccurrenceCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public OccurrenceCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (Occurrence entry : Occurrence.values()) {
-            enums.append(entry.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (Occurrence entry : Occurrence.values()) {
+      enums.append(entry.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

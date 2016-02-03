@@ -44,54 +44,55 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class ShellUtil {
 
-    private ShellUtil() {
+  private ShellUtil() {
+  }
+
+  static String canonicalizeSignerConf(
+      final String keystoreType,
+      final String signerConf,
+      final PasswordResolver passwordResolver)
+  throws Exception {
+    if (!signerConf.contains("file:") && !signerConf.contains("base64:")
+        && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
+      return signerConf;
     }
 
-    static String canonicalizeSignerConf(
-            final String keystoreType,
-            final String signerConf,
-            final PasswordResolver passwordResolver)
-    throws Exception {
-        if (!signerConf.contains("file:") && !signerConf.contains("base64:")
-                && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
-            return signerConf;
-        }
+    ConfPairs pairs = new ConfPairs(signerConf);
+    String keystoreConf = pairs.getValue("keystore");
+    String passwordHint = pairs.getValue("password");
+    String keyLabel   = pairs.getValue("key-label");
 
-        ConfPairs pairs = new ConfPairs(signerConf);
-        String keystoreConf = pairs.getValue("keystore");
-        String passwordHint = pairs.getValue("password");
-        String keyLabel     = pairs.getValue("key-label");
+    if (passwordHint == null) {
+      throw new IllegalArgumentException("password is not set in " + signerConf);
+    }
 
-        if (passwordHint == null) {
-            throw new IllegalArgumentException("password is not set in " + signerConf);
-        }
+    byte[] keystoreBytes;
+    if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
+      String keystoreFile = keystoreConf.substring("file:".length());
+      keystoreBytes = IoUtil.read(keystoreFile);
+    } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
+      keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+    } else {
+      return signerConf;
+    }
 
-        byte[] keystoreBytes;
-        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
-            String keystoreFile = keystoreConf.substring("file:".length());
-            keystoreBytes = IoUtil.read(keystoreFile);
-        } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
-            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
-        } else {
-            return signerConf;
-        }
+    char[] password;
+    if (passwordResolver == null) {
+      password = passwordHint.toCharArray();
+    } else {
+      password = passwordResolver.resolvePassword(passwordHint);
+    }
 
-        char[] password;
-        if (passwordResolver == null) {
-            password = passwordHint.toCharArray();
-        } else {
-            password = passwordResolver.resolvePassword(passwordHint);
-        }
+    keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
+        keystoreBytes, keyLabel, password);
 
-        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel, password);
-
-        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
-        return pairs.getEncoded();
-    } // method doExecute
+    pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+    return pairs.getEncoded();
+  } // method doExecute
 
 }

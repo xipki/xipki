@@ -43,48 +43,49 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EnrollCertResultType {
 
-    private List<CMPCertificate> cACertificates;
+  private List<CMPCertificate> cACertificates;
 
-    private List<ResultEntryType> resultEntries;
+  private List<ResultEntryType> resultEntries;
 
-    public EnrollCertResultType() {
+  public EnrollCertResultType() {
+  }
+
+  public void addCACertificate(
+      final CMPCertificate cACertificate) {
+    if (cACertificates == null) {
+      cACertificates = new ArrayList<>(1);
+    }
+    cACertificates.add(cACertificate);
+  }
+
+  public void addResultEntry(
+      final ResultEntryType resultEntry) {
+    ParamUtil.assertNotNull("resultEntry", resultEntry);
+
+    if (!(resultEntry instanceof EnrollCertResultEntryType
+        || resultEntry instanceof ErrorResultEntryType)) {
+      throw new IllegalArgumentException(
+          "Unaccepted parameter of class " + resultEntry.getClass().getName());
     }
 
-    public void addCACertificate(
-            final CMPCertificate cACertificate) {
-        if (cACertificates == null) {
-            cACertificates = new ArrayList<>(1);
-        }
-        cACertificates.add(cACertificate);
+    if (resultEntries == null) {
+      resultEntries = new ArrayList<>(1);
     }
 
-    public void addResultEntry(
-            final ResultEntryType resultEntry) {
-        ParamUtil.assertNotNull("resultEntry", resultEntry);
+    resultEntries.add(resultEntry);
+  }
 
-        if (!(resultEntry instanceof EnrollCertResultEntryType
-                || resultEntry instanceof ErrorResultEntryType)) {
-            throw new IllegalArgumentException(
-                    "Unaccepted parameter of class " + resultEntry.getClass().getName());
-        }
+  public List<CMPCertificate> getCACertificates() {
+    return cACertificates;
+  }
 
-        if (resultEntries == null) {
-            resultEntries = new ArrayList<>(1);
-        }
-
-        resultEntries.add(resultEntry);
-    }
-
-    public List<CMPCertificate> getCACertificates() {
-        return cACertificates;
-    }
-
-    public List<ResultEntryType> getResultEntries() {
-        return resultEntries;
-    }
+  public List<ResultEntryType> getResultEntries() {
+    return resultEntries;
+  }
 
 }

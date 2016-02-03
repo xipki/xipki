@@ -39,201 +39,202 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OcspCertType extends DbDataObject {
 
-    public static final String TAG_ROOT = "cert";
+  public static final String TAG_ROOT = "cert";
 
-    public static final String TAG_id = "id";
+  public static final String TAG_id = "id";
 
-    private Integer id;
+  private Integer id;
 
-    /**
-     * issuer id
-     */
-    public static final String TAG_iid = "iid";
+  /**
+   * issuer id
+   */
+  public static final String TAG_iid = "iid";
 
-    private Integer iid;
+  private Integer iid;
 
-    /**
-     * certificate serial number
-     */
-    public static final String TAG_sn = "sn";
+  /**
+   * certificate serial number
+   */
+  public static final String TAG_sn = "sn";
 
-    private String sn;
+  private String sn;
 
-    public static final String TAG_update = "update";
+  public static final String TAG_update = "update";
 
-    private Long update;
+  private Long update;
 
-    /**
-     * whether revoked
-     */
-    public static final String TAG_rev = "rev";
+  /**
+   * whether revoked
+   */
+  public static final String TAG_rev = "rev";
 
-    private Boolean rev;
+  private Boolean rev;
 
-    /**
-     * revocation reason
-     */
-    public static final String TAG_rr = "rr";
+  /**
+   * revocation reason
+   */
+  public static final String TAG_rr = "rr";
 
-    private Integer rr;
+  private Integer rr;
 
-    /**
-     * revocation time
-     */
-    public static final String TAG_rt = "rt";
+  /**
+   * revocation time
+   */
+  public static final String TAG_rt = "rt";
 
-    private Long rt;
+  private Long rt;
 
-    /**
-     * revocation invalidity time
-     */
-    public static final String TAG_rit = "rit";
+  /**
+   * revocation invalidity time
+   */
+  public static final String TAG_rit = "rit";
 
-    private Long rit;
+  private Long rit;
 
-    /**
-     * certificate profile name
-     */
-    public static final String TAG_profile = "profile";
+  /**
+   * certificate profile name
+   */
+  public static final String TAG_profile = "profile";
 
-    private String profile;
+  private String profile;
 
-    /**
-     * file name of the certificate
-     */
-    public static final String TAG_file = "file";
+  /**
+   * file name of the certificate
+   */
+  public static final String TAG_file = "file";
 
-    private String file;
+  private String file;
 
-    public Integer getId() {
-        return id;
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(
+      final Integer id) {
+    this.id = id;
+  }
+
+  public Integer getIid() {
+    return iid;
+  }
+
+  public void setIid(
+      final Integer iid) {
+    this.iid = iid;
+  }
+
+  public String getSn() {
+    return sn;
+  }
+
+  public void setSn(
+      final String sn) {
+    this.sn = sn;
+  }
+
+  public String getProfile() {
+    return profile;
+  }
+
+  public void setProfile(
+      final String profile) {
+    this.profile = profile;
+  }
+
+  public Long getUpdate() {
+    return update;
+  }
+
+  public void setUpdate(
+      final Long update) {
+    this.update = update;
+  }
+
+  public Boolean getRev() {
+    return rev;
+  }
+
+  public void setRev(
+      final Boolean rev) {
+    this.rev = rev;
+  }
+
+  public Integer getRr() {
+    return rr;
+  }
+
+  public void setRr(
+      final Integer rr) {
+    this.rr = rr;
+  }
+
+  public Long getRt() {
+    return rt;
+  }
+
+  public void setRt(
+      final Long rt) {
+    this.rt = rt;
+  }
+
+  public Long getRit() {
+    return rit;
+  }
+
+  public void setRit(
+      final Long rit) {
+    this.rit = rit;
+  }
+
+  public String getFile() {
+    return file;
+  }
+
+  public void setFile(
+      final String file) {
+    this.file = file;
+  }
+
+  @Override
+  public void validate()
+  throws InvalidDataObjectException {
+    assertNotNull("id", id);
+    assertNotNull("iid", iid);
+    assertNotBlank("sn", sn);
+    assertNotNull("update", update);
+    assertNotNull("rev", rev);
+    if (rev) {
+      assertNotNull("rr", rr);
+      assertNotNull("rt", rt);
     }
 
-    public void setId(
-            final Integer id) {
-        this.id = id;
-    }
+    assertNotBlank("file", file);
+  }
 
-    public Integer getIid() {
-        return iid;
-    }
+  @Override
+  public void writeTo(
+      final DbiXmlWriter writer)
+  throws InvalidDataObjectException, XMLStreamException {
+    validate();
 
-    public void setIid(
-            final Integer iid) {
-        this.iid = iid;
-    }
-
-    public String getSn() {
-        return sn;
-    }
-
-    public void setSn(
-            final String sn) {
-        this.sn = sn;
-    }
-
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setProfile(
-            final String profile) {
-        this.profile = profile;
-    }
-
-    public Long getUpdate() {
-        return update;
-    }
-
-    public void setUpdate(
-            final Long update) {
-        this.update = update;
-    }
-
-    public Boolean getRev() {
-        return rev;
-    }
-
-    public void setRev(
-            final Boolean rev) {
-        this.rev = rev;
-    }
-
-    public Integer getRr() {
-        return rr;
-    }
-
-    public void setRr(
-            final Integer rr) {
-        this.rr = rr;
-    }
-
-    public Long getRt() {
-        return rt;
-    }
-
-    public void setRt(
-            final Long rt) {
-        this.rt = rt;
-    }
-
-    public Long getRit() {
-        return rit;
-    }
-
-    public void setRit(
-            final Long rit) {
-        this.rit = rit;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(
-            final String file) {
-        this.file = file;
-    }
-
-    @Override
-    public void validate()
-    throws InvalidDataObjectException {
-        assertNotNull("id", id);
-        assertNotNull("iid", iid);
-        assertNotBlank("sn", sn);
-        assertNotNull("update", update);
-        assertNotNull("rev", rev);
-        if (rev) {
-            assertNotNull("rr", rr);
-            assertNotNull("rt", rt);
-        }
-
-        assertNotBlank("file", file);
-    }
-
-    @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException {
-        validate();
-
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_iid, iid);
-        writeIfNotNull(writer, TAG_sn, sn);
-        writeIfNotNull(writer, TAG_update, update);
-        writeIfNotNull(writer, TAG_rev, rev);
-        writeIfNotNull(writer, TAG_rr, rr);
-        writeIfNotNull(writer, TAG_rt, rt);
-        writeIfNotNull(writer, TAG_rit, rit);
-        writeIfNotNull(writer, TAG_profile, profile);
-        writeIfNotNull(writer, TAG_file, file);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_id, id);
+    writeIfNotNull(writer, TAG_iid, iid);
+    writeIfNotNull(writer, TAG_sn, sn);
+    writeIfNotNull(writer, TAG_update, update);
+    writeIfNotNull(writer, TAG_rev, rev);
+    writeIfNotNull(writer, TAG_rr, rr);
+    writeIfNotNull(writer, TAG_rt, rt);
+    writeIfNotNull(writer, TAG_rit, rit);
+    writeIfNotNull(writer, TAG_profile, profile);
+    writeIfNotNull(writer, TAG_file, file);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

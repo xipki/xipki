@@ -44,17 +44,18 @@ import org.xipki.pki.ca.qa.api.QASystemManager;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class X509CertprofileNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    private QASystemManager qaSystemManager;
+  @Reference
+  private QASystemManager qaSystemManager;
 
-    @Override
-    protected Set<String> getEnums() {
-        return qaSystemManager.getCertprofileNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return qaSystemManager.getCertprofileNames();
+  }
 
 }

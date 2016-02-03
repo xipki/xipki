@@ -45,50 +45,51 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "caprofile-add",
-        description = "add certificate profile to CA")
+    description = "add certificate profile to CA")
 @Service
 public class CaProfileAddCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile name\n"
-                + "(required)")
-    @Completion(ProfileNameCompleter.class)
-    private String profileName;
+  @Option(name = "--profile",
+      required = true,
+      description = "profile name\n"
+        + "(required)")
+  @Completion(ProfileNameCompleter.class)
+  private String profileName;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
+  @Option(name = "--local-name",
+      required = false,
+      description = "profile localname")
+  private String profileLocalname;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (StringUtil.isBlank(profileLocalname)) {
-            profileLocalname = profileName;
-        }
-
-        boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile ").append(profileName);
-        if (!profileLocalname.equals(profileName)) {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
-        sb.append(" to CA ").append(caName);
-
-        output(b, "associated", "could not associate",
-                sb.toString());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (StringUtil.isBlank(profileLocalname)) {
+      profileLocalname = profileName;
     }
+
+    boolean b = caManager.addCertprofileToCA(profileName, profileLocalname, caName);
+    StringBuilder sb = new StringBuilder();
+    sb.append("certificate profile ").append(profileName);
+    if (!profileLocalname.equals(profileName)) {
+      sb.append(" (localname ").append(profileLocalname).append(")");
+    }
+    sb.append(" to CA ").append(caName);
+
+    output(b, "associated", "could not associate",
+        sb.toString());
+    return null;
+  }
 
 }

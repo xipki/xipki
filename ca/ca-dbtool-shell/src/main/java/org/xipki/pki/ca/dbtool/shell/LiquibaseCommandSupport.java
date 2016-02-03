@@ -59,196 +59,197 @@ import org.xipki.pki.ca.dbtool.shell.completer.LogLevelCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
 
-    private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
+  private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
-    private static final List<String> yesNo = new ArrayList<>(2);
+  private static final List<String> yesNo = new ArrayList<>(2);
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    static {
-        yesNo.add("yes");
-        yesNo.add("no");
+  static {
+    yesNo.add("yes");
+    yesNo.add("no");
+  }
+
+  @Option(name = "--quiet", aliases = "-q",
+      description = "quiet mode")
+  private Boolean quiet = Boolean.FALSE;
+
+  @Option(name = "--log-level",
+      description = "log level, valid values are debug, info, warning, severe, off")
+  @Completion(LogLevelCompleter.class)
+  private String logLevel = "warning";
+
+  @Option(name = "--log-file",
+      description = "log file")
+  @Completion(FilePathCompleter.class)
+  private String logFile;
+
+  @Option(name = "--ca-conf",
+      description = "CA configuration file")
+  @Completion(FilePathCompleter.class)
+  private String caconfFile = DFLT_CACONF_FILE;
+
+  protected void resetAndInit(
+      final LiquibaseDatabaseConf dbConf,
+      final String schemaFile)
+  throws Exception {
+    printDatabaseInfo(dbConf, schemaFile);
+    if (!quiet) {
+      if (!confirm("reset and initialize")) {
+        out("cancelled");
+        return;
+      }
     }
 
-    @Option(name = "--quiet", aliases = "-q",
-            description = "quiet mode")
-    private Boolean quiet = Boolean.FALSE;
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    try {
+      liquibase.init(logLevel, logFile);
+      liquibase.releaseLocks();
 
-    @Option(name = "--log-level",
-            description = "log level, valid values are debug, info, warning, severe, off")
-    @Completion(LogLevelCompleter.class)
-    private String logLevel = "warning";
+      if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
+        liquibase.init("severe", logFile);
+      }
+      liquibase.dropAll();
 
-    @Option(name = "--log-file",
-            description = "log file")
-    @Completion(FilePathCompleter.class)
-    private String logFile;
-
-    @Option(name = "--ca-conf",
-            description = "CA configuration file")
-    @Completion(FilePathCompleter.class)
-    private String caconfFile = DFLT_CACONF_FILE;
-
-    protected void resetAndInit(
-            final LiquibaseDatabaseConf dbConf,
-            final String schemaFile)
-    throws Exception {
-        printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet) {
-            if (!confirm("reset and initialize")) {
-                out("cancelled");
-                return;
-            }
-        }
-
-        LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-        try {
-            liquibase.init(logLevel, logFile);
-            liquibase.releaseLocks();
-
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
-                liquibase.init("severe", logFile);
-            }
-            liquibase.dropAll();
-
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
-                liquibase.init(logLevel, logFile);
-            }
-            liquibase.update();
-        } finally {
-            liquibase.shutdown();
-        }
-
+      if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
+        liquibase.init(logLevel, logFile);
+      }
+      liquibase.update();
+    } finally {
+      liquibase.shutdown();
     }
 
-    protected void update(
-            final LiquibaseDatabaseConf dbConf,
-            final String schemaFile)
-    throws Exception {
-        printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet) {
-            if (!confirm("update")) {
-                out("cancelled");
-                return;
-            }
-        }
+  }
 
-        LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-        try {
-            liquibase.init(logLevel, logFile);
-            liquibase.update();
-        } finally {
-            liquibase.shutdown();
-        }
-
+  protected void update(
+      final LiquibaseDatabaseConf dbConf,
+      final String schemaFile)
+  throws Exception {
+    printDatabaseInfo(dbConf, schemaFile);
+    if (!quiet) {
+      if (!confirm("update")) {
+        out("cancelled");
+        return;
+      }
     }
 
-    private static Properties getDbConfPoperties(
-            final String dbconfFile)
-    throws FileNotFoundException, IOException {
-        Properties props = new Properties();
-        props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
-        return props;
+    LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+    try {
+      liquibase.init(logLevel, logFile);
+      liquibase.update();
+    } finally {
+      liquibase.shutdown();
     }
 
-    protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
-    throws FileNotFoundException, IOException, PasswordResolverException {
-        Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
-        Properties props = getPropertiesFromFile(caconfFile);
-        for (Object objKey : props.keySet()) {
-            String key = (String) objKey;
-            if (key.startsWith("datasource.")) {
-                String datasourceFile = props.getProperty(key);
-                String datasourceName = key.substring("datasource.".length());
-                Properties dbConf = getDbConfPoperties(datasourceFile);
-                LiquibaseDatabaseConf dbParams = LiquibaseDatabaseConf.getInstance(
-                        dbConf, passwordResolver);
-                ret.put(datasourceName, dbParams);
-            }
-        }
+  }
 
-        return ret;
+  private static Properties getDbConfPoperties(
+      final String dbconfFile)
+  throws FileNotFoundException, IOException {
+    Properties props = new Properties();
+    props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
+    return props;
+  }
+
+  protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
+  throws FileNotFoundException, IOException, PasswordResolverException {
+    Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
+    Properties props = getPropertiesFromFile(caconfFile);
+    for (Object objKey : props.keySet()) {
+      String key = (String) objKey;
+      if (key.startsWith("datasource.")) {
+        String datasourceFile = props.getProperty(key);
+        String datasourceName = key.substring("datasource.".length());
+        Properties dbConf = getDbConfPoperties(datasourceFile);
+        LiquibaseDatabaseConf dbParams = LiquibaseDatabaseConf.getInstance(
+            dbConf, passwordResolver);
+        ret.put(datasourceName, dbParams);
+      }
     }
 
-    private static Properties getPropertiesFromFile(
-            final String propFile)
-    throws FileNotFoundException, IOException {
-        Properties props = new Properties();
-        props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
-        return props;
+    return ret;
+  }
+
+  private static Properties getPropertiesFromFile(
+      final String propFile)
+  throws FileNotFoundException, IOException {
+    Properties props = new Properties();
+    props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
+    return props;
+  }
+
+  private void printDatabaseInfo(
+      final LiquibaseDatabaseConf dbParams,
+      final String schemaFile) {
+    StringBuilder msg = new StringBuilder();
+    msg.append("\n--------------------------------------------\n");
+    msg.append("driver    = ").append(dbParams.getDriver()).append("\n");
+    msg.append("user    = ").append(dbParams.getUsername()).append("\n");
+    msg.append("url     = ").append(dbParams.getUrl()).append("\n");
+    if (dbParams.getSchema() != null) {
+      msg.append("schema    = ").append(dbParams.getSchema()).append("\n");
+    }
+    msg.append("schema file = ").append(schemaFile).append("\n");
+
+    System.out.println(msg);
+  }
+
+  private boolean confirm(
+      final String command)
+  throws IOException {
+    String text = read("\nDo you wish to " + command + " the database", yesNo);
+    return "yes".equalsIgnoreCase(text);
+  }
+
+  private String read(
+      String prompt,
+      List<String> validValues)
+  throws IOException {
+    if (validValues == null) {
+      validValues = Collections.emptyList();
     }
 
-    private void printDatabaseInfo(
-            final LiquibaseDatabaseConf dbParams,
-            final String schemaFile) {
-        StringBuilder msg = new StringBuilder();
-        msg.append("\n--------------------------------------------\n");
-        msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
-        msg.append("user        = ").append(dbParams.getUsername()).append("\n");
-        msg.append("url         = ").append(dbParams.getUrl()).append("\n");
-        if (dbParams.getSchema() != null) {
-            msg.append("schema      = ").append(dbParams.getSchema()).append("\n");
-        }
-        msg.append("schema file = ").append(schemaFile).append("\n");
-
-        System.out.println(msg);
+    if (prompt == null) {
+      prompt = "Please enter";
     }
 
-    private boolean confirm(
-            final String command)
-    throws IOException {
-        String text = read("\nDo you wish to " + command + " the database", yesNo);
-        return "yes".equalsIgnoreCase(text);
+    if (isNotEmpty(validValues)) {
+      StringBuilder promptBuilder = new StringBuilder(prompt);
+      promptBuilder.append(" [");
+
+      for (String validValue : validValues) {
+        promptBuilder.append(validValue).append("/");
+      }
+      promptBuilder.deleteCharAt(promptBuilder.length() - 1);
+      promptBuilder.append("] ?");
+
+      prompt = promptBuilder.toString();
     }
 
-    private String read(
-            String prompt,
-            List<String> validValues)
-    throws IOException {
-        if (validValues == null) {
-            validValues = Collections.emptyList();
+    out(prompt);
+    while (true) {
+      String answer = session.readLine(null, null);
+      if (answer == null) {
+        throw new IOException("interrupted");
+      }
+
+      if (isEmpty(validValues) || validValues.contains(answer)) {
+        return answer;
+      } else {
+        StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
+        for (String validValue : validValues) {
+          retryPromptBuilder.append(validValue).append("/");
         }
-
-        if (prompt == null) {
-            prompt = "Please enter";
-        }
-
-        if (isNotEmpty(validValues)) {
-            StringBuilder promptBuilder = new StringBuilder(prompt);
-            promptBuilder.append(" [");
-
-            for (String validValue : validValues) {
-                promptBuilder.append(validValue).append("/");
-            }
-            promptBuilder.deleteCharAt(promptBuilder.length() - 1);
-            promptBuilder.append("] ?");
-
-            prompt = promptBuilder.toString();
-        }
-
-        out(prompt);
-        while (true) {
-            String answer = session.readLine(null, null);
-            if (answer == null) {
-                throw new IOException("interrupted");
-            }
-
-            if (isEmpty(validValues) || validValues.contains(answer)) {
-                return answer;
-            } else {
-                StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for (String validValue : validValues) {
-                    retryPromptBuilder.append(validValue).append("/");
-                }
-                retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-                out(retryPromptBuilder.toString());
-            }
-        }
-    } // method read
+        retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
+        out(retryPromptBuilder.toString());
+      }
+    }
+  } // method read
 
 }

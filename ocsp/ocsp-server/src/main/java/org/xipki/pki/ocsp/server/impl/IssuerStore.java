@@ -46,77 +46,78 @@ import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IssuerStore {
 
-    private final Set<Integer> ids;
+  private final Set<Integer> ids;
 
-    private final List<IssuerEntry> entries;
+  private final List<IssuerEntry> entries;
 
-    public IssuerStore(
-            final List<IssuerEntry> entries) {
-        this.entries = new ArrayList<>(entries.size());
-        Set<Integer> ids = new HashSet<>(entries.size());
+  public IssuerStore(
+      final List<IssuerEntry> entries) {
+    this.entries = new ArrayList<>(entries.size());
+    Set<Integer> ids = new HashSet<>(entries.size());
 
-        for (IssuerEntry entry : entries) {
-            for (IssuerEntry existingEntry : this.entries) {
-                if (existingEntry.getId() == entry.getId()) {
-                    throw new IllegalArgumentException(
-                            "issuer with the same id " + entry.getId() + " already available");
-                }
-            }
-            this.entries.add(entry);
-            ids.add(entry.getId());
+    for (IssuerEntry entry : entries) {
+      for (IssuerEntry existingEntry : this.entries) {
+        if (existingEntry.getId() == entry.getId()) {
+          throw new IllegalArgumentException(
+              "issuer with the same id " + entry.getId() + " already available");
         }
-
-        this.ids = Collections.unmodifiableSet(ids);
+      }
+      this.entries.add(entry);
+      ids.add(entry.getId());
     }
 
-    public Set<Integer> getIds() {
-        return ids;
+    this.ids = Collections.unmodifiableSet(ids);
+  }
+
+  public Set<Integer> getIds() {
+    return ids;
+  }
+
+  public Integer getIssuerIdForFp(
+      final HashAlgoType hashAlgo,
+      final byte[] issuerNameHash,
+      final byte[] issuerKeyHash) {
+    IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+    return (issuerEntry == null)
+        ? null
+        : issuerEntry.getId();
+  }
+
+  public IssuerEntry getIssuerForId(
+      final int id) {
+    for (IssuerEntry entry : entries) {
+      if (entry.getId() == id) {
+        return entry;
+      }
     }
 
-    public Integer getIssuerIdForFp(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuerEntry == null)
-                ? null
-                : issuerEntry.getId();
+    return null;
+  }
+
+  public IssuerEntry getIssuerForFp(
+      final HashAlgoType hashAlgo,
+      final byte[] issuerNameHash,
+      final byte[] issuerKeyHash) {
+    for (IssuerEntry entry : entries) {
+      if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash)) {
+        return entry;
+      }
     }
 
-    public IssuerEntry getIssuerForId(
-            final int id) {
-        for (IssuerEntry entry : entries) {
-            if (entry.getId() == id) {
-                return entry;
-            }
-        }
+    return null;
+  }
 
-        return null;
+  public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
+    Set<IssuerHashNameAndKey> ret = new HashSet<>();
+    for (IssuerEntry issuerEntry : entries) {
+      ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
     }
-
-    public IssuerEntry getIssuerForFp(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        for (IssuerEntry entry : entries) {
-            if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash)) {
-                return entry;
-            }
-        }
-
-        return null;
-    }
-
-    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
-        Set<IssuerHashNameAndKey> ret = new HashSet<>();
-        for (IssuerEntry issuerEntry : entries) {
-            ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
-        }
-        return ret;
-    }
+    return ret;
+  }
 
 }

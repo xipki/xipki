@@ -37,11 +37,12 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum CertpathValidationModel {
 
-    PKIX,
-    CHAIN
+  PKIX,
+  CHAIN
 
 }

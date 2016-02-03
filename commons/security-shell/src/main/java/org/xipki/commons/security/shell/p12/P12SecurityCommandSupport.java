@@ -45,45 +45,46 @@ import org.xipki.commons.security.shell.SecurityCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 keystore file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String p12File;
+  @Option(name = "--p12",
+      required = true,
+      description = "PKCS#12 keystore file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    protected String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  protected String password;
 
-    protected char[] getPassword() {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if (pwdInChar != null) {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+  protected char[] getPassword() {
+    char[] pwdInChar = readPasswordIfNotSet(password);
+    if (pwdInChar != null) {
+      password = new String(pwdInChar);
+    }
+    return pwdInChar;
+  }
+
+  protected KeyStore getKeyStore()
+  throws Exception {
+    KeyStore ks;
+
+    FileInputStream fIn = null;
+    try {
+      fIn = new FileInputStream(expandFilepath(p12File));
+      ks = KeyStore.getInstance("PKCS12", "BC");
+      ks.load(fIn, getPassword());
+    } finally {
+      if (fIn != null) {
+        fIn.close();
+      }
     }
 
-    protected KeyStore getKeyStore()
-    throws Exception {
-        KeyStore ks;
-
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
-        }
-
-        return ks;
-    }
+    return ks;
+  }
 
 }

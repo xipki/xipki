@@ -48,59 +48,60 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollTemplateType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-template-enroll",
-        description = "CA Client Template Enroll Load test")
+    description = "CA Client Template Enroll Load test")
 @Service
 public class CALoadTestTemplateEnrollCmd extends CALoadTestCommandSupport {
 
-    @Option(name = "--template", aliases = "-t",
-            required = true,
-            description = "template file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String templateFile;
+  @Option(name = "--template", aliases = "-t",
+      required = true,
+      description = "template file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String templateFile;
 
-    @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+  @Option(name = "--duration",
+      description = "duration in seconds")
+  private Integer durationInSecond = 30;
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (numThreads < 1) {
-            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (numThreads < 1) {
+      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+    }
 
-        if (durationInSecond < 1) {
-            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
-        }
+    if (durationInSecond < 1) {
+      throw new IllegalCmdParamException("invalid duration " + durationInSecond);
+    }
 
-        EnrollTemplateType template = CALoadTestTemplateEnroll.parse(
-                new FileInputStream(templateFile));
-        int n = template.getEnrollCert().size();
+    EnrollTemplateType template = CALoadTestTemplateEnroll.parse(
+        new FileInputStream(templateFile));
+    int n = template.getEnrollCert().size();
 
-        StringBuilder description = new StringBuilder();
-        description.append("template: ").append(templateFile).append("\n");
-        description.append("#certs/req: ").append(n).append("\n");
-        description.append("unit: ").append(n).append(" certificate");
-        if (n > 1) {
-            description.append("s");
-        }
-        description.append("\n");
+    StringBuilder description = new StringBuilder();
+    description.append("template: ").append(templateFile).append("\n");
+    description.append("#certs/req: ").append(n).append("\n");
+    description.append("unit: ").append(n).append(" certificate");
+    if (n > 1) {
+      description.append("s");
+    }
+    description.append("\n");
 
-        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(caClient,
-                template, description.toString());
-        loadTest.setDuration(durationInSecond);
-        loadTest.setThreads(numThreads);
-        loadTest.test();
+    CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(caClient,
+        template, description.toString());
+    loadTest.setDuration(durationInSecond);
+    loadTest.setThreads(numThreads);
+    loadTest.test();
 
-        return null;
-    } // method doExecute
+    return null;
+  } // method doExecute
 
 }

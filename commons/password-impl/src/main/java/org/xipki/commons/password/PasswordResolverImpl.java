@@ -45,72 +45,73 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PasswordResolverImpl implements PasswordResolver {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
-    private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
-            new ConcurrentLinkedQueue<SinglePasswordResolver>();
+  private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
+      new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
-    public PasswordResolverImpl() {
+  public PasswordResolverImpl() {
+  }
+
+  public void bindService(
+      final SinglePasswordResolver service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.debug("bindService invoked with null.");
+      return;
     }
 
-    public void bindService(
-            final SinglePasswordResolver service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.debug("bindService invoked with null.");
-            return;
-        }
+    boolean replaced = resolvers.remove(service);
+    resolvers.add(service);
+    String txt = replaced
+        ? "replaced"
+        : "added";
+    LOG.debug("{} SinglePasswordResolver binding for {}",
+        txt, service);
+  }
 
-        boolean replaced = resolvers.remove(service);
-        resolvers.add(service);
-        String txt = replaced
-                ? "replaced"
-                : "added";
-        LOG.debug("{} SinglePasswordResolver binding for {}",
-                txt, service);
+  public void unbindService(
+      final SinglePasswordResolver service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.debug("unbindService invoked with null.");
+      return;
     }
 
-    public void unbindService(
-            final SinglePasswordResolver service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.debug("unbindService invoked with null.");
-            return;
-        }
+    try {
+      if (resolvers.remove(service)) {
+        LOG.debug("removed SinglePasswordResolver binding for {}", service);
+      } else {
+        LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
+      }
+    } catch (Exception e) {
+      LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
+    }
+  }
 
-        try {
-            if (resolvers.remove(service)) {
-                LOG.debug("removed SinglePasswordResolver binding for {}", service);
-            } else {
-                LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
-            }
-        } catch (Exception e) {
-            LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
-        }
+  @Override
+  public char[] resolvePassword(
+      final String passwordHint)
+  throws PasswordResolverException {
+    int index = passwordHint.indexOf(':');
+    if (index == -1) {
+      return passwordHint.toCharArray();
     }
 
-    @Override
-    public char[] resolvePassword(
-            final String passwordHint)
-    throws PasswordResolverException {
-        int index = passwordHint.indexOf(':');
-        if (index == -1) {
-            return passwordHint.toCharArray();
-        }
+    String protocol = passwordHint.substring(0, index);
 
-        String protocol = passwordHint.substring(0, index);
-
-        for (SinglePasswordResolver resolver : resolvers) {
-            if (resolver.canResolveProtocol(protocol)) {
-                return resolver.resolvePassword(passwordHint);
-            }
-        }
-
-        return passwordHint.toCharArray();
+    for (SinglePasswordResolver resolver : resolvers) {
+      if (resolver.canResolveProtocol(protocol)) {
+        return resolver.resolvePassword(passwordHint);
+      }
     }
+
+    return passwordHint.toCharArray();
+  }
 
 }

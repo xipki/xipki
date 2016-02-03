@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-rm",
-        description = "remove publisher (negative, QA)")
+    description = "remove publisher (negative, QA)")
 @Service
 public class NegPublisherRemoveCmd extends PublisherRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-publisher-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-publisher-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

@@ -37,29 +37,30 @@ package org.xipki.pki.ocsp.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class ResponderUnreachableException extends OCSPResponseException {
 
-    public ResponderUnreachableException() {
-        super();
-    }
+  public ResponderUnreachableException() {
+    super();
+  }
 
-    public ResponderUnreachableException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public ResponderUnreachableException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public ResponderUnreachableException(
-            final String message) {
-        super(message);
-    }
+  public ResponderUnreachableException(
+      final String message) {
+    super(message);
+  }
 
-    public ResponderUnreachableException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public ResponderUnreachableException(
+      final Throwable cause) {
+    super(cause);
+  }
 
 }

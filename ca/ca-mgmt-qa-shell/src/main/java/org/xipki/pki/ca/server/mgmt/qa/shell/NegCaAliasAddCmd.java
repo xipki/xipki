@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaAliasAddCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-caalias-add",
-        description = "add CA alias (negative, QA)")
+    description = "add CA alias (negative, QA)")
 @Service
 public class NegCaAliasAddCmd extends CaAliasAddCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-caalias-add");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-caalias-add");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

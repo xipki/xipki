@@ -49,54 +49,55 @@ import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "neg-unrevoke",
-        description = "unrevoke certificate (negative, for QA)")
+    description = "unrevoke certificate (negative, for QA)")
 @Service
 public class NegUnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
+      throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
+    }
 
-        X509Certificate caCert = null;
-        if (issuerCertFile != null) {
-            caCert = X509Util.parseCert(issuerCertFile);
-        }
+    X509Certificate caCert = null;
+    if (issuerCertFile != null) {
+      caCert = X509Util.parseCert(issuerCertFile);
+    }
 
-        CertIdOrError certIdOrError;
-        if (certFile != null) {
-            X509Certificate cert = X509Util.parseCert(certFile);
-            if (caCert != null) {
-                String errorMsg = checkCertificate(cert, caCert);
-                if (errorMsg != null) {
-                    throw new CmdFailure(errorMsg);
-                }
-            }
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.unrevokeCert(cert, debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
-        } else {
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            RequestResponseDebug debug = getRequestResponseDebug();
-            try {
-                certIdOrError = caClient.unrevokeCert(issuer, getSerialNumber(), debug);
-            } finally {
-                saveRequestResponse(debug);
-            }
+    CertIdOrError certIdOrError;
+    if (certFile != null) {
+      X509Certificate cert = X509Util.parseCert(certFile);
+      if (caCert != null) {
+        String errorMsg = checkCertificate(cert, caCert);
+        if (errorMsg != null) {
+          throw new CmdFailure(errorMsg);
         }
+      }
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.unrevokeCert(cert, debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    } else {
+      X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+      RequestResponseDebug debug = getRequestResponseDebug();
+      try {
+        certIdOrError = caClient.unrevokeCert(issuer, getSerialNumber(), debug);
+      } finally {
+        saveRequestResponse(debug);
+      }
+    }
 
-        if (certIdOrError.getError() == null) {
-            throw new CmdFailure("releasing revocation successful but expected failure");
-        }
-        return null;
-    } // method doExecute
+    if (certIdOrError.getError() == null) {
+      throw new CmdFailure("releasing revocation successful but expected failure");
+    }
+    return null;
+  } // method doExecute
 
 }

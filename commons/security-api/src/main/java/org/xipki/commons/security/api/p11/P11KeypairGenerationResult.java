@@ -42,29 +42,30 @@ import org.xipki.commons.security.api.KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
-    private final byte[] id;
+  private final byte[] id;
 
-    private final String label;
+  private final String label;
 
-    public P11KeypairGenerationResult(
-            final byte[] id,
-            final String label,
-            final X509CertificateHolder certificate) {
-        super(certificate);
-        this.id = id;
-        this.label = label;
-    }
+  public P11KeypairGenerationResult(
+      final byte[] id,
+      final String label,
+      final X509CertificateHolder certificate) {
+    super(certificate);
+    this.id = id;
+    this.label = label;
+  }
 
-    public byte[] getId() {
-        return Arrays.copyOf(id, id.length);
-    }
+  public byte[] getId() {
+    return Arrays.copyOf(id, id.length);
+  }
 
-    public String getLabel() {
-        return label;
-    }
+  public String getLabel() {
+    return label;
+  }
 
 }

@@ -45,55 +45,56 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "crlsigner-check",
-        description = "check information of CRL signers (QA)")
+    description = "check information of CRL signers (QA)")
 @Service
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
-        String name = ey.getName();
-        out("checking CRL signer " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
+    String name = ey.getName();
+    out("checking CRL signer " + name);
 
-        X509CrlSignerEntry cs = caManager.getCrlSigner(name);
-        if (cs == null) {
-            throw new CmdFailure("CRL signer named '" + name + "' is not configured");
-        }
+    X509CrlSignerEntry cs = caManager.getCrlSigner(name);
+    if (cs == null) {
+      throw new CmdFailure("CRL signer named '" + name + "' is not configured");
+    }
 
-        if (ey.getSignerType() != null) {
-            String ex = ey.getSignerType();
-            String is = cs.getType();
-            MgmtQAShellUtil.assertEquals("signer type", ex, is);
-        }
+    if (ey.getSignerType() != null) {
+      String ex = ey.getSignerType();
+      String is = cs.getType();
+      MgmtQAShellUtil.assertEquals("signer type", ex, is);
+    }
 
-        if (ey.getSignerConf() != null) {
-            String ex = ey.getSignerConf();
-            String is = cs.getConf();
-            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
-        }
+    if (ey.getSignerConf() != null) {
+      String ex = ey.getSignerConf();
+      String is = cs.getConf();
+      MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+    }
 
-        if (ey.getCrlControl() != null) {
-            CRLControl ex = new CRLControl(ey.getCrlControl());
-            CRLControl is = new CRLControl(cs.getCrlControl());
+    if (ey.getCrlControl() != null) {
+      CRLControl ex = new CRLControl(ey.getCrlControl());
+      CRLControl is = new CRLControl(cs.getCrlControl());
 
-            if (!ex.equals(is)) {
-                throw new CmdFailure("CRL control: is '" + is.getConf()
-                    + "', but expected '" + ex.getConf() + "'");
-            }
-        }
+      if (!ex.equals(is)) {
+        throw new CmdFailure("CRL control: is '" + is.getConf()
+          + "', but expected '" + ex.getConf() + "'");
+      }
+    }
 
-        if (ey.getBase64Cert() != null) {
-            String ex = ey.getBase64Cert();
-            String is = cs.getBase64Cert();
-            MgmtQAShellUtil.assertEquals("certificate", ex, is);
-        }
+    if (ey.getBase64Cert() != null) {
+      String ex = ey.getBase64Cert();
+      String is = cs.getBase64Cert();
+      MgmtQAShellUtil.assertEquals("certificate", ex, is);
+    }
 
-        out(" checked CRL signer " + name);
-        return null;
-    } // method doExecute
+    out(" checked CRL signer " + name);
+    return null;
+  } // method doExecute
 
 }

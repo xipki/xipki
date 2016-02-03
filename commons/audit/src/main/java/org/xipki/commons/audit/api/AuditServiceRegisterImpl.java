@@ -43,74 +43,75 @@ import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<AuditService> services =
-            new ConcurrentLinkedDeque<AuditService>();
+  private ConcurrentLinkedDeque<AuditService> services =
+      new ConcurrentLinkedDeque<AuditService>();
 
-    private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
+  private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
-    private boolean auditEnabled;
+  private boolean auditEnabled;
 
-    @Override
-    public AuditService getAuditService() {
-        if (auditEnabled) {
-            return services.isEmpty()
-                    ? defaultAuditService
-                    : services.getLast();
-        } else {
-            return null;
-        }
+  @Override
+  public AuditService getAuditService() {
+    if (auditEnabled) {
+      return services.isEmpty()
+          ? defaultAuditService
+          : services.getLast();
+    } else {
+      return null;
+    }
+  }
+
+  public void bindService(
+      final AuditService service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.debug("bindService invoked with null.");
+      return;
     }
 
-    public void bindService(
-            final AuditService service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.debug("bindService invoked with null.");
-            return;
-        }
+    boolean replaced = services.remove(service);
+    services.add(service);
 
-        boolean replaced = services.remove(service);
-        services.add(service);
+    String action = replaced
+        ? "replaced"
+        : "added";
+    LOG.debug("{} AuditService binding for {}", action, service);
+  }
 
-        String action = replaced
-                ? "replaced"
-                : "added";
-        LOG.debug("{} AuditService binding for {}", action, service);
+  public void unbindService(
+      final AuditService service) {
+    //might be null if dependency is optional
+    if (service == null) {
+      LOG.debug("unbindService invoked with null.");
+      return;
     }
 
-    public void unbindService(
-            final AuditService service) {
-        //might be null if dependency is optional
-        if (service == null) {
-            LOG.debug("unbindService invoked with null.");
-            return;
-        }
-
-        try {
-            if (services.remove(service)) {
-                LOG.debug("removed AuditService binding for {}", service);
-            } else {
-                LOG.debug("no AuditService binding found to remove for '{}'", service);
-            }
-        } catch (Exception e) {
-            LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
-        }
+    try {
+      if (services.remove(service)) {
+        LOG.debug("removed AuditService binding for {}", service);
+      } else {
+        LOG.debug("no AuditService binding found to remove for '{}'", service);
+      }
+    } catch (Exception e) {
+      LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
     }
+  }
 
-    public void setAuditEnabled(
-            final boolean auditEnabled) {
-        this.auditEnabled = auditEnabled;
-    }
+  public void setAuditEnabled(
+      final boolean auditEnabled) {
+    this.auditEnabled = auditEnabled;
+  }
 
-    @Override
-    public boolean isAuditEnabled() {
-        return auditEnabled;
-    }
+  @Override
+  public boolean isAuditEnabled() {
+    return auditEnabled;
+  }
 
 }

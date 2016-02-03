@@ -59,109 +59,110 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DbDigestExportWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+  private final DataSourceWrapper dataSource;
 
-    private final String destFolder;
+  private final String destFolder;
 
-    private final int numCertsPerSelect;
+  private final int numCertsPerSelect;
 
-    private final int numThreads;
+  private final int numThreads;
 
-    public DbDigestExportWorker(
-            final DataSourceFactory dataSourceFactory,
-            final PasswordResolver passwordResolver,
-            final String dbConfFile,
-            final String destFolder,
-            final int numCertsPerSelect,
-            final int numThreads)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        File f = new File(destFolder);
-        if (!f.exists()) {
-            f.mkdirs();
-        } else {
-            if (!f.isDirectory()) {
-                throw new IOException(destFolder + " is not a folder");
-            }
+  public DbDigestExportWorker(
+      final DataSourceFactory dataSourceFactory,
+      final PasswordResolver passwordResolver,
+      final String dbConfFile,
+      final String destFolder,
+      final int numCertsPerSelect,
+      final int numThreads)
+  throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    File f = new File(destFolder);
+    if (!f.exists()) {
+      f.mkdirs();
+    } else {
+      if (!f.isDirectory()) {
+        throw new IOException(destFolder + " is not a folder");
+      }
 
-            if (!f.canWrite()) {
-                throw new IOException(destFolder + " is not writable");
-            }
-        }
-
-        String[] children = f.list();
-        if (children != null && children.length > 0) {
-            throw new IOException(destFolder + " is not empty");
-        }
-
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-        this.destFolder = destFolder;
-        this.numCertsPerSelect = numCertsPerSelect;
-        this.numThreads = numThreads;
-    } // constructor
-
-    @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
-    throws Exception {
-        long start = System.currentTimeMillis();
-
-        try {
-            DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
-            System.out.println("database schema: " + dbSchemaType);
-            DbDigestExporter digester;
-            if (dbSchemaType == DbSchemaType.EJBCA_CA_v3) {
-                digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
-                        numCertsPerSelect, dbSchemaType, numThreads);
-            } else {
-                digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
-                        numCertsPerSelect, dbSchemaType, numThreads);
-            }
-            digester.digest();
-        } finally {
-            try {
-                dataSource.shutdown();
-            } catch (Throwable e) {
-                LOG.error("dataSource.shutdown()", e);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    } // method doRun
-
-    public static DbSchemaType detectDbSchemaType(
-            final DataSourceWrapper dataSource)
-    throws DataAccessException {
-        Connection conn = dataSource.getConnection();
-        try {
-            if (dataSource.tableExists(conn, "CAINFO")
-                    && dataSource.tableExists(conn, "RAWCERT")) {
-                return DbSchemaType.XIPKI_CA_v1;
-            } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CERTHASH")) {
-                return DbSchemaType.XIPKI_OCSP_v1;
-            } else if (dataSource.tableExists(conn, "CS_CA")
-                    && dataSource.tableExists(conn, "CRAW")) {
-                return DbSchemaType.XIPKI_CA_v2;
-            } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CHASH")) {
-                return DbSchemaType.XIPKI_OCSP_v2;
-            } else if (dataSource.tableExists(conn, "CAData")
-                    && dataSource.tableExists(conn, "CertificateData")) {
-                return DbSchemaType.EJBCA_CA_v3;
-            } else {
-                throw new IllegalArgumentException("unknown database schema");
-            }
-        } finally {
-            dataSource.returnConnection(conn);
-        }
+      if (!f.canWrite()) {
+        throw new IOException(destFolder + " is not writable");
+      }
     }
+
+    String[] children = f.list();
+    if (children != null && children.length > 0) {
+      throw new IOException(destFolder + " is not empty");
+    }
+
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+    this.destFolder = destFolder;
+    this.numCertsPerSelect = numCertsPerSelect;
+    this.numThreads = numThreads;
+  } // constructor
+
+  @Override
+  public void doRun(
+      final AtomicBoolean stopMe)
+  throws Exception {
+    long start = System.currentTimeMillis();
+
+    try {
+      DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
+      System.out.println("database schema: " + dbSchemaType);
+      DbDigestExporter digester;
+      if (dbSchemaType == DbSchemaType.EJBCA_CA_v3) {
+        digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
+            numCertsPerSelect, dbSchemaType, numThreads);
+      } else {
+        digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
+            numCertsPerSelect, dbSchemaType, numThreads);
+      }
+      digester.digest();
+    } finally {
+      try {
+        dataSource.shutdown();
+      } catch (Throwable e) {
+        LOG.error("dataSource.shutdown()", e);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+    }
+  } // method doRun
+
+  public static DbSchemaType detectDbSchemaType(
+      final DataSourceWrapper dataSource)
+  throws DataAccessException {
+    Connection conn = dataSource.getConnection();
+    try {
+      if (dataSource.tableExists(conn, "CAINFO")
+          && dataSource.tableExists(conn, "RAWCERT")) {
+        return DbSchemaType.XIPKI_CA_v1;
+      } else if (dataSource.tableExists(conn, "ISSUER")
+          && dataSource.tableExists(conn, "CERTHASH")) {
+        return DbSchemaType.XIPKI_OCSP_v1;
+      } else if (dataSource.tableExists(conn, "CS_CA")
+          && dataSource.tableExists(conn, "CRAW")) {
+        return DbSchemaType.XIPKI_CA_v2;
+      } else if (dataSource.tableExists(conn, "ISSUER")
+          && dataSource.tableExists(conn, "CHASH")) {
+        return DbSchemaType.XIPKI_OCSP_v2;
+      } else if (dataSource.tableExists(conn, "CAData")
+          && dataSource.tableExists(conn, "CertificateData")) {
+        return DbSchemaType.EJBCA_CA_v3;
+      } else {
+        throw new IllegalArgumentException("unknown database schema");
+      }
+    } finally {
+      dataSource.returnConnection(conn);
+    }
+  }
 
 }

@@ -42,62 +42,63 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class NameIdStore {
 
-    private final String table;
+  private final String table;
 
-    private final Map<String, Integer> entries;
+  private final Map<String, Integer> entries;
 
-    NameIdStore(
-            final String table,
-            final Map<String, Integer> entries) {
-        this.table = table;
-        this.entries = new HashMap<>();
+  NameIdStore(
+      final String table,
+      final Map<String, Integer> entries) {
+    this.table = table;
+    this.entries = new HashMap<>();
 
-        for (String name : entries.keySet()) {
-            addEntry(name, entries.get(name));
-        }
+    for (String name : entries.keySet()) {
+      addEntry(name, entries.get(name));
+    }
+  }
+
+  void addEntry(
+      final String name,
+      final Integer id) {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotNull("id", id);
+
+    if (entries.containsKey(name)) {
+      throw new IllegalArgumentException(
+          "entry with the same name " + name + " already available");
     }
 
-    void addEntry(
-            final String name,
-            final Integer id) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotNull("id", id);
-
-        if (entries.containsKey(name)) {
-            throw new IllegalArgumentException(
-                    "entry with the same name " + name + " already available");
-        }
-
-        if (entries.containsValue(id)) {
-            throw new IllegalArgumentException(
-                    "entry with the same id " + id + " already available");
-        }
-
-        entries.put(name, id);
+    if (entries.containsValue(id)) {
+      throw new IllegalArgumentException(
+          "entry with the same id " + id + " already available");
     }
 
-    String getName(
-            final Integer id) {
-        for (String name : entries.keySet()) {
-            if (id == entries.get(name)) {
-                return name;
-            }
-        }
+    entries.put(name, id);
+  }
 
-        return null;
+  String getName(
+      final Integer id) {
+    for (String name : entries.keySet()) {
+      if (id == entries.get(name)) {
+        return name;
+      }
     }
 
-    Integer getId(
-            final String name) {
-        return entries.get(name);
-    }
+    return null;
+  }
 
-    public String getTable() {
-        return table;
-    }
+  Integer getId(
+      final String name) {
+    return entries.get(name);
+  }
+
+  public String getTable() {
+    return table;
+  }
 
 }

@@ -37,56 +37,57 @@ package org.xipki.commons.audit.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum AuditLevel {
 
-    ERROR    (3, "ERROR    "),
-    WARN     (4, "WARN     "),
-    INFO     (6, "INFO     "),
-    DEBUG    (7, "DEBUG    ");
+  ERROR(3, "ERROR  "),
+  WARN(4, "WARN   "),
+  INFO(6, "INFO   "),
+  DEBUG(7, "DEBUG  ");
 
-    private final int value;
+  private final int value;
 
-    private final String alignedText;
+  private final String alignedText;
 
-    private AuditLevel(
-            final int value,
-            final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
+  private AuditLevel(
+      final int value,
+      final String alignedText) {
+    this.value = value;
+    this.alignedText = alignedText;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
+  public static final AuditLevel forName(
+      final String name) {
+    if (name == null) {
+      return null;
     }
 
-    public int getValue() {
+    for (AuditLevel value : values()) {
+      if (value.name().equals(name)) {
         return value;
+      }
     }
+    return null;
+  }
 
-    public static final AuditLevel forName(
-            final String name) {
-        if (name == null) {
-            return null;
-        }
-
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        return null;
+  public static final AuditLevel forValue(
+      final int value) {
+    for (AuditLevel v : values()) {
+      if (v.getValue() == value) {
+        return v;
+      }
     }
+    return null;
+  }
 
-    public static final AuditLevel forValue(
-            final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        return null;
-    }
-
-    public String getAlignedText() {
-        return alignedText;
-    }
+  public String getAlignedText() {
+    return alignedText;
+  }
 
 }

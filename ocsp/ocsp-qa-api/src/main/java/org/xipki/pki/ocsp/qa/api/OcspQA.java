@@ -45,17 +45,18 @@ import org.xipki.commons.common.qa.ValidationResult;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface OcspQA {
 
-    ValidationResult checkOCSP(
-            OCSPResp response,
-            X509Certificate issuer,
-            List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts,
-            OcspError expectedOcspError,
-            Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            OcspResponseOption responseOption);
+  ValidationResult checkOCSP(
+      OCSPResp response,
+      X509Certificate issuer,
+      List<BigInteger> serialNumbers,
+      Map<BigInteger, byte[]> encodedCerts,
+      OcspError expectedOcspError,
+      Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+      OcspResponseOption responseOption);
 
 }

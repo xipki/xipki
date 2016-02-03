@@ -43,45 +43,46 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class RevokeCertRequestEntryType extends IssuerSerialEntryType {
 
-    private final int reason;
+  private final int reason;
 
-    private final Date invalidityDate;
+  private final Date invalidityDate;
 
-    public RevokeCertRequestEntryType(
-            final String id,
-            final X509Certificate cert,
-            final int reason,
-            final Date invalidityDate) {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber(), reason, invalidityDate);
+  public RevokeCertRequestEntryType(
+      final String id,
+      final X509Certificate cert,
+      final int reason,
+      final Date invalidityDate) {
+    this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+        cert.getSerialNumber(), reason, invalidityDate);
+  }
+
+  public RevokeCertRequestEntryType(
+      final String id,
+      final X500Name issuer,
+      final BigInteger serialNumber,
+      final int reason,
+      final Date invalidityDate) {
+    super(id, issuer, serialNumber);
+
+    if (!(reason >= 0 && reason <= 10 && reason != 7)) {
+      throw new IllegalArgumentException("invalid reason: " + reason);
     }
 
-    public RevokeCertRequestEntryType(
-            final String id,
-            final X500Name issuer,
-            final BigInteger serialNumber,
-            final int reason,
-            final Date invalidityDate) {
-        super(id, issuer, serialNumber);
+    this.reason = reason;
+    this.invalidityDate = invalidityDate;
+  }
 
-        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-            throw new IllegalArgumentException("invalid reason: " + reason);
-        }
+  public int getReason() {
+    return reason;
+  }
 
-        this.reason = reason;
-        this.invalidityDate = invalidityDate;
-    }
-
-    public int getReason() {
-        return reason;
-    }
-
-    public Date getInvalidityDate() {
-        return invalidityDate;
-    }
+  public Date getInvalidityDate() {
+    return invalidityDate;
+  }
 
 }

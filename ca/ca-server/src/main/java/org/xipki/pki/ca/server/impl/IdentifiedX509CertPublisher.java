@@ -55,129 +55,130 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class IdentifiedX509CertPublisher {
 
-    private final PublisherEntry entry;
+  private final PublisherEntry entry;
 
-    private final X509CertPublisher certPublisher;
+  private final X509CertPublisher certPublisher;
 
-    public IdentifiedX509CertPublisher(
-            final PublisherEntry entry,
-            final String realType)
-    throws CertPublisherException {
-        ParamUtil.assertNotNull("entry", entry);
+  public IdentifiedX509CertPublisher(
+      final PublisherEntry entry,
+      final String realType)
+  throws CertPublisherException {
+    ParamUtil.assertNotNull("entry", entry);
 
-        this.entry = entry;
+    this.entry = entry;
 
-        final String type = (realType == null)
-                ? entry.getType()
-                : realType;
+    final String type = (realType == null)
+        ? entry.getType()
+        : realType;
 
-        X509CertPublisher realPublisher;
-        if ("ocsp".equalsIgnoreCase(type)) {
-            realPublisher = new OCSPCertPublisher();
-        } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
-            String className = type.substring("java:".length());
-            try {
-                Class<?> clazz = Class.forName(className);
-                realPublisher = (X509CertPublisher) clazz.newInstance();
-            } catch (Exception e) {
-                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            }
-        } else {
-            throw new CertPublisherException("invalid type " + type);
-        }
-        this.certPublisher = realPublisher;
-    } // constructor
-
-    public void initialize(
-            final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> dataSources)
-    throws CertPublisherException {
-        certPublisher.initialize(entry.getConf(), passwordResolver, dataSources);
+    X509CertPublisher realPublisher;
+    if ("ocsp".equalsIgnoreCase(type)) {
+      realPublisher = new OCSPCertPublisher();
+    } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
+      String className = type.substring("java:".length());
+      try {
+        Class<?> clazz = Class.forName(className);
+        realPublisher = (X509CertPublisher) clazz.newInstance();
+      } catch (Exception e) {
+        throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
+      }
+    } else {
+      throw new CertPublisherException("invalid type " + type);
     }
+    this.certPublisher = realPublisher;
+  } // constructor
 
-    public void setEnvParameterResolver(
-            final EnvParameterResolver parameterResolver) {
-        certPublisher.setEnvParameterResolver(parameterResolver);
-    }
+  public void initialize(
+      final PasswordResolver passwordResolver,
+      final Map<String, DataSourceWrapper> dataSources)
+  throws CertPublisherException {
+    certPublisher.initialize(entry.getConf(), passwordResolver, dataSources);
+  }
 
-    public boolean issuerAdded(
-            final X509Cert issuerCert) {
-        return certPublisher.issuerAdded(issuerCert);
-    }
+  public void setEnvParameterResolver(
+      final EnvParameterResolver parameterResolver) {
+    certPublisher.setEnvParameterResolver(parameterResolver);
+  }
 
-    public boolean certificateAdded(
-            final X509CertificateInfo certInfo) {
-        return certPublisher.certificateAdded(certInfo);
-    }
+  public boolean issuerAdded(
+      final X509Cert issuerCert) {
+    return certPublisher.issuerAdded(issuerCert);
+  }
 
-    public boolean certificateRevoked(
-            final X509Cert issuerCert,
-            final X509CertWithDBCertId cert,
-            final String certprofile,
-            final CertRevocationInfo revInfo) {
-        return certPublisher.certificateRevoked(issuerCert, cert, certprofile, revInfo);
-    }
+  public boolean certificateAdded(
+      final X509CertificateInfo certInfo) {
+    return certPublisher.certificateAdded(certInfo);
+  }
 
-    public boolean crlAdded(
-            final X509Cert caCert,
-            final X509CRL crl) {
-        return certPublisher.crlAdded(caCert, crl);
-    }
+  public boolean certificateRevoked(
+      final X509Cert issuerCert,
+      final X509CertWithDBCertId cert,
+      final String certprofile,
+      final CertRevocationInfo revInfo) {
+    return certPublisher.certificateRevoked(issuerCert, cert, certprofile, revInfo);
+  }
 
-    public PublisherEntry getDbEntry() {
-        return entry;
-    }
+  public boolean crlAdded(
+      final X509Cert caCert,
+      final X509CRL crl) {
+    return certPublisher.crlAdded(caCert, crl);
+  }
 
-    public String getName() {
-        return entry.getName();
-    }
+  public PublisherEntry getDbEntry() {
+    return entry;
+  }
 
-    public boolean isHealthy() {
-        return certPublisher.isHealthy();
-    }
+  public String getName() {
+    return entry.getName();
+  }
 
-    public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister) {
-        certPublisher.setAuditServiceRegister(auditServiceRegister);
-    }
+  public boolean isHealthy() {
+    return certPublisher.isHealthy();
+  }
 
-    public boolean caRevoked(
-            final X509Cert caCert,
-            final CertRevocationInfo revocationInfo) {
-        return certPublisher.caRevoked(caCert, revocationInfo);
-    }
+  public void setAuditServiceRegister(
+      final AuditServiceRegister auditServiceRegister) {
+    certPublisher.setAuditServiceRegister(auditServiceRegister);
+  }
 
-    public boolean caUnrevoked(
-            final X509Cert caCert) {
-        return certPublisher.caUnrevoked(caCert);
-    }
+  public boolean caRevoked(
+      final X509Cert caCert,
+      final CertRevocationInfo revocationInfo) {
+    return certPublisher.caRevoked(caCert, revocationInfo);
+  }
 
-    public boolean certificateUnrevoked(
-            final X509Cert issuerCert,
-            final X509CertWithDBCertId cert) {
-        return certPublisher.certificateUnrevoked(issuerCert, cert);
-    }
+  public boolean caUnrevoked(
+      final X509Cert caCert) {
+    return certPublisher.caUnrevoked(caCert);
+  }
 
-    public boolean certificateRemoved(
-            final X509Cert issuerCert,
-            final X509CertWithDBCertId cert) {
-        return certPublisher.certificateRemoved(issuerCert, cert);
-    }
+  public boolean certificateUnrevoked(
+      final X509Cert issuerCert,
+      final X509CertWithDBCertId cert) {
+    return certPublisher.certificateUnrevoked(issuerCert, cert);
+  }
 
-    public boolean isAsyn() {
-        return certPublisher.isAsyn();
-    }
+  public boolean certificateRemoved(
+      final X509Cert issuerCert,
+      final X509CertWithDBCertId cert) {
+    return certPublisher.certificateRemoved(issuerCert, cert);
+  }
 
-    public void shutdown() {
-        certPublisher.shutdown();
-    }
+  public boolean isAsyn() {
+    return certPublisher.isAsyn();
+  }
 
-    public boolean publishsGoodCert() {
-        return certPublisher.publishsGoodCert();
-    }
+  public void shutdown() {
+    certPublisher.shutdown();
+  }
+
+  public boolean publishsGoodCert() {
+    return certPublisher.publishsGoodCert();
+  }
 
 }

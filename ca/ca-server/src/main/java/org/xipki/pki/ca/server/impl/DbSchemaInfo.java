@@ -49,47 +49,48 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DbSchemaInfo {
-    private final Map<String, String> variables = new HashMap<>();
+  private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(DataSourceWrapper dataSource)
-    throws DataAccessException {
-        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
-        Connection c = dataSource.getConnection();
-        if (c == null) {
-            throw new DataAccessException("could not get connection");
-        }
-
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = dataSource.createStatement(c);
-            if (stmt == null) {
-                throw new DataAccessException("could not create statement");
-            }
-
-            rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String name = rs.getString("NAME");
-                String value = rs.getString("VALUE2");
-                variables.put(name, value);
-            }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
-        } finally {
-            dataSource.releaseResources(stmt, rs);
-        }
-    } // constructor
-
-    public Set<String> getVariableNames() {
-        return Collections.unmodifiableSet(variables.keySet());
+  public DbSchemaInfo(DataSourceWrapper dataSource)
+  throws DataAccessException {
+    final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+    Connection c = dataSource.getConnection();
+    if (c == null) {
+      throw new DataAccessException("could not get connection");
     }
 
-    public String getVariableValue(String variableName) {
-        return variables.get(variableName);
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+      stmt = dataSource.createStatement(c);
+      if (stmt == null) {
+        throw new DataAccessException("could not create statement");
+      }
+
+      rs = stmt.executeQuery(sql);
+      while (rs.next()) {
+        String name = rs.getString("NAME");
+        String value = rs.getString("VALUE2");
+        variables.put(name, value);
+      }
+    } catch (SQLException e) {
+      throw dataSource.translate(sql, e);
+    } finally {
+      dataSource.releaseResources(stmt, rs);
     }
+  } // constructor
+
+  public Set<String> getVariableNames() {
+    return Collections.unmodifiableSet(variables.keySet());
+  }
+
+  public String getVariableValue(String variableName) {
+    return variables.get(variableName);
+  }
 
 }

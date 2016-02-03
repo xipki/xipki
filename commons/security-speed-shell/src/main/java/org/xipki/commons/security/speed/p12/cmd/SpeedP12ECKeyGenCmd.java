@@ -45,23 +45,24 @@ import org.xipki.commons.security.speed.p12.P12ECKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-gen-p12",
-        description = "performance test of PKCS#12 EC key generation")
+    description = "performance test of PKCS#12 EC key generation")
 public class SpeedP12ECKeyGenCmd extends SingleSpeedCommandSupport {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      required = true,
+      description = "EC curve name\n"
+          + "(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected LoadExecutor getTester()
-    throws Exception {
-        return new P12ECKeyGenLoadTest(curveName, securityFactory);
-    }
+  @Override
+  protected LoadExecutor getTester()
+  throws Exception {
+    return new P12ECKeyGenLoadTest(curveName, securityFactory);
+  }
 
 }

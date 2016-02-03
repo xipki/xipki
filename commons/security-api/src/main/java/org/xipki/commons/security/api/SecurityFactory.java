@@ -52,85 +52,86 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface SecurityFactory {
 
-    String DEFAULT_P11MODULE_NAME = "default";
+  String DEFAULT_P11MODULE_NAME = "default";
 
-    Set<String> getPkcs11ModuleNames();
+  Set<String> getPkcs11ModuleNames();
 
-    String getDefaultPkcs11ModuleName();
+  String getDefaultPkcs11ModuleName();
 
-    PasswordResolver getPasswordResolver();
+  PasswordResolver getPasswordResolver();
 
-    KeyCertPair createPrivateKeyAndCert(
-            String type,
-            String conf,
-            X509Certificate cert)
-    throws SignerException;
+  KeyCertPair createPrivateKeyAndCert(
+      String type,
+      String conf,
+      X509Certificate cert)
+  throws SignerException;
 
-    ConcurrentContentSigner createSigner(
-            String type,
-            String conf,
-            X509Certificate cert)
-    throws SignerException;
+  ConcurrentContentSigner createSigner(
+      String type,
+      String conf,
+      X509Certificate cert)
+  throws SignerException;
 
-    ConcurrentContentSigner createSigner(
-            String type,
-            String conf,
-            X509Certificate[] certs)
-    throws SignerException;
+  ConcurrentContentSigner createSigner(
+      String type,
+      String conf,
+      X509Certificate[] certs)
+  throws SignerException;
 
-    ConcurrentContentSigner createSigner(
-            String type,
-            String confWithoutAlgo,
-            String hashAlgo,
-            SignatureAlgoControl sigAlgoControl,
-            X509Certificate cert)
-    throws SignerException;
+  ConcurrentContentSigner createSigner(
+      String type,
+      String confWithoutAlgo,
+      String hashAlgo,
+      SignatureAlgoControl sigAlgoControl,
+      X509Certificate cert)
+  throws SignerException;
 
-    ConcurrentContentSigner createSigner(
-            String type,
-            String confWithoutAlgo,
-            String hashAlgo,
-            SignatureAlgoControl sigAlgoControl,
-            X509Certificate[] certs)
-    throws SignerException;
+  ConcurrentContentSigner createSigner(
+      String type,
+      String confWithoutAlgo,
+      String hashAlgo,
+      SignatureAlgoControl sigAlgoControl,
+      X509Certificate[] certs)
+  throws SignerException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            PublicKey publicKey)
-    throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(
+      PublicKey publicKey)
+  throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            X509Certificate cert)
-    throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(
+      X509Certificate cert)
+  throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            X509CertificateHolder cert)
-    throws InvalidKeyException;
+  ContentVerifierProvider getContentVerifierProvider(
+      X509CertificateHolder cert)
+  throws InvalidKeyException;
 
-    PublicKey generatePublicKey(
-            SubjectPublicKeyInfo subjectPublicKeyInfo)
-    throws InvalidKeyException;
+  PublicKey generatePublicKey(
+      SubjectPublicKeyInfo subjectPublicKeyInfo)
+  throws InvalidKeyException;
 
-    boolean verifyPOPO(
-            CertificationRequest p10Req);
+  boolean verifyPOPO(
+      CertificationRequest p10Req);
 
-    P11CryptService getP11CryptService(
-            String moduleName)
-    throws SignerException;
+  P11CryptService getP11CryptService(
+      String moduleName)
+  throws SignerException;
 
-    PublicKey getPkcs11PublicKey(
-            String moduleName,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
-    throws InvalidKeyException;
+  PublicKey getPkcs11PublicKey(
+      String moduleName,
+      P11SlotIdentifier slotId,
+      P11KeyIdentifier keyId)
+  throws InvalidKeyException;
 
-    String getPkcs11Provider();
+  String getPkcs11Provider();
 
-    SecureRandom getRandom4Sign();
+  SecureRandom getRandom4Sign();
 
-    SecureRandom getRandom4Key();
+  SecureRandom getRandom4Key();
 
 }

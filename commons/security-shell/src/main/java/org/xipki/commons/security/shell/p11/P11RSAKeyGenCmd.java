@@ -45,42 +45,43 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "rsa",
-        description = "generate RSA keypair in PKCS#11 device")
+    description = "generate RSA keypair in PKCS#11 device")
 @Service
 public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
 
-    @Option(name = "--key-size",
-            description = "keysize in bit")
-    private Integer keysize = 2048;
+  @Option(name = "--key-size",
+      description = "keysize in bit")
+  private Integer keysize = 2048;
 
-    @Option(name = "-e",
-            description = "public exponent")
-    private String publicExponent = "0x10001";
+  @Option(name = "-e",
+      description = "public exponent")
+  private String publicExponent = "0x10001";
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (keysize % 1024 != 0) {
-            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-        }
-
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if (noCert) {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-                    label);
-            finalize(keyId);
-        } else {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (keysize % 1024 != 0) {
+      throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
     }
+
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    if (noCert) {
+      P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+          label);
+      finalize(keyId);
+    } else {
+      P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
+          keysize, toBigInt(publicExponent),
+          label, getSubject(),
+          getKeyUsage(),
+          getExtendedKeyUsage());
+      finalize(keyAndCert);
+    }
+    return null;
+  }
 
 }

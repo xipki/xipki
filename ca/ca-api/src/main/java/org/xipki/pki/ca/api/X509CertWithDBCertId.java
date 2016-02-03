@@ -39,30 +39,31 @@ import java.security.cert.X509Certificate;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509CertWithDBCertId extends X509Cert {
 
-    private Integer certId;
+  private Integer certId;
 
-    public X509CertWithDBCertId(
-            final X509Certificate cert) {
-        super(cert);
-    }
+  public X509CertWithDBCertId(
+      final X509Certificate cert) {
+    super(cert);
+  }
 
-    public X509CertWithDBCertId(
-            final X509Certificate cert,
-            final byte[] encodedCert) {
-        super(cert, encodedCert);
-    }
+  public X509CertWithDBCertId(
+      final X509Certificate cert,
+      final byte[] encodedCert) {
+    super(cert, encodedCert);
+  }
 
-    public Integer getCertId() {
-        return certId;
-    }
+  public Integer getCertId() {
+    return certId;
+  }
 
-    public void setCertId(
-            final Integer certId) {
-        this.certId = certId;
-    }
+  public void setCertId(
+      final Integer certId) {
+    this.certId = certId;
+  }
 
 }

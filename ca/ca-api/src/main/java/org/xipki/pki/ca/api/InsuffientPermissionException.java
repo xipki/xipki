@@ -37,15 +37,16 @@ package org.xipki.pki.ca.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class InsuffientPermissionException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public InsuffientPermissionException(
-            final String message) {
-        super(message);
-    }
+  public InsuffientPermissionException(
+      final String message) {
+    super(message);
+  }
 
 }

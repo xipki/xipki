@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaGenRootCACmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-gen-rca",
-        description = "generate selfsigned CA (negative, QA)")
+    description = "generate selfsigned CA (negative, QA)")
 @Service
 public class NegCaGenRootCACmd extends CaGenRootCACmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-gen-rca");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-gen-rca");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

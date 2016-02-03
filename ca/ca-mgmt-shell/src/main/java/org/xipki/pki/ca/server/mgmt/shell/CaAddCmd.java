@@ -47,30 +47,31 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "ca-add",
-        description = "add CA")
+    description = "add CA")
 @Service
 public class CaAddCmd extends CaAddOrGenCommandSupport {
 
-    @Option(name = "--cert",
-            description = "CA certificate file")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      description = "CA certificate file")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        X509CAEntry caEntry = getCAEntry();
-        if (certFile != null) {
-            X509Certificate caCert = X509Util.parseCert(certFile);
-            caEntry.setCertificate(caCert);
-        }
-
-        boolean b = caManager.addCA(caEntry);
-        output(b, "added", "could not add", "CA " + caEntry.getName());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    X509CAEntry caEntry = getCAEntry();
+    if (certFile != null) {
+      X509Certificate caCert = X509Util.parseCert(certFile);
+      caEntry.setCertificate(caCert);
     }
+
+    boolean b = caManager.addCA(caEntry);
+    output(b, "added", "could not add", "CA " + caEntry.getName());
+    return null;
+  }
 
 }

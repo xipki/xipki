@@ -39,35 +39,36 @@ import org.bouncycastle.util.encoders.Hex;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class OCSPNonceUnmatchedException extends OCSPResponseException {
 
-    public OCSPNonceUnmatchedException(
-            final byte[] expected,
-            final byte[] is) {
-        super(buildMessage(expected, is));
-    }
+  public OCSPNonceUnmatchedException(
+      final byte[] expected,
+      final byte[] is) {
+    super(buildMessage(expected, is));
+  }
 
-    private static String buildMessage(
-            final byte[] expected,
-            final byte[] is) {
-        StringBuilder sb = new StringBuilder(100);
-        sb.append("nonce unmatch (received ");
-        if (is == null || is.length == 0) {
-            sb.append("none");
-        } else {
-            sb.append(Hex.toHexString(is));
-        }
-        sb.append(", but expected ");
-        if (expected == null || expected.length == 0) {
-            sb.append("nonce");
-        } else {
-            sb.append(Hex.toHexString(expected));
-        }
-        sb.append(")");
-        return sb.toString();
+  private static String buildMessage(
+      final byte[] expected,
+      final byte[] is) {
+    StringBuilder sb = new StringBuilder(100);
+    sb.append("nonce unmatch (received ");
+    if (is == null || is.length == 0) {
+      sb.append("none");
+    } else {
+      sb.append(Hex.toHexString(is));
     }
+    sb.append(", but expected ");
+    if (expected == null || expected.length == 0) {
+      sb.append("nonce");
+    } else {
+      sb.append(Hex.toHexString(expected));
+    }
+    sb.append(")");
+    return sb.toString();
+  }
 
 }

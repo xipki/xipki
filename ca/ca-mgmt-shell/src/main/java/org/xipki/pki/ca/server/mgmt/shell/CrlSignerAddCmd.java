@@ -49,68 +49,69 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-add",
-        description = "add CRL signer")
+    description = "add CRL signer")
 @Service
 public class CrlSignerAddCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CRL signer name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "CRL signer name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--signer-type",
-            required = true,
-            description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n"
-                    + "(required)")
-    @Completion(CrlSignerNameCompleter.class)
-    private String signerType;
+  @Option(name = "--signer-type",
+      required = true,
+      description = "CRL signer type, use 'CA' to sign the CRL by the CA itself\n"
+          + "(required)")
+  @Completion(CrlSignerNameCompleter.class)
+  private String signerType;
 
-    @Option(name = "--signer-conf",
-            description = "CRL signer configuration")
-    private String signerConf;
+  @Option(name = "--signer-conf",
+      description = "CRL signer configuration")
+  private String signerConf;
 
-    @Option(name = "--cert",
-            description = "CRL signer's certificate file")
-    @Completion(FilePathCompleter.class)
-    private String signerCertFile;
+  @Option(name = "--cert",
+      description = "CRL signer's certificate file")
+  @Completion(FilePathCompleter.class)
+  private String signerCertFile;
 
-    @Option(name = "--control",
-            required = true,
-            description = "CRL control\n"
-                    + "(required)")
-    private String crlControl;
+  @Option(name = "--control",
+      required = true,
+      description = "CRL control\n"
+          + "(required)")
+  private String crlControl;
 
-    @Reference
-    private PasswordResolver passwordResolver;
+  @Reference
+  private PasswordResolver passwordResolver;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        String base64Cert = null;
-        if (!"CA".equalsIgnoreCase(signerType)) {
-            if (signerCertFile != null) {
-                byte[] encodedCert = IoUtil.read(signerCertFile);
-                base64Cert = IoUtil.base64Encode(encodedCert, false);
-                X509Util.parseCert(encodedCert);
-            }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    String base64Cert = null;
+    if (!"CA".equalsIgnoreCase(signerType)) {
+      if (signerCertFile != null) {
+        byte[] encodedCert = IoUtil.read(signerCertFile);
+        base64Cert = IoUtil.base64Encode(encodedCert, false);
+        X509Util.parseCert(encodedCert);
+      }
 
-            if (signerConf != null) {
-                if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-                    signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-                            signerConf, passwordResolver);
-                }
-            }
+      if (signerConf != null) {
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+          signerConf = ShellUtil.canonicalizeSignerConf(signerType,
+              signerConf, passwordResolver);
         }
-
-        X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf,
-                base64Cert, crlControl);
-        boolean b = caManager.addCrlSigner(entry);
-        output(b, "added", "could not add", "CRL signer " + name);
-        return null;
+      }
     }
+
+    X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf,
+        base64Cert, crlControl);
+    boolean b = caManager.addCrlSigner(entry);
+    output(b, "added", "could not add", "CRL signer " + name);
+    return null;
+  }
 
 }

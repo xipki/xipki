@@ -40,61 +40,62 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PKIStatusInfo {
 
-    private final int status;
+  private final int status;
 
-    private final int pkiFailureInfo;
+  private final int pkiFailureInfo;
 
-    private final String statusMessage;
+  private final String statusMessage;
 
-    public PKIStatusInfo(
-            final int status,
-            final int pkiFailureInfo,
-            final String statusMessage) {
-        this.status = status;
-        this.pkiFailureInfo = pkiFailureInfo;
-        this.statusMessage = statusMessage;
+  public PKIStatusInfo(
+      final int status,
+      final int pkiFailureInfo,
+      final String statusMessage) {
+    this.status = status;
+    this.pkiFailureInfo = pkiFailureInfo;
+    this.statusMessage = statusMessage;
+  }
+
+  public PKIStatusInfo(
+      final int status) {
+    this.status = status;
+    this.pkiFailureInfo = 0;
+    this.statusMessage = null;
+  }
+
+  public PKIStatusInfo(
+      final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
+    this.status = bcPKIStatusInfo.getStatus().intValue();
+    if (bcPKIStatusInfo.getFailInfo() != null) {
+      this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
+    } else {
+      this.pkiFailureInfo = 0;
     }
+    PKIFreeText text = bcPKIStatusInfo.getStatusString();
+    this.statusMessage = (text == null)
+        ? null
+        : text.getStringAt(0).getString();
+  }
 
-    public PKIStatusInfo(
-            final int status) {
-        this.status = status;
-        this.pkiFailureInfo = 0;
-        this.statusMessage = null;
-    }
+  public int getStatus() {
+    return status;
+  }
 
-    public PKIStatusInfo(
-            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
-        this.status = bcPKIStatusInfo.getStatus().intValue();
-        if (bcPKIStatusInfo.getFailInfo() != null) {
-            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
-        } else {
-            this.pkiFailureInfo = 0;
-        }
-        PKIFreeText text = bcPKIStatusInfo.getStatusString();
-        this.statusMessage = (text == null)
-                ? null
-                : text.getStringAt(0).getString();
-    }
+  public int getPkiFailureInfo() {
+    return pkiFailureInfo;
+  }
 
-    public int getStatus() {
-        return status;
-    }
+  public String getStatusMessage() {
+    return statusMessage;
+  }
 
-    public int getPkiFailureInfo() {
-        return pkiFailureInfo;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
-    }
-
-    @Override
-    public String toString() {
-        return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
-    }
+  @Override
+  public String toString() {
+    return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
+  }
 
 }

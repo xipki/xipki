@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileAddCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-profile-add",
-        description = "add certificate profile (negative, QA)")
+    description = "add certificate profile (negative, QA)")
 @Service
 public class NegProfileAddCmd extends ProfileAddCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-profile-add");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-profile-add");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

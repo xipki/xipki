@@ -47,75 +47,76 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 abstract class AbstractP11DSASigner implements Signer {
 
-    private final Digest digest;
+  private final Digest digest;
 
-    protected P11KeyParameter param;
+  protected P11KeyParameter param;
 
-    protected abstract byte[] sign(
-            final byte[] hashValue)
-    throws SignerException;
+  protected abstract byte[] sign(
+      final byte[] hashValue)
+  throws SignerException;
 
-    public AbstractP11DSASigner(
-            final Digest digest) {
-        ParamUtil.assertNotNull("digest", digest);
-        this.digest = digest;
+  public AbstractP11DSASigner(
+      final Digest digest) {
+    ParamUtil.assertNotNull("digest", digest);
+    this.digest = digest;
+  }
+
+  @Override
+  public void init(
+      final boolean forSigning,
+      final CipherParameters param) {
+    if (!forSigning) {
+      throw new RuntimeCryptoException("verification mode not supported.");
     }
 
-    @Override
-    public void init(
-            final boolean forSigning,
-            final CipherParameters param) {
-        if (!forSigning) {
-            throw new RuntimeCryptoException("verification mode not supported.");
-        }
-
-        if (!(param instanceof P11KeyParameter)) {
-            throw new IllegalArgumentException("invalid param type "  + param.getClass().getName());
-        }
-        this.param = (P11KeyParameter) param;
-        reset();
+    if (!(param instanceof P11KeyParameter)) {
+      throw new IllegalArgumentException("invalid param type "  + param.getClass().getName());
     }
+    this.param = (P11KeyParameter) param;
+    reset();
+  }
 
-    @Override
-    public void update(
-            final byte b) {
-        digest.update(b);
+  @Override
+  public void update(
+      final byte b) {
+    digest.update(b);
+  }
+
+  @Override
+  public void update(
+      final byte[] in,
+      final int off,
+      final int len) {
+    digest.update(in, off, len);
+  }
+
+  @Override
+  public byte[] generateSignature()
+  throws CryptoException, DataLengthException {
+    byte[] digestValue = new byte[digest.getDigestSize()];
+    digest.doFinal(digestValue, 0);
+
+    try {
+      return sign(digestValue);
+    } catch (SignerException e) {
+      throw new InvalidCipherTextException("SignerException: " + e.getMessage());
     }
+  }
 
-    @Override
-    public void update(
-            final byte[] in,
-            final int off,
-            final int len) {
-        digest.update(in, off, len);
-    }
+  @Override
+  public boolean verifySignature(
+      final byte[] signature) {
+    throw new UnsupportedOperationException("verifySignature not supported");
+  }
 
-    @Override
-    public byte[] generateSignature()
-    throws CryptoException, DataLengthException {
-        byte[] digestValue = new byte[digest.getDigestSize()];
-        digest.doFinal(digestValue, 0);
-
-        try {
-            return sign(digestValue);
-        } catch (SignerException e) {
-            throw new InvalidCipherTextException("SignerException: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public boolean verifySignature(
-            final byte[] signature) {
-        throw new UnsupportedOperationException("verifySignature not supported");
-    }
-
-    @Override
-    public void reset() {
-        digest.reset();
-    }
+  @Override
+  public void reset() {
+    digest.reset();
+  }
 
 }

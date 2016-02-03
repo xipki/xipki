@@ -42,41 +42,42 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class FingerprintCertificateValidator implements CACertValidator {
 
-    private static final HashAlgoType DEFAULT_HASHALGO = HashAlgoType.SHA256;
+  private static final HashAlgoType DEFAULT_HASHALGO = HashAlgoType.SHA256;
 
-    private HashAlgoType hashAlgo;
+  private HashAlgoType hashAlgo;
 
-    public HashAlgoType getHashAlgo() {
-        return hashAlgo;
+  public HashAlgoType getHashAlgo() {
+    return hashAlgo;
+  }
+
+  public void setHashAlgo(
+      final HashAlgoType hashAlgo) {
+    this.hashAlgo = hashAlgo;
+  }
+
+  @Override
+  public boolean isTrusted(
+      final X509Certificate cert) {
+    HashAlgoType algo = (hashAlgo == null)
+        ? DEFAULT_HASHALGO
+        : hashAlgo;
+    byte[] actual;
+    try {
+      actual = algo.digest(cert.getEncoded());
+    } catch (CertificateEncodingException e) {
+      return false;
     }
 
-    public void setHashAlgo(
-            final HashAlgoType hashAlgo) {
-        this.hashAlgo = hashAlgo;
-    }
+    return isCertTrusted(algo, actual);
+  }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        HashAlgoType algo = (hashAlgo == null)
-                ? DEFAULT_HASHALGO
-                : hashAlgo;
-        byte[] actual;
-        try {
-            actual = algo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
-
-        return isCertTrusted(algo, actual);
-    }
-
-    protected abstract boolean isCertTrusted(
-            HashAlgoType hashAlgo,
-            byte[] hashValue);
+  protected abstract boolean isCertTrusted(
+      HashAlgoType hashAlgo,
+      byte[] hashValue);
 
 }

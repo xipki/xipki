@@ -46,35 +46,36 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "capub-add",
-        description = "add publisher to CA")
+    description = "add publisher to CA")
 @Service
 public class CaPublisherAddCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--publisher",
-        required = true, multiValued = true,
-        description = "publisher name\n"
-                + "(required, multi-valued)")
-    @Completion(PublisherNameCompleter.class)
-    private List<String> publisherNames;
+  @Option(name = "--publisher",
+    required = true, multiValued = true,
+    description = "publisher name\n"
+        + "(required, multi-valued)")
+  @Completion(PublisherNameCompleter.class)
+  private List<String> publisherNames;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        for (String publisherName : publisherNames) {
-            boolean b = caManager.addPublisherToCA(publisherName, caName);
-            output(b, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    for (String publisherName : publisherNames) {
+      boolean b = caManager.addPublisherToCA(publisherName, caName);
+      output(b, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
     }
+    return null;
+  }
 
 }

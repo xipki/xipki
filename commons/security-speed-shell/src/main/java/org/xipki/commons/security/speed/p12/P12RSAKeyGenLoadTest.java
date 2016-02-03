@@ -43,28 +43,29 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final RSAKeypairGenerator kpGen;
+  private final RSAKeypairGenerator kpGen;
 
-    public P12RSAKeyGenLoadTest(
-            final int keysize,
-            final BigInteger publicExponent,
-            final SecurityFactory securityFactory)
-    throws Exception {
-        super("PKCS#12 RSA key generation\n"
-                + "keysize: " + keysize + "\n"
-                + "public exponent: " + publicExponent,
-                securityFactory);
+  public P12RSAKeyGenLoadTest(
+      final int keysize,
+      final BigInteger publicExponent,
+      final SecurityFactory securityFactory)
+  throws Exception {
+    super("PKCS#12 RSA key generation\n"
+        + "keysize: " + keysize + "\n"
+        + "public exponent: " + publicExponent,
+        securityFactory);
 
-        this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
-    }
+    this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
+  }
 
-    @Override
-    protected P12RawKeypairGenerator getKeypairGenerator() {
-        return kpGen;
-    }
+  @Override
+  protected P12RawKeypairGenerator getKeypairGenerator() {
+    return kpGen;
+  }
 
 }

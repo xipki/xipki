@@ -41,18 +41,19 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class DuplicationModeCompleter extends AbstractEnumCompleter {
 
-    public DuplicationModeCompleter() {
-        StringBuilder enums = new StringBuilder();
-        for (DuplicationMode mode : DuplicationMode.values()) {
-            enums.append(mode.getDescription()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+  public DuplicationModeCompleter() {
+    StringBuilder enums = new StringBuilder();
+    for (DuplicationMode mode : DuplicationMode.values()) {
+      enums.append(mode.getDescription()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

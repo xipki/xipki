@@ -41,39 +41,40 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EnrollCertRequestEntryType extends IdentifiedObject {
 
-    private final String certprofile;
+  private final String certprofile;
 
-    private final CertRequest certReq;
+  private final CertRequest certReq;
 
-    private final ProofOfPossession popo;
+  private final ProofOfPossession popo;
 
-    public EnrollCertRequestEntryType(
-            final String id,
-            final String certprofile,
-            final CertRequest certReq,
-            final ProofOfPossession popo) {
-        super(id);
-        ParamUtil.assertNotNull("certReq", certReq);
+  public EnrollCertRequestEntryType(
+      final String id,
+      final String certprofile,
+      final CertRequest certReq,
+      final ProofOfPossession popo) {
+    super(id);
+    ParamUtil.assertNotNull("certReq", certReq);
 
-        this.certprofile = certprofile;
-        this.certReq = certReq;
-        this.popo = popo;
-    }
+    this.certprofile = certprofile;
+    this.certReq = certReq;
+    this.popo = popo;
+  }
 
-    public String getCertprofile() {
-        return certprofile;
-    }
+  public String getCertprofile() {
+    return certprofile;
+  }
 
-    public CertRequest getCertReq() {
-        return certReq;
-    }
+  public CertRequest getCertReq() {
+    return certReq;
+  }
 
-    public ProofOfPossession getPopo() {
-        return popo;
-    }
+  public ProofOfPossession getPopo() {
+    return popo;
+  }
 
 }

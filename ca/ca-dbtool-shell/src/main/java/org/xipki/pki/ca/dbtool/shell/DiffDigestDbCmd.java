@@ -51,82 +51,83 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-db", name = "diff-digest-db",
-        description = "diff digest XiPKI/EJBCA database")
+    description = "diff digest XiPKI/EJBCA database")
 @Service
 public class DiffDigestDbCmd extends DbPortCommandSupport {
 
-    @Option(name = "--ref-db",
-            description = "database configuration file of the reference system\n"
-                    + "(one of--ref-db and--ref-dir must be specified)")
-    @Completion(FilePathCompleter.class)
-    private String refDbConf;
+  @Option(name = "--ref-db",
+      description = "database configuration file of the reference system\n"
+          + "(one of--ref-db and--ref-dir must be specified)")
+  @Completion(FilePathCompleter.class)
+  private String refDbConf;
 
-    @Option(name = "--ref-dir",
-            description = "directory of exported digest files of the reference system\n"
-                    + "(one of--ref-db and--ref-dir must be specified)")
-    @Completion(DirPathCompleter.class)
-    private String refDir;
+  @Option(name = "--ref-dir",
+      description = "directory of exported digest files of the reference system\n"
+          + "(one of--ref-db and--ref-dir must be specified)")
+  @Completion(DirPathCompleter.class)
+  private String refDir;
 
-    @Option(name = "--target",
-            required = true,
-            description = "configuration file of the target database to be evaluated")
-    @Completion(FilePathCompleter.class)
-    private String dbconfFile;
+  @Option(name = "--target",
+      required = true,
+      description = "configuration file of the target database to be evaluated")
+  @Completion(FilePathCompleter.class)
+  private String dbconfFile;
 
-    @Option(name = "--report-dir",
-            required = true,
-            description = "report directory\n"
-                    + "(required)")
-    @Completion(DirPathCompleter.class)
-    private String reportDir;
+  @Option(name = "--report-dir",
+      required = true,
+      description = "report directory\n"
+          + "(required)")
+  @Completion(DirPathCompleter.class)
+  private String reportDir;
 
-    @Option(name = "--revoked-only")
-    private Boolean revokedOnly = Boolean.FALSE;
+  @Option(name = "--revoked-only")
+  private Boolean revokedOnly = Boolean.FALSE;
 
-    @Option(name = "-k",
-            description = "number of certificates per SELECT")
-    private Integer numCertsPerSelect = 1000;
+  @Option(name = "-k",
+      description = "number of certificates per SELECT")
+  private Integer numCertsPerSelect = 1000;
 
-    @Option(name = "--ref-threads",
-            description = "number of threads to query the target database")
-    private Integer numRefThreads = 5;
+  @Option(name = "--ref-threads",
+      description = "number of threads to query the target database")
+  private Integer numRefThreads = 5;
 
-    @Option(name = "--target-threads",
-            description = "number of threads to query the target database")
-    private Integer numTargetThreads = 40;
+  @Option(name = "--target-threads",
+      description = "number of threads to query the target database")
+  private Integer numTargetThreads = 40;
 
-    @Option(name = "--ca-cert",
-            multiValued = true,
-            description = "Certificate of CAs to be considered\n"
-                        + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private List<String> caCertFiles;
+  @Option(name = "--ca-cert",
+      multiValued = true,
+      description = "Certificate of CAs to be considered\n"
+            + "(multi-valued)")
+  @Completion(FilePathCompleter.class)
+  private List<String> caCertFiles;
 
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
-        Set<byte[]> cACerts = null;
-        if (caCertFiles != null && !caCertFiles.isEmpty()) {
-            cACerts = new HashSet<>(caCertFiles.size());
-            for (String fileName : caCertFiles) {
-                cACerts.add(IoUtil.read(fileName));
-            }
-        }
-
-        return new DbDigestDiffWorker(
-                dataSourceFactory,
-                passwordResolver,
-                revokedOnly,
-                refDir,
-                refDbConf,
-                dbconfFile,
-                reportDir,
-                numCertsPerSelect,
-                numRefThreads,
-                numTargetThreads,
-                cACerts);
+  protected DbPortWorker getDbPortWorker()
+  throws Exception {
+    Set<byte[]> cACerts = null;
+    if (caCertFiles != null && !caCertFiles.isEmpty()) {
+      cACerts = new HashSet<>(caCertFiles.size());
+      for (String fileName : caCertFiles) {
+        cACerts.add(IoUtil.read(fileName));
+      }
     }
+
+    return new DbDigestDiffWorker(
+        dataSourceFactory,
+        passwordResolver,
+        revokedOnly,
+        refDir,
+        refDbConf,
+        dbconfFile,
+        reportDir,
+        numCertsPerSelect,
+        numRefThreads,
+        numTargetThreads,
+        cACerts);
+  }
 
 }

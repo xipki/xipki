@@ -46,106 +46,107 @@ import org.bouncycastle.crypto.Digest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 abstract class AbstractECDSASignatureSpi extends SignatureSpi {
 
-    private Digest digest;
+  private Digest digest;
 
-    private P11PrivateKey signingKey;
+  private P11PrivateKey signingKey;
 
-    private boolean x962;
+  private boolean x962;
 
-    AbstractECDSASignatureSpi(
-            final Digest digest,
-            final boolean x962) {
-        this.digest = digest;
-        this.x962 = x962;
+  AbstractECDSASignatureSpi(
+      final Digest digest,
+      final boolean x962) {
+    this.digest = digest;
+    this.x962 = x962;
+  }
+
+  protected void engineInitVerify(
+      final PublicKey publicKey)
+  throws InvalidKeyException {
+    throw new UnsupportedOperationException("engineInitVerify unsupported");
+  }
+
+  protected void engineInitSign(
+      final PrivateKey privateKey)
+  throws InvalidKeyException {
+    if (!(privateKey instanceof P11PrivateKey)) {
+      throw new InvalidKeyException("privateKey is not instanceof "
+          + P11PrivateKey.class.getName());
     }
 
-    protected void engineInitVerify(
-            final PublicKey publicKey)
-    throws InvalidKeyException {
-        throw new UnsupportedOperationException("engineInitVerify unsupported");
+    String algo = privateKey.getAlgorithm();
+    if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
+      throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
     }
 
-    protected void engineInitSign(
-            final PrivateKey privateKey)
-    throws InvalidKeyException {
-        if (!(privateKey instanceof P11PrivateKey)) {
-            throw new InvalidKeyException("privateKey is not instanceof "
-                    + P11PrivateKey.class.getName());
-        }
+    digest.reset();
+    this.signingKey = (P11PrivateKey) signingKey;
+  }
 
-        String algo = privateKey.getAlgorithm();
-        if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
-            throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
-        }
+  protected void engineUpdate(
+      final byte b)
+  throws SignatureException {
+    digest.update(b);
+  }
 
-        digest.reset();
-        this.signingKey = (P11PrivateKey) signingKey;
+  protected void engineUpdate(
+      final byte[]  b,
+      final int off,
+      final int len)
+  throws SignatureException {
+    digest.update(b, off, len);
+  }
+
+  protected byte[] engineSign()
+  throws SignatureException {
+    byte[]  hash = new byte[digest.getDigestSize()];
+
+    digest.doFinal(hash, 0);
+
+    try {
+      if (x962) {
+        return signingKey.CKM_ECDSA_X962(hash);
+      } else {
+        return signingKey.CKM_ECDSA_Plain(hash);
+      }
+    } catch (SignatureException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SignatureException(e.getMessage(), e);
     }
+  }
 
-    protected void engineUpdate(
-            final byte b)
-    throws SignatureException {
-        digest.update(b);
-    }
+  protected void engineSetParameter(
+      final AlgorithmParameterSpec params) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
 
-    protected void engineUpdate(
-            final byte[]  b,
-            final int off,
-            final int len)
-    throws SignatureException {
-        digest.update(b, off, len);
-    }
+  /**
+   * @deprecated replaced with
+   * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+   */
+  protected void engineSetParameter(
+      final String  param,
+      final Object  value) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
 
-    protected byte[] engineSign()
-    throws SignatureException {
-        byte[]  hash = new byte[digest.getDigestSize()];
+  /**
+   * @deprecated
+   */
+  protected Object engineGetParameter(
+      final String param) {
+    throw new UnsupportedOperationException("engineSetParameter unsupported");
+  }
 
-        digest.doFinal(hash, 0);
-
-        try {
-            if (x962) {
-                return signingKey.CKM_ECDSA_X962(hash);
-            } else {
-                return signingKey.CKM_ECDSA_Plain(hash);
-            }
-        } catch (SignatureException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new SignatureException(e.getMessage(), e);
-        }
-    }
-
-    protected void engineSetParameter(
-            final AlgorithmParameterSpec params) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
-    }
-
-    /**
-     * @deprecated replaced with
-     * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-     */
-    protected void engineSetParameter(
-            final String  param,
-            final Object  value) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
-    }
-
-    /**
-     * @deprecated
-     */
-    protected Object engineGetParameter(
-            final String param) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
-    }
-
-    protected boolean engineVerify(
-            final byte[] sigBytes)
-    throws SignatureException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
-    }
+  protected boolean engineVerify(
+      final byte[] sigBytes)
+  throws SignatureException {
+    throw new UnsupportedOperationException("engineVerify unsupported");
+  }
 
 }

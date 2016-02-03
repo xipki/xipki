@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.EnvRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-env-rm",
-        description = "remove environment parameter (negative, QA)")
+    description = "remove environment parameter (negative, QA)")
 @Service
 public class NegEnvRemoveCmd extends EnvRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-env-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-env-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

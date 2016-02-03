@@ -46,24 +46,25 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11ECDSAPlainContentSigner extends AbstractP11DSAContentSigner {
 
-    public P11ECDSAPlainContentSigner(
-            final P11CryptService cryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
-            final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, OperatorCreationException {
-        super(cryptService, slot, keyId, signatureAlgId);
-    }
+  public P11ECDSAPlainContentSigner(
+      final P11CryptService cryptService,
+      final P11SlotIdentifier slot,
+      final P11KeyIdentifier keyId,
+      final AlgorithmIdentifier signatureAlgId)
+  throws NoSuchAlgorithmException, OperatorCreationException {
+    super(cryptService, slot, keyId, signatureAlgId);
+  }
 
-    @Override
-    protected byte[] CKM_SIGN(
-            final byte[] hashValue)
-    throws SignerException {
-        return cryptService.CKM_ECDSA_Plain(hashValue, slot, keyId);
-    }
+  @Override
+  protected byte[] CKM_SIGN(
+      final byte[] hashValue)
+  throws SignerException {
+    return cryptService.CKM_ECDSA_Plain(hashValue, slot, keyId);
+  }
 
 }

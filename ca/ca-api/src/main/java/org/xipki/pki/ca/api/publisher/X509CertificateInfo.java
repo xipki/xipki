@@ -47,142 +47,143 @@ import org.xipki.pki.ca.api.X509CertWithDBCertId;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509CertificateInfo {
 
-    private final byte[] subjectPublicKey;
+  private final byte[] subjectPublicKey;
 
-    private final X509CertWithDBCertId cert;
+  private final X509CertWithDBCertId cert;
 
-    private final X509Cert issuerCert;
+  private final X509Cert issuerCert;
 
-    private final String profileName;
+  private final String profileName;
 
-    private RequestType reqType;
+  private RequestType reqType;
 
-    private byte[] transactionId;
+  private byte[] transactionId;
 
-    private RequestorInfo requestor;
+  private RequestorInfo requestor;
 
-    private String user;
+  private String user;
 
-    private String warningMessage;
+  private String warningMessage;
 
-    private CertRevocationInfo revInfo;
+  private CertRevocationInfo revInfo;
 
-    private X500Name requestedSubject;
+  private X500Name requestedSubject;
 
-    private boolean alreadyIssued;
+  private boolean alreadyIssued;
 
-    public X509CertificateInfo(
-            final X509CertWithDBCertId cert,
-            final X509Cert issuerCert,
-            final byte[] subjectPublicKey,
-            final String profileName)
-    throws CertificateEncodingException {
-        ParamUtil.assertNotNull("cert", cert);
-        ParamUtil.assertNotNull("issuerCert", issuerCert);
-        ParamUtil.assertNotBlank("profileName", profileName);
-        ParamUtil.assertNotNull("subjectPublicKey", subjectPublicKey);
+  public X509CertificateInfo(
+      final X509CertWithDBCertId cert,
+      final X509Cert issuerCert,
+      final byte[] subjectPublicKey,
+      final String profileName)
+  throws CertificateEncodingException {
+    ParamUtil.assertNotNull("cert", cert);
+    ParamUtil.assertNotNull("issuerCert", issuerCert);
+    ParamUtil.assertNotBlank("profileName", profileName);
+    ParamUtil.assertNotNull("subjectPublicKey", subjectPublicKey);
 
-        this.cert = cert;
-        this.subjectPublicKey = subjectPublicKey;
+    this.cert = cert;
+    this.subjectPublicKey = subjectPublicKey;
 
-        this.issuerCert = issuerCert;
-        this.profileName = profileName;
-    }
+    this.issuerCert = issuerCert;
+    this.profileName = profileName;
+  }
 
-    public byte[] getSubjectPublicKey() {
-        return subjectPublicKey;
-    }
+  public byte[] getSubjectPublicKey() {
+    return subjectPublicKey;
+  }
 
-    public X509CertWithDBCertId getCert() {
-        return cert;
-    }
+  public X509CertWithDBCertId getCert() {
+    return cert;
+  }
 
-    public X509Cert getIssuerCert() {
-        return issuerCert;
-    }
+  public X509Cert getIssuerCert() {
+    return issuerCert;
+  }
 
-    public String getProfileName() {
-        return profileName;
-    }
+  public String getProfileName() {
+    return profileName;
+  }
 
-    public String getWarningMessage() {
-        return warningMessage;
-    }
+  public String getWarningMessage() {
+    return warningMessage;
+  }
 
-    public void setWarningMessage(
-            final String warningMessage) {
-        this.warningMessage = warningMessage;
-    }
+  public void setWarningMessage(
+      final String warningMessage) {
+    this.warningMessage = warningMessage;
+  }
 
-    public RequestorInfo getRequestor() {
-        return requestor;
-    }
+  public RequestorInfo getRequestor() {
+    return requestor;
+  }
 
-    public void setRequestor(
-            final RequestorInfo requestor) {
-        this.requestor = requestor;
-    }
+  public void setRequestor(
+      final RequestorInfo requestor) {
+    this.requestor = requestor;
+  }
 
-    public String getUser() {
-        return user;
-    }
+  public String getUser() {
+    return user;
+  }
 
-    public void setUser(
-            final String user) {
-        this.user = user;
-    }
+  public void setUser(
+      final String user) {
+    this.user = user;
+  }
 
-    public boolean isRevoked() {
-        return revInfo != null;
-    }
+  public boolean isRevoked() {
+    return revInfo != null;
+  }
 
-    public CertRevocationInfo getRevocationInfo() {
-        return revInfo;
-    }
+  public CertRevocationInfo getRevocationInfo() {
+    return revInfo;
+  }
 
-    public void setRevocationInfo(
-            final CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
-    }
+  public void setRevocationInfo(
+      final CertRevocationInfo revInfo) {
+    this.revInfo = revInfo;
+  }
 
-    public boolean isAlreadyIssued() {
-        return alreadyIssued;
-    }
+  public boolean isAlreadyIssued() {
+    return alreadyIssued;
+  }
 
-    public void setAlreadyIssued(
-            final boolean alreadyIssued) {
-        this.alreadyIssued = alreadyIssued;
-    }
+  public void setAlreadyIssued(
+      final boolean alreadyIssued) {
+    this.alreadyIssued = alreadyIssued;
+  }
 
-    public RequestType getReqType() {
-        return reqType;
-    }
+  public RequestType getReqType() {
+    return reqType;
+  }
 
-    public byte[] getTransactionId() {
-        return transactionId;
-    }
+  public byte[] getTransactionId() {
+    return transactionId;
+  }
 
-    public void setReqType(
-            final RequestType reqType) {
-        this.reqType = reqType;
-    }
+  public void setReqType(
+      final RequestType reqType) {
+    this.reqType = reqType;
+  }
 
-    public void setTransactionId(
-            final byte[] transactionId) {
-        this.transactionId = transactionId;
-    }
+  public void setTransactionId(
+      final byte[] transactionId) {
+    this.transactionId = transactionId;
+  }
 
-    public X500Name getRequestedSubject() {
-        return requestedSubject;
-    }
+  public X500Name getRequestedSubject() {
+    return requestedSubject;
+  }
 
-    public void setRequestedSubject(
-            final X500Name requestedSubject) {
-        this.requestedSubject = requestedSubject;
-    }
+  public void setRequestedSubject(
+      final X500Name requestedSubject) {
+    this.requestedSubject = requestedSubject;
+  }
 
 }

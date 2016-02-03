@@ -48,44 +48,45 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "responder-check",
-        description = "check information of responder (QA)")
+    description = "check information of responder (QA)")
 @Service
 public class ResponderCheckCmd extends ResponderUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking responder " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking responder " + name);
 
-        CmpResponderEntry cr = caManager.getCmpResponder(name);
-        if (cr == null) {
-            throw new CmdFailure("CMP responder named '" + name + "' is not configured");
-        }
-
-        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-            if (cr.getBase64Cert() != null) {
-                throw new CmdFailure("Cert: is configured but expected is none");
-            }
-        } else if (certFile != null) {
-            byte[] ex = IoUtil.read(certFile);
-            if (cr.getBase64Cert() == null) {
-                throw new CmdFailure("Cert: is not configured explicitly as expected");
-            }
-            if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
-                throw new CmdFailure("Cert: the expected one and the actual one differ");
-            }
-        }
-
-        String signerConf = getSignerConf();
-        if (signerConf != null) {
-            MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
-        }
-
-        out(" checked responder " + name);
-        return null;
+    CmpResponderEntry cr = caManager.getCmpResponder(name);
+    if (cr == null) {
+      throw new CmdFailure("CMP responder named '" + name + "' is not configured");
     }
+
+    if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+      if (cr.getBase64Cert() != null) {
+        throw new CmdFailure("Cert: is configured but expected is none");
+      }
+    } else if (certFile != null) {
+      byte[] ex = IoUtil.read(certFile);
+      if (cr.getBase64Cert() == null) {
+        throw new CmdFailure("Cert: is not configured explicitly as expected");
+      }
+      if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+        throw new CmdFailure("Cert: the expected one and the actual one differ");
+      }
+    }
+
+    String signerConf = getSignerConf();
+    if (signerConf != null) {
+      MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
+    }
+
+    out(" checked responder " + name);
+    return null;
+  }
 
 }

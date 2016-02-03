@@ -37,31 +37,32 @@ package org.xipki.pki.ca.dbtool;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IDRange {
 
-    private final int from;
+  private final int from;
 
-    private final int to;
+  private final int to;
 
-    public IDRange(
-            final int from,
-            final int to) {
-        if (from > to) {
-            throw new IllegalArgumentException(
-                    "from could not be greater than to: " + from + " > " + to);
-        }
-        this.from = from;
-        this.to = to;
+  public IDRange(
+      final int from,
+      final int to) {
+    if (from > to) {
+      throw new IllegalArgumentException(
+          "from could not be greater than to: " + from + " > " + to);
     }
+    this.from = from;
+    this.to = to;
+  }
 
-    public int getFrom() {
-        return from;
-    }
+  public int getFrom() {
+    return from;
+  }
 
-    public int getTo() {
-        return to;
-    }
+  public int getTo() {
+    return to;
+  }
 
 }

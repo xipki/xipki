@@ -44,62 +44,63 @@ import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DbPortFileNameIterator implements Iterator<String> {
 
-    private BufferedReader reader;
+  private BufferedReader reader;
 
-    private String nextFilename;
+  private String nextFilename;
 
-    public DbPortFileNameIterator(
-            final String filename)
-    throws IOException {
-        this.reader = new BufferedReader(new FileReader(filename));
-        this.nextFilename = readNextFilenameLine();
+  public DbPortFileNameIterator(
+      final String filename)
+  throws IOException {
+    this.reader = new BufferedReader(new FileReader(filename));
+    this.nextFilename = readNextFilenameLine();
+  }
+
+  @Override
+  public boolean hasNext() {
+    return nextFilename != null;
+  }
+
+  @Override
+  public String next() {
+    String s = nextFilename;
+    nextFilename = null;
+    try {
+      nextFilename = readNextFilenameLine();
+    } catch (IOException e) {
+      throw new RuntimeException("error while reading next file name");
+    }
+    return s;
+  }
+
+  @Override
+  public void remove() {
+    throw new UnsupportedOperationException("remove is not supported");
+  }
+
+  public void close() {
+    try {
+      reader.close();
+    } catch (Throwable t) {
+    }
+  }
+
+  private String readNextFilenameLine()
+  throws IOException {
+    String line;
+    while ((line = reader.readLine()) != null) {
+      line = line.trim();
+      if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
+        continue;
+      }
+      return line;
     }
 
-    @Override
-    public boolean hasNext() {
-        return nextFilename != null;
-    }
-
-    @Override
-    public String next() {
-        String s = nextFilename;
-        nextFilename = null;
-        try {
-            nextFilename = readNextFilenameLine();
-        } catch (IOException e) {
-            throw new RuntimeException("error while reading next file name");
-        }
-        return s;
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("remove is not supported");
-    }
-
-    public void close() {
-        try {
-            reader.close();
-        } catch (Throwable t) {
-        }
-    }
-
-    private String readNextFilenameLine()
-    throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            line = line.trim();
-            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
-                continue;
-            }
-            return line;
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

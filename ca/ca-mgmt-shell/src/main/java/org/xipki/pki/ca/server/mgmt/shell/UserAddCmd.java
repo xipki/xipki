@@ -42,38 +42,39 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "user-add",
-        description = "add user")
+    description = "add user")
 @Service
 public class UserAddCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "user Name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "user Name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--password",
-            description = "user password")
-    private String password;
+  @Option(name = "--password",
+      description = "user password")
+  private String password;
 
-    @Option(name = "--cn-regex",
-            required = true,
-            description = "regex for the permitted common name")
-    private String cnRegex;
+  @Option(name = "--cn-regex",
+      required = true,
+      description = "regex for the permitted common name")
+  private String cnRegex;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (password == null) {
-            password = new String(readPassword());
-        }
-        AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);
-        boolean b = caManager.addUser(userEntry);
-        output(b, "added", "could not add", "user " + name);
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (password == null) {
+      password = new String(readPassword());
     }
+    AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);
+    boolean b = caManager.addUser(userEntry);
+    output(b, "added", "could not add", "user " + name);
+    return null;
+  }
 
 }

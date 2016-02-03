@@ -39,39 +39,40 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertificatePolicyQualifier {
 
-    private final String cpsUri;
+  private final String cpsUri;
 
-    private final String userNotice;
+  private final String userNotice;
 
-    private CertificatePolicyQualifier(
-            final String cpsUri,
-            final String userNotice) {
-        this.cpsUri = cpsUri;
-        this.userNotice = userNotice;
-    }
+  private CertificatePolicyQualifier(
+      final String cpsUri,
+      final String userNotice) {
+    this.cpsUri = cpsUri;
+    this.userNotice = userNotice;
+  }
 
-    public String getCpsUri() {
-        return cpsUri;
-    }
+  public String getCpsUri() {
+    return cpsUri;
+  }
 
-    public String getUserNotice() {
-        return userNotice;
-    }
+  public String getUserNotice() {
+    return userNotice;
+  }
 
-    public static CertificatePolicyQualifier getInstanceForUserNotice(
-            final String userNotice) {
-        ParamUtil.assertNotBlank("userNotice", userNotice);
-        return new CertificatePolicyQualifier(null, userNotice);
-    }
+  public static CertificatePolicyQualifier getInstanceForUserNotice(
+      final String userNotice) {
+    ParamUtil.assertNotBlank("userNotice", userNotice);
+    return new CertificatePolicyQualifier(null, userNotice);
+  }
 
-    public static CertificatePolicyQualifier getInstanceForCpsUri(
-            final String cpsUri) {
-        ParamUtil.assertNotBlank("cpsUri", cpsUri);
-        return new CertificatePolicyQualifier(cpsUri, null);
-    }
+  public static CertificatePolicyQualifier getInstanceForCpsUri(
+      final String cpsUri) {
+    ParamUtil.assertNotBlank("cpsUri", cpsUri);
+    return new CertificatePolicyQualifier(cpsUri, null);
+  }
 
 }

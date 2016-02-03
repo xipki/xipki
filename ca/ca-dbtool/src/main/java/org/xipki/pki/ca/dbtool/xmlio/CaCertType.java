@@ -39,315 +39,316 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CaCertType extends DbDataObject {
 
-    public static final String TAG_ROOT = "cert";
+  public static final String TAG_ROOT = "cert";
 
-    public static final String TAG_id = "id";
+  public static final String TAG_id = "id";
 
-    private Integer id;
+  private Integer id;
 
-    public static final String TAG_art = "art";
+  public static final String TAG_art = "art";
 
-    private Integer art;
+  private Integer art;
 
-    public static final String TAG_caId = "caId";
+  public static final String TAG_caId = "caId";
 
-    private Integer caId;
+  private Integer caId;
 
-    /**
-     * certificate serial number
-     */
-    public static final String TAG_sn = "sn";
+  /**
+   * certificate serial number
+   */
+  public static final String TAG_sn = "sn";
 
-    private String sn;
+  private String sn;
 
-    /**
-     * certificate profile id
-     */
-    public static final String TAG_pid = "pid";
+  /**
+   * certificate profile id
+   */
+  public static final String TAG_pid = "pid";
 
-    private Integer pid;
+  private Integer pid;
 
-    /**
-     * requestor id
-     */
-    public static final String TAG_rid = "rid";
+  /**
+   * requestor id
+   */
+  public static final String TAG_rid = "rid";
 
-    private Integer rid;
+  private Integer rid;
 
-    public static final String TAG_update = "update";
+  public static final String TAG_update = "update";
 
-    private Long update;
+  private Long update;
 
-    /**
-     * whether revoked
-     */
-    public static final String TAG_rev = "rev";
+  /**
+   * whether revoked
+   */
+  public static final String TAG_rev = "rev";
 
-    private Boolean rev;
+  private Boolean rev;
 
-    /**
-     * revocation reason
-     */
-    public static final String TAG_rr = "rr";
+  /**
+   * revocation reason
+   */
+  public static final String TAG_rr = "rr";
 
-    private Integer rr;
+  private Integer rr;
 
-    /**
-     * revocation time
-     */
-    public static final String TAG_rt = "rt";
+  /**
+   * revocation time
+   */
+  public static final String TAG_rt = "rt";
 
-    private Long rt;
+  private Long rt;
 
-    /**
-     * revocation invalidity time
-     */
-    public static final String TAG_rit = "rit";
+  /**
+   * revocation invalidity time
+   */
+  public static final String TAG_rit = "rit";
 
-    private Long rit;
+  private Long rit;
 
-    public static final String TAG_user = "user";
+  public static final String TAG_user = "user";
 
-    private String user;
+  private String user;
 
-    /**
-     * base64 encoded transaction id
-     */
-    public static final String TAG_tid = "tid";
+  /**
+   * base64 encoded transaction id
+   */
+  public static final String TAG_tid = "tid";
 
-    private String tid;
+  private String tid;
 
-    public static final String TAG_reqType = "reqType";
+  public static final String TAG_reqType = "reqType";
 
-    private Integer reqType;
+  private Integer reqType;
 
-    /**
-     * first 8 bytes of the SHA1 sum of the requested subject
-     */
-    public static final String TAG_fpRs = "fpRs";
+  /**
+   * first 8 bytes of the SHA1 sum of the requested subject
+   */
+  public static final String TAG_fpRs = "fpRs";
 
-    private Long fpRs;
+  private Long fpRs;
 
-    /**
-     * requested subject, if differs from the one in certificate
-     */
-    public static final String TAG_rs = "rs";
+  /**
+   * requested subject, if differs from the one in certificate
+   */
+  public static final String TAG_rs = "rs";
 
-    private String rs;
+  private String rs;
 
-    /**
-     * file name of the certificate
-     */
-    public static final String TAG_file = "file";
+  /**
+   * file name of the certificate
+   */
+  public static final String TAG_file = "file";
 
-    private String file;
+  private String file;
 
-    public Integer getId() {
-        return id;
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(
+      final Integer id) {
+    this.id = id;
+  }
+
+  public Integer getArt() {
+    return art;
+  }
+
+  public void setArt(
+      final Integer art) {
+    this.art = art;
+  }
+
+  public Integer getCaId() {
+    return caId;
+  }
+
+  public void setCaId(
+      final Integer caId) {
+    this.caId = caId;
+  }
+
+  public String getSn() {
+    return sn;
+  }
+
+  public void setSn(
+      final String sn) {
+    this.sn = sn;
+  }
+
+  public Integer getPid() {
+    return pid;
+  }
+
+  public void setPid(
+      final Integer pid) {
+    this.pid = pid;
+  }
+
+  public Integer getRid() {
+    return rid;
+  }
+
+  public void setRid(
+      final Integer rid) {
+    this.rid = rid;
+  }
+
+  public Long getUpdate() {
+    return update;
+  }
+
+  public void setUpdate(
+      final Long update) {
+    this.update = update;
+  }
+
+  public Boolean getRev() {
+    return rev;
+  }
+
+  public void setRev(
+      final Boolean rev) {
+    this.rev = rev;
+  }
+
+  public Integer getRr() {
+    return rr;
+  }
+
+  public void setRr(
+      final Integer rr) {
+    this.rr = rr;
+  }
+
+  public Long getRt() {
+    return rt;
+  }
+
+  public void setRt(
+      final Long rt) {
+    this.rt = rt;
+  }
+
+  public Long getRit() {
+    return rit;
+  }
+
+  public void setRit(
+      final Long rit) {
+    this.rit = rit;
+  }
+
+  public String getTid() {
+    return tid;
+  }
+
+  public void setTid(
+      final String tid) {
+    this.tid = tid;
+  }
+
+  public Integer getReqType() {
+    return reqType;
+  }
+
+  public void setReqType(
+      final Integer reqType) {
+    this.reqType = reqType;
+  }
+
+  public Long getFpRs() {
+    return fpRs;
+  }
+
+  public void setFpRs(
+      final Long fpRs) {
+    this.fpRs = fpRs;
+  }
+
+  public String getRs() {
+    return rs;
+  }
+
+  public void setRs(
+      final String rs) {
+    this.rs = rs;
+  }
+
+  public String getFile() {
+    return file;
+  }
+
+  public void setFile(
+      final String file) {
+    this.file = file;
+  }
+
+  @Override
+  public void validate()
+  throws InvalidDataObjectException {
+    assertNotNull("id", id);
+    assertNotNull("art", art);
+    assertNotNull("caId", caId);
+    assertNotBlank("sn", sn);
+    assertNotNull("pid", pid);
+    assertNotNull("update", update);
+    assertNotNull("rev", rev);
+    if (rev) {
+      assertNotNull("rr", rr);
+      assertNotNull("rt", rt);
     }
 
-    public void setId(
-            final Integer id) {
-        this.id = id;
+    assertNotNull("reqType", reqType);
+    if (rs != null) {
+      assertNotNull("fpRs", fpRs);
+      assertNotBlank("rs", rs);
     }
+    assertNotBlank("file", file);
+  }
 
-    public Integer getArt() {
-        return art;
-    }
+  public String getUser() {
+    return user;
+  }
 
-    public void setArt(
-            final Integer art) {
-        this.art = art;
-    }
+  public void setUser(
+      final String user) {
+    this.user = user;
+  }
 
-    public Integer getCaId() {
-        return caId;
-    }
+  @Override
+  public void writeTo(
+      final DbiXmlWriter writer)
+  throws InvalidDataObjectException, XMLStreamException {
+    validate();
 
-    public void setCaId(
-            final Integer caId) {
-        this.caId = caId;
-    }
-
-    public String getSn() {
-        return sn;
-    }
-
-    public void setSn(
-            final String sn) {
-        this.sn = sn;
-    }
-
-    public Integer getPid() {
-        return pid;
-    }
-
-    public void setPid(
-            final Integer pid) {
-        this.pid = pid;
-    }
-
-    public Integer getRid() {
-        return rid;
-    }
-
-    public void setRid(
-            final Integer rid) {
-        this.rid = rid;
-    }
-
-    public Long getUpdate() {
-        return update;
-    }
-
-    public void setUpdate(
-            final Long update) {
-        this.update = update;
-    }
-
-    public Boolean getRev() {
-        return rev;
-    }
-
-    public void setRev(
-            final Boolean rev) {
-        this.rev = rev;
-    }
-
-    public Integer getRr() {
-        return rr;
-    }
-
-    public void setRr(
-            final Integer rr) {
-        this.rr = rr;
-    }
-
-    public Long getRt() {
-        return rt;
-    }
-
-    public void setRt(
-            final Long rt) {
-        this.rt = rt;
-    }
-
-    public Long getRit() {
-        return rit;
-    }
-
-    public void setRit(
-            final Long rit) {
-        this.rit = rit;
-    }
-
-    public String getTid() {
-        return tid;
-    }
-
-    public void setTid(
-            final String tid) {
-        this.tid = tid;
-    }
-
-    public Integer getReqType() {
-        return reqType;
-    }
-
-    public void setReqType(
-            final Integer reqType) {
-        this.reqType = reqType;
-    }
-
-    public Long getFpRs() {
-        return fpRs;
-    }
-
-    public void setFpRs(
-            final Long fpRs) {
-        this.fpRs = fpRs;
-    }
-
-    public String getRs() {
-        return rs;
-    }
-
-    public void setRs(
-            final String rs) {
-        this.rs = rs;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(
-            final String file) {
-        this.file = file;
-    }
-
-    @Override
-    public void validate()
-    throws InvalidDataObjectException {
-        assertNotNull("id", id);
-        assertNotNull("art", art);
-        assertNotNull("caId", caId);
-        assertNotBlank("sn", sn);
-        assertNotNull("pid", pid);
-        assertNotNull("update", update);
-        assertNotNull("rev", rev);
-        if (rev) {
-            assertNotNull("rr", rr);
-            assertNotNull("rt", rt);
-        }
-
-        assertNotNull("reqType", reqType);
-        if (rs != null) {
-            assertNotNull("fpRs", fpRs);
-            assertNotBlank("rs", rs);
-        }
-        assertNotBlank("file", file);
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(
-            final String user) {
-        this.user = user;
-    }
-
-    @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException {
-        validate();
-
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_art, art);
-        writeIfNotNull(writer, TAG_caId, caId);
-        writeIfNotNull(writer, TAG_sn, sn);
-        writeIfNotNull(writer, TAG_pid, pid);
-        writeIfNotNull(writer, TAG_rid, rid);
-        writeIfNotNull(writer, TAG_update, update);
-        writeIfNotNull(writer, TAG_rev, rev);
-        writeIfNotNull(writer, TAG_rr, rr);
-        writeIfNotNull(writer, TAG_rt, rt);
-        writeIfNotNull(writer, TAG_rit, rit);
-        writeIfNotNull(writer, TAG_user, user);
-        writeIfNotNull(writer, TAG_tid, tid);
-        writeIfNotNull(writer, TAG_reqType, reqType);
-        writeIfNotNull(writer, TAG_fpRs, fpRs);
-        writeIfNotNull(writer, TAG_rs, rs);
-        writeIfNotNull(writer, TAG_file, file);
-        writer.writeEndElement();
-        writer.writeNewline();
-    }
+    writer.writeStartElement(TAG_ROOT);
+    writeIfNotNull(writer, TAG_id, id);
+    writeIfNotNull(writer, TAG_art, art);
+    writeIfNotNull(writer, TAG_caId, caId);
+    writeIfNotNull(writer, TAG_sn, sn);
+    writeIfNotNull(writer, TAG_pid, pid);
+    writeIfNotNull(writer, TAG_rid, rid);
+    writeIfNotNull(writer, TAG_update, update);
+    writeIfNotNull(writer, TAG_rev, rev);
+    writeIfNotNull(writer, TAG_rr, rr);
+    writeIfNotNull(writer, TAG_rt, rt);
+    writeIfNotNull(writer, TAG_rit, rit);
+    writeIfNotNull(writer, TAG_user, user);
+    writeIfNotNull(writer, TAG_tid, tid);
+    writeIfNotNull(writer, TAG_reqType, reqType);
+    writeIfNotNull(writer, TAG_fpRs, fpRs);
+    writeIfNotNull(writer, TAG_rs, rs);
+    writeIfNotNull(writer, TAG_file, file);
+    writer.writeEndElement();
+    writer.writeNewline();
+  }
 
 }

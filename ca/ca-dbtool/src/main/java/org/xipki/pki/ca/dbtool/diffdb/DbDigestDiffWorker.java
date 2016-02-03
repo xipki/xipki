@@ -58,133 +58,134 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DbDigestDiffWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
 
-    private final boolean revokedOnly;
+  private final boolean revokedOnly;
 
-    private final String refDirname;
+  private final String refDirname;
 
-    private final DataSourceWrapper refDatasource;
+  private final DataSourceWrapper refDatasource;
 
-    private final Set<byte[]> includeCACerts;
+  private final Set<byte[]> includeCACerts;
 
-    private final DataSourceWrapper dataSource;
+  private final DataSourceWrapper dataSource;
 
-    private final String reportDir;
+  private final String reportDir;
 
-    private final int numCertsPerSelect;
+  private final int numCertsPerSelect;
 
-    private final int numRefThreads;
+  private final int numRefThreads;
 
-    private final int numTargetThreads;
+  private final int numTargetThreads;
 
-    public DbDigestDiffWorker(
-            final DataSourceFactory dataSourceFactory,
-            final PasswordResolver passwordResolver,
-            final boolean revokedOnly,
-            final String refDirname,
-            final String refDbConfFile,
-            final String dbConfFile,
-            final String reportDirName,
-            final int numCertsPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads,
-            final Set<byte[]> includeCACerts)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        boolean validRef = false;
-        if (refDirname == null) {
-            validRef = (refDbConfFile != null);
-        } else {
-            validRef = (refDbConfFile == null);
-        }
+  public DbDigestDiffWorker(
+      final DataSourceFactory dataSourceFactory,
+      final PasswordResolver passwordResolver,
+      final boolean revokedOnly,
+      final String refDirname,
+      final String refDbConfFile,
+      final String dbConfFile,
+      final String reportDirName,
+      final int numCertsPerSelect,
+      final int numRefThreads,
+      final int numTargetThreads,
+      final Set<byte[]> includeCACerts)
+  throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    boolean validRef = false;
+    if (refDirname == null) {
+      validRef = (refDbConfFile != null);
+    } else {
+      validRef = (refDbConfFile == null);
+    }
 
-        if (!validRef) {
-            throw new IllegalArgumentException(
-                    "Exactly one of refDirname and refDbConffile must be not null");
-        }
+    if (!validRef) {
+      throw new IllegalArgumentException(
+          "Exactly one of refDirname and refDbConffile must be not null");
+    }
 
-        this.includeCACerts = includeCACerts;
+    this.includeCACerts = includeCACerts;
 
-        File f = new File(reportDirName);
-        if (!f.exists()) {
-            f.mkdirs();
-        } else {
-            if (!f.isDirectory()) {
-                throw new IOException(reportDirName + " is not a folder");
-            }
+    File f = new File(reportDirName);
+    if (!f.exists()) {
+      f.mkdirs();
+    } else {
+      if (!f.isDirectory()) {
+        throw new IOException(reportDirName + " is not a folder");
+      }
 
-            if (!f.canWrite()) {
-                throw new IOException(reportDirName + " is not writable");
-            }
-        }
+      if (!f.canWrite()) {
+        throw new IOException(reportDirName + " is not writable");
+      }
+    }
 
-        String[] children = f.list();
-        if (children != null && children.length > 0) {
-            throw new IOException(reportDirName + " is not empty");
-        }
+    String[] children = f.list();
+    if (children != null && children.length > 0) {
+      throw new IOException(reportDirName + " is not empty");
+    }
 
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
 
-        this.revokedOnly = revokedOnly;
-        if (refDirname != null) {
-            this.refDirname = refDirname;
-            this.refDatasource = null;
-        } else {
-            this.refDirname = null;
-            Properties refProps = DbPorter.getDbConfProperties(
-                    new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
-            this.refDatasource = dataSourceFactory.createDataSource(
-                    null, refProps, passwordResolver);
-        }
+    this.revokedOnly = revokedOnly;
+    if (refDirname != null) {
+      this.refDirname = refDirname;
+      this.refDatasource = null;
+    } else {
+      this.refDirname = null;
+      Properties refProps = DbPorter.getDbConfProperties(
+          new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
+      this.refDatasource = dataSourceFactory.createDataSource(
+          null, refProps, passwordResolver);
+    }
 
-        this.reportDir = reportDirName;
-        this.numCertsPerSelect = numCertsPerSelect;
-        this.numRefThreads = numRefThreads;
-        this.numTargetThreads = numTargetThreads;
-    } // constructor DbDigestDiffWorker
+    this.reportDir = reportDirName;
+    this.numCertsPerSelect = numCertsPerSelect;
+    this.numRefThreads = numRefThreads;
+    this.numTargetThreads = numTargetThreads;
+  } // constructor DbDigestDiffWorker
 
-    @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
-    throws Exception {
-        long start = System.currentTimeMillis();
+  @Override
+  public void doRun(
+      final AtomicBoolean stopMe)
+  throws Exception {
+    long start = System.currentTimeMillis();
 
+    try {
+      DbDigestDiff diff;
+      if (refDirname != null) {
+        diff = DbDigestDiff.getInstanceForDirRef(
+          refDirname, dataSource, reportDir, revokedOnly, stopMe,
+          numCertsPerSelect, numRefThreads, numTargetThreads);
+      } else {
+        diff = DbDigestDiff.getInstanceForDbRef(
+          refDatasource, dataSource, reportDir, revokedOnly, stopMe,
+          numCertsPerSelect, numRefThreads, numTargetThreads);
+      }
+      diff.setIncludeCACerts(includeCACerts);
+      diff.diff();
+    } finally {
+      if (refDatasource != null) {
         try {
-            DbDigestDiff diff;
-            if (refDirname != null) {
-                diff = DbDigestDiff.getInstanceForDirRef(
-                    refDirname, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numRefThreads, numTargetThreads);
-            } else {
-                diff = DbDigestDiff.getInstanceForDbRef(
-                    refDatasource, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numRefThreads, numTargetThreads);
-            }
-            diff.setIncludeCACerts(includeCACerts);
-            diff.diff();
-        } finally {
-            if (refDatasource != null) {
-                try {
-                    refDatasource.shutdown();
-                } catch (Throwable e) {
-                    LOG.error("refDatasource.shutdown()", e);
-                }
-            }
-
-            try {
-                dataSource.shutdown();
-            } catch (Throwable e) {
-                LOG.error("dataSource.shutdown()", e);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+          refDatasource.shutdown();
+        } catch (Throwable e) {
+          LOG.error("refDatasource.shutdown()", e);
         }
-    } // method doRun
+      }
+
+      try {
+        dataSource.shutdown();
+      } catch (Throwable e) {
+        LOG.error("dataSource.shutdown()", e);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+    }
+  } // method doRun
 
 }

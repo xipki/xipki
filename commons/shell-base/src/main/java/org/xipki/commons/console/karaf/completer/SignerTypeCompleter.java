@@ -40,13 +40,14 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class SignerTypeCompleter extends AbstractEnumCompleter {
 
-    public SignerTypeCompleter() {
-        setTokens("JKS, PKCS11, PKCS12");
-    }
+  public SignerTypeCompleter() {
+    setTokens("JKS, PKCS11, PKCS12");
+  }
 
 }

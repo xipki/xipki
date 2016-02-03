@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-responder-up",
-        description = "update responder (negative, QA)")
+    description = "update responder (negative, QA)")
 @Service
 public class NegResponderUpdateCmd extends ResponderUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-responder-up");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-responder-up");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

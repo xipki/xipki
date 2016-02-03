@@ -37,29 +37,30 @@ package org.xipki.pki.ocsp.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @SuppressWarnings("serial")
 public class OCSPTargetUnmatchedException extends OCSPResponseException {
 
-    public OCSPTargetUnmatchedException() {
-        super();
-    }
+  public OCSPTargetUnmatchedException() {
+    super();
+  }
 
-    public OCSPTargetUnmatchedException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public OCSPTargetUnmatchedException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public OCSPTargetUnmatchedException(
-            final String message) {
-        super(message);
-    }
+  public OCSPTargetUnmatchedException(
+      final String message) {
+    super(message);
+  }
 
-    public OCSPTargetUnmatchedException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public OCSPTargetUnmatchedException(
+      final Throwable cause) {
+    super(cause);
+  }
 
 }

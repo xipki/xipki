@@ -45,128 +45,129 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertRevocationInfo implements Serializable {
 
-    private CRLReason reason;
+  private CRLReason reason;
 
-    private Date revocationTime;
+  private Date revocationTime;
 
-    private Date invalidityTime;
+  private Date invalidityTime;
 
-    public CertRevocationInfo(
-            final CRLReason reason) {
-        this(reason, new Date(), null);
+  public CertRevocationInfo(
+      final CRLReason reason) {
+    this(reason, new Date(), null);
+  }
+
+  public CertRevocationInfo(
+      final int reasonCode) {
+    this(reasonCode, new Date(), null);
+  }
+
+  public CertRevocationInfo(
+      final CRLReason reason,
+      final Date revocationTime,
+      final Date invalidityTime) {
+    ParamUtil.assertNotNull("reason", reason);
+    ParamUtil.assertNotNull("revocationTime", revocationTime);
+    this.reason = reason;
+    this.revocationTime = revocationTime;
+    this.invalidityTime = invalidityTime;
+    this.serialVersion = SERIAL_VERSION;
+  }
+
+  public CertRevocationInfo(
+      final int reasonCode,
+      final Date revocationTime,
+      final Date invalidityTime) {
+    ParamUtil.assertNotNull("revocationTime", revocationTime);
+
+    this.reason = CRLReason.forReasonCode(reasonCode);
+    if (this.reason == null) {
+      throw new IllegalArgumentException("invalid reason " + reasonCode);
     }
+    this.revocationTime = revocationTime;
+    this.invalidityTime = invalidityTime;
+    this.serialVersion = SERIAL_VERSION;
+  }
 
-    public CertRevocationInfo(
-            final int reasonCode) {
-        this(reasonCode, new Date(), null);
+  public void setReason(
+      final CRLReason reason) {
+    ParamUtil.assertNotNull("reason", reason);
+    this.reason = reason;
+  }
+
+  public CRLReason getReason() {
+    return reason;
+  }
+
+  public void setRevocationTime(
+      final Date revocationTime) {
+    this.revocationTime = revocationTime;
+  }
+
+  /**
+   *
+   * @return revocation time, never be null
+   */
+  public Date getRevocationTime() {
+    if (revocationTime == null) {
+      revocationTime = new Date();
     }
+    return revocationTime;
+  }
 
-    public CertRevocationInfo(
-            final CRLReason reason,
-            final Date revocationTime,
-            final Date invalidityTime) {
-        ParamUtil.assertNotNull("reason", reason);
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
-        this.reason = reason;
-        this.revocationTime = revocationTime;
-        this.invalidityTime = invalidityTime;
-        this.serialVersion = SERIAL_VERSION;
-    }
+  /**
+   *
+   * @return invalidity time, may be null
+   */
+  public Date getInvalidityTime() {
+    return invalidityTime;
+  }
 
-    public CertRevocationInfo(
-            final int reasonCode,
-            final Date revocationTime,
-            final Date invalidityTime) {
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
+  public void setInvalidityTime(
+      final Date invalidityTime) {
+    this.invalidityTime = invalidityTime;
+  }
 
-        this.reason = CRLReason.forReasonCode(reasonCode);
-        if (this.reason == null) {
-            throw new IllegalArgumentException("invalid reason " + reasonCode);
-        }
-        this.revocationTime = revocationTime;
-        this.invalidityTime = invalidityTime;
-        this.serialVersion = SERIAL_VERSION;
-    }
+  //------------------------------------------------
+  // Customized serialization
+  //------------------------------------------------
+  private static final long serialVersionUID = 1L;
 
-    public void setReason(
-            final CRLReason reason) {
-        ParamUtil.assertNotNull("reason", reason);
-        this.reason = reason;
-    }
+  private static final String SR_serialVersion = "serialVersion";
+  private static final double SERIAL_VERSION = 1.0;
 
-    public CRLReason getReason() {
-        return reason;
-    }
+  private static final String SR_reason = "reason";
+  private static final String SR_revocationTime = "revocationTime";
+  private static final String SR_invalidityTime = "invalidityTime";
 
-    public void setRevocationTime(
-            final Date revocationTime) {
-        this.revocationTime = revocationTime;
-    }
+  private double serialVersion;
 
-    /**
-     *
-     * @return revocation time, never be null
-     */
-    public Date getRevocationTime() {
-        if (revocationTime == null) {
-            revocationTime = new Date();
-        }
-        return revocationTime;
-    }
+  private void writeObject(
+      final java.io.ObjectOutputStream out)
+  throws IOException {
+    final Map<String, Object> serialMap = new HashMap<String, Object>();
 
-    /**
-     *
-     * @return invalidity time, may be null
-     */
-    public Date getInvalidityTime() {
-        return invalidityTime;
-    }
+    serialMap.put(SR_serialVersion, serialVersion);
+    serialMap.put(SR_reason, reason);
+    serialMap.put(SR_revocationTime, revocationTime);
+    serialMap.put(SR_invalidityTime, invalidityTime);
 
-    public void setInvalidityTime(
-            final Date invalidityTime) {
-        this.invalidityTime = invalidityTime;
-    }
+    out.writeObject(serialMap);
+  }
 
-    //------------------------------------------------
-    // Customized serialization
-    //------------------------------------------------
-    private static final long serialVersionUID = 1L;
-
-    private static final String SR_serialVersion = "serialVersion";
-    private static final double SERIAL_VERSION = 1.0;
-
-    private static final String SR_reason = "reason";
-    private static final String SR_revocationTime = "revocationTime";
-    private static final String SR_invalidityTime = "invalidityTime";
-
-    private double serialVersion;
-
-    private void writeObject(
-            final java.io.ObjectOutputStream out)
-    throws IOException {
-        final Map<String, Object> serialMap = new HashMap<String, Object>();
-
-        serialMap.put(SR_serialVersion, serialVersion);
-        serialMap.put(SR_reason, reason);
-        serialMap.put(SR_revocationTime, revocationTime);
-        serialMap.put(SR_invalidityTime, invalidityTime);
-
-        out.writeObject(serialMap);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(
-            final java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
-        serialVersion = (double) serialMap.get(SR_serialVersion);
-        reason = (CRLReason) serialMap.get(SR_reason);
-        revocationTime = (Date) serialMap.get(SR_revocationTime);
-        invalidityTime = (Date) serialMap.get(SR_invalidityTime);
-    }
+  @SuppressWarnings("unchecked")
+  private void readObject(
+      final java.io.ObjectInputStream in)
+  throws IOException, ClassNotFoundException {
+    final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
+    serialVersion = (double) serialMap.get(SR_serialVersion);
+    reason = (CRLReason) serialMap.get(SR_reason);
+    revocationTime = (Date) serialMap.get(SR_revocationTime);
+    invalidityTime = (Date) serialMap.get(SR_invalidityTime);
+  }
 
 }

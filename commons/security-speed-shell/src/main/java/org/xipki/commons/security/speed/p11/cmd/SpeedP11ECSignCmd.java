@@ -45,24 +45,25 @@ import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign",
-        description = "performance test of PKCS#11 EC signature creation")
+    description = "performance test of PKCS#11 EC signature creation")
 public class SpeedP11ECSignCmd extends SpeedP11SignCommandSupport {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      required = true,
+      description = "EC curve name\n"
+          + "(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected LoadExecutor getTester()
-    throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName);
-    }
+  @Override
+  protected LoadExecutor getTester()
+  throws Exception {
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName);
+  }
 
 }

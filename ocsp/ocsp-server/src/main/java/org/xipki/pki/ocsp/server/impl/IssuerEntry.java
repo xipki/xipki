@@ -48,60 +48,61 @@ import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IssuerEntry {
 
-    private final int id;
+  private final int id;
 
-    private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
+  private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
 
-    private final Date notBefore;
+  private final Date notBefore;
 
-    private CertRevocationInfo revocationInfo;
+  private CertRevocationInfo revocationInfo;
 
-    public IssuerEntry(
-            final int id,
-            final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
-            final Date caNotBefore) {
-        ParamUtil.assertNotEmpty("issuerHashMap", issuerHashMap);
-        ParamUtil.assertNotNull("caNotBefore", caNotBefore);
+  public IssuerEntry(
+      final int id,
+      final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
+      final Date caNotBefore) {
+    ParamUtil.assertNotEmpty("issuerHashMap", issuerHashMap);
+    ParamUtil.assertNotNull("caNotBefore", caNotBefore);
 
-        this.id = id;
-        this.issuerHashMap = issuerHashMap;
-        this.notBefore = caNotBefore;
-    }
+    this.id = id;
+    this.issuerHashMap = issuerHashMap;
+    this.notBefore = caNotBefore;
+  }
 
-    public int getId() {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public boolean matchHash(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
-        return (issuerHash == null)
-                ? false
-                : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
-    }
+  public boolean matchHash(
+      final HashAlgoType hashAlgo,
+      final byte[] issuerNameHash,
+      final byte[] issuerKeyHash) {
+    IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
+    return (issuerHash == null)
+        ? false
+        : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
+  }
 
-    public void setRevocationInfo(
-            final Date revocationTime) {
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
-        this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
-    }
+  public void setRevocationInfo(
+      final Date revocationTime) {
+    ParamUtil.assertNotNull("revocationTime", revocationTime);
+    this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
+  }
 
-    public CertRevocationInfo getRevocationInfo() {
-        return revocationInfo;
-    }
+  public CertRevocationInfo getRevocationInfo() {
+    return revocationInfo;
+  }
 
-    public Date getNotBefore() {
-        return notBefore;
-    }
+  public Date getNotBefore() {
+    return notBefore;
+  }
 
-    Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
-        return Collections.unmodifiableCollection(issuerHashMap.values());
-    }
+  Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
+    return Collections.unmodifiableCollection(issuerHashMap.values());
+  }
 
 }

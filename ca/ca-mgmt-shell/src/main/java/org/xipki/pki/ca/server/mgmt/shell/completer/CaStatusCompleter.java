@@ -40,13 +40,14 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class CaStatusCompleter extends AbstractEnumCompleter {
 
-    public CaStatusCompleter() {
-        setTokens("active,inactive");
-    }
+  public CaStatusCompleter() {
+    setTokens("active,inactive");
+  }
 
 }

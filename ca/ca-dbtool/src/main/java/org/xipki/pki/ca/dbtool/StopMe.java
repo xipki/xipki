@@ -39,19 +39,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class StopMe {
 
-    private final AtomicBoolean stopMe;
+  private final AtomicBoolean stopMe;
 
-    public StopMe(
-            final AtomicBoolean stopMe) {
-        this.stopMe = stopMe;
-    }
+  public StopMe(
+      final AtomicBoolean stopMe) {
+    this.stopMe = stopMe;
+  }
 
-    public boolean stopMe() {
-        return stopMe.get();
-    }
+  public boolean stopMe() {
+    return stopMe.get();
+  }
 
 }

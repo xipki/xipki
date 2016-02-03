@@ -42,32 +42,33 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-add",
-        description = "add CMP control")
+    description = "add CMP control")
 @Service
 public class CmpControlAddCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "CMP control name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "CMP control name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--conf",
-            required = true,
-            description = "CMP control configuration\n"
-                    + "(required)")
-    private String conf;
+  @Option(name = "--conf",
+      required = true,
+      description = "CMP control configuration\n"
+          + "(required)")
+  private String conf;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        CmpControlEntry entry = new CmpControlEntry(name, conf);
-        boolean b = caManager.addCmpControl(entry);
-        output(b, "added", "could not add", "CMP control " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    CmpControlEntry entry = new CmpControlEntry(name, conf);
+    boolean b = caManager.addCmpControl(entry);
+    output(b, "added", "could not add", "CMP control " + name);
+    return null;
+  }
 
 }

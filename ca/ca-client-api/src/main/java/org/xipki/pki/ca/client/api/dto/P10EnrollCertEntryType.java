@@ -40,30 +40,31 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P10EnrollCertEntryType {
 
-    private final CertificationRequest p10Request;
+  private final CertificationRequest p10Request;
 
-    private final String profile;
+  private final String profile;
 
-    public P10EnrollCertEntryType(
-            final CertificationRequest p10Request,
-            final String profile) {
-        ParamUtil.assertNotNull("p10Request", p10Request);
-        ParamUtil.assertNotBlank("profile", profile);
+  public P10EnrollCertEntryType(
+      final CertificationRequest p10Request,
+      final String profile) {
+    ParamUtil.assertNotNull("p10Request", p10Request);
+    ParamUtil.assertNotBlank("profile", profile);
 
-        this.p10Request = p10Request;
-        this.profile = profile;
-    }
+    this.p10Request = p10Request;
+    this.profile = profile;
+  }
 
-    public CertificationRequest getP10Request() {
-        return p10Request;
-    }
+  public CertificationRequest getP10Request() {
+    return p10Request;
+  }
 
-    public String getProfile() {
-        return profile;
-    }
+  public String getProfile() {
+    return profile;
+  }
 
 }

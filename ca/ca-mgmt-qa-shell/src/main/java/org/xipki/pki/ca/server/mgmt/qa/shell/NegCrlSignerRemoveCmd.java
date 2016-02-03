@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-crlsigner-rm",
-        description = "remove CRL signer (negative, QA)")
+    description = "remove CRL signer (negative, QA)")
 @Service
 public class NegCrlSignerRemoveCmd extends CrlSignerRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-crlsigner-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-crlsigner-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

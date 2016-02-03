@@ -43,26 +43,27 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "scep-rm",
-        description = "remove SCEP")
+    description = "remove SCEP")
 @Service
 public class ScepRemoveCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "SCEP CA name\n"
-                    + "(required)")
-    @Completion(ScepNameCompleter.class)
-    private String name;
+  @Option(name = "--ca",
+      required = true,
+      description = "SCEP CA name\n"
+          + "(required)")
+  @Completion(ScepNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeScep(name);
-        output(b, "removed", "could not remove", "SCEP for CA " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeScep(name);
+    output(b, "removed", "could not remove", "SCEP for CA " + name);
+    return null;
+  }
 
 }

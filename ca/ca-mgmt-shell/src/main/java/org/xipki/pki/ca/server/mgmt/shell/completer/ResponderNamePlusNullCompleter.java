@@ -42,17 +42,18 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ResponderNamePlusNullCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        Set<String> ret = new HashSet<>();
-        ret.addAll(caManager.getCmpResponderNames());
-        ret.add("NULL");
-        return ret;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    Set<String> ret = new HashSet<>();
+    ret.addAll(caManager.getCmpResponderNames());
+    ret.add("NULL");
+    return ret;
+  }
 
 }

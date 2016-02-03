@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-up",
-        description = "update CA")
+    description = "update CA")
 @Service
 public class NegCaUpdateCmd extends CaUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-ca-up");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-ca-up");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

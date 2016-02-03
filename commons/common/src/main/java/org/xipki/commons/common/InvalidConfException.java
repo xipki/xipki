@@ -37,29 +37,30 @@ package org.xipki.commons.common;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class InvalidConfException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public InvalidConfException() {
-    }
+  public InvalidConfException() {
+  }
 
-    public InvalidConfException(
-            final String message) {
-        super(message);
-    }
+  public InvalidConfException(
+      final String message) {
+    super(message);
+  }
 
-    public InvalidConfException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public InvalidConfException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public InvalidConfException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public InvalidConfException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

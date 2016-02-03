@@ -37,15 +37,16 @@ package org.xipki.commons.password.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface SinglePasswordResolver {
 
-    boolean canResolveProtocol(
-            String protocol);
+  boolean canResolveProtocol(
+      String protocol);
 
-    char[] resolvePassword(
-            String passwordHint)
-    throws PasswordResolverException;
+  char[] resolvePassword(
+      String passwordHint)
+  throws PasswordResolverException;
 
 }

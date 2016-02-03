@@ -49,37 +49,38 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "neg-enroll-p12",
-        description = "enroll certificate (PKCS#12 keystore, negative, for QA)")
+    description = "enroll certificate (PKCS#12 keystore, negative, for QA)")
 @Service
 public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
 
-    @Option(name = "--p12",
-            required = true,
-            description = "PKCS#12 request file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p12File;
+  @Option(name = "--p12",
+      required = true,
+      description = "PKCS#12 request file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p12File;
 
-    @Option(name = "--password",
-            description = "password of the PKCS#12 file")
-    private String password;
+  @Option(name = "--password",
+      description = "password of the PKCS#12 file")
+  private String password;
 
-    @Override
-    protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl)
-    throws SignerException {
-        if (password == null) {
-            password = new String(readPassword());
-        }
-
-        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-                p12File, password, 1);
-        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+  @Override
+  protected ConcurrentContentSigner getSigner(
+      final String hashAlgo,
+      final SignatureAlgoControl signatureAlgoControl)
+  throws SignerException {
+    if (password == null) {
+      password = new String(readPassword());
     }
+
+    String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
+        p12File, password, 1);
+    return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
+        signatureAlgoControl, (X509Certificate[]) null);
+  }
 
 }

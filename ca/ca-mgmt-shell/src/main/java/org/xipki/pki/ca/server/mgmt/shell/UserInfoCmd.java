@@ -44,30 +44,31 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "user-info",
-        description = "show information of user")
+    description = "show information of user")
 @Service
 public class UserInfoCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", required = true, description = "user name")
-    private String name;
+  @Argument(index = 0, name = "name", required = true, description = "user name")
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        UserEntry userEntry = caManager.getUser(name);
-        if (userEntry == null) {
-            throw new UnexpectedException("\tno user named '" + name + "' is configured");
-        } else {
-            sb.append(name).append("\n\t").append(userEntry);
-        }
-
-        out(sb.toString());
-        return null;
+    UserEntry userEntry = caManager.getUser(name);
+    if (userEntry == null) {
+      throw new UnexpectedException("\tno user named '" + name + "' is configured");
+    } else {
+      sb.append(name).append("\n\t").append(userEntry);
     }
+
+    out(sb.toString());
+    return null;
+  }
 
 }

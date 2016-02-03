@@ -43,39 +43,40 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class AbstractCaCertStoreDbPorter extends DbPorter {
 
-    private static final String CRLS_DIRNAME = "crls";
+  private static final String CRLS_DIRNAME = "crls";
 
-    private static final String CRLS_MANIFEST_FILENAME = "crls-manifest";
+  private static final String CRLS_MANIFEST_FILENAME = "crls-manifest";
 
-    private static final String USERS_DIRNAME = "users";
+  private static final String USERS_DIRNAME = "users";
 
-    private static final String USERS_MANIFEST_FILENAME = "users-manifest";
+  private static final String USERS_MANIFEST_FILENAME = "users-manifest";
 
-    protected final String crlsDir;
+  protected final String crlsDir;
 
-    protected final String crlsListFile;
+  protected final String crlsListFile;
 
-    protected final String usersDir;
+  protected final String usersDir;
 
-    protected final String usersListFile;
+  protected final String usersListFile;
 
-    AbstractCaCertStoreDbPorter(
-            final DataSourceWrapper dataSource,
-            final String baseDir,
-            final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
-    throws DataAccessException {
-        super(dataSource, baseDir, stopMe, evaluateOnly);
+  AbstractCaCertStoreDbPorter(
+      final DataSourceWrapper dataSource,
+      final String baseDir,
+      final AtomicBoolean stopMe,
+      final boolean evaluateOnly)
+  throws DataAccessException {
+    super(dataSource, baseDir, stopMe, evaluateOnly);
 
-        this.crlsDir = this.baseDir + File.separator + CRLS_DIRNAME;
-        this.crlsListFile = this.baseDir + File.separator + CRLS_MANIFEST_FILENAME;
+    this.crlsDir = this.baseDir + File.separator + CRLS_DIRNAME;
+    this.crlsListFile = this.baseDir + File.separator + CRLS_MANIFEST_FILENAME;
 
-        this.usersDir = this.baseDir + File.separator + USERS_DIRNAME;
-        this.usersListFile = this.baseDir + File.separator + USERS_MANIFEST_FILENAME;
-    }
+    this.usersDir = this.baseDir + File.separator + USERS_DIRNAME;
+    this.usersListFile = this.baseDir + File.separator + USERS_MANIFEST_FILENAME;
+  }
 
 }

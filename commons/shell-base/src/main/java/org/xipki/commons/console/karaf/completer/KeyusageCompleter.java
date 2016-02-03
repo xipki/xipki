@@ -45,24 +45,25 @@ import org.xipki.commons.security.api.KeyUsage;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> usages;
+  private static final Set<String> usages;
 
-    static {
-        Set<String> set = new HashSet<>();
-        for (KeyUsage usage : KeyUsage.values()) {
-            set.add(usage.getName());
-        }
-        usages = Collections.unmodifiableSet(set);
+  static {
+    Set<String> set = new HashSet<>();
+    for (KeyUsage usage : KeyUsage.values()) {
+      set.add(usage.getName());
     }
+    usages = Collections.unmodifiableSet(set);
+  }
 
-    @Override
-    protected Set<String> getEnums() {
-        return usages;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return usages;
+  }
 
 }

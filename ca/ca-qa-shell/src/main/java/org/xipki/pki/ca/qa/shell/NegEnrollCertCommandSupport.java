@@ -64,108 +64,109 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject to be requested.\n"
-                    + "default is the subject of self-signed certifite.")
-    private String subject;
+  @Option(name = "--subject", aliases = "-s",
+      description = "subject to be requested.\n"
+          + "default is the subject of self-signed certifite.")
+  private String subject;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
-    private String profile;
+  @Option(name = "--profile", aliases = "-p",
+      required = true,
+      description = "certificate profile\n"
+          + "(required)")
+  private String profile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
+  @Option(name = "--user",
+      description = "username")
+  private String user;
 
-    @Option(name = "--hash",
-            description = "hash algorithm name for the POPO computation")
-    @Completion(HashAlgCompleter.class)
-    private String hashAlgo = "SHA256";
+  @Option(name = "--hash",
+      description = "hash algorithm name for the POPO computation")
+  @Completion(HashAlgCompleter.class)
+  private String hashAlgo = "SHA256";
 
-    @Option(name = "--rsa-mgf1",
-            description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
-                    + "(only applied to RSA key)")
-    private Boolean rsaMgf1 = Boolean.FALSE;
+  @Option(name = "--rsa-mgf1",
+      description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
+          + "(only applied to RSA key)")
+  private Boolean rsaMgf1 = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-            description = "whether to use the Plain DSA for the POPO computation\n"
-                    + "(only applied to DSA and ECDSA key)")
-    private Boolean dsaPlain = Boolean.FALSE;
+  @Option(name = "--dsa-plain",
+      description = "whether to use the Plain DSA for the POPO computation\n"
+          + "(only applied to DSA and ECDSA key)")
+  private Boolean dsaPlain = Boolean.FALSE;
 
-    @Option(name = "--ca",
-            description = "CA name\n"
-                    + "required if the profile is supported by more than one CA")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      description = "CA name\n"
+          + "required if the profile is supported by more than one CA")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Reference
-    protected SecurityFactory securityFactory;
+  @Reference
+  protected SecurityFactory securityFactory;
 
-    protected abstract ConcurrentContentSigner getSigner(
-            String hashAlgo,
-            SignatureAlgoControl signatureAlgoControl)
-    throws SignerException;
+  protected abstract ConcurrentContentSigner getSigner(
+      String hashAlgo,
+      SignatureAlgoControl signatureAlgoControl)
+  throws SignerException;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        EnrollCertRequestType request = new EnrollCertRequestType(
-                EnrollCertRequestType.Type.CERT_REQ);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    EnrollCertRequestType request = new EnrollCertRequestType(
+        EnrollCertRequestType.Type.CERT_REQ);
 
-        CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-        ConcurrentContentSigner signer = getSigner(hashAlgo,
-                new SignatureAlgoControl(rsaMgf1, dsaPlain));
-        X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
+    CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+    ConcurrentContentSigner signer = getSigner(hashAlgo,
+        new SignatureAlgoControl(rsaMgf1, dsaPlain));
+    X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
-        X500Name x500Subject = (subject == null)
-                ? ssCert.getSubject()
-                : new X500Name(subject);
-        certTemplateBuilder.setSubject(x500Subject);
-        certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
-        CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
+    X500Name x500Subject = (subject == null)
+        ? ssCert.getSubject()
+        : new X500Name(subject);
+    certTemplateBuilder.setSubject(x500Subject);
+    certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
+    CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
-        ProofOfPossessionSigningKeyBuilder popoBuilder =
-                new ProofOfPossessionSigningKeyBuilder(certReq);
-        ContentSigner contentSigner = signer.borrowContentSigner();
-        POPOSigningKey popoSk;
-        try {
-            popoSk = popoBuilder.build(contentSigner);
-        } finally {
-            signer.returnContentSigner(contentSigner);
-        }
+    ProofOfPossessionSigningKeyBuilder popoBuilder =
+        new ProofOfPossessionSigningKeyBuilder(certReq);
+    ContentSigner contentSigner = signer.borrowContentSigner();
+    POPOSigningKey popoSk;
+    try {
+      popoSk = popoBuilder.build(contentSigner);
+    } finally {
+      signer.returnContentSigner(contentSigner);
+    }
 
-        ProofOfPossession popo = new ProofOfPossession(popoSk);
+    ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
-                certReq, popo);
-        request.addRequestEntry(reqEntry);
+    EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
+        certReq, popo);
+    request.addRequestEntry(reqEntry);
 
-        EnrollCertResult result;
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            result = caClient.requestCerts(request, caName, user, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+    EnrollCertResult result;
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      result = caClient.requestCerts(request, caName, user, debug);
+    } finally {
+      saveRequestResponse(debug);
+    }
 
-        X509Certificate cert = null;
-        if (result != null) {
-            String id = result.getAllIds().iterator().next();
-            CertOrError certOrError = result.getCertificateOrError(id);
-            cert = (X509Certificate) certOrError.getCertificate();
-        }
+    X509Certificate cert = null;
+    if (result != null) {
+      String id = result.getAllIds().iterator().next();
+      CertOrError certOrError = result.getCertificateOrError(id);
+      cert = (X509Certificate) certOrError.getCertificate();
+    }
 
-        if (cert != null) {
-            throw new CmdFailure("no certificate is excepted, but received one");
-        }
+    if (cert != null) {
+      throw new CmdFailure("no certificate is excepted, but received one");
+    }
 
-        return null;
-    } // method getSigner
+    return null;
+  } // method getSigner
 
 }

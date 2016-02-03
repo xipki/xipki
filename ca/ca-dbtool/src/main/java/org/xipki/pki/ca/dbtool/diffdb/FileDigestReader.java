@@ -58,159 +58,160 @@ import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class FileDigestReader implements DigestReader {
 
-    private final int totalAccount;
+  private final int totalAccount;
 
-    private final String caDirname;
+  private final String caDirname;
 
-    private final String caSubjectName;
+  private final String caSubjectName;
 
-    private final X509Certificate caCert;
+  private final X509Certificate caCert;
 
-    private final BufferedReader certsFilesReader;
+  private final BufferedReader certsFilesReader;
 
-    private final boolean revokedOnly;
+  private final boolean revokedOnly;
 
-    private BufferedReader certsReader;
+  private BufferedReader certsReader;
 
-    private DbDigestEntry next;
+  private DbDigestEntry next;
 
-    public FileDigestReader(
-            final String caDirname,
-            final boolean revokedOnly)
-    throws IOException, CertificateException {
-        ParamUtil.assertNotBlank("caDirname", caDirname);
-        this.caDirname = caDirname;
-        this.revokedOnly = revokedOnly;
+  public FileDigestReader(
+      final String caDirname,
+      final boolean revokedOnly)
+  throws IOException, CertificateException {
+    ParamUtil.assertNotBlank("caDirname", caDirname);
+    this.caDirname = caDirname;
+    this.revokedOnly = revokedOnly;
 
-        this.caCert = X509Util.parseCert(
-                new File(caDirname, "ca.der"));
-        Properties props = new Properties();
-        props.load(new FileInputStream(new File(caDirname, CaEntry.FILENAME_OVERVIEW)));
-        String accoutPropKey = revokedOnly
-                ? CaEntry.PROPKEY_ACCOUNT_REVOKED
-                : CaEntry.PROPKEY_ACCOUNT;
-        String accoutS = props.getProperty(accoutPropKey);
-        this.totalAccount = Integer.parseInt(accoutS);
+    this.caCert = X509Util.parseCert(
+        new File(caDirname, "ca.der"));
+    Properties props = new Properties();
+    props.load(new FileInputStream(new File(caDirname, CaEntry.FILENAME_OVERVIEW)));
+    String accoutPropKey = revokedOnly
+        ? CaEntry.PROPKEY_ACCOUNT_REVOKED
+        : CaEntry.PROPKEY_ACCOUNT;
+    String accoutS = props.getProperty(accoutPropKey);
+    this.totalAccount = Integer.parseInt(accoutS);
 
-        this.certsFilesReader = new BufferedReader(
-                new FileReader(
-                        new File(caDirname, "certs-manifest")));
-        this.caSubjectName = X509Util.getRFC4519Name(this.caCert.getSubjectX500Principal());
-        this.next = retrieveNext(true);
+    this.certsFilesReader = new BufferedReader(
+        new FileReader(
+            new File(caDirname, "certs-manifest")));
+    this.caSubjectName = X509Util.getRFC4519Name(this.caCert.getSubjectX500Principal());
+    this.next = retrieveNext(true);
+  }
+
+  @Override
+  public X509Certificate getCaCert() {
+    return caCert;
+  }
+
+  @Override
+  public String getCaSubjectName() {
+    return this.caSubjectName;
+  }
+
+  @Override
+  public int getTotalAccount() {
+    return totalAccount;
+  }
+
+  @Override
+  public synchronized CertsBundle nextCerts(
+      final int n)
+  throws DataAccessException, InterruptedException {
+    if (!hasNext()) {
+      return null;
     }
 
-    @Override
-    public X509Certificate getCaCert() {
-        return caCert;
+    int numSkipped = 0;
+    List<Long> serialNumbers = new ArrayList<>(n);
+    Map<Long, DbDigestEntry> certs = new HashMap<>(n);
+
+    int k = 0;
+    while (hasNext()) {
+      DbDigestEntry line;
+      try {
+        line = nextCert();
+      } catch (IOException e) {
+        throw new DataAccessException("IOException: " + e.getMessage());
+      }
+      if (revokedOnly && !line.isRevoked()) {
+        numSkipped++;
+        continue;
+      }
+
+      serialNumbers.add(line.getSerialNumber());
+      certs.put(line.getSerialNumber(), line);
+      k++;
+      if (k >= n) {
+        break;
+      }
     }
 
-    @Override
-    public String getCaSubjectName() {
-        return this.caSubjectName;
+    return (k == 0)
+        ? null
+        : new CertsBundle(numSkipped, certs, serialNumbers);
+  } // method nextCerts
+
+  private DbDigestEntry nextCert()
+  throws IOException {
+    if (next == null) {
+      throw new IllegalStateException("reach end of the stream");
     }
 
-    @Override
-    public int getTotalAccount() {
-        return totalAccount;
+    DbDigestEntry ret = next;
+    next = null;
+    next = retrieveNext(false);
+    return ret;
+  }
+
+  private DbDigestEntry retrieveNext(
+      final boolean firstTime)
+  throws IOException {
+    String line = firstTime
+        ? null
+        : certsReader.readLine();
+    if (line == null) {
+      close(certsReader);
+      String nextFileName = certsFilesReader.readLine();
+      if (nextFileName == null) {
+        return null;
+      }
+      String filePath = "certs" + File.separator + nextFileName;
+      certsReader = new BufferedReader(
+          new FileReader(new File(caDirname, filePath)));
+      line = certsReader.readLine();
     }
 
-    @Override
-    public synchronized CertsBundle nextCerts(
-            final int n)
-    throws DataAccessException, InterruptedException {
-        if (!hasNext()) {
-            return null;
-        }
+    return (line == null)
+        ? null
+        : DbDigestEntry.decode(line);
+  }
 
-        int numSkipped = 0;
-        List<Long> serialNumbers = new ArrayList<>(n);
-        Map<Long, DbDigestEntry> certs = new HashMap<>(n);
+  @Override
+  public void close() {
+    close(certsFilesReader);
+    close(certsReader);
+  }
 
-        int k = 0;
-        while (hasNext()) {
-            DbDigestEntry line;
-            try {
-                line = nextCert();
-            } catch (IOException e) {
-                throw new DataAccessException("IOException: " + e.getMessage());
-            }
-            if (revokedOnly && !line.isRevoked()) {
-                numSkipped++;
-                continue;
-            }
+  private boolean hasNext() {
+    return next != null;
+  }
 
-            serialNumbers.add(line.getSerialNumber());
-            certs.put(line.getSerialNumber(), line);
-            k++;
-            if (k >= n) {
-                break;
-            }
-        }
-
-        return (k == 0)
-                ? null
-                : new CertsBundle(numSkipped, certs, serialNumbers);
-    } // method nextCerts
-
-    private DbDigestEntry nextCert()
-    throws IOException {
-        if (next == null) {
-            throw new IllegalStateException("reach end of the stream");
-        }
-
-        DbDigestEntry ret = next;
-        next = null;
-        next = retrieveNext(false);
-        return ret;
+  private static void close(
+      final Reader reader) {
+    if (reader == null) {
+      return;
     }
 
-    private DbDigestEntry retrieveNext(
-            final boolean firstTime)
-    throws IOException {
-        String line = firstTime
-                ? null
-                : certsReader.readLine();
-        if (line == null) {
-            close(certsReader);
-            String nextFileName = certsFilesReader.readLine();
-            if (nextFileName == null) {
-                return null;
-            }
-            String filePath = "certs" + File.separator + nextFileName;
-            certsReader = new BufferedReader(
-                    new FileReader(new File(caDirname, filePath)));
-            line = certsReader.readLine();
-        }
-
-        return (line == null)
-                ? null
-                : DbDigestEntry.decode(line);
+    try {
+      reader.close();
+    } catch (Exception e) {
     }
-
-    @Override
-    public void close() {
-        close(certsFilesReader);
-        close(certsReader);
-    }
-
-    private boolean hasNext() {
-        return next != null;
-    }
-
-    private static void close(
-            final Reader reader) {
-        if (reader == null) {
-            return;
-        }
-
-        try {
-            reader.close();
-        } catch (Exception e) {
-        }
-    }
+  }
 
 }

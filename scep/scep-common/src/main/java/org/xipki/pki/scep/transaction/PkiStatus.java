@@ -37,44 +37,45 @@ package org.xipki.pki.scep.transaction;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum PkiStatus {
 
-    /**
-     * request granted
-     */
-    SUCCESS (0),
+  /**
+   * request granted
+   */
+  SUCCESS (0),
 
-    /**
-     * request rejected
-     */
-    FAILURE (2),
+  /**
+   * request rejected
+   */
+  FAILURE (2),
 
-    /**
-     * request pending for manual approval
-     */
-    PENDING (3);
+  /**
+   * request pending for manual approval
+   */
+  PENDING (3);
 
-    private final int code;
+  private final int code;
 
-    private PkiStatus(
-            final int code) {
-        this.code = code;
+  private PkiStatus(
+      final int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public static PkiStatus valueForCode(
+      final int code) {
+    for (PkiStatus m : values()) {
+      if (m.code == code) {
+        return m;
+      }
     }
-
-    public int getCode() {
-        return code;
-    }
-
-    public static PkiStatus valueForCode(
-            final int code) {
-        for (PkiStatus m : values()) {
-            if (m.code == code) {
-                return m;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
 }

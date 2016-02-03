@@ -54,123 +54,124 @@ import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface CAClient {
 
-    Set<String> getCaNames();
+  Set<String> getCaNames();
 
-    Set<CertprofileInfo> getCertprofiles(
-            String caName);
+  Set<CertprofileInfo> getCertprofiles(
+      String caName);
 
-    EnrollCertResult requestCert(
-            CertificationRequest p10Request,
-            String profile,
-            String caName,
-            String username,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  EnrollCertResult requestCert(
+      CertificationRequest p10Request,
+      String profile,
+      String caName,
+      String username,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    EnrollCertResult requestCerts(
-            EnrollCertRequestType request,
-            String caName,
-            String username,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  EnrollCertResult requestCerts(
+      EnrollCertRequestType request,
+      String caName,
+      String username,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    CertIdOrError revokeCert(
-            X500Name issuer,
-            BigInteger serial,
-            int reason,
-            Date invalidityTime,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError revokeCert(
+      X500Name issuer,
+      BigInteger serial,
+      int reason,
+      Date invalidityTime,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    CertIdOrError revokeCert(
-            X509Certificate cert,
-            int reason,
-            Date invalidityTime,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError revokeCert(
+      X509Certificate cert,
+      int reason,
+      Date invalidityTime,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    Map<String, CertIdOrError> revokeCerts(
-            RevokeCertRequestType request,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  Map<String, CertIdOrError> revokeCerts(
+      RevokeCertRequestType request,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    X509CRL downloadCRL(
-            String caName,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  X509CRL downloadCRL(
+      String caName,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    X509CRL downloadCRL(
-            String caName,
-            BigInteger crlNumber,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  X509CRL downloadCRL(
+      String caName,
+      BigInteger crlNumber,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    X509CRL generateCRL(
-            String caName,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  X509CRL generateCRL(
+      String caName,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    String getCaNameByIssuer(
-            X500Name issuer)
-    throws CAClientException;
+  String getCaNameByIssuer(
+      X500Name issuer)
+  throws CAClientException;
 
-    byte[] envelope(
-            CertRequest certRequest,
-            ProofOfPossession popo,
-            String profileName,
-            String caName,
-            String username)
-    throws CAClientException;
+  byte[] envelope(
+      CertRequest certRequest,
+      ProofOfPossession popo,
+      String profileName,
+      String caName,
+      String username)
+  throws CAClientException;
 
-    byte[] envelopeRevocation(
-            X500Name issuer,
-            BigInteger serial,
-            int reason)
-    throws CAClientException;
+  byte[] envelopeRevocation(
+      X500Name issuer,
+      BigInteger serial,
+      int reason)
+  throws CAClientException;
 
-    byte[] envelopeRevocation(
-            X509Certificate cert,
-            int reason)
-    throws CAClientException;
+  byte[] envelopeRevocation(
+      X509Certificate cert,
+      int reason)
+  throws CAClientException;
 
-    CertIdOrError unrevokeCert(
-            X500Name issuer,
-            BigInteger serial,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError unrevokeCert(
+      X500Name issuer,
+      BigInteger serial,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    CertIdOrError unrevokeCert(
-            X509Certificate cert,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError unrevokeCert(
+      X509Certificate cert,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    Map<String, CertIdOrError> unrevokeCerts(
-            UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  Map<String, CertIdOrError> unrevokeCerts(
+      UnrevokeOrRemoveCertRequestType request,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    CertIdOrError removeCert(
-            X500Name issuer,
-            BigInteger serial,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError removeCert(
+      X500Name issuer,
+      BigInteger serial,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    CertIdOrError removeCert(
-            X509Certificate cert,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  CertIdOrError removeCert(
+      X509Certificate cert,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    Map<String, CertIdOrError> removeCerts(
-            UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
-    throws CAClientException, PKIErrorException;
+  Map<String, CertIdOrError> removeCerts(
+      UnrevokeOrRemoveCertRequestType request,
+      RequestResponseDebug debug)
+  throws CAClientException, PKIErrorException;
 
-    HealthCheckResult getHealthCheckResult(
-            String caName)
-    throws CAClientException;
+  HealthCheckResult getHealthCheckResult(
+      String caName)
+  throws CAClientException;
 
 }

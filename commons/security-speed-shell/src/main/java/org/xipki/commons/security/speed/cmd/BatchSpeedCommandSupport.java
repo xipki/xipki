@@ -42,35 +42,36 @@ import org.xipki.commons.common.LoadExecutor;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
 
-    @Option(name = "--duration",
-            description = "duration in seconds for each test case")
-    private Integer durationInSecond = 10;
+  @Option(name = "--duration",
+      description = "duration in seconds for each test case")
+  private Integer durationInSecond = 10;
 
-    @Option(name = "--thread",
-            description = "number of threads")
-    private Integer numThreads = 5;
+  @Option(name = "--thread",
+      description = "number of threads")
+  private Integer numThreads = 5;
 
-    protected abstract List<LoadExecutor> getTesters()
-    throws Exception;
+  protected abstract List<LoadExecutor> getTesters()
+  throws Exception;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        List<LoadExecutor> testers = getTesters();
-        for (LoadExecutor tester : testers) {
-            tester.setDuration(durationInSecond);
-            tester.setThreads(Math.min(20, numThreads));
-            System.out.println("============================================");
-            tester.test();
-            if (tester.isInterrupted()) {
-                throw new InterruptedException("cancelled by the user");
-            }
-        }
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    List<LoadExecutor> testers = getTesters();
+    for (LoadExecutor tester : testers) {
+      tester.setDuration(durationInSecond);
+      tester.setThreads(Math.min(20, numThreads));
+      System.out.println("============================================");
+      tester.test();
+      if (tester.isInterrupted()) {
+        throw new InterruptedException("cancelled by the user");
+      }
     }
+    return null;
+  }
 
 }

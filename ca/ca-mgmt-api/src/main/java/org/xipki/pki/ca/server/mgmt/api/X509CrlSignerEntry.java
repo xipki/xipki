@@ -49,149 +49,150 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509CrlSignerEntry implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
+  private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String name;
+  private final String name;
 
-    private final String signerType;
+  private final String signerType;
 
-    private final String signerConf;
+  private final String signerConf;
 
-    private final String base64Cert;
+  private final String base64Cert;
 
-    private X509Certificate cert;
+  private X509Certificate cert;
 
-    private boolean certFaulty;
+  private boolean certFaulty;
 
-    private boolean confFaulty;
+  private boolean confFaulty;
 
-    private String crlControl;
+  private String crlControl;
 
-    public X509CrlSignerEntry(
-            final String name,
-            final String signerType,
-            final String signerConf,
-            final String base64Cert,
-            final String crlControl)
-    throws InvalidConfException {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("type", signerType);
-        ParamUtil.assertNotNull("crlControl", crlControl);
+  public X509CrlSignerEntry(
+      final String name,
+      final String signerType,
+      final String signerConf,
+      final String base64Cert,
+      final String crlControl)
+  throws InvalidConfException {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotBlank("type", signerType);
+    ParamUtil.assertNotNull("crlControl", crlControl);
 
-        if ("CA".equalsIgnoreCase(name)) {
-            this.base64Cert = null;
-        } else {
-            this.base64Cert = base64Cert;
+    if ("CA".equalsIgnoreCase(name)) {
+      this.base64Cert = null;
+    } else {
+      this.base64Cert = base64Cert;
+    }
+
+    this.name = name;
+    this.signerType = signerType;
+    this.signerConf = signerConf;
+    this.crlControl = crlControl;
+
+    if (this.base64Cert != null) {
+      try {
+        this.cert = X509Util.parseBase64EncodedCert(base64Cert);
+      } catch (Throwable t) {
+        LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
+        certFaulty = true;
+      }
+    }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setConfFaulty(
+      final boolean faulty) {
+    this.confFaulty = faulty;
+  }
+
+  public boolean isFaulty() {
+    return certFaulty || confFaulty;
+  }
+
+  public String getType() {
+    return signerType;
+  }
+
+  public String getConf() {
+    return signerConf;
+  }
+
+  public String getBase64Cert() {
+    return base64Cert;
+  }
+
+  public X509Certificate getCertificate() {
+    return cert;
+  }
+
+  public void setCertificate(
+      final X509Certificate cert) {
+    if (base64Cert != null) {
+      throw new IllegalStateException("certificate is already by specified by base64Cert");
+    }
+    this.cert = cert;
+  }
+
+  public String getCrlControl() {
+    return crlControl;
+  }
+
+  @Override
+  public String toString() {
+    return toString(false);
+  }
+
+  public String toString(
+      final boolean verbose) {
+    return toString(verbose, true);
+  }
+
+  public String toString(
+      final boolean verbose,
+      final boolean ignoreSensitiveInfo) {
+    StringBuilder sb = new StringBuilder(1000);
+    sb.append("name: ").append(name).append('\n');
+    sb.append("faulty: ").append(isFaulty()).append('\n');
+    sb.append("signerType: ").append(signerType).append('\n');
+    sb.append("signerConf: ");
+    if (signerConf == null) {
+      sb.append("null");
+    } else {
+      sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
+    }
+    sb.append('\n');
+    sb.append("crlControl: ").append(crlControl).append("\n");
+    if (cert != null) {
+      sb.append("cert: ").append("\n");
+      sb.append("\tissuer: ").append(
+          X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
+      sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
+      sb.append("\tsubject: ").append(
+          X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+
+      if (verbose) {
+        sb.append("\tencoded: ");
+        try {
+          sb.append(Base64.toBase64String(cert.getEncoded()));
+        } catch (CertificateEncodingException e) {
+          sb.append("ERROR");
         }
-
-        this.name = name;
-        this.signerType = signerType;
-        this.signerConf = signerConf;
-        this.crlControl = crlControl;
-
-        if (this.base64Cert != null) {
-            try {
-                this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            } catch (Throwable t) {
-                LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
-                certFaulty = true;
-            }
-        }
+      }
+    } else {
+      sb.append("cert: null\n");
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setConfFaulty(
-            final boolean faulty) {
-        this.confFaulty = faulty;
-    }
-
-    public boolean isFaulty() {
-        return certFaulty || confFaulty;
-    }
-
-    public String getType() {
-        return signerType;
-    }
-
-    public String getConf() {
-        return signerConf;
-    }
-
-    public String getBase64Cert() {
-        return base64Cert;
-    }
-
-    public X509Certificate getCertificate() {
-        return cert;
-    }
-
-    public void setCertificate(
-            final X509Certificate cert) {
-        if (base64Cert != null) {
-            throw new IllegalStateException("certificate is already by specified by base64Cert");
-        }
-        this.cert = cert;
-    }
-
-    public String getCrlControl() {
-        return crlControl;
-    }
-
-    @Override
-    public String toString() {
-        return toString(false);
-    }
-
-    public String toString(
-            final boolean verbose) {
-        return toString(verbose, true);
-    }
-
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
-        StringBuilder sb = new StringBuilder(1000);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("faulty: ").append(isFaulty()).append('\n');
-        sb.append("signerType: ").append(signerType).append('\n');
-        sb.append("signerConf: ");
-        if (signerConf == null) {
-            sb.append("null");
-        } else {
-            sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
-        }
-        sb.append('\n');
-        sb.append("crlControl: ").append(crlControl).append("\n");
-        if (cert != null) {
-            sb.append("cert: ").append("\n");
-            sb.append("\tissuer: ").append(
-                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
-            sb.append("\tsubject: ").append(
-                    X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
-
-            if (verbose) {
-                sb.append("\tencoded: ");
-                try {
-                    sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e) {
-                    sb.append("ERROR");
-                }
-            }
-        } else {
-            sb.append("cert: null\n");
-        }
-
-        return sb.toString();
-    } // method toString
+    return sb.toString();
+  } // method toString
 
 }

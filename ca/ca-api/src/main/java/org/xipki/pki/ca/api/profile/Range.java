@@ -37,69 +37,70 @@ package org.xipki.pki.ca.api.profile;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class Range {
 
-    private Integer min;
+  private Integer min;
 
-    private Integer max;
+  private Integer max;
 
-    public Range(
-            final Integer min,
-            final Integer max) {
-        setRange(min, max);
+  public Range(
+      final Integer min,
+      final Integer max) {
+    setRange(min, max);
+  }
+
+  public Integer getMin() {
+    return min;
+  }
+
+  public Integer getMax() {
+    return max;
+  }
+
+  public void setRange(
+      final Integer min,
+      final Integer max) {
+    if (min == null && max == null) {
+      throw new IllegalArgumentException("min and max cannot be both null");
+    }
+    if (min != null && max != null && min > max) {
+      throw new IllegalArgumentException(
+        String.format("min cannot be greater than max: %d > %d", min, max));
+    }
+    this.min = min;
+    this.max = max;
+  }
+
+  public boolean match(
+      final int i) {
+    if (min != null && i < min) {
+      return false;
+    }
+    if (max != null && i > max) {
+      return false;
     }
 
-    public Integer getMin() {
-        return min;
-    }
+    return true;
+  }
 
-    public Integer getMax() {
-        return max;
+  /**
+   * @Override
+   */
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    if (min != null) {
+      sb.append(min);
     }
-
-    public void setRange(
-            final Integer min,
-            final Integer max) {
-        if (min == null && max == null) {
-            throw new IllegalArgumentException("min and max cannot be both null");
-        }
-        if (min != null && max != null && min > max) {
-            throw new IllegalArgumentException(
-                String.format("min cannot be greater than max: %d > %d", min, max));
-        }
-        this.min = min;
-        this.max = max;
+    sb.append(", ");
+    if (max != null) {
+      sb.append(max);
     }
-
-    public boolean match(
-            final int i) {
-        if (min != null && i < min) {
-            return false;
-        }
-        if (max != null && i > max) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @Override
-     */
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        if (min != null) {
-            sb.append(min);
-        }
-        sb.append(", ");
-        if (max != null) {
-            sb.append(max);
-        }
-        sb.append("]");
-        return sb.toString();
-    }
+    sb.append("]");
+    return sb.toString();
+  }
 
 }

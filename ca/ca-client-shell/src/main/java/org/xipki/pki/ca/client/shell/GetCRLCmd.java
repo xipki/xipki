@@ -56,98 +56,99 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cli", name = "getcrl",
-        description = "download CRL")
+    description = "download CRL")
 @Service
 public class GetCRLCmd extends CRLCommandSupport {
 
-    @Option(name = "--with-basecrl",
-            description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    private Boolean withBaseCRL = Boolean.FALSE;
+  @Option(name = "--with-basecrl",
+      description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
+  private Boolean withBaseCRL = Boolean.FALSE;
 
-    @Option(name = "--basecrl-out",
-            description = "where to save the baseCRL\n"
-                    + "(defaults to <out>-baseCRL)")
-    @Completion(FilePathCompleter.class)
-    private String baseCRLOut;
+  @Option(name = "--basecrl-out",
+      description = "where to save the baseCRL\n"
+          + "(defaults to <out>-baseCRL)")
+  @Completion(FilePathCompleter.class)
+  private String baseCRLOut;
 
-    @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
-    throws CAClientException, PKIErrorException {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            return caClient.downloadCRL(caName, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+  @Override
+  protected X509CRL retrieveCRL(
+      final String caName)
+  throws CAClientException, PKIErrorException {
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      return caClient.downloadCRL(caName, debug);
+    } finally {
+      saveRequestResponse(debug);
+    }
+  }
+
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Set<String> caNames = caClient.getCaNames();
+    if (isEmpty(caNames)) {
+      throw new IllegalCmdParamException("no CA is configured");
     }
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Set<String> caNames = caClient.getCaNames();
-        if (isEmpty(caNames)) {
-            throw new IllegalCmdParamException("no CA is configured");
+    if (caName != null && !caNames.contains(caName)) {
+      throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+          + caNames);
+    }
+
+    if (caName == null) {
+      if (caNames.size() == 1) {
+        caName = caNames.iterator().next();
+      } else {
+        throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+            + " is required");
+      }
+    }
+
+    X509CRL crl = null;
+    try {
+      crl = retrieveCRL(caName);
+    } catch (PKIErrorException e) {
+      throw new CmdFailure("received no CRL from server: " + e.getMessage());
+    }
+
+    if (crl == null) {
+      throw new CmdFailure("received no CRL from server");
+    }
+
+    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+
+    if (withBaseCRL.booleanValue()) {
+      byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+      if (octetString != null) {
+        if (baseCRLOut == null) {
+          baseCRLOut = outFile + "-baseCRL";
         }
 
-        if (caName != null && !caNames.contains(caName)) {
-            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
-                    + caNames);
-        }
+        byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+        BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
-        if (caName == null) {
-            if (caNames.size() == 1) {
-                caName = caNames.iterator().next();
-            } else {
-                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
-                        + " is required");
-            }
-        }
-
-        X509CRL crl = null;
+        RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            crl = retrieveCRL(caName);
+          crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
         } catch (PKIErrorException e) {
-            throw new CmdFailure("received no CRL from server: " + e.getMessage());
+          throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
+        } finally {
+          saveRequestResponse(debug);
         }
 
         if (crl == null) {
-            throw new CmdFailure("received no CRL from server");
+          throw new CmdFailure("received no baseCRL from server");
+        } else {
+          saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
         }
+      }
+    }
 
-        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
-
-        if (withBaseCRL.booleanValue()) {
-            byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-            if (octetString != null) {
-                if (baseCRLOut == null) {
-                    baseCRLOut = outFile + "-baseCRL";
-                }
-
-                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
-                RequestResponseDebug debug = getRequestResponseDebug();
-                try {
-                    crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
-                } catch (PKIErrorException e) {
-                    throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
-                } finally {
-                    saveRequestResponse(debug);
-                }
-
-                if (crl == null) {
-                    throw new CmdFailure("received no baseCRL from server");
-                } else {
-                    saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
-                }
-            }
-        }
-
-        return null;
-    } // method doExecute
+    return null;
+  } // method doExecute
 
 }

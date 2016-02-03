@@ -46,30 +46,31 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "scep-info",
-        description = "show information of SCEP")
+    description = "show information of SCEP")
 @Service
 public class ScepInfoCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "SCEP CA name\n"
-                    + "(required)")
-    @Completion(ScepNameCompleter.class)
-    private String name;
+  @Option(name = "--ca",
+      required = true,
+      description = "SCEP CA name\n"
+          + "(required)")
+  @Completion(ScepNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        ScepEntry scep = caManager.getScepEntry(name);
-        if (scep == null) {
-            throw new UnexpectedException("could not find SCEP '" + name + "'");
-        }
-
-        System.out.println(scep.toString());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    ScepEntry scep = caManager.getScepEntry(name);
+    if (scep == null) {
+      throw new UnexpectedException("could not find SCEP '" + name + "'");
     }
+
+    System.out.println(scep.toString());
+    return null;
+  }
 
 }

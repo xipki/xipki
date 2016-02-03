@@ -44,82 +44,83 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponseOptionType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class ResponseOption {
 
-    private final boolean includeInvalidityDate;
+  private final boolean includeInvalidityDate;
 
-    private final boolean includeRevReason;
+  private final boolean includeRevReason;
 
-    private final EmbedCertsMode embedCertsMode;
+  private final EmbedCertsMode embedCertsMode;
 
-    private final boolean includeCerthash;
+  private final boolean includeCerthash;
 
-    private final HashAlgoType certHashAlgo;
+  private final HashAlgoType certHashAlgo;
 
-    private final Long cacheMaxAge;
+  private final Long cacheMaxAge;
 
-    public ResponseOption(
-            final ResponseOptionType conf)
-    throws InvalidConfException {
-        this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
-        this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
-        this.embedCertsMode = conf.getEmbedCertsMode();
-        this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
-        CacheType cacheConf = conf.getCache();
-        if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {
-            this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
+  public ResponseOption(
+      final ResponseOptionType conf)
+  throws InvalidConfException {
+    this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
+    this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
+    this.embedCertsMode = conf.getEmbedCertsMode();
+    this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
+    CacheType cacheConf = conf.getCache();
+    if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {
+      this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
+    } else {
+      this.cacheMaxAge = null;
+    }
+
+    HashAlgoType _certHashAlgo = null;
+    String s = conf.getCerthashAlgorithm();
+    if (s != null) {
+      String token = s.trim();
+      if (StringUtil.isNotBlank(token)) {
+        HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
+        if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo)) {
+          _certHashAlgo = algo;
         } else {
-            this.cacheMaxAge = null;
+          throw new InvalidConfException("hash algorithm " + token + " is unsupported");
         }
-
-        HashAlgoType _certHashAlgo = null;
-        String s = conf.getCerthashAlgorithm();
-        if (s != null) {
-            String token = s.trim();
-            if (StringUtil.isNotBlank(token)) {
-                HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo)) {
-                    _certHashAlgo = algo;
-                } else {
-                    throw new InvalidConfException("hash algorithm " + token + " is unsupported");
-                }
-            }
-        }
-        this.certHashAlgo = _certHashAlgo;
+      }
     }
+    this.certHashAlgo = _certHashAlgo;
+  }
 
-    public boolean isIncludeInvalidityDate() {
-        return includeInvalidityDate;
-    }
+  public boolean isIncludeInvalidityDate() {
+    return includeInvalidityDate;
+  }
 
-    public boolean isIncludeRevReason() {
-        return includeRevReason;
-    }
+  public boolean isIncludeRevReason() {
+    return includeRevReason;
+  }
 
-    public boolean isIncludeCerthash() {
-        return includeCerthash;
-    }
+  public boolean isIncludeCerthash() {
+    return includeCerthash;
+  }
 
-    public Long getCacheMaxAge() {
-        return cacheMaxAge;
-    }
+  public Long getCacheMaxAge() {
+    return cacheMaxAge;
+  }
 
-    public EmbedCertsMode getEmbedCertsMode() {
-        return embedCertsMode;
-    }
+  public EmbedCertsMode getEmbedCertsMode() {
+    return embedCertsMode;
+  }
 
-    public HashAlgoType getCertHashAlgo() {
-        return certHashAlgo;
-    }
+  public HashAlgoType getCertHashAlgo() {
+    return certHashAlgo;
+  }
 
-    private static boolean getBoolean(
-            final Boolean b,
-            final boolean dflt) {
-        return (b == null)
-                ? dflt
-                : b.booleanValue();
-    }
+  private static boolean getBoolean(
+      final Boolean b,
+      final boolean dflt) {
+    return (b == null)
+        ? dflt
+        : b.booleanValue();
+  }
 
 }

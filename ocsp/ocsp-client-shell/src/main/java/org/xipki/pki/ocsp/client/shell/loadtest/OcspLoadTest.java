@@ -59,138 +59,139 @@ import org.xipki.pki.ocsp.client.shell.OCSPUtils;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OcspLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 10) {
-                long sn = nextSerialNumber();
-                int numFailed = testNext(sn)
-                        ? 0
-                        : 1;
-
-                account(1, numFailed);
-            }
-        }
-
-        private boolean testNext(
-                final long sn) {
-            BasicOCSPResp basicResp;
-            try {
-                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
-                        options, null);
-                basicResp = OCSPUtils.extractBasicOCSPResp(response);
-            } catch (OCSPRequestorException e) {
-                LOG.warn("OCSPRequestorException: {}", e.getMessage());
-                return false;
-            } catch (OCSPResponseException e) {
-                LOG.warn("OCSPResponseException: {}", e.getMessage());
-                return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return false;
-            }
-
-            SingleResp[] singleResponses = basicResp.getResponses();
-
-            int n = (singleResponses == null)
-                    ? 0
-                    : singleResponses.length;
-
-            if (n == 0) {
-                LOG.warn("received no status from server");
-                return false;
-            } else if (n != 1) {
-                LOG.warn("received status with {} single responses from server, {}",
-                        n, "but 1 was requested");
-                return false;
-            } else {
-                SingleResp singleResp = singleResponses[0];
-                CertificateStatus singleCertStatus = singleResp.getCertStatus();
-
-                String status;
-                if (singleCertStatus == null) {
-                    status = "good";
-                } else if (singleCertStatus instanceof RevokedStatus) {
-                    RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
-                    Date revTime = revStatus.getRevocationTime();
-
-                    if (revStatus.hasRevocationReason()) {
-                        int reason = revStatus.getRevocationReason();
-                        status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
-                    } else {
-                        status = "revoked, no reason, revocationTime = " + revTime;
-                    }
-                } else if (singleCertStatus instanceof UnknownStatus) {
-                    status = "unknown";
-                } else {
-                    LOG.warn("status: ERROR");
-                    return false;
-                }
-
-                LOG.info("SN: {}, status: {}", sn, status);
-                return true;
-            } // end if
-        } // method testNext
-
-    } // class Testor
-
-    private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
-
-    private final OCSPRequestor requestor;
-
-    private final List<Long> serials;
-
-    private final int numSerials;
-
-    private int serialIndex;
-
-    private X509Certificate caCert;
-
-    private URL serverUrl;
-
-    private RequestOptions options;
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
+    public void run() {
+      while (!stop() && getErrorAccout() < 10) {
+        long sn = nextSerialNumber();
+        int numFailed = testNext(sn)
+            ? 0
+            : 1;
+
+        account(1, numFailed);
+      }
     }
 
-    public OcspLoadTest(
-            final OCSPRequestor requestor,
-            final List<Long> serials,
-            final X509Certificate caCert,
-            final URL serverUrl,
-            final RequestOptions options,
-            final String description) {
-        super(description);
-        ParamUtil.assertNotNull("requestor", requestor);
-        ParamUtil.assertNotEmpty("serials", serials);
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("serverUrl", serverUrl);
-        ParamUtil.assertNotNull("options", options);
+    private boolean testNext(
+        final long sn) {
+      BasicOCSPResp basicResp;
+      try {
+        OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
+            options, null);
+        basicResp = OCSPUtils.extractBasicOCSPResp(response);
+      } catch (OCSPRequestorException e) {
+        LOG.warn("OCSPRequestorException: {}", e.getMessage());
+        return false;
+      } catch (OCSPResponseException e) {
+        LOG.warn("OCSPResponseException: {}", e.getMessage());
+        return false;
+      } catch (Throwable t) {
+        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+        return false;
+      }
 
-        this.requestor = requestor;
-        this.serials = serials;
-        this.numSerials = serials.size();
-        this.caCert = caCert;
-        this.serverUrl = serverUrl;
-        this.options = options;
+      SingleResp[] singleResponses = basicResp.getResponses();
 
-        this.serialIndex = 0;
-    }
+      int n = (singleResponses == null)
+          ? 0
+          : singleResponses.length;
 
-    private synchronized long nextSerialNumber() {
-        serialIndex++;
-        if (serialIndex >= numSerials) {
-            serialIndex = 0;
+      if (n == 0) {
+        LOG.warn("received no status from server");
+        return false;
+      } else if (n != 1) {
+        LOG.warn("received status with {} single responses from server, {}",
+            n, "but 1 was requested");
+        return false;
+      } else {
+        SingleResp singleResp = singleResponses[0];
+        CertificateStatus singleCertStatus = singleResp.getCertStatus();
+
+        String status;
+        if (singleCertStatus == null) {
+          status = "good";
+        } else if (singleCertStatus instanceof RevokedStatus) {
+          RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
+          Date revTime = revStatus.getRevocationTime();
+
+          if (revStatus.hasRevocationReason()) {
+            int reason = revStatus.getRevocationReason();
+            status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
+          } else {
+            status = "revoked, no reason, revocationTime = " + revTime;
+          }
+        } else if (singleCertStatus instanceof UnknownStatus) {
+          status = "unknown";
+        } else {
+          LOG.warn("status: ERROR");
+          return false;
         }
-        return this.serials.get(serialIndex);
+
+        LOG.info("SN: {}, status: {}", sn, status);
+        return true;
+      } // end if
+    } // method testNext
+
+  } // class Testor
+
+  private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
+
+  private final OCSPRequestor requestor;
+
+  private final List<Long> serials;
+
+  private final int numSerials;
+
+  private int serialIndex;
+
+  private X509Certificate caCert;
+
+  private URL serverUrl;
+
+  private RequestOptions options;
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
+
+  public OcspLoadTest(
+      final OCSPRequestor requestor,
+      final List<Long> serials,
+      final X509Certificate caCert,
+      final URL serverUrl,
+      final RequestOptions options,
+      final String description) {
+    super(description);
+    ParamUtil.assertNotNull("requestor", requestor);
+    ParamUtil.assertNotEmpty("serials", serials);
+    ParamUtil.assertNotNull("caCert", caCert);
+    ParamUtil.assertNotNull("serverUrl", serverUrl);
+    ParamUtil.assertNotNull("options", options);
+
+    this.requestor = requestor;
+    this.serials = serials;
+    this.numSerials = serials.size();
+    this.caCert = caCert;
+    this.serverUrl = serverUrl;
+    this.options = options;
+
+    this.serialIndex = 0;
+  }
+
+  private synchronized long nextSerialNumber() {
+    serialIndex++;
+    if (serialIndex >= numSerials) {
+      serialIndex = 0;
     }
+    return this.serials.get(serialIndex);
+  }
 
 }

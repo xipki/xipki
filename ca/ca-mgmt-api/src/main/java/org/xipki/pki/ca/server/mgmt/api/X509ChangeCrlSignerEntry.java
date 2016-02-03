@@ -42,67 +42,68 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509ChangeCrlSignerEntry implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String name;
+  private final String name;
 
-    private String signerType;
+  private String signerType;
 
-    private String signerConf;
+  private String signerConf;
 
-    private String base64Cert;
+  private String base64Cert;
 
-    private String crlControl;
+  private String crlControl;
 
-    public X509ChangeCrlSignerEntry(
-            final String name)
-    throws InvalidConfException {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
-    }
+  public X509ChangeCrlSignerEntry(
+      final String name)
+  throws InvalidConfException {
+    ParamUtil.assertNotBlank("name", name);
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getSignerType() {
-        return signerType;
-    }
+  public String getSignerType() {
+    return signerType;
+  }
 
-    public void setSignerType(
-            final String signerType) {
-        this.signerType = signerType;
-    }
+  public void setSignerType(
+      final String signerType) {
+    this.signerType = signerType;
+  }
 
-    public String getSignerConf() {
-        return signerConf;
-    }
+  public String getSignerConf() {
+    return signerConf;
+  }
 
-    public void setSignerConf(
-            final String signerConf) {
-        this.signerConf = signerConf;
-    }
+  public void setSignerConf(
+      final String signerConf) {
+    this.signerConf = signerConf;
+  }
 
-    public String getBase64Cert() {
-        return base64Cert;
-    }
+  public String getBase64Cert() {
+    return base64Cert;
+  }
 
-    public void setBase64Cert(
-            final String base64Cert) {
-        this.base64Cert = base64Cert;
-    }
+  public void setBase64Cert(
+      final String base64Cert) {
+    this.base64Cert = base64Cert;
+  }
 
-    public String getCrlControl() {
-        return crlControl;
-    }
+  public String getCrlControl() {
+    return crlControl;
+  }
 
-    public void setCrlControl(
-            final String crlControl) {
-        this.crlControl = crlControl;
-    }
+  public void setCrlControl(
+      final String crlControl) {
+    this.crlControl = crlControl;
+  }
 
 }

@@ -41,104 +41,105 @@ import java.util.List;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509ChangeCAEntry extends ChangeCAEntry implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private List<String> crlUris;
+  private List<String> crlUris;
 
-    private List<String> deltaCrlUris;
+  private List<String> deltaCrlUris;
 
-    private List<String> ocspUris;
+  private List<String> ocspUris;
 
-    private List<String> caCertUris;
+  private List<String> caCertUris;
 
-    private X509Certificate cert;
+  private X509Certificate cert;
 
-    private String crlSignerName;
+  private String crlSignerName;
 
-    private Integer numCrls;
+  private Integer numCrls;
 
-    private String extraControl;
+  private String extraControl;
 
-    public X509ChangeCAEntry(
-            final String name)
-    throws CAMgmtException {
-        super(name);
-    }
+  public X509ChangeCAEntry(
+      final String name)
+  throws CAMgmtException {
+    super(name);
+  }
 
-    public List<String> getCrlUris() {
-        return crlUris;
-    }
+  public List<String> getCrlUris() {
+    return crlUris;
+  }
 
-    public void setCrlUris(
-            final List<String> crlUris) {
-        this.crlUris = crlUris;
-    }
+  public void setCrlUris(
+      final List<String> crlUris) {
+    this.crlUris = crlUris;
+  }
 
-    public List<String> getDeltaCrlUris() {
-        return deltaCrlUris;
-    }
+  public List<String> getDeltaCrlUris() {
+    return deltaCrlUris;
+  }
 
-    public void setDeltaCrlUris(
-            final List<String> deltaCrlUris) {
-        this.deltaCrlUris = deltaCrlUris;
-    }
+  public void setDeltaCrlUris(
+      final List<String> deltaCrlUris) {
+    this.deltaCrlUris = deltaCrlUris;
+  }
 
-    public List<String> getOcspUris() {
-        return ocspUris;
-    }
+  public List<String> getOcspUris() {
+    return ocspUris;
+  }
 
-    public void setOcspUris(
-            final List<String> ocspUris) {
-        this.ocspUris = ocspUris;
-    }
+  public void setOcspUris(
+      final List<String> ocspUris) {
+    this.ocspUris = ocspUris;
+  }
 
-    public List<String> getCaCertUris() {
-        return caCertUris;
-    }
+  public List<String> getCaCertUris() {
+    return caCertUris;
+  }
 
-    public void setCacertUris(
-            final List<String> caCertUris) {
-        this.caCertUris = caCertUris;
-    }
+  public void setCacertUris(
+      final List<String> caCertUris) {
+    this.caCertUris = caCertUris;
+  }
 
-    public X509Certificate getCert() {
-        return cert;
-    }
+  public X509Certificate getCert() {
+    return cert;
+  }
 
-    public void setCert(
-            final X509Certificate cert) {
-        this.cert = cert;
-    }
+  public void setCert(
+      final X509Certificate cert) {
+    this.cert = cert;
+  }
 
-    public String getCrlSignerName() {
-        return crlSignerName;
-    }
+  public String getCrlSignerName() {
+    return crlSignerName;
+  }
 
-    public void setCrlSignerName(
-            final String crlSignerName) {
-        this.crlSignerName = crlSignerName;
-    }
+  public void setCrlSignerName(
+      final String crlSignerName) {
+    this.crlSignerName = crlSignerName;
+  }
 
-    public Integer getNumCrls() {
-        return numCrls;
-    }
+  public Integer getNumCrls() {
+    return numCrls;
+  }
 
-    public void setNumCrls(
-            final Integer numCrls) {
-        this.numCrls = numCrls;
-    }
+  public void setNumCrls(
+      final Integer numCrls) {
+    this.numCrls = numCrls;
+  }
 
-    public String getExtraControl() {
-        return extraControl;
-    }
+  public String getExtraControl() {
+    return extraControl;
+  }
 
-    public void setExtraControl(
-            final String extraControl) {
-        this.extraControl = extraControl;
-    }
+  public void setExtraControl(
+      final String extraControl) {
+    this.extraControl = extraControl;
+  }
 
 }

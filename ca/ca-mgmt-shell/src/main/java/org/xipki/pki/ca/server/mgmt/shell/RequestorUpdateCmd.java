@@ -48,35 +48,36 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "requestor-up",
-        description = "update requestor")
+    description = "update requestor")
 @Service
 public class RequestorUpdateCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
-    protected String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "requestor name\n"
+          + "(required)")
+  protected String name;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "requestor certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String certFile;
+  @Option(name = "--cert",
+      required = true,
+      description = "requestor certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String certFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        // check if the certificate is valid
-        byte[] certBytes = IoUtil.read(certFile);
-        X509Util.parseCert(new ByteArrayInputStream(certBytes));
-        boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
-        output(b, "updated", "could not update", "CMP requestor " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    // check if the certificate is valid
+    byte[] certBytes = IoUtil.read(certFile);
+    X509Util.parseCert(new ByteArrayInputStream(certBytes));
+    boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
+    output(b, "updated", "could not update", "CMP requestor " + name);
+    return null;
+  }
 
 }

@@ -43,48 +43,49 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertWithEncoded {
 
-    private final X509Certificate certificate;
+  private final X509Certificate certificate;
 
-    private final String className;
+  private final String className;
 
-    private final byte[] encoded;
+  private final byte[] encoded;
 
-    public CertWithEncoded(
-            final X509Certificate cert)
-    throws CertificateEncodingException {
-        ParamUtil.assertNotNull("cert", cert);
-        this.certificate = cert;
-        this.className = cert.getClass().getName();
-        this.encoded = cert.getEncoded();
+  public CertWithEncoded(
+      final X509Certificate cert)
+  throws CertificateEncodingException {
+    ParamUtil.assertNotNull("cert", cert);
+    this.certificate = cert;
+    this.className = cert.getClass().getName();
+    this.encoded = cert.getEncoded();
+  }
+
+  public X509Certificate getCertificate() {
+    return certificate;
+  }
+
+  public boolean equalsCert(
+      final X509Certificate cert) {
+    if (certificate == cert) {
+      return true;
     }
 
-    public X509Certificate getCertificate() {
-        return certificate;
+    if (className.equals(cert.getClass().getName())) {
+      return certificate.equals(cert);
+    } else if (certificate.equals(cert)) {
+      return true;
+    } else {
+      byte[] encodedCert;
+      try {
+        encodedCert = cert.getEncoded();
+      } catch (CertificateEncodingException e) {
+        return false;
+      }
+      return Arrays.equals(encoded, encodedCert);
     }
-
-    public boolean equalsCert(
-            final X509Certificate cert) {
-        if (certificate == cert) {
-            return true;
-        }
-
-        if (className.equals(cert.getClass().getName())) {
-            return certificate.equals(cert);
-        } else if (certificate.equals(cert)) {
-            return true;
-        } else {
-            byte[] encodedCert;
-            try {
-                encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e) {
-                return false;
-            }
-            return Arrays.equals(encoded, encodedCert);
-        }
-    }
+  }
 
 }

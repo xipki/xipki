@@ -39,14 +39,15 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class FilePathCompleter extends AbstractPathCompleter {
 
-    @Override
-    protected boolean isDirOnly() {
-        return false;
-    }
+  @Override
+  protected boolean isDirOnly() {
+    return false;
+  }
 
 }

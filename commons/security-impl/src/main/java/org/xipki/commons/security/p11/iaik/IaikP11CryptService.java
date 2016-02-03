@@ -60,389 +60,390 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public final class IaikP11CryptService implements P11CryptService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
 
-    private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
+  private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
 
-    private final ConcurrentSkipListSet<IaikP11Identity> identities =
-            new ConcurrentSkipListSet<>();
+  private final ConcurrentSkipListSet<IaikP11Identity> identities =
+      new ConcurrentSkipListSet<>();
 
-    private IaikP11Module extModule;
+  private IaikP11Module extModule;
 
-    private final P11ModuleConf moduleConf;
+  private final P11ModuleConf moduleConf;
 
-    private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
+  private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
 
-    private IaikP11CryptService(
-            final P11ModuleConf moduleConf)
-    throws SignerException {
-        this.moduleConf = moduleConf;
-        refresh();
+  private IaikP11CryptService(
+      final P11ModuleConf moduleConf)
+  throws SignerException {
+    this.moduleConf = moduleConf;
+    refresh();
+  }
+
+  private boolean lastRefreshSuccessful;
+  private long lastRefresh;
+
+  private synchronized boolean reconnect()
+  throws SignerException {
+    if (System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL) {
+      LOG.info("just refreshed within one minute, skip this reconnect()");
+      return lastRefreshSuccessful;
     }
 
-    private boolean lastRefreshSuccessful;
-    private long lastRefresh;
+    lastRefresh = System.currentTimeMillis();
 
-    private synchronized boolean reconnect()
-    throws SignerException {
-        if (System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL) {
-            LOG.info("just refreshed within one minute, skip this reconnect()");
-            return lastRefreshSuccessful;
+    IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
+    refresh();
+    return lastRefreshSuccessful;
+  }
+
+  @Override
+  public synchronized void refresh()
+  throws SignerException {
+    LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
+    lastRefreshSuccessful = false;
+    try {
+      this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
+    } catch (SignerException e) {
+      final String message = "could not initialize the PKCS#11 Module for "
+          + moduleConf.getName();
+      if (LOG.isErrorEnabled()) {
+        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      throw e;
+    }
+
+    Set<IaikP11Identity> currentIdentifies = new HashSet<>();
+
+    List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
+    for (P11SlotIdentifier slotId : slotIds) {
+      IaikP11Slot slot;
+      try {
+        slot = extModule.getSlot(slotId);
+        if (slot == null) {
+          LOG.warn("could not initialize slot " + slotId);
+          continue;
         }
-
-        lastRefresh = System.currentTimeMillis();
-
-        IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
-        refresh();
-        return lastRefreshSuccessful;
-    }
-
-    @Override
-    public synchronized void refresh()
-    throws SignerException {
-        LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
-        lastRefreshSuccessful = false;
-        try {
-            this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
-        } catch (SignerException e) {
-            final String message = "could not initialize the PKCS#11 Module for "
-                    + moduleConf.getName();
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            throw e;
+      } catch (SignerException e) {
+        final String message = "SignerException while initializing slot " + slotId;
+        if (LOG.isWarnEnabled()) {
+          LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+              e.getMessage());
         }
-
-        Set<IaikP11Identity> currentIdentifies = new HashSet<>();
-
-        List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
-        for (P11SlotIdentifier slotId : slotIds) {
-            IaikP11Slot slot;
-            try {
-                slot = extModule.getSlot(slotId);
-                if (slot == null) {
-                    LOG.warn("could not initialize slot " + slotId);
-                    continue;
-                }
-            } catch (SignerException e) {
-                final String message = "SignerException while initializing slot " + slotId;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
-                }
-                LOG.debug(message, e);
-                continue;
-            } catch (Throwable t) {
-                final String message = "unexpected error while initializing slot " + slotId;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
-                }
-                LOG.debug(message, t);
-                continue;
-            }
-
-            slot.refresh();
-            for (P11Identity identity : slot.getP11Identities()) {
-                currentIdentifies.add((IaikP11Identity) identity);
-            }
+        LOG.debug(message, e);
+        continue;
+      } catch (Throwable t) {
+        final String message = "unexpected error while initializing slot " + slotId;
+        if (LOG.isWarnEnabled()) {
+          LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+              t.getMessage());
         }
+        LOG.debug(message, t);
+        continue;
+      }
 
-        this.identities.clear();
-        this.identities.addAll(currentIdentifies);
-        currentIdentifies.clear();
-        currentIdentifies = null;
-
-        lastRefreshSuccessful = true;
-
-        if (LOG.isInfoEnabled()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for (IaikP11Identity identity : this.identities) {
-                sb.append("\t(slot ").append(identity.getSlotId());
-                sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
-                sb.append(", key=").append(identity.getKeyId()).append(")\n");
-            }
-
-            LOG.info(sb.toString());
-        }
-
-        LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
-    } // method refresh
-
-    @Override
-    public byte[] CKM_RSA_PKCS(
-            final byte[] encodedDigestInfo,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
-
-        try {
-            return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
-        } catch (PKCS11RuntimeException e) {
-            final String message = "error while calling identity.CKM_RSA_PKCS()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            if (reconnect()) {
-                return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
-            }
-        }
+      slot.refresh();
+      for (P11Identity identity : slot.getP11Identities()) {
+        currentIdentifies.add((IaikP11Identity) identity);
+      }
     }
 
-    private byte[] CKM_RSA_PKCS_noReconnect(
-            final byte[] encodedDigestInfo,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+    this.identities.clear();
+    this.identities.addAll(currentIdentifies);
+    currentIdentifies.clear();
+    currentIdentifies = null;
+
+    lastRefreshSuccessful = true;
+
+    if (LOG.isInfoEnabled()) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
+      for (IaikP11Identity identity : this.identities) {
+        sb.append("\t(slot ").append(identity.getSlotId());
+        sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
+        sb.append(", key=").append(identity.getKeyId()).append(")\n");
+      }
+
+      LOG.info(sb.toString());
     }
 
-    @Override
-    public byte[] CKM_RSA_X509(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
+    LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
+  } // method refresh
 
-        try {
-            return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
-            final String message = "error while calling identity.CKM_RSA_X_509()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            if (reconnect()) {
-                return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
-            }
-        }
+  @Override
+  public byte[] CKM_RSA_PKCS(
+      final byte[] encodedDigestInfo,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    checkState();
+
+    try {
+      return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+    } catch (PKCS11RuntimeException e) {
+      final String message = "error while calling identity.CKM_RSA_PKCS()";
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      if (reconnect()) {
+        return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
+      } else {
+        throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
+      }
     }
+  }
 
-    private byte[] CKM_RSA_X509_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
+  private byte[] CKM_RSA_PKCS_noReconnect(
+      final byte[] encodedDigestInfo,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+  }
+
+  @Override
+  public byte[] CKM_RSA_X509(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    checkState();
+
+    try {
+      return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
+    } catch (PKCS11RuntimeException e) {
+      final String message = "error while calling identity.CKM_RSA_X_509()";
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      if (reconnect()) {
+        return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
+      } else {
+        throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
+      }
     }
+  }
 
-    @Override
-    public byte[] CKM_ECDSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        byte[] plainSignature = CKM_ECDSA_Plain(hash, slotId, keyId);
-        return SignerUtil.convertPlainDSASigX962(plainSignature);
+  private byte[] CKM_RSA_X509_noReconnect(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
+  }
+
+  @Override
+  public byte[] CKM_ECDSA_X962(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    byte[] plainSignature = CKM_ECDSA_Plain(hash, slotId, keyId);
+    return SignerUtil.convertPlainDSASigX962(plainSignature);
+  }
+
+  @Override
+  public byte[] CKM_ECDSA_Plain(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    checkState();
+
+    try {
+      return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
+    } catch (PKCS11RuntimeException e) {
+      final String message = "error while calling identity.CKM_ECDSA()";
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      if (reconnect()) {
+        return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
+      } else {
+        throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
+      }
     }
+  }
 
-    @Override
-    public byte[] CKM_ECDSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
+  private byte[] CKM_ECDSAPlain_noReconnect(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
+  }
 
-        try {
-            return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
-            final String message = "error while calling identity.CKM_ECDSA()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            if (reconnect()) {
-                return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
-            }
-        }
+  @Override
+  public byte[] CKM_DSA_X962(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    byte[] plainSignature = CKM_DSA_Plain(hash, slotId, keyId);
+    return SignerUtil.convertPlainDSASigX962(plainSignature);
+  }
+
+  @Override
+  public byte[] CKM_DSA_Plain(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    checkState();
+
+    try {
+      return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
+    } catch (PKCS11RuntimeException e) {
+      final String message = "error while calling identity.CKM_DSA()";
+      if (LOG.isWarnEnabled()) {
+        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+            e.getMessage());
+      }
+      LOG.debug(message, e);
+      if (reconnect()) {
+        return CKM_DSA_noReconnect(hash, slotId, keyId);
+      } else {
+        throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
+      }
     }
+  }
 
-    private byte[] CKM_ECDSAPlain_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
+  private byte[] CKM_DSA_noReconnect(
+      final byte[] hash,
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
+  }
+
+  @Override
+  public PublicKey getPublicKey(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    IaikP11Identity identity = getIdentity2(slotId, keyId);
+    return (identity == null)
+        ? null
+        : identity.getPublicKey();
+  }
+
+  @Override
+  public X509Certificate getCertificate(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    IaikP11Identity identity = getIdentity2(slotId, keyId);
+    return (identity == null)
+        ? null
+        : identity.getCertificate();
+  }
+
+  private IaikP11Identity getIdentity(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    IaikP11Identity identity = getIdentity2(slotId, keyId);
+    if (identity == null) {
+      throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
     }
+    return identity;
+  }
 
-    @Override
-    public byte[] CKM_DSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        byte[] plainSignature = CKM_DSA_Plain(hash, slotId, keyId);
-        return SignerUtil.convertPlainDSASigX962(plainSignature);
-    }
-
-    @Override
-    public byte[] CKM_DSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
-
-        try {
-            return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
-            final String message = "error while calling identity.CKM_DSA()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
-            }
-            LOG.debug(message, e);
-            if (reconnect()) {
-                return CKM_DSA_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
-            }
-        }
-    }
-
-    private byte[] CKM_DSA_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
-    }
-
-    @Override
-    public PublicKey getPublicKey(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return (identity == null)
-                ? null
-                : identity.getPublicKey();
-    }
-
-    @Override
-    public X509Certificate getCertificate(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return (identity == null)
-                ? null
-                : identity.getCertificate();
-    }
-
-    private IaikP11Identity getIdentity(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
-        }
+  private IaikP11Identity getIdentity2(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId) {
+    for (IaikP11Identity identity : identities) {
+      if (identity.match(slotId, keyId)) {
         return identity;
+      }
     }
 
-    private IaikP11Identity getIdentity2(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId) {
-        for (IaikP11Identity identity : identities) {
-            if (identity.match(slotId, keyId)) {
-                return identity;
-            }
-        }
+    return null;
+  }
 
-        return null;
+  private synchronized void checkState()
+  throws SignerException {
+    if (!lastRefreshSuccessful) {
+      if (System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL) {
+        reconnect();
+      }
     }
 
-    private synchronized void checkState()
-    throws SignerException {
-        if (!lastRefreshSuccessful) {
-            if (System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL) {
-                reconnect();
-            }
-        }
+    if (!lastRefreshSuccessful) {
+      throw new SignerException("PKCS#11 module is not initialized");
+    }
+  }
 
-        if (!lastRefreshSuccessful) {
-            throw new SignerException("PKCS#11 module is not initialized");
-        }
+  @Override
+  public String toString() {
+    return moduleConf.toString();
+  }
+
+  @Override
+  public X509Certificate[] getCertificates(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId)
+  throws SignerException {
+    IaikP11Identity identity = getIdentity2(slotId, keyId);
+    return (identity == null)
+        ? null
+        : identity.getCertificateChain();
+  }
+
+  @Override
+  public P11SlotIdentifier[] getSlotIdentifiers()
+  throws SignerException {
+    List<P11SlotIdentifier> slotIds = new LinkedList<>();
+    for (IaikP11Identity identity : identities) {
+      P11SlotIdentifier slotId = identity.getSlotId();
+      if (!slotIds.contains(slotId)) {
+        slotIds.add(slotId);
+      }
     }
 
-    @Override
-    public String toString() {
-        return moduleConf.toString();
+    return slotIds.toArray(new P11SlotIdentifier[0]);
+  }
+
+  @Override
+  public String[] getKeyLabels(
+      final P11SlotIdentifier slotId)
+  throws SignerException {
+    List<String> keyLabels = new LinkedList<>();
+    for (IaikP11Identity identity : identities) {
+      if (slotId.equals(identity.getSlotId())) {
+        keyLabels.add(identity.getKeyId().getKeyLabel());
+      }
     }
 
-    @Override
-    public X509Certificate[] getCertificates(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
-        return (identity == null)
-                ? null
-                : identity.getCertificateChain();
+    return keyLabels.toArray(new String[0]);
+  }
+
+  public synchronized static IaikP11CryptService getInstance(
+      final P11ModuleConf moduleConf)
+  throws SignerException {
+    synchronized (instances) {
+      final String name = moduleConf.getName();
+      IaikP11CryptService instance = instances.get(name);
+      if (instance == null) {
+        instance = new IaikP11CryptService(moduleConf);
+        instances.put(name, instance);
+      }
+
+      return instance;
     }
-
-    @Override
-    public P11SlotIdentifier[] getSlotIdentifiers()
-    throws SignerException {
-        List<P11SlotIdentifier> slotIds = new LinkedList<>();
-        for (IaikP11Identity identity : identities) {
-            P11SlotIdentifier slotId = identity.getSlotId();
-            if (!slotIds.contains(slotId)) {
-                slotIds.add(slotId);
-            }
-        }
-
-        return slotIds.toArray(new P11SlotIdentifier[0]);
-    }
-
-    @Override
-    public String[] getKeyLabels(
-            final P11SlotIdentifier slotId)
-    throws SignerException {
-        List<String> keyLabels = new LinkedList<>();
-        for (IaikP11Identity identity : identities) {
-            if (slotId.equals(identity.getSlotId())) {
-                keyLabels.add(identity.getKeyId().getKeyLabel());
-            }
-        }
-
-        return keyLabels.toArray(new String[0]);
-    }
-
-    public synchronized static IaikP11CryptService getInstance(
-            final P11ModuleConf moduleConf)
-    throws SignerException {
-        synchronized (instances) {
-            final String name = moduleConf.getName();
-            IaikP11CryptService instance = instances.get(name);
-            if (instance == null) {
-                instance = new IaikP11CryptService(moduleConf);
-                instances.put(name, instance);
-            }
-
-            return instance;
-        }
-    }
+  }
 
 }

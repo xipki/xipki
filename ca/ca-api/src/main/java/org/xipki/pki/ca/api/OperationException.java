@@ -37,58 +37,59 @@ package org.xipki.pki.ca.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OperationException extends Exception {
 
-    public static enum ErrorCode {
+  public static enum ErrorCode {
 
-        ALREADY_ISSUED,
-        BAD_CERT_TEMPLATE,
-        BAD_REQUEST,
-        CERT_REVOKED,
-        CERT_UNREVOKED,
-        CRL_FAILURE,
-        DATABASE_FAILURE,
-        INSUFFICIENT_PERMISSION,
-        INVALID_EXTENSION,
-        NOT_PERMITTED,
-        SYSTEM_FAILURE,
-        SYSTEM_UNAVAILABLE,
-        UNKNOWN_CERT,
-        UNKNOWN_CERT_PROFILE
+    ALREADY_ISSUED,
+    BAD_CERT_TEMPLATE,
+    BAD_REQUEST,
+    CERT_REVOKED,
+    CERT_UNREVOKED,
+    CRL_FAILURE,
+    DATABASE_FAILURE,
+    INSUFFICIENT_PERMISSION,
+    INVALID_EXTENSION,
+    NOT_PERMITTED,
+    SYSTEM_FAILURE,
+    SYSTEM_UNAVAILABLE,
+    UNKNOWN_CERT,
+    UNKNOWN_CERT_PROFILE
 
-    } // enum ErrorCode
+  } // enum ErrorCode
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final ErrorCode errorCode;
+  private final ErrorCode errorCode;
 
-    private final String errorMessage;
+  private final String errorMessage;
 
-    public OperationException(
-            final ErrorCode errorCode) {
-        super(
-            String.format("error code: %s", errorCode));
-        this.errorCode = errorCode;
-        this.errorMessage = null;
-    }
+  public OperationException(
+      final ErrorCode errorCode) {
+    super(
+      String.format("error code: %s", errorCode));
+    this.errorCode = errorCode;
+    this.errorMessage = null;
+  }
 
-    public OperationException(
-            final ErrorCode errorCode,
-            final String errorMessage) {
-        super(
-            String.format("error code: %s, error message: %s", errorCode, errorMessage));
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-    }
+  public OperationException(
+      final ErrorCode errorCode,
+      final String errorMessage) {
+    super(
+      String.format("error code: %s, error message: %s", errorCode, errorMessage));
+    this.errorCode = errorCode;
+    this.errorMessage = errorMessage;
+  }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
+  public ErrorCode getErrorCode() {
+    return errorCode;
+  }
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+  public String getErrorMessage() {
+    return errorMessage;
+  }
 
 }

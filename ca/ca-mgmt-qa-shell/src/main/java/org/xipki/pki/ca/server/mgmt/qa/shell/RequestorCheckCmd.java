@@ -47,34 +47,35 @@ import org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "requestor-check",
-        description = "check information of requestors (QA)")
+    description = "check information of requestors (QA)")
 @Service
 public class RequestorCheckCmd extends RequestorUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking requestor " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking requestor " + name);
 
-        CmpRequestorEntry cr = caManager.getCmpRequestor(name);
-        if (cr == null) {
-            throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
-        }
-
-        byte[] ex = IoUtil.read(certFile);
-        if (cr.getBase64Cert() == null) {
-            throw new CmdFailure("Cert: is not configured explicitly as expected");
-        }
-
-        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
-            throw new CmdFailure("Cert: the expected one and the actual one differ");
-        }
-
-        out(" checked requestor " + name);
-        return null;
+    CmpRequestorEntry cr = caManager.getCmpRequestor(name);
+    if (cr == null) {
+      throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
     }
+
+    byte[] ex = IoUtil.read(certFile);
+    if (cr.getBase64Cert() == null) {
+      throw new CmdFailure("Cert: is not configured explicitly as expected");
+    }
+
+    if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+      throw new CmdFailure("Cert: the expected one and the actual one differ");
+    }
+
+    out(" checked requestor " + name);
+    return null;
+  }
 
 }

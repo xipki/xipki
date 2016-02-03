@@ -51,64 +51,65 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class OCSPStatusCommandSupport extends XipkiCommandSupport {
 
-    @Option(name = "--issuer", aliases = "-i",
-            required = true,
-            description = "issuer certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    protected String issuerCertFile;
+  @Option(name = "--issuer", aliases = "-i",
+      required = true,
+      description = "issuer certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  protected String issuerCertFile;
 
-    @Option(name = "--nonce",
-            description = "use nonce")
-    protected Boolean usenonce = Boolean.FALSE;
+  @Option(name = "--nonce",
+      description = "use nonce")
+  protected Boolean usenonce = Boolean.FALSE;
 
-    @Option(name = "--nonce-len",
-            description = "nonce length in octects")
-    protected Integer nonceLen;
+  @Option(name = "--nonce-len",
+      description = "nonce length in octects")
+  protected Integer nonceLen;
 
-    @Option(name = "--hash",
-            description = "hash algorithm name")
-    @Completion(HashAlgCompleter.class)
-    protected String hashAlgo = "SHA256";
+  @Option(name = "--hash",
+      description = "hash algorithm name")
+  @Completion(HashAlgCompleter.class)
+  protected String hashAlgo = "SHA256";
 
-    @Option(name = "--sig-alg",
-            multiValued = true,
-            description = "comma-separated preferred signature algorithms\n"
-                    + "(multi-valued)")
-    @Completion(SigAlgCompleter.class)
-    protected List<String> prefSigAlgs;
+  @Option(name = "--sig-alg",
+      multiValued = true,
+      description = "comma-separated preferred signature algorithms\n"
+          + "(multi-valued)")
+  @Completion(SigAlgCompleter.class)
+  protected List<String> prefSigAlgs;
 
-    @Option(name = "--http-get",
-            description = "use HTTP GET for small request")
-    protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
+  @Option(name = "--http-get",
+      description = "use HTTP GET for small request")
+  protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
-    @Option(name = "--sign",
-            description = "sign request")
-    protected Boolean signRequest = Boolean.FALSE;
+  @Option(name = "--sign",
+      description = "sign request")
+  protected Boolean signRequest = Boolean.FALSE;
 
-    @Reference
-    protected OCSPRequestor requestor;
+  @Reference
+  protected OCSPRequestor requestor;
 
-    protected RequestOptions getRequestOptions()
-    throws Exception {
-        ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
-        RequestOptions options = new RequestOptions();
-        options.setUseNonce(usenonce.booleanValue());
-        if (nonceLen != null) {
-            options.setNonceLen(nonceLen);
-        }
-        options.setHashAlgorithmId(hashAlgoOid);
-        options.setSignRequest(signRequest.booleanValue());
-        options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
-
-        if (isNotEmpty(prefSigAlgs)) {
-            options.setPreferredSignatureAlgorithms2(prefSigAlgs);
-        }
-        return options;
+  protected RequestOptions getRequestOptions()
+  throws Exception {
+    ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
+    RequestOptions options = new RequestOptions();
+    options.setUseNonce(usenonce.booleanValue());
+    if (nonceLen != null) {
+      options.setNonceLen(nonceLen);
     }
+    options.setHashAlgorithmId(hashAlgoOid);
+    options.setSignRequest(signRequest.booleanValue());
+    options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
+
+    if (isNotEmpty(prefSigAlgs)) {
+      options.setPreferredSignatureAlgorithms2(prefSigAlgs);
+    }
+    return options;
+  }
 
 }

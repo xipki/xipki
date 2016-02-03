@@ -44,23 +44,24 @@ import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign-p12",
-        description = "performance test of PKCS#12 EC signature creation")
+    description = "performance test of PKCS#12 EC signature creation")
 public class SpeedP12ECSignCmd extends SpeedP12SignCommandSupport {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+  @Option(name = "--curve",
+      required = true,
+      description = "EC curve name\n"
+          + "(required)")
+  @Completion(ECCurveNameCompleter.class)
+  private String curveName;
 
-    @Override
-    protected LoadExecutor getTester()
-    throws Exception {
-        return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
-    }
+  @Override
+  protected LoadExecutor getTester()
+  throws Exception {
+    return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
+  }
 
 }
