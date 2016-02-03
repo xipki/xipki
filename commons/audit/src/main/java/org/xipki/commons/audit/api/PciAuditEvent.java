@@ -53,7 +53,7 @@ import java.util.List;
  * @since 2.0
  */
 
-public class PCIAuditEvent {
+public class PciAuditEvent {
 
   private static final String UNDEFINED = "undefined";
 
@@ -105,7 +105,7 @@ public class PCIAuditEvent {
    */
   private AuditLevel level;
 
-  public PCIAuditEvent(
+  public PciAuditEvent(
       final Date date) {
     synchronized (dateFormatter) {
       this.date = dateFormatter.format(date);
@@ -260,16 +260,16 @@ public class PCIAuditEvent {
     Enumeration<NetworkInterface> interfaces;
     try {
       interfaces = NetworkInterface.getNetworkInterfaces();
-    } catch (SocketException e) {
+    } catch (SocketException ex) {
       return "UNKNOWN";
     }
     while (interfaces.hasMoreElements()) {
-      NetworkInterface n = (NetworkInterface) interfaces.nextElement();
-      Enumeration<InetAddress> ee = n.getInetAddresses();
+      NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
+      Enumeration<InetAddress> ee = ni.getInetAddresses();
       while (ee.hasMoreElements()) {
-        InetAddress i = (InetAddress) ee.nextElement();
-        if (i instanceof Inet4Address) {
-          addresses.add(((Inet4Address) i).getHostAddress());
+        InetAddress ia = (InetAddress) ee.nextElement();
+        if (ia instanceof Inet4Address) {
+          addresses.add(((Inet4Address) ia).getHostAddress());
         }
       }
     }
@@ -291,7 +291,7 @@ public class PCIAuditEvent {
     } else {
       try {
         return InetAddress.getLocalHost().getHostAddress();
-      } catch (UnknownHostException e) {
+      } catch (UnknownHostException ex) {
         return "UNKNOWN";
       }
     }
