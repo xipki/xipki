@@ -37,55 +37,56 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum DuplicationMode {
 
-    FORBIDDEN (1, "forbidden"),
-    FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
-    PERMITTED (3, "permitted");
+  FORBIDDEN (1, "forbidden"),
+  FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
+  PERMITTED (3, "permitted");
 
-    private final int mode;
+  private final int mode;
 
-    private final String description;
+  private final String description;
 
-    private DuplicationMode(
-            final int mode,
-            final String description) {
-        this.mode = mode;
-        this.description = description;
+  private DuplicationMode(
+      final int mode,
+      final String description) {
+    this.mode = mode;
+    this.description = description;
+  }
+
+  public int getMode() {
+    return mode;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public static DuplicationMode getInstance(
+      final String text) {
+    for (DuplicationMode value : values()) {
+      if (value.description.equalsIgnoreCase(text)
+          || value.name().equalsIgnoreCase(text)
+          || Integer.toString(value.mode).equalsIgnoreCase(text)) {
+        return value;
+      }
     }
 
-    public int getMode() {
-        return mode;
+    return null;
+  }
+
+  public static DuplicationMode getInstance(
+      final int mode) {
+    for (DuplicationMode value : values()) {
+      if (mode == value.mode) {
+        return value;
+      }
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public static DuplicationMode getInstance(
-            final String text) {
-        for (DuplicationMode value : values()) {
-            if (value.description.equalsIgnoreCase(text)
-                    || value.name().equalsIgnoreCase(text)
-                    || Integer.toString(value.mode).equalsIgnoreCase(text)) {
-                return value;
-            }
-        }
-
-        return null;
-    }
-
-    public static DuplicationMode getInstance(
-            final int mode) {
-        for (DuplicationMode value : values()) {
-            if (mode == value.mode) {
-                return value;
-            }
-        }
-
-        return null;
-    }
+    return null;
+  }
 
 }

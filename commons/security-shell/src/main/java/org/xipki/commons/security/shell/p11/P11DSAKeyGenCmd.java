@@ -45,50 +45,51 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
+    description = "generate DSA keypair in PKCS#11 device")
 @Service
 public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer pLen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qLen;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
-
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
-
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        if (noCert) {
-            P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-            finalize(keyId);
-        } else {
-            P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
-                    pLen, qLen,
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
-
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (pLen % 1024 != 0) {
+      throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
     }
+
+    if (qLen == null) {
+      if (pLen >= 2048) {
+        qLen = 256;
+      } else {
+        qLen = 160;
+      }
+    }
+
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    if (noCert) {
+      P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
+      finalize(keyId);
+    } else {
+      P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
+          pLen, qLen,
+          label, getSubject(),
+          getKeyUsage(),
+          getExtendedKeyUsage());
+      finalize(keyAndCert);
+    }
+
+    return null;
+  }
 
 }

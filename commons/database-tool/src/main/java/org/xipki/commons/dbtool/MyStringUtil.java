@@ -37,31 +37,32 @@ package org.xipki.commons.dbtool;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class MyStringUtil {
 
-    private MyStringUtil() {
+  private MyStringUtil() {
+  }
+
+  public static boolean isBlank(
+      final String s) {
+    return s == null || s.isEmpty();
+  }
+
+  public static boolean isNotBlank(
+      final String s) {
+    return s != null && !s.isEmpty();
+  }
+
+  public static boolean startsWithIgnoreCase(
+      final String s,
+      final String prefix) {
+    if (s.length() < prefix.length()) {
+      return false;
     }
 
-    public static boolean isBlank(
-            final String s) {
-        return s == null || s.isEmpty();
-    }
-
-    public static boolean isNotBlank(
-            final String s) {
-        return s != null && !s.isEmpty();
-    }
-
-    public static boolean startsWithIgnoreCase(
-            final String s,
-            final String prefix) {
-        if (s.length() < prefix.length()) {
-            return false;
-        }
-
-        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
-    }
+    return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+  }
 
 }

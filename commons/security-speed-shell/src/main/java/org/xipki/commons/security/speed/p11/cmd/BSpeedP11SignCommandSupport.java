@@ -39,14 +39,15 @@ import org.apache.karaf.shell.api.action.Option;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class BSpeedP11SignCommandSupport extends BSpeedP11CommandSupport {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+  @Option(name = "--sig-algo",
+      required = true,
+      description = "signature algorithm\n"
+          + "(required)")
+  protected String sigAlgo;
 
 }

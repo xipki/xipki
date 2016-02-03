@@ -43,37 +43,38 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public final class CachingCertificateValidator implements CACertValidator {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+  private final ConcurrentHashMap<String, Boolean> cachedAnswers;
 
-    private final CACertValidator delegate;
+  private final CACertValidator delegate;
 
-    public CachingCertificateValidator(
-            final CACertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+  public CachingCertificateValidator(
+      final CACertValidator delegate) {
+    this.delegate = delegate;
+    this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+  }
+
+  @Override
+  public boolean isTrusted(
+      final X509Certificate cert) {
+    String hexFp;
+    try {
+      hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+    } catch (CertificateEncodingException e) {
+      return false;
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
-
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
-        }
+    if (cachedAnswers.containsKey(hexFp)) {
+      return cachedAnswers.get(cert);
+    } else {
+      boolean answer = delegate.isTrusted(cert);
+      cachedAnswers.put(hexFp, answer);
+      return answer;
     }
+  }
 
 }

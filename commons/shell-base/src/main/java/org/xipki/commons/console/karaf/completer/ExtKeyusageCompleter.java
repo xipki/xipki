@@ -45,30 +45,31 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> usages;
+  private static final Set<String> usages;
 
-    static {
-        Set<String> set = new HashSet<>();
-        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+  static {
+    Set<String> set = new HashSet<>();
+    set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+    set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+    set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+    set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+    set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+    set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+    set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+    set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
 
-        usages = Collections.unmodifiableSet(set);
-    }
+    usages = Collections.unmodifiableSet(set);
+  }
 
-    @Override
-    protected Set<String> getEnums() {
-        return usages;
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return usages;
+  }
 
 }

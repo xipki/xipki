@@ -47,59 +47,60 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ExtensionNameCompleter extends AbstractEnumCompleter {
 
-    public ExtensionNameCompleter() {
-        List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-        oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
-        oids.add(ObjectIdentifiers.id_extension_admission);
-        oids.add(Extension.auditIdentity);
-        oids.add(Extension.authorityInfoAccess);
-        oids.add(Extension.authorityKeyIdentifier);
-        oids.add(Extension.basicConstraints);
-        oids.add(Extension.biometricInfo);
-        oids.add(Extension.certificateIssuer);
-        oids.add(Extension.certificatePolicies);
-        oids.add(Extension.cRLDistributionPoints);
-        oids.add(Extension.cRLNumber);
-        oids.add(Extension.deltaCRLIndicator);
-        oids.add(Extension.extendedKeyUsage);
-        oids.add(Extension.freshestCRL);
-        oids.add(Extension.inhibitAnyPolicy);
-        oids.add(Extension.instructionCode);
-        oids.add(Extension.invalidityDate);
-        oids.add(Extension.issuerAlternativeName);
-        oids.add(Extension.issuingDistributionPoint);
-        oids.add(Extension.keyUsage);
-        oids.add(Extension.logoType);
-        oids.add(Extension.nameConstraints);
-        oids.add(Extension.noRevAvail);
-        oids.add(Extension.policyConstraints);
-        oids.add(Extension.policyMappings);
-        oids.add(Extension.privateKeyUsagePeriod);
-        oids.add(Extension.qCStatements);
-        oids.add(Extension.reasonCode);
-        oids.add(Extension.subjectAlternativeName);
-        oids.add(Extension.subjectDirectoryAttributes);
-        oids.add(Extension.subjectInfoAccess);
-        oids.add(Extension.subjectKeyIdentifier);
-        oids.add(Extension.targetInformation);
-        oids.add(ObjectIdentifiers.id_pe_tlsfeature);
+  public ExtensionNameCompleter() {
+    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+    oids.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
+    oids.add(ObjectIdentifiers.id_extension_admission);
+    oids.add(Extension.auditIdentity);
+    oids.add(Extension.authorityInfoAccess);
+    oids.add(Extension.authorityKeyIdentifier);
+    oids.add(Extension.basicConstraints);
+    oids.add(Extension.biometricInfo);
+    oids.add(Extension.certificateIssuer);
+    oids.add(Extension.certificatePolicies);
+    oids.add(Extension.cRLDistributionPoints);
+    oids.add(Extension.cRLNumber);
+    oids.add(Extension.deltaCRLIndicator);
+    oids.add(Extension.extendedKeyUsage);
+    oids.add(Extension.freshestCRL);
+    oids.add(Extension.inhibitAnyPolicy);
+    oids.add(Extension.instructionCode);
+    oids.add(Extension.invalidityDate);
+    oids.add(Extension.issuerAlternativeName);
+    oids.add(Extension.issuingDistributionPoint);
+    oids.add(Extension.keyUsage);
+    oids.add(Extension.logoType);
+    oids.add(Extension.nameConstraints);
+    oids.add(Extension.noRevAvail);
+    oids.add(Extension.policyConstraints);
+    oids.add(Extension.policyMappings);
+    oids.add(Extension.privateKeyUsagePeriod);
+    oids.add(Extension.qCStatements);
+    oids.add(Extension.reasonCode);
+    oids.add(Extension.subjectAlternativeName);
+    oids.add(Extension.subjectDirectoryAttributes);
+    oids.add(Extension.subjectInfoAccess);
+    oids.add(Extension.subjectKeyIdentifier);
+    oids.add(Extension.targetInformation);
+    oids.add(ObjectIdentifiers.id_pe_tlsfeature);
 
-        StringBuilder enums = new StringBuilder();
+    StringBuilder enums = new StringBuilder();
 
-        for (ASN1ObjectIdentifier oid : oids) {
-            String name = ObjectIdentifiers.getName(oid);
-            if (StringUtil.isBlank(name)) {
-                name = oid.getId();
-            }
-            enums.append(name).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (ASN1ObjectIdentifier oid : oids) {
+      String name = ObjectIdentifiers.getName(oid);
+      if (StringUtil.isBlank(name)) {
+        name = oid.getId();
+      }
+      enums.append(name).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

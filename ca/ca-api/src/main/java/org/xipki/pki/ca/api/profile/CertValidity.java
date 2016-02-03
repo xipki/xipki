@@ -44,202 +44,203 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertValidity implements Comparable<CertValidity>, Serializable {
 
-    public static enum Unit {
+  public static enum Unit {
 
-        YEAR("y"),
-        DAY("d"),
-        HOUR("h");
+    YEAR("y"),
+    DAY("d"),
+    HOUR("h");
 
-        private String suffix;
-        private Unit(
-                String suffix) {
-            this.suffix = suffix;
-        }
-
-        public String getSuffix() {
-            return suffix;
-        }
-
-    } // enum Unit
-
-    private static final long serialVersionUID = 1917871166917453960L;
-
-    private static final long SECOND = 1000L;
-
-    private static final TimeZone utc = TimeZone.getTimeZone("UTC");
-
-    private final int validity;
-    private final Unit unit;
-
-    public static CertValidity getInstance(
-            final String validityS) {
-        ParamUtil.assertNotBlank("validityS", validityS);
-        final int len = validityS.length();
-        final char suffix = validityS.charAt(len - 1);
-        Unit unit;
-        String numValdityS;
-        if (suffix == 'y' || suffix == 'Y') {
-            unit = Unit.YEAR;
-            numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'd' || suffix == 'd') {
-            unit = Unit.DAY;
-            numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'h' || suffix == 'h') {
-            unit = Unit.HOUR;
-            numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix >= '0' && suffix <= '9') {
-            unit = Unit.DAY;
-            numValdityS = validityS;
-        } else {
-            throw new IllegalArgumentException(
-                String.format("invalid validityS: %s", validityS));
-        }
-
-        int validity;
-        try {
-            validity = Integer.parseInt(numValdityS);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    String.format("invalid validityS: ", validityS));
-        }
-        return new CertValidity(validity, unit);
-    } // method getInstance
-
-    public CertValidity(
-            final int validity,
-            final Unit unit) {
-        if (validity < 1) {
-            throw new IllegalArgumentException("validity could not be less than 1");
-        }
-        ParamUtil.assertNotNull("unit", unit);
-        this.validity = validity;
-        this.unit = unit;
+    private String suffix;
+    private Unit(
+        String suffix) {
+      this.suffix = suffix;
     }
 
-    public int getValidity() {
-        return validity;
+    public String getSuffix() {
+      return suffix;
     }
 
-    public Unit getUnit() {
-        return unit;
+  } // enum Unit
+
+  private static final long serialVersionUID = 1917871166917453960L;
+
+  private static final long SECOND = 1000L;
+
+  private static final TimeZone utc = TimeZone.getTimeZone("UTC");
+
+  private final int validity;
+  private final Unit unit;
+
+  public static CertValidity getInstance(
+      final String validityS) {
+    ParamUtil.assertNotBlank("validityS", validityS);
+    final int len = validityS.length();
+    final char suffix = validityS.charAt(len - 1);
+    Unit unit;
+    String numValdityS;
+    if (suffix == 'y' || suffix == 'Y') {
+      unit = Unit.YEAR;
+      numValdityS = validityS.substring(0, len - 1);
+    } else if (suffix == 'd' || suffix == 'd') {
+      unit = Unit.DAY;
+      numValdityS = validityS.substring(0, len - 1);
+    } else if (suffix == 'h' || suffix == 'h') {
+      unit = Unit.HOUR;
+      numValdityS = validityS.substring(0, len - 1);
+    } else if (suffix >= '0' && suffix <= '9') {
+      unit = Unit.DAY;
+      numValdityS = validityS;
+    } else {
+      throw new IllegalArgumentException(
+        String.format("invalid validityS: %s", validityS));
     }
 
-    public Date add(
-            final Date referenceDate) {
-        switch (unit) {
-        case HOUR:
-            return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
-        case DAY:
-            return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
-        case YEAR:
-            Calendar c = Calendar.getInstance(utc);
-            c.setTime(referenceDate);
-            c.add(Calendar.YEAR, validity);
-            c.add(Calendar.SECOND, -1);
+    int validity;
+    try {
+      validity = Integer.parseInt(numValdityS);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(
+          String.format("invalid validityS: ", validityS));
+    }
+    return new CertValidity(validity, unit);
+  } // method getInstance
 
-            int month = c.get(Calendar.MONTH);
-            // february
-            if (month == 1) {
-                int day = c.get(Calendar.DAY_OF_MONTH);
-                if (day > 28) {
-                    int year = c.get(Calendar.YEAR);
-                    if (isLeapYear(year)) {
-                        day = 29;
-                    } else {
-                        day = 28;
-                    }
-                }
-            }
+  public CertValidity(
+      final int validity,
+      final Unit unit) {
+    if (validity < 1) {
+      throw new IllegalArgumentException("validity could not be less than 1");
+    }
+    ParamUtil.assertNotNull("unit", unit);
+    this.validity = validity;
+    this.unit = unit;
+  }
 
-            return c.getTime();
-        default:
-            throw new RuntimeException(
-                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+  public int getValidity() {
+    return validity;
+  }
+
+  public Unit getUnit() {
+    return unit;
+  }
+
+  public Date add(
+      final Date referenceDate) {
+    switch (unit) {
+    case HOUR:
+      return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
+    case DAY:
+      return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
+    case YEAR:
+      Calendar c = Calendar.getInstance(utc);
+      c.setTime(referenceDate);
+      c.add(Calendar.YEAR, validity);
+      c.add(Calendar.SECOND, -1);
+
+      int month = c.get(Calendar.MONTH);
+      // february
+      if (month == 1) {
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if (day > 28) {
+          int year = c.get(Calendar.YEAR);
+          if (isLeapYear(year)) {
+            day = 29;
+          } else {
+            day = 28;
+          }
         }
-    } // method add
+      }
 
-    private int getApproxHours() {
-        switch (unit) {
-        case HOUR:
-            return validity;
-        case DAY:
-            return 24 * validity;
-        case YEAR:
-            return (365 * validity + validity / 4) * 24;
-        default:
-            throw new RuntimeException(
-                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
-        }
+      return c.getTime();
+    default:
+      throw new RuntimeException(
+          String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+    }
+  } // method add
+
+  private int getApproxHours() {
+    switch (unit) {
+    case HOUR:
+      return validity;
+    case DAY:
+      return 24 * validity;
+    case YEAR:
+      return (365 * validity + validity / 4) * 24;
+    default:
+      throw new RuntimeException(
+          String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public int compareTo(
+      final CertValidity o) {
+    if (unit == o.unit) {
+      if (validity == o.validity) {
+        return 0;
+      }
+
+      return (validity < o.validity)
+          ? -1
+          : 1;
+    } else {
+      int thisHours = getApproxHours();
+      int thatHours = o.getApproxHours();
+      if (thisHours == thatHours) {
+        return 0;
+      } else {
+        return (thisHours < thatHours)
+            ? -1
+            : 1;
+      }
+    }
+  }
+
+  @Override
+  public boolean equals(
+      final Object obj) {
+    if (!(obj instanceof CertValidity)) {
+      return false;
     }
 
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
+    CertValidity b = (CertValidity) obj;
+    return unit == b.unit && validity == b.validity;
+  }
+
+  @Override
+  public String toString() {
+    switch (unit) {
+    case HOUR:
+      return validity + "h";
+    case DAY:
+      return validity + "d";
+    case YEAR:
+      return validity + "y";
+    default:
+      throw new RuntimeException(
+        String.format("should not reach here, unknown CertValidity.Unit %s", unit));
     }
+  }
 
-    @Override
-    public int compareTo(
-            final CertValidity o) {
-        if (unit == o.unit) {
-            if (validity == o.validity) {
-                return 0;
-            }
-
-            return (validity < o.validity)
-                    ? -1
-                    : 1;
-        } else {
-            int thisHours = getApproxHours();
-            int thatHours = o.getApproxHours();
-            if (thisHours == thatHours) {
-                return 0;
-            } else {
-                return (thisHours < thatHours)
-                        ? -1
-                        : 1;
-            }
-        }
+  private static boolean isLeapYear(
+      final int year) {
+    if (year % 4 != 0) {
+      return false;
+    } else if (year % 100 != 0) {
+      return true;
+    } else {
+      return year % 400 == 0;
     }
-
-    @Override
-    public boolean equals(
-            final Object obj) {
-        if (!(obj instanceof CertValidity)) {
-            return false;
-        }
-
-        CertValidity b = (CertValidity) obj;
-        return unit == b.unit && validity == b.validity;
-    }
-
-    @Override
-    public String toString() {
-        switch (unit) {
-        case HOUR:
-            return validity + "h";
-        case DAY:
-            return validity + "d";
-        case YEAR:
-            return validity + "y";
-        default:
-            throw new RuntimeException(
-                String.format("should not reach here, unknown CertValidity.Unit %s", unit));
-        }
-    }
-
-    private static boolean isLeapYear(
-            final int year) {
-        if (year % 4 != 0) {
-            return false;
-        } else if (year % 100 != 0) {
-            return true;
-        } else {
-            return year % 400 == 0;
-        }
-    }
+  }
 
 }

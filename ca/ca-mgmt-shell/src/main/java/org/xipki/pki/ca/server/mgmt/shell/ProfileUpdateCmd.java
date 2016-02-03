@@ -46,47 +46,48 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "profile-up",
-        description = "update certificate profile")
+    description = "update certificate profile")
 @Service
 public class ProfileUpdateCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "profile name\n"
-                    + "(required)")
-    @Completion(ProfileNameCompleter.class)
-    protected String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "profile name\n"
+          + "(required)")
+  @Completion(ProfileNameCompleter.class)
+  protected String name;
 
-    @Option(name = "--type",
-            description = "profile type")
-    protected String type;
+  @Option(name = "--type",
+      description = "profile type")
+  protected String type;
 
-    @Option(name = "--conf",
-            description = "profile configuration or 'NULL'")
-    protected String conf;
+  @Option(name = "--conf",
+      description = "profile configuration or 'NULL'")
+  protected String conf;
 
-    @Option(name = "--conf-file",
-            description = "profile configuration file")
-    @Completion(FilePathCompleter.class)
-    protected String confFile;
+  @Option(name = "--conf-file",
+      description = "profile configuration file")
+  @Completion(FilePathCompleter.class)
+  protected String confFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (type == null && conf == null && confFile == null) {
-            throw new IllegalCmdParamException("nothing to update");
-        }
-
-        if (conf == null && confFile != null) {
-            conf = new String(IoUtil.read(confFile));
-        }
-
-        boolean b = caManager.changeCertprofile(name, type, conf);
-        output(b, "updated", "could not update", "certificate profile " + name);
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (type == null && conf == null && confFile == null) {
+      throw new IllegalCmdParamException("nothing to update");
     }
+
+    if (conf == null && confFile != null) {
+      conf = new String(IoUtil.read(confFile));
+    }
+
+    boolean b = caManager.changeCertprofile(name, type, conf);
+    output(b, "updated", "could not update", "certificate profile " + name);
+    return null;
+  }
 
 }

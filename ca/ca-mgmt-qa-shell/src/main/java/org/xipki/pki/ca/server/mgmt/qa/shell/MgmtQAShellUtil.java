@@ -42,48 +42,49 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class MgmtQAShellUtil {
 
-    private MgmtQAShellUtil() {
+  private MgmtQAShellUtil() {
+  }
+
+  public static void assertEquals(
+      final String desc,
+      String ex,
+      final String is)
+  throws CmdFailure {
+    if (CAManager.NULL.equals(ex)) {
+      ex = null;
     }
 
-    public static void assertEquals(
-            final String desc,
-            String ex,
-            final String is)
-    throws CmdFailure {
-        if (CAManager.NULL.equals(ex)) {
-            ex = null;
-        }
-
-        boolean b;
-        if (ex == null) {
-            b = (is == null);
-        } else {
-            b = ex.equals(is);
-        }
-
-        if (!b) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
-        }
+    boolean b;
+    if (ex == null) {
+      b = (is == null);
+    } else {
+      b = ex.equals(is);
     }
 
-    public static void assertEquals(
-            final String desc,
-            final Collection<?> ex, Collection<?> is)
-    throws CmdFailure {
-        boolean b;
-        if (ex == null) {
-            b = (is == null);
-        } else {
-            b = ex.equals(is);
-        }
-
-        if (!b) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
-        }
+    if (!b) {
+      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
     }
+  }
+
+  public static void assertEquals(
+      final String desc,
+      final Collection<?> ex, Collection<?> is)
+  throws CmdFailure {
+    boolean b;
+    if (ex == null) {
+      b = (is == null);
+    } else {
+      b = ex.equals(is);
+    }
+
+    if (!b) {
+      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
+    }
+  }
 
 }

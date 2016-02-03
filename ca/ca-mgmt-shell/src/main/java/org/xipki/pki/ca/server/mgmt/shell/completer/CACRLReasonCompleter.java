@@ -42,19 +42,20 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class CACRLReasonCompleter extends AbstractEnumCompleter {
 
-    public CACRLReasonCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public CACRLReasonCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (CRLReason reason : CaRevokeCmd.permitted_reasons) {
-            enums.append(reason.getDescription()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (CRLReason reason : CaRevokeCmd.permitted_reasons) {
+      enums.append(reason.getDescription()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-rm",
-        description = "remove CA (negative, QA)")
+    description = "remove CA (negative, QA)")
 @Service
 public class NegCaRemoveCmd extends CaRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-ca-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-ca-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

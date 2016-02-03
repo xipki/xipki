@@ -1,4 +1,8 @@
 .gitignore
+
+# CheckStyle #
+.checkstyle
+
 # Directories #
 /build/
 /bin/

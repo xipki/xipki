@@ -48,147 +48,148 @@ import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class CAConf {
 
-    private final String name;
+  private final String name;
 
-    private final String url;
+  private final String url;
 
-    private final String healthUrl;
+  private final String healthUrl;
 
-    private final String requestorName;
+  private final String requestorName;
 
-    private X509CmpRequestor requestor;
+  private X509CmpRequestor requestor;
 
-    private boolean certAutoconf;
+  private boolean certAutoconf;
 
-    private boolean certprofilesAutoconf;
+  private boolean certprofilesAutoconf;
 
-    private X509Certificate cert;
+  private X509Certificate cert;
 
-    private final X509Certificate responder;
+  private final X509Certificate responder;
 
-    private X500Name subject;
+  private X500Name subject;
 
-    private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
+  private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-    CAConf(
-            final String name,
-            final String url,
-            final String healthUrl,
-            final String requestorName,
-            final X509Certificate responder) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("url", url);
-        ParamUtil.assertNotNull("requestorName", requestorName);
-        ParamUtil.assertNotNull("responder", responder);
+  CAConf(
+      final String name,
+      final String url,
+      final String healthUrl,
+      final String requestorName,
+      final X509Certificate responder) {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotBlank("url", url);
+    ParamUtil.assertNotNull("requestorName", requestorName);
+    ParamUtil.assertNotNull("responder", responder);
 
-        this.name = name;
-        this.url = url;
-        this.requestorName = requestorName;
-        this.responder = responder;
-        if (StringUtil.isBlank(healthUrl)) {
-            this.healthUrl = url.replace("cmp", "health");
-        } else {
-            this.healthUrl = healthUrl;
-        }
+    this.name = name;
+    this.url = url;
+    this.requestorName = requestorName;
+    this.responder = responder;
+    if (StringUtil.isBlank(healthUrl)) {
+      this.healthUrl = url.replace("cmp", "health");
+    } else {
+      this.healthUrl = healthUrl;
     }
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getUrl() {
-        return url;
-    }
+  public String getUrl() {
+    return url;
+  }
 
-    public String getHealthUrl() {
-        return healthUrl;
-    }
+  public String getHealthUrl() {
+    return healthUrl;
+  }
 
-    public void setCert(
-            final X509Certificate cert) {
-        this.cert = cert;
-        if (cert != null) {
-            this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        } else {
-            this.subject = null;
-        }
+  public void setCert(
+      final X509Certificate cert) {
+    this.cert = cert;
+    if (cert != null) {
+      this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+    } else {
+      this.subject = null;
     }
+  }
 
-    public void setCertprofiles(
-            final Set<CertprofileInfo> profiles) {
-        if (profiles == null) {
-            this.profiles = Collections.emptyMap();
-        } else {
-            this.profiles = new HashMap<>();
-            for (CertprofileInfo m : profiles) {
-                this.profiles.put(m.getName(), m);
-            }
-        }
+  public void setCertprofiles(
+      final Set<CertprofileInfo> profiles) {
+    if (profiles == null) {
+      this.profiles = Collections.emptyMap();
+    } else {
+      this.profiles = new HashMap<>();
+      for (CertprofileInfo m : profiles) {
+        this.profiles.put(m.getName(), m);
+      }
     }
+  }
 
-    public X509Certificate getCert() {
-        return cert;
-    }
+  public X509Certificate getCert() {
+    return cert;
+  }
 
-    public X500Name getSubject() {
-        return subject;
-    }
+  public X500Name getSubject() {
+    return subject;
+  }
 
-    public Set<String> getProfileNames() {
-        return profiles.keySet();
-    }
+  public Set<String> getProfileNames() {
+    return profiles.keySet();
+  }
 
-    public boolean supportsProfile(
-            final String profileName) {
-        return profiles.containsKey(profileName);
-    }
+  public boolean supportsProfile(
+      final String profileName) {
+    return profiles.containsKey(profileName);
+  }
 
-    public CertprofileInfo getProfile(
-            final String profileName) {
-        return profiles.get(profileName);
-    }
+  public CertprofileInfo getProfile(
+      final String profileName) {
+    return profiles.get(profileName);
+  }
 
-    public boolean isCAInfoConfigured() {
-        return cert != null;
-    }
+  public boolean isCAInfoConfigured() {
+    return cert != null;
+  }
 
-    public X509Certificate getResponder() {
-        return responder;
-    }
+  public X509Certificate getResponder() {
+    return responder;
+  }
 
-    public boolean isCertAutoconf() {
-        return certAutoconf;
-    }
+  public boolean isCertAutoconf() {
+    return certAutoconf;
+  }
 
-    public void setCertAutoconf(
-            final boolean autoconf) {
-        this.certAutoconf = autoconf;
-    }
+  public void setCertAutoconf(
+      final boolean autoconf) {
+    this.certAutoconf = autoconf;
+  }
 
-    public boolean isCertprofilesAutoconf() {
-        return certprofilesAutoconf;
-    }
+  public boolean isCertprofilesAutoconf() {
+    return certprofilesAutoconf;
+  }
 
-    public void setCertprofilesAutoconf(
-            final boolean autoconf) {
-        this.certprofilesAutoconf = autoconf;
-    }
+  public void setCertprofilesAutoconf(
+      final boolean autoconf) {
+    this.certprofilesAutoconf = autoconf;
+  }
 
-    public void setRequestor(
-            final X509CmpRequestor requestor) {
-        this.requestor = requestor;
-    }
+  public void setRequestor(
+      final X509CmpRequestor requestor) {
+    this.requestor = requestor;
+  }
 
-    public String getRequestorName() {
-        return requestorName;
-    }
+  public String getRequestorName() {
+    return requestorName;
+  }
 
-    public X509CmpRequestor getRequestor() {
-        return requestor;
-    }
+  public X509CmpRequestor getRequestor() {
+    return requestor;
+  }
 
 }

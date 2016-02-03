@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUnrevokeCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-unrevoke",
-        description = "unrevoke CA")
+    description = "unrevoke CA")
 @Service
 public class NegCaUnrevokeCmd extends CaUnrevokeCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-ca-unrevoke");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-ca-unrevoke");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

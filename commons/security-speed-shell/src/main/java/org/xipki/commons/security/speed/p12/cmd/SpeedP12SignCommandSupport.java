@@ -40,14 +40,15 @@ import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class SpeedP12SignCommandSupport extends SingleSpeedCommandSupport {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+  @Option(name = "--sig-algo",
+      required = true,
+      description = "signature algorithm\n"
+          + "(required)")
+  protected String sigAlgo;
 
 }

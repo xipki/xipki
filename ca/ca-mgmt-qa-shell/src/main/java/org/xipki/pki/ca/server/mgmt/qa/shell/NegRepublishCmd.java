@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.RepublishCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-republish",
-        description = "republish certificates (negative, QA)")
+    description = "republish certificates (negative, QA)")
 @Service
 public class NegRepublishCmd extends RepublishCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-republish");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-republish");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

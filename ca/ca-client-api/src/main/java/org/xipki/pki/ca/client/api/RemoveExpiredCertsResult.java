@@ -37,52 +37,53 @@ package org.xipki.pki.ca.client.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class RemoveExpiredCertsResult {
 
-    private int numOfCerts;
+  private int numOfCerts;
 
-    private long expiredAt;
+  private long expiredAt;
 
-    private String userLike;
+  private String userLike;
 
-    private String certprofile;
+  private String certprofile;
 
-    public int getNumOfCerts() {
-        return numOfCerts;
-    }
+  public int getNumOfCerts() {
+    return numOfCerts;
+  }
 
-    public void setNumOfCerts(
-            final int numOfCerts) {
-        this.numOfCerts = numOfCerts;
-    }
+  public void setNumOfCerts(
+      final int numOfCerts) {
+    this.numOfCerts = numOfCerts;
+  }
 
-    public long getExpiredAt() {
-        return expiredAt;
-    }
+  public long getExpiredAt() {
+    return expiredAt;
+  }
 
-    public void setExpiredAt(
-            final long expiredAt) {
-        this.expiredAt = expiredAt;
-    }
+  public void setExpiredAt(
+      final long expiredAt) {
+    this.expiredAt = expiredAt;
+  }
 
-    public String getUserLike() {
-        return userLike;
-    }
+  public String getUserLike() {
+    return userLike;
+  }
 
-    public void setUserLike(
-            final String userLike) {
-        this.userLike = userLike;
-    }
+  public void setUserLike(
+      final String userLike) {
+    this.userLike = userLike;
+  }
 
-    public String getCertprofile() {
-        return certprofile;
-    }
+  public String getCertprofile() {
+    return certprofile;
+  }
 
-    public void setCertprofile(
-            final String certprofile) {
-        this.certprofile = certprofile;
-    }
+  public void setCertprofile(
+      final String certprofile) {
+    this.certprofile = certprofile;
+  }
 
 }

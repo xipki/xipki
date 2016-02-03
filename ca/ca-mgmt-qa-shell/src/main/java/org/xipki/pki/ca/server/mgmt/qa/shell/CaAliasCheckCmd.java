@@ -45,38 +45,39 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "caalias-check",
-        description = "check CA aliases (QA)")
+    description = "check CA aliases (QA)")
 @Service
 public class CaAliasCheckCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--alias",
-            required = true,
-            description = "alias name\n"
-                    + "(required)")
-    private String aliasName;
+  @Option(name = "--alias",
+      required = true,
+      description = "alias name\n"
+          + "(required)")
+  private String aliasName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
-        String _caName = caManager.getCaNameForAlias(aliasName);
-        if (_caName == null) {
-            throw new CmdFailure("alias '" + aliasName + "' is not configured");
-        }
-
-        MgmtQAShellUtil.assertEquals("CA name", caName, _caName);
-        out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
+    String _caName = caManager.getCaNameForAlias(aliasName);
+    if (_caName == null) {
+      throw new CmdFailure("alias '" + aliasName + "' is not configured");
     }
+
+    MgmtQAShellUtil.assertEquals("CA name", caName, _caName);
+    out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
+    return null;
+  }
 
 }

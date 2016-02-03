@@ -37,30 +37,31 @@ package org.xipki.pki.ca.client.impl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CmpRequestorException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CmpRequestorException() {
-        super();
-    }
+  public CmpRequestorException() {
+    super();
+  }
 
-    public CmpRequestorException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CmpRequestorException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
-    public CmpRequestorException(
-            final String message) {
-        super(message);
-    }
+  public CmpRequestorException(
+      final String message) {
+    super(message);
+  }
 
-    public CmpRequestorException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CmpRequestorException(
+      final Throwable cause) {
+    super(cause);
+  }
 
 }

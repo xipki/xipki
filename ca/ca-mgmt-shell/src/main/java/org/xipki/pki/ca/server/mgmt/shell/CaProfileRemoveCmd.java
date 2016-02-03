@@ -43,32 +43,33 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "caprofile-rm",
-        description = "remove certificate profile from CA")
+    description = "remove certificate profile from CA")
 @Service
 public class CaProfileRemoveCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--profile-local",
-            required = true, description = "certificate profile local name\n"
-                    + "(required)")
-    private String profileLocalname;
+  @Option(name = "--profile-local",
+      required = true, description = "certificate profile local name\n"
+          + "(required)")
+  private String profileLocalname;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCertprofileFromCA(profileLocalname, caName);
-        output(b, "removed", "could not remove",
-                "certificate with localname " + profileLocalname + " from CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCertprofileFromCA(profileLocalname, caName);
+    output(b, "removed", "could not remove",
+        "certificate with localname " + profileLocalname + " from CA " + caName);
+    return null;
+  }
 
 }

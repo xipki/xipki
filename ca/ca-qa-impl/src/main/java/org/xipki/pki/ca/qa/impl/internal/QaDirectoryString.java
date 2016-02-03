@@ -40,30 +40,31 @@ import org.xipki.pki.ca.api.profile.DirectoryStringType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaDirectoryString {
 
-    private final DirectoryStringType type;
+  private final DirectoryStringType type;
 
-    private final String text;
+  private final String text;
 
-    public QaDirectoryString(
-            final DirectoryStringType type,
-            final String text) {
-        ParamUtil.assertNotNull("type", type);
-        ParamUtil.assertNotBlank("text", text);
+  public QaDirectoryString(
+      final DirectoryStringType type,
+      final String text) {
+    ParamUtil.assertNotNull("type", type);
+    ParamUtil.assertNotBlank("text", text);
 
-        this.type = type;
-        this.text = text;
-    }
+    this.type = type;
+    this.text = text;
+  }
 
-    public DirectoryStringType getType() {
-        return type;
-    }
+  public DirectoryStringType getType() {
+    return type;
+  }
 
-    public String getText() {
-        return text;
-    }
+  public String getText() {
+    return text;
+  }
 
 }

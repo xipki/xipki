@@ -37,18 +37,19 @@ package org.xipki.pki.ca.dbtool.xmlio;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class InvalidDataObjectException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public InvalidDataObjectException() {
-    }
+  public InvalidDataObjectException() {
+  }
 
-    public InvalidDataObjectException(
-            final String message) {
-        super(message);
-    }
+  public InvalidDataObjectException(
+      final String message) {
+    super(message);
+  }
 
 }

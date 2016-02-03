@@ -45,104 +45,105 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class ResponderOption {
 
-    private final OCSPMode mode;
+  private final OCSPMode mode;
 
-    private final boolean inheritCaRevocation;
+  private final boolean inheritCaRevocation;
 
-    private final String requestOptionName;
+  private final String requestOptionName;
 
-    private final String responseOptionName;
+  private final String responseOptionName;
 
-    private final String auditOptionName;
+  private final String auditOptionName;
 
-    private final String certprofileOptionName;
+  private final String certprofileOptionName;
 
-    private final String signerName;
+  private final String signerName;
 
-    private final List<String> storeNames;
+  private final List<String> storeNames;
 
-    private final List<String> servletPaths;
+  private final List<String> servletPaths;
 
-    public ResponderOption(
-            final ResponderType conf)
-    throws InvalidConfException {
-        String s = conf.getMode();
-        if (s == null || "RFC6960".equalsIgnoreCase(s)) {
-            this.mode = OCSPMode.RFC6960;
-        } else if ("RFC2560".equalsIgnoreCase(s)) {
-            this.mode = OCSPMode.RFC2560;
-        } else {
-            throw new InvalidConfException("invalid OCSP mode '" + s + "'");
+  public ResponderOption(
+      final ResponderType conf)
+  throws InvalidConfException {
+    String s = conf.getMode();
+    if (s == null || "RFC6960".equalsIgnoreCase(s)) {
+      this.mode = OCSPMode.RFC6960;
+    } else if ("RFC2560".equalsIgnoreCase(s)) {
+      this.mode = OCSPMode.RFC2560;
+    } else {
+      throw new InvalidConfException("invalid OCSP mode '" + s + "'");
+    }
+
+    this.signerName = conf.getSigner();
+    this.requestOptionName = conf.getRequest();
+    this.responseOptionName = conf.getResponse();
+    this.auditOptionName = conf.getAudit();
+    this.certprofileOptionName = conf.getCertprofile();
+    this.inheritCaRevocation = conf.isInheritCaRevocation();
+
+    List<String> list = new ArrayList<>(conf.getStores().getStore());
+    this.storeNames = Collections.unmodifiableList(list);
+
+    if (conf.getServletPaths() == null) {
+      this.servletPaths = Collections.emptyList();
+    } else {
+      List<String> paths = conf.getServletPaths().getServletPath();
+      for (String path : paths) {
+        int n = path.length();
+        if (n > 0 && path.charAt(0) == '/') {
+          throw new InvalidConfException(
+              "servlet path '" + path + "' must not start with '/'");
         }
-
-        this.signerName = conf.getSigner();
-        this.requestOptionName = conf.getRequest();
-        this.responseOptionName = conf.getResponse();
-        this.auditOptionName = conf.getAudit();
-        this.certprofileOptionName = conf.getCertprofile();
-        this.inheritCaRevocation = conf.isInheritCaRevocation();
-
-        List<String> list = new ArrayList<>(conf.getStores().getStore());
-        this.storeNames = Collections.unmodifiableList(list);
-
-        if (conf.getServletPaths() == null) {
-            this.servletPaths = Collections.emptyList();
-        } else {
-            List<String> paths = conf.getServletPaths().getServletPath();
-            for (String path : paths) {
-                int n = path.length();
-                if (n > 0 && path.charAt(0) == '/') {
-                    throw new InvalidConfException(
-                            "servlet path '" + path + "' must not start with '/'");
-                }
-                if (n > 1 && path.charAt(n - 1) == '/') {
-                    throw new InvalidConfException(
-                            "servlet path '" + path + "' must not end with '/'");
-                }
-            }
-            list = new ArrayList<>(paths);
-            this.servletPaths = Collections.unmodifiableList(list);
+        if (n > 1 && path.charAt(n - 1) == '/') {
+          throw new InvalidConfException(
+              "servlet path '" + path + "' must not end with '/'");
         }
-    } // constructor
-
-    public OCSPMode getMode() {
-        return mode;
+      }
+      list = new ArrayList<>(paths);
+      this.servletPaths = Collections.unmodifiableList(list);
     }
+  } // constructor
 
-    public boolean isInheritCaRevocation() {
-        return inheritCaRevocation;
-    }
+  public OCSPMode getMode() {
+    return mode;
+  }
 
-    public String getSignerName() {
-        return signerName;
-    }
+  public boolean isInheritCaRevocation() {
+    return inheritCaRevocation;
+  }
 
-    public String getRequestOptionName() {
-        return requestOptionName;
-    }
+  public String getSignerName() {
+    return signerName;
+  }
 
-    public String getResponseOptionName() {
-        return responseOptionName;
-    }
+  public String getRequestOptionName() {
+    return requestOptionName;
+  }
 
-    public String getAuditOptionName() {
-        return auditOptionName;
-    }
+  public String getResponseOptionName() {
+    return responseOptionName;
+  }
 
-    public List<String> getStoreNames() {
-        return storeNames;
-    }
+  public String getAuditOptionName() {
+    return auditOptionName;
+  }
 
-    public String getCertprofileOptionName() {
-        return certprofileOptionName;
-    }
+  public List<String> getStoreNames() {
+    return storeNames;
+  }
 
-    public List<String> getServletPaths() {
-        return servletPaths;
-    }
+  public String getCertprofileOptionName() {
+    return certprofileOptionName;
+  }
+
+  public List<String> getServletPaths() {
+    return servletPaths;
+  }
 
 }

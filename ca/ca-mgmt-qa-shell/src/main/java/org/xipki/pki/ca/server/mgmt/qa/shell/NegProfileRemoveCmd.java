@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-profile-rm",
-        description = "remove Profile (negative, QA)")
+    description = "remove Profile (negative, QA)")
 @Service
 public class NegProfileRemoveCmd extends ProfileRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-profile-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-profile-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

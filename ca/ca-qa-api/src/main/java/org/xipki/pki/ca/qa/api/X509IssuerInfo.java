@@ -51,100 +51,101 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509IssuerInfo {
 
-    private final Set<String> caIssuerURLs;
+  private final Set<String> caIssuerURLs;
 
-    private final Set<String> ocspURLs;
+  private final Set<String> ocspURLs;
 
-    private final Set<String> crlURLs;
+  private final Set<String> crlURLs;
 
-    private final Set<String> deltaCrlURLs;
+  private final Set<String> deltaCrlURLs;
 
-    private final X509Certificate cert;
+  private final X509Certificate cert;
 
-    private final Certificate bcCert;
+  private final Certificate bcCert;
 
-    private final byte[] ski;
+  private final byte[] ski;
 
-    public X509IssuerInfo(
-            final List<String> caIssuerURLs,
-            final List<String> ocspURLs,
-            final List<String> crlURLs,
-            final List<String> deltaCrlURLs,
-            final byte[] certBytes)
-    throws CertificateException {
-        ParamUtil.assertNotNull("certBytes", certBytes);
+  public X509IssuerInfo(
+      final List<String> caIssuerURLs,
+      final List<String> ocspURLs,
+      final List<String> crlURLs,
+      final List<String> deltaCrlURLs,
+      final byte[] certBytes)
+  throws CertificateException {
+    ParamUtil.assertNotNull("certBytes", certBytes);
 
-        if (CollectionUtil.isEmpty(caIssuerURLs)) {
-            this.caIssuerURLs = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(caIssuerURLs);
-            this.caIssuerURLs = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(ocspURLs)) {
-            this.ocspURLs = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(ocspURLs);
-            this.ocspURLs = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(crlURLs)) {
-            this.crlURLs = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(crlURLs);
-            this.crlURLs = Collections.unmodifiableSet(set);
-        }
-
-        if (CollectionUtil.isEmpty(deltaCrlURLs)) {
-            this.deltaCrlURLs = null;
-        } else {
-            Set<String> set = new HashSet<>();
-            set.addAll(deltaCrlURLs);
-            this.deltaCrlURLs = Collections.unmodifiableSet(set);
-        }
-
-        try {
-            this.cert = X509Util.parseCert(certBytes);
-        } catch (IOException e) {
-            throw new CertificateException(e.getMessage(), e);
-        }
-        this.bcCert = Certificate.getInstance(certBytes);
-        this.ski = X509Util.extractSKI(cert);
-    } // constructor
-
-    public Set<String> getCaIssuerURLs() {
-        return caIssuerURLs;
+    if (CollectionUtil.isEmpty(caIssuerURLs)) {
+      this.caIssuerURLs = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(caIssuerURLs);
+      this.caIssuerURLs = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> getOcspURLs() {
-        return ocspURLs;
+    if (CollectionUtil.isEmpty(ocspURLs)) {
+      this.ocspURLs = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(ocspURLs);
+      this.ocspURLs = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> getCrlURLs() {
-        return crlURLs;
+    if (CollectionUtil.isEmpty(crlURLs)) {
+      this.crlURLs = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(crlURLs);
+      this.crlURLs = Collections.unmodifiableSet(set);
     }
 
-    public Set<String> getDeltaCrlURLs() {
-        return deltaCrlURLs;
+    if (CollectionUtil.isEmpty(deltaCrlURLs)) {
+      this.deltaCrlURLs = null;
+    } else {
+      Set<String> set = new HashSet<>();
+      set.addAll(deltaCrlURLs);
+      this.deltaCrlURLs = Collections.unmodifiableSet(set);
     }
 
-    public X509Certificate getCert() {
-        return cert;
+    try {
+      this.cert = X509Util.parseCert(certBytes);
+    } catch (IOException e) {
+      throw new CertificateException(e.getMessage(), e);
     }
+    this.bcCert = Certificate.getInstance(certBytes);
+    this.ski = X509Util.extractSKI(cert);
+  } // constructor
 
-    public byte[] getSubjectKeyIdentifier() {
-        return Arrays.clone(ski);
-    }
+  public Set<String> getCaIssuerURLs() {
+    return caIssuerURLs;
+  }
 
-    public Certificate getBcCert() {
-        return bcCert;
-    }
+  public Set<String> getOcspURLs() {
+    return ocspURLs;
+  }
+
+  public Set<String> getCrlURLs() {
+    return crlURLs;
+  }
+
+  public Set<String> getDeltaCrlURLs() {
+    return deltaCrlURLs;
+  }
+
+  public X509Certificate getCert() {
+    return cert;
+  }
+
+  public byte[] getSubjectKeyIdentifier() {
+    return Arrays.clone(ski);
+  }
+
+  public Certificate getBcCert() {
+    return bcCert;
+  }
 
 }

@@ -49,53 +49,54 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "caalias-info",
-        description = "show information of CA alias")
+    description = "show information of CA alias")
 @Service
 public class CaAliasInfoCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "alias", description = "CA alias")
-    @Completion(CaAliasCompleter.class)
-    private String caAlias;
+  @Argument(index = 0, name = "alias", description = "CA alias")
+  @Completion(CaAliasCompleter.class)
+  private String caAlias;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Set<String> aliasNames = caManager.getCaAliasNames();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Set<String> aliasNames = caManager.getCaAliasNames();
 
-        StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
 
-        if (caAlias == null) {
-            int n = aliasNames.size();
+    if (caAlias == null) {
+      int n = aliasNames.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
-                        ? "no"
-                        : "1");
-                sb.append(" CA alias is configured\n");
-            } else {
-                sb.append(n).append(" CA aliases are configured:\n");
-            }
+      if (n == 0 || n == 1) {
+        sb.append((n == 0)
+            ? "no"
+            : "1");
+        sb.append(" CA alias is configured\n");
+      } else {
+        sb.append(n).append(" CA aliases are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(aliasNames);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(aliasNames);
+      Collections.sort(sorted);
 
-            for (String aliasName : sorted) {
-                sb.append("\t").append(aliasName).append("\n");
-            }
-        } else {
-            if (aliasNames.contains(caAlias)) {
-                String paramValue = caManager.getCaNameForAlias(caAlias);
-                sb.append(caAlias).append("\n\t").append(paramValue);
-            } else {
-                throw new UnexpectedException("could not find CA alias '" + caAlias + "'");
-            }
-        }
+      for (String aliasName : sorted) {
+        sb.append("\t").append(aliasName).append("\n");
+      }
+    } else {
+      if (aliasNames.contains(caAlias)) {
+        String paramValue = caManager.getCaNameForAlias(caAlias);
+        sb.append(caAlias).append("\n\t").append(paramValue);
+      } else {
+        throw new UnexpectedException("could not find CA alias '" + caAlias + "'");
+      }
+    }
 
-        out(sb.toString());
-        return null;
-    } // method doExecute
+    out(sb.toString());
+    return null;
+  } // method doExecute
 
 }

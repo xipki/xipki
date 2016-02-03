@@ -37,29 +37,30 @@ package org.xipki.commons.password.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class PasswordResolverException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public PasswordResolverException() {
-    }
+  public PasswordResolverException() {
+  }
 
-    public PasswordResolverException(
-            final String message) {
-        super(message);
-    }
+  public PasswordResolverException(
+      final String message) {
+    super(message);
+  }
 
-    public PasswordResolverException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public PasswordResolverException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public PasswordResolverException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public PasswordResolverException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

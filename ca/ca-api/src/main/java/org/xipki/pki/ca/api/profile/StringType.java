@@ -44,32 +44,33 @@ import org.bouncycastle.asn1.DERUTF8String;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum StringType {
 
-    teletexString,
-    printableString,
-    utf8String,
-    bmpString,
-    ia5String;
+  teletexString,
+  printableString,
+  utf8String,
+  bmpString,
+  ia5String;
 
-    public ASN1Encodable createString(
-            final String text) {
-        if (teletexString == this) {
-            return new DERT61String(text);
-        } else if (printableString == this) {
-            return new DERPrintableString(text);
-        } else if (utf8String == this) {
-            return new DERUTF8String(text);
-        } else if (bmpString == this) {
-            return new DERBMPString(text);
-        } else if (ia5String == this) {
-            return new DERIA5String(text, true);
-        } else {
-            throw new RuntimeException(
-                    String.format("should not reach here, unkown StringType '%s'", text));
-        }
+  public ASN1Encodable createString(
+      final String text) {
+    if (teletexString == this) {
+      return new DERT61String(text);
+    } else if (printableString == this) {
+      return new DERPrintableString(text);
+    } else if (utf8String == this) {
+      return new DERUTF8String(text);
+    } else if (bmpString == this) {
+      return new DERBMPString(text);
+    } else if (ia5String == this) {
+      return new DERIA5String(text, true);
+    } else {
+      throw new RuntimeException(
+          String.format("should not reach here, unkown StringType '%s'", text));
     }
+  }
 
 }

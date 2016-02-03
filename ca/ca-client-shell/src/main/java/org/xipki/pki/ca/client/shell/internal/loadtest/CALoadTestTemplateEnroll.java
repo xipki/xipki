@@ -83,224 +83,225 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CALoadTestTemplateEnroll extends LoadExecutor {
 
-    private final static class CertRequestWithProfile {
+  private final static class CertRequestWithProfile {
 
-        private final String certprofile;
+    private final String certprofile;
 
-        private final CertRequest certRequest;
+    private final CertRequest certRequest;
 
-        public CertRequestWithProfile(
-                final String certprofile,
-                final CertRequest certRequest) {
-            this.certprofile = certprofile;
-            this.certRequest = certRequest;
-        }
+    public CertRequestWithProfile(
+        final String certprofile,
+        final CertRequest certRequest) {
+      this.certprofile = certprofile;
+      this.certRequest = certRequest;
+    }
 
-    } // class CertRequestWithProfile
+  } // class CertRequestWithProfile
 
-    class Testor implements Runnable {
-
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
-                if (certReqs != null) {
-                    boolean successful = testNext(certReqs);
-                    int numFailed = successful
-                            ? 0
-                            : 1;
-                    account(1, numFailed);
-                } else {
-                    account(1, 1);
-                }
-            }
-        }
-
-        private boolean testNext(
-                final Map<Integer, CertRequestWithProfile> certRequests) {
-            EnrollCertResult result;
-            try {
-                EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
-                for (Integer certId : certRequests.keySet()) {
-                    CertRequestWithProfile certRequest = certRequests.get(certId);
-                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
-                            "id-" + certId,
-                            certRequest.certprofile,
-                            certRequest.certRequest,
-                            RA_VERIFIED);
-
-                    request.addRequestEntry(requestEntry);
-                }
-
-                result = caClient.requestCerts(request, null,
-                        userPrefix + System.currentTimeMillis(), null);
-            } catch (CAClientException | PKIErrorException e) {
-                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return false;
-            }
-
-            if (result == null) {
-                return false;
-            }
-
-            Set<String> ids = result.getAllIds();
-            if (ids.size() < certRequests.size()) {
-                return false;
-            }
-
-            for (String id : ids) {
-                CertOrError certOrError = result.getCertificateOrError(id);
-                X509Certificate cert = (X509Certificate) certOrError.getCertificate();
-
-                if (cert == null) {
-                    return false;
-                }
-            }
-
-            return true;
-        } // method testNext
-
-    } // class Testor
-
-    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestTemplateEnroll.class);
-
-    private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-
-    private static Object jaxbUnmarshallerLock = new Object();
-
-    private static Unmarshaller jaxbUnmarshaller;
-
-    private final CAClient caClient;
-
-    private final String userPrefix = "LOADTEST-";
-
-    private final List<LoadTestEntry> loadtestEntries;
-
-    private final AtomicLong index;
-
-    public CALoadTestTemplateEnroll(
-            final CAClient caClient,
-            final EnrollTemplateType template,
-            final String description)
-    throws Exception {
-        super(description);
-
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("template", template);
-
-        this.caClient = caClient;
-
-        Calendar baseTime = Calendar.getInstance(Locale.UK);
-        baseTime.set(Calendar.YEAR, 2014);
-        baseTime.set(Calendar.MONTH, 0);
-        baseTime.set(Calendar.DAY_OF_MONTH, 1);
-
-        this.index = new AtomicLong(getSecureIndex());
-
-        List<EnrollCertType> list = template.getEnrollCert();
-        loadtestEntries = new ArrayList<>(list.size());
-
-        for (EnrollCertType entry : list) {
-            KeyEntry keyEntry;
-            if (entry.getEcKey() != null) {
-                keyEntry = new ECKeyEntry(entry.getEcKey().getCurve());
-            } else if (entry.getRsaKey() != null) {
-                keyEntry = new RSAKeyEntry(entry.getRsaKey().getModulusLength());
-            } else if (entry.getDsaKey() != null) {
-                keyEntry = new DSAKeyEntry(entry.getDsaKey().getPLength());
-            } else {
-                throw new RuntimeException("should not reach here, unknown child of KeyEntry");
-            }
-
-            String randomDNStr = entry.getRandomDN();
-            RandomDN randomDN = RandomDN.getInstance(randomDNStr);
-            if (randomDN == null) {
-                throw new InvalidConfException("invalid randomDN " + randomDNStr);
-            }
-
-            LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
-                    keyEntry, entry.getSubject(), randomDN);
-            loadtestEntries.add(loadtestEntry);
-        }
-    } // constructor
+  class Testor implements Runnable {
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
+        if (certReqs != null) {
+          boolean successful = testNext(certReqs);
+          int numFailed = successful
+              ? 0
+              : 1;
+          account(1, numFailed);
+        } else {
+          account(1, 1);
+        }
+      }
     }
 
-    public int getNumberOfCertsInOneRequest() {
-        return loadtestEntries.size();
+    private boolean testNext(
+        final Map<Integer, CertRequestWithProfile> certRequests) {
+      EnrollCertResult result;
+      try {
+        EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
+        for (Integer certId : certRequests.keySet()) {
+          CertRequestWithProfile certRequest = certRequests.get(certId);
+          EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
+              "id-" + certId,
+              certRequest.certprofile,
+              certRequest.certRequest,
+              RA_VERIFIED);
+
+          request.addRequestEntry(requestEntry);
+        }
+
+        result = caClient.requestCerts(request, null,
+            userPrefix + System.currentTimeMillis(), null);
+      } catch (CAClientException | PKIErrorException e) {
+        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+        return false;
+      } catch (Throwable t) {
+        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+        return false;
+      }
+
+      if (result == null) {
+        return false;
+      }
+
+      Set<String> ids = result.getAllIds();
+      if (ids.size() < certRequests.size()) {
+        return false;
+      }
+
+      for (String id : ids) {
+        CertOrError certOrError = result.getCertificateOrError(id);
+        X509Certificate cert = (X509Certificate) certOrError.getCertificate();
+
+        if (cert == null) {
+          return false;
+        }
+      }
+
+      return true;
+    } // method testNext
+
+  } // class Testor
+
+  private static final Logger LOG = LoggerFactory.getLogger(CALoadTestTemplateEnroll.class);
+
+  private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
+
+  private static Object jaxbUnmarshallerLock = new Object();
+
+  private static Unmarshaller jaxbUnmarshaller;
+
+  private final CAClient caClient;
+
+  private final String userPrefix = "LOADTEST-";
+
+  private final List<LoadTestEntry> loadtestEntries;
+
+  private final AtomicLong index;
+
+  public CALoadTestTemplateEnroll(
+      final CAClient caClient,
+      final EnrollTemplateType template,
+      final String description)
+  throws Exception {
+    super(description);
+
+    ParamUtil.assertNotNull("caClient", caClient);
+    ParamUtil.assertNotNull("template", template);
+
+    this.caClient = caClient;
+
+    Calendar baseTime = Calendar.getInstance(Locale.UK);
+    baseTime.set(Calendar.YEAR, 2014);
+    baseTime.set(Calendar.MONTH, 0);
+    baseTime.set(Calendar.DAY_OF_MONTH, 1);
+
+    this.index = new AtomicLong(getSecureIndex());
+
+    List<EnrollCertType> list = template.getEnrollCert();
+    loadtestEntries = new ArrayList<>(list.size());
+
+    for (EnrollCertType entry : list) {
+      KeyEntry keyEntry;
+      if (entry.getEcKey() != null) {
+        keyEntry = new ECKeyEntry(entry.getEcKey().getCurve());
+      } else if (entry.getRsaKey() != null) {
+        keyEntry = new RSAKeyEntry(entry.getRsaKey().getModulusLength());
+      } else if (entry.getDsaKey() != null) {
+        keyEntry = new DSAKeyEntry(entry.getDsaKey().getPLength());
+      } else {
+        throw new RuntimeException("should not reach here, unknown child of KeyEntry");
+      }
+
+      String randomDNStr = entry.getRandomDN();
+      RandomDN randomDN = RandomDN.getInstance(randomDNStr);
+      if (randomDN == null) {
+        throw new InvalidConfException("invalid randomDN " + randomDNStr);
+      }
+
+      LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
+          keyEntry, entry.getSubject(), randomDN);
+      loadtestEntries.add(loadtestEntry);
     }
+  } // constructor
 
-    private Map<Integer, CertRequestWithProfile> nextCertRequests() {
-        Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
-        final int n = loadtestEntries.size();
-        for (int i = 0; i < n; i++) {
-            LoadTestEntry loadtestEntry = loadtestEntries.get(i);
-            final int certId = i + 1;
-            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
 
-            long thisIndex = index.getAndIncrement();
-            certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
+  public int getNumberOfCertsInOneRequest() {
+    return loadtestEntries.size();
+  }
 
-            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null) {
-                return null;
-            }
+  private Map<Integer, CertRequestWithProfile> nextCertRequests() {
+    Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
+    final int n = loadtestEntries.size();
+    for (int i = 0; i < n; i++) {
+      LoadTestEntry loadtestEntry = loadtestEntries.get(i);
+      final int certId = i + 1;
+      CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 
-            certTempBuilder.setPublicKey(spki);
+      long thisIndex = index.getAndIncrement();
+      certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
-            CertTemplate certTemplate = certTempBuilder.build();
-            CertRequest certRequest = new CertRequest(certId, certTemplate, null);
-            CertRequestWithProfile requestWithCertprofile = new CertRequestWithProfile(
-                    loadtestEntry.getCertprofile(), certRequest);
-            certRequests.put(certId, requestWithCertprofile);
+      SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
+      if (spki == null) {
+        return null;
+      }
+
+      certTempBuilder.setPublicKey(spki);
+
+      CertTemplate certTemplate = certTempBuilder.build();
+      CertRequest certRequest = new CertRequest(certId, certTemplate, null);
+      CertRequestWithProfile requestWithCertprofile = new CertRequestWithProfile(
+          loadtestEntry.getCertprofile(), certRequest);
+      certRequests.put(certId, requestWithCertprofile);
+    }
+    return certRequests;
+  } // method nextCertRequests
+
+  public static EnrollTemplateType parse(
+      final InputStream configStream)
+  throws InvalidConfException {
+    synchronized (jaxbUnmarshallerLock) {
+      Object root;
+      try {
+        if (jaxbUnmarshaller == null) {
+          JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+          jaxbUnmarshaller = context.createUnmarshaller();
+
+          final SchemaFactory schemaFact = SchemaFactory.newInstance(
+              javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+          URL url = ObjectFactory.class.getResource("/xsd/loadtest.xsd");
+          jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
         }
-        return certRequests;
-    } // method nextCertRequests
 
-    public static EnrollTemplateType parse(
-            final InputStream configStream)
-    throws InvalidConfException {
-        synchronized (jaxbUnmarshallerLock) {
-            Object root;
-            try {
-                if (jaxbUnmarshaller == null) {
-                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                    jaxbUnmarshaller = context.createUnmarshaller();
+        root = jaxbUnmarshaller.unmarshal(configStream);
+      } catch (SAXException e) {
+        throw new InvalidConfException(
+            "parse profile failed, message: " + e.getMessage(),
+            e);
+      } catch (JAXBException e) {
+        throw new InvalidConfException(
+            "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
+            e);
+      }
 
-                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = ObjectFactory.class.getResource("/xsd/loadtest.xsd");
-                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-                }
-
-                root = jaxbUnmarshaller.unmarshal(configStream);
-            } catch (SAXException e) {
-                throw new InvalidConfException(
-                        "parse profile failed, message: " + e.getMessage(),
-                        e);
-            } catch (JAXBException e) {
-                throw new InvalidConfException(
-                        "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
-                        e);
-            }
-
-            if (root instanceof JAXBElement) {
-                return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
-            } else {
-                throw new InvalidConfException("invalid root element type");
-            }
-        }
-    } // method parse
+      if (root instanceof JAXBElement) {
+        return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
+      } else {
+        throw new InvalidConfException("invalid root element type");
+      }
+    }
+  } // method parse
 
 }

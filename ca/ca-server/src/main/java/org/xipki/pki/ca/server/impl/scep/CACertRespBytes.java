@@ -55,28 +55,28 @@ import org.xipki.commons.common.util.ParamUtil;
 
 class CACertRespBytes {
 
-    private final byte[] bytes;
+  private final byte[] bytes;
 
-    CACertRespBytes(
-            final X509Certificate cACert,
-            final X509Certificate responderCert)
-    throws CMSException, CertificateException {
-        ParamUtil.assertNotNull("cACert", cACert);
-        ParamUtil.assertNotNull("responderCert", responderCert);
+  CACertRespBytes(
+      final X509Certificate cACert,
+      final X509Certificate responderCert)
+  throws CMSException, CertificateException {
+    ParamUtil.assertNotNull("cACert", cACert);
+    ParamUtil.assertNotNull("responderCert", responderCert);
 
-        CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-        try {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-            bytes = degenerateSignedData.getEncoded();
-        } catch (IOException e) {
-            throw new CMSException("could not build CMS SignedDta");
-        }
+    CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+    try {
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
+      cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
+      CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+      bytes = degenerateSignedData.getEncoded();
+    } catch (IOException e) {
+      throw new CMSException("could not build CMS SignedDta");
     }
+  }
 
-    byte[] getBytes() {
-        return Arrays.clone(bytes);
-    }
+  byte[] getBytes() {
+    return Arrays.clone(bytes);
+  }
 
 }

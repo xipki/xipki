@@ -46,71 +46,72 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class FilePasswordCallback implements PasswordCallback {
 
-    private String passwordFile;
+  private String passwordFile;
 
-    @Override
-    public char[] getPassword(
-            final String prompt)
-    throws PasswordResolverException {
-        if (passwordFile == null) {
-            throw new PasswordResolverException("please initialize me first");
+  @Override
+  public char[] getPassword(
+      final String prompt)
+  throws PasswordResolverException {
+    if (passwordFile == null) {
+      throw new PasswordResolverException("please initialize me first");
+    }
+
+    String passwordHint = null;
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(expandFilepath(passwordFile)));
+      String line;
+      while ((line = reader.readLine()) != null) {
+        line = line.trim();
+        if (StringUtil.isNotBlank(line) && !line.startsWith("#")) {
+          passwordHint = line;
+          break;
         }
-
-        String passwordHint = null;
-        BufferedReader reader = null;
+      }
+    } catch (IOException e) {
+      throw new PasswordResolverException("could not read file " + passwordFile, e);
+    } finally {
+      if (reader != null) {
         try {
-            reader = new BufferedReader(new FileReader(expandFilepath(passwordFile)));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (StringUtil.isNotBlank(line) && !line.startsWith("#")) {
-                    passwordHint = line;
-                    break;
-                }
-            }
+          reader.close();
         } catch (IOException e) {
-            throw new PasswordResolverException("could not read file " + passwordFile, e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                }
-            }
         }
-
-        if (passwordHint == null) {
-            throw new PasswordResolverException("no password is specified in file " + passwordFile);
-        }
-
-        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE)) {
-            return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
-        } else {
-            return passwordHint.toCharArray();
-        }
-    } // method getPassword
-
-    @Override
-    public void init(
-            final String conf)
-    throws PasswordResolverException {
-        if (StringUtil.isBlank(conf)) {
-            throw new PasswordResolverException("conf could not be null or empty");
-        }
-        passwordFile = expandFilepath(conf);
+      }
     }
 
-    private static String expandFilepath(
-            final String path) {
-        if (path.startsWith("~" + File.separator)) {
-            return System.getProperty("user.home") + path.substring(1);
-        } else {
-            return path;
-        }
+    if (passwordHint == null) {
+      throw new PasswordResolverException("no password is specified in file " + passwordFile);
     }
+
+    if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE)) {
+      return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
+    } else {
+      return passwordHint.toCharArray();
+    }
+  } // method getPassword
+
+  @Override
+  public void init(
+      final String conf)
+  throws PasswordResolverException {
+    if (StringUtil.isBlank(conf)) {
+      throw new PasswordResolverException("conf could not be null or empty");
+    }
+    passwordFile = expandFilepath(conf);
+  }
+
+  private static String expandFilepath(
+      final String path) {
+    if (path.startsWith("~" + File.separator)) {
+      return System.getProperty("user.home") + path.substring(1);
+    } else {
+      return path;
+    }
+  }
 
 }

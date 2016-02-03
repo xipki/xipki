@@ -40,34 +40,35 @@ import java.util.List;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class RequestResponseDebug {
 
-    private final List<RequestResponsePair> pairs = new LinkedList<>();
+  private final List<RequestResponsePair> pairs = new LinkedList<>();
 
-    public void add(
-            final RequestResponsePair pair) {
-        pairs.add(pair);
-    }
+  public void add(
+      final RequestResponsePair pair) {
+    pairs.add(pair);
+  }
 
-    public int size() {
-        return pairs.size();
-    }
+  public int size() {
+    return pairs.size();
+  }
 
-    public RequestResponsePair get(
-            final int index) {
-        return pairs.get(index);
-    }
+  public RequestResponsePair get(
+      final int index) {
+    return pairs.get(index);
+  }
 
-    public boolean remove(
-            final RequestResponsePair pair) {
-        return pairs.remove(pair);
-    }
+  public boolean remove(
+      final RequestResponsePair pair) {
+    return pairs.remove(pair);
+  }
 
-    public RequestResponsePair remove(
-            final int index) {
-        return pairs.remove(index);
-    }
+  public RequestResponsePair remove(
+      final int index) {
+    return pairs.remove(index);
+  }
 
 }

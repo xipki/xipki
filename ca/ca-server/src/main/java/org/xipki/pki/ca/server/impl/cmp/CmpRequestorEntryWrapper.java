@@ -40,30 +40,31 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CmpRequestorEntryWrapper {
 
-    private CmpRequestorEntry dbEntry;
+  private CmpRequestorEntry dbEntry;
 
-    private X509CertWithDBCertId cert;
+  private X509CertWithDBCertId cert;
 
-    public CmpRequestorEntryWrapper() {
-    }
+  public CmpRequestorEntryWrapper() {
+  }
 
-    public void setDbEntry(
-            final CmpRequestorEntry dbEntry) {
-        this.dbEntry = dbEntry;
-        cert = null;
-        cert = new X509CertWithDBCertId(dbEntry.getCert());
-    }
+  public void setDbEntry(
+      final CmpRequestorEntry dbEntry) {
+    this.dbEntry = dbEntry;
+    cert = null;
+    cert = new X509CertWithDBCertId(dbEntry.getCert());
+  }
 
-    public X509CertWithDBCertId getCert() {
-        return cert;
-    }
+  public X509CertWithDBCertId getCert() {
+    return cert;
+  }
 
-    public CmpRequestorEntry getDbEntry() {
-        return dbEntry;
-    }
+  public CmpRequestorEntry getDbEntry() {
+    return dbEntry;
+  }
 
 }

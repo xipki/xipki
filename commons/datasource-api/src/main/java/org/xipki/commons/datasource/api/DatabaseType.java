@@ -37,46 +37,47 @@ package org.xipki.commons.datasource.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum DatabaseType {
 
-    H2,
-    DB2,
-    HSQL,
-    MYSQL,
-    ORACLE,
-    POSTGRES,
-    UNKNOWN;
+  H2,
+  DB2,
+  HSQL,
+  MYSQL,
+  ORACLE,
+  POSTGRES,
+  UNKNOWN;
 
-    public static DatabaseType getDataSourceForDriver(
-            final String driverClass) {
-        return getDatabaseType(driverClass);
-    }
+  public static DatabaseType getDataSourceForDriver(
+      final String driverClass) {
+    return getDatabaseType(driverClass);
+  }
 
-    public static DatabaseType getDataSourceForDataSource(
-            final String dataSourceClass) {
-        return getDatabaseType(dataSourceClass);
-    }
+  public static DatabaseType getDataSourceForDataSource(
+      final String dataSourceClass) {
+    return getDatabaseType(dataSourceClass);
+  }
 
-    private static DatabaseType getDatabaseType(
-            final String className) {
-        if (className.contains("db2.")) {
-            return DatabaseType.DB2;
-        }
-        if (className.contains("h2.")) {
-            return DatabaseType.H2;
-        } else if (className.contains("hsqldb.")) {
-            return DatabaseType.HSQL;
-        } else if (className.contains("mysql.")) {
-            return DatabaseType.MYSQL;
-        } else if (className.contains("oracle.")) {
-            return DatabaseType.ORACLE;
-        } else if (className.contains("postgres.") || className.contains("postgresql.")) {
-            return DatabaseType.POSTGRES;
-        } else {
-            return DatabaseType.UNKNOWN;
-        }
+  private static DatabaseType getDatabaseType(
+      final String className) {
+    if (className.contains("db2.")) {
+      return DatabaseType.DB2;
     }
+    if (className.contains("h2.")) {
+      return DatabaseType.H2;
+    } else if (className.contains("hsqldb.")) {
+      return DatabaseType.HSQL;
+    } else if (className.contains("mysql.")) {
+      return DatabaseType.MYSQL;
+    } else if (className.contains("oracle.")) {
+      return DatabaseType.ORACLE;
+    } else if (className.contains("postgres.") || className.contains("postgresql.")) {
+      return DatabaseType.POSTGRES;
+    } else {
+      return DatabaseType.UNKNOWN;
+    }
+  }
 
 }

@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-rm",
-        description = "remove CMP control")
+    description = "remove CMP control")
 @Service
 public class CmpControlRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "CMP control name", required = true)
-    @Completion(CmpControlNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "CMP control name", required = true)
+  @Completion(CmpControlNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCmpControl(name);
-        output(b, "removed", "could not remove", "CMP control");
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCmpControl(name);
+    output(b, "removed", "could not remove", "CMP control");
+    return null;
+  }
 
 }

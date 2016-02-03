@@ -44,52 +44,53 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EnrollCertRequestType {
 
-    public static enum Type {
+  public static enum Type {
 
-        CERT_REQ,
-        KEY_UPDATE,
-        CROSS_CERT_REQ;
+    CERT_REQ,
+    KEY_UPDATE,
+    CROSS_CERT_REQ;
 
-    } // enum Type
+  } // enum Type
 
-    private final Type type;
+  private final Type type;
 
-    private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
+  private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
-    public EnrollCertRequestType(
-            final Type type) {
-        ParamUtil.assertNotNull("type", type);
-        this.type = type;
+  public EnrollCertRequestType(
+      final Type type) {
+    ParamUtil.assertNotNull("type", type);
+    this.type = type;
+  }
+
+  public Type getType() {
+    return type;
+  }
+
+  public boolean addRequestEntry(
+      final EnrollCertRequestEntryType requestEntry) {
+    String id = requestEntry.getId();
+    ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
+    for (EnrollCertRequestEntryType re : requestEntries) {
+      if (re.getId().equals(id)) {
+        return false;
+      }
+
+      if (re.getCertReq().getCertReqId().equals(certReqId)) {
+        return false;
+      }
     }
 
-    public Type getType() {
-        return type;
-    }
+    requestEntries.add(requestEntry);
+    return true;
+  }
 
-    public boolean addRequestEntry(
-            final EnrollCertRequestEntryType requestEntry) {
-        String id = requestEntry.getId();
-        ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
-        for (EnrollCertRequestEntryType re : requestEntries) {
-            if (re.getId().equals(id)) {
-                return false;
-            }
-
-            if (re.getCertReq().getCertReqId().equals(certReqId)) {
-                return false;
-            }
-        }
-
-        requestEntries.add(requestEntry);
-        return true;
-    }
-
-    public List<EnrollCertRequestEntryType> getRequestEntries() {
-        return Collections.unmodifiableList(requestEntries);
-    }
+  public List<EnrollCertRequestEntryType> getRequestEntries() {
+    return Collections.unmodifiableList(requestEntries);
+  }
 
 }

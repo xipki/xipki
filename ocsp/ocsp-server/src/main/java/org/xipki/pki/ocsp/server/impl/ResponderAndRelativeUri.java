@@ -39,29 +39,30 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class ResponderAndRelativeUri {
 
-    private final Responder responder;
+  private final Responder responder;
 
-    private final String relativeUri;
+  private final String relativeUri;
 
-    public ResponderAndRelativeUri(
-            final Responder responder,
-            final String relativeUri) {
-        ParamUtil.assertNotNull("responder", responder);
-        ParamUtil.assertNotNull("relativeUri", relativeUri);
-        this.responder = responder;
-        this.relativeUri = relativeUri;
-    }
+  public ResponderAndRelativeUri(
+      final Responder responder,
+      final String relativeUri) {
+    ParamUtil.assertNotNull("responder", responder);
+    ParamUtil.assertNotNull("relativeUri", relativeUri);
+    this.responder = responder;
+    this.relativeUri = relativeUri;
+  }
 
-    public Responder getResponder() {
-        return responder;
-    }
+  public Responder getResponder() {
+    return responder;
+  }
 
-    public String getRelativeUri() {
-        return relativeUri;
-    }
+  public String getRelativeUri() {
+    return relativeUri;
+  }
 
 }

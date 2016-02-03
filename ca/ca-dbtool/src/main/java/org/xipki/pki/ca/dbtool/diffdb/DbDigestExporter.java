@@ -37,11 +37,12 @@ package org.xipki.pki.ca.dbtool.diffdb;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface DbDigestExporter {
 
-    void digest()
-    throws Exception;
+  void digest()
+  throws Exception;
 
 }

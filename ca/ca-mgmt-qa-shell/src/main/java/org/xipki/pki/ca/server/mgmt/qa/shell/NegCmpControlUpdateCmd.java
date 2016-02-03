@@ -42,24 +42,25 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-cmpcontrol-up",
-        description = "update CMP control (negative, QA)")
+    description = "update CMP control (negative, QA)")
 @Service
 public class NegCmpControlUpdateCmd extends CmpControlUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-cmpcontrol-up");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-cmpcontrol-up");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 }

@@ -47,86 +47,87 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DbiXmlWriter {
 
-    private final static XMLOutputFactory factory = XMLOutputFactory.newFactory();
+  private final static XMLOutputFactory factory = XMLOutputFactory.newFactory();
 
-    private final String rootElementName;
+  private final String rootElementName;
 
-    private final ByteArrayOutputStream stream;
+  private final ByteArrayOutputStream stream;
 
-    private final XMLStreamWriter writer;
+  private final XMLStreamWriter writer;
 
-    private boolean flushed = false;
+  private boolean flushed = false;
 
-    public DbiXmlWriter(
-            final String rootElementName,
-            final String version)
-    throws XMLStreamException {
-        ParamUtil.assertNotBlank("rootElementName", rootElementName);
-        ParamUtil.assertNotBlank("version", version);
-        this.rootElementName = rootElementName;
-        stream = new ByteArrayOutputStream();
+  public DbiXmlWriter(
+      final String rootElementName,
+      final String version)
+  throws XMLStreamException {
+    ParamUtil.assertNotBlank("rootElementName", rootElementName);
+    ParamUtil.assertNotBlank("version", version);
+    this.rootElementName = rootElementName;
+    stream = new ByteArrayOutputStream();
 
-        synchronized (factory) {
-            writer = factory.createXMLStreamWriter(stream);
-        }
-        writer.writeStartDocument("UTF-8", "1.0");
-        writeNewline();
-        writer.writeStartElement(rootElementName);
-        writer.writeAttribute("version", version);
-        writeNewline();
+    synchronized (factory) {
+      writer = factory.createXMLStreamWriter(stream);
+    }
+    writer.writeStartDocument("UTF-8", "1.0");
+    writeNewline();
+    writer.writeStartElement(rootElementName);
+    writer.writeAttribute("version", version);
+    writeNewline();
+  }
+
+  public String getRootElementName() {
+    return rootElementName;
+  }
+
+  public void writeStartElement(
+      final String localName)
+  throws XMLStreamException {
+    writer.writeStartElement(localName);
+  }
+
+  public void writeEndElement()
+  throws XMLStreamException {
+    writer.writeEndElement();
+  }
+
+  public void writeElement(
+      final String localName,
+      final String value)
+  throws XMLStreamException {
+    writer.writeStartElement(localName);
+    writer.writeCharacters(value);
+    writer.writeEndElement();
+  }
+
+  public void writeNewline()
+  throws XMLStreamException {
+    writer.writeCharacters("\n");
+  }
+
+  public void flush()
+  throws IOException, XMLStreamException {
+    if (flushed) {
+      return;
     }
 
-    public String getRootElementName() {
-        return rootElementName;
-    }
+    writer.writeEndElement();
+    writer.writeEndDocument();
 
-    public void writeStartElement(
-            final String localName)
-    throws XMLStreamException {
-        writer.writeStartElement(localName);
-    }
+    stream.flush();
+    flushed = true;
+  }
 
-    public void writeEndElement()
-    throws XMLStreamException {
-        writer.writeEndElement();
-    }
-
-    public void writeElement(
-            final String localName,
-            final String value)
-    throws XMLStreamException {
-        writer.writeStartElement(localName);
-        writer.writeCharacters(value);
-        writer.writeEndElement();
-    }
-
-    public void writeNewline()
-    throws XMLStreamException {
-        writer.writeCharacters("\n");
-    }
-
-    public void flush()
-    throws IOException, XMLStreamException {
-        if (flushed) {
-            return;
-        }
-
-        writer.writeEndElement();
-        writer.writeEndDocument();
-
-        stream.flush();
-        flushed = true;
-    }
-
-    public void rewriteToZipStream(
-            final ZipOutputStream zipStream)
-    throws IOException, XMLStreamException {
-        flush();
-        zipStream.write(stream.toByteArray());
-    }
+  public void rewriteToZipStream(
+      final ZipOutputStream zipStream)
+  throws IOException, XMLStreamException {
+    flush();
+    zipStream.write(stream.toByteArray());
+  }
 
 }

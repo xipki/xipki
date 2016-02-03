@@ -41,14 +41,15 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class CmpControlNameCompleter extends MgmtNameCompleter {
 
-    @Override
-    protected Set<String> getEnums() {
-        return caManager.getCmpControlNames();
-    }
+  @Override
+  protected Set<String> getEnums() {
+    return caManager.getCmpControlNames();
+  }
 
 }

@@ -40,54 +40,55 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaGeneralSubtree {
 
-    private final GeneralSubtreeBaseType jaxb;
+  private final GeneralSubtreeBaseType jaxb;
 
-    public QaGeneralSubtree(
-            final GeneralSubtreeBaseType jaxb) {
-        ParamUtil.assertNotNull("jaxb", jaxb);
-        Integer i = jaxb.getMinimum();
-        if (i != null && i < 0) {
-            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
-        }
-
-        i = jaxb.getMaximum();
-        if (i != null && i < 0) {
-            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
-        }
-
-        this.jaxb = jaxb;
+  public QaGeneralSubtree(
+      final GeneralSubtreeBaseType jaxb) {
+    ParamUtil.assertNotNull("jaxb", jaxb);
+    Integer i = jaxb.getMinimum();
+    if (i != null && i < 0) {
+      throw new IllegalArgumentException("negative minimum is not allowed: " + i);
     }
 
-    public String getRfc822Name() {
-        return jaxb.getRfc822Name();
+    i = jaxb.getMaximum();
+    if (i != null && i < 0) {
+      throw new IllegalArgumentException("negative maximum is not allowed: " + i);
     }
 
-    public String getDNSName() {
-        return jaxb.getDNSName();
-    }
+    this.jaxb = jaxb;
+  }
 
-    public String getDirectoryName() {
-        return jaxb.getDirectoryName();
-    }
+  public String getRfc822Name() {
+    return jaxb.getRfc822Name();
+  }
 
-    public String getUri() {
-        return jaxb.getUri();
-    }
+  public String getDNSName() {
+    return jaxb.getDNSName();
+  }
 
-    public String getIpAddress() {
-        return jaxb.getIpAddress();
-    }
+  public String getDirectoryName() {
+    return jaxb.getDirectoryName();
+  }
 
-    public Integer getMinimum() {
-        return jaxb.getMinimum();
-    }
+  public String getUri() {
+    return jaxb.getUri();
+  }
 
-    public Integer getMaximum() {
-        return jaxb.getMaximum();
-    }
+  public String getIpAddress() {
+    return jaxb.getIpAddress();
+  }
+
+  public Integer getMinimum() {
+    return jaxb.getMinimum();
+  }
+
+  public Integer getMaximum() {
+    return jaxb.getMaximum();
+  }
 
 }

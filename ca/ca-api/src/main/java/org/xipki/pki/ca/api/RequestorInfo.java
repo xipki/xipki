@@ -37,12 +37,13 @@ package org.xipki.pki.ca.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface RequestorInfo {
 
-    String getName();
+  String getName();
 
-    boolean isRA();
+  boolean isRA();
 
 }

@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-crlsigner-up",
-        description = "update CRL signer (negative, QA)")
+    description = "update CRL signer (negative, QA)")
 @Service
 public class NegCrlSignerUpdateCmd extends CrlSignerUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-crlsigner-up");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-crlsigner-up");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

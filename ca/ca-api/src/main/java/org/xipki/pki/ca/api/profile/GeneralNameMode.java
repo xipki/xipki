@@ -42,34 +42,35 @@ import org.xipki.commons.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class GeneralNameMode {
 
-    private final GeneralNameTag tag;
+  private final GeneralNameTag tag;
 
-    // not applied to all tags, currently only for tag otherName
-    private final Set<ASN1ObjectIdentifier> allowedTypes;
+  // not applied to all tags, currently only for tag otherName
+  private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-    public GeneralNameMode(
-            final GeneralNameTag tag) {
-        this.tag = tag;
-        this.allowedTypes = null;
-    }
+  public GeneralNameMode(
+      final GeneralNameTag tag) {
+    this.tag = tag;
+    this.allowedTypes = null;
+  }
 
-    public GeneralNameMode(
-            final GeneralNameTag tag,
-            final Set<ASN1ObjectIdentifier> allowedTypes) {
-        this.tag = tag;
-        this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
-    }
+  public GeneralNameMode(
+      final GeneralNameTag tag,
+      final Set<ASN1ObjectIdentifier> allowedTypes) {
+    this.tag = tag;
+    this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
+  }
 
-    public GeneralNameTag getTag() {
-        return tag;
-    }
+  public GeneralNameTag getTag() {
+    return tag;
+  }
 
-    public Set<ASN1ObjectIdentifier> getAllowedTypes() {
-        return allowedTypes;
-    }
+  public Set<ASN1ObjectIdentifier> getAllowedTypes() {
+    return allowedTypes;
+  }
 
 }

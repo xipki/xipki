@@ -45,112 +45,113 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class P11Identity implements Comparable<P11Identity> {
 
-    protected final P11SlotIdentifier slotId;
+  protected final P11SlotIdentifier slotId;
 
-    protected final P11KeyIdentifier keyId;
+  protected final P11KeyIdentifier keyId;
 
-    protected final X509Certificate[] certificateChain;
+  protected final X509Certificate[] certificateChain;
 
-    protected final PublicKey publicKey;
+  protected final PublicKey publicKey;
 
-    private final int signatureKeyBitLength;
+  private final int signatureKeyBitLength;
 
-    public P11Identity(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
-            final X509Certificate[] certificateChain,
-            final PublicKey publicKey) {
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("keyId", keyId);
+  public P11Identity(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId,
+      final X509Certificate[] certificateChain,
+      final PublicKey publicKey) {
+    ParamUtil.assertNotNull("slotId", slotId);
+    ParamUtil.assertNotNull("keyId", keyId);
 
-        if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-                && publicKey == null) {
-            throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
-        }
-
-        this.slotId = slotId;
-        this.keyId = keyId;
-        this.certificateChain =
-                (certificateChain != null && certificateChain.length > 0)
-                        ? certificateChain
-                        : null;
-
-        this.publicKey = (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
-
-        if (this.publicKey instanceof RSAPublicKey) {
-            signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-        } else if (this.publicKey instanceof ECPublicKey) {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey)
-                    .getParams().getCurve().getField().getFieldSize();
-        } else if (this.publicKey instanceof DSAPublicKey) {
-            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
-        } else {
-            throw new IllegalArgumentException(
-                    "currently only RSA, DSA and EC public key are supported, but not "
-                    + this.publicKey.getAlgorithm()
-                    + " (class: " + this.publicKey.getClass().getName() + ")");
-        }
-    } // constructor
-
-    public P11KeyIdentifier getKeyId() {
-        return keyId;
+    if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
+        && publicKey == null) {
+      throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
     }
 
-    public X509Certificate getCertificate() {
-        return (certificateChain != null && certificateChain.length > 0)
-                ? certificateChain[0]
-                : null;
+    this.slotId = slotId;
+    this.keyId = keyId;
+    this.certificateChain =
+        (certificateChain != null && certificateChain.length > 0)
+            ? certificateChain
+            : null;
+
+    this.publicKey = (publicKey == null)
+        ? certificateChain[0].getPublicKey()
+        : publicKey;
+
+    if (this.publicKey instanceof RSAPublicKey) {
+      signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
+    } else if (this.publicKey instanceof ECPublicKey) {
+      signatureKeyBitLength = ((ECPublicKey) this.publicKey)
+          .getParams().getCurve().getField().getFieldSize();
+    } else if (this.publicKey instanceof DSAPublicKey) {
+      signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
+    } else {
+      throw new IllegalArgumentException(
+          "currently only RSA, DSA and EC public key are supported, but not "
+          + this.publicKey.getAlgorithm()
+          + " (class: " + this.publicKey.getClass().getName() + ")");
+    }
+  } // constructor
+
+  public P11KeyIdentifier getKeyId() {
+    return keyId;
+  }
+
+  public X509Certificate getCertificate() {
+    return (certificateChain != null && certificateChain.length > 0)
+        ? certificateChain[0]
+        : null;
+  }
+
+  public X509Certificate[] getCertificateChain() {
+    return (certificateChain == null)
+        ? null
+        : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
+  }
+
+  public PublicKey getPublicKey() {
+    return (publicKey == null)
+        ? certificateChain[0].getPublicKey()
+        : publicKey;
+  }
+
+  public P11SlotIdentifier getSlotId() {
+    return slotId;
+  }
+
+  public boolean match(
+      final P11SlotIdentifier slotId,
+      final P11KeyIdentifier keyId) {
+    if (!this.slotId.equals(slotId)) {
+      return false;
     }
 
-    public X509Certificate[] getCertificateChain() {
-        return (certificateChain == null)
-                ? null
-                : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
+    return this.keyId.equals(keyId);
+  }
+
+  public boolean match(
+      final P11SlotIdentifier slotId,
+      final String keyLabel) {
+    if (keyLabel == null) {
+      return false;
     }
 
-    public PublicKey getPublicKey() {
-        return (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
-    }
+    return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
+  }
 
-    public P11SlotIdentifier getSlotId() {
-        return slotId;
-    }
+  public int getSignatureKeyBitLength() {
+    return signatureKeyBitLength;
+  }
 
-    public boolean match(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId) {
-        if (!this.slotId.equals(slotId)) {
-            return false;
-        }
-
-        return this.keyId.equals(keyId);
-    }
-
-    public boolean match(
-            final P11SlotIdentifier slotId,
-            final String keyLabel) {
-        if (keyLabel == null) {
-            return false;
-        }
-
-        return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
-    }
-
-    public int getSignatureKeyBitLength() {
-        return signatureKeyBitLength;
-    }
-
-    @Override
-    public int compareTo(P11Identity o) {
-        return keyId.compareTo(o.keyId);
-    }
+  @Override
+  public int compareTo(P11Identity o) {
+    return keyId.compareTo(o.keyId);
+  }
 
 }

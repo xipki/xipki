@@ -42,28 +42,29 @@ import org.xipki.commons.password.api.SecurePasswordInputPanel;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class GuiPasswordCallback implements PasswordCallback {
 
-    @Override
-    public char[] getPassword(
-            String prompt)
-    throws PasswordResolverException {
-        if (StringUtil.isBlank(prompt)) {
-            prompt = "Password required";
-        }
-        char[] password = SecurePasswordInputPanel.readPassword(prompt);
-        if (password == null) {
-            throw new PasswordResolverException("user has cancelled");
-        }
-        return password;
+  @Override
+  public char[] getPassword(
+      String prompt)
+  throws PasswordResolverException {
+    if (StringUtil.isBlank(prompt)) {
+      prompt = "Password required";
     }
+    char[] password = SecurePasswordInputPanel.readPassword(prompt);
+    if (password == null) {
+      throw new PasswordResolverException("user has cancelled");
+    }
+    return password;
+  }
 
-    @Override
-    public void init(
-            final String conf)
-    throws PasswordResolverException {
-    }
+  @Override
+  public void init(
+      final String conf)
+  throws PasswordResolverException {
+  }
 
 }

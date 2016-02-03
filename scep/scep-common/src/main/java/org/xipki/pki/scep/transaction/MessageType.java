@@ -37,66 +37,67 @@ package org.xipki.pki.scep.transaction;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum MessageType {
 
-    /**
-     * Response to certificate or CRL request
-     */
-    CertRep (3),
+  /**
+   * Response to certificate or CRL request
+   */
+  CertRep (3),
 
-    /**
-     * PKCS #10 certificate request for renewal of an existing certificate.
-     * Since draft-gutman-scep version 0
-     */
-    RenewalReq (17),
+  /**
+   * PKCS #10 certificate request for renewal of an existing certificate.
+   * Since draft-gutman-scep version 0
+   */
+  RenewalReq (17),
 
-    /**
-     * PKCS #10 certificate request for update of a certificate issued by a different CA.
-     * Since draft-gutman-scep version 0
-     */
-    UpdateReq (18),
+  /**
+   * PKCS #10 certificate request for update of a certificate issued by a different CA.
+   * Since draft-gutman-scep version 0
+   */
+  UpdateReq (18),
 
-    /**
-     * PKCS #10 certificate request
-     */
-    PKCSReq (19),
+  /**
+   * PKCS #10 certificate request
+   */
+  PKCSReq (19),
 
-    /**
-     * Certificate polling in manual enrolment
-     */
-    CertPoll (20),
+  /**
+   * Certificate polling in manual enrolment
+   */
+  CertPoll (20),
 
-    /**
-     * Retrieve a certificate
-     */
-    GetCert (21),
+  /**
+   * Retrieve a certificate
+   */
+  GetCert (21),
 
-    /**
-     * Retrieve a CRL
-     */
-    GetCRL (22);
+  /**
+   * Retrieve a CRL
+   */
+  GetCRL (22);
 
-    private final int code;
+  private final int code;
 
-    private MessageType(
-            final int code) {
-        this.code = code;
+  private MessageType(
+      final int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public static MessageType valueForCode(
+      final int code) {
+    for (MessageType m : values()) {
+      if (m.code == code) {
+        return m;
+      }
     }
-
-    public int getCode() {
-        return code;
-    }
-
-    public static MessageType valueForCode(
-            final int code) {
-        for (MessageType m : values()) {
-            if (m.code == code) {
-                return m;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
 }

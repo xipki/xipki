@@ -39,53 +39,54 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class OcspRespWithCacheInfo {
 
-    final static class ResponseCacheInfo {
+  final static class ResponseCacheInfo {
 
-        private final long thisUpdate;
+    private final long thisUpdate;
 
-        private Long nextUpdate;
+    private Long nextUpdate;
 
-        ResponseCacheInfo(
-                final long thisUpdate) {
-            this.thisUpdate = thisUpdate;
-        }
-
-        public long getThisUpdate() {
-            return thisUpdate;
-        }
-
-        public void setNextUpdate(
-                final Long nextUpdate) {
-            this.nextUpdate = nextUpdate;
-        }
-
-        public Long getNextUpdate() {
-            return nextUpdate;
-        }
-
-    } // class ResponseCacheInfo
-
-    private final OCSPResp response;
-
-    private final ResponseCacheInfo cacheInfo;
-
-    public OcspRespWithCacheInfo(
-            final OCSPResp response,
-            final ResponseCacheInfo cacheInfo) {
-        this.response = response;
-        this.cacheInfo = cacheInfo;
+    ResponseCacheInfo(
+        final long thisUpdate) {
+      this.thisUpdate = thisUpdate;
     }
 
-    public OCSPResp getResponse() {
-        return response;
+    public long getThisUpdate() {
+      return thisUpdate;
     }
 
-    public ResponseCacheInfo getCacheInfo() {
-        return cacheInfo;
+    public void setNextUpdate(
+        final Long nextUpdate) {
+      this.nextUpdate = nextUpdate;
     }
+
+    public Long getNextUpdate() {
+      return nextUpdate;
+    }
+
+  } // class ResponseCacheInfo
+
+  private final OCSPResp response;
+
+  private final ResponseCacheInfo cacheInfo;
+
+  public OcspRespWithCacheInfo(
+      final OCSPResp response,
+      final ResponseCacheInfo cacheInfo) {
+    this.response = response;
+    this.cacheInfo = cacheInfo;
+  }
+
+  public OCSPResp getResponse() {
+    return response;
+  }
+
+  public ResponseCacheInfo getCacheInfo() {
+    return cacheInfo;
+  }
 
 }

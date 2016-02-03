@@ -50,40 +50,41 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "jscep", name = "getcert",
-        description = "download certificate")
+    description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumber;
+  @Option(name = "--serial", aliases = "-s",
+      required = true,
+      description = "serial number\n"
+          + "(required)")
+  private String serialNumber;
 
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+  @Option(name = "--out", aliases = "-o",
+      required = true,
+      description = "where to save the certificate\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String outputFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Client client = getScepClient();
-        BigInteger serial = toBigInt(serialNumber);
-        CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
-        X509Certificate cert = extractEECerts(certs);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Client client = getScepClient();
+    BigInteger serial = toBigInt(serialNumber);
+    CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
+    X509Certificate cert = extractEECerts(certs);
 
-        if (cert == null) {
-            throw new CmdFailure("received no certficate from server");
-        }
-
-        saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    if (cert == null) {
+      throw new CmdFailure("received no certficate from server");
     }
+
+    saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
+    return null;
+  }
 
 }

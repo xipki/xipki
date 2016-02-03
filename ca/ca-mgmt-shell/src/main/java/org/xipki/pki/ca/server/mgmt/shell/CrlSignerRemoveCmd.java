@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-rm",
-        description = "remove CRL signer")
+    description = "remove CRL signer")
 @Service
 public class CrlSignerRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
-    @Completion(CrlSignerNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
+  @Completion(CrlSignerNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCrlSigner(name);
-        output(b, "removed", "could not remove", "CRL signer " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCrlSigner(name);
+    output(b, "removed", "could not remove", "CRL signer " + name);
+    return null;
+  }
 
 }

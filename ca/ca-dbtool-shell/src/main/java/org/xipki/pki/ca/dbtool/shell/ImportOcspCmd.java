@@ -46,43 +46,44 @@ import org.xipki.pki.ca.dbtool.port.OcspDbImportWorker;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-db", name = "import-ocsp",
-        description = "import OCSP database")
+    description = "import OCSP database")
 @Service
 public class ImportOcspCmd extends DbPortCommandSupport {
 
-    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
+  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ocsp-db.properties";
 
-    @Option(name = "--db-conf",
-            description = "database configuration file")
-    @Completion(FilePathCompleter.class)
-    private String dbconfFile = DFLT_DBCONF_FILE;
+  @Option(name = "--db-conf",
+      description = "database configuration file")
+  @Completion(FilePathCompleter.class)
+  private String dbconfFile = DFLT_DBCONF_FILE;
 
-    @Option(name = "--in-dir",
-            required = true,
-            description = "input directory\n"
-                    + "(required)")
-    @Completion(DirPathCompleter.class)
-    private String indir;
+  @Option(name = "--in-dir",
+      required = true,
+      description = "input directory\n"
+          + "(required)")
+  @Completion(DirPathCompleter.class)
+  private String indir;
 
-    @Option(name = "-k",
-            description = "number of certificates per commit")
-    private Integer numCertsPerCommit = 100;
+  @Option(name = "-k",
+      description = "number of certificates per commit")
+  private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume")
-    private Boolean resume = Boolean.FALSE;
+  @Option(name = "--resume")
+  private Boolean resume = Boolean.FALSE;
 
-    @Option(name = "--test",
-            description = "just test the import, no real import")
-    private Boolean testOnly = Boolean.FALSE;
+  @Option(name = "--test",
+      description = "just test the import, no real import")
+  private Boolean testOnly = Boolean.FALSE;
 
-    @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
-        return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
-                indir, numCertsPerCommit.intValue(), testOnly);
-    }
+  @Override
+  protected DbPortWorker getDbPortWorker()
+  throws Exception {
+    return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
+        indir, numCertsPerCommit.intValue(), testOnly);
+  }
 
 }

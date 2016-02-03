@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "responder-rm",
-        description = "remove responder")
+    description = "remove responder")
 @Service
 public class ResponderRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "responder name", required = true)
-    @Completion(ResponderNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "responder name", required = true)
+  @Completion(ResponderNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCmpResponder(name);
-        output(b, "removed", "could not remove", "CMP responder " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCmpResponder(name);
+    output(b, "removed", "could not remove", "CMP responder " + name);
+    return null;
+  }
 
 }

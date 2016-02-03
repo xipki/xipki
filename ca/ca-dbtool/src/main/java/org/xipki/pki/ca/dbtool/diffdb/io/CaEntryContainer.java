@@ -45,51 +45,52 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CaEntryContainer {
 
-    private final Map<Integer, CaEntry> caEntryMap;
+  private final Map<Integer, CaEntry> caEntryMap;
 
-    public CaEntryContainer(
-            final Set<CaEntry> caEntries) {
-        ParamUtil.assertNotEmpty("caEntries", caEntries);
-        caEntryMap = new HashMap<>(caEntries.size());
-        for (CaEntry m : caEntries) {
-            caEntryMap.put(m.getCaId(), m);
-        }
+  public CaEntryContainer(
+      final Set<CaEntry> caEntries) {
+    ParamUtil.assertNotEmpty("caEntries", caEntries);
+    caEntryMap = new HashMap<>(caEntries.size());
+    for (CaEntry m : caEntries) {
+      caEntryMap.put(m.getCaId(), m);
+    }
+  }
+
+  public void addDigestEntry(
+      final int caId,
+      final int id,
+      final DbDigestEntry reportEntry)
+  throws IOException, InvalidDataObjectException {
+    CaEntry m = caEntryMap.get(caId);
+    if (m == null) {
+      throw new IllegalArgumentException("unknown caId '" + caId + "'");
+    }
+    m.addDigestEntry(id, reportEntry);
+  }
+
+  public void close()
+  throws IOException {
+    StringBuilder sb = new StringBuilder();
+
+    for (CaEntry m : caEntryMap.values()) {
+      try {
+        m.close();
+      } catch (IOException e) {
+        sb.append("could not close CAEntry '").append(m.getCaId());
+        sb.append("': ").append(e.getMessage()).append(", ");
+      }
     }
 
-    public void addDigestEntry(
-            final int caId,
-            final int id,
-            final DbDigestEntry reportEntry)
-    throws IOException, InvalidDataObjectException {
-        CaEntry m = caEntryMap.get(caId);
-        if (m == null) {
-            throw new IllegalArgumentException("unknown caId '" + caId + "'");
-        }
-        m.addDigestEntry(id, reportEntry);
+    int n = sb.length();
+    if (n > 0) {
+      sb.delete(n - 2, n);
+      throw new IOException(sb.toString());
     }
-
-    public void close()
-    throws IOException {
-        StringBuilder sb = new StringBuilder();
-
-        for (CaEntry m : caEntryMap.values()) {
-            try {
-                m.close();
-            } catch (IOException e) {
-                sb.append("could not close CAEntry '").append(m.getCaId());
-                sb.append("': ").append(e.getMessage()).append(", ");
-            }
-        }
-
-        int n = sb.length();
-        if (n > 0) {
-            sb.delete(n - 2, n);
-            throw new IOException(sb.toString());
-        }
-    }
+  }
 
 }

@@ -45,24 +45,25 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class AbstractDynamicEnumCompleter implements Completer {
 
-    protected abstract Set<String> getEnums();
+  protected abstract Set<String> getEnums();
 
-    @Override
-    public int complete(
-            final Session session,
-            final CommandLine commandLine,
-            final List<String> candidates) {
-        StringsCompleter delegate = new StringsCompleter();
+  @Override
+  public int complete(
+      final Session session,
+      final CommandLine commandLine,
+      final List<String> candidates) {
+    StringsCompleter delegate = new StringsCompleter();
 
-        for (String s : getEnums()) {
-            delegate.getStrings().add(s);
-        }
-
-        return delegate.complete(session, commandLine, candidates);
+    for (String s : getEnums()) {
+      delegate.getStrings().add(s);
     }
+
+    return delegate.complete(session, commandLine, candidates);
+  }
 
 }

@@ -41,52 +41,53 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CmpControlEntry implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String name;
+  private final String name;
 
-    private final String conf;
+  private final String conf;
 
-    private boolean faulty;
+  private boolean faulty;
 
-    public CmpControlEntry(
-            final String name,
-            final String conf) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("conf", conf);
-        this.name = name;
-        this.conf = conf;
-    }
+  public CmpControlEntry(
+      final String name,
+      final String conf) {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotBlank("conf", conf);
+    this.name = name;
+    this.conf = conf;
+  }
 
-    public boolean isFaulty() {
-        return faulty;
-    }
+  public boolean isFaulty() {
+    return faulty;
+  }
 
-    public void setFaulty(
-            final boolean faulty) {
-        this.faulty = faulty;
-    }
+  public void setFaulty(
+      final boolean faulty) {
+    this.faulty = faulty;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getConf() {
-        return conf;
-    }
+  public String getConf() {
+    return conf;
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("  name: ").append(name).append('\n');
-        sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("  conf: ").append(conf);
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("  name: ").append(name).append('\n');
+    sb.append("faulty: ").append(faulty).append('\n');
+    sb.append("  conf: ").append(conf);
 
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 
 }

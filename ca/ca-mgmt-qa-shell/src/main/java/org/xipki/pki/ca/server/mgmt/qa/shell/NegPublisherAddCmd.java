@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherAddCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-publisher-add",
-        description = "add publisher (negative, QA)")
+    description = "add publisher (negative, QA)")
 @Service
 public class NegPublisherAddCmd extends PublisherAddCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-publisher-add");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-publisher-add");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "publisher-rm",
-        description = "remove publisher")
+    description = "remove publisher")
 @Service
 public class PublisherRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "publisher name", required = true)
-    @Completion(PublisherNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "publisher name", required = true)
+  @Completion(PublisherNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removePublisher(name);
-        output(b, "removed", "could not remove", "certificate profile " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removePublisher(name);
+    output(b, "removed", "could not remove", "certificate profile " + name);
+    return null;
+  }
 
 }

@@ -39,21 +39,22 @@ import org.bouncycastle.asn1.crmf.CertId;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class RevokeCertResultEntryType extends ResultEntryType {
 
-    private final CertId certId;
+  private final CertId certId;
 
-    public RevokeCertResultEntryType(
-            final String id,
-            final CertId certId) {
-        super(id);
-        this.certId = certId;
-    }
+  public RevokeCertResultEntryType(
+      final String id,
+      final CertId certId) {
+    super(id);
+    this.certId = certId;
+  }
 
-    public CertId getCertId() {
-        return certId;
-    }
+  public CertId getCertId() {
+    return certId;
+  }
 
 }

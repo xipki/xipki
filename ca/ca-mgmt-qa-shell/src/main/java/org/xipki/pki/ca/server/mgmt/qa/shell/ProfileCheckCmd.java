@@ -44,44 +44,45 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "profile-check",
-        description = "check information of profiles (QA)")
+    description = "check information of profiles (QA)")
 @Service
 public class ProfileCheckCmd extends ProfileUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking profile " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking profile " + name);
 
-        if (type == null && conf == null && confFile == null) {
-            System.out.println("nothing to update");
-            return null;
-        }
-
-        if (conf == null && confFile != null) {
-            conf = new String(IoUtil.read(confFile));
-        }
-
-        CertprofileEntry cp = caManager.getCertprofile(name);
-        if (cp == null) {
-            throw new CmdFailure("certificate profile named '" + name + "' is not configured");
-        }
-
-        if (cp.getType() != null) {
-            String ex = type;
-            String is = cp.getType();
-            MgmtQAShellUtil.assertEquals("type", ex, is);
-        }
-
-        String ex = conf;
-        String is = cp.getConf();
-        MgmtQAShellUtil.assertEquals("conf", ex, is);
-
-        out(" checked profile " + name);
-        return null;
+    if (type == null && conf == null && confFile == null) {
+      System.out.println("nothing to update");
+      return null;
     }
+
+    if (conf == null && confFile != null) {
+      conf = new String(IoUtil.read(confFile));
+    }
+
+    CertprofileEntry cp = caManager.getCertprofile(name);
+    if (cp == null) {
+      throw new CmdFailure("certificate profile named '" + name + "' is not configured");
+    }
+
+    if (cp.getType() != null) {
+      String ex = type;
+      String is = cp.getType();
+      MgmtQAShellUtil.assertEquals("type", ex, is);
+    }
+
+    String ex = conf;
+    String is = cp.getConf();
+    MgmtQAShellUtil.assertEquals("conf", ex, is);
+
+    out(" checked profile " + name);
+    return null;
+  }
 
 }

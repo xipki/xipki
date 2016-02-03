@@ -37,36 +37,37 @@ package org.xipki.pki.ca.server.impl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class SystemEvent {
 
-    private final String name;
+  private final String name;
 
-    private final String owner;
+  private final String owner;
 
-    private final long eventTime;
+  private final long eventTime;
 
-    public SystemEvent(
-            final String name,
-            final String owner,
-            final long eventTime) {
-        super();
-        this.name = name;
-        this.owner = owner;
-        this.eventTime = eventTime;
-    }
+  public SystemEvent(
+      final String name,
+      final String owner,
+      final long eventTime) {
+    super();
+    this.name = name;
+    this.owner = owner;
+    this.eventTime = eventTime;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getOwner() {
-        return owner;
-    }
+  public String getOwner() {
+    return owner;
+  }
 
-    public long getEventTime() {
-        return eventTime;
-    }
+  public long getEventTime() {
+    return eventTime;
+  }
 
 }

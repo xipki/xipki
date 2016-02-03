@@ -41,20 +41,21 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CaCrlsWriter extends DbiXmlWriter {
 
-    public CaCrlsWriter()
-    throws IOException, XMLStreamException {
-        super("crls", "1");
-    }
+  public CaCrlsWriter()
+  throws IOException, XMLStreamException {
+    super("crls", "1");
+  }
 
-    public void add(
-            final CaCrlType crl)
-    throws InvalidDataObjectException, XMLStreamException {
-        crl.validate();
-        crl.writeTo(this);
-    }
+  public void add(
+      final CaCrlType crl)
+  throws InvalidDataObjectException, XMLStreamException {
+    crl.validate();
+    crl.writeTo(this);
+  }
 
 }

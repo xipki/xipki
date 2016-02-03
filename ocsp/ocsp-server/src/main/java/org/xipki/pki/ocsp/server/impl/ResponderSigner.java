@@ -55,121 +55,122 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class ResponderSigner {
 
-    private final Map<String, ConcurrentContentSigner> algoSignerMap;
+  private final Map<String, ConcurrentContentSigner> algoSignerMap;
 
-    private final List<ConcurrentContentSigner> signers;
+  private final List<ConcurrentContentSigner> signers;
 
-    private final X509CertificateHolder bcCertificate;
+  private final X509CertificateHolder bcCertificate;
 
-    private final X509Certificate certificate;
+  private final X509Certificate certificate;
 
-    private final X509CertificateHolder[] bcCertificateChain;
+  private final X509CertificateHolder[] bcCertificateChain;
 
-    private final X509Certificate[] certificateChain;
+  private final X509Certificate[] certificateChain;
 
-    private final X500Name responderId;
+  private final X500Name responderId;
 
-    public ResponderSigner(
-            final List<ConcurrentContentSigner> signers)
-    throws CertificateEncodingException, IOException {
-        ParamUtil.assertNotEmpty("signers", signers);
+  public ResponderSigner(
+      final List<ConcurrentContentSigner> signers)
+  throws CertificateEncodingException, IOException {
+    ParamUtil.assertNotEmpty("signers", signers);
 
-        this.signers = signers;
-        X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();
-        int n = _certificateChain.length;
-        if (n > 1) {
-            X509Certificate c = _certificateChain[n - 1];
-            if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal())) {
-                n--;
-            }
-        }
-        this.certificateChain = new X509Certificate[n];
-        System.arraycopy(_certificateChain, 0, this.certificateChain, 0, n);
+    this.signers = signers;
+    X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();
+    int n = _certificateChain.length;
+    if (n > 1) {
+      X509Certificate c = _certificateChain[n - 1];
+      if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal())) {
+        n--;
+      }
+    }
+    this.certificateChain = new X509Certificate[n];
+    System.arraycopy(_certificateChain, 0, this.certificateChain, 0, n);
 
-        this.certificate = certificateChain[0];
+    this.certificate = certificateChain[0];
 
-        this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
-        this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
-        for (int i = 0; i < certificateChain.length; i++) {
-            this.bcCertificateChain[i] = new X509CertificateHolder(
-                    this.certificateChain[i].getEncoded());
-        }
-
-        this.responderId = this.bcCertificate.getSubject();
-        algoSignerMap = new HashMap<>();
-        for (ConcurrentContentSigner signer : signers) {
-            String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
-            algoSignerMap.put(algoName, signer);
-        }
-    } // constructor
-
-    public ConcurrentContentSigner getFirstSigner() {
-        return signers.get(0);
+    this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
+    this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
+    for (int i = 0; i < certificateChain.length; i++) {
+      this.bcCertificateChain[i] = new X509CertificateHolder(
+          this.certificateChain[i].getEncoded());
     }
 
-    public ConcurrentContentSigner getSignerForPreferredSigAlgs(
-            final ASN1Sequence preferredSigAlgs) {
-        if (preferredSigAlgs == null) {
-            return signers.get(0);
-        }
+    this.responderId = this.bcCertificate.getSubject();
+    algoSignerMap = new HashMap<>();
+    for (ConcurrentContentSigner signer : signers) {
+      String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
+      algoSignerMap.put(algoName, signer);
+    }
+  } // constructor
 
-        int size = preferredSigAlgs.size();
-        for (int i = 0; i < size; i++) {
-            ASN1Sequence algObj = (ASN1Sequence) preferredSigAlgs.getObjectAt(i);
-            AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
-            String algoName = getSignatureAlgorithmName(sigAlgId);
-            if (algoSignerMap.containsKey(algoName)) {
-                return algoSignerMap.get(algoName);
-            }
-        }
-        return null;
+  public ConcurrentContentSigner getFirstSigner() {
+    return signers.get(0);
+  }
+
+  public ConcurrentContentSigner getSignerForPreferredSigAlgs(
+      final ASN1Sequence preferredSigAlgs) {
+    if (preferredSigAlgs == null) {
+      return signers.get(0);
     }
 
-    public X500Name getResponderId() {
-        return responderId;
+    int size = preferredSigAlgs.size();
+    for (int i = 0; i < size; i++) {
+      ASN1Sequence algObj = (ASN1Sequence) preferredSigAlgs.getObjectAt(i);
+      AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
+      String algoName = getSignatureAlgorithmName(sigAlgId);
+      if (algoSignerMap.containsKey(algoName)) {
+        return algoSignerMap.get(algoName);
+      }
+    }
+    return null;
+  }
+
+  public X500Name getResponderId() {
+    return responderId;
+  }
+
+  public X509Certificate getCertificate() {
+    return certificate;
+  }
+
+  public X509Certificate[] getCertificateChain() {
+    return certificateChain;
+  }
+
+  public X509CertificateHolder getBcCertificate() {
+    return bcCertificate;
+  }
+
+  public X509CertificateHolder[] getBcCertificateChain() {
+    return bcCertificateChain;
+  }
+
+  public boolean isHealthy() {
+    for (ConcurrentContentSigner signer : signers) {
+      if (!signer.isHealthy()) {
+        return false;
+      }
     }
 
-    public X509Certificate getCertificate() {
-        return certificate;
+    return true;
+  }
+
+  private static String getSignatureAlgorithmName(
+      final AlgorithmIdentifier sigAlgId) {
+    ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+    if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
+      return algOid.getId();
     }
 
-    public X509Certificate[] getCertificateChain() {
-        return certificateChain;
-    }
-
-    public X509CertificateHolder getBcCertificate() {
-        return bcCertificate;
-    }
-
-    public X509CertificateHolder[] getBcCertificateChain() {
-        return bcCertificateChain;
-    }
-
-    public boolean isHealthy() {
-        for (ConcurrentContentSigner signer : signers) {
-            if (!signer.isHealthy()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static String getSignatureAlgorithmName(
-            final AlgorithmIdentifier sigAlgId) {
-        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
-            return algOid.getId();
-        }
-
-        ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-        RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
-        ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-        return digestAlgOid.getId() + "WITHRSAANDMGF1";
-    }
+    ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+    RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+    ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+    return digestAlgOid.getId() + "WITHRSAANDMGF1";
+  }
 
 }

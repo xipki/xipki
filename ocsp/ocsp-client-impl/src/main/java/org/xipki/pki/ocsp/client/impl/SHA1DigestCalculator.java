@@ -42,18 +42,19 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class SHA1DigestCalculator extends AbstractDigestCalculator {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return OIWObjectIdentifiers.idSHA1;
-    }
+  @Override
+  protected ASN1ObjectIdentifier getObjectIdentifier() {
+    return OIWObjectIdentifiers.idSHA1;
+  }
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA1Digest();
-    }
+  @Override
+  protected Digest getDigester() {
+    return new SHA1Digest();
+  }
 
 }

@@ -45,23 +45,24 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "neg-getcrl",
-        description = "download CRL (negative, for QA)")
+    description = "download CRL (negative, for QA)")
 @Service
 public class NegGetCRLCmd extends NegCRLCommandSupport {
 
-    @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
-    throws CAClientException, PKIErrorException {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            return caClient.downloadCRL(caName, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+  @Override
+  protected X509CRL retrieveCRL(
+      final String caName)
+  throws CAClientException, PKIErrorException {
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      return caClient.downloadCRL(caName, debug);
+    } finally {
+      saveRequestResponse(debug);
     }
+  }
 
 }

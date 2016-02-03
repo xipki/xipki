@@ -46,114 +46,115 @@ import org.xipki.commons.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
 
-    protected static final String SQL_ADD_ISSUER =
-        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
-        + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  protected static final String SQL_ADD_ISSUER =
+    "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
+    + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    protected static final String SQL_ADD_CERT =
-        "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN)"
-        + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+  protected static final String SQL_ADD_CERT =
+    "INSERT INTO CERT (ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,PN)"
+    + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
-    protected static final String SQL_DEL_CERT =
-        "DELETE FROM CERT WHERE ID>?";
+  protected static final String SQL_DEL_CERT =
+    "DELETE FROM CERT WHERE ID>?";
 
-    protected static final String SQL_ADD_CHASH =
-        "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
+  protected static final String SQL_ADD_CHASH =
+    "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";
 
-    protected static final String SQL_DEL_CHASH =
-        "DELETE FROM CHASH WHERE ID>?";
+  protected static final String SQL_DEL_CHASH =
+    "DELETE FROM CHASH WHERE ID>?";
 
-    protected static final String SQL_ADD_CRAW =
-        "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
+  protected static final String SQL_ADD_CRAW =
+    "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
 
-    protected static final String SQL_DEL_CRAW =
-        "DELETE FROM CRAW WHERE ID>?";
+  protected static final String SQL_DEL_CRAW =
+    "DELETE FROM CRAW WHERE ID>?";
 
-    AbstractOcspCertStoreDbImporter(
-            final DataSourceWrapper dataSource,
-            final String srcDir,
-            final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
-    throws Exception {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
-    }
+  AbstractOcspCertStoreDbImporter(
+      final DataSourceWrapper dataSource,
+      final String srcDir,
+      final AtomicBoolean stopMe,
+      final boolean evaluateOnly)
+  throws Exception {
+    super(dataSource, srcDir, stopMe, evaluateOnly);
+  }
 
-    protected String sha1(
-            final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
-    }
+  protected String sha1(
+      final byte[] data) {
+    return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
+  }
 
-    protected String sha224(
-            final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
-    }
+  protected String sha224(
+      final byte[] data) {
+    return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
+  }
 
-    protected String sha256(
-            final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
-    }
+  protected String sha256(
+      final byte[] data) {
+    return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
+  }
 
-    protected String sha384(
-            final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
-    }
+  protected String sha384(
+      final byte[] data) {
+    return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
+  }
 
-    protected String sha512(
-            final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
-    }
+  protected String sha512(
+      final byte[] data) {
+    return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
+  }
 
-    protected void deleteCertGreatherThan(
-            final int id,
-            final Logger log) {
-        deleteFromTableWithLargerId("CRAW", "CID", id, log);
-        deleteFromTableWithLargerId("CHASH", "CID", id, log);
-        deleteFromTableWithLargerId("CERT", "ID", id, log);
-    }
+  protected void deleteCertGreatherThan(
+      final int id,
+      final Logger log) {
+    deleteFromTableWithLargerId("CRAW", "CID", id, log);
+    deleteFromTableWithLargerId("CHASH", "CID", id, log);
+    deleteFromTableWithLargerId("CERT", "ID", id, log);
+  }
 
-    protected void dropIndexes()
-    throws DataAccessException {
-        System.out.println("dropping indexes");
-        long start = System.currentTimeMillis();
+  protected void dropIndexes()
+  throws DataAccessException {
+    System.out.println("dropping indexes");
+    long start = System.currentTimeMillis();
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
-        dataSource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
+    dataSource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
+    dataSource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH");
-        dataSource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
+    dataSource.dropForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH");
+    dataSource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
 
-        dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
-        dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
-        dataSource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
+    dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
+    dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
+    dataSource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
 
-        long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
-    }
+    long duration = (System.currentTimeMillis() - start) / 1000;
+    System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
+  }
 
-    protected void recoverIndexes()
-    throws DataAccessException {
-        System.out.println("recovering indexes");
-        long start = System.currentTimeMillis();
+  protected void recoverIndexes()
+  throws DataAccessException {
+    System.out.println("recovering indexes");
+    long start = System.currentTimeMillis();
 
-        dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-        dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
-        dataSource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
+    dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
+    dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
+    dataSource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
-                "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
-        dataSource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
+    dataSource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
+        "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
+    dataSource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW", "CID", "CERT", "ID",
-                "CASCADE", "NO ACTION");
-        dataSource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
-                "CASCADE", "NO ACTION");
+    dataSource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW", "CID", "CERT", "ID",
+        "CASCADE", "NO ACTION");
+    dataSource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
+        "CASCADE", "NO ACTION");
 
-        long duration = (System.currentTimeMillis() - start) / 1000;
-        System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
-    }
+    long duration = (System.currentTimeMillis() - start) / 1000;
+    System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));
+  }
 
 }

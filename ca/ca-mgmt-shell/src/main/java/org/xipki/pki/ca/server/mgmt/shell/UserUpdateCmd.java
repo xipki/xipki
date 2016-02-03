@@ -41,36 +41,37 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "user-up",
-        description = "update user")
+    description = "update user")
 @Service
 public class UserUpdateCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "user Name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "user Name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--password",
-            description = "user password, 'NULL' for empty password, 'C' to read from console")
-    private String password;
+  @Option(name = "--password",
+      description = "user password, 'NULL' for empty password, 'C' to read from console")
+  private String password;
 
-    @Option(name = "--cn-regex",
-            description = "regex for the permitted common name, 'NULL' for empty password")
-    private String cnRegex;
+  @Option(name = "--cn-regex",
+      description = "regex for the permitted common name, 'NULL' for empty password")
+  private String cnRegex;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if ("CONSOLE".equalsIgnoreCase(password)) {
-            password = new String(readPassword());
-        }
-        boolean b = caManager.changeUser(name, password, cnRegex);
-        output(b, "added", "could not add", "user " + name);
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if ("CONSOLE".equalsIgnoreCase(password)) {
+      password = new String(readPassword());
     }
+    boolean b = caManager.changeUser(name, password, cnRegex);
+    output(b, "added", "could not add", "user " + name);
+    return null;
+  }
 
 }

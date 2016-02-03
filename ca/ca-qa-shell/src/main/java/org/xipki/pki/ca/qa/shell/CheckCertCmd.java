@@ -61,126 +61,127 @@ import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "check-cert",
-        description = "check the certificate")
+    description = "check the certificate")
 @Service
 public class CheckCertCmd extends XipkiCommandSupport {
 
-    @Option(name = "--cert", aliases = "-c",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert", aliases = "-c",
+      required = true,
+      description = "certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--issuer",
-            description = "issuer name\n"
-                    + "required if multiple issuers are configured")
-    @Completion(X509IssuerNameCompleter.class)
-    private String issuerName;
+  @Option(name = "--issuer",
+      description = "issuer name\n"
+          + "required if multiple issuers are configured")
+  @Completion(X509IssuerNameCompleter.class)
+  private String issuerName;
 
-    @Option(name = "--p10",
-            required = true,
-            description = "PKCS#10 request file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10File;
+  @Option(name = "--p10",
+      required = true,
+      description = "PKCS#10 request file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p10File;
 
-    @Option(name = "--profile", aliases = "-p",
-            required = true,
-            description = "certificate profile\n"
-                    + "(required)")
-    @Completion(X509IssuerNameCompleter.class)
-    private String profileName;
+  @Option(name = "--profile", aliases = "-p",
+      required = true,
+      description = "certificate profile\n"
+          + "(required)")
+  @Completion(X509IssuerNameCompleter.class)
+  private String profileName;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show status verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show status verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Reference
-    private QASystemManager qaSystemManager;
+  @Reference
+  private QASystemManager qaSystemManager;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Set<String> issuerNames = qaSystemManager.getIssuerNames();
-        if (isEmpty(issuerNames)) {
-            throw new IllegalCmdParamException("no issuer is configured");
-        }
-
-        if (issuerName == null) {
-            if (issuerNames.size() != 1) {
-                throw new IllegalCmdParamException("no issuer is specified");
-            }
-
-            issuerName = issuerNames.iterator().next();
-        }
-
-        if (!issuerNames.contains(issuerName)) {
-            throw new IllegalCmdParamException("issuer " + issuerName
-                    + " is not within the configured issuers " + issuerNames);
-        }
-
-        X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
-
-        X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
-        if (qa == null) {
-            throw new IllegalCmdParamException("found no certificate profile named '"
-                    + profileName + "'");
-        }
-
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
-        Extensions extensions = null;
-        ASN1Set attrs = p10Req.getCertificationRequestInfo().getAttributes();
-        for (int i = 0; i < attrs.size(); i++) {
-            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
-                extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
-            }
-        }
-
-        byte[] certBytes = IoUtil.read(certFile);
-        ValidationResult result = qa.checkCert(certBytes, issuerInfo,
-                p10Req.getCertificationRequestInfo().getSubject(),
-                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
-        sb.append("\tcertificate is ");
-        sb.append(result.isAllSuccessful()
-                ? "valid"
-                : "invalid");
-
-        if (verbose.booleanValue()) {
-            for (ValidationIssue issue : result.getValidationIssues()) {
-                sb.append("\n");
-                format(issue, "    ", sb);
-            }
-        }
-
-        out(sb.toString());
-        if (!result.isAllSuccessful()) {
-            throw new CmdFailure("certificate is invalid");
-        }
-        return null;
-    } // method doExecute
-
-    private static void format(
-            final ValidationIssue issue,
-            final String prefix,
-            final StringBuilder sb) {
-        sb.append(prefix);
-        sb.append(issue.getCode());
-        sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(
-                issue.isFailed()
-                    ? "failed"
-                    : "successful");
-        if (issue.getMessage() != null) {
-            sb.append(", ").append(issue.getMessage());
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Set<String> issuerNames = qaSystemManager.getIssuerNames();
+    if (isEmpty(issuerNames)) {
+      throw new IllegalCmdParamException("no issuer is configured");
     }
+
+    if (issuerName == null) {
+      if (issuerNames.size() != 1) {
+        throw new IllegalCmdParamException("no issuer is specified");
+      }
+
+      issuerName = issuerNames.iterator().next();
+    }
+
+    if (!issuerNames.contains(issuerName)) {
+      throw new IllegalCmdParamException("issuer " + issuerName
+          + " is not within the configured issuers " + issuerNames);
+    }
+
+    X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
+
+    X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
+    if (qa == null) {
+      throw new IllegalCmdParamException("found no certificate profile named '"
+          + profileName + "'");
+    }
+
+    CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+    Extensions extensions = null;
+    ASN1Set attrs = p10Req.getCertificationRequestInfo().getAttributes();
+    for (int i = 0; i < attrs.size(); i++) {
+      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+        extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+      }
+    }
+
+    byte[] certBytes = IoUtil.read(certFile);
+    ValidationResult result = qa.checkCert(certBytes, issuerInfo,
+        p10Req.getCertificationRequestInfo().getSubject(),
+        p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
+    sb.append("\tcertificate is ");
+    sb.append(result.isAllSuccessful()
+        ? "valid"
+        : "invalid");
+
+    if (verbose.booleanValue()) {
+      for (ValidationIssue issue : result.getValidationIssues()) {
+        sb.append("\n");
+        format(issue, "  ", sb);
+      }
+    }
+
+    out(sb.toString());
+    if (!result.isAllSuccessful()) {
+      throw new CmdFailure("certificate is invalid");
+    }
+    return null;
+  } // method doExecute
+
+  private static void format(
+      final ValidationIssue issue,
+      final String prefix,
+      final StringBuilder sb) {
+    sb.append(prefix);
+    sb.append(issue.getCode());
+    sb.append(", ").append(issue.getDescription());
+    sb.append(", ").append(
+        issue.isFailed()
+          ? "failed"
+          : "successful");
+    if (issue.getMessage() != null) {
+      sb.append(", ").append(issue.getMessage());
+    }
+  }
 
 }

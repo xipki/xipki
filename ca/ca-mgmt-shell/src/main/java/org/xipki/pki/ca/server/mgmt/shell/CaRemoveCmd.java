@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "ca-rm",
-        description = "remove CA")
+    description = "remove CA")
 @Service
 public class CaRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "CA name", required = true)
-    @Completion(CaNameCompleter.class)
-    private String name;
+  @Argument(index = 0, name = "name", description = "CA name", required = true)
+  @Completion(CaNameCompleter.class)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCA(name);
-        output(b, "removed", "could not remove", "CA " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCA(name);
+    output(b, "removed", "could not remove", "CA " + name);
+    return null;
+  }
 
 }

@@ -45,23 +45,24 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-qa", name = "neg-gencrl",
-        description = "generate CRL (negative, for QA)")
+    description = "generate CRL (negative, for QA)")
 @Service
 public class NegGenCRLCmd extends NegCRLCommandSupport {
 
-    @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
-    throws CAClientException, PKIErrorException {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            return caClient.generateCRL(caName, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+  @Override
+  protected X509CRL retrieveCRL(
+      final String caName)
+  throws CAClientException, PKIErrorException {
+    RequestResponseDebug debug = getRequestResponseDebug();
+    try {
+      return caClient.generateCRL(caName, debug);
+    } finally {
+      saveRequestResponse(debug);
     }
+  }
 
 }

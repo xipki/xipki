@@ -47,100 +47,101 @@ import org.xipki.commons.security.api.BadASN1ObjectException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ASN1Util {
 
-    private static final BigInteger MAX_BYTE = BigInteger.valueOf(Byte.MAX_VALUE);
+  private static final BigInteger MAX_BYTE = BigInteger.valueOf(Byte.MAX_VALUE);
 
-    private static final BigInteger MIN_BYTE = BigInteger.valueOf(Byte.MIN_VALUE);
+  private static final BigInteger MIN_BYTE = BigInteger.valueOf(Byte.MIN_VALUE);
 
-    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
+  private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
 
-    private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
+  private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
-    private ASN1Util() {
+  private ASN1Util() {
+  }
+
+  public static byte[] getBytes(
+      final ASN1Encodable obj,
+      final String desc)
+  throws BadASN1ObjectException {
+    if (!(obj instanceof ASN1OctetString)) {
+      throw new BadASN1ObjectException(desc + " is not an octet string");
     }
 
-    public static byte[] getBytes(
-            final ASN1Encodable obj,
-            final String desc)
-    throws BadASN1ObjectException {
-        if (!(obj instanceof ASN1OctetString)) {
-            throw new BadASN1ObjectException(desc + " is not an octet string");
-        }
+    return ((ASN1OctetString) obj).getOctets();
+  }
 
-        return ((ASN1OctetString) obj).getOctets();
+  public static boolean getBoolean(
+      final ASN1Encodable obj,
+      final String desc)
+  throws BadASN1ObjectException {
+    if (!(obj instanceof ASN1Boolean)) {
+      throw new BadASN1ObjectException(desc + " is not a boolean");
+    }
+    return ((ASN1Boolean) obj).isTrue();
+  }
+
+  public static byte getByte(
+      final ASN1Encodable obj,
+      final String desc)
+  throws BadASN1ObjectException {
+    if (!(obj instanceof ASN1Integer)) {
+      throw new BadASN1ObjectException(desc + " is not an integer");
     }
 
-    public static boolean getBoolean(
-            final ASN1Encodable obj,
-            final String desc)
-    throws BadASN1ObjectException {
-        if (!(obj instanceof ASN1Boolean)) {
-            throw new BadASN1ObjectException(desc + " is not a boolean");
-        }
-        return ((ASN1Boolean) obj).isTrue();
+    BigInteger bi = ((ASN1Integer) obj).getValue();
+    if (bi.compareTo(MAX_BYTE) > 0 || bi.compareTo(MIN_BYTE) < 0) {
+      throw new BadASN1ObjectException(desc + " is not in the range of byte");
+    }
+    return bi.byteValue();
+  }
+
+  public static int getInt(
+      final ASN1Encodable obj,
+      final String desc)
+  throws BadASN1ObjectException {
+    if (!(obj instanceof ASN1Integer)) {
+      throw new BadASN1ObjectException(desc + " is not an integer");
     }
 
-    public static byte getByte(
-            final ASN1Encodable obj,
-            final String desc)
-    throws BadASN1ObjectException {
-        if (!(obj instanceof ASN1Integer)) {
-            throw new BadASN1ObjectException(desc + " is not an integer");
-        }
+    BigInteger bi = ((ASN1Integer) obj).getValue();
+    if (bi.compareTo(MAX_INT) > 0 || bi.compareTo(MIN_INT) < 0) {
+      throw new BadASN1ObjectException(desc + " is not in the range of integer");
+    }
+    return bi.intValue();
+  }
 
-        BigInteger bi = ((ASN1Integer) obj).getValue();
-        if (bi.compareTo(MAX_BYTE) > 0 || bi.compareTo(MIN_BYTE) < 0) {
-            throw new BadASN1ObjectException(desc + " is not in the range of byte");
-        }
-        return bi.byteValue();
+  public static String getString(
+      final ASN1Encodable obj,
+      final String desc)
+  throws BadASN1ObjectException {
+    if (!(obj instanceof ASN1String)) {
+      throw new BadASN1ObjectException(desc + " is not a string");
     }
 
-    public static int getInt(
-            final ASN1Encodable obj,
-            final String desc)
-    throws BadASN1ObjectException {
-        if (!(obj instanceof ASN1Integer)) {
-            throw new BadASN1ObjectException(desc + " is not an integer");
-        }
+    return ((ASN1String) obj).getString();
+  }
 
-        BigInteger bi = ((ASN1Integer) obj).getValue();
-        if (bi.compareTo(MAX_INT) > 0 || bi.compareTo(MIN_INT) < 0) {
-            throw new BadASN1ObjectException(desc + " is not in the range of integer");
-        }
-        return bi.intValue();
+  public static void assertSequenceLength(
+      final ASN1Sequence seq,
+      final int size,
+      final String desc)
+  throws BadASN1ObjectException {
+    final int n = seq.size();
+    if (n != size) {
+      StringBuilder sb = new StringBuilder(100);
+      sb.append("wrong number of elements in sequence");
+      if (desc != null && !desc.isEmpty()) {
+        sb.append("'").append(desc).append("'");
+      }
+      sb.append(", is '").append(n).append("'");
+      sb.append(", but expected '").append(size).append("'");
+
+      throw new BadASN1ObjectException(sb.toString());
     }
-
-    public static String getString(
-            final ASN1Encodable obj,
-            final String desc)
-    throws BadASN1ObjectException {
-        if (!(obj instanceof ASN1String)) {
-            throw new BadASN1ObjectException(desc + " is not a string");
-        }
-
-        return ((ASN1String) obj).getString();
-    }
-
-    public static void assertSequenceLength(
-            final ASN1Sequence seq,
-            final int size,
-            final String desc)
-    throws BadASN1ObjectException {
-        final int n = seq.size();
-        if (n != size) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence");
-            if (desc != null && !desc.isEmpty()) {
-                sb.append("'").append(desc).append("'");
-            }
-            sb.append(", is '").append(n).append("'");
-            sb.append(", but expected '").append(size).append("'");
-
-            throw new BadASN1ObjectException(sb.toString());
-        }
-    }
+  }
 
 }

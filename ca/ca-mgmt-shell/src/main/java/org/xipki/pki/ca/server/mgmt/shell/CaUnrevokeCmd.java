@@ -44,27 +44,28 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "ca-unrevoke",
-        description = "unrevoke CA")
+    description = "unrevoke CA")
 @Service
 public class CaUnrevokeCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "CA name", required = true)
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Argument(index = 0, name = "name", description = "CA name", required = true)
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (!caManager.getCaNames().contains(caName)) {
-            throw new IllegalCmdParamException("invalid CA name " + caName);
-        }
-
-        boolean b = caManager.unrevokeCa(caName);
-        output(b, "unrevoked", "could not unrevoke", "CA " + caName);
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (!caManager.getCaNames().contains(caName)) {
+      throw new IllegalCmdParamException("invalid CA name " + caName);
     }
+
+    boolean b = caManager.unrevokeCa(caName);
+    output(b, "unrevoked", "could not unrevoke", "CA " + caName);
+    return null;
+  }
 
 }

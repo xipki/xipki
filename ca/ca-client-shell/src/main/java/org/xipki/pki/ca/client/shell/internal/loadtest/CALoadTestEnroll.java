@@ -61,132 +61,133 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CALoadTestEnroll extends LoadExecutor {
 
-    class Testor implements Runnable {
-        @Override
-        public void run() {
-            while (!stop() && getErrorAccout() < 1) {
-                Map<Integer, CertRequest> certReqs = nextCertRequests();
-                if (certReqs != null) {
-                    boolean successful = testNext(certReqs);
-                    int numFailed = successful
-                            ? 0
-                            : 1;
-                    account(1, numFailed);
-                } else {
-                    account(1, 1);
-                }
-            }
-        }
-
-        private boolean testNext(
-                final Map<Integer, CertRequest> certRequests) {
-            EnrollCertResult result;
-            try {
-                EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
-                for (Integer certId : certRequests.keySet()) {
-                    String id = "id-" + certId;
-                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
-                            id,
-                            loadtestEntry.getCertprofile(),
-                            certRequests.get(certId),
-                            RA_VERIFIED);
-
-                    request.addRequestEntry(requestEntry);
-                }
-
-                result = caClient.requestCerts(request, null,
-                        userPrefix + System.currentTimeMillis(), null);
-            } catch (CAClientException | PKIErrorException e) {
-                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return false;
-            }
-
-            if (result == null) {
-                return false;
-            }
-
-            Set<String> ids = result.getAllIds();
-            int nSuccess = 0;
-            for (String id : ids) {
-                CertOrError certOrError = result.getCertificateOrError(id);
-                X509Certificate cert = (X509Certificate) certOrError.getCertificate();
-
-                if (cert != null) {
-                    nSuccess++;
-                }
-            }
-
-            return nSuccess == certRequests.size();
-        } // method testNext
-
-    } // class Testor
-
-    private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-
-    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
-
-    private final CAClient caClient;
-
-    private final LoadTestEntry loadtestEntry;
-
-    private final AtomicLong index;
-
-    private final String userPrefix = "LOADTEST-";
-
-    private final int n;
-
+  class Testor implements Runnable {
     @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
-    }
-
-    public CALoadTestEnroll(
-            final CAClient caClient,
-            final LoadTestEntry loadtestEntry,
-            final int n,
-            final String description) {
-        super(description);
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
-        if (n < 1) {
-            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        Map<Integer, CertRequest> certReqs = nextCertRequests();
+        if (certReqs != null) {
+          boolean successful = testNext(certReqs);
+          int numFailed = successful
+              ? 0
+              : 1;
+          account(1, numFailed);
+        } else {
+          account(1, 1);
         }
-        this.n = n;
-        this.loadtestEntry = loadtestEntry;
-        this.caClient = caClient;
-
-        this.index = new AtomicLong(getSecureIndex());
+      }
     }
 
-    private Map<Integer, CertRequest> nextCertRequests() {
-        Map<Integer, CertRequest> certRequests = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            final int certId = i + 1;
-            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+    private boolean testNext(
+        final Map<Integer, CertRequest> certRequests) {
+      EnrollCertResult result;
+      try {
+        EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
+        for (Integer certId : certRequests.keySet()) {
+          String id = "id-" + certId;
+          EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
+              id,
+              loadtestEntry.getCertprofile(),
+              certRequests.get(certId),
+              RA_VERIFIED);
 
-            long thisIndex = index.getAndIncrement();
-            certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
-
-            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null) {
-                return null;
-            }
-
-            certTempBuilder.setPublicKey(spki);
-
-            CertTemplate certTemplate = certTempBuilder.build();
-            CertRequest certRequest = new CertRequest(certId, certTemplate, null);
-            certRequests.put(certId, certRequest);
+          request.addRequestEntry(requestEntry);
         }
-        return certRequests;
+
+        result = caClient.requestCerts(request, null,
+            userPrefix + System.currentTimeMillis(), null);
+      } catch (CAClientException | PKIErrorException e) {
+        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+        return false;
+      } catch (Throwable t) {
+        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+        return false;
+      }
+
+      if (result == null) {
+        return false;
+      }
+
+      Set<String> ids = result.getAllIds();
+      int nSuccess = 0;
+      for (String id : ids) {
+        CertOrError certOrError = result.getCertificateOrError(id);
+        X509Certificate cert = (X509Certificate) certOrError.getCertificate();
+
+        if (cert != null) {
+          nSuccess++;
+        }
+      }
+
+      return nSuccess == certRequests.size();
+    } // method testNext
+
+  } // class Testor
+
+  private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
+
+  private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
+
+  private final CAClient caClient;
+
+  private final LoadTestEntry loadtestEntry;
+
+  private final AtomicLong index;
+
+  private final String userPrefix = "LOADTEST-";
+
+  private final int n;
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
+
+  public CALoadTestEnroll(
+      final CAClient caClient,
+      final LoadTestEntry loadtestEntry,
+      final int n,
+      final String description) {
+    super(description);
+    ParamUtil.assertNotNull("caClient", caClient);
+    ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
+    if (n < 1) {
+      throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
     }
+    this.n = n;
+    this.loadtestEntry = loadtestEntry;
+    this.caClient = caClient;
+
+    this.index = new AtomicLong(getSecureIndex());
+  }
+
+  private Map<Integer, CertRequest> nextCertRequests() {
+    Map<Integer, CertRequest> certRequests = new HashMap<>();
+    for (int i = 0; i < n; i++) {
+      final int certId = i + 1;
+      CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+
+      long thisIndex = index.getAndIncrement();
+      certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
+
+      SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
+      if (spki == null) {
+        return null;
+      }
+
+      certTempBuilder.setPublicKey(spki);
+
+      CertTemplate certTemplate = certTempBuilder.build();
+      CertRequest certRequest = new CertRequest(certId, certTemplate, null);
+      certRequests.put(certId, certRequest);
+    }
+    return certRequests;
+  }
 
 }

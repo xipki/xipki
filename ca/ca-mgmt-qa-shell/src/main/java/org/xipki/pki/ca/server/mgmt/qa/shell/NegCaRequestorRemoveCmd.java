@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-careq-rm",
-        description = "remove requestor in CA")
+    description = "remove requestor in CA")
 @Service
 public class NegCaRequestorRemoveCmd extends CaRequestorRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-careq-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-careq-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

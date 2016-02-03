@@ -44,25 +44,26 @@ import org.xipki.pki.ocsp.server.impl.jaxb.MappingType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class AuditOption {
 
-    private final Map<String, String> certprofileMapping;
+  private final Map<String, String> certprofileMapping;
 
-    public AuditOption(
-            final AuditOptionType conf) {
-        Map<String, String> map = new ConcurrentHashMap<>();
-        if (conf.getCertprofileMappings() != null) {
-            for (MappingType m : conf.getCertprofileMappings().getMapping()) {
-                map.put(m.getFrom(), m.getTo());
-            }
-        }
-        this.certprofileMapping = Collections.unmodifiableMap(map);
+  public AuditOption(
+      final AuditOptionType conf) {
+    Map<String, String> map = new ConcurrentHashMap<>();
+    if (conf.getCertprofileMappings() != null) {
+      for (MappingType m : conf.getCertprofileMappings().getMapping()) {
+        map.put(m.getFrom(), m.getTo());
+      }
     }
+    this.certprofileMapping = Collections.unmodifiableMap(map);
+  }
 
-    public Map<String, String> getCertprofileMapping() {
-        return certprofileMapping;
-    }
+  public Map<String, String> getCertprofileMapping() {
+    return certprofileMapping;
+  }
 
 }

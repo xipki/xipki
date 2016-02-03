@@ -46,76 +46,77 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CmpResponderEntryWrapper {
 
-    private CmpResponderEntry dbEntry;
+  private CmpResponderEntry dbEntry;
 
-    private ConcurrentContentSigner signer;
+  private ConcurrentContentSigner signer;
 
-    private X500Name subjectAsX500Name;
+  private X500Name subjectAsX500Name;
 
-    private GeneralName subjectAsGeneralName;
+  private GeneralName subjectAsGeneralName;
 
-    public CmpResponderEntryWrapper() {
+  public CmpResponderEntryWrapper() {
+  }
+
+  public void setDbEntry(
+      final CmpResponderEntry dbEntry) {
+    this.dbEntry = dbEntry;
+    signer = null;
+    if (dbEntry.getCertificate() != null) {
+      subjectAsX500Name = X500Name.getInstance(
+          dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
+      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+    }
+  }
+
+  public ConcurrentContentSigner getSigner() {
+    return signer;
+  }
+
+  public void initSigner(
+      final SecurityFactory securityFactory)
+  throws SignerException {
+    if (signer != null) {
+      return;
     }
 
-    public void setDbEntry(
-            final CmpResponderEntry dbEntry) {
-        this.dbEntry = dbEntry;
-        signer = null;
-        if (dbEntry.getCertificate() != null) {
-            subjectAsX500Name = X500Name.getInstance(
-                    dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
-            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
-        }
+    if (dbEntry == null) {
+      throw new SignerException("dbEntry is null");
     }
 
-    public ConcurrentContentSigner getSigner() {
-        return signer;
+    X509Certificate responderCert = dbEntry.getCertificate();
+    dbEntry.setConfFaulty(true);
+    signer = securityFactory.createSigner(
+        dbEntry.getType(), dbEntry.getConf(), responderCert);
+    dbEntry.setConfFaulty(false);
+    if (dbEntry.getBase64Cert() == null) {
+      dbEntry.setCertificate(signer.getCertificate());
+      subjectAsX500Name = X500Name.getInstance(
+          signer.getCertificateAsBCObject().getSubject());
+      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
     }
+  } // method initSigner
 
-    public void initSigner(
-            final SecurityFactory securityFactory)
-    throws SignerException {
-        if (signer != null) {
-            return;
-        }
+  public CmpResponderEntry getDbEntry() {
+    return dbEntry;
+  }
 
-        if (dbEntry == null) {
-            throw new SignerException("dbEntry is null");
-        }
+  public boolean isHealthy() {
+    return (signer == null)
+        ? false
+        : signer.isHealthy();
+  }
 
-        X509Certificate responderCert = dbEntry.getCertificate();
-        dbEntry.setConfFaulty(true);
-        signer = securityFactory.createSigner(
-                dbEntry.getType(), dbEntry.getConf(), responderCert);
-        dbEntry.setConfFaulty(false);
-        if (dbEntry.getBase64Cert() == null) {
-            dbEntry.setCertificate(signer.getCertificate());
-            subjectAsX500Name = X500Name.getInstance(
-                    signer.getCertificateAsBCObject().getSubject());
-            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
-        }
-    } // method initSigner
+  public GeneralName getSubjectAsGeneralName() {
+    return subjectAsGeneralName;
+  }
 
-    public CmpResponderEntry getDbEntry() {
-        return dbEntry;
-    }
-
-    public boolean isHealthy() {
-        return (signer == null)
-                ? false
-                : signer.isHealthy();
-    }
-
-    public GeneralName getSubjectAsGeneralName() {
-        return subjectAsGeneralName;
-    }
-
-    public X500Name getSubjectAsX500Name() {
-        return subjectAsX500Name;
-    }
+  public X500Name getSubjectAsX500Name() {
+    return subjectAsX500Name;
+  }
 
 }

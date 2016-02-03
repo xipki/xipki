@@ -41,51 +41,52 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class AddUserEntry implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String name;
+  private final String name;
 
-    private final String password;
+  private final String password;
 
-    private final String cnRegex;
+  private final String cnRegex;
 
-    public AddUserEntry(
-            final String name,
-            final String password,
-            final String cnRegex)
-    throws CAMgmtException {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("password", password);
-        ParamUtil.assertNotBlank("cnRegex", cnRegex);
+  public AddUserEntry(
+      final String name,
+      final String password,
+      final String cnRegex)
+  throws CAMgmtException {
+    ParamUtil.assertNotBlank("name", name);
+    ParamUtil.assertNotBlank("password", password);
+    ParamUtil.assertNotBlank("cnRegex", cnRegex);
 
-        this.name = name;
-        this.password = password;
-        this.cnRegex = cnRegex;
-    }
+    this.name = name;
+    this.password = password;
+    this.cnRegex = cnRegex;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public String getCnRegex() {
-        return cnRegex;
-    }
+  public String getCnRegex() {
+    return cnRegex;
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("password: ").append(password).append("\n");
-        sb.append("cnRegex: ").append(cnRegex);
-        return sb.toString();
-    }
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(200);
+    sb.append("name: ").append(name).append('\n');
+    sb.append("password: ").append(password).append("\n");
+    sb.append("cnRegex: ").append(cnRegex);
+    return sb.toString();
+  }
 
 }

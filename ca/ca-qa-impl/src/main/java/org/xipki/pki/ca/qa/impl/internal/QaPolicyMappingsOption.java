@@ -44,29 +44,30 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaPolicyMappingsOption extends QaExtension {
 
-    private final Map<String, String> policyMappings;
+  private final Map<String, String> policyMappings;
 
-    public QaPolicyMappingsOption(
-            final PolicyMappings jaxb) {
-        this.policyMappings = new HashMap<>();
-        for (PolicyIdMappingType type : jaxb.getMapping()) {
-            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
-            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
-            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
-        }
+  public QaPolicyMappingsOption(
+      final PolicyMappings jaxb) {
+    this.policyMappings = new HashMap<>();
+    for (PolicyIdMappingType type : jaxb.getMapping()) {
+      String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+      String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+      policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
     }
+  }
 
-    public String getSubjectDomainPolicy(
-            final String issuerDomainPolicy) {
-        return policyMappings.get(issuerDomainPolicy);
-    }
+  public String getSubjectDomainPolicy(
+      final String issuerDomainPolicy) {
+    return policyMappings.get(issuerDomainPolicy);
+  }
 
-    public Set<String> getIssuerDomainPolicies() {
-        return policyMappings.keySet();
-    }
+  public Set<String> getIssuerDomainPolicies() {
+    return policyMappings.keySet();
+  }
 
 }

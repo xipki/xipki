@@ -40,38 +40,39 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ErrorResultEntryType extends ResultEntryType {
 
-    private final PKIStatusInfo statusInfo;
+  private final PKIStatusInfo statusInfo;
 
-    public ErrorResultEntryType(
-            final String id,
-            final PKIStatusInfo statusInfo) {
-        super(id);
-        ParamUtil.assertNotNull("statusInfo", statusInfo);
-        this.statusInfo = statusInfo;
-    }
+  public ErrorResultEntryType(
+      final String id,
+      final PKIStatusInfo statusInfo) {
+    super(id);
+    ParamUtil.assertNotNull("statusInfo", statusInfo);
+    this.statusInfo = statusInfo;
+  }
 
-    public ErrorResultEntryType(
-            final String id,
-            final int status,
-            final int pkiFailureInfo,
-            final String statusMessage) {
-        super(id);
-        this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
-    }
+  public ErrorResultEntryType(
+      final String id,
+      final int status,
+      final int pkiFailureInfo,
+      final String statusMessage) {
+    super(id);
+    this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
+  }
 
-    public ErrorResultEntryType(
-            final String id,
-            final int status) {
-        super(id);
-        this.statusInfo = new PKIStatusInfo(status);
-    }
+  public ErrorResultEntryType(
+      final String id,
+      final int status) {
+    super(id);
+    this.statusInfo = new PKIStatusInfo(status);
+  }
 
-    public PKIStatusInfo getStatusInfo() {
-        return statusInfo;
-    }
+  public PKIStatusInfo getStatusInfo() {
+    return statusInfo;
+  }
 
 }

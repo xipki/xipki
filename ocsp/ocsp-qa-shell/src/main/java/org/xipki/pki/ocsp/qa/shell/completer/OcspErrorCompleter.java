@@ -41,18 +41,19 @@ import org.xipki.pki.ocsp.qa.api.OcspError;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 @Service
 public class OcspErrorCompleter extends AbstractEnumCompleter {
 
-    public OcspErrorCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public OcspErrorCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (OcspError entry : OcspError.values()) {
-            enums.append(entry.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (OcspError entry : OcspError.values()) {
+      enums.append(entry.name()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

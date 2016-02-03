@@ -45,40 +45,41 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "requestor-add",
-        description = "add requestor")
+    description = "add requestor")
 @Service
 public class RequestorAddCmd extends CaCommandSupport {
 
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
-    private String name;
+  @Option(name = "--name", aliases = "-n",
+      required = true,
+      description = "requestor name\n"
+          + "(required)")
+  private String name;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "requestor certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      required = true,
+      description = "requestor certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-        CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
+    CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
 
-        boolean b;
-        if (entry.getCert() == null) {
-            b = false;
-        } else {
-            b = caManager.addCmpRequestor(entry);
-        }
-        output(b, "added", "could not add", "CMP requestor " + name);
-        return null;
+    boolean b;
+    if (entry.getCert() == null) {
+      b = false;
+    } else {
+      b = caManager.addCmpRequestor(entry);
     }
+    output(b, "added", "could not add", "CMP requestor " + name);
+    return null;
+  }
 
 }

@@ -41,20 +41,21 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CaCertsWriter extends DbiXmlWriter {
 
-    public CaCertsWriter()
-    throws IOException, XMLStreamException {
-        super("certs", "1");
-    }
+  public CaCertsWriter()
+  throws IOException, XMLStreamException {
+    super("certs", "1");
+  }
 
-    public void add(
-            final CaCertType cert)
-    throws InvalidDataObjectException, XMLStreamException {
-        cert.validate();
-        cert.writeTo(this);
-    }
+  public void add(
+      final CaCertType cert)
+  throws InvalidDataObjectException, XMLStreamException {
+    cert.validate();
+    cert.writeTo(this);
+  }
 
 }

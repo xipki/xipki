@@ -43,23 +43,24 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-db", name = "updatedb-ca",
-        description = "update the CA database schema")
+    description = "update the CA database schema")
 @Service
 public class UpdateDbCaCmd extends LiquibaseCommandSupport {
 
-    private static final String schemaFile = "xipki/sql/ca-init.xml";
+  private static final String schemaFile = "xipki/sql/ca-init.xml";
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        update(dbConf, schemaFile);
-        return null;
-    }
+    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+    update(dbConf, schemaFile);
+    return null;
+  }
 
 }

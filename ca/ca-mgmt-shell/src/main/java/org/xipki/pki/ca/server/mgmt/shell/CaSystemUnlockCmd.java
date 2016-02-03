@@ -42,25 +42,26 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "unlock",
-        description = "unlock CA system")
+    description = "unlock CA system")
 @Service
 public class CaSystemUnlockCmd extends CaCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean unlocked = caManager.unlockCA();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean unlocked = caManager.unlockCA();
 
-        if (unlocked) {
-            out("unlocked CA system, calling xipki-ca:restart to restart CA system");
-        } else {
-            throw new UnexpectedException("could not unlock CA system");
-        }
-
-        return null;
+    if (unlocked) {
+      out("unlocked CA system, calling xipki-ca:restart to restart CA system");
+    } else {
+      throw new UnexpectedException("could not unlock CA system");
     }
+
+    return null;
+  }
 
 }

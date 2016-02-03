@@ -47,21 +47,22 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "scep", name = "enroll",
-        description = "enroll certificate via automic selected messageType")
+    description = "enroll certificate via automic selected messageType")
 @Service
 public class EnrollCertCmd extends EnrollCertCommandSupport {
 
-    @Override
-    protected EnrolmentResponse requestCertificate(
-            final ScepClient client,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ScepClientException {
-        return client.scepEnrol(csr, identityKey, identityCert);
-    }
+  @Override
+  protected EnrolmentResponse requestCertificate(
+      final ScepClient client,
+      final CertificationRequest csr,
+      final PrivateKey identityKey,
+      final X509Certificate identityCert)
+  throws ScepClientException {
+    return client.scepEnrol(csr, identityKey, identityCert);
+  }
 
 }

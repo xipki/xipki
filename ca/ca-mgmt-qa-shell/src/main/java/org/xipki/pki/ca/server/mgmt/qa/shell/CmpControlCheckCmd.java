@@ -44,29 +44,30 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "cmpcontrol-check",
-        description = "show information of CMP control (QA)")
+    description = "show information of CMP control (QA)")
 @Service
 public class CmpControlCheckCmd extends CmpControlUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking CMP control " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking CMP control " + name);
 
-        CmpControlEntry c = caManager.getCmpControl(name);
-        if (c == null) {
-            throw new CmdFailure("no CMP control named '" + name + "' is configured");
-        }
-
-        String is = c.getConf();
-        String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
-        MgmtQAShellUtil.assertEquals("CMP control", ex, is);
-
-        out(" checked CMP control " + name);
-        return null;
+    CmpControlEntry c = caManager.getCmpControl(name);
+    if (c == null) {
+      throw new CmdFailure("no CMP control named '" + name + "' is configured");
     }
+
+    String is = c.getConf();
+    String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
+    MgmtQAShellUtil.assertEquals("CMP control", ex, is);
+
+    out(" checked CMP control " + name);
+    return null;
+  }
 
 }

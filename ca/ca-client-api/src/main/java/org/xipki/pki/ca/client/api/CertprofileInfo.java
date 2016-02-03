@@ -40,45 +40,46 @@ import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertprofileInfo {
 
-    private final String name;
+  private final String name;
 
-    private final String type;
+  private final String type;
 
-    private final String conf;
+  private final String conf;
 
-    public CertprofileInfo(
-            final String name,
-            final String type,
-            final String conf) {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
-        if (StringUtil.isBlank(type)) {
-            this.type = null;
-        } else {
-            this.type = type;
-        }
-
-        if (StringUtil.isBlank(conf)) {
-            this.conf = null;
-        } else {
-            this.conf = conf;
-        }
+  public CertprofileInfo(
+      final String name,
+      final String type,
+      final String conf) {
+    ParamUtil.assertNotBlank("name", name);
+    this.name = name;
+    if (StringUtil.isBlank(type)) {
+      this.type = null;
+    } else {
+      this.type = type;
     }
 
-    public String getName() {
-        return name;
+    if (StringUtil.isBlank(conf)) {
+      this.conf = null;
+    } else {
+      this.conf = conf;
     }
+  }
 
-    public String getType() {
-        return type;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getConf() {
-        return conf;
-    }
+  public String getType() {
+    return type;
+  }
+
+  public String getConf() {
+    return conf;
+  }
 
 }

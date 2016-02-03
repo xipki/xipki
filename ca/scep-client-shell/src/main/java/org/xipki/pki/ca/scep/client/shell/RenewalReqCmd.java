@@ -47,21 +47,22 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "scep", name = "renewal-req",
-        description = "enroll certificate via messageType RenewalReq")
+    description = "enroll certificate via messageType RenewalReq")
 @Service
 public class RenewalReqCmd extends EnrollCertCommandSupport {
 
-    @Override
-    protected EnrolmentResponse requestCertificate(
-            final ScepClient client,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ScepClientException {
-        return client.scepRenewalReq(csr, identityKey, identityCert);
-    }
+  @Override
+  protected EnrolmentResponse requestCertificate(
+      final ScepClient client,
+      final CertificationRequest csr,
+      final PrivateKey identityKey,
+      final X509Certificate identityCert)
+  throws ScepClientException {
+    return client.scepRenewalReq(csr, identityKey, identityCert);
+  }
 
 }

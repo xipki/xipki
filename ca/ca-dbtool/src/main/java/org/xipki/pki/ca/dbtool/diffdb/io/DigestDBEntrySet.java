@@ -40,52 +40,53 @@ import java.util.List;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DigestDBEntrySet implements Comparable<DigestDBEntrySet> {
 
-    private final int startId;
+  private final int startId;
 
-    private Exception exception;
+  private Exception exception;
 
-    private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
+  private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
-    public DigestDBEntrySet(
-            final int startId) {
-        this.startId = startId;
+  public DigestDBEntrySet(
+      final int startId) {
+    this.startId = startId;
+  }
+
+  public void setException(
+      final Exception exception) {
+    this.exception = exception;
+  }
+
+  public Exception getException() {
+    return exception;
+  }
+
+  public void addEntry(
+      final IdentifiedDbDigestEntry entry) {
+    entries.add(entry);
+  }
+
+  public int getStartId() {
+    return startId;
+  }
+
+  public List<IdentifiedDbDigestEntry> getEntries() {
+    return entries;
+  }
+
+  @Override
+  public int compareTo(DigestDBEntrySet o) {
+    if (startId < o.startId) {
+      return -1;
+    } else if (startId == o.startId) {
+      return 0;
+    } else {
+      return 1;
     }
-
-    public void setException(
-            final Exception exception) {
-        this.exception = exception;
-    }
-
-    public Exception getException() {
-        return exception;
-    }
-
-    public void addEntry(
-            final IdentifiedDbDigestEntry entry) {
-        entries.add(entry);
-    }
-
-    public int getStartId() {
-        return startId;
-    }
-
-    public List<IdentifiedDbDigestEntry> getEntries() {
-        return entries;
-    }
-
-    @Override
-    public int compareTo(DigestDBEntrySet o) {
-        if (startId < o.startId) {
-            return -1;
-        } else if (startId == o.startId) {
-            return 0;
-        } else {
-            return 1;
-        }
-    }
+  }
 
 }

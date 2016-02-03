@@ -86,499 +86,500 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 class CaConfigurationDbImporter extends DbPorter {
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    CaConfigurationDbImporter(
-            final DataSourceWrapper dataSource,
-            final Unmarshaller unmarshaller,
-            final String srcDir,
-            final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        this.unmarshaller = unmarshaller;
+  CaConfigurationDbImporter(
+      final DataSourceWrapper dataSource,
+      final Unmarshaller unmarshaller,
+      final String srcDir,
+      final AtomicBoolean stopMe,
+      final boolean evaluateOnly)
+  throws DataAccessException, PasswordResolverException, IOException {
+    super(dataSource, srcDir, stopMe, evaluateOnly);
+    ParamUtil.assertNotNull("unmarshaller", unmarshaller);
+    this.unmarshaller = unmarshaller;
+  }
+
+  public void importToDB()
+  throws Exception {
+    CAConfigurationType caconf;
+    try {
+      @SuppressWarnings("unchecked")
+      JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
+          unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
+      caconf = root.getValue();
+    } catch (JAXBException e) {
+      throw XMLUtil.convert(e);
     }
 
-    public void importToDB()
-    throws Exception {
-        CAConfigurationType caconf;
+    if (caconf.getVersion() > VERSION) {
+      throw new InvalidInputException("could not import CA configuration greater than "
+          + VERSION + ": " + caconf.getVersion());
+    }
+
+    System.out.println("importing CA configuration to database");
+    try {
+      import_cmpcontrol(caconf.getCmpcontrols());
+      import_responder(caconf.getResponders());
+      import_environment(caconf.getEnvironments());
+      import_requestor(caconf.getRequestors());
+      import_publisher(caconf.getPublishers());
+      import_profile(caconf.getProfiles());
+      import_crlsigner(caconf.getCrlsigners());
+      import_ca(caconf.getCas());
+      import_caalias(caconf.getCaaliases());
+      import_ca_has_requestor(caconf.getCaHasRequestors());
+      import_ca_has_publisher(caconf.getCaHasPublishers());
+      import_ca_has_certprofile(caconf.getCaHasProfiles());
+      import_scep(caconf.getSceps());
+    } catch (Exception e) {
+      System.err.println("error while importing CA configuration to database. message: "
+          + e.getMessage());
+      throw e;
+    }
+    System.out.println(" imported CA configuration to database");
+  } // method importToDB
+
+  private void import_cmpcontrol(
+      final Cmpcontrols controls)
+  throws DataAccessException {
+    System.out.println("importing table CMPCONTROL");
+    final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
+
+    if (controls != null && CollectionUtil.isNotEmpty(controls.getCmpcontrol())) {
+      PreparedStatement ps = null;
+      try {
+        ps = prepareStatement(sql);
+
+        for (CmpcontrolType control : controls.getCmpcontrol()) {
+          try {
+            int idx = 1;
+            ps.setString(idx++, control.getName());
+            ps.setString(idx++, control.getConf());
+
+            ps.executeUpdate();
+          } catch (SQLException e) {
+            System.err.println("error while importing CMPCONTROL " + control.getName());
+            throw translate(sql, e);
+          }
+        }
+      } finally {
+        releaseResources(ps, null);
+      }
+    }
+    System.out.println(" imported table CMPCONTROL");
+  } // method import_cmpcontrol
+
+  private void import_responder(
+      final Responders responders)
+  throws DataAccessException, IOException {
+    System.out.println("importing table RESPONDER");
+    if (responders == null) {
+      System.out.println(" imported table RESPONDER: nothing to import");
+      return;
+    }
+    final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
+
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (ResponderType responder : responders.getResponder()) {
         try {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
-                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
-            caconf = root.getValue();
-        } catch (JAXBException e) {
-            throw XMLUtil.convert(e);
-        }
+          int idx = 1;
+          ps.setString(idx++, responder.getName());
+          ps.setString(idx++, responder.getType());
+          ps.setString(idx++, getValue(responder.getCert()));
+          ps.setString(idx++, getValue(responder.getConf()));
 
-        if (caconf.getVersion() > VERSION) {
-            throw new InvalidInputException("could not import CA configuration greater than "
-                    + VERSION + ": " + caconf.getVersion());
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CRLSIGNER with NAME="
+              + responder.getName());
+          throw translate(sql, e);
         }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
 
-        System.out.println("importing CA configuration to database");
+    System.out.println(" imported table RESPONDER");
+  } // method import_responder
+
+  private void import_environment(
+      final Environments environments)
+  throws DataAccessException {
+    System.out.println("importing table ENVIRONMENT");
+    final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+      for (EnvironmentType environment : environments.getEnvironment()) {
         try {
-            import_cmpcontrol(caconf.getCmpcontrols());
-            import_responder(caconf.getResponders());
-            import_environment(caconf.getEnvironments());
-            import_requestor(caconf.getRequestors());
-            import_publisher(caconf.getPublishers());
-            import_profile(caconf.getProfiles());
-            import_crlsigner(caconf.getCrlsigners());
-            import_ca(caconf.getCas());
-            import_caalias(caconf.getCaaliases());
-            import_ca_has_requestor(caconf.getCaHasRequestors());
-            import_ca_has_publisher(caconf.getCaHasPublishers());
-            import_ca_has_certprofile(caconf.getCaHasProfiles());
-            import_scep(caconf.getSceps());
-        } catch (Exception e) {
-            System.err.println("error while importing CA configuration to database. message: "
-                    + e.getMessage());
-            throw e;
+          int idx = 1;
+          ps.setString(idx++, environment.getName());
+          ps.setString(idx++, environment.getValue());
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing ENVIRONMENT with NAME="
+              + environment.getName());
+          throw translate(sql, e);
         }
-        System.out.println(" imported CA configuration to database");
-    } // method importToDB
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table ENVIRONMENT");
+  } // method import_environment
 
-    private void import_cmpcontrol(
-            final Cmpcontrols controls)
-    throws DataAccessException {
-        System.out.println("importing table CMPCONTROL");
-        final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
+  private void import_crlsigner(
+      final Crlsigners crlsigners)
+  throws DataAccessException, IOException {
+    System.out.println("importing table CRLSIGNER");
+    final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL,"
+        + " SIGNER_CONF) VALUES (?, ?, ?, ?, ?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
 
-        if (controls != null && CollectionUtil.isNotEmpty(controls.getCmpcontrol())) {
-            PreparedStatement ps = null;
-            try {
-                ps = prepareStatement(sql);
-
-                for (CmpcontrolType control : controls.getCmpcontrol()) {
-                    try {
-                        int idx = 1;
-                        ps.setString(idx++, control.getName());
-                        ps.setString(idx++, control.getConf());
-
-                        ps.executeUpdate();
-                    } catch (SQLException e) {
-                        System.err.println("error while importing CMPCONTROL " + control.getName());
-                        throw translate(sql, e);
-                    }
-                }
-            } finally {
-                releaseResources(ps, null);
-            }
-        }
-        System.out.println(" imported table CMPCONTROL");
-    } // method import_cmpcontrol
-
-    private void import_responder(
-            final Responders responders)
-    throws DataAccessException, IOException {
-        System.out.println("importing table RESPONDER");
-        if (responders == null) {
-            System.out.println(" imported table RESPONDER: nothing to import");
-            return;
-        }
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
-
-        PreparedStatement ps = null;
+      for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
         try {
-            ps = prepareStatement(sql);
-
-            for (ResponderType responder : responders.getResponder()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, responder.getName());
-                    ps.setString(idx++, responder.getType());
-                    ps.setString(idx++, getValue(responder.getCert()));
-                    ps.setString(idx++, getValue(responder.getConf()));
-
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CRLSIGNER with NAME="
-                            + responder.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, crlsigner.getName());
+          ps.setString(idx++, crlsigner.getSignerType());
+          ps.setString(idx++, getValue(crlsigner.getSignerCert()));
+          ps.setString(idx++, crlsigner.getCrlControl());
+          ps.setString(idx++, getValue(crlsigner.getSignerConf()));
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CRLSIGNER with NAME="
+              + crlsigner.getName());
+          throw translate(sql, e);
         }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CRLSIGNER");
+  } // method import_crlsigner
 
-        System.out.println(" imported table RESPONDER");
-    } // method import_responder
+  private void import_requestor(
+      final Requestors requestors)
+  throws DataAccessException, IOException {
+    System.out.println("importing table REQUESTOR");
+    final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
 
-    private void import_environment(
-            final Environments environments)
-    throws DataAccessException {
-        System.out.println("importing table ENVIRONMENT");
-        final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
-        PreparedStatement ps = null;
+      for (RequestorType requestor : requestors.getRequestor()) {
         try {
-            ps = prepareStatement(sql);
-            for (EnvironmentType environment : environments.getEnvironment()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, environment.getName());
-                    ps.setString(idx++, environment.getValue());
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing ENVIRONMENT with NAME="
-                            + environment.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
-        }
-        System.out.println(" imported table ENVIRONMENT");
-    } // method import_environment
+          int idx = 1;
+          ps.setString(idx++, requestor.getName());
+          ps.setString(idx++, getValue(requestor.getCert()));
 
-    private void import_crlsigner(
-            final Crlsigners crlsigners)
-    throws DataAccessException, IOException {
-        System.out.println("importing table CRLSIGNER");
-        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL,"
-                + " SIGNER_CONF) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = null;
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing REQUESTOR with NAME="
+              + requestor.getName());
+          throw translate(sql, e);
+        }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table REQUESTOR");
+  } // method import_requestor
+
+  private void import_publisher(
+      final Publishers publishers)
+  throws DataAccessException, IOException {
+    System.out.println("importing table PUBLISHER");
+    final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+      for (PublisherType publisher : publishers.getPublisher()) {
         try {
-            ps = prepareStatement(sql);
+          int idx = 1;
+          ps.setString(idx++, publisher.getName());
+          ps.setString(idx++, publisher.getType());
+          ps.setString(idx++, getValue(publisher.getConf()));
 
-            for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, crlsigner.getName());
-                    ps.setString(idx++, crlsigner.getSignerType());
-                    ps.setString(idx++, getValue(crlsigner.getSignerCert()));
-                    ps.setString(idx++, crlsigner.getCrlControl());
-                    ps.setString(idx++, getValue(crlsigner.getSignerConf()));
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CRLSIGNER with NAME="
-                            + crlsigner.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing PUBLISHER with NAME="
+              + publisher.getName());
+          throw translate(sql, e);
         }
-        System.out.println(" imported table CRLSIGNER");
-    } // method import_crlsigner
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table PUBLISHER");
+  } // method import_publisher
 
-    private void import_requestor(
-            final Requestors requestors)
-    throws DataAccessException, IOException {
-        System.out.println("importing table REQUESTOR");
-        final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
-        PreparedStatement ps = null;
+  private void import_profile(
+      final Profiles profiles)
+  throws DataAccessException, IOException {
+    System.out.println("importing table PROFILE");
+    final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+      for (ProfileType certprofile : profiles.getProfile()) {
         try {
-            ps = prepareStatement(sql);
+          int idx = 1;
+          ps.setString(idx++, certprofile.getName());
+          int art = (certprofile.getArt() == null)
+              ? 1
+              : certprofile.getArt();
+          ps.setInt(idx++, art);
+          ps.setString(idx++, certprofile.getType());
 
-            for (RequestorType requestor : requestors.getRequestor()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, requestor.getName());
-                    ps.setString(idx++, getValue(requestor.getCert()));
+          String conf = getValue(certprofile.getConf());
+          ps.setString(idx++, conf);
 
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing REQUESTOR with NAME="
-                            + requestor.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing PROFILE with NAME="
+              + certprofile.getName());
+          throw translate(sql, e);
+        } catch (IOException e) {
+          System.err.println("error while importing PROFILE with NAME="
+              + certprofile.getName());
+          throw e;
         }
-        System.out.println(" imported table REQUESTOR");
-    } // method import_requestor
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table PROFILE");
+  } // method import_profile
 
-    private void import_publisher(
-            final Publishers publishers)
-    throws DataAccessException, IOException {
-        System.out.println("importing table PUBLISHER");
-        final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
-        PreparedStatement ps = null;
+  private void import_ca(
+      final Cas cas)
+  throws DataAccessException, CertificateException, IOException {
+    System.out.println("importing table CA");
+    StringBuilder sqlBuilder = new StringBuilder();
+    sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS,");
+    sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
+    sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
+    sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS,");
+    sqlBuilder.append(" NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS,");
+    sqlBuilder.append(" REV, RR, RT, RIT, VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF)");
+    sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,");
+    sqlBuilder.append(" ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    final String sql = sqlBuilder.toString();
+
+    PreparedStatement ps = null;
+    try {
+      ps = prepareStatement(sql);
+
+      for (CaType ca : cas.getCa()) {
+        int art = (ca.getArt() == null)
+            ? 1
+            : ca.getArt();
+
         try {
-            ps = prepareStatement(sql);
-            for (PublisherType publisher : publishers.getPublisher()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, publisher.getName());
-                    ps.setString(idx++, publisher.getType());
-                    ps.setString(idx++, getValue(publisher.getConf()));
+          String b64Cert = getValue(ca.getCert());
+          X509Certificate c = X509Util.parseCert(Base64.decode(b64Cert));
 
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing PUBLISHER with NAME="
-                            + publisher.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, ca.getName().toUpperCase());
+          ps.setInt(idx++, art);
+          ps.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(),
+              maxX500nameLen));
+          ps.setLong(idx++, ca.getNextSerial());
+          ps.setInt(idx++, ca.getNextCrlNo());
+          ps.setString(idx++, ca.getStatus());
+          ps.setString(idx++, ca.getCrlUris());
+          ps.setString(idx++, ca.getDeltacrlUris());
+          ps.setString(idx++, ca.getOcspUris());
+          ps.setString(idx++, ca.getCacertUris());
+          ps.setString(idx++, ca.getMaxValidity());
+          ps.setString(idx++, b64Cert);
+          ps.setString(idx++, ca.getSignerType());
+          ps.setString(idx++, ca.getCrlsignerName());
+          ps.setString(idx++, ca.getResponderName());
+          ps.setString(idx++, ca.getCmpcontrolName());
+          ps.setInt(idx++, ca.getDuplicateKey());
+          ps.setInt(idx++, ca.getDuplicateSubject());
+          ps.setString(idx++, ca.getPermissions());
+          Integer numCrls = ca.getNumCrls();
+          int tNumCrls = (numCrls == null)
+              ? 30
+              : numCrls.intValue();
+          ps.setInt(idx++, tNumCrls);
+          ps.setInt(idx++, ca.getExpirationPeriod());
+          ps.setInt(idx++, ca.getKeepExpiredCertDays());
+          setBoolean(ps, idx++, ca.isRevoked());
+          setInt(ps, idx++, ca.getRevReason());
+          setLong(ps, idx++, ca.getRevTime());
+          setLong(ps, idx++, ca.getRevInvTime());
+          ps.setString(idx++, ca.getValidityMode());
+          ps.setString(idx++, ca.getExtraControl());
+          ps.setString(idx++, getValue(ca.getSignerConf()));
+
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CA with NAME=" + ca.getName());
+          throw translate(sql, e);
+        } catch (CertificateException | IOException e) {
+          System.err.println("error while importing CA with NAME=" + ca.getName());
+          throw e;
         }
-        System.out.println(" imported table PUBLISHER");
-    } // method import_publisher
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
 
-    private void import_profile(
-            final Profiles profiles)
-    throws DataAccessException, IOException {
-        System.out.println("importing table PROFILE");
-        final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
-        PreparedStatement ps = null;
+    System.out.println(" imported table CA");
+  } // method import_ca
+
+  private void import_caalias(
+      final Caaliases caaliases)
+  throws DataAccessException {
+    System.out.println("importing table CAALIAS");
+    final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (CaaliasType caalias : caaliases.getCaalias()) {
         try {
-            ps = prepareStatement(sql);
-            for (ProfileType certprofile : profiles.getProfile()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, certprofile.getName());
-                    int art = (certprofile.getArt() == null)
-                            ? 1
-                            : certprofile.getArt();
-                    ps.setInt(idx++, art);
-                    ps.setString(idx++, certprofile.getType());
-
-                    String conf = getValue(certprofile.getConf());
-                    ps.setString(idx++, conf);
-
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing PROFILE with NAME="
-                            + certprofile.getName());
-                    throw translate(sql, e);
-                } catch (IOException e) {
-                    System.err.println("error while importing PROFILE with NAME="
-                            + certprofile.getName());
-                    throw e;
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, caalias.getName());
+          ps.setString(idx++, caalias.getCaName().toUpperCase());
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CAALIAS with NAME="
+              + caalias.getName());
+          throw translate(sql, e);
         }
-        System.out.println(" imported table PROFILE");
-    } // method import_profile
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CAALIAS");
+  } // method import_caalias
 
-    private void import_ca(
-            final Cas cas)
-    throws DataAccessException, CertificateException, IOException {
-        System.out.println("importing table CA");
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS,");
-        sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
-        sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
-        sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS,");
-        sqlBuilder.append(" NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS,");
-        sqlBuilder.append(" REV, RR, RT, RIT, VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,");
-        sqlBuilder.append(" ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
+  private void import_ca_has_requestor(
+      final CaHasRequestors ca_has_requestors)
+  throws DataAccessException {
+    System.out.println("importing table CA_HAS_REQUESTOR");
+    final String sql =
+        "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES)"
+        + " VALUES (?, ?, ?, ?, ?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (CaHasRequestorType entry : ca_has_requestors.getCaHasRequestor()) {
         try {
-            ps = prepareStatement(sql);
+          int idx = 1;
+          ps.setString(idx++, entry.getCaName().toUpperCase());
+          ps.setString(idx++, entry.getRequestorName());
+          setBoolean(ps, idx++, entry.isRa());
+          ps.setString(idx++, entry.getPermissions());
+          ps.setString(idx++, entry.getProfiles());
 
-            for (CaType ca : cas.getCa()) {
-                int art = (ca.getArt() == null)
-                        ? 1
-                        : ca.getArt();
-
-                try {
-                    String b64Cert = getValue(ca.getCert());
-                    X509Certificate c = X509Util.parseCert(Base64.decode(b64Cert));
-
-                    int idx = 1;
-                    ps.setString(idx++, ca.getName().toUpperCase());
-                    ps.setInt(idx++, art);
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(),
-                            maxX500nameLen));
-                    ps.setLong(idx++, ca.getNextSerial());
-                    ps.setInt(idx++, ca.getNextCrlNo());
-                    ps.setString(idx++, ca.getStatus());
-                    ps.setString(idx++, ca.getCrlUris());
-                    ps.setString(idx++, ca.getDeltacrlUris());
-                    ps.setString(idx++, ca.getOcspUris());
-                    ps.setString(idx++, ca.getCacertUris());
-                    ps.setString(idx++, ca.getMaxValidity());
-                    ps.setString(idx++, b64Cert);
-                    ps.setString(idx++, ca.getSignerType());
-                    ps.setString(idx++, ca.getCrlsignerName());
-                    ps.setString(idx++, ca.getResponderName());
-                    ps.setString(idx++, ca.getCmpcontrolName());
-                    ps.setInt(idx++, ca.getDuplicateKey());
-                    ps.setInt(idx++, ca.getDuplicateSubject());
-                    ps.setString(idx++, ca.getPermissions());
-                    Integer numCrls = ca.getNumCrls();
-                    int tNumCrls = (numCrls == null)
-                            ? 30
-                            : numCrls.intValue();
-                    ps.setInt(idx++, tNumCrls);
-                    ps.setInt(idx++, ca.getExpirationPeriod());
-                    ps.setInt(idx++, ca.getKeepExpiredCertDays());
-                    setBoolean(ps, idx++, ca.isRevoked());
-                    setInt(ps, idx++, ca.getRevReason());
-                    setLong(ps, idx++, ca.getRevTime());
-                    setLong(ps, idx++, ca.getRevInvTime());
-                    ps.setString(idx++, ca.getValidityMode());
-                    ps.setString(idx++, ca.getExtraControl());
-                    ps.setString(idx++, getValue(ca.getSignerConf()));
-
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CA with NAME=" + ca.getName());
-                    throw translate(sql, e);
-                } catch (CertificateException | IOException e) {
-                    System.err.println("error while importing CA with NAME=" + ca.getName());
-                    throw e;
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CA_HAS_REQUESTOR with CA_NAME="
+              + entry.getCaName()
+              + " and requestor_name=" + entry.getRequestorName());
+          throw translate(sql, e);
         }
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CA_HAS_REQUESTOR");
+  } // method import_ca_has_requestor
 
-        System.out.println(" imported table CA");
-    } // method import_ca
-
-    private void import_caalias(
-            final Caaliases caaliases)
-    throws DataAccessException {
-        System.out.println("importing table CAALIAS");
-        final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
-        PreparedStatement ps = prepareStatement(sql);
+  private void import_ca_has_publisher(
+      final CaHasPublishers ca_has_publishers)
+  throws Exception {
+    System.out.println("importing table CA_HAS_PUBLISHER");
+    final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (CaHasPublisherType entry : ca_has_publishers.getCaHasPublisher()) {
         try {
-            for (CaaliasType caalias : caaliases.getCaalias()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, caalias.getName());
-                    ps.setString(idx++, caalias.getCaName().toUpperCase());
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CAALIAS with NAME="
-                            + caalias.getName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, entry.getCaName().toUpperCase());
+          ps.setString(idx++, entry.getPublisherName());
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CA_HAS_PUBLISHER with CA_NAME="
+              + entry.getCaName()
+              + " and publisher_name=" + entry.getPublisherName());
+          throw translate(sql, e);
         }
-        System.out.println(" imported table CAALIAS");
-    } // method import_caalias
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CA_HAS_PUBLISHER");
+  } // method import_ca_has_publisher
 
-    private void import_ca_has_requestor(
-            final CaHasRequestors ca_has_requestors)
-    throws DataAccessException {
-        System.out.println("importing table CA_HAS_REQUESTOR");
-        final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES)"
-                + " VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = prepareStatement(sql);
+  private void import_ca_has_certprofile(
+      final CaHasProfiles ca_has_certprofiles)
+  throws DataAccessException {
+    System.out.println("importing table CA_HAS_PROFILE");
+    final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
+        + " VALUES (?, ?, ?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (CaHasProfileType entry : ca_has_certprofiles.getCaHasProfile()) {
         try {
-            for (CaHasRequestorType entry : ca_has_requestors.getCaHasRequestor()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
-                    ps.setString(idx++, entry.getRequestorName());
-                    setBoolean(ps, idx++, entry.isRa());
-                    ps.setString(idx++, entry.getPermissions());
-                    ps.setString(idx++, entry.getProfiles());
-
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CA_HAS_REQUESTOR with CA_NAME="
-                            + entry.getCaName()
-                            + " and requestor_name=" + entry.getRequestorName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, entry.getCaName().toUpperCase());
+          ps.setString(idx++, entry.getProfileName());
+          ps.setString(idx++, entry.getProfileLocalname());
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing CA_HAS_PROFILE with CA_NAME="
+              + entry.getCaName()
+              + ", profile_name=" + entry.getProfileName()
+              + " and profile_localname=" + entry.getProfileLocalname());
+          throw translate(sql, e);
         }
-        System.out.println(" imported table CA_HAS_REQUESTOR");
-    } // method import_ca_has_requestor
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table CA_HAS_PROFILE");
+  } // method import_ca_has_certprofile
 
-    private void import_ca_has_publisher(
-            final CaHasPublishers ca_has_publishers)
-    throws Exception {
-        System.out.println("importing table CA_HAS_PUBLISHER");
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
-        PreparedStatement ps = prepareStatement(sql);
+  private void import_scep(
+      final Sceps sceps)
+  throws DataAccessException, IOException {
+    System.out.println("importing table SCEP");
+    final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, "
+        + "RESPONDER_CERT, CONTROL, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
+    PreparedStatement ps = prepareStatement(sql);
+    try {
+      for (ScepType entry : sceps.getScep()) {
         try {
-            for (CaHasPublisherType entry : ca_has_publishers.getCaHasPublisher()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
-                    ps.setString(idx++, entry.getPublisherName());
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CA_HAS_PUBLISHER with CA_NAME="
-                            + entry.getCaName()
-                            + " and publisher_name=" + entry.getPublisherName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
+          int idx = 1;
+          ps.setString(idx++, entry.getCaName().toUpperCase());
+          ps.setString(idx++, entry.getResponderType());
+          ps.setString(idx++, getValue(entry.getResponderCert()));
+          ps.setString(idx++, entry.getControl());
+          ps.setString(idx++, getValue(entry.getResponderConf()));
+          ps.executeUpdate();
+        } catch (SQLException e) {
+          System.err.println("error while importing SCEP with NAME=" + entry.getCaName());
+          throw translate(sql, e);
         }
-        System.out.println(" imported table CA_HAS_PUBLISHER");
-    } // method import_ca_has_publisher
-
-    private void import_ca_has_certprofile(
-            final CaHasProfiles ca_has_certprofiles)
-    throws DataAccessException {
-        System.out.println("importing table CA_HAS_PROFILE");
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
-                + " VALUES (?, ?, ?)";
-        PreparedStatement ps = prepareStatement(sql);
-        try {
-            for (CaHasProfileType entry : ca_has_certprofiles.getCaHasProfile()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
-                    ps.setString(idx++, entry.getProfileName());
-                    ps.setString(idx++, entry.getProfileLocalname());
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing CA_HAS_PROFILE with CA_NAME="
-                            + entry.getCaName()
-                            + ", profile_name=" + entry.getProfileName()
-                            + " and profile_localname=" + entry.getProfileLocalname());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
-        }
-        System.out.println(" imported table CA_HAS_PROFILE");
-    } // method import_ca_has_certprofile
-
-    private void import_scep(
-            final Sceps sceps)
-    throws DataAccessException, IOException {
-        System.out.println("importing table SCEP");
-        final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, "
-                + "RESPONDER_CERT, CONTROL, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement ps = prepareStatement(sql);
-        try {
-            for (ScepType entry : sceps.getScep()) {
-                try {
-                    int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
-                    ps.setString(idx++, entry.getResponderType());
-                    ps.setString(idx++, getValue(entry.getResponderCert()));
-                    ps.setString(idx++, entry.getControl());
-                    ps.setString(idx++, getValue(entry.getResponderConf()));
-                    ps.executeUpdate();
-                } catch (SQLException e) {
-                    System.err.println("error while importing SCEP with NAME=" + entry.getCaName());
-                    throw translate(sql, e);
-                }
-            }
-        } finally {
-            releaseResources(ps, null);
-        }
-        System.out.println(" imported table SCEP");
-    } // method import_scep
+      }
+    } finally {
+      releaseResources(ps, null);
+    }
+    System.out.println(" imported table SCEP");
+  } // method import_scep
 
 }

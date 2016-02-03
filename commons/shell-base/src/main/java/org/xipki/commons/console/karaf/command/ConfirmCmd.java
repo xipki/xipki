@@ -43,29 +43,30 @@ import org.xipki.commons.console.karaf.XipkiCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-cmd", name = "confirm",
-        description = "prompt")
+    description = "prompt")
 @Service
 public class ConfirmCmd extends XipkiCommandSupport {
 
-    @Argument(index = 0, name = "message",
-            required = true,
-            description = "prompt message\n"
-                    + "(required)")
-    private String prompt;
+  @Argument(index = 0, name = "message",
+      required = true,
+      description = "prompt message\n"
+          + "(required)")
+  private String prompt;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean toContinue = confirm(
-                prompt + "\nDo you want to contine [yes/no]?", 3);
-        if (!toContinue) {
-            throw new CmdFailure("User cancelled");
-        }
-
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean toContinue = confirm(
+        prompt + "\nDo you want to contine [yes/no]?", 3);
+    if (!toContinue) {
+      throw new CmdFailure("User cancelled");
     }
+
+    return null;
+  }
 
 }

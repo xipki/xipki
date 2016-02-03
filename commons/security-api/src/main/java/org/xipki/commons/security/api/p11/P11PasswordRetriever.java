@@ -41,12 +41,13 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface P11PasswordRetriever {
 
-    List<char[]> getPassword(
-            P11SlotIdentifier slotId)
-    throws PasswordResolverException;
+  List<char[]> getPassword(
+      P11SlotIdentifier slotId)
+  throws PasswordResolverException;
 
 }

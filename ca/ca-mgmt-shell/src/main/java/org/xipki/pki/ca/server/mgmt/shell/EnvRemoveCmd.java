@@ -41,22 +41,23 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "env-rm",
-        description = "remove CA environment parameter")
+    description = "remove CA environment parameter")
 @Service
 public class EnvRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
-    private String name;
+  @Argument(index = 0, name = "name", description = "environment parameter name", required = true)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeEnvParam(name);
-        output(b, "removed", "could not remove", "environment parameter " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeEnvParam(name);
+    output(b, "removed", "could not remove", "environment parameter " + name);
+    return null;
+  }
 
 }

@@ -44,53 +44,54 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class CaCommandSupport extends XipkiCommandSupport {
 
-    @Reference
-    protected CAManager caManager;
+  @Reference
+  protected CAManager caManager;
 
-    protected static String getRealString(
-            final String s) {
-        return CAManager.NULL.equalsIgnoreCase(s)
-                ? null
-                : s;
+  protected static String getRealString(
+      final String s) {
+    return CAManager.NULL.equalsIgnoreCase(s)
+        ? null
+        : s;
+  }
+
+  protected static String toString(
+      final Collection<? extends Object> c) {
+    if (c == null) {
+      return "null";
     }
 
-    protected static String toString(
-            final Collection<? extends Object> c) {
-        if (c == null) {
-            return "null";
-        }
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    int n = c.size();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        int n = c.size();
-
-        int i = 0;
-        for (Object o : c) {
-            sb.append(o);
-            if (i < n - 1) {
-                sb.append(", ");
-            }
-            i++;
-        }
-        sb.append("}");
-        return sb.toString();
+    int i = 0;
+    for (Object o : c) {
+      sb.append(o);
+      if (i < n - 1) {
+        sb.append(", ");
+      }
+      i++;
     }
+    sb.append("}");
+    return sb.toString();
+  }
 
-    protected void output(
-            final boolean successful,
-            final String posPrefix,
-            final String negPrefix,
-            final String message)
-    throws CmdFailure {
-        if (successful) {
-            out(posPrefix + " " + message);
-        } else {
-            throw new CmdFailure(negPrefix + " " + message);
-        }
+  protected void output(
+      final boolean successful,
+      final String posPrefix,
+      final String negPrefix,
+      final String message)
+  throws CmdFailure {
+    if (successful) {
+      out(posPrefix + " " + message);
+    } else {
+      throw new CmdFailure(negPrefix + " " + message);
     }
+  }
 
 }

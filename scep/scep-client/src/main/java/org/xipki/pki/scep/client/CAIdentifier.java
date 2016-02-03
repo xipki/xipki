@@ -46,96 +46,97 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CAIdentifier {
 
-    private final String url;
+  private final String url;
 
-    private final String profile;
+  private final String profile;
 
-    public CAIdentifier(
-            final String serverUrl,
-            final String profile)
-    throws MalformedURLException {
-        URL url = new URL(serverUrl);
-        final String protocol = url.getProtocol();
-        if (!protocol.equalsIgnoreCase("http")
-                && !protocol.equalsIgnoreCase("https")) {
-            throw new IllegalArgumentException(
-                    "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
-        }
-
-        if (url.getQuery() != null) {
-            throw new IllegalArgumentException("URL should contain no query string");
-        }
-
-        this.url = serverUrl;
-        this.profile = profile;
+  public CAIdentifier(
+      final String serverUrl,
+      final String profile)
+  throws MalformedURLException {
+    URL url = new URL(serverUrl);
+    final String protocol = url.getProtocol();
+    if (!protocol.equalsIgnoreCase("http")
+        && !protocol.equalsIgnoreCase("https")) {
+      throw new IllegalArgumentException(
+          "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
     }
 
-    public String getUrl() {
-        return url;
+    if (url.getQuery() != null) {
+      throw new IllegalArgumentException("URL should contain no query string");
     }
 
-    public String getProfile() {
-        return profile;
-    }
+    this.url = serverUrl;
+    this.profile = profile;
+  }
 
-    public String buildGetUrl(
-            final Operation operation)
-    throws TransactionException {
-        return buildGetUrl(operation, null);
-    }
+  public String getUrl() {
+    return url;
+  }
 
-    @SuppressWarnings("deprecation")
-    public String buildGetUrl(
-            final Operation operation,
-            final String message) {
-        StringBuilder ub = new StringBuilder(url);
-        ub.append('?').append("operation=").append(operation.getCode());
-        if (!ScepUtil.isBlank(message)) {
-            String _urlMessage;
-            try {
-                _urlMessage = URLEncoder.encode(message, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                _urlMessage = URLEncoder.encode(message);
-            }
-            ub.append("&message=").append(_urlMessage);
-        }
-        return ub.toString();
-    }
+  public String getProfile() {
+    return profile;
+  }
 
-    public String buildPostUrl(
-            final Operation operation) {
-        StringBuilder ub = new StringBuilder(url);
-        ub.append('?').append("operation=").append(operation.getCode());
-        return ub.toString();
-    }
+  public String buildGetUrl(
+      final Operation operation)
+  throws TransactionException {
+    return buildGetUrl(operation, null);
+  }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("URL: ").append(url);
-        if (ScepUtil.isNotBlank(profile)) {
-            sb.append(", CA-Ident: ").append(profile);
-        }
-        return sb.toString();
+  @SuppressWarnings("deprecation")
+  public String buildGetUrl(
+      final Operation operation,
+      final String message) {
+    StringBuilder ub = new StringBuilder(url);
+    ub.append('?').append("operation=").append(operation.getCode());
+    if (!ScepUtil.isBlank(message)) {
+      String _urlMessage;
+      try {
+        _urlMessage = URLEncoder.encode(message, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        _urlMessage = URLEncoder.encode(message);
+      }
+      ub.append("&message=").append(_urlMessage);
     }
+    return ub.toString();
+  }
 
-    @Override
-    public boolean equals(
-            final Object object) {
-        if (object instanceof CAIdentifier) {
-            CAIdentifier b = (CAIdentifier) object;
-            return url == b.url && profile == b.profile;
-        }
-        return false;
-    }
+  public String buildPostUrl(
+      final Operation operation) {
+    StringBuilder ub = new StringBuilder(url);
+    ub.append('?').append("operation=").append(operation.getCode());
+    return ub.toString();
+  }
 
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("URL: ").append(url);
+    if (ScepUtil.isNotBlank(profile)) {
+      sb.append(", CA-Ident: ").append(profile);
     }
+    return sb.toString();
+  }
+
+  @Override
+  public boolean equals(
+      final Object object) {
+    if (object instanceof CAIdentifier) {
+      CAIdentifier b = (CAIdentifier) object;
+      return url == b.url && profile == b.profile;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
 
 }

@@ -41,22 +41,23 @@ import org.xipki.commons.password.PBEPasswordResolver;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "pbe-enc",
-        description = "encrypt password with master password")
+    description = "encrypt password with master password")
 @Service
 public class PBEEncryptCmd extends SecurityCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        char[] masterPassword = readPassword("Please enter the master password");
-        char[] password = readPassword("Please enter the password");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    char[] masterPassword = readPassword("Please enter the master password");
+    char[] password = readPassword("Please enter the password");
 
-        String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
-        out("the encrypted password is: '" + passwordHint + "'");
-        return null;
-    }
+    String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
+    out("the encrypted password is: '" + passwordHint + "'");
+    return null;
+  }
 
 }

@@ -42,18 +42,19 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "gencrl",
-        description = "generate CRL")
+    description = "generate CRL")
 @Service
 public class GenCRLCmd extends CRLCommandSupport {
 
-    @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
-    throws Exception {
-        return caManager.generateCRLonDemand(caName);
-    }
+  @Override
+  protected X509CRL retrieveCRL(
+      final String caName)
+  throws Exception {
+    return caManager.generateCRLonDemand(caName);
+  }
 
 }

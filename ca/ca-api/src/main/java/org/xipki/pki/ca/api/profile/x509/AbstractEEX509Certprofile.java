@@ -37,18 +37,19 @@ package org.xipki.pki.ca.api.profile.x509;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class AbstractEEX509Certprofile extends BaseX509Certprofile {
 
-    @Override
-    public boolean isCA() {
-        return false;
-    }
+  @Override
+  public boolean isCA() {
+    return false;
+  }
 
-    @Override
-    public Integer getPathLenBasicConstraint() {
-        return null;
-    }
+  @Override
+  public Integer getPathLenBasicConstraint() {
+    return null;
+  }
 
 }

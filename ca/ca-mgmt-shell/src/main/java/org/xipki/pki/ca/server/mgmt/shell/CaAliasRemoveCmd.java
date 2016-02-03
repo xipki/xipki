@@ -43,23 +43,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "caalias-rm",
-        description = "remove CA alias")
+    description = "remove CA alias")
 @Service
 public class CaAliasRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "alias", description = "CA alias", required = true)
-    @Completion(CaAliasCompleter.class)
-    private String caAlias;
+  @Argument(index = 0, name = "alias", description = "CA alias", required = true)
+  @Completion(CaAliasCompleter.class)
+  private String caAlias;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCaAlias(caAlias);
-        output(b, "removed", "could not remove", "CA alias " + caAlias);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCaAlias(caAlias);
+    output(b, "removed", "could not remove", "CA alias " + caAlias);
+    return null;
+  }
 
 }

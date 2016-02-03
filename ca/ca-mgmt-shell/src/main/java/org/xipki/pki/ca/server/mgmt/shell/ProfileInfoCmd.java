@@ -49,55 +49,56 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "profile-info",
-        description = "show information of certifiate profile")
+    description = "show information of certifiate profile")
 @Service
 public class ProfileInfoCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "certificate profile name")
-    private String name;
+  @Argument(index = 0, name = "name", description = "certificate profile name")
+  private String name;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show certificate profile information verbosely")
-    private Boolean verbose = Boolean.FALSE;
+  @Option(name = "--verbose", aliases = "-v",
+      description = "show certificate profile information verbosely")
+  private Boolean verbose = Boolean.FALSE;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> names = caManager.getCertprofileNames();
-            int n = names.size();
+    if (name == null) {
+      Set<String> names = caManager.getCertprofileNames();
+      int n = names.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
-                        ? "no"
-                        : "1");
-                sb.append(" profile is configured\n");
-            } else {
-                sb.append(n).append(" profiles are configured:\n");
-            }
+      if (n == 0 || n == 1) {
+        sb.append((n == 0)
+            ? "no"
+            : "1");
+        sb.append(" profile is configured\n");
+      } else {
+        sb.append(n).append(" profiles are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(names);
+      Collections.sort(sorted);
 
-            for (String name : sorted) {
-                sb.append("\t").append(name).append("\n");
-            }
-        } else {
-            CertprofileEntry entry = caManager.getCertprofile(name);
-            if (entry == null) {
-                throw new UnexpectedException("\tno certprofile named '" + name + " is configured");
-            } else {
-                sb.append(entry.toString(verbose));
-            }
-        }
+      for (String name : sorted) {
+        sb.append("\t").append(name).append("\n");
+      }
+    } else {
+      CertprofileEntry entry = caManager.getCertprofile(name);
+      if (entry == null) {
+        throw new UnexpectedException("\tno certprofile named '" + name + " is configured");
+      } else {
+        sb.append(entry.toString(verbose));
+      }
+    }
 
-        out(sb.toString());
-        return null;
-    } // method doExecute
+    out(sb.toString());
+    return null;
+  } // method doExecute
 
 }

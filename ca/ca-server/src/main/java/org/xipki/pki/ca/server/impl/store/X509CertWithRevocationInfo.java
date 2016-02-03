@@ -40,48 +40,49 @@ import org.xipki.pki.ca.api.X509CertWithDBCertId;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class X509CertWithRevocationInfo {
 
-    private X509CertWithDBCertId cert;
+  private X509CertWithDBCertId cert;
 
-    private CertRevocationInfo revInfo;
+  private CertRevocationInfo revInfo;
 
-    private String certprofile;
+  private String certprofile;
 
-    public X509CertWithRevocationInfo() {
-    }
+  public X509CertWithRevocationInfo() {
+  }
 
-    public X509CertWithDBCertId getCert() {
-        return cert;
-    }
+  public X509CertWithDBCertId getCert() {
+    return cert;
+  }
 
-    public boolean isRevoked() {
-        return revInfo != null;
-    }
+  public boolean isRevoked() {
+    return revInfo != null;
+  }
 
-    public CertRevocationInfo getRevInfo() {
-        return revInfo;
-    }
+  public CertRevocationInfo getRevInfo() {
+    return revInfo;
+  }
 
-    public void setCert(
-            final X509CertWithDBCertId cert) {
-        this.cert = cert;
-    }
+  public void setCert(
+      final X509CertWithDBCertId cert) {
+    this.cert = cert;
+  }
 
-    public void setRevInfo(
-            final CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
-    }
+  public void setRevInfo(
+      final CertRevocationInfo revInfo) {
+    this.revInfo = revInfo;
+  }
 
-    public String getCertprofile() {
-        return certprofile;
-    }
+  public String getCertprofile() {
+    return certprofile;
+  }
 
-    public void setCertprofile(
-            final String certprofile) {
-        this.certprofile = certprofile;
-    }
+  public void setCertprofile(
+      final String certprofile) {
+    this.certprofile = certprofile;
+  }
 
 }

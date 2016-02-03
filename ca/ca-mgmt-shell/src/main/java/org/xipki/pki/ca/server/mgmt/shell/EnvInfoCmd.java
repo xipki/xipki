@@ -47,51 +47,52 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "env-info",
-        description = "show information of CA environment parameter")
+    description = "show information of CA environment parameter")
 @Service
 public class EnvInfoCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "environment parameter name")
-    private String name;
+  @Argument(index = 0, name = "name", description = "environment parameter name")
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        StringBuilder sb = new StringBuilder();
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    StringBuilder sb = new StringBuilder();
 
-        if (name == null) {
-            Set<String> paramNames = caManager.getEnvParamNames();
-            int n = paramNames.size();
+    if (name == null) {
+      Set<String> paramNames = caManager.getEnvParamNames();
+      int n = paramNames.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
-                        ? "no"
-                        : "1");
-                sb.append(" environment parameter is configured\n");
-            } else {
-                sb.append(n).append(" enviroment paramters are configured:\n");
-            }
+      if (n == 0 || n == 1) {
+        sb.append((n == 0)
+            ? "no"
+            : "1");
+        sb.append(" environment parameter is configured\n");
+      } else {
+        sb.append(n).append(" enviroment paramters are configured:\n");
+      }
 
-            List<String> sorted = new ArrayList<>(paramNames);
-            Collections.sort(sorted);
+      List<String> sorted = new ArrayList<>(paramNames);
+      Collections.sort(sorted);
 
-            for (String paramName : sorted) {
-                sb.append("\t").append(paramName).append("\n");
-            }
-        } else {
-            String paramValue = caManager.getEnvParam(name);
-            if (paramValue == null) {
-                throw new UnexpectedException("\tno environment named '" + name + " is configured");
-            } else {
-                sb.append(name).append("\n\t").append(paramValue);
-            }
-        }
+      for (String paramName : sorted) {
+        sb.append("\t").append(paramName).append("\n");
+      }
+    } else {
+      String paramValue = caManager.getEnvParam(name);
+      if (paramValue == null) {
+        throw new UnexpectedException("\tno environment named '" + name + " is configured");
+      } else {
+        sb.append(name).append("\n\t").append(paramValue);
+      }
+    }
 
-        out(sb.toString());
-        return null;
-    } // method doExecute
+    out(sb.toString());
+    return null;
+  } // method doExecute
 
 }

@@ -41,44 +41,45 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class DfltEnvParameterResolver implements EnvParameterResolver {
 
-    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
+  private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
-    public DfltEnvParameterResolver() {
-    }
+  public DfltEnvParameterResolver() {
+  }
 
-    @Override
-    public String getParameterValue(
-            final String parameterName) {
-        return envParameters.get(parameterName);
-    }
+  @Override
+  public String getParameterValue(
+      final String parameterName) {
+    return envParameters.get(parameterName);
+  }
 
-    @Override
-    public Set<String> getAllParameterNames() {
-        return envParameters.keySet();
-    }
+  @Override
+  public Set<String> getAllParameterNames() {
+    return envParameters.keySet();
+  }
 
-    public String getEnvParam(
-            final String name) {
-        return envParameters.get(name);
-    }
+  public String getEnvParam(
+      final String name) {
+    return envParameters.get(name);
+  }
 
-    public void addEnvParam(
-            final String name,
-            final String value) {
-        envParameters.put(name, value);
-    }
+  public void addEnvParam(
+      final String name,
+      final String value) {
+    envParameters.put(name, value);
+  }
 
-    public void clear() {
-        envParameters.clear();
-    }
+  public void clear() {
+    envParameters.clear();
+  }
 
-    public String removeEnvParam(
-            final String name) {
-        return envParameters.remove(name);
-    }
+  public String removeEnvParam(
+      final String name) {
+    return envParameters.remove(name);
+  }
 
 }

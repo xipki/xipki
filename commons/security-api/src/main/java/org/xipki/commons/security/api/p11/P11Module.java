@@ -41,14 +41,15 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface P11Module {
 
-    List<P11SlotIdentifier> getSlotIdentifiers();
+  List<P11SlotIdentifier> getSlotIdentifiers();
 
-    P11WritableSlot getSlot(
-            P11SlotIdentifier slotId)
-    throws SignerException;
+  P11WritableSlot getSlot(
+      P11SlotIdentifier slotId)
+  throws SignerException;
 
 }

@@ -42,27 +42,28 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class EjbcaCACertExtractor {
 
-    private EjbcaCACertExtractor() {
+  private EjbcaCACertExtractor() {
+  }
+
+  public static X509Certificate extractCACert(
+      final String caData)
+  throws Exception {
+    XMLDocumentReader cadataReader = new XMLDocumentReader(
+        new ByteArrayInputStream(caData.getBytes()), false);
+    final String XPATH_CERT =
+        "/java/object/void[string[position()=1]='certificatechain']/object/void"
+        + "/string[1]";
+    String b64Cert = cadataReader.getValue(XPATH_CERT);
+    if (b64Cert == null) {
+      throw new Exception("Could not extract CA certificate");
     }
 
-    public static X509Certificate extractCACert(
-            final String caData)
-    throws Exception {
-        XMLDocumentReader cadataReader = new XMLDocumentReader(
-                new ByteArrayInputStream(caData.getBytes()), false);
-        final String XPATH_CERT =
-                "/java/object/void[string[position()=1]='certificatechain']/object/void"
-                + "/string[1]";
-        String b64Cert = cadataReader.getValue(XPATH_CERT);
-        if (b64Cert == null) {
-            throw new Exception("Could not extract CA certificate");
-        }
-
-        return X509Util.parseBase64EncodedCert(b64Cert);
-    }
+    return X509Util.parseBase64EncodedCert(b64Cert);
+  }
 
 }

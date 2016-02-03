@@ -43,37 +43,38 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "publisher-check",
-        description = "check information of publishers (QA)")
+    description = "check information of publishers (QA)")
 @Service
 public class PublisherCheckCmd extends PublisherUpdateCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("checking publisher " + name);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("checking publisher " + name);
 
-        PublisherEntry cp = caManager.getPublisher(name);
-        if (cp == null) {
-            throw new CmdFailure("publisher named '" + name + "' is not configured");
-        }
-
-        if (cp.getType() != null) {
-            String ex = type;
-            String is = cp.getType();
-            MgmtQAShellUtil.assertEquals("type", ex, is);
-        }
-
-        if (cp.getConf() != null) {
-            String ex = conf;
-            String is = cp.getConf();
-            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
-        }
-
-        out(" checked publisher " + name);
-        return null;
+    PublisherEntry cp = caManager.getPublisher(name);
+    if (cp == null) {
+      throw new CmdFailure("publisher named '" + name + "' is not configured");
     }
+
+    if (cp.getType() != null) {
+      String ex = type;
+      String is = cp.getType();
+      MgmtQAShellUtil.assertEquals("type", ex, is);
+    }
+
+    if (cp.getConf() != null) {
+      String ex = conf;
+      String is = cp.getConf();
+      MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+    }
+
+    out(" checked publisher " + name);
+    return null;
+  }
 
 }

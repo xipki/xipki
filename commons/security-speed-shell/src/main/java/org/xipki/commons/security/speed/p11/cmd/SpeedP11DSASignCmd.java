@@ -43,33 +43,34 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "speed-dsa-sign",
-        description = "performance test of PKCS#11 DSA signature creation")
+    description = "performance test of PKCS#11 DSA signature creation")
 public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer pLen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qLen;
 
-    @Override
-    protected LoadExecutor getTester()
-    throws Exception {
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
-
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen);
+  @Override
+  protected LoadExecutor getTester()
+  throws Exception {
+    if (qLen == null) {
+      if (pLen >= 2048) {
+        qLen = 256;
+      } else {
+        qLen = 160;
+      }
     }
+
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen);
+  }
 
 }

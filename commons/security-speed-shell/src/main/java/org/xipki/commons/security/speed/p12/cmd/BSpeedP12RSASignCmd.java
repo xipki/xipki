@@ -45,22 +45,23 @@ import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-sign-p12",
-        description = "performance test of PKCS#12 RSA signature creation (batch)")
+    description = "performance test of PKCS#12 RSA signature creation (batch)")
 public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
-        for (int keysize : keysizes) {
-            ret.add(
-                    new P12RSASignLoadTest(securityFactory, sigAlgo, keysize,
-                            new BigInteger("0x10001")));
-        }
-        return ret;
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    for (int keysize : keysizes) {
+      ret.add(
+          new P12RSASignLoadTest(securityFactory, sigAlgo, keysize,
+              new BigInteger("0x10001")));
     }
+    return ret;
+  }
 }

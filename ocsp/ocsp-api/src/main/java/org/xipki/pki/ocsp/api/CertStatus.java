@@ -37,14 +37,15 @@ package org.xipki.pki.ocsp.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum CertStatus {
 
-    GOOD,
-    REVOKED,
-    UNKNOWN,
-    IGNORE,
-    ISSUER_UNKNOWN
+  GOOD,
+  REVOKED,
+  UNKNOWN,
+  IGNORE,
+  ISSUER_UNKNOWN
 
 }

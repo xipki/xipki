@@ -42,67 +42,68 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ChangeScepEntry implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String caName;
+  private final String caName;
 
-    private String responderType;
+  private String responderType;
 
-    private String responderConf;
+  private String responderConf;
 
-    private String base64Cert;
+  private String base64Cert;
 
-    private String control;
+  private String control;
 
-    public ChangeScepEntry(
-            final String caName)
-    throws InvalidConfException {
-        ParamUtil.assertNotBlank("caName", caName);
-        this.caName = caName.toUpperCase();
-    }
+  public ChangeScepEntry(
+      final String caName)
+  throws InvalidConfException {
+    ParamUtil.assertNotBlank("caName", caName);
+    this.caName = caName.toUpperCase();
+  }
 
-    public String getCaName() {
-        return caName;
-    }
+  public String getCaName() {
+    return caName;
+  }
 
-    public String getResponderType() {
-        return responderType;
-    }
+  public String getResponderType() {
+    return responderType;
+  }
 
-    public void setResponderType(
-            final String responderType) {
-        this.responderType = responderType;
-    }
+  public void setResponderType(
+      final String responderType) {
+    this.responderType = responderType;
+  }
 
-    public String getResponderConf() {
-        return responderConf;
-    }
+  public String getResponderConf() {
+    return responderConf;
+  }
 
-    public void setResponderConf(
-            final String responderConf) {
-        this.responderConf = responderConf;
-    }
+  public void setResponderConf(
+      final String responderConf) {
+    this.responderConf = responderConf;
+  }
 
-    public String getBase64Cert() {
-        return base64Cert;
-    }
+  public String getBase64Cert() {
+    return base64Cert;
+  }
 
-    public void setBase64Cert(
-            final String base64Cert) {
-        this.base64Cert = base64Cert;
-    }
+  public void setBase64Cert(
+      final String base64Cert) {
+    this.base64Cert = base64Cert;
+  }
 
-    public String getControl() {
-        return control;
-    }
+  public String getControl() {
+    return control;
+  }
 
-    public void setControl(
-            final String control) {
-        this.control = control;
-    }
+  public void setControl(
+      final String control) {
+    this.control = control;
+  }
 
 }

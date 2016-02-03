@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.cert.UnrevokeCertCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-unrevoke-cert",
-        description = "unrevoke certificate (negative, QA)")
+    description = "unrevoke certificate (negative, QA)")
 @Service
 public class NegUnrevokeCertCmd extends UnrevokeCertCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-unrevoke-cert");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-unrevoke-cert");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("Exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("Exception expected, but received none");
+  }
 
 }

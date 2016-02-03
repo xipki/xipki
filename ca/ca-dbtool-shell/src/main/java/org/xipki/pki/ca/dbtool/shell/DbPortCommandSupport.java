@@ -48,51 +48,52 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class DbPortCommandSupport extends XipkiCommandSupport {
 
-    @Reference
-    protected DataSourceFactory dataSourceFactory;
+  @Reference
+  protected DataSourceFactory dataSourceFactory;
 
-    @Reference
-    protected PasswordResolver passwordResolver;
+  @Reference
+  protected PasswordResolver passwordResolver;
 
-    public DbPortCommandSupport() {
+  public DbPortCommandSupport() {
+  }
+
+  protected abstract DbPortWorker getDbPortWorker()
+  throws Exception;
+
+  protected Object doExecute()
+  throws Exception {
+    ExecutorService executor = Executors.newFixedThreadPool(1);
+    DbPortWorker myRun = getDbPortWorker();
+    executor.execute(myRun);
+
+    executor.shutdown();
+    while (true) {
+      try {
+        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+        if (terminated) {
+          break;
+        }
+      } catch (InterruptedException e) {
+        myRun.setStopMe(true);
+      }
     }
 
-    protected abstract DbPortWorker getDbPortWorker()
-    throws Exception;
+    Exception e = myRun.getException();
+    if (e != null) {
+      String errMsg = e.getMessage();
+      if (StringUtil.isBlank(errMsg)) {
+        errMsg = "ERROR";
+      }
 
-    protected Object doExecute()
-    throws Exception {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        DbPortWorker myRun = getDbPortWorker();
-        executor.execute(myRun);
-
-        executor.shutdown();
-        while (true) {
-            try {
-                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                if (terminated) {
-                    break;
-                }
-            } catch (InterruptedException e) {
-                myRun.setStopMe(true);
-            }
-        }
-
-        Exception e = myRun.getException();
-        if (e != null) {
-            String errMsg = e.getMessage();
-            if (StringUtil.isBlank(errMsg)) {
-                errMsg = "ERROR";
-            }
-
-            System.err.println(errMsg);
-        }
-
-        return null;
+      System.err.println(errMsg);
     }
+
+    return null;
+  }
 
 }

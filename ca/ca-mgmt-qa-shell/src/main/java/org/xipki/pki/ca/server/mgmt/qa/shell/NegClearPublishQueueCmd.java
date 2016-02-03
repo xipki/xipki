@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.ClearPublishQueueCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-clear-publishqueue",
-        description = "clear publish queue")
+    description = "clear publish queue")
 @Service
 public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-clear-publishqueue");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-clear-publishqueue");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }

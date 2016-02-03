@@ -43,33 +43,34 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "caalias-add",
-        description = "add CA alias")
+    description = "add CA alias")
 @Service
 public class CaAliasAddCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--alias",
-            required = true,
-            description = "CA alias\n"
-                    + "(required)")
-    private String caAlias;
+  @Option(name = "--alias",
+      required = true,
+      description = "CA alias\n"
+          + "(required)")
+  private String caAlias;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.addCaAlias(caAlias, caName);
-        output(b, "added", "could not add",
-                "CA alias " + caAlias + " associated with CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.addCaAlias(caAlias, caName);
+    output(b, "added", "could not add",
+        "CA alias " + caAlias + " associated with CA " + caName);
+    return null;
+  }
 
 }

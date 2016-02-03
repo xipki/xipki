@@ -47,52 +47,53 @@ import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public abstract class NegCRLCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--ca",
-            description = "CA name\n"
-                    + "required if multiple CAs are configured")
-    private String caName;
+  @Option(name = "--ca",
+      description = "CA name\n"
+          + "required if multiple CAs are configured")
+  private String caName;
 
-    protected abstract X509CRL retrieveCRL(
-            String caName)
-    throws CAClientException, PKIErrorException;
+  protected abstract X509CRL retrieveCRL(
+      String caName)
+  throws CAClientException, PKIErrorException;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        Set<String> caNames = caClient.getCaNames();
-        if (isEmpty(caNames)) {
-            throw new IllegalCmdParamException("no CA is configured");
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    Set<String> caNames = caClient.getCaNames();
+    if (isEmpty(caNames)) {
+      throw new IllegalCmdParamException("no CA is configured");
+    }
 
-        if (caName != null && !caNames.contains(caName)) {
-            throw new IllegalCmdParamException("CA " + caName
-                    + " is not within the configured CAs " + caNames);
-        }
+    if (caName != null && !caNames.contains(caName)) {
+      throw new IllegalCmdParamException("CA " + caName
+          + " is not within the configured CAs " + caNames);
+    }
 
-        if (caName == null) {
-            if (caNames.size() == 1) {
-                caName = caNames.iterator().next();
-            } else {
-                throw new IllegalCmdParamException("no caname is specified, one of "
-                        + caNames + " is required");
-            }
-        }
+    if (caName == null) {
+      if (caNames.size() == 1) {
+        caName = caNames.iterator().next();
+      } else {
+        throw new IllegalCmdParamException("no caname is specified, one of "
+            + caNames + " is required");
+      }
+    }
 
-        X509CRL crl = null;
-        try {
-            crl = retrieveCRL(caName);
-        } catch (PKIErrorException e) {
-        }
+    X509CRL crl = null;
+    try {
+      crl = retrieveCRL(caName);
+    } catch (PKIErrorException e) {
+    }
 
-        if (crl != null) {
-            throw new CmdFailure("no CRL is expected, but received one");
-        }
+    if (crl != null) {
+      throw new CmdFailure("no CRL is expected, but received one");
+    }
 
-        return null;
-    } // method doExecute
+    return null;
+  } // method doExecute
 
 }

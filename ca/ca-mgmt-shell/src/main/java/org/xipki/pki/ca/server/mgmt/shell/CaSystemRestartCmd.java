@@ -44,46 +44,47 @@ import org.xipki.commons.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "restart",
-        description = "restart CA system")
+    description = "restart CA system")
 @Service
 public class CaSystemRestartCmd extends CaCommandSupport {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean successful = caManager.restartCaSystem();
-        if (!successful) {
-            throw new CmdFailure("could not restart CA system");
-        }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean successful = caManager.restartCaSystem();
+    if (!successful) {
+      throw new CmdFailure("could not restart CA system");
+    }
 
-        StringBuilder sb = new StringBuilder("restarted CA system");
-        Set<String> names = new HashSet<>(caManager.getCaNames());
+    StringBuilder sb = new StringBuilder("restarted CA system");
+    Set<String> names = new HashSet<>(caManager.getCaNames());
 
-        if (names.size() > 0) {
-            sb.append(" with following CAs: ");
-            Set<String> caAliasNames = caManager.getCaAliasNames();
-            for (String aliasName : caAliasNames) {
-                String name = caManager.getCaNameForAlias(aliasName);
-                names.remove(name);
+    if (names.size() > 0) {
+      sb.append(" with following CAs: ");
+      Set<String> caAliasNames = caManager.getCaAliasNames();
+      for (String aliasName : caAliasNames) {
+        String name = caManager.getCaNameForAlias(aliasName);
+        names.remove(name);
 
-                sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
-            }
+        sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
+      }
 
-            for (String name : names) {
-                sb.append(name).append(", ");
-            }
+      for (String name : names) {
+        sb.append(name).append(", ");
+      }
 
-            int len = sb.length();
-            sb.delete(len - 2, len);
-        } else {
-            sb.append(": no CA is configured");
-        }
+      int len = sb.length();
+      sb.delete(len - 2, len);
+    } else {
+      sb.append(": no CA is configured");
+    }
 
-        out(sb.toString());
-        return null;
-    } // method doExecute
+    out(sb.toString());
+    return null;
+  } // method doExecute
 
 }

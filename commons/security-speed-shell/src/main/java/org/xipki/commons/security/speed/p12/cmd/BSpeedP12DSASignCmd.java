@@ -44,28 +44,29 @@ import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign-p12",
-        description = "performance test of PKCS#12 DSA signature creation")
+    description = "performance test of PKCS#12 DSA signature creation")
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
-            if (pLen == 1024) {
-                sigAlgo = "SHA1withDSA";
-            }
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+    for (int i = 0; i < pqLens.length; i += 2) {
+      int pLen = pqLens[i];
+      int qLen = pqLens[i + 1];
+      if (pLen == 1024) {
+        sigAlgo = "SHA1withDSA";
+      }
 
-            ret.add(
-                    new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen));
-        }
-        return ret;
+      ret.add(
+          new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen));
     }
+    return ret;
+  }
 
 }

@@ -37,22 +37,23 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum ValidityMode {
-    STRICT,
-    LAX,
-    CUTOFF;
+  STRICT,
+  LAX,
+  CUTOFF;
 
-    public static ValidityMode getInstance(
-            final String text) {
-        for (ValidityMode value : values()) {
-            if (value.name().equalsIgnoreCase(text)) {
-                return value;
-            }
-        }
-
-        return null;
+  public static ValidityMode getInstance(
+      final String text) {
+    for (ValidityMode value : values()) {
+      if (value.name().equalsIgnoreCase(text)) {
+        return value;
+      }
     }
+
+    return null;
+  }
 
 }

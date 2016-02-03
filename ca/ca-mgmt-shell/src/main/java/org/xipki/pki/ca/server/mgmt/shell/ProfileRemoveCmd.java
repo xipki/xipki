@@ -41,22 +41,23 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "profile-rm",
-        description = "remove certifiate profile")
+    description = "remove certifiate profile")
 @Service
 public class ProfileRemoveCmd extends CaCommandSupport {
 
-    @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
-    private String name;
+  @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
+  private String name;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removeCertprofile(name);
-        output(b, "removed", "could not remove", "certificate profile " + name);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removeCertprofile(name);
+    output(b, "removed", "could not remove", "certificate profile " + name);
+    return null;
+  }
 
 }

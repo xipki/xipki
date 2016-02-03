@@ -45,31 +45,32 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
-        description = "performance test of PKCS#11 DSA signature creation (batch)")
+    description = "performance test of PKCS#11 DSA signature creation (batch)")
 public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+  @Override
+  protected List<LoadExecutor> getTesters()
+  throws Exception {
+    List<LoadExecutor> ret = new LinkedList<>();
+    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
-            if (pLen == 1024) {
-                sigAlgo = "SHA1withDSA";
-            }
+    for (int i = 0; i < pqLens.length; i += 2) {
+      int pLen = pqLens[i];
+      int qLen = pqLens[i + 1];
+      if (pLen == 1024) {
+        sigAlgo = "SHA1withDSA";
+      }
 
-            ret.add(
-                    new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen));
-        }
-        return ret;
+      ret.add(
+          new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen));
     }
+    return ret;
+  }
 
 }

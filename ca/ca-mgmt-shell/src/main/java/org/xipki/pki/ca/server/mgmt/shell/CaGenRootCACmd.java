@@ -48,43 +48,44 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "gen-rca",
-        description = "generate selfsigned CA")
+    description = "generate selfsigned CA")
 @Service
 public class CaGenRootCACmd extends CaAddOrGenCommandSupport {
 
-    @Option(name = "--p10",
-            required = true,
-            description = "PKCS#10 request of the Root CA\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10ReqFile;
+  @Option(name = "--p10",
+      required = true,
+      description = "PKCS#10 request of the Root CA\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String p10ReqFile;
 
-    @Option(name = "--profile",
-            required = true,
-            description = "profile of the Root CA\n"
-                    + "(required)")
-    private String rcaProfile;
+  @Option(name = "--profile",
+      required = true,
+      description = "profile of the Root CA\n"
+          + "(required)")
+  private String rcaProfile;
 
-    @Option(name = "--out", aliases = "-o",
-            description = "where to save the generated CA certificate")
-    @Completion(FilePathCompleter.class)
-    private String rcaCertOutFile;
+  @Option(name = "--out", aliases = "-o",
+      description = "where to save the generated CA certificate")
+  @Completion(FilePathCompleter.class)
+  private String rcaCertOutFile;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        X509CAEntry caEntry = getCAEntry();
-        byte[] p10Req = IoUtil.read(p10ReqFile);
-        X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
-        if (rcaCertOutFile != null) {
-            saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
-                    rcaCert.getEncoded());
-        }
-        out("generated root CA " + caEntry.getName());
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    X509CAEntry caEntry = getCAEntry();
+    byte[] p10Req = IoUtil.read(p10ReqFile);
+    X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
+    if (rcaCertOutFile != null) {
+      saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
+          rcaCert.getEncoded());
     }
+    out("generated root CA " + caEntry.getName());
+    return null;
+  }
 
 }

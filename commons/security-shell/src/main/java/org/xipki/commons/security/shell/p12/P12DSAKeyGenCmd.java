@@ -44,45 +44,46 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "dsa-p12",
-        description = "generate RSA keypair in PKCS#12 keystore")
+    description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+  @Option(name = "--plen",
+      description = "bit length of the prime")
+  private Integer pLen = 2048;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+  @Option(name = "--qlen",
+      description = "bit length of the sub-prime")
+  private Integer qLen;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
-
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
-
-        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
-                pLen, qLen, getPassword(), subject,
-                getKeyUsage(), getExtendedKeyUsage(),
-                securityFactory.getRandom4Key());
-
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-        saveKeyAndCert(keyAndCert);
-
-        return null;
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    if (pLen % 1024 != 0) {
+      throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
     }
+
+    if (qLen == null) {
+      if (pLen >= 2048) {
+        qLen = 256;
+      } else {
+        qLen = 160;
+      }
+    }
+
+    P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
+        pLen, qLen, getPassword(), subject,
+        getKeyUsage(), getExtendedKeyUsage(),
+        securityFactory.getRandom4Key());
+
+    P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+    saveKeyAndCert(keyAndCert);
+
+    return null;
+  }
 
 }

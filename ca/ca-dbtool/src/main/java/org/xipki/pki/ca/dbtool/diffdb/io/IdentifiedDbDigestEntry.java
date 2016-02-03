@@ -39,37 +39,38 @@ import org.xipki.pki.ca.dbtool.QueueEntry;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class IdentifiedDbDigestEntry implements QueueEntry {
 
-    private final DbDigestEntry content;
+  private final DbDigestEntry content;
 
-    private Integer caId;
+  private Integer caId;
 
-    private final int id;
+  private final int id;
 
-    public IdentifiedDbDigestEntry(
-            final DbDigestEntry content,
-            final int id) {
-        this.content = content;
-        this.id = id;
-    }
+  public IdentifiedDbDigestEntry(
+      final DbDigestEntry content,
+      final int id) {
+    this.content = content;
+    this.id = id;
+  }
 
-    public int getId() {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public DbDigestEntry getContent() {
-        return content;
-    }
+  public DbDigestEntry getContent() {
+    return content;
+  }
 
-    public void setCaId(Integer caId) {
-        this.caId = caId;
-    }
+  public void setCaId(Integer caId) {
+    this.caId = caId;
+  }
 
-    public Integer getCaId() {
-        return caId;
-    }
+  public Integer getCaId() {
+    return caId;
+  }
 
 }

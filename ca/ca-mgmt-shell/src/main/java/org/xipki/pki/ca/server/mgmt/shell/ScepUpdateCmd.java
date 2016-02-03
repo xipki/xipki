@@ -55,95 +55,96 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "scep-up",
-        description = "Update SCEP")
+    description = "Update SCEP")
 @Service
 public class ScepUpdateCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(ScepNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(ScepNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--resp-type",
-            description = "type of the responder")
-    @Completion(SignerTypeCompleter.class)
-    private String responderType;
+  @Option(name = "--resp-type",
+      description = "type of the responder")
+  @Completion(SignerTypeCompleter.class)
+  private String responderType;
 
-    @Option(name = "--resp-conf",
-            description = "conf of the responder")
-    private String responderConf;
+  @Option(name = "--resp-conf",
+      description = "conf of the responder")
+  private String responderConf;
 
-    @Option(name = "--resp-cert",
-            description = "responder certificate file or 'NULL'")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--resp-cert",
+      description = "responder certificate file or 'NULL'")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--control",
-            description = "SCEP control or 'NULL'")
-    private String control;
+  @Option(name = "--control",
+      description = "SCEP control or 'NULL'")
+  private String control;
 
-    private PasswordResolver passwordResolver;
+  private PasswordResolver passwordResolver;
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
+  public void setPasswordResolver(
+      final PasswordResolver passwordResolver) {
+    this.passwordResolver = passwordResolver;
+  }
+
+  private String getResponderConf()
+  throws Exception {
+    if (responderConf == null) {
+      return responderConf;
+    }
+    String _respType = responderType;
+    if (_respType == null) {
+      ScepEntry entry = caManager.getScepEntry(caName);
+      if (entry == null) {
+        throw new IllegalCmdParamException("please specify the responderType");
+      }
+      _respType = entry.getResponderType();
     }
 
-    private String getResponderConf()
-    throws Exception {
-        if (responderConf == null) {
-            return responderConf;
-        }
-        String _respType = responderType;
-        if (_respType == null) {
-            ScepEntry entry = caManager.getScepEntry(caName);
-            if (entry == null) {
-                throw new IllegalCmdParamException("please specify the responderType");
-            }
-            _respType = entry.getResponderType();
-        }
+    return ShellUtil.canonicalizeSignerConf(_respType, responderConf, passwordResolver);
+  }
 
-        return ShellUtil.canonicalizeSignerConf(_respType, responderConf, passwordResolver);
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    String certConf = null;
+    if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+      certConf = CAManager.NULL;
+    } else if (certFile != null) {
+      byte[] certBytes = IoUtil.read(certFile);
+      X509Util.parseCert(new ByteArrayInputStream(certBytes));
+      certConf = Base64.toBase64String(certBytes);
     }
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        String certConf = null;
-        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-            certConf = CAManager.NULL;
-        } else if (certFile != null) {
-            byte[] certBytes = IoUtil.read(certFile);
-            X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            certConf = Base64.toBase64String(certBytes);
-        }
+    ChangeScepEntry entry = new ChangeScepEntry(caName);
+    if (responderType != null) {
+      entry.setResponderType(responderType);
+    }
 
-        ChangeScepEntry entry = new ChangeScepEntry(caName);
-        if (responderType != null) {
-            entry.setResponderType(responderType);
-        }
+    String conf = getResponderConf();
+    if (conf != null) {
+      entry.setResponderConf(conf);
+    }
 
-        String conf = getResponderConf();
-        if (conf != null) {
-            entry.setResponderConf(conf);
-        }
+    if (certConf != null) {
+      entry.setBase64Cert(certConf);
+    }
 
-        if (certConf != null) {
-            entry.setBase64Cert(certConf);
-        }
+    if (control != null) {
+      entry.setControl(control);
+    }
 
-        if (control != null) {
-            entry.setControl(control);
-        }
-
-        boolean b = caManager.changeScep(entry);
-        output(b, "updated", "could not update", "SCEP responder " + caName);
-        return null;
-    } // method doExecute
+    boolean b = caManager.changeScep(entry);
+    output(b, "updated", "could not update", "SCEP responder " + caName);
+    return null;
+  } // method doExecute
 
 }

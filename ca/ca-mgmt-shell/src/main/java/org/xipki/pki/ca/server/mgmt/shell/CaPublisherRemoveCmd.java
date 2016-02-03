@@ -44,34 +44,35 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-ca", name = "capub-rm",
-        description = "remove publisher from CA")
+    description = "remove publisher from CA")
 @Service
 public class CaPublisherRemoveCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
-    @Completion(CaNameCompleter.class)
-    private String caName;
+  @Option(name = "--ca",
+      required = true,
+      description = "CA name\n"
+          + "(required)")
+  @Completion(CaNameCompleter.class)
+  private String caName;
 
-    @Option(name = "--publisher",
-            required = true,
-            description = "publisher name\n"
-                    + "(required)")
-    @Completion(PublisherNameCompleter.class)
-    private String publisherName;
+  @Option(name = "--publisher",
+      required = true,
+      description = "publisher name\n"
+          + "(required)")
+  @Completion(PublisherNameCompleter.class)
+  private String publisherName;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        boolean b = caManager.removePublisherFromCA(publisherName, caName);
-        output(b, "removed", "could not remove",
-                "publisher " + publisherName + " from CA " + caName);
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    boolean b = caManager.removePublisherFromCA(publisherName, caName);
+    output(b, "removed", "could not remove",
+        "publisher " + publisherName + " from CA " + caName);
+    return null;
+  }
 
 }

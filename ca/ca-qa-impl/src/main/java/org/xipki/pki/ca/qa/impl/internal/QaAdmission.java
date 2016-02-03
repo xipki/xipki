@@ -46,56 +46,57 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class QaAdmission extends QaExtension {
 
-    private final String registrationNumber;
+  private final String registrationNumber;
 
-    private final byte[] addProfessionInfo;
+  private final byte[] addProfessionInfo;
 
-    private final List<String> professionOIDs;
+  private final List<String> professionOIDs;
 
-    private final List<String> professionItems;
+  private final List<String> professionItems;
 
-    public QaAdmission(
-            final Admission jaxb) {
-        this.registrationNumber = jaxb.getRegistrationNumber();
-        this.addProfessionInfo = jaxb.getAddProfessionInfo();
+  public QaAdmission(
+      final Admission jaxb) {
+    this.registrationNumber = jaxb.getRegistrationNumber();
+    this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
-        List<String> items = jaxb.getProfessionItem();
-        if (CollectionUtil.isEmpty(items)) {
-            professionItems = null;
-        } else {
-            professionItems = Collections.unmodifiableList(items);
-        }
-
-        List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if (oids == null) {
-            this.professionOIDs = null;
-        } else {
-            List<String> list = new LinkedList<>();
-            for (OidWithDescType oid : oids) {
-                list.add(oid.getValue());
-            }
-            this.professionOIDs = Collections.unmodifiableList(list);
-        }
+    List<String> items = jaxb.getProfessionItem();
+    if (CollectionUtil.isEmpty(items)) {
+      professionItems = null;
+    } else {
+      professionItems = Collections.unmodifiableList(items);
     }
 
-    public String getRegistrationNumber() {
-        return registrationNumber;
+    List<OidWithDescType> oids = jaxb.getProfessionOid();
+    if (oids == null) {
+      this.professionOIDs = null;
+    } else {
+      List<String> list = new LinkedList<>();
+      for (OidWithDescType oid : oids) {
+        list.add(oid.getValue());
+      }
+      this.professionOIDs = Collections.unmodifiableList(list);
     }
+  }
 
-    public byte[] getAddProfessionInfo() {
-        return Arrays.clone(addProfessionInfo);
-    }
+  public String getRegistrationNumber() {
+    return registrationNumber;
+  }
 
-    public List<String> getProfessionOIDs() {
-        return professionOIDs;
-    }
+  public byte[] getAddProfessionInfo() {
+    return Arrays.clone(addProfessionInfo);
+  }
 
-    public List<String> getProfessionItems() {
-        return professionItems;
-    }
+  public List<String> getProfessionOIDs() {
+    return professionOIDs;
+  }
+
+  public List<String> getProfessionItems() {
+    return professionItems;
+  }
 
 }

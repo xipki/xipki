@@ -51,91 +51,92 @@ import org.xipki.pki.ca.api.profile.RDNControl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class SubjectControl {
 
-    private final Map<ASN1ObjectIdentifier, RDNControl> controls;
+  private final Map<ASN1ObjectIdentifier, RDNControl> controls;
 
-    private final Map<ASN1ObjectIdentifier, String> typeGroups;
+  private final Map<ASN1ObjectIdentifier, String> typeGroups;
 
-    private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
+  private final Map<String, Set<ASN1ObjectIdentifier>> groupTypes;
 
-    private final Set<String> groups;
+  private final Set<String> groups;
 
-    private final List<ASN1ObjectIdentifier> types;
+  private final List<ASN1ObjectIdentifier> types;
 
-    public SubjectControl(
-            final boolean backwardsSubject,
-            final Map<ASN1ObjectIdentifier, RDNControl> pControls) {
-        ParamUtil.assertNotEmpty("pControls", pControls);
+  public SubjectControl(
+      final boolean backwardsSubject,
+      final Map<ASN1ObjectIdentifier, RDNControl> pControls) {
+    ParamUtil.assertNotEmpty("pControls", pControls);
 
-        this.controls = pControls;
-        this.typeGroups = new HashMap<>();
-        Set<ASN1ObjectIdentifier> oids = controls.keySet();
-        List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-        List<ASN1ObjectIdentifier> _oids = backwardsSubject
-                ? ObjectIdentifiers.getBackwardDNs()
-                : ObjectIdentifiers.getForwardDNs();
-        for (ASN1ObjectIdentifier oid : _oids) {
-            if (oids.contains(oid)) {
-                sortedOids.add(oid);
-            }
-        }
-
-        for (ASN1ObjectIdentifier oid : oids) {
-            if (!sortedOids.contains(oid)) {
-                sortedOids.add(oid);
-            }
-        }
-
-        this.types = Collections.unmodifiableList(sortedOids);
-
-        Set<String> groups = new HashSet<>();
-        this.groupTypes = new HashMap<>();
-
-        for (ASN1ObjectIdentifier type : controls.keySet()) {
-            String group = controls.get(type).getGroup();
-            if (StringUtil.isBlank(group)) {
-                continue;
-            }
-
-            groups.add(group);
-            typeGroups.put(type, group);
-            Set<ASN1ObjectIdentifier> types = groupTypes.get(group);
-            if (types == null) {
-                types = new HashSet<>();
-                groupTypes.put(group, types);
-            }
-            types.add(type);
-        }
-
-        this.groups = Collections.unmodifiableSet(groups);
-    } // constructor
-
-    public RDNControl getControl(
-            final ASN1ObjectIdentifier type) {
-        return controls.isEmpty()
-                ? SubjectDNSpec.getRDNControl(type)
-                : controls.get(type);
+    this.controls = pControls;
+    this.typeGroups = new HashMap<>();
+    Set<ASN1ObjectIdentifier> oids = controls.keySet();
+    List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+    List<ASN1ObjectIdentifier> _oids = backwardsSubject
+        ? ObjectIdentifiers.getBackwardDNs()
+        : ObjectIdentifiers.getForwardDNs();
+    for (ASN1ObjectIdentifier oid : _oids) {
+      if (oids.contains(oid)) {
+        sortedOids.add(oid);
+      }
     }
 
-    public String getGroup(
-            final ASN1ObjectIdentifier type) {
-        return typeGroups.get(type);
+    for (ASN1ObjectIdentifier oid : oids) {
+      if (!sortedOids.contains(oid)) {
+        sortedOids.add(oid);
+      }
     }
 
-    public Set<ASN1ObjectIdentifier> getTypesForGroup(
-            final String group) {
-        return groupTypes.get(group);
+    this.types = Collections.unmodifiableList(sortedOids);
+
+    Set<String> groups = new HashSet<>();
+    this.groupTypes = new HashMap<>();
+
+    for (ASN1ObjectIdentifier type : controls.keySet()) {
+      String group = controls.get(type).getGroup();
+      if (StringUtil.isBlank(group)) {
+        continue;
+      }
+
+      groups.add(group);
+      typeGroups.put(type, group);
+      Set<ASN1ObjectIdentifier> types = groupTypes.get(group);
+      if (types == null) {
+        types = new HashSet<>();
+        groupTypes.put(group, types);
+      }
+      types.add(type);
     }
 
-    public Set<String> getGroups() {
-        return groups;
-    }
+    this.groups = Collections.unmodifiableSet(groups);
+  } // constructor
 
-    public List<ASN1ObjectIdentifier> getTypes() {
-        return types;
-    }
+  public RDNControl getControl(
+      final ASN1ObjectIdentifier type) {
+    return controls.isEmpty()
+        ? SubjectDNSpec.getRDNControl(type)
+        : controls.get(type);
+  }
+
+  public String getGroup(
+      final ASN1ObjectIdentifier type) {
+    return typeGroups.get(type);
+  }
+
+  public Set<ASN1ObjectIdentifier> getTypesForGroup(
+      final String group) {
+    return groupTypes.get(group);
+  }
+
+  public Set<String> getGroups() {
+    return groups;
+  }
+
+  public List<ASN1ObjectIdentifier> getTypes() {
+    return types;
+  }
 
 }

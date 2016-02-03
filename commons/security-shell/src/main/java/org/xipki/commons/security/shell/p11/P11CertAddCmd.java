@@ -51,40 +51,41 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-tk", name = "add-cert",
-        description = "add certificate to PKCS#11 device")
+    description = "add certificate to PKCS#11 device")
 @Service
 public class P11CertAddCmd extends SecurityCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    private Integer slotIndex;
+  @Option(name = "--slot",
+      required = true,
+      description = "slot index\n"
+          + "(required)")
+  private Integer slotIndex;
 
-    @Option(name = "--cert",
-            required = true,
-            description = "certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+  @Option(name = "--cert",
+      required = true,
+      description = "certificate file\n"
+          + "(required)")
+  @Completion(FilePathCompleter.class)
+  private String certFile;
 
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+  @Option(name = "--module",
+      description = "name of the PKCS#11 module.")
+  @Completion(P11ModuleNameCompleter.class)
+  private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        X509Certificate cert = X509Util.parseCert(certFile);
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier p11KeyId = slot.addCert(cert);
-        out("added certificate under " + p11KeyId);
-        securityFactory.getP11CryptService(moduleName).refresh();
-        return null;
-    }
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    X509Certificate cert = X509Util.parseCert(certFile);
+    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+    P11KeyIdentifier p11KeyId = slot.addCert(cert);
+    out("added certificate under " + p11KeyId);
+    securityFactory.getP11CryptService(moduleName).refresh();
+    return null;
+  }
 
 }

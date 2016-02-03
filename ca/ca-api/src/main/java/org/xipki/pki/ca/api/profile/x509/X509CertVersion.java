@@ -37,33 +37,34 @@ package org.xipki.pki.ca.api.profile.x509;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum X509CertVersion {
 
-    V1(1),
-    V2(2),
-    V3(3);
+  V1(1),
+  V2(2),
+  V3(3);
 
-    private int version;
+  private int version;
 
-    private X509CertVersion(
-            final int version) {
-        this.version = version;
+  private X509CertVersion(
+      final int version) {
+    this.version = version;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public static X509CertVersion getInstance(
+      final int version) {
+    for (X509CertVersion m : values()) {
+      if (m.version == version) {
+        return m;
+      }
     }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public static X509CertVersion getInstance(
-            final int version) {
-        for (X509CertVersion m : values()) {
-            if (m.version == version) {
-                return m;
-            }
-        }
-        return null;
-    }
+    return null;
+  }
 
 }

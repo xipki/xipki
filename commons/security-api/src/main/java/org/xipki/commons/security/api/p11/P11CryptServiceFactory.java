@@ -39,15 +39,16 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public interface P11CryptServiceFactory {
 
-    void init(
-            P11Control p11Control);
+  void init(
+      P11Control p11Control);
 
-    P11CryptService createP11CryptService(
-            String moduleName)
-    throws SignerException;
+  P11CryptService createP11CryptService(
+      String moduleName)
+  throws SignerException;
 
 }

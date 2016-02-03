@@ -57,70 +57,71 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OcspFromCaDbImportWorker extends DbPortWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImportWorker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+  private final DataSourceWrapper dataSource;
 
-    private final Unmarshaller unmarshaller;
+  private final Unmarshaller unmarshaller;
 
-    private final String publisherName;
+  private final String publisherName;
 
-    private final boolean resume;
+  private final boolean resume;
 
-    private final String srcFolder;
+  private final String srcFolder;
 
-    private final int batchEntriesPerCommit;
+  private final int batchEntriesPerCommit;
 
-    private final boolean evaluateOnly;
+  private final boolean evaluateOnly;
 
-    public OcspFromCaDbImportWorker(
-            final DataSourceFactory dataSourceFactory,
-            final PasswordResolver passwordResolver,
-            final String dbConfFile,
-            final String publisherName,
-            final boolean resume,
-            final String srcFolder,
-            final int batchEntriesPerCommit,
-            final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        unmarshaller = jaxbContext.createUnmarshaller();
-        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
-        this.publisherName = publisherName;
-        this.resume = resume;
-        this.srcFolder = IoUtil.expandFilepath(srcFolder);
-        this.batchEntriesPerCommit = batchEntriesPerCommit;
-        this.evaluateOnly = evaluateOnly;
+  public OcspFromCaDbImportWorker(
+      final DataSourceFactory dataSourceFactory,
+      final PasswordResolver passwordResolver,
+      final String dbConfFile,
+      final String publisherName,
+      final boolean resume,
+      final String srcFolder,
+      final int batchEntriesPerCommit,
+      final boolean evaluateOnly)
+  throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+    Properties props = DbPorter.getDbConfProperties(
+        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+    this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+    unmarshaller = jaxbContext.createUnmarshaller();
+    unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+    this.publisherName = publisherName;
+    this.resume = resume;
+    this.srcFolder = IoUtil.expandFilepath(srcFolder);
+    this.batchEntriesPerCommit = batchEntriesPerCommit;
+    this.evaluateOnly = evaluateOnly;
+  }
+
+  @Override
+  public void doRun(
+      final AtomicBoolean stopMe)
+  throws Exception {
+    long start = System.currentTimeMillis();
+    // CertStore
+    try {
+      OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
+          dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit,
+          resume, stopMe, evaluateOnly);
+      certStoreImporter.importToDB();
+      certStoreImporter.shutdown();
+    } finally {
+      try {
+        dataSource.shutdown();
+      } catch (Throwable e) {
+        LOG.error("dataSource.shutdown()", e);
+      }
+      long end = System.currentTimeMillis();
+      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
     }
-
-    @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
-    throws Exception {
-        long start = System.currentTimeMillis();
-        // CertStore
-        try {
-            OcspCertStoreFromCaDbImporter certStoreImporter = new OcspCertStoreFromCaDbImporter(
-                    dataSource, unmarshaller, srcFolder, publisherName, batchEntriesPerCommit,
-                    resume, stopMe, evaluateOnly);
-            certStoreImporter.importToDB();
-            certStoreImporter.shutdown();
-        } finally {
-            try {
-                dataSource.shutdown();
-            } catch (Throwable e) {
-                LOG.error("dataSource.shutdown()", e);
-            }
-            long end = System.currentTimeMillis();
-            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-        }
-    }
+  }
 
 }

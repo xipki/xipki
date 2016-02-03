@@ -37,11 +37,12 @@ package org.xipki.pki.ocsp.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public enum OCSPMode {
 
-    RFC2560,
-    RFC6960
+  RFC2560,
+  RFC6960
 
 }

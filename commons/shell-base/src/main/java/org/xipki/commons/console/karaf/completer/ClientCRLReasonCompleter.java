@@ -41,19 +41,20 @@ import org.xipki.commons.security.api.CRLReason;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Service
 public class ClientCRLReasonCompleter extends AbstractEnumCompleter {
 
-    public ClientCRLReasonCompleter() {
-        StringBuilder enums = new StringBuilder();
+  public ClientCRLReasonCompleter() {
+    StringBuilder enums = new StringBuilder();
 
-        for (CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS) {
-            enums.append(reason.getDescription()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    for (CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS) {
+      enums.append(reason.getDescription()).append(",");
     }
+    enums.deleteCharAt(enums.length() - 1);
+    setTokens(enums.toString());
+  }
 
 }

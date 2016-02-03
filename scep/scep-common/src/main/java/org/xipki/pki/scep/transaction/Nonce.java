@@ -42,41 +42,42 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class Nonce {
 
-    private static final SecureRandom random = new SecureRandom();
+  private static final SecureRandom random = new SecureRandom();
 
-    private static final int NONCE_LEN = 16;
+  private static final int NONCE_LEN = 16;
 
-    private final byte[] bytes;
+  private final byte[] bytes;
 
-    private Nonce(
-            final byte[] bytes,
-            final boolean cloneBytes) {
-        ParamUtil.assertNotNull("bytes", bytes);
-        if (bytes.length != 16) {
-            throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
-        }
-        this.bytes = cloneBytes
-                ? Arrays.clone(bytes)
-                : bytes;
+  private Nonce(
+      final byte[] bytes,
+      final boolean cloneBytes) {
+    ParamUtil.assertNotNull("bytes", bytes);
+    if (bytes.length != 16) {
+      throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
     }
+    this.bytes = cloneBytes
+        ? Arrays.clone(bytes)
+        : bytes;
+  }
 
-    public Nonce(
-            final byte[] bytes) {
-        this(bytes, true);
-    }
+  public Nonce(
+      final byte[] bytes) {
+    this(bytes, true);
+  }
 
-    public byte[] getBytes() {
-        return Arrays.clone(bytes);
-    }
+  public byte[] getBytes() {
+    return Arrays.clone(bytes);
+  }
 
-    public static Nonce randomNonce() {
-        byte[] bytes = new byte[NONCE_LEN];
-        random.nextBytes(bytes);
-        return new Nonce(bytes, false);
-    }
+  public static Nonce randomNonce() {
+    byte[] bytes = new byte[NONCE_LEN];
+    random.nextBytes(bytes);
+    return new Nonce(bytes, false);
+  }
 
 }

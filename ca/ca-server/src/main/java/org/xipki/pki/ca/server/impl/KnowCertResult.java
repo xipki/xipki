@@ -37,29 +37,30 @@ package org.xipki.pki.ca.server.impl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class KnowCertResult {
 
-    public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+  public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
 
-    private final boolean known;
+  private final boolean known;
 
-    private final String user;
+  private final String user;
 
-    public KnowCertResult(
-            final boolean known,
-            final String user) {
-        this.known = known;
-        this.user = user;
-    }
+  public KnowCertResult(
+      final boolean known,
+      final String user) {
+    this.known = known;
+    this.user = user;
+  }
 
-    public boolean isKnown() {
-        return known;
-    }
+  public boolean isKnown() {
+    return known;
+  }
 
-    public String getUser() {
-        return user;
-    }
+  public String getUser() {
+    return user;
+  }
 
 }

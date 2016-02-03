@@ -37,29 +37,30 @@ package org.xipki.pki.ca.api;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CertprofileException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CertprofileException() {
-    }
+  public CertprofileException() {
+  }
 
-    public CertprofileException(
-            final String message) {
-        super(message);
-    }
+  public CertprofileException(
+      final String message) {
+    super(message);
+  }
 
-    public CertprofileException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CertprofileException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public CertprofileException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CertprofileException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

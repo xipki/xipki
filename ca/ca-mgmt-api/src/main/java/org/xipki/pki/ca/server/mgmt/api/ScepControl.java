@@ -54,107 +54,108 @@ import org.xipki.commons.common.util.StringUtil;
  * signerCert.included=<'true'|'false'>
  *
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ScepControl implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public static final String KEY_caCertIncluded = "caCert.included";
+  public static final String KEY_caCertIncluded = "caCert.included";
 
-    public static final String KEY_signerCertIncluded = "signerCert.included";
+  public static final String KEY_signerCertIncluded = "signerCert.included";
 
-    private boolean includeCACert = true;
+  private boolean includeCACert = true;
 
-    private boolean includeSignerCert = true;
+  private boolean includeSignerCert = true;
 
-    public ScepControl(
-            final String conf)
-    throws InvalidConfException {
-        if (StringUtil.isBlank(conf)) {
-            return;
-        }
-        ParamUtil.assertNotBlank("conf", conf);
-        ConfPairs props;
-        try {
-            props = new ConfPairs(conf);
-        } catch (RuntimeException e) {
-            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
-        }
-
-        this.includeCACert = getBoolean(props, KEY_caCertIncluded, true);
-        this.includeSignerCert = getBoolean(props, KEY_signerCertIncluded, true);
+  public ScepControl(
+      final String conf)
+  throws InvalidConfException {
+    if (StringUtil.isBlank(conf)) {
+      return;
+    }
+    ParamUtil.assertNotBlank("conf", conf);
+    ConfPairs props;
+    try {
+      props = new ConfPairs(conf);
+    } catch (RuntimeException e) {
+      throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
     }
 
-    public String getConf() {
-        ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
-        pairs.putPair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
+    this.includeCACert = getBoolean(props, KEY_caCertIncluded, true);
+    this.includeSignerCert = getBoolean(props, KEY_signerCertIncluded, true);
+  }
 
-        return pairs.getEncoded();
+  public String getConf() {
+    ConfPairs pairs = new ConfPairs();
+    pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
+    pairs.putPair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
+
+    return pairs.getEncoded();
+  }
+
+  public boolean isIncludeCACert() {
+    return includeCACert;
+  }
+
+  public void setIncludeCACert(
+      final boolean includeCACert) {
+    this.includeCACert = includeCACert;
+  }
+
+  public boolean isIncludeSignerCert() {
+    return includeSignerCert;
+  }
+
+  public void setIncludeSignerCert(
+      final boolean includeSignerCert) {
+    this.includeSignerCert = includeSignerCert;
+  }
+
+  @Override
+  public String toString() {
+    return getConf();
+  }
+
+  @Override
+  public int hashCode() {
+    return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(
+      final Object obj) {
+    if (!(obj instanceof ScepControl)) {
+      return false;
     }
 
-    public boolean isIncludeCACert() {
-        return includeCACert;
+    ScepControl b = (ScepControl) obj;
+    if (includeCACert != b.includeCACert
+        || includeSignerCert != b.includeSignerCert) {
+      return false;
     }
 
-    public void setIncludeCACert(
-            final boolean includeCACert) {
-        this.includeCACert = includeCACert;
+    return true;
+  }
+
+  private static boolean getBoolean(
+      final ConfPairs props,
+      final String propKey,
+      final boolean dfltValue)
+  throws InvalidConfException {
+    String s = props.getValue(propKey);
+    if (s != null) {
+      s = s.trim();
+      if ("true".equalsIgnoreCase(s)) {
+        return Boolean.TRUE;
+      } else if ("false".equalsIgnoreCase(s)) {
+        return Boolean.FALSE;
+      } else {
+        throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+      }
     }
-
-    public boolean isIncludeSignerCert() {
-        return includeSignerCert;
-    }
-
-    public void setIncludeSignerCert(
-            final boolean includeSignerCert) {
-        this.includeSignerCert = includeSignerCert;
-    }
-
-    @Override
-    public String toString() {
-        return getConf();
-    }
-
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(
-            final Object obj) {
-        if (!(obj instanceof ScepControl)) {
-            return false;
-        }
-
-        ScepControl b = (ScepControl) obj;
-        if (includeCACert != b.includeCACert
-                || includeSignerCert != b.includeSignerCert) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static boolean getBoolean(
-            final ConfPairs props,
-            final String propKey,
-            final boolean dfltValue)
-    throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            s = s.trim();
-            if ("true".equalsIgnoreCase(s)) {
-                return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
-                return Boolean.FALSE;
-            } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
-            }
-        }
-        return dfltValue;
-    }
+    return dfltValue;
+  }
 
 }

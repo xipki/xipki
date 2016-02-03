@@ -37,18 +37,19 @@ package org.xipki.pki.ca.client.impl;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class ClientErrorCode {
 
-    /**
-     * Intern status to indicate that there are errors in the response
-     */
-    static final int PKIStatus_RESPONSE_ERROR = -1;
+  /**
+   * Intern status to indicate that there are errors in the response
+   */
+  static final int PKIStatus_RESPONSE_ERROR = -1;
 
-    static final int PKIStatus_NO_ANSWER = -2;
+  static final int PKIStatus_NO_ANSWER = -2;
 
-    private ClientErrorCode() {
-    }
+  private ClientErrorCode() {
+  }
 
 }

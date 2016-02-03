@@ -42,25 +42,26 @@ import org.xipki.pki.ca.server.mgmt.shell.CaAliasRemoveCmd;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 @Command(scope = "xipki-caqa", name = "neg-caalias-rm",
-        description = "remove CA alias (negative, QA)")
+    description = "remove CA alias (negative, QA)")
 @Service
 public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        out("neg-caalias-rm");
+  @Override
+  protected Object doExecute()
+  throws Exception {
+    out("neg-caalias-rm");
 
-        try {
-            super.doExecute();
-        } catch (Exception e) {
-            return null;
-        }
-
-        throw new CmdFailure("exception expected, but received none");
+    try {
+      super.doExecute();
+    } catch (Exception e) {
+      return null;
     }
+
+    throw new CmdFailure("exception expected, but received none");
+  }
 
 }
