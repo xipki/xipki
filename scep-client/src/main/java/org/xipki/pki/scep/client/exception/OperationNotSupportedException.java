@@ -37,15 +37,16 @@ package org.xipki.pki.scep.client.exception;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class OperationNotSupportedException extends ScepClientException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public OperationNotSupportedException(
-            final String message) {
-        super(message);
-    }
+  public OperationNotSupportedException(
+      final String message) {
+    super(message);
+  }
 
 }

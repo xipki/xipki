@@ -39,13 +39,14 @@ import org.xipki.pki.scep.transaction.CACapability;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class HttpGetOnlyCATest extends AbstractCATest {
 
-    @Override
-    protected CACapability[] getExcludedCACaps() {
-        return new CACapability[]{CACapability.POSTPKIOperation};
-    }
+  @Override
+  protected CACapability[] getExcludedCACaps() {
+    return new CACapability[]{CACapability.POSTPKIOperation};
+  }
 
 }

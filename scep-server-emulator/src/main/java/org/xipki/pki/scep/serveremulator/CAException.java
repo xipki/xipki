@@ -37,29 +37,30 @@ package org.xipki.pki.scep.serveremulator;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public class CAException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public CAException() {
-    }
+  public CAException() {
+  }
 
-    public CAException(
-            final String message) {
-        super(message);
-    }
+  public CAException(
+      final String message) {
+    super(message);
+  }
 
-    public CAException(
-            final Throwable cause) {
-        super(cause);
-    }
+  public CAException(
+      final Throwable cause) {
+    super(cause);
+  }
 
-    public CAException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+  public CAException(
+      final String message,
+      final Throwable cause) {
+    super(message, cause);
+  }
 
 }

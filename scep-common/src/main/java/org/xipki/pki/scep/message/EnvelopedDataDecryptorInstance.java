@@ -46,29 +46,30 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
+ * @since 2.0
  */
 
 public final class EnvelopedDataDecryptorInstance {
 
-    private final RecipientId recipientId;
+  private final RecipientId recipientId;
 
-    private final KeyTransRecipient recipient;
+  private final KeyTransRecipient recipient;
 
-    public EnvelopedDataDecryptorInstance(
-        final X509Certificate recipientCert,
-        final PrivateKey privKey) {
-        ParamUtil.assertNotNull("recipientCert", recipientCert);
-        ParamUtil.assertNotNull("privKey", privKey);
-        this.recipientId = new JceKeyTransRecipientId(recipientCert);
-        this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
-    }
+  public EnvelopedDataDecryptorInstance(
+    final X509Certificate recipientCert,
+    final PrivateKey privKey) {
+    ParamUtil.assertNotNull("recipientCert", recipientCert);
+    ParamUtil.assertNotNull("privKey", privKey);
+    this.recipientId = new JceKeyTransRecipientId(recipientCert);
+    this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
+  }
 
-    public KeyTransRecipient getRecipient() {
-        return recipient;
-    }
+  public KeyTransRecipient getRecipient() {
+    return recipient;
+  }
 
-    public RecipientId getRecipientId() {
-        return recipientId;
-    }
+  public RecipientId getRecipientId() {
+    return recipientId;
+  }
 
 }
