@@ -95,7 +95,7 @@ import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.GeneralNameMode;
 import org.xipki.pki.ca.api.profile.KeyParametersOption;
-import org.xipki.pki.ca.api.profile.RDNControl;
+import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.StringType;
 import org.xipki.pki.ca.api.profile.x509.AuthorityInfoAccessControl;
@@ -105,7 +105,7 @@ import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
-import org.xipki.pki.ca.api.profile.x509.SubjectDNSpec;
+import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.internal.MonetaryValueOption;
@@ -380,7 +380,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
       duplicateSubjectPermitted = b.booleanValue();
     }
 
-    Map<ASN1ObjectIdentifier, RDNControl> subjectDNControls = new HashMap<>();
+    Map<ASN1ObjectIdentifier, RdnControl> subjectDNControls = new HashMap<>();
 
     for (RdnType t : subject.getRdn()) {
       StringType stringType = XmlX509CertprofileUtil.convertStringType(
@@ -397,7 +397,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
       }
 
       if (patterns == null) {
-        Pattern pattern = SubjectDNSpec.getPattern(type);
+        Pattern pattern = SubjectDnSpec.getPattern(type);
         if (pattern != null) {
           patterns = Arrays.asList(pattern);
         }
@@ -409,14 +409,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
       } else {
         range = null;
       }
-      RDNControl rdnControl = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs());
+      RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
       rdnControl.setStringType(stringType);
       rdnControl.setStringLengthRange(range);
       rdnControl.setPatterns(patterns);
       rdnControl.setPrefix(t.getPrefix());
       rdnControl.setSuffix(t.getSuffix());
       rdnControl.setGroup(t.getGroup());
-      SubjectDNSpec.fixRDNControl(rdnControl);
+      SubjectDnSpec.fixRDNControl(rdnControl);
 
       subjectDNControls.put(type, rdnControl);
     }
@@ -1119,19 +1119,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         DERIA5String sourceDataUri = m.getSourceDataUri();
         switch (biometricDataOption.getSourceDataUriOccurrence()) {
-        case FORBIDDEN:
-          sourceDataUri = null;
-          break;
-        case REQUIRED:
-          if (sourceDataUri == null) {
-            throw new BadCertTemplateException("biometricInfo[" + i
+          case FORBIDDEN:
+            sourceDataUri = null;
+            break;
+          case REQUIRED:
+            if (sourceDataUri == null) {
+              throw new BadCertTemplateException("biometricInfo[" + i
                 + "].sourceDataUri is not specified in request but is required");
-          }
-          break;
-        case OPTIONAL:
-          break;
-        default:
-          throw new BadCertTemplateException(
+            }
+            break;
+          case OPTIONAL:
+            break;
+          default:
+            throw new BadCertTemplateException(
               "could not reach here, unknown tripleState");
         }
 
@@ -1204,7 +1204,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public AuthorityInfoAccessControl getAIAControl() {
+  public AuthorityInfoAccessControl getAiaControl() {
     return aIAControl;
   }
 
@@ -1231,7 +1231,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
   }
 
   @Override
-  public boolean includeIssuerAndSerialInAKI() {
+  public boolean includeIssuerAndSerialInAki() {
     return includeIssuerAndSerialInAKI;
   }
 

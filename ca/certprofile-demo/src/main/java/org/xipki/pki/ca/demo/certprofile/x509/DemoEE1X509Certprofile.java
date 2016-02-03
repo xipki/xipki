@@ -55,8 +55,8 @@ import org.xipki.pki.ca.api.profile.CertValidity.Unit;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.KeyParametersOption;
-import org.xipki.pki.ca.api.profile.RDNControl;
-import org.xipki.pki.ca.api.profile.x509.AbstractEEX509Certprofile;
+import org.xipki.pki.ca.api.profile.RdnControl;
+import org.xipki.pki.ca.api.profile.x509.AbstractEeX509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 
@@ -65,7 +65,7 @@ import org.xipki.pki.ca.api.profile.x509.SubjectControl;
  * @since 2.0
  */
 
-public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile {
+public class DemoEE1X509Certprofile extends AbstractEeX509Certprofile {
 
   private final CertValidity validity;
 
@@ -103,16 +103,16 @@ public class DemoEE1X509Certprofile extends AbstractEEX509Certprofile {
     extensionControls.put(Extension.keyUsage,
         new ExtensionControl(true, true, true));
 
-    Map<ASN1ObjectIdentifier, RDNControl> controls = new HashMap<>();
+    Map<ASN1ObjectIdentifier, RdnControl> controls = new HashMap<>();
 
     ASN1ObjectIdentifier oid = ObjectIdentifiers.DN_O;
-    controls.put(oid, new RDNControl(oid, 1, 1));
+    controls.put(oid, new RdnControl(oid, 1, 1));
 
     oid = ObjectIdentifiers.DN_OU;
-    controls.put(oid, new RDNControl(oid, 0, 1));
+    controls.put(oid, new RdnControl(oid, 0, 1));
 
     oid = ObjectIdentifiers.DN_C;
-    controls.put(oid, new RDNControl(oid, 1, 1));
+    controls.put(oid, new RdnControl(oid, 1, 1));
 
     subjectControl = new SubjectControl(false, controls);
   } // constructor
