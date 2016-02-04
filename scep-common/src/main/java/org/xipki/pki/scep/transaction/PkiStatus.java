@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,40 +42,40 @@ package org.xipki.pki.scep.transaction;
 
 public enum PkiStatus {
 
-  /**
-   * request granted
-   */
-  SUCCESS (0),
+    /**
+     * request granted
+     */
+    SUCCESS (0),
 
-  /**
-   * request rejected
-   */
-  FAILURE (2),
+    /**
+     * request rejected
+     */
+    FAILURE (2),
 
-  /**
-   * request pending for manual approval
-   */
-  PENDING (3);
+    /**
+     * request pending for manual approval
+     */
+    PENDING (3);
 
-  private final int code;
+    private final int code;
 
-  private PkiStatus(
-      final int code) {
-    this.code = code;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public static PkiStatus valueForCode(
-      final int code) {
-    for (PkiStatus m : values()) {
-      if (m.code == code) {
-        return m;
-      }
+    private PkiStatus(
+            final int code) {
+        this.code = code;
     }
-    return null;
-  }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static PkiStatus valueForCode(
+            final int code) {
+        for (PkiStatus m : values()) {
+            if (m.code == code) {
+                return m;
+            }
+        }
+        return null;
+    }
 
 }
