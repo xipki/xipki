@@ -51,7 +51,7 @@ public enum AuditLevel {
 
   private final String alignedText;
 
-  private AuditLevel(
+  AuditLevel(
       final int value,
       final String alignedText) {
     this.value = value;

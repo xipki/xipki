@@ -70,7 +70,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
   public void bindService(
       final AuditService service) {
-    //might be null if dependency is optional
+                //might be null if dependency is optional
     if (service == null) {
       LOG.debug("bindService invoked with null.");
       return;
@@ -87,20 +87,16 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
   public void unbindService(
       final AuditService service) {
-    //might be null if dependency is optional
+                //might be null if dependency is optional
     if (service == null) {
       LOG.debug("unbindService invoked with null.");
       return;
     }
 
-    try {
-      if (services.remove(service)) {
-        LOG.debug("removed AuditService binding for {}", service);
-      } else {
-        LOG.debug("no AuditService binding found to remove for '{}'", service);
-      }
-    } catch (Exception ex) {
-      LOG.debug("caught Exception({}). service is probably destroyed.", ex.getMessage());
+    if (services.remove(service)) {
+      LOG.debug("removed AuditService binding for {}", service);
+    } else {
+      LOG.debug("no AuditService binding found to remove for '{}'", service);
     }
   }
 
