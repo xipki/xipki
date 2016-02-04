@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0" default-activation="lazy">
-  <!--
-     Properties
-  -->
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <!--
-      Note: Don't include a "-" in the persistent-id, or the config admin will
-      interpret it as a service-factory.
-  -->
-  <cm:property-placeholder persistent-id="org.xipki.pki.ca.client" update-strategy="reload">
-    <cm:default-properties>
-      <cm:property name="clientConfFile" value="xipki/client-config/ca-client.xml"/>
-    </cm:default-properties>
-  </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
-  <bean id="caClient" class="org.xipki.pki.ca.client.impl.CAClientImpl" init-method="init" destroy-method="shutdown">
-    <property name="securityFactory" ref="securityFactory"/>
-    <property name="confFile" value="${clientConfFile}"/>
-  </bean>
-  <service ref="caClient" interface="org.xipki.pki.ca.client.api.CAClient"/>
+                                xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+                                xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0" default-activation="lazy">
+                <!--
+                                 Properties
+                -->
+                <!-- Allow the use of system properties -->
+                <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+                <!--
+                                                Note: Don't include a "-" in the persistent-id, or the config admin will
+                                                interpret it as a service-factory.
+                -->
+                <cm:property-placeholder persistent-id="org.xipki.pki.ca.client" update-strategy="reload">
+                                <cm:default-properties>
+                                                <cm:property name="clientConfFile" value="xipki/client-config/ca-client.xml"/>
+                                </cm:default-properties>
+                </cm:property-placeholder>
+                <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+                <bean id="caClient" class="org.xipki.pki.ca.client.impl.CAClientImpl" init-method="init" destroy-method="shutdown">
+                                <property name="securityFactory" ref="securityFactory"/>
+                                <property name="confFile" value="${clientConfFile}"/>
+                </bean>
+                <service ref="caClient" interface="org.xipki.pki.ca.client.api.CAClient"/>
 </blueprint>

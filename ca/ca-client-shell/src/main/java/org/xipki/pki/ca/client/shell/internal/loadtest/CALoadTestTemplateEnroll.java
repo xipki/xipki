@@ -88,13 +88,13 @@ import org.xml.sax.SAXException;
 
 public class CALoadTestTemplateEnroll extends LoadExecutor {
 
-  private final static class CertRequestWithProfile {
+  private static final class CertRequestWithProfile {
 
     private final String certprofile;
 
     private final CertRequest certRequest;
 
-    public CertRequestWithProfile(
+    CertRequestWithProfile(
         final String certprofile,
         final CertRequest certRequest) {
       this.certprofile = certprofile;

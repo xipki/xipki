@@ -66,6 +66,38 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
 
 public class CALoadTestEnroll extends LoadExecutor {
 
+  private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
+
+  private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
+
+  private final CAClient caClient;
+
+  private final LoadTestEntry loadtestEntry;
+
+  private final AtomicLong index;
+
+  private final String userPrefix = "LOADTEST-";
+
+  private final int n;
+
+  public CALoadTestEnroll(
+      final CAClient caClient,
+      final LoadTestEntry loadtestEntry,
+      final int n,
+      final String description) {
+    super(description);
+    ParamUtil.assertNotNull("caClient", caClient);
+    ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
+    if (n < 1) {
+      throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+    }
+    this.n = n;
+    this.loadtestEntry = loadtestEntry;
+    this.caClient = caClient;
+
+    this.index = new AtomicLong(getSecureIndex());
+  }
+
   class Testor implements Runnable {
     @Override
     public void run() {
@@ -129,42 +161,10 @@ public class CALoadTestEnroll extends LoadExecutor {
 
   } // class Testor
 
-  private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-
-  private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
-
-  private final CAClient caClient;
-
-  private final LoadTestEntry loadtestEntry;
-
-  private final AtomicLong index;
-
-  private final String userPrefix = "LOADTEST-";
-
-  private final int n;
-
   @Override
   protected Runnable getTestor()
   throws Exception {
     return new Testor();
-  }
-
-  public CALoadTestEnroll(
-      final CAClient caClient,
-      final LoadTestEntry loadtestEntry,
-      final int n,
-      final String description) {
-    super(description);
-    ParamUtil.assertNotNull("caClient", caClient);
-    ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
-    if (n < 1) {
-      throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
-    }
-    this.n = n;
-    this.loadtestEntry = loadtestEntry;
-    this.caClient = caClient;
-
-    this.index = new AtomicLong(getSecureIndex());
   }
 
   private Map<Integer, CertRequest> nextCertRequests() {

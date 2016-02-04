@@ -186,13 +186,13 @@ limitations under the License.
                                 </module>
 
 
-                                <!--module name="IllegalCatch" /-->
+                                <module name="IllegalCatch" />
                                 <module name="IllegalInstantiation" />
                                 <module name="IllegalThrows" />
                                 <module name="MultipleVariableDeclarations" />
                                 <module name="PackageDeclaration" />
                                 <module name="ParameterAssignment" />
-                                <!--module name="RedundantThrows" /-->
+                                <module name="RedundantThrows" />
                                 <module name="SimplifyBooleanExpression" />
                                 <module name="SimplifyBooleanReturn" />
 

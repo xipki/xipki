@@ -103,6 +103,13 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
+  @Reference
+  protected SecurityFactory securityFactory;
+
+  @Option(name = "--hash",
+      description = "hash algorithm name for the POPO computation")
+  protected String hashAlgo = "SHA256";
+
   @Option(name = "--subject", aliases = "-s",
       description = "subject to be requested\n"
           + "(defaults to subject of self-signed certifite)")
@@ -124,10 +131,6 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
   @Option(name = "--user",
       description = "username")
   private String user;
-
-  @Option(name = "--hash",
-      description = "hash algorithm name for the POPO computation")
-  private String hashAlgo = "SHA256";
 
   @Option(name = "--rsa-mgf1",
       description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
@@ -211,11 +214,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
   @Completion(ExtensionNameCompleter.class)
   private List<String> wantExtensionTypes;
 
-  @Reference
-  protected SecurityFactory securityFactory;
-
   protected abstract ConcurrentContentSigner getSigner(
-      String hashAlgo,
       SignatureAlgoControl signatureAlgoControl)
   throws SignerException;
 
@@ -227,13 +226,13 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
-    ConcurrentContentSigner signer = getSigner(hashAlgo,
+    ConcurrentContentSigner signer = getSigner(
         new SignatureAlgoControl(rsaMgf1, dsaPlain));
     X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 
     X500Name x500Subject = (subject == null)
         ? ssCert.getSubject()
-        : getSubject(subject);
+        : new X500Name(subject);
     certTemplateBuilder.setSubject(x500Subject);
     certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
@@ -315,27 +314,27 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     // biometricInfo
     if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
-      TypeOfBiometricData _biometricType;
+      TypeOfBiometricData objBiometricType;
       if (StringUtil.isNumber(biometricType)) {
-        _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
+        objBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
       } else {
-        _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
+        objBiometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
       }
 
-      ASN1ObjectIdentifier _biometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+      ASN1ObjectIdentifier objBiometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
       byte[] biometricBytes = IoUtil.read(biometricFile);
-      MessageDigest md = MessageDigest.getInstance(_biometricHashAlgo.getId());
+      MessageDigest md = MessageDigest.getInstance(objBiometricHashAlgo.getId());
       md.reset();
-      byte[] _biometricDataHash = md.digest(biometricBytes);
+      byte[] biometricDataHash = md.digest(biometricBytes);
 
-      DERIA5String _sourceDataUri = null;
+      DERIA5String sourceDataUri = null;
       if (biometricUri != null) {
-        _sourceDataUri = new DERIA5String(biometricUri);
+        sourceDataUri = new DERIA5String(biometricUri);
       }
-      BiometricData biometricData = new BiometricData(_biometricType,
-          new AlgorithmIdentifier(_biometricHashAlgo),
-          new DEROctetString(_biometricDataHash),
-          _sourceDataUri);
+      BiometricData biometricData = new BiometricData(objBiometricType,
+          new AlgorithmIdentifier(objBiometricHashAlgo),
+          new DEROctetString(biometricDataHash),
+          sourceDataUri);
 
       ASN1EncodableVector v = new ASN1EncodableVector();
       v.add(biometricData);
@@ -408,10 +407,5 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     return null;
   } // method doExecute
-
-  protected X500Name getSubject(
-      final String subject) {
-    return new X500Name(subject);
-  }
 
 }

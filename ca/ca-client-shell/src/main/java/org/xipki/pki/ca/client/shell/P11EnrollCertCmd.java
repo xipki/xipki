@@ -84,7 +84,6 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
 
   @Override
   protected ConcurrentContentSigner getSigner(
-      final String hashAlgo,
       final SignatureAlgoControl signatureAlgoControl)
   throws SignerException {
     P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);

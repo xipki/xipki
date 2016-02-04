@@ -49,12 +49,12 @@ public class CRLResultType {
   public CRLResultType() {
   }
 
-  public void setCRL(
+  public void setCrl(
       final X509CRL crl) {
     this.crl = crl;
   }
 
-  public X509CRL getCRL() {
+  public X509CRL getCrl() {
     return crl;
   }
 }

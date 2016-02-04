@@ -66,21 +66,16 @@ public class Slf4jAuditServiceImpl implements AuditService {
       return;
     }
 
-    try {
-      switch (event.getLevel()) {
-        case DEBUG:
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("{}", createMessage(event));
-          }
-          break;
-        default:
-          LOG.info("{}", createMessage(event));
-          break;
-      } // end switch
-    } catch (Throwable th) {
-      LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-          AuditLevel.ERROR.getAlignedText(), th.getMessage());
-    }
+    switch (event.getLevel()) {
+      case DEBUG:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{}", createMessage(event));
+        }
+        break;
+      default:
+        LOG.info("{}", createMessage(event));
+        break;
+    } // end switch
   }
 
   @Override
@@ -90,23 +85,18 @@ public class Slf4jAuditServiceImpl implements AuditService {
       return;
     }
 
-    try {
-      CharArrayWriter msg = event.toCharArrayWriter("");
-      AuditLevel al = event.getLevel();
-      switch (al) {
-        case DEBUG:
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("{} | {}", al.getAlignedText(), msg);
-          }
-          break;
-        default:
-          LOG.info("{} | {}", al.getAlignedText(), msg);
-          break;
-      } // end switch
-    } catch (Throwable th) {
-      LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}",
-          AuditLevel.ERROR.getAlignedText(), th.getMessage());
-    }
+    CharArrayWriter msg = event.toCharArrayWriter("");
+    AuditLevel al = event.getLevel();
+    switch (al) {
+      case DEBUG:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{} | {}", al.getAlignedText(), msg);
+        }
+        break;
+      default:
+        LOG.info("{} | {}", al.getAlignedText(), msg);
+        break;
+    } // end switch
   }
 
   private static String createMessage(

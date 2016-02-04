@@ -3,69 +3,69 @@
  Copyright (c) 2014 - 2015 Lijun Liao
 -->
 <xs:schema xmlns="http://xipki.org.xipki.pki.ca.lient/loadtest"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-  targetNamespace="http://xipki.org.xipki.pki.ca.lient/loadtest"
-  elementFormDefault="qualified"
-  version="1.0"
-  jxb:version="2.0">
-  <xs:annotation>
-    <xs:appinfo>
-      <jxb:schemaBindings>
-        <jxb:package name="org.xipki.pki.ca.client.shell.internal.loadtest.jaxb"/>
-      </jxb:schemaBindings>
-    </xs:appinfo>
-  </xs:annotation>
-  <!-- CertStore -->
-  <xs:element name="enrollTemplate" type="enrollTemplateType"/>
-  <xs:complexType name="enrollTemplateType">
-    <xs:sequence>
-      <xs:element name="enrollCert" type="enrollCertType" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="enrollCertType">
-    <xs:sequence>
-      <xs:element name="certprofile" type="xs:string"/>
-      <xs:element name="subject" type="xs:string"/>
-      <xs:element name="randomDN" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>
-            Valid values are GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:choice>
-        <xs:element name="rsaKey" type="rsaKeyType"/>
-        <xs:element name="dsaKey" type="dsaKeyType"/>
-        <xs:element name="ecKey" type="ecKeyType"/>
-      </xs:choice>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="rsaKeyType">
-    <xs:complexContent>
-      <xs:extension base="xs:anyType">
-        <xs:attribute name="modulusLength" type="xs:int" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="dsaKeyType">
-    <xs:complexContent>
-      <xs:extension base="xs:anyType">
-        <xs:attribute name="pLength" type="xs:int" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="ecKeyType">
-    <xs:complexContent>
-      <xs:extension base="xs:anyType">
-        <xs:attribute name="curve" type="xs:string" use="required">
-          <xs:annotation>
-            <xs:documentation>
-              curve name or OID
-            </xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+                targetNamespace="http://xipki.org.xipki.pki.ca.lient/loadtest"
+                elementFormDefault="qualified"
+                version="1.0"
+                jxb:version="2.0">
+                <xs:annotation>
+                                <xs:appinfo>
+                                                <jxb:schemaBindings>
+                                                                <jxb:package name="org.xipki.pki.ca.client.shell.internal.loadtest.jaxb"/>
+                                                </jxb:schemaBindings>
+                                </xs:appinfo>
+                </xs:annotation>
+                <!-- CertStore -->
+                <xs:element name="enrollTemplate" type="enrollTemplateType"/>
+                <xs:complexType name="enrollTemplateType">
+                                <xs:sequence>
+                                                <xs:element name="enrollCert" type="enrollCertType" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                </xs:complexType>
+                <xs:complexType name="enrollCertType">
+                                <xs:sequence>
+                                                <xs:element name="certprofile" type="xs:string"/>
+                                                <xs:element name="subject" type="xs:string"/>
+                                                <xs:element name="randomDN" type="xs:string">
+                                                                <xs:annotation>
+                                                                                <xs:documentation>
+                                                                                                Valid values are GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN
+                                                                                </xs:documentation>
+                                                                </xs:annotation>
+                                                </xs:element>
+                                                <xs:choice>
+                                                                <xs:element name="rsaKey" type="rsaKeyType"/>
+                                                                <xs:element name="dsaKey" type="dsaKeyType"/>
+                                                                <xs:element name="ecKey" type="ecKeyType"/>
+                                                </xs:choice>
+                                </xs:sequence>
+                </xs:complexType>
+                <xs:complexType name="rsaKeyType">
+                                <xs:complexContent>
+                                                <xs:extension base="xs:anyType">
+                                                                <xs:attribute name="modulusLength" type="xs:int" use="required"/>
+                                                </xs:extension>
+                                </xs:complexContent>
+                </xs:complexType>
+                <xs:complexType name="dsaKeyType">
+                                <xs:complexContent>
+                                                <xs:extension base="xs:anyType">
+                                                                <xs:attribute name="pLength" type="xs:int" use="required"/>
+                                                </xs:extension>
+                                </xs:complexContent>
+                </xs:complexType>
+                <xs:complexType name="ecKeyType">
+                                <xs:complexContent>
+                                                <xs:extension base="xs:anyType">
+                                                                <xs:attribute name="curve" type="xs:string" use="required">
+                                                                                <xs:annotation>
+                                                                                                <xs:documentation>
+                                                                                                                curve name or OID
+                                                                                                </xs:documentation>
+                                                                                </xs:annotation>
+                                                                </xs:attribute>
+                                                </xs:extension>
+                                </xs:complexContent>
+                </xs:complexType>
 </xs:schema>

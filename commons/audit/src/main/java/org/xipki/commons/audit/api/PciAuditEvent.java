@@ -61,9 +61,9 @@ public class PciAuditEvent {
 
   private static final String DEFAULT_REPLACE_DELIMITER = "_";
 
-  private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+  private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy/MM/dd");
 
-  private static final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+  private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("HH:mm:ss");
 
   /**
    * 10.3.1 "User Identification"
@@ -93,7 +93,7 @@ public class PciAuditEvent {
   /**
    * 10.3.5 "Origination of Event"
    */
-  private String origination = null;
+  private String origination;
 
   /**
    * 10.3.6 "Identity or name of affected data, system component, or resource"
@@ -107,12 +107,12 @@ public class PciAuditEvent {
 
   public PciAuditEvent(
       final Date date) {
-    synchronized (dateFormatter) {
-      this.date = dateFormatter.format(date);
+    synchronized (DATE_FORMATTER) {
+      this.date = DATE_FORMATTER.format(date);
     }
 
-    synchronized (timeFormatter) {
-      this.time = timeFormatter.format(date);
+    synchronized (TIME_FORMATTER) {
+      this.time = TIME_FORMATTER.format(date);
     }
 
     this.level = AuditLevel.INFO;
@@ -230,10 +230,15 @@ public class PciAuditEvent {
 
   private static boolean isBlank(
       final CharSequence cs) {
-    int strLen;
-    if (cs == null || (strLen = cs.length()) == 0) {
+    if (cs == null) {
       return true;
     }
+
+    int strLen = cs.length();
+    if (strLen == 0) {
+      return true;
+    }
+
     for (int i = 0; i < strLen; i++) {
       if (!Character.isWhitespace(cs.charAt(i))) {
         return false;

@@ -73,70 +73,11 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
 
 public class CALoadTestRevoke extends LoadExecutor {
 
-  class Testor implements Runnable {
-
-    @Override
-    public void run() {
-      while (!stop() && getErrorAccout() < 1) {
-        List<Long> serialNumbers;
-        try {
-          serialNumbers = nextSerials();
-        } catch (DataAccessException ex) {
-          account(1, 1);
-          break;
-        }
-
-        if (CollectionUtil.isEmpty(serialNumbers)) {
-          break;
-        }
-
-        boolean successful = testNext(serialNumbers);
-        int numFailed = successful
-            ? 0
-            : 1;
-        account(1, numFailed);
-      }
-    }
-
-    private boolean testNext(
-        final List<Long> serialNumbers) {
-      RevokeCertRequestType request = new RevokeCertRequestType();
-      int id = 1;
-      for (Long serialNumber : serialNumbers) {
-        CRLReason reason = reasons[(int) (serialNumber % reasons.length)];
-        RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
-            Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
-            reason.getCode(), null);
-        request.addRequestEntry(entry);
-      }
-
-      Map<String, CertIdOrError> result;
-      try {
-        result = caClient.revokeCerts(request, null);
-      } catch (CAClientException | PKIErrorException e) {
-        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-        return false;
-      } catch (Throwable t) {
-        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-        return false;
-      }
-
-      if (result == null) {
-        return false;
-      }
-
-      int nSuccess = 0;
-      for (CertIdOrError entry : result.values()) {
-        if (entry.getCertId() != null) {
-          nSuccess++;
-        }
-      }
-      return nSuccess == serialNumbers.size();
-    } // method testNext
-
-  } // class Testor
-
   private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
+
+  private static final CRLReason[] REASONS = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+        CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+        CRLReason.CERTIFICATE_HOLD,  CRLReason.PRIVILEGE_WITHDRAWN};
 
   private final CAClient caClient;
 
@@ -162,17 +103,7 @@ public class CALoadTestRevoke extends LoadExecutor {
 
   private long nextStartSerial;
 
-  private boolean noUnrevokedCerts = false;
-
-  private CRLReason[] reasons = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
-      CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
-      CRLReason.CERTIFICATE_HOLD,  CRLReason.PRIVILEGE_WITHDRAWN};
-
-  @Override
-  protected Runnable getTestor()
-  throws Exception {
-    return new Testor();
-  }
+  private boolean noUnrevokedCerts;
 
   public CALoadTestRevoke(
       final CAClient caClient,
@@ -226,6 +157,75 @@ public class CALoadTestRevoke extends LoadExecutor {
     }
   } // constructor
 
+  class Testor implements Runnable {
+
+    @Override
+    public void run() {
+      while (!stop() && getErrorAccout() < 1) {
+        List<Long> serialNumbers;
+        try {
+          serialNumbers = nextSerials();
+        } catch (DataAccessException ex) {
+          account(1, 1);
+          break;
+        }
+
+        if (CollectionUtil.isEmpty(serialNumbers)) {
+          break;
+        }
+
+        boolean successful = testNext(serialNumbers);
+        int numFailed = successful
+            ? 0
+            : 1;
+        account(1, numFailed);
+      }
+    }
+
+    private boolean testNext(
+        final List<Long> serialNumbers) {
+      RevokeCertRequestType request = new RevokeCertRequestType();
+      int id = 1;
+      for (Long serialNumber : serialNumbers) {
+        CRLReason reason = REASONS[(int) (serialNumber % REASONS.length)];
+        RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
+            Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
+            reason.getCode(), null);
+        request.addRequestEntry(entry);
+      }
+
+      Map<String, CertIdOrError> result;
+      try {
+        result = caClient.revokeCerts(request, null);
+      } catch (CAClientException | PKIErrorException e) {
+        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+        return false;
+      } catch (Throwable t) {
+        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+        return false;
+      }
+
+      if (result == null) {
+        return false;
+      }
+
+      int nSuccess = 0;
+      for (CertIdOrError entry : result.values()) {
+        if (entry.getCertId() != null) {
+          nSuccess++;
+        }
+      }
+      return nSuccess == serialNumbers.size();
+    } // method testNext
+
+  } // class Testor
+
+  @Override
+  protected Runnable getTestor()
+  throws Exception {
+    return new Testor();
+  }
+
   private List<Long> nextSerials()
   throws DataAccessException {
     List<Long> ret = new ArrayList<>(n);
@@ -263,12 +263,12 @@ public class CALoadTestRevoke extends LoadExecutor {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        int n = 0;
+        int i = 0;
         try {
           stmt = caDataSource.getConnection().prepareStatement(sql);
           rs = stmt.executeQuery();
           while (rs.next()) {
-            n++;
+            i++;
             long serial = rs.getLong("SN");
             if (serial + 1 > nextStartSerial) {
               nextStartSerial = serial + 1;
@@ -283,12 +283,12 @@ public class CALoadTestRevoke extends LoadExecutor {
           caDataSource.releaseResources(stmt, rs);
         }
 
-        if (n == 0) {
+        if (i == 0) {
           System.out.println("no unrevoked certificate");
           System.out.flush();
         }
 
-        if (n < 1000) {
+        if (i < 1000) {
           noUnrevokedCerts = true;
         }
       }
