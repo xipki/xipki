@@ -88,7 +88,7 @@ import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class X509SelfSignedCertBuilder {

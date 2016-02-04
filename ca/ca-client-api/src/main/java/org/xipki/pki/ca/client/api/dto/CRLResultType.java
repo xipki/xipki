@@ -39,7 +39,7 @@ import java.security.cert.X509CRL;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CRLResultType {

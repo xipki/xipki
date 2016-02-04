@@ -50,7 +50,7 @@ import org.w3c.dom.Node;
 /**
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  *
  */
 public class SimpleXPath {

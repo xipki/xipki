@@ -49,7 +49,7 @@ import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-qa", name = "neg-unrevoke",

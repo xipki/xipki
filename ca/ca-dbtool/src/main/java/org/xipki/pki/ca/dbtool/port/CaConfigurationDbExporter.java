@@ -82,7 +82,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class CaConfigurationDbExporter extends DbPorter {

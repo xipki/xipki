@@ -42,7 +42,7 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class EjbcaCACertExtractor {

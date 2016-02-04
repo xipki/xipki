@@ -82,7 +82,7 @@ import org.xipki.pki.ca.api.profile.StringType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public abstract class BaseX509Certprofile extends X509Certprofile {

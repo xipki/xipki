@@ -68,7 +68,7 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CALoadTestRevoke extends LoadExecutor {

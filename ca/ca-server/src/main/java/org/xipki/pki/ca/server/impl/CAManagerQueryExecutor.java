@@ -105,7 +105,7 @@ import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class CAManagerQueryExecutor {

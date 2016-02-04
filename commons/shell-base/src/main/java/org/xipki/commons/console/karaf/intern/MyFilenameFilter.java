@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 public class MyFilenameFilter implements FilenameFilter {
 

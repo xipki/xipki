@@ -37,7 +37,7 @@ package org.xipki.pki.ca.api.profile;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public enum GeneralNameTag {

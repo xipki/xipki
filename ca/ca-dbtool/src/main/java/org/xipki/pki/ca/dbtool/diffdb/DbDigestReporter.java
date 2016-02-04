@@ -50,7 +50,7 @@ import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class DbDigestReporter {

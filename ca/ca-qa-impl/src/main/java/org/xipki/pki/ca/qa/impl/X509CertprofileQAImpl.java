@@ -91,7 +91,7 @@ import org.xipki.pki.ca.qa.impl.internal.QaExtensionValue;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class X509CertprofileQAImpl implements X509CertprofileQA {

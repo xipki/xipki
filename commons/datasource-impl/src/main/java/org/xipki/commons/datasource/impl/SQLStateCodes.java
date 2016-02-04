@@ -46,7 +46,7 @@ import org.xipki.commons.datasource.api.DatabaseType;
  * JDBC state codes for a particular database. It is the first two digits (the SQL state "class").
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 public class SQLStateCodes {
 

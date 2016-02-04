@@ -74,7 +74,7 @@ import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-ocsp", name = "status",

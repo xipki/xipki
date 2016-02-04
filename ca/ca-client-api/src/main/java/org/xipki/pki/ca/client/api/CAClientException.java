@@ -37,7 +37,7 @@ package org.xipki.pki.ca.client.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CAClientException extends Exception {

@@ -71,7 +71,7 @@ import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 abstract class DbDigestReader implements DigestReader {

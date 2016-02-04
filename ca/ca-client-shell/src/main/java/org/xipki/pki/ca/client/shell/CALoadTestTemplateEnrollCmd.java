@@ -48,7 +48,7 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollTemplateType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-template-enroll",

@@ -45,7 +45,7 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class ResponderOption {

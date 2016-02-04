@@ -65,7 +65,7 @@ import org.xipki.pki.ocsp.server.impl.jaxb.VersionsType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class RequestOption {

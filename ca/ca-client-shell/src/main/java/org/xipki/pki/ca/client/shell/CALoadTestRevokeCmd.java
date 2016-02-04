@@ -54,7 +54,7 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestRevoke;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-revoke",

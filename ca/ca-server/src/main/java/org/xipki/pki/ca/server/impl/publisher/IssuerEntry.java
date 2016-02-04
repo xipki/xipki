@@ -41,7 +41,7 @@ import org.bouncycastle.util.encoders.Base64;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class IssuerEntry {

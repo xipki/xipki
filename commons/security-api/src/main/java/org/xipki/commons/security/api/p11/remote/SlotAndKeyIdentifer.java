@@ -54,7 +54,7 @@ import org.xipki.commons.security.api.BadASN1ObjectException;
  * </pre>
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class SlotAndKeyIdentifer extends ASN1Object {

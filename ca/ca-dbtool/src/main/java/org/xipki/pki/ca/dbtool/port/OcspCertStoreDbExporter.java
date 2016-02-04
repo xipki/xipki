@@ -72,7 +72,7 @@ import org.xipki.pki.ca.dbtool.xmlio.OcspCertsWriter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class OcspCertStoreDbExporter extends DbPorter {

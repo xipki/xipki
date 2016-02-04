@@ -39,7 +39,7 @@ import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public interface P11CryptServiceFactory {

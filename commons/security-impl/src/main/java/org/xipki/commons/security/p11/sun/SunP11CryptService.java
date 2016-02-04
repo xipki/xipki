@@ -71,7 +71,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @SuppressWarnings("restriction")

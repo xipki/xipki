@@ -85,7 +85,7 @@ import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {

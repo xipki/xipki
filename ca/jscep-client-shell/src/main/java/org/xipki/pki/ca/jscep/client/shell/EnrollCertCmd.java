@@ -48,7 +48,7 @@ import org.jscep.transaction.TransactionException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "jscep", name = "enroll",

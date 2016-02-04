@@ -45,7 +45,7 @@ import org.xipki.commons.security.shell.SecurityCommandSupport;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {

@@ -51,7 +51,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-db", name = "diff-digest-db",

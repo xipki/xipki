@@ -45,7 +45,7 @@ import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",

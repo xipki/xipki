@@ -61,7 +61,7 @@ import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-qa", name = "check-cert",

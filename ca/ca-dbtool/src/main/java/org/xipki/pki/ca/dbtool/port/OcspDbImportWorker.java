@@ -57,7 +57,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class OcspDbImportWorker extends DbPortWorker {

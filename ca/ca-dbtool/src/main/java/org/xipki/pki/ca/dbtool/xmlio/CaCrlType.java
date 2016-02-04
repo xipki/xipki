@@ -39,7 +39,7 @@ import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CaCrlType extends DbDataObject {

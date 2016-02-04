@@ -49,7 +49,7 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class DbSchemaInfo {

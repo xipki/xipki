@@ -68,7 +68,7 @@ import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDigestExportReader;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter {

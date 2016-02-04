@@ -54,7 +54,7 @@ import org.xipki.commons.common.util.StringUtil;
  * signerCert.included=<'true'|'false'>
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class ScepControl implements Serializable {

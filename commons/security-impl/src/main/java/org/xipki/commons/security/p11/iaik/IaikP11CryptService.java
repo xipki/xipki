@@ -60,7 +60,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public final class IaikP11CryptService implements P11CryptService {

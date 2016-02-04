@@ -43,7 +43,7 @@ import org.xipki.pki.ocsp.api.CertprofileOption;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class Responder {

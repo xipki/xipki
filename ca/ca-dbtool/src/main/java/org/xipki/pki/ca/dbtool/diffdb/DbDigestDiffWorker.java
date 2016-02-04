@@ -58,7 +58,7 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class DbDigestDiffWorker extends DbPortWorker {
