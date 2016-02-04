@@ -99,6 +99,10 @@ public abstract class CmpRequestor {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
 
+  protected final SecurityFactory securityFactory;
+
+  protected boolean signRequest;
+
   private final  Random random = new Random();
 
   private final ConcurrentContentSigner requestor;
@@ -111,11 +115,7 @@ public abstract class CmpRequestor {
 
   private final String c14nRecipientName;
 
-  protected final SecurityFactory securityFactory;
-
-  protected boolean signRequest;
-
-  private boolean sendRequestorCert = false;
+  private boolean sendRequestorCert;
 
   public CmpRequestor(
       final X509Certificate requestorCert,
@@ -196,11 +196,11 @@ public abstract class CmpRequestor {
       final PKIMessage request,
       final RequestResponseDebug debug)
   throws CmpRequestorException {
-    PKIMessage _request;
+    PKIMessage realRequest;
     if (signRequest) {
-      _request = sign(request);
+      realRequest = sign(request);
     } else {
-      _request = request;
+      realRequest = request;
     }
 
     if (responderCert == null) {
@@ -209,9 +209,9 @@ public abstract class CmpRequestor {
 
     byte[] encodedRequest;
     try {
-      encodedRequest = _request.getEncoded();
+      encodedRequest = realRequest.getEncoded();
     } catch (IOException ex) {
-      LOG.error("error while encode the PKI request {}", _request);
+      LOG.error("error while encode the PKI request {}", realRequest);
       throw new CmpRequestorException(ex.getMessage(), ex);
     }
 
@@ -226,7 +226,7 @@ public abstract class CmpRequestor {
     try {
       encodedResponse = send(encodedRequest);
     } catch (IOException ex) {
-      LOG.error("error while send the PKI request {} to server", _request);
+      LOG.error("error while send the PKI request {} to server", realRequest);
       throw new CmpRequestorException("TRANSPORT_ERROR", ex);
     }
 
@@ -247,9 +247,9 @@ public abstract class CmpRequestor {
 
     PKIHeader respHeader = response.getHeader();
     ASN1OctetString tid = respHeader.getTransactionID();
-    GeneralName recipient = respHeader.getRecipient();
-    if (!sender.equals(recipient)) {
-      LOG.warn("tid={}: unknown CMP requestor '{}'", tid, recipient);
+    GeneralName rec = respHeader.getRecipient();
+    if (!sender.equals(rec)) {
+      LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
     }
 
     PKIResponse ret = new PKIResponse(response);
@@ -303,15 +303,15 @@ public abstract class CmpRequestor {
       throw new CmpRequestorException("invalid syntax of the response");
     }
 
-    int _action;
+    int realAction;
     try {
-      _action = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
+      realAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
     } catch (IllegalArgumentException ex) {
       throw new CmpRequestorException("invalid syntax of the response");
     }
 
-    if (action != _action) {
-      throw new CmpRequestorException("received XiPKI action '" + _action
+    if (action != realAction) {
+      throw new CmpRequestorException("received XiPKI action '" + realAction
           + "' instead the exceptected '" + action  + "'");
     }
 
@@ -347,9 +347,9 @@ public abstract class CmpRequestor {
     InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
     InfoTypeAndValue itv = null;
     if (itvs != null && itvs.length > 0) {
-      for (InfoTypeAndValue _itv : itvs) {
-        if (exepectedType.equals(_itv.getInfoType().getId())) {
-          itv = _itv;
+      for (InfoTypeAndValue entry : itvs) {
+        if (exepectedType.equals(entry.getInfoType().getId())) {
+          itv = entry;
           break;
         }
       }
@@ -410,14 +410,14 @@ public abstract class CmpRequestor {
         recipient);
     hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-    ASN1OctetString _tid;
+    ASN1OctetString realTid;
     if (tid == null) {
-      _tid = new DEROctetString(randomTransactionId());
+      realTid = new DEROctetString(randomTransactionId());
     } else {
-      _tid = tid;
+      realTid = tid;
     }
 
-    hBuilder.setTransactionID(_tid);
+    hBuilder.setTransactionID(realTid);
 
     List<InfoTypeAndValue> itvs = new ArrayList<>(2);
     if (addImplictConfirm) {
@@ -549,7 +549,7 @@ public abstract class CmpRequestor {
       if (protectionVerificationResult == null
           || protectionVerificationResult.getProtectionResult()
               != ProtectionResult.VALID) {
-        throw new PKIErrorException(ClientErrorCode.PKIStatus_RESPONSE_ERROR,
+        throw new PKIErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
             PKIFailureInfo.badMessageCheck,
             "message check of the response failed");
       }

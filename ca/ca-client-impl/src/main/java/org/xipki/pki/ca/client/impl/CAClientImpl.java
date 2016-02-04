@@ -384,7 +384,6 @@ public final class CAClientImpl implements CAClient {
         }
       }
 
-      //------------------------------------------------
       if (requestorConf.getSignerType() != null) {
         try {
           ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
@@ -487,21 +486,22 @@ public final class CAClientImpl implements CAClient {
   public EnrollCertResult requestCert(
       final CertificationRequest p10Request,
       final String profile,
-      String caName,
+      final String caName,
       final String username,
       final RequestResponseDebug debug)
   throws CAClientException, PKIErrorException {
-    if (caName == null) {
-      caName = getCANameForProfile(profile);
-      if (caName == null) {
+  String realCaName = caName;
+    if (realCaName == null) {
+      realCaName = getCANameForProfile(profile);
+      if (realCaName == null) {
         throw new CAClientException("cert profile " + profile
             + " is not supported by any CA");
       }
     }
 
-    CAConf ca = casMap.get(caName.trim());
+    CAConf ca = casMap.get(realCaName.trim());
     if (ca == null) {
-      throw new CAClientException("could not find CA named " + caName);
+      throw new CAClientException("could not find CA named " + realCaName);
     }
 
     final String id = "cert-1";
@@ -513,13 +513,13 @@ public final class CAClientImpl implements CAClient {
       throw new CAClientException(e.getMessage(), e);
     }
 
-    return parseEnrollCertResult((EnrollCertResultType) result, caName);
+    return parseEnrollCertResult((EnrollCertResultType) result, realCaName);
   } // method requestCert
 
   @Override
   public EnrollCertResult requestCerts(
       final EnrollCertRequestType request,
-      String caName,
+      final String caName,
       final String username,
       final RequestResponseDebug debug)
   throws CAClientException, PKIErrorException {
@@ -530,12 +530,13 @@ public final class CAClientImpl implements CAClient {
       return null;
     }
 
-    boolean b = (caName != null);
-    if (caName == null) {
+    String realCaName = caName;
+    boolean b = (realCaName != null);
+    if (realCaName == null) {
       // detect the CA name
       String profile = requestEntries.get(0).getCertprofile();
-      caName = getCANameForProfile(profile);
-      if (caName == null) {
+      realCaName = getCANameForProfile(profile);
+      if (realCaName == null) {
         throw new CAClientException("cert profile " + profile
             + " is not supported by any CA");
       }
@@ -545,13 +546,13 @@ public final class CAClientImpl implements CAClient {
       // make sure that all requests are targeted on the same CA
       for (EnrollCertRequestEntryType entry : request.getRequestEntries()) {
         String profile = entry.getCertprofile();
-        checkCertprofileSupportInCA(profile, caName);
+        checkCertprofileSupportInCA(profile, realCaName);
       }
     }
 
-    CAConf ca = casMap.get(caName.trim());
+    CAConf ca = casMap.get(realCaName.trim());
     if (ca == null) {
-      throw new CAClientException("could not find CA named " + caName);
+      throw new CAClientException("could not find CA named " + realCaName);
     }
 
     EnrollCertResultType result;
@@ -561,21 +562,22 @@ public final class CAClientImpl implements CAClient {
       throw new CAClientException(e.getMessage(), e);
     }
 
-    return parseEnrollCertResult((EnrollCertResultType) result, caName);
+    return parseEnrollCertResult((EnrollCertResultType) result, realCaName);
   } // method requestCerts
 
   private void checkCertprofileSupportInCA(
       final String certprofile,
-      String caName)
+      final String caName)
   throws CAClientException {
-    if (caName != null) {
-      CAConf ca = casMap.get(caName.trim());
+  String realCaName = caName;
+    if (realCaName != null) {
+      CAConf ca = casMap.get(realCaName.trim());
       if (ca == null) {
-        throw new CAClientException("unknown ca: " + caName);
+        throw new CAClientException("unknown ca: " + realCaName);
       } else {
         if (!ca.supportsProfile(certprofile)) {
           throw new CAClientException("cert profile " + certprofile
-              + " is not supported by the CA " + caName);
+              + " is not supported by the CA " + realCaName);
         }
       }
       return;
@@ -586,8 +588,8 @@ public final class CAClientImpl implements CAClient {
         continue;
       }
       if (ca.supportsProfile(certprofile)) {
-        if (caName == null) {
-          caName = ca.getName();
+        if (realCaName == null) {
+          realCaName = ca.getName();
         } else {
           throw new CAClientException("cert profile " + certprofile
               + " supported by more than one CA, please specify the CA name.");
@@ -595,7 +597,7 @@ public final class CAClientImpl implements CAClient {
       }
     }
 
-    if (caName == null) {
+    if (realCaName == null) {
       throw new CAClientException("unsupported cert profile " + certprofile);
     }
   } // method checkCertprofileSupportInCA
@@ -668,20 +670,19 @@ public final class CAClientImpl implements CAClient {
   throws CAClientException {
     Map<String, CertIdOrError> ret = new HashMap<>();
 
-    RevokeCertResultType _result = (RevokeCertResultType) result;
-    for (ResultEntryType _entry : _result.getResultEntries()) {
+    for (ResultEntryType re : result.getResultEntries()) {
       CertIdOrError certIdOrError;
-      if (_entry instanceof RevokeCertResultEntryType) {
-        RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
+      if (re instanceof RevokeCertResultEntryType) {
+        RevokeCertResultEntryType entry = (RevokeCertResultEntryType) re;
         certIdOrError = new CertIdOrError(entry.getCertId());
-      } else if (_entry instanceof ErrorResultEntryType) {
-        ErrorResultEntryType entry = (ErrorResultEntryType) _entry;
+      } else if (re instanceof ErrorResultEntryType) {
+        ErrorResultEntryType entry = (ErrorResultEntryType) re;
         certIdOrError = new CertIdOrError(entry.getStatusInfo());
       } else {
-        throw new CAClientException("unknwon type " + _entry);
+        throw new CAClientException("unknwon type " + re);
       }
 
-      ret.put(_entry.getId(), certIdOrError);
+      ret.put(re.getId(), certIdOrError);
     }
 
     return ret;
@@ -720,7 +721,7 @@ public final class CAClientImpl implements CAClient {
       throw new CAClientException(e.getMessage(), e);
     }
 
-    return result.getCRL();
+    return result.getCrl();
   }
 
   @Override
@@ -738,7 +739,7 @@ public final class CAClientImpl implements CAClient {
     X509CmpRequestor requestor = ca.getRequestor();
     try {
       CRLResultType result = requestor.generateCRL(debug);
-      return result.getCRL();
+      return result.getCrl();
     } catch (CmpRequestorException e) {
       throw new CAClientException(e.getMessage(), e);
     }
@@ -815,23 +816,24 @@ public final class CAClientImpl implements CAClient {
       final CertRequest certRequest,
       final ProofOfPossession pop,
       final String profileName,
-      String caName,
+      final String caName,
       final String username)
   throws CAClientException {
-    if (caName == null) {
+  String realCaName = caName;
+    if (realCaName == null) {
       // detect the CA name
-      caName = getCANameForProfile(profileName);
-      if (caName == null) {
+      realCaName = getCANameForProfile(profileName);
+      if (realCaName == null) {
         throw new CAClientException("cert profile " + profileName
             + " is not supported by any CA");
       }
     } else {
-      checkCertprofileSupportInCA(profileName, caName);
+      checkCertprofileSupportInCA(profileName, realCaName);
     }
 
-    CAConf ca = casMap.get(caName.trim());
+    CAConf ca = casMap.get(realCaName.trim());
     if (ca == null) {
-      throw new CAClientException("could not find CA named " + caName);
+      throw new CAClientException("could not find CA named " + realCaName);
     }
 
     PKIMessage pkiMessage;
@@ -858,10 +860,10 @@ public final class CAClientImpl implements CAClient {
       return false;
     }
 
-    X509Certificate _caCert = (X509Certificate) caCert;
-    X509Certificate _cert = (X509Certificate) cert;
+    X509Certificate x509caCert = (X509Certificate) caCert;
+    X509Certificate x509cert = (X509Certificate) cert;
 
-    if (!_cert.getIssuerX500Principal().equals(_caCert.getSubjectX500Principal())) {
+    if (!x509cert.getIssuerX500Principal().equals(x509caCert.getSubjectX500Principal())) {
       return false;
     }
 
@@ -871,17 +873,17 @@ public final class CAClientImpl implements CAClient {
     }
 
     final String provider = "XipkiNSS";
-    Boolean tryXipkiNSStoVerify = tryXipkiNSStoVerifyMap.get(_caCert);
-    PublicKey caPublicKey = _caCert.getPublicKey();
+    Boolean tryXipkiNSStoVerify = tryXipkiNSStoVerifyMap.get(x509caCert);
+    PublicKey caPublicKey = x509caCert.getPublicKey();
     try {
       if (tryXipkiNSStoVerify == null) {
         if (caPublicKey instanceof ECPublicKey || Security.getProvider(provider) == null) {
           tryXipkiNSStoVerify = Boolean.FALSE;
-          tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+          tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
         } else {
-          byte[] tbs = _cert.getTBSCertificate();
-          byte[] signatureValue = _cert.getSignature();
-          String sigAlgName = _cert.getSigAlgName();
+          byte[] tbs = x509cert.getTBSCertificate();
+          byte[] signatureValue = x509cert.getSignature();
+          String sigAlgName = x509cert.getSigAlgName();
           try {
             Signature verifier = Signature.getInstance(sigAlgName, provider);
             verifier.initVerify(caPublicKey);
@@ -890,26 +892,26 @@ public final class CAClientImpl implements CAClient {
 
             LOG.info("use {} to verify {} signature", provider, sigAlgName);
             tryXipkiNSStoVerify = Boolean.TRUE;
-            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+            tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
             return sigValid;
           } catch (Exception e) {
             LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
             tryXipkiNSStoVerify = Boolean.FALSE;
-            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+            tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
           }
         }
       }
 
       if (tryXipkiNSStoVerify) {
-        byte[] tbs = _cert.getTBSCertificate();
-        byte[] signatureValue = _cert.getSignature();
-        String sigAlgName = _cert.getSigAlgName();
+        byte[] tbs = x509cert.getTBSCertificate();
+        byte[] signatureValue = x509cert.getSignature();
+        String sigAlgName = x509cert.getSigAlgName();
         Signature verifier = Signature.getInstance(sigAlgName, provider);
         verifier.initVerify(caPublicKey);
         verifier.update(tbs);
         return verifier.verify(signatureValue);
       } else {
-        _cert.verify(caPublicKey);
+        x509cert.verify(caPublicKey);
         return true;
       }
     } catch (SignatureException | InvalidKeyException | CertificateException

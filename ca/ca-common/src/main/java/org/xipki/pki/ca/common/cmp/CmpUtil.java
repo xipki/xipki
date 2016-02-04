@@ -64,6 +64,9 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 
 public class CmpUtil {
 
+  private CmpUtil() {
+  }
+
   public static PKIMessage addProtection(
       final PKIMessage pkiMessage,
       final ConcurrentContentSigner signer,
@@ -75,17 +78,18 @@ public class CmpUtil {
   public static PKIMessage addProtection(
       final PKIMessage pkiMessage,
       final ConcurrentContentSigner signer,
-      GeneralName signerName,
+      final GeneralName signerName,
       final boolean addSignerCert)
   throws CMPException, NoIdleSignerException {
-    if (signerName == null) {
+    GeneralName localSignerName = signerName;
+    if (localSignerName == null) {
       X500Name x500Name = X500Name.getInstance(
           signer.getCertificate().getSubjectX500Principal().getEncoded());
-      signerName = new GeneralName(x500Name);
+      localSignerName = new GeneralName(x500Name);
     }
     PKIHeader header = pkiMessage.getHeader();
     ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
-        signerName, header.getRecipient());
+        localSignerName, header.getRecipient());
     PKIFreeText freeText = header.getFreeText();
     if (freeText != null) {
       builder.setFreeText(freeText);
@@ -199,9 +203,6 @@ public class CmpUtil {
       final CmpUtf8Pairs utf8Pairs) {
     return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
         new DERUTF8String(utf8Pairs.getEncoded()));
-  }
-
-  private CmpUtil() {
   }
 
 }

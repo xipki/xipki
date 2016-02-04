@@ -143,7 +143,7 @@ import org.xml.sax.SAXException;
 
 abstract class X509CmpRequestor extends CmpRequestor {
 
-  private final static DigestCalculatorProvider digesetCalculatorProvider
+  private static final DigestCalculatorProvider DIGEST_CALCULATOR_PROVIDER
       = new BcDigestCalculatorProvider();
 
   private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
@@ -260,7 +260,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     CRLResultType result = new CRLResultType();
-    result.setCRL(crl);
+    result.setCrl(crl);
     return result;
   } // method evaluateCRLResponse
 
@@ -342,10 +342,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
       CertId certId = null;
       if (revCerts != null) {
-        for (CertId _certId : revCerts) {
-          if (re.getIssuer().equals(_certId.getIssuer().getName())
-              && re.getSerialNumber().equals(_certId.getSerialNumber().getValue())) {
-            certId = _certId;
+        for (CertId entry : revCerts) {
+          if (re.getIssuer().equals(entry.getIssuer().getName())
+              && re.getSerialNumber().equals(entry.getSerialNumber().getValue())) {
+            certId = entry;
             break;
           }
         }
@@ -373,7 +373,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     PKIMessage request = buildPKIMessage(p10Req, username);
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
     reqIdIdMap.put(MINUS_ONE, p10Req.getId());
-    return intern_requestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
+    return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
   }
 
   public EnrollCertResultType requestCertificate(
@@ -401,10 +401,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
         exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
     }
 
-    return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
+    return internRequestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
   }
 
-  private EnrollCertResultType intern_requestCertificate(
+  private EnrollCertResultType internRequestCertificate(
       final PKIMessage reqMessage,
       final Map<BigInteger, String> reqIdIdMap,
       final int expectedBodyType,
@@ -485,7 +485,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             certHolder = new X509CertificateHolder(cmpCert.getEncoded());
           } catch (IOException ex) {
             resultEntry = new ErrorResultEntryType(thisId,
-                ClientErrorCode.PKIStatus_RESPONSE_ERROR,
+                ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
                 PKIFailureInfo.systemFailure,
                 "error while decode the certificate");
           }
@@ -509,7 +509,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     if (CollectionUtil.isNotEmpty(reqIdIdMap)) {
       for (BigInteger reqId : reqIdIdMap.keySet()) {
         ErrorResultEntryType ere = new ErrorResultEntryType(reqIdIdMap.get(reqId),
-            ClientErrorCode.PKIStatus_NO_ANSWER);
+            ClientErrorCode.PKISTATUS_NO_ANSWER);
         result.addResultEntry(ere);
       }
     }
@@ -540,7 +540,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     PKIHeader header = buildPKIHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
     CertificateConfirmationContent certConfirm;
     try {
-      certConfirm = certConfirmBuilder.build(digesetCalculatorProvider);
+      certConfirm = certConfirmBuilder.build(DIGEST_CALCULATOR_PROVIDER);
     } catch (CMPException ex) {
       throw new CmpRequestorException(ex.getMessage(), ex);
     }

@@ -54,6 +54,9 @@ import org.xipki.pki.ca.client.api.CAClient;
 
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
+  @Reference
+  protected CAClient caClient;
+
   @Option(name = "--req-out",
       description = "where to save the request")
   @Completion(FilePathCompleter.class)
@@ -63,9 +66,6 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
       description = "where to save the response")
   @Completion(FilePathCompleter.class)
   private String respout;
-
-  @Reference
-  protected CAClient caClient;
 
   protected RequestResponseDebug getRequestResponseDebug() {
     boolean saveReq = isNotBlank(reqout);

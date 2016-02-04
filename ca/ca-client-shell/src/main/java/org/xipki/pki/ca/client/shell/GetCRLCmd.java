@@ -75,8 +75,7 @@ public class GetCRLCmd extends CRLCommandSupport {
   private String baseCRLOut;
 
   @Override
-  protected X509CRL retrieveCRL(
-      final String caName)
+  protected X509CRL retrieveCrl()
   throws CAClientException, PKIErrorException {
     RequestResponseDebug debug = getRequestResponseDebug();
     try {
@@ -110,7 +109,7 @@ public class GetCRLCmd extends CRLCommandSupport {
 
     X509CRL crl = null;
     try {
-      crl = retrieveCRL(caName);
+      crl = retrieveCrl();
     } catch (PKIErrorException ex) {
       throw new CmdFailure("received no CRL from server: " + ex.getMessage());
     }

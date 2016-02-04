@@ -120,12 +120,12 @@ class CAConf {
   }
 
   public void setCertprofiles(
-      final Set<CertprofileInfo> profiles) {
+      final Set<CertprofileInfo> certProfiles) {
     if (profiles == null) {
       this.profiles = Collections.emptyMap();
     } else {
       this.profiles = new HashMap<>();
-      for (CertprofileInfo m : profiles) {
+      for (CertprofileInfo m : certProfiles) {
         this.profiles.put(m.getName(), m);
       }
     }

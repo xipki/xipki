@@ -54,8 +54,7 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 public class GenCRLCmd extends CRLCommandSupport {
 
   @Override
-  protected X509CRL retrieveCRL(
-      final String caName)
+  protected X509CRL retrieveCrl()
   throws CAClientException, PKIErrorException {
     RequestResponseDebug debug = getRequestResponseDebug();
     try {

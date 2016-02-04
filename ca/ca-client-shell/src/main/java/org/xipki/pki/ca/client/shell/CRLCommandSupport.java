@@ -68,8 +68,7 @@ public abstract class CRLCommandSupport extends ClientCommandSupport {
   @Completion(FilePathCompleter.class)
   protected String outFile;
 
-  protected abstract X509CRL retrieveCRL(
-      String caName)
+  protected abstract X509CRL retrieveCrl()
   throws CAClientException, PKIErrorException;
 
   @Override
@@ -96,7 +95,7 @@ public abstract class CRLCommandSupport extends ClientCommandSupport {
 
     X509CRL crl = null;
     try {
-      crl = retrieveCRL(caName);
+      crl = retrieveCrl();
     } catch (PKIErrorException ex) {
       throw new CmdFailure("received no CRL from server: " + ex.getMessage());
     }

@@ -70,7 +70,6 @@ public class P12EnrollCertCmd extends EnrollCertCommandSupport {
 
   @Override
   protected ConcurrentContentSigner getSigner(
-      final String hashAlgo,
       final SignatureAlgoControl signatureAlgoControl)
   throws SignerException {
     if (password == null) {

@@ -82,12 +82,12 @@ public abstract class KeyEntry {
         throw new IllegalArgumentException("invalid RSA keysize " + keysize);
       }
 
-      BigInteger _baseN = BigInteger.valueOf(0);
-      _baseN = _baseN.setBit(keysize - 1);
+      BigInteger n = BigInteger.valueOf(0);
+      n = n.setBit(keysize - 1);
       for (int i = 32; i < keysize - 1; i += 2) {
-      _baseN = _baseN.setBit(i);
+      n = n.setBit(i);
       }
-      this.baseN = _baseN;
+      this.baseN = n;
     }
 
     @Override
