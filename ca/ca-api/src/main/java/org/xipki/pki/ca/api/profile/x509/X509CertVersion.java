@@ -48,7 +48,7 @@ public enum X509CertVersion {
 
     private int version;
 
-    private X509CertVersion(
+    X509CertVersion(
             final int version) {
         this.version = version;
     }

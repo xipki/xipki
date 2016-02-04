@@ -137,7 +137,7 @@ class OcspCertStoreDbExporter extends DbPorter {
             try {
                 @SuppressWarnings("unchecked")
                 JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                        unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CertStore));
+                        unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CERTSTORE));
                 certstore = root.getValue();
             } catch (JAXBException e) {
                 throw XMLUtil.convert(e);
@@ -154,13 +154,13 @@ class OcspCertStoreDbExporter extends DbPorter {
         System.out.println("exporting OCSP certstore from database");
 
         if (!resume) {
-            export_issuer(certstore);
+            exportIssuer(certstore);
         }
-        Exception exception = export_cert(certstore, processLogFile);
+        Exception exception = exportCert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         try {
-            marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
+            marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CERTSTORE));
         } catch (JAXBException e) {
             throw XMLUtil.convert(e);
         }
@@ -172,7 +172,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
     } // method export
 
-    private void export_issuer(
+    private void exportIssuer(
             final CertStoreType certstore)
     throws DataAccessException, IOException {
         System.out.println("exporting table ISSUER");
@@ -204,13 +204,13 @@ class OcspCertStoreDbExporter extends DbPorter {
                 boolean revoked = rs.getBoolean("REV");
                 issuer.setRevoked(revoked);
                 if (revoked) {
-                    int rev_reason = rs.getInt("RR");
-                    long rev_time = rs.getLong("RT");
-                    long rev_invalidity_time = rs.getLong("RIT");
-                    issuer.setRevReason(rev_reason);
-                    issuer.setRevTime(rev_time);
-                    if (rev_invalidity_time != 0) {
-                        issuer.setRevInvTime(rev_invalidity_time);
+                    int revReason = rs.getInt("RR");
+                    long revTime = rs.getLong("RT");
+                    long revInvalidityTime = rs.getLong("RIT");
+                    issuer.setRevReason(revReason);
+                    issuer.setRevTime(revTime);
+                    if (revInvalidityTime != 0) {
+                        issuer.setRevInvTime(revInvalidityTime);
                     }
                 }
 
@@ -223,9 +223,9 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
 
         System.out.println(" exported table ISSUER");
-    } // method export_issuer
+    } // method exportIssuer
 
-    private Exception export_cert(
+    private Exception exportCert(
             final CertStoreType certstore,
             final File processLogFile) {
         File fCertsDir = new File(certsDir);
@@ -235,7 +235,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         try {
             certsFileOs = new FileOutputStream(certsListFile, true);
-            do_export_cert(certstore, processLogFile, certsFileOs);
+            doExportCert(certstore, processLogFile, certsFileOs);
             return null;
         } catch (Exception e) {
             // delete the temporary files
@@ -247,9 +247,9 @@ class OcspCertStoreDbExporter extends DbPorter {
         } finally {
             IoUtil.closeStream(certsFileOs);
         }
-    } // method export_cert
+    } // method exportCert
 
-    private void do_export_cert(
+    private void doExportCert(
             final CertStoreType certstore,
             final File processLogFile,
             final FileOutputStream certsFileOs)
@@ -333,10 +333,10 @@ class OcspCertStoreDbExporter extends DbPorter {
                     String b64Cert = rs.getString("CERT");
                     byte[] certBytes = Base64.decode(b64Cert);
 
-                    String sha1_cert = HashCalculator.hexSha1(certBytes);
+                    String sha1Cert = HashCalculator.hexSha1(certBytes);
 
                     if (!evaulateOnly) {
-                        ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
+                        ZipEntry certZipEntry = new ZipEntry(sha1Cert + ".der");
                         currentCertsZip.putNextEntry(certZipEntry);
                         try {
                             currentCertsZip.write(certBytes);
@@ -349,8 +349,8 @@ class OcspCertStoreDbExporter extends DbPorter {
 
                     cert.setId(id);
 
-                    int issuer_id = rs.getInt("IID");
-                    cert.setIid(issuer_id);
+                    int issuerId = rs.getInt("IID");
+                    cert.setIid(issuerId);
 
                     long serial = rs.getLong("SN");
                     cert.setSn(Long.toHexString(serial));
@@ -362,16 +362,16 @@ class OcspCertStoreDbExporter extends DbPorter {
                     cert.setRev(revoked);
 
                     if (revoked) {
-                        int rev_reason = rs.getInt("RR");
-                        long rev_time = rs.getLong("RT");
-                        long rev_invalidity_time = rs.getLong("RIT");
-                        cert.setRr(rev_reason);
-                        cert.setRt(rev_time);
-                        if (rev_invalidity_time != 0) {
-                            cert.setRit(rev_invalidity_time);
+                        int revReason = rs.getInt("RR");
+                        long revTime = rs.getLong("RT");
+                        long revInvalidityTime = rs.getLong("RIT");
+                        cert.setRr(revReason);
+                        cert.setRt(revTime);
+                        if (revInvalidityTime != 0) {
+                            cert.setRit(revInvalidityTime);
                         }
                     }
-                    cert.setFile(sha1_cert + ".der");
+                    cert.setFile(sha1Cert + ".der");
 
                     String profile = rs.getString("PN");
                     cert.setProfile(profile);
@@ -440,7 +440,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         System.out.println(getExportedText() + processLog.getNumProcessed()
                 + " certificates from tables CERT, CHASH and CRAW");
-    } // method do_export_cert
+    } // method doExportCert
 
     private void finalizeZip(
             final ZipOutputStream zipOutStream,

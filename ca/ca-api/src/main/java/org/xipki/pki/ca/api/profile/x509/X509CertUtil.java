@@ -67,6 +67,9 @@ import org.xipki.pki.ca.api.CertprofileException;
 
 public class X509CertUtil {
 
+    private X509CertUtil() {
+    }
+
     public static BasicConstraints createBasicConstraints(
             final boolean isCa,
             final Integer pathLen) {
@@ -196,9 +199,6 @@ public class X509CertUtil {
         }
 
         return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
-    }
-
-    private X509CertUtil() {
     }
 
 }

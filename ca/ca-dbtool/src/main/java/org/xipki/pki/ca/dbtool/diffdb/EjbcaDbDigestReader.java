@@ -63,6 +63,51 @@ import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 public class EjbcaDbDigestReader extends DbDigestReader {
 
+    private final int caId;
+
+    private final String selectCertSql;
+
+    private final String selectBase64CertSql;
+
+    private final String caFingerprint;
+
+    private EjbcaDbDigestReader(
+            final DataSourceWrapper datasource,
+            final X509Certificate caCert,
+            final boolean revokedOnly,
+            final int totalAccount,
+            final int minId,
+            final int maxId,
+            final int numThreads,
+            final DbSchemaType dbSchemaType,
+            final int caId,
+            final boolean dbContainsOtherCA,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
+    throws Exception {
+        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+                numCertsToPredicate, stopMe);
+        ParamUtil.assertNotNull("datasource", datasource);
+
+        this.caId = caId;
+
+        this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
+
+        this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
+        sb.append(",status,revocationDate,revocationReason");
+        sb.append(" FROM CertificateData WHERE id>=? AND id<?");
+        if (revokedOnly) {
+            sb.append(" AND status=40");
+        }
+        this.selectCertSql = sb.toString();
+        if (!init()) {
+            throw new Exception("could not initialize the EjbcaDigestReader");
+        }
+    } // constructor
+
     private class EjbcaDbRetriever implements Retriever {
 
         private Connection conn;
@@ -71,14 +116,14 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
         private PreparedStatement selectBase64CertStmt;
 
-        public EjbcaDbRetriever()
+        EjbcaDbRetriever()
         throws DataAccessException {
-            Connection conn = datasource.getConnection();
+            Connection connection = datasource.getConnection();
             try {
-                selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-                selectBase64CertStmt = datasource.prepareStatement(conn, selectBase64CertSql);
+                selectCertStmt = datasource.prepareStatement(connection, selectCertSql);
+                selectBase64CertStmt = datasource.prepareStatement(connection, selectBase64CertSql);
             } catch (DataAccessException e) {
-                datasource.returnConnection(conn);
+                datasource.returnConnection(connection);
                 throw e;
             }
         }
@@ -155,9 +200,9 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
                     if (revoked) {
                         revReason = rs.getInt("revocationReason");
-                        long rev_timeInMs = rs.getLong("revocationDate");
+                        long revTimeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
-                        revTime = rev_timeInMs / 1000;
+                        revTime = revTimeInMs / 1000;
                     }
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
@@ -177,51 +222,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         } // method query
 
     } // class EjbcaDbRetriever
-
-    private final int caId;
-
-    private final String selectCertSql;
-
-    private final String selectBase64CertSql;
-
-    private final String caFingerprint;
-
-    private EjbcaDbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final boolean revokedOnly,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final DbSchemaType dbSchemaType,
-            final int caId,
-            final boolean dbContainsOtherCA,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
-    throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
-                numCertsToPredicate, stopMe);
-        ParamUtil.assertNotNull("datasource", datasource);
-
-        this.caId = caId;
-
-        this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
-
-        this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
-        sb.append(",status,revocationDate,revocationReason");
-        sb.append(" FROM CertificateData WHERE id>=? AND id<?");
-        if (revokedOnly) {
-            sb.append(" AND status=40");
-        }
-        this.selectCertSql = sb.toString();
-        if (!init()) {
-            throw new Exception("could not initialize the EjbcaDigestReader");
-        }
-    } // constructor
 
     public int getCaId() {
         return caId;

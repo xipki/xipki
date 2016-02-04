@@ -40,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBException;
 
@@ -109,8 +108,7 @@ public class DbDigestExportWorker extends DbPortWorker {
     } // constructor
 
     @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
+    public void doRun()
     throws Exception {
         long start = System.currentTimeMillis();
 

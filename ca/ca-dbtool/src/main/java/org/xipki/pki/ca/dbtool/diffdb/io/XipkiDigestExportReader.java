@@ -68,7 +68,7 @@ public class XipkiDigestExportReader {
 
         private PreparedStatement selectCertStmt;
 
-        public Retriever()
+        Retriever()
         throws DataAccessException {
             this.conn = datasource.getConnection();
             try {

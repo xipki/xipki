@@ -61,17 +61,17 @@ public class Range {
     }
 
     public void setRange(
-            final Integer min,
-            final Integer max) {
-        if (min == null && max == null) {
-            throw new IllegalArgumentException("min and max cannot be both null");
+            final Integer pMin,
+            final Integer pMax) {
+        if (pMin == null && pMax == null) {
+            throw new IllegalArgumentException("pMin and pMax cannot be both null");
         }
-        if (min != null && max != null && min > max) {
+        if (pMin != null && pMax != null && pMin > pMax) {
             throw new IllegalArgumentException(
-                String.format("min cannot be greater than max: %d > %d", min, max));
+                String.format("pMin cannot be greater than pMax: %d > %d", pMin, pMax));
         }
-        this.min = min;
-        this.max = max;
+        this.min = pMin;
+        this.max = pMax;
     }
 
     public boolean match(

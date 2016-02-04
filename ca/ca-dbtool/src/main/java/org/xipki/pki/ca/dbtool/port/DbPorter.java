@@ -60,11 +60,11 @@ import org.xml.sax.SAXException;
 
 public class DbPorter extends DbToolBase {
 
-    public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
+    public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.xml";
 
-    public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
+    public static final String FILENAME_CA_CERTSTORE = "ca-certstore.xml";
 
-    public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
+    public static final String FILENAME_OCSP_CERTSTORE = "ocsp-certstore.xml";
 
     public static final String DIRNAME_CRL = "crl";
 
@@ -80,11 +80,11 @@ public class DbPorter extends DbToolBase {
 
     public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
+    public static final int VERSION = 1;
+
     private static final String CERTS_DIRNAME = "certs";
 
     private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
-
-    public static final int VERSION = 1;
 
     protected final boolean evaulateOnly;
 

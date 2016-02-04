@@ -70,7 +70,7 @@ public class X509CertificateInfo {
 
     private String warningMessage;
 
-    private CertRevocationInfo revInfo;
+    private CertRevocationInfo revocationInfo;
 
     private X500Name requestedSubject;
 
@@ -138,16 +138,16 @@ public class X509CertificateInfo {
     }
 
     public boolean isRevoked() {
-        return revInfo != null;
+        return revocationInfo != null;
     }
 
     public CertRevocationInfo getRevocationInfo() {
-        return revInfo;
+        return revocationInfo;
     }
 
     public void setRevocationInfo(
-            final CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
+            final CertRevocationInfo revocationInfo) {
+        this.revocationInfo = revocationInfo;
     }
 
     public boolean isAlreadyIssued() {

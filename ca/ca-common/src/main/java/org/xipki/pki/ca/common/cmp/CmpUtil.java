@@ -137,12 +137,12 @@ public class CmpUtil {
             builder.addCMPCertificate(signerCert);
         }
 
-        ContentSigner realSigner = signer.borrowContentSigner();
+        ContentSigner contentSigner = signer.borrowContentSigner();
         try {
-            ProtectedPKIMessage signedMessage = builder.build(realSigner);
+            ProtectedPKIMessage signedMessage = builder.build(contentSigner);
             return signedMessage.toASN1Structure();
         } finally {
-            signer.returnContentSigner(realSigner);
+            signer.returnContentSigner(contentSigner);
         }
     } // method addProtection
 

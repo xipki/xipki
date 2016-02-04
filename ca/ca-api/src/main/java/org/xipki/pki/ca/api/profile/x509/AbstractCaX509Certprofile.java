@@ -51,10 +51,10 @@ public abstract class AbstractCaX509Certprofile extends BaseX509Certprofile {
     protected Set<KeyUsageControl> keyUsages;
 
     public AbstractCaX509Certprofile() {
-        Set<KeyUsageControl> keyUsages = new HashSet<>();
-        keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
-        keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
-        this.keyUsages = Collections.unmodifiableSet(keyUsages);
+        Set<KeyUsageControl> usages = new HashSet<>();
+        usages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
+        usages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
+        this.keyUsages = Collections.unmodifiableSet(usages);
     }
 
     @Override

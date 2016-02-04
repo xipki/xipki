@@ -342,9 +342,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         this.ca = conf.isCa();
         this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
 
-        String specialBehavior = conf.getSpecialBehavior();
-        if (specialBehavior != null) {
-            this.specialBehavior = SpecialX509CertprofileBehavior.getInstance(specialBehavior);
+        String specBehavior = conf.getSpecialBehavior();
+        if (specBehavior != null) {
+            this.specialBehavior = SpecialX509CertprofileBehavior.getInstance(specBehavior);
         }
 
         if (conf.isDuplicateKey() != null) {
@@ -974,19 +974,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // PrivateKeyUsagePeriod
         type = Extension.privateKeyUsagePeriod;
         if (occurences.remove(type) != null) {
-            Date _notAfter;
+            Date localNotAfter;
             if (privateKeyUsagePeriod == null) {
-                _notAfter = notAfter;
+                localNotAfter = notAfter;
             } else {
-                _notAfter = privateKeyUsagePeriod.add(notBefore);
-                if (_notAfter.after(notAfter)) {
-                    _notAfter = notAfter;
+                localNotAfter = privateKeyUsagePeriod.add(notBefore);
+                if (localNotAfter.after(notAfter)) {
+                    localNotAfter = notAfter;
                 }
             }
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
-            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(_notAfter)));
+            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(localNotAfter)));
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     new DERSequence(v));
             values.addExtension(type, extValue);
@@ -1259,27 +1259,28 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return null;
         }
 
-        DirectoryString[] _professionItems = null;
+        DirectoryString[] localProfessionItems = null;
         if (professionItems != null && professionItems.size() > 0) {
             int n = professionItems.size();
-            _professionItems = new DirectoryString[n];
+            localProfessionItems = new DirectoryString[n];
             for (int i = 0; i < n; i++) {
-                _professionItems[i] = new DirectoryString(professionItems.get(i));
+                localProfessionItems[i] = new DirectoryString(professionItems.get(i));
             }
         }
 
-        ASN1ObjectIdentifier[] _professionOIDs = null;
+        ASN1ObjectIdentifier[] localProfessionOIDs = null;
         if (professionOIDs != null && professionOIDs.size() > 0) {
-            _professionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
+            localProfessionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
         }
 
-        ASN1OctetString _addProfessionInfo = null;
+        ASN1OctetString localAddProfessionInfo = null;
         if (addProfessionInfo != null && addProfessionInfo.length > 0) {
-            _addProfessionInfo = new DEROctetString(addProfessionInfo);
+            localAddProfessionInfo = new DEROctetString(addProfessionInfo);
         }
 
         ProfessionInfo professionInfo = new ProfessionInfo(
-                null, _professionItems, _professionOIDs, registrationNumber, _addProfessionInfo);
+                null, localProfessionItems, localProfessionOIDs, registrationNumber,
+                localAddProfessionInfo);
 
         Admissions admissions = new Admissions(null, null,
                 new ProfessionInfo[]{professionInfo});

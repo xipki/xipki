@@ -76,33 +76,33 @@ public class CmpUtf8Pairs {
             return;
         }
 
-        String realString = string;
+        String localString = string;
         // remove the ending '%'-symbols
-        while (realString.charAt(realString.length() - 1) == TOKEN_TERM) {
-            realString = realString.substring(0, realString.length() - 1);
+        while (localString.charAt(localString.length() - 1) == TOKEN_TERM) {
+            localString = localString.substring(0, localString.length() - 1);
         }
 
         // find the position of terminators
         List<Integer> positions = new LinkedList<>();
 
         int idx = 1;
-        int n = realString.length();
+        int n = localString.length();
         while (idx < n) {
-            char c = realString.charAt(idx++);
+            char c = localString.charAt(idx++);
             if (c == TOKEN_TERM) {
-                char b = realString.charAt(idx);
+                char b = localString.charAt(idx);
                 if (b < '0' || b > '9') {
                     positions.add(idx - 1);
                 }
             }
         }
-        positions.add(realString.length());
+        positions.add(localString.length());
 
         // parse the token
         int beginIndex = 0;
         for (int i = 0; i < positions.size(); i++) {
             int endIndex = positions.get(i);
-            String token = realString.substring(beginIndex, endIndex);
+            String token = localString.substring(beginIndex, endIndex);
 
             int sepIdx = token.indexOf(NAME_TERM);
             if (sepIdx == -1 || sepIdx == token.length() - 1) {
@@ -242,16 +242,16 @@ public class CmpUtf8Pairs {
 
     private static String encodeNameOrValue(
             final String s) {
-    String realS = s;
-        if (realS.indexOf("%") != -1) {
-            realS = realS.replaceAll("%", "%25");
+        String localS = s;
+        if (localS.indexOf("%") != -1) {
+            localS = localS.replaceAll("%", "%25");
         }
 
-        if (realS.indexOf("?") != -1) {
-            realS = realS.replaceAll("\\?", "%3f");
+        if (localS.indexOf("?") != -1) {
+            localS = localS.replaceAll("\\?", "%3f");
         }
 
-        return realS;
+        return localS;
     }
 
     private static String decodeNameOrValue(

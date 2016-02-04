@@ -76,6 +76,70 @@ import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 abstract class DbDigestReader implements DigestReader {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
+
+    protected final BlockingQueue<IDRange> inQueue;
+
+    protected final BlockingQueue<DigestDBEntrySet> outQueue;
+
+    protected final DataSourceWrapper datasource;
+
+    protected final X509Certificate caCert;
+
+    protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
+
+    protected final StopMe stopMe;
+
+    private final int numThreads;
+
+    private ExecutorService executor;
+
+    private List<Retriever> retrievers;
+
+    private final boolean revokedOnly;
+
+    private final int totalAccount;
+
+    private final String caSubjectName;
+
+    private final int minId;
+
+    private final int maxId;
+
+    private final AtomicBoolean endReached = new AtomicBoolean(false);
+
+    private Exception exception;
+
+    private int nextId;
+
+    DbDigestReader(
+            final DataSourceWrapper datasource,
+            final X509Certificate caCert,
+            final boolean revokedOnly,
+            final int totalAccount,
+            final int minId,
+            final int maxId,
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
+    throws DataAccessException, CertificateException, IOException {
+        ParamUtil.assertNotNull("datasource", datasource);
+        this.datasource = datasource;
+        this.totalAccount = totalAccount;
+        this.revokedOnly = revokedOnly;
+        this.numThreads = numThreads;
+        this.caCert = caCert;
+        this.caSubjectName = X509Util.getRFC4519Name(caCert.getSubjectX500Principal());
+        this.minId = minId;
+        this.maxId = maxId;
+        this.nextId = minId;
+
+        this.stopMe = stopMe;
+        this.inQueue = new LinkedBlockingDeque<>();
+        this.outQueue = new LinkedBlockingDeque<>();
+        this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);
+    }
+
     interface Retriever extends Runnable {
     } // interface Retriever
 
@@ -139,70 +203,6 @@ abstract class DbDigestReader implements DigestReader {
         }
 
     } // class Dispatcher
-
-    private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
-
-    protected final BlockingQueue<IDRange> inQueue;
-
-    protected final BlockingQueue<DigestDBEntrySet> outQueue;
-
-    private final int numThreads;
-
-    private ExecutorService executor;
-
-    private List<Retriever> retrievers;
-
-    protected final DataSourceWrapper datasource;
-
-    protected final X509Certificate caCert;
-
-    private final boolean revokedOnly;
-
-    private final int totalAccount;
-
-    private final String caSubjectName;
-
-    private final int minId;
-
-    private final int maxId;
-
-    private final AtomicBoolean endReached = new AtomicBoolean(false);
-
-    private Exception exception;
-
-    protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
-
-    private int nextId;
-
-    protected final StopMe stopMe;
-
-    public DbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final boolean revokedOnly,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
-    throws DataAccessException, CertificateException, IOException {
-        ParamUtil.assertNotNull("datasource", datasource);
-        this.datasource = datasource;
-        this.totalAccount = totalAccount;
-        this.revokedOnly = revokedOnly;
-        this.numThreads = numThreads;
-        this.caCert = caCert;
-        this.caSubjectName = X509Util.getRFC4519Name(caCert.getSubjectX500Principal());
-        this.minId = minId;
-        this.maxId = maxId;
-        this.nextId = minId;
-
-        this.stopMe = stopMe;
-        this.inQueue = new LinkedBlockingDeque<>();
-        this.outQueue = new LinkedBlockingDeque<>();
-        this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);
-    }
 
     boolean init() {
         retrievers = new ArrayList<>(numThreads);

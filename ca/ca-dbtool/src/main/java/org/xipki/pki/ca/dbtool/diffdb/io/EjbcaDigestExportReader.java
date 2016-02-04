@@ -75,7 +75,7 @@ public class EjbcaDigestExportReader {
 
         private PreparedStatement selectRawCertStmt;
 
-        public Retriever()
+        Retriever()
         throws DataAccessException {
             this.conn = datasource.getConnection();
             try {
@@ -170,9 +170,9 @@ public class EjbcaDigestExportReader {
 
                     if (revoked) {
                         revReason = rs.getInt("revocationReason");
-                        long rev_timeInMs = rs.getLong("revocationDate");
+                        long revTimeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
-                        revTime = rev_timeInMs / 1000;
+                        revTime = revTimeInMs / 1000;
                     }
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
