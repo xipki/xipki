@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,52 +42,52 @@ package org.xipki.commons.audit.api;
 
 public enum AuditLevel {
 
-  ERROR(3, "ERROR  "),
-  WARN(4, "WARN   "),
-  INFO(6, "INFO   "),
-  DEBUG(7, "DEBUG  ");
+    ERROR(3, "ERROR    "),
+    WARN(4, "WARN     "),
+    INFO(6, "INFO     "),
+    DEBUG(7, "DEBUG    ");
 
-  private final int value;
+    private final int value;
 
-  private final String alignedText;
+    private final String alignedText;
 
-  AuditLevel(
-      final int value,
-      final String alignedText) {
-    this.value = value;
-    this.alignedText = alignedText;
-  }
-
-  public int getValue() {
-    return value;
-  }
-
-  public static final AuditLevel forName(
-      final String name) {
-    if (name == null) {
-      return null;
+    AuditLevel(
+            final int value,
+            final String alignedText) {
+        this.value = value;
+        this.alignedText = alignedText;
     }
 
-    for (AuditLevel value : values()) {
-      if (value.name().equals(name)) {
+    public int getValue() {
         return value;
-      }
     }
-    return null;
-  }
 
-  public static final AuditLevel forValue(
-      final int value) {
-    for (AuditLevel v : values()) {
-      if (v.getValue() == value) {
-        return v;
-      }
+    public static final AuditLevel forName(
+            final String name) {
+        if (name == null) {
+            return null;
+        }
+
+        for (AuditLevel value : values()) {
+            if (value.name().equals(name)) {
+                return value;
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
-  public String getAlignedText() {
-    return alignedText;
-  }
+    public static final AuditLevel forValue(
+            final int value) {
+        for (AuditLevel v : values()) {
+            if (v.getValue() == value) {
+                return v;
+            }
+        }
+        return null;
+    }
+
+    public String getAlignedText() {
+        return alignedText;
+    }
 
 }

@@ -31,109 +31,109 @@ import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 
 public class BCRSAPrivateKey implements RSAPrivateKey, PKCS12BagAttributeCarrier {
 
-  static final long serialVersionUID = 5110188922551353628L;
+    static final long serialVersionUID = 5110188922551353628L;
 
-  private static BigInteger ZERO = BigInteger.valueOf(0);
+    private static BigInteger ZERO = BigInteger.valueOf(0);
 
-  protected BigInteger modulus;
+    protected BigInteger modulus;
 
-  protected BigInteger privateExponent;
+    protected BigInteger privateExponent;
 
-  private transient PKCS12BagAttributeCarrierImpl attrCarrier =
-      new PKCS12BagAttributeCarrierImpl();
+    private transient PKCS12BagAttributeCarrierImpl attrCarrier =
+            new PKCS12BagAttributeCarrierImpl();
 
-  protected BCRSAPrivateKey() {
-  }
-
-  public BCRSAPrivateKey(
-      final RSAKeyParameters key) {
-    this.modulus = key.getModulus();
-    this.privateExponent = key.getExponent();
-  }
-
-  public BCRSAPrivateKey(
-      final RSAPrivateKeySpec spec) {
-    this.modulus = spec.getModulus();
-    this.privateExponent = spec.getPrivateExponent();
-  }
-
-  public BCRSAPrivateKey(
-      final RSAPrivateKey key) {
-    this.modulus = key.getModulus();
-    this.privateExponent = key.getPrivateExponent();
-  }
-
-  public BigInteger getModulus() {
-    return modulus;
-  }
-
-  public BigInteger getPrivateExponent() {
-    return privateExponent;
-  }
-
-  public String getAlgorithm() {
-    return "RSA";
-  }
-
-  public String getFormat() {
-    return "PKCS#8";
-  }
-
-  public byte[] getEncoded() {
-    return KeyUtil.getEncodedPrivateKeyInfo(
-        new AlgorithmIdentifier(
-            PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
-            new org.bouncycastle.asn1.pkcs.RSAPrivateKey(getModulus(),
-            ZERO, getPrivateExponent(), ZERO, ZERO, ZERO, ZERO, ZERO));
-  }
-
-  public boolean equals(
-      final Object o) {
-    if (!(o instanceof RSAPrivateKey)) {
-      return false;
+    protected BCRSAPrivateKey() {
     }
 
-    if (o == this) {
-      return true;
+    public BCRSAPrivateKey(
+            final RSAKeyParameters key) {
+        this.modulus = key.getModulus();
+        this.privateExponent = key.getExponent();
     }
 
-    RSAPrivateKey key = (RSAPrivateKey) o;
+    public BCRSAPrivateKey(
+            final RSAPrivateKeySpec spec) {
+        this.modulus = spec.getModulus();
+        this.privateExponent = spec.getPrivateExponent();
+    }
 
-    return getModulus().equals(key.getModulus())
-      && getPrivateExponent().equals(key.getPrivateExponent());
-  }
+    public BCRSAPrivateKey(
+            final RSAPrivateKey key) {
+        this.modulus = key.getModulus();
+        this.privateExponent = key.getPrivateExponent();
+    }
 
-  public int hashCode() {
-    return getModulus().hashCode() ^ getPrivateExponent().hashCode();
-  }
+    public BigInteger getModulus() {
+        return modulus;
+    }
 
-  public void setBagAttribute(
-      final ASN1ObjectIdentifier oid,
-      final ASN1Encodable attribute) {
-    attrCarrier.setBagAttribute(oid, attribute);
-  }
+    public BigInteger getPrivateExponent() {
+        return privateExponent;
+    }
 
-  public ASN1Encodable getBagAttribute(
-      final ASN1ObjectIdentifier oid) {
-    return attrCarrier.getBagAttribute(oid);
-  }
+    public String getAlgorithm() {
+        return "RSA";
+    }
 
-  public Enumeration<?> getBagAttributeKeys() {
-    return attrCarrier.getBagAttributeKeys();
-  }
+    public String getFormat() {
+        return "PKCS#8";
+    }
 
-  private void readObject(
-      final ObjectInputStream in)
-  throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
+    public byte[] getEncoded() {
+        return KeyUtil.getEncodedPrivateKeyInfo(
+                new AlgorithmIdentifier(
+                        PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
+                        new org.bouncycastle.asn1.pkcs.RSAPrivateKey(getModulus(),
+                        ZERO, getPrivateExponent(), ZERO, ZERO, ZERO, ZERO, ZERO));
+    }
 
-    this.attrCarrier = new PKCS12BagAttributeCarrierImpl();
-  }
+    public boolean equals(
+            final Object o) {
+        if (!(o instanceof RSAPrivateKey)) {
+            return false;
+        }
 
-  private void writeObject(
-      final ObjectOutputStream out)
-  throws IOException {
-    out.defaultWriteObject();
-  }
+        if (o == this) {
+            return true;
+        }
+
+        RSAPrivateKey key = (RSAPrivateKey) o;
+
+        return getModulus().equals(key.getModulus())
+            && getPrivateExponent().equals(key.getPrivateExponent());
+    }
+
+    public int hashCode() {
+        return getModulus().hashCode() ^ getPrivateExponent().hashCode();
+    }
+
+    public void setBagAttribute(
+            final ASN1ObjectIdentifier oid,
+            final ASN1Encodable attribute) {
+        attrCarrier.setBagAttribute(oid, attribute);
+    }
+
+    public ASN1Encodable getBagAttribute(
+            final ASN1ObjectIdentifier oid) {
+        return attrCarrier.getBagAttribute(oid);
+    }
+
+    public Enumeration<?> getBagAttributeKeys() {
+        return attrCarrier.getBagAttributeKeys();
+    }
+
+    private void readObject(
+            final ObjectInputStream in)
+    throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+
+        this.attrCarrier = new PKCS12BagAttributeCarrierImpl();
+    }
+
+    private void writeObject(
+            final ObjectOutputStream out)
+    throws IOException {
+        out.defaultWriteObject();
+    }
 
 }

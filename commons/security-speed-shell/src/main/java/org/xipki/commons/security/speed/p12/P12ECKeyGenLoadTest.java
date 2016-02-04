@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,22 +46,22 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
-  private final ECKeypairGenerator kpGen;
+    private final ECKeypairGenerator kpGen;
 
-  public P12ECKeyGenLoadTest(
-      final String curveNameOrOid,
-      final SecurityFactory securityFactory)
-  throws Exception {
-    super("PKCS#12 EC key generation\n"
-        + "curve: " + curveNameOrOid,
-        securityFactory);
+    public P12ECKeyGenLoadTest(
+            final String curveNameOrOid,
+            final SecurityFactory securityFactory)
+    throws Exception {
+        super("PKCS#12 EC key generation\n"
+                + "curve: " + curveNameOrOid,
+                securityFactory);
 
-    this.kpGen = new ECKeypairGenerator(curveNameOrOid);
-  }
+        this.kpGen = new ECKeypairGenerator(curveNameOrOid);
+    }
 
-  @Override
-  protected P12RawKeypairGenerator getKeypairGenerator() {
-    return kpGen;
-  }
+    @Override
+    protected P12RawKeypairGenerator getKeypairGenerator() {
+        return kpGen;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -65,218 +65,218 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 class SunP11Identity implements Comparable<SunP11Identity> {
 
-  private final Cipher rsaCipher;
+    private final Cipher rsaCipher;
 
-  private final Signature dsaSignature;
+    private final Signature dsaSignature;
 
-  private final P11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
-  private final String keyLabel;
+    private final String keyLabel;
 
-  private final PrivateKey privateKey;
+    private final PrivateKey privateKey;
 
-  private final X509Certificate[] certificateChain;
+    private final X509Certificate[] certificateChain;
 
-  private final PublicKey publicKey;
+    private final PublicKey publicKey;
 
-  private final int signatureKeyBitLength;
+    private final int signatureKeyBitLength;
 
-  public SunP11Identity(
-      final Provider p11Provider,
-      final P11SlotIdentifier slotId,
-      final String keyLabel,
-      final PrivateKey privateKey,
-      final X509Certificate[] certificateChain,
-      final PublicKey publicKey)
-  throws SignerException {
-    super();
+    public SunP11Identity(
+            final Provider p11Provider,
+            final P11SlotIdentifier slotId,
+            final String keyLabel,
+            final PrivateKey privateKey,
+            final X509Certificate[] certificateChain,
+            final PublicKey publicKey)
+    throws SignerException {
+        super();
 
-    ParamUtil.assertNotNull("p11Provider", p11Provider);
-    ParamUtil.assertNotNull("slotId", slotId);
-    ParamUtil.assertNotNull("privateKey", privateKey);
-    ParamUtil.assertNotNull("keyLabel", keyLabel);
+        ParamUtil.assertNotNull("p11Provider", p11Provider);
+        ParamUtil.assertNotNull("slotId", slotId);
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotNull("keyLabel", keyLabel);
 
-    if ((certificateChain == null
-        || certificateChain.length == 0
-        || certificateChain[0] == null)
-        && publicKey == null) {
-      throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
+        if ((certificateChain == null
+                || certificateChain.length == 0
+                || certificateChain[0] == null)
+                && publicKey == null) {
+            throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
+        }
+
+        this.slotId = slotId;
+        this.privateKey = privateKey;
+        this.publicKey = (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
+        this.certificateChain = certificateChain;
+
+        this.keyLabel = keyLabel;
+
+        if (this.publicKey instanceof RSAPublicKey) {
+            signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
+            String algorithm = "RSA/ECB/NoPadding";
+            this.dsaSignature = null;
+            try {
+                this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+            }
+            try {
+                this.rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            } catch (InvalidKeyException e) {
+                throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
+            }
+        } else if (this.publicKey instanceof ECPublicKey
+                || this.publicKey instanceof DSAPublicKey) {
+            String algorithm;
+            if (this.publicKey instanceof ECPublicKey) {
+                signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve()
+                        .getField().getFieldSize();
+                algorithm = "NONEwithECDSA";
+            } else if (this.publicKey instanceof DSAPublicKey) {
+                signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP()
+                        .bitLength();
+                algorithm = "NONEwithDSA";
+            } else {
+                throw new RuntimeException("should not reach here");
+            }
+
+            try {
+                this.dsaSignature = Signature.getInstance(algorithm, p11Provider);
+            } catch (NoSuchAlgorithmException e) {
+                throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
+            }
+            try {
+                this.dsaSignature.initSign(privateKey);
+            } catch (InvalidKeyException e) {
+                throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
+            }
+            this.rsaCipher = null;
+        } else {
+            throw new IllegalArgumentException(
+                    "currently only RSA, EC and DSA public key are supported, but not "
+                    + this.publicKey.getAlgorithm()
+                    + " (class: " + this.publicKey.getClass().getName() + ")");
+        }
+    } // constructor
+
+    public String getKeyLabel() {
+        return keyLabel;
     }
 
-    this.slotId = slotId;
-    this.privateKey = privateKey;
-    this.publicKey = (publicKey == null)
-        ? certificateChain[0].getPublicKey()
-        : publicKey;
-    this.certificateChain = certificateChain;
-
-    this.keyLabel = keyLabel;
-
-    if (this.publicKey instanceof RSAPublicKey) {
-      signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-      String algorithm = "RSA/ECB/NoPadding";
-      this.dsaSignature = null;
-      try {
-        this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
-      } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-        throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
-      }
-      try {
-        this.rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-      } catch (InvalidKeyException e) {
-        throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
-      }
-    } else if (this.publicKey instanceof ECPublicKey
-        || this.publicKey instanceof DSAPublicKey) {
-      String algorithm;
-      if (this.publicKey instanceof ECPublicKey) {
-        signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve()
-            .getField().getFieldSize();
-        algorithm = "NONEwithECDSA";
-      } else if (this.publicKey instanceof DSAPublicKey) {
-        signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP()
-            .bitLength();
-        algorithm = "NONEwithDSA";
-      } else {
-        throw new RuntimeException("should not reach here");
-      }
-
-      try {
-        this.dsaSignature = Signature.getInstance(algorithm, p11Provider);
-      } catch (NoSuchAlgorithmException e) {
-        throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
-      }
-      try {
-        this.dsaSignature.initSign(privateKey);
-      } catch (InvalidKeyException e) {
-        throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
-      }
-      this.rsaCipher = null;
-    } else {
-      throw new IllegalArgumentException(
-          "currently only RSA, EC and DSA public key are supported, but not "
-          + this.publicKey.getAlgorithm()
-          + " (class: " + this.publicKey.getClass().getName() + ")");
-    }
-  } // constructor
-
-  public String getKeyLabel() {
-    return keyLabel;
-  }
-
-  public PrivateKey getPrivateKey() {
-    return privateKey;
-  }
-
-  public X509Certificate getCertificate() {
-    return (certificateChain != null && certificateChain.length > 0)
-        ? certificateChain[0]
-        : null;
-  }
-
-  public X509Certificate[] getCertificateChain() {
-    return certificateChain;
-  }
-
-  public PublicKey getPublicKey() {
-    return (publicKey == null)
-        ? certificateChain[0].getPublicKey()
-        : publicKey;
-  }
-
-  public P11SlotIdentifier getSlotId() {
-    return slotId;
-  }
-
-  public boolean match(
-      final P11SlotIdentifier slotId,
-      final String keyLabel) {
-    return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
-  }
-
-  public byte[] CKM_RSA_PKCS(
-      final byte[] encodedDigestInfo)
-  throws SignerException {
-    byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
-        (signatureKeyBitLength + 7) / 8);
-    return CKM_RSA_X509(padded);
-  }
-
-  public byte[] CKM_RSA_X509(
-      final byte[] hash)
-  throws SignerException {
-    if (!(publicKey instanceof RSAPublicKey)) {
-      throw new SignerException("operation CKM_RSA_X509 is not allowed for "
-          + publicKey.getAlgorithm() + " public key");
+    public PrivateKey getPrivateKey() {
+        return privateKey;
     }
 
-    synchronized (rsaCipher) {
-      try {
-        rsaCipher.update(hash);
-        return rsaCipher.doFinal();
-      } catch (IllegalBlockSizeException | BadPaddingException e) {
-        throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
-      }
-    }
-  }
-
-  public byte[] CKM_ECDSA(
-      final byte[] hash)
-  throws SignerException {
-    byte[] x962Sig = CKM_ECDSA_X962(hash);
-    return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
-  }
-
-  public byte[] CKM_ECDSA_X962(
-      final byte[] hash)
-  throws SignerException {
-    if (!(publicKey instanceof ECPublicKey)) {
-      throw new SignerException("operation CKM_ECDSA is not allowed for "
-          + publicKey.getAlgorithm() + " public key");
+    public X509Certificate getCertificate() {
+        return (certificateChain != null && certificateChain.length > 0)
+                ? certificateChain[0]
+                : null;
     }
 
-    byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
-
-    synchronized (dsaSignature) {
-      try {
-        dsaSignature.update(truncatedDigest);
-        return dsaSignature.sign();
-      } catch (SignatureException e) {
-        throw new SignerException(e.getMessage(), e);
-      }
-    }
-  }
-
-  public byte[] CKM_DSA(
-      final byte[] hash)
-  throws SignerException {
-    byte[] x962Sig = CKM_DSA_X962(hash);
-    return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
-  }
-
-  public byte[] CKM_DSA_X962(
-      final byte[] hash)
-  throws SignerException {
-    if (!(publicKey instanceof DSAPublicKey)) {
-      throw new SignerException("operation CKM_DSA is not allowed for "
-          + publicKey.getAlgorithm() + " public key");
+    public X509Certificate[] getCertificateChain() {
+        return certificateChain;
     }
 
-    byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
-    synchronized (dsaSignature) {
-      try {
-        dsaSignature.update(truncatedDigest);
-        return dsaSignature.sign();
-      } catch (SignatureException e) {
-        throw new SignerException(e.getMessage(), e);
-      }
+    public PublicKey getPublicKey() {
+        return (publicKey == null)
+                ? certificateChain[0].getPublicKey()
+                : publicKey;
     }
-  }
 
-  @Override
-  public int compareTo(
-      final SunP11Identity o) {
-    return this.keyLabel.compareTo(o.keyLabel);
-  }
+    public P11SlotIdentifier getSlotId() {
+        return slotId;
+    }
+
+    public boolean match(
+            final P11SlotIdentifier slotId,
+            final String keyLabel) {
+        return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
+    }
+
+    public byte[] CKM_RSA_PKCS(
+            final byte[] encodedDigestInfo)
+    throws SignerException {
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
+                (signatureKeyBitLength + 7) / 8);
+        return CKM_RSA_X509(padded);
+    }
+
+    public byte[] CKM_RSA_X509(
+            final byte[] hash)
+    throws SignerException {
+        if (!(publicKey instanceof RSAPublicKey)) {
+            throw new SignerException("operation CKM_RSA_X509 is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
+        }
+
+        synchronized (rsaCipher) {
+            try {
+                rsaCipher.update(hash);
+                return rsaCipher.doFinal();
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+            }
+        }
+    }
+
+    public byte[] CKM_ECDSA(
+            final byte[] hash)
+    throws SignerException {
+        byte[] x962Sig = CKM_ECDSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
+    }
+
+    public byte[] CKM_ECDSA_X962(
+            final byte[] hash)
+    throws SignerException {
+        if (!(publicKey instanceof ECPublicKey)) {
+            throw new SignerException("operation CKM_ECDSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
+        }
+
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
+
+        synchronized (dsaSignature) {
+            try {
+                dsaSignature.update(truncatedDigest);
+                return dsaSignature.sign();
+            } catch (SignatureException e) {
+                throw new SignerException(e.getMessage(), e);
+            }
+        }
+    }
+
+    public byte[] CKM_DSA(
+            final byte[] hash)
+    throws SignerException {
+        byte[] x962Sig = CKM_DSA_X962(hash);
+        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
+    }
+
+    public byte[] CKM_DSA_X962(
+            final byte[] hash)
+    throws SignerException {
+        if (!(publicKey instanceof DSAPublicKey)) {
+            throw new SignerException("operation CKM_DSA is not allowed for "
+                    + publicKey.getAlgorithm() + " public key");
+        }
+
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
+        synchronized (dsaSignature) {
+            try {
+                dsaSignature.update(truncatedDigest);
+                return dsaSignature.sign();
+            } catch (SignatureException e) {
+                throw new SignerException(e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public int compareTo(
+            final SunP11Identity o) {
+        return this.keyLabel.compareTo(o.keyLabel);
+    }
 
 }

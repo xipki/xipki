@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,28 +46,28 @@ import java.util.Set;
 
 public class EnrollCertResult {
 
-  private final Certificate caCertificate;
+    private final Certificate caCertificate;
 
-  private final Map<String, CertOrError> certificatesOrErrors;
+    private final Map<String, CertOrError> certificatesOrErrors;
 
-  public EnrollCertResult(
-      final Certificate caCertificate,
-      final Map<String, CertOrError> certificatesOrErrors) {
-    this.caCertificate = caCertificate;
-    this.certificatesOrErrors = certificatesOrErrors;
-  }
+    public EnrollCertResult(
+            final Certificate caCertificate,
+            final Map<String, CertOrError> certificatesOrErrors) {
+        this.caCertificate = caCertificate;
+        this.certificatesOrErrors = certificatesOrErrors;
+    }
 
-  public Certificate getCaCertificate() {
-    return caCertificate;
-  }
+    public Certificate getCaCertificate() {
+        return caCertificate;
+    }
 
-  public CertOrError getCertificateOrError(
-      final String id) {
-    return certificatesOrErrors.get(id);
-  }
+    public CertOrError getCertificateOrError(
+            final String id) {
+        return certificatesOrErrors.get(id);
+    }
 
-  public Set<String> getAllIds() {
-    return certificatesOrErrors.keySet();
-  }
+    public Set<String> getAllIds() {
+        return certificatesOrErrors.keySet();
+    }
 
 }

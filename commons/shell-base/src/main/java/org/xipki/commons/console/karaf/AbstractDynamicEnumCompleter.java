@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,20 +50,20 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 public abstract class AbstractDynamicEnumCompleter implements Completer {
 
-  protected abstract Set<String> getEnums();
+    protected abstract Set<String> getEnums();
 
-  @Override
-  public int complete(
-      final Session session,
-      final CommandLine commandLine,
-      final List<String> candidates) {
-    StringsCompleter delegate = new StringsCompleter();
+    @Override
+    public int complete(
+            final Session session,
+            final CommandLine commandLine,
+            final List<String> candidates) {
+        StringsCompleter delegate = new StringsCompleter();
 
-    for (String s : getEnums()) {
-      delegate.getStrings().add(s);
+        for (String s : getEnums()) {
+            delegate.getStrings().add(s);
+        }
+
+        return delegate.complete(session, commandLine, candidates);
     }
-
-    return delegate.complete(session, commandLine, candidates);
-  }
 
 }

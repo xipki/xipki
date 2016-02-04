@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,25 +42,25 @@ package org.xipki.pki.ocsp.client.api;
 
 public class OCSPRequestorException extends Exception {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public OCSPRequestorException() {
-  }
+    public OCSPRequestorException() {
+    }
 
-  public OCSPRequestorException(
-      final String message) {
-    super(message);
-  }
+    public OCSPRequestorException(
+            final String message) {
+        super(message);
+    }
 
-  public OCSPRequestorException(
-      final Throwable cause) {
-    super(cause);
-  }
+    public OCSPRequestorException(
+            final Throwable cause) {
+        super(cause);
+    }
 
-  public OCSPRequestorException(
-      final String message,
-      final Throwable cause) {
-    super(message, cause);
-  }
+    public OCSPRequestorException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -65,190 +65,190 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class ScepServer {
 
-  private final String name;
+    private final String name;
 
-  private final CACaps caCaps;
+    private final CACaps caCaps;
 
-  private final boolean withRA;
+    private final boolean withRA;
 
-  private final boolean withNextCA;
+    private final boolean withNextCA;
 
-  private final boolean generateCRL;
+    private final boolean generateCRL;
 
-  private final ScepControl control;
+    private final ScepControl control;
 
-  private Long maxSigningTimeBiasInMs;
+    private Long maxSigningTimeBiasInMs;
 
-  private ScepServlet servlet;
+    private ScepServlet servlet;
 
-  private Certificate cACert;
+    private Certificate cACert;
 
-  private Certificate rACert;
+    private Certificate rACert;
 
-  private Certificate nextCACert;
+    private Certificate nextCACert;
 
-  private Certificate nextRACert;
+    private Certificate nextRACert;
 
-  public ScepServer(
-      final String name,
-      final CACaps caCaps,
-      final boolean withRA,
-      final boolean withNextCA,
-      final boolean generateCRL,
-      final ScepControl control) {
-    ParamUtil.assertNotBlank("name", name);
-    ParamUtil.assertNotNull("caCaps", caCaps);
-    ParamUtil.assertNotNull("control", control);
-    this.name = name;
-    this.caCaps = caCaps;
-    this.withRA = withRA;
-    this.withNextCA = withNextCA;
-    this.generateCRL = generateCRL;
-    this.control = control;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setMaxSigningTimeBias(
-      final long ms) {
-    this.maxSigningTimeBiasInMs = ms;
-  }
-
-  public ScepServlet getServlet()
-  throws Exception {
-    if (servlet != null) {
-      return servlet;
+    public ScepServer(
+            final String name,
+            final CACaps caCaps,
+            final boolean withRA,
+            final boolean withNextCA,
+            final boolean generateCRL,
+            final ScepControl control) {
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotNull("caCaps", caCaps);
+        ParamUtil.assertNotNull("control", control);
+        this.name = name;
+        this.caCaps = caCaps;
+        this.withRA = withRA;
+        this.withNextCA = withNextCA;
+        this.generateCRL = generateCRL;
+        this.control = control;
     }
 
-    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
-    X500Name rCASubject;
-      kpGen.initialize(2048);
-      KeyPair keypair = kpGen.generateKeyPair();
-      PrivateKey rCAKey = keypair.getPrivate();
-      rCASubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
-
-    kpGen.initialize(2048);
-    keypair = kpGen.generateKeyPair();
-
-    SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-    X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
-    this.cACert = issueSubCACert(
-        rCAKey,
-        rCASubject,
-        pkInfo,
-        subject,
-        BigInteger.valueOf(2),
-        new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
-    CAEmulator ca = new CAEmulator(keypair.getPrivate(), this.cACert, generateCRL);
-
-    RAEmulator ra = null;
-    if (withRA) {
-      kpGen.initialize(2048);
-      keypair = kpGen.generateKeyPair();
-      pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-
-      subject = new X500Name("CN=RA1, OU=emulator, O=xipki.org, C=DE");
-      this.rACert = ca.generateCert(pkInfo, subject);
-      ra = new RAEmulator(keypair.getPrivate(), this.rACert);
+    public String getName() {
+        return name;
     }
 
-    NextCAandRA nextCAandRA = null;
-    if (withNextCA) {
-      kpGen.initialize(2048);
-      keypair = kpGen.generateKeyPair();
+    public void setMaxSigningTimeBias(
+            final long ms) {
+        this.maxSigningTimeBiasInMs = ms;
+    }
 
-      pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-      subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
+    public ScepServlet getServlet()
+    throws Exception {
+        if (servlet != null) {
+            return servlet;
+        }
 
-      Date startTime = new Date(System.currentTimeMillis() + 365 * CAEmulator.DAY_IN_MS);
-      this.nextCACert = issueSubCACert(
-          rCAKey,
-          rCASubject,
-          pkInfo,
-          subject,
-          BigInteger.valueOf(2),
-          startTime);
-      CAEmulator tmpCA = new CAEmulator(keypair.getPrivate(), this.nextCACert, generateCRL);
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
+        X500Name rCASubject;
+            kpGen.initialize(2048);
+            KeyPair keypair = kpGen.generateKeyPair();
+            PrivateKey rCAKey = keypair.getPrivate();
+            rCASubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
 
-      if (withRA) {
         kpGen.initialize(2048);
         keypair = kpGen.generateKeyPair();
-        pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
-        subject = new X500Name("CN=RA2, OU=emulator, O=xipki.org, C=DE");
-        Date rAStartTime = new Date(startTime.getTime() + 10 * CAEmulator.DAY_IN_MS);
-        this.nextRACert = tmpCA.generateCert(pkInfo, subject, rAStartTime);
-      } // end if(withRA)
+        SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+        X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
+        this.cACert = issueSubCACert(
+                rCAKey,
+                rCASubject,
+                pkInfo,
+                subject,
+                BigInteger.valueOf(2),
+                new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
+        CAEmulator ca = new CAEmulator(keypair.getPrivate(), this.cACert, generateCRL);
 
-      nextCAandRA = new NextCAandRA(this.nextCACert, this.nextRACert);
-    } // end if(withNextCA)
+        RAEmulator ra = null;
+        if (withRA) {
+            kpGen.initialize(2048);
+            keypair = kpGen.generateKeyPair();
+            pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
-    ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
-    if (maxSigningTimeBiasInMs != null) {
-      scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
+            subject = new X500Name("CN=RA1, OU=emulator, O=xipki.org, C=DE");
+            this.rACert = ca.generateCert(pkInfo, subject);
+            ra = new RAEmulator(keypair.getPrivate(), this.rACert);
+        }
+
+        NextCAandRA nextCAandRA = null;
+        if (withNextCA) {
+            kpGen.initialize(2048);
+            keypair = kpGen.generateKeyPair();
+
+            pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+            subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
+
+            Date startTime = new Date(System.currentTimeMillis() + 365 * CAEmulator.DAY_IN_MS);
+            this.nextCACert = issueSubCACert(
+                    rCAKey,
+                    rCASubject,
+                    pkInfo,
+                    subject,
+                    BigInteger.valueOf(2),
+                    startTime);
+            CAEmulator tmpCA = new CAEmulator(keypair.getPrivate(), this.nextCACert, generateCRL);
+
+            if (withRA) {
+                kpGen.initialize(2048);
+                keypair = kpGen.generateKeyPair();
+                pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+
+                subject = new X500Name("CN=RA2, OU=emulator, O=xipki.org, C=DE");
+                Date rAStartTime = new Date(startTime.getTime() + 10 * CAEmulator.DAY_IN_MS);
+                this.nextRACert = tmpCA.generateCert(pkInfo, subject, rAStartTime);
+            } // end if(withRA)
+
+            nextCAandRA = new NextCAandRA(this.nextCACert, this.nextRACert);
+        } // end if(withNextCA)
+
+        ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
+        if (maxSigningTimeBiasInMs != null) {
+            scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
+        }
+
+        this.servlet = new ScepServlet(scepResponder);
+        this.servlet.setAuditService(new Slf4jAuditServiceImpl());
+        return this.servlet;
+    } // method getServlet
+
+    public Certificate getCACert() {
+        return cACert;
     }
 
-    this.servlet = new ScepServlet(scepResponder);
-    this.servlet.setAuditService(new Slf4jAuditServiceImpl());
-    return this.servlet;
-  } // method getServlet
+    public Certificate getRACert() {
+        return rACert;
+    }
 
-  public Certificate getCACert() {
-    return cACert;
-  }
+    public Certificate getNextCACert() {
+        return nextCACert;
+    }
 
-  public Certificate getRACert() {
-    return rACert;
-  }
+    public Certificate getNextRACert() {
+        return nextRACert;
+    }
 
-  public Certificate getNextCACert() {
-    return nextCACert;
-  }
+    public boolean isWithRA() {
+        return withRA;
+    }
 
-  public Certificate getNextRACert() {
-    return nextRACert;
-  }
+    public boolean isWithNextCA() {
+        return withNextCA;
+    }
 
-  public boolean isWithRA() {
-    return withRA;
-  }
+    public boolean isGenerateCRL() {
+        return generateCRL;
+    }
 
-  public boolean isWithNextCA() {
-    return withNextCA;
-  }
+    private static Certificate issueSubCACert(
+            final PrivateKey rCAKey,
+            final X500Name issuer,
+            final SubjectPublicKeyInfo pubKeyInfo,
+            final X500Name subject,
+            final BigInteger serialNumber,
+            final Date startTime)
+    throws CertIOException, OperatorCreationException {
+        Date notAfter = new Date(startTime.getTime() + CAEmulator.DAY_IN_MS * 3650);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
+                issuer,
+                serialNumber,
+                startTime,
+                notAfter,
+                subject,
+                pubKeyInfo);
 
-  public boolean isGenerateCRL() {
-    return generateCRL;
-  }
+        X509KeyUsage ku = new X509KeyUsage(
+                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+        certGenerator.addExtension(Extension.keyUsage, true, ku);
+        BasicConstraints bc = new BasicConstraints(0);
+        certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-  private static Certificate issueSubCACert(
-      final PrivateKey rCAKey,
-      final X500Name issuer,
-      final SubjectPublicKeyInfo pubKeyInfo,
-      final X500Name subject,
-      final BigInteger serialNumber,
-      final Date startTime)
-  throws CertIOException, OperatorCreationException {
-    Date notAfter = new Date(startTime.getTime() + CAEmulator.DAY_IN_MS * 3650);
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        issuer,
-        serialNumber,
-        startTime,
-        notAfter,
-        subject,
-        pubKeyInfo);
-
-    X509KeyUsage ku = new X509KeyUsage(
-          X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
-    certGenerator.addExtension(Extension.keyUsage, true, ku);
-    BasicConstraints bc = new BasicConstraints(0);
-    certGenerator.addExtension(Extension.basicConstraints, true, bc);
-
-    String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rCAKey, HashAlgoType.SHA256);
-    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rCAKey);
-    return certGenerator.build(contentSigner).toASN1Structure();
-  }
+        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(rCAKey, HashAlgoType.SHA256);
+        ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rCAKey);
+        return certGenerator.build(contentSigner).toASN1Structure();
+    }
 
 }

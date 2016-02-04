@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,20 +51,20 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
 
-  @Reference
-  private SecurityFactory securityFactory;
+    @Reference
+    private SecurityFactory securityFactory;
 
-  @Override
-  protected Set<String> getEnums() {
-    Set<String> names = securityFactory.getPkcs11ModuleNames();
-    if (CollectionUtil.isEmpty(names)) {
-      return Collections.emptySet();
+    @Override
+    protected Set<String> getEnums() {
+        Set<String> names = securityFactory.getPkcs11ModuleNames();
+        if (CollectionUtil.isEmpty(names)) {
+            return Collections.emptySet();
+        }
+        Set<String> ret = new HashSet<>(names);
+        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
+            ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
+        }
+        return ret;
     }
-    Set<String> ret = new HashSet<>(names);
-    if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
-      ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
-    }
-    return ret;
-  }
 
 }

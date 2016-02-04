@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,37 +54,37 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "jscep", name = "getcert",
-    description = "download certificate")
+        description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {
 
-  @Option(name = "--serial", aliases = "-s",
-      required = true,
-      description = "serial number\n"
-          + "(required)")
-  private String serialNumber;
+    @Option(name = "--serial", aliases = "-s",
+            required = true,
+            description = "serial number\n"
+                    + "(required)")
+    private String serialNumber;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outputFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Client client = getScepClient();
-    BigInteger serial = toBigInt(serialNumber);
-    CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
-    X509Certificate cert = extractEECerts(certs);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Client client = getScepClient();
+        BigInteger serial = toBigInt(serialNumber);
+        CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
+        X509Certificate cert = extractEECerts(certs);
 
-    if (cert == null) {
-      throw new CmdFailure("received no certficate from server");
+        if (cert == null) {
+            throw new CmdFailure("received no certficate from server");
+        }
+
+        saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
+        return null;
     }
-
-    saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
-    return null;
-  }
 
 }

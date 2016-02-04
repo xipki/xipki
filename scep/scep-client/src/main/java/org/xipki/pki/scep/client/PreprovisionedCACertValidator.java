@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,48 +50,48 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public final class PreprovisionedCACertValidator implements CACertValidator {
 
-  private final Set<String> fpOfCerts;
+    private final Set<String> fpOfCerts;
 
-  public PreprovisionedCACertValidator(
-      final X509Certificate cert) {
-    ParamUtil.assertNotNull("cert", cert);
-    fpOfCerts = new HashSet<String>(1);
-    String hexFp;
-    try {
-      hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-    } catch (CertificateEncodingException e) {
-      throw new IllegalArgumentException(
-          "at least one of the certificate could not be encoded");
+    public PreprovisionedCACertValidator(
+            final X509Certificate cert) {
+        ParamUtil.assertNotNull("cert", cert);
+        fpOfCerts = new HashSet<String>(1);
+        String hexFp;
+        try {
+            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new IllegalArgumentException(
+                    "at least one of the certificate could not be encoded");
+        }
+        fpOfCerts.add(hexFp);
     }
-    fpOfCerts.add(hexFp);
-  }
 
-  public PreprovisionedCACertValidator(
-      final Set<X509Certificate> certs) {
-    ParamUtil.assertNotEmpty("certs", certs);
-    fpOfCerts = new HashSet<String>(certs.size());
-    for (X509Certificate m : certs) {
-      String hexFp;
-      try {
-        hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
-      } catch (CertificateEncodingException e) {
-        throw new IllegalArgumentException(
-            "at least one of the certificate could not be encoded");
-      }
-      fpOfCerts.add(hexFp);
+    public PreprovisionedCACertValidator(
+            final Set<X509Certificate> certs) {
+        ParamUtil.assertNotEmpty("certs", certs);
+        fpOfCerts = new HashSet<String>(certs.size());
+        for (X509Certificate m : certs) {
+            String hexFp;
+            try {
+                hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
+            } catch (CertificateEncodingException e) {
+                throw new IllegalArgumentException(
+                        "at least one of the certificate could not be encoded");
+            }
+            fpOfCerts.add(hexFp);
+        }
     }
-  }
 
-  @Override
-  public boolean isTrusted(
-      final X509Certificate cert) {
-    String hextFp;
-    try {
-      hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-    } catch (CertificateEncodingException e) {
-      return false;
+    @Override
+    public boolean isTrusted(
+            final X509Certificate cert) {
+        String hextFp;
+        try {
+            hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+        } catch (CertificateEncodingException e) {
+            return false;
+        }
+        return fpOfCerts.contains(hextFp);
     }
-    return fpOfCerts.contains(hextFp);
-  }
 
 }

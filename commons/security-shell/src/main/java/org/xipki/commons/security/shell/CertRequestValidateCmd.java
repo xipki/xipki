@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,28 +49,28 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-tk", name = "validate-req",
-    description = "Validate PKCS#10 request")
+        description = "Validate PKCS#10 request")
 @Service
 public class CertRequestValidateCmd extends SecurityCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    CertificationRequest p10Req = CertificationRequest.getInstance(
-        IoUtil.read(p10File));
-    boolean b = securityFactory.verifyPOPO(p10Req);
-    String txt = b
-        ? "valid"
-        : "invalid";
-    out("The POP is " + txt);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        CertificationRequest p10Req = CertificationRequest.getInstance(
+                IoUtil.read(p10File));
+        boolean b = securityFactory.verifyPOPO(p10Req);
+        String txt = b
+                ? "valid"
+                : "invalid";
+        out("The POP is " + txt);
+        return null;
+    }
 
 }

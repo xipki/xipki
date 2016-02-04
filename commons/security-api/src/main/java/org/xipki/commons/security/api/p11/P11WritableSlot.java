@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,78 +50,78 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public interface P11WritableSlot {
 
-  P11SlotIdentifier getSlotIdentifier();
+    P11SlotIdentifier getSlotIdentifier();
 
-  void updateCertificate(
-      P11KeyIdentifier keyIdentifier,
-      X509Certificate newCert,
-      Set<X509Certificate> caCerts,
-      SecurityFactory securityFactory)
-  throws Exception;
+    void updateCertificate(
+            P11KeyIdentifier keyIdentifier,
+            X509Certificate newCert,
+            Set<X509Certificate> caCerts,
+            SecurityFactory securityFactory)
+    throws Exception;
 
-  boolean removeKeyAndCerts(
-      P11KeyIdentifier keyIdentifier)
-  throws Exception;
+    boolean removeKeyAndCerts(
+            P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-  boolean removeKey(
-      P11KeyIdentifier keyIdentifier)
-  throws Exception;
+    boolean removeKey(
+            P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-  void removeCerts(
-      P11KeyIdentifier keyIdentifier)
-  throws Exception;
+    void removeCerts(
+            P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-  P11KeyIdentifier addCert(
-      X509Certificate cert)
-  throws Exception;
+    P11KeyIdentifier addCert(
+            X509Certificate cert)
+    throws Exception;
 
-  P11KeyIdentifier generateRSAKeypair(
-      int keySize,
-      BigInteger publicExponent,
-      String label)
-  throws Exception;
+    P11KeyIdentifier generateRSAKeypair(
+            int keySize,
+            BigInteger publicExponent,
+            String label)
+    throws Exception;
 
-  P11KeypairGenerationResult generateRSAKeypairAndCert(
-      int keySize,
-      BigInteger publicExponent,
-      String label,
-      String subject,
-      Integer keyUsage,
-      List<ASN1ObjectIdentifier> extendedKeyusage)
-  throws Exception;
+    P11KeypairGenerationResult generateRSAKeypairAndCert(
+            int keySize,
+            BigInteger publicExponent,
+            String label,
+            String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
 
-  P11KeyIdentifier generateDSAKeypair(
-      int pLength,
-      int qLength,
-      String label)
-  throws Exception;
+    P11KeyIdentifier generateDSAKeypair(
+            int pLength,
+            int qLength,
+            String label)
+    throws Exception;
 
-  P11KeypairGenerationResult generateDSAKeypairAndCert(
-      int pLength,
-      int qLength,
-      String label,
-      String subject,
-      Integer keyUsage,
-      List<ASN1ObjectIdentifier> extendedKeyusage)
-  throws Exception;
+    P11KeypairGenerationResult generateDSAKeypairAndCert(
+            int pLength,
+            int qLength,
+            String label,
+            String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
 
-  P11KeyIdentifier generateECKeypair(
-      String curveNameOrOid,
-      String label)
-  throws Exception;
+    P11KeyIdentifier generateECKeypair(
+            String curveNameOrOid,
+            String label)
+    throws Exception;
 
-  P11KeypairGenerationResult generateECDSAKeypairAndCert(
-      String curveNameOrOid,
-      String label,
-      String subject,
-      Integer keyUsage,
-      List<ASN1ObjectIdentifier> extendedKeyusage)
-  throws Exception;
+    P11KeypairGenerationResult generateECDSAKeypairAndCert(
+            String curveNameOrOid,
+            String label,
+            String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
 
-  X509Certificate exportCert(
-      P11KeyIdentifier keyIdentifier)
-  throws Exception;
+    X509Certificate exportCert(
+            P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-  List<? extends P11Identity> getP11Identities();
+    List<? extends P11Identity> getP11Identities();
 
 }

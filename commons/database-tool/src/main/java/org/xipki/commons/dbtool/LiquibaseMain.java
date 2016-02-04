@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -61,141 +61,141 @@ import liquibase.resource.ResourceAccessor;
 
 public class LiquibaseMain {
 
-  private final LiquibaseDatabaseConf dbConf;
+    private final LiquibaseDatabaseConf dbConf;
 
-  private final String changeLogFile;
+    private final String changeLogFile;
 
-  private Database database;
+    private Database database;
 
-  private Liquibase liquibase;
+    private Liquibase liquibase;
 
-  public static boolean loglevelIsSevereOrOff(
-      final String logLevel) {
-    return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
-  }
-
-  public LiquibaseMain(
-      final LiquibaseDatabaseConf dbConf,
-      final String changeLogFile) {
-    if (dbConf == null) {
-      throw new IllegalArgumentException("dbConf could not be null");
+    public static boolean loglevelIsSevereOrOff(
+            final String logLevel) {
+        return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
     }
 
-    if (MyStringUtil.isBlank(changeLogFile)) {
-      throw new IllegalArgumentException("changeLogFile could not be empty");
+    public LiquibaseMain(
+            final LiquibaseDatabaseConf dbConf,
+            final String changeLogFile) {
+        if (dbConf == null) {
+            throw new IllegalArgumentException("dbConf could not be null");
+        }
+
+        if (MyStringUtil.isBlank(changeLogFile)) {
+            throw new IllegalArgumentException("changeLogFile could not be empty");
+        }
+
+        this.dbConf = dbConf;
+        this.changeLogFile = changeLogFile;
     }
 
-    this.dbConf = dbConf;
-    this.changeLogFile = changeLogFile;
-  }
-
-  public void changeLogLevel(
-      final String logLevel, String logFile)
-  throws CommandLineParsingException {
-    try {
-      Logger log = LogFactory.getInstance().getLog();
-      if (logFile != null && logFile.length() > 0) {
-        log.setLogLevel(logLevel, logFile);
-      } else {
-        log.setLogLevel(logLevel);
-      }
-    } catch (IllegalArgumentException e) {
-      throw new CommandLineParsingException(e.getMessage(), e);
+    public void changeLogLevel(
+            final String logLevel, String logFile)
+    throws CommandLineParsingException {
+        try {
+            Logger log = LogFactory.getInstance().getLog();
+            if (logFile != null && logFile.length() > 0) {
+                log.setLogLevel(logLevel, logFile);
+            } else {
+                log.setLogLevel(logLevel);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new CommandLineParsingException(e.getMessage(), e);
+        }
     }
-  }
 
-  public void init(
-      final String logLevel, String logFile)
-  throws Exception {
-    changeLogLevel(logLevel, logFile);
+    public void init(
+            final String logLevel, String logFile)
+    throws Exception {
+        changeLogLevel(logLevel, logFile);
 
-    FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
-    ClassLoader classLoader = getClass().getClassLoader();
-    ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
+        FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
+        ClassLoader classLoader = getClass().getClassLoader();
+        ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
-    String defaultSchemaName = dbConf.getSchema();
-    this.database = CommandLineUtils.createDatabaseObject(
-      clOpener, // resourceAccessor
-      dbConf.getUrl(), // url
-      dbConf.getUsername(), // username
-      dbConf.getPassword(), // password
-      dbConf.getDriver(), // driver
-      (String) null, // defaultCatalogName
-      defaultSchemaName, // defaultSchemaName
-      false, // outputDefaultCatalog
-      false, // outputDefaultSchema
-      (String) null, // databaseClass
-      (String) null, // driverPropertiesFile
-      (String) null, // propertyProviderClass
-      (String) null, // liquibaseCatalogName
-      (String) null, // liquibaseSchemaName
-      (String) null, // databaseChangeLogTableName
-      (String) null); // databaseChangeLogLockTableName
-    try {
-      CompositeResourceAccessor fileOpener =
-          new CompositeResourceAccessor(fsOpener, clOpener);
+        String defaultSchemaName = dbConf.getSchema();
+        this.database = CommandLineUtils.createDatabaseObject(
+            clOpener, // resourceAccessor
+            dbConf.getUrl(), // url
+            dbConf.getUsername(), // username
+            dbConf.getPassword(), // password
+            dbConf.getDriver(), // driver
+            (String) null, // defaultCatalogName
+            defaultSchemaName, // defaultSchemaName
+            false, // outputDefaultCatalog
+            false, // outputDefaultSchema
+            (String) null, // databaseClass
+            (String) null, // driverPropertiesFile
+            (String) null, // propertyProviderClass
+            (String) null, // liquibaseCatalogName
+            (String) null, // liquibaseSchemaName
+            (String) null, // databaseChangeLogTableName
+            (String) null); // databaseChangeLogLockTableName
+        try {
+            CompositeResourceAccessor fileOpener =
+                    new CompositeResourceAccessor(fsOpener, clOpener);
 
-      boolean includeCatalog = false;
-      boolean includeSchema = false;
-      boolean includeTablespace = false;
-      DiffOutputControl diffOutputControl =
-          new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
+            boolean includeCatalog = false;
+            boolean includeSchema = false;
+            boolean includeTablespace = false;
+            DiffOutputControl diffOutputControl =
+                    new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
 
-      CompareControl.SchemaComparison[] finalSchemaComparisons;
-      finalSchemaComparisons = new CompareControl.SchemaComparison[] {
-            new CompareControl.SchemaComparison(
-              new CatalogAndSchema(null, defaultSchemaName),
-              new CatalogAndSchema(null, defaultSchemaName))
-          };
+            CompareControl.SchemaComparison[] finalSchemaComparisons;
+            finalSchemaComparisons = new CompareControl.SchemaComparison[] {
+                        new CompareControl.SchemaComparison(
+                            new CatalogAndSchema(null, defaultSchemaName),
+                            new CatalogAndSchema(null, defaultSchemaName))
+                    };
 
-      for (CompareControl.SchemaComparison schema : finalSchemaComparisons) {
-        diffOutputControl.addIncludedSchema(schema.getReferenceSchema());
-        diffOutputControl.addIncludedSchema(schema.getComparisonSchema());
-      }
+            for (CompareControl.SchemaComparison schema : finalSchemaComparisons) {
+                diffOutputControl.addIncludedSchema(schema.getReferenceSchema());
+                diffOutputControl.addIncludedSchema(schema.getComparisonSchema());
+            }
 
-      this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
-    } catch (Exception e) {
-      try {
-        database.rollback();
-        database.close();
-      } catch (Exception e2) {
-        LogFactory.getInstance().getLog().warning("problem closing connection", e);
-      }
-      throw e;
+            this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
+        } catch (Exception e) {
+            try {
+                database.rollback();
+                database.close();
+            } catch (Exception e2) {
+                LogFactory.getInstance().getLog().warning("problem closing connection", e);
+            }
+            throw e;
+        }
+    } // method init
+
+    public void releaseLocks()
+    throws Exception {
+        LockService lockService = LockServiceFactory.getInstance().getLockService(database);
+        lockService.forceReleaseLock();
+        System.out.println("successfully released the database");
     }
-  } // method init
 
-  public void releaseLocks()
-  throws Exception {
-    LockService lockService = LockServiceFactory.getInstance().getLockService(database);
-    lockService.forceReleaseLock();
-    System.out.println("successfully released the database");
-  }
-
-  public void dropAll()
-  throws Exception {
-    liquibase.dropAll();
-    System.out.println("successfully  dropped the database");
-  }
-
-  public void update()
-  throws Exception {
-    liquibase.update((String) null);
-    System.out.println("successfully  updated the database");
-  }
-
-  public void shutdown() {
-    try {
-      if (database != null) {
-        database.rollback();
-        database.close();
-      }
-    } catch (DatabaseException e) {
-      LogFactory.getInstance().getLog().warning("problem closing connection", e);
-    } finally {
-      database = null;
-      liquibase = null;
+    public void dropAll()
+    throws Exception {
+        liquibase.dropAll();
+        System.out.println("successfully    dropped the database");
     }
-  }
+
+    public void update()
+    throws Exception {
+        liquibase.update((String) null);
+        System.out.println("successfully    updated the database");
+    }
+
+    public void shutdown() {
+        try {
+            if (database != null) {
+                database.rollback();
+                database.close();
+            }
+        } catch (DatabaseException e) {
+            LogFactory.getInstance().getLog().warning("problem closing connection", e);
+        } finally {
+            database = null;
+            liquibase = null;
+        }
+    }
 
 }

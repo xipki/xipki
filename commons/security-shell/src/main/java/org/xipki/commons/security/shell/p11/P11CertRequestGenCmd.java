@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -58,59 +58,59 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
  */
 
 @Command(scope = "xipki-tk", name = "req",
-    description = "generate PKCS#10 request with PKCS#11 device")
+        description = "generate PKCS#10 request with PKCS#11 device")
 @Service
 public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
 
-  @Option(name = "--slot",
-      required = true,
-      description = "slot index\n"
-          + "(required)")
-  private Integer slotIndex;
+    @Option(name = "--slot",
+            required = true,
+            description = "slot index\n"
+                    + "(required)")
+    private Integer slotIndex;
 
-  @Option(name = "--key-id",
-      description = "id of the private key in the PKCS#11 device\n"
-          + "either keyId or keyLabel must be specified")
-  private String keyId;
+    @Option(name = "--key-id",
+            description = "id of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    private String keyId;
 
-  @Option(name = "--key-label",
-      description = "label of the private key in the PKCS#11 device\n"
-          + "either keyId or keyLabel must be specified")
-  private String keyLabel;
+    @Option(name = "--key-label",
+            description = "label of the private key in the PKCS#11 device\n"
+                    + "either keyId or keyLabel must be specified")
+    private String keyLabel;
 
-  @Option(name = "--module",
-      description = "name of the PKCS#11 module")
-  @Completion(P11ModuleNameCompleter.class)
-  private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    @Option(name = "--module",
+            description = "name of the PKCS#11 module")
+    @Completion(P11ModuleNameCompleter.class)
+    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-  private P11KeyIdentifier getKeyIdentifier()
-  throws Exception {
-    P11KeyIdentifier keyIdentifier;
-    if (keyId != null && keyLabel == null) {
-      keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-    } else if (keyId == null && keyLabel != null) {
-      keyIdentifier = new P11KeyIdentifier(keyLabel);
-    } else {
-      throw new IllegalCmdParamException(
-          "exactly one of keyId or keyLabel should be specified");
+    private P11KeyIdentifier getKeyIdentifier()
+    throws Exception {
+        P11KeyIdentifier keyIdentifier;
+        if (keyId != null && keyLabel == null) {
+            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+        } else if (keyId == null && keyLabel != null) {
+            keyIdentifier = new P11KeyIdentifier(keyLabel);
+        } else {
+            throw new IllegalCmdParamException(
+                    "exactly one of keyId or keyLabel should be specified");
+        }
+        return keyIdentifier;
     }
-    return keyIdentifier;
-  }
 
-  @Override
-  protected ConcurrentContentSigner getSigner(
-      final String hashAlgo,
-      final SignatureAlgoControl signatureAlgoControl)
-  throws Exception {
-    P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
-    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+    @Override
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl)
+    throws Exception {
+        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
-    String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
-            moduleName, slotIdentifier, keyIdentifier, 1);
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
+                        moduleName, slotIdentifier, keyIdentifier, 1);
 
-    return securityFactory.createSigner("PKCS11",
-        signerConfWithoutAlgo, hashAlgo, signatureAlgoControl,
-        (X509Certificate[]) null);
-  }
+        return securityFactory.createSigner("PKCS11",
+                signerConfWithoutAlgo, hashAlgo, signatureAlgoControl,
+                (X509Certificate[]) null);
+    }
 
 }

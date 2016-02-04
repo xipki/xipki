@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,22 +47,22 @@ import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-rsa-gen",
-    description = "performance test of PKCS#11 RSA key generation")
+        description = "performance test of PKCS#11 RSA key generation")
 public class SpeedP11RSAKeyGenCmd extends SpeedP11CommandSupport {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
-  private Integer keysize = 2048;
+    @Option(name = "--key-size",
+            description = "keysize in bit")
+    private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
-  private String publicExponent = "0x10001";
+    @Option(name = "-e",
+            description = "public exponent")
+    private String publicExponent = "0x10001";
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    return new P11RSAKeyGenLoadTest(slot, keysize, toBigInt(publicExponent));
-  }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        return new P11RSAKeyGenLoadTest(slot, keysize, toBigInt(publicExponent));
+    }
 
 }

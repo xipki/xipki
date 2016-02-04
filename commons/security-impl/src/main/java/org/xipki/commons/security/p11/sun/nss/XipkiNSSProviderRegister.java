@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,28 +48,28 @@ import org.xipki.commons.common.util.LogUtil;
 
 public class XipkiNSSProviderRegister {
 
-  private static Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
+    private static Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
 
-  public void regist() {
-    if (Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null) {
-      try {
-        XipkiNSSProvider provider = new XipkiNSSProvider();
-        Security.addProvider(provider);
-      } catch (Throwable t) {
-        final String message = "could not add provider " + XipkiNSSProvider.PROVIDER_NAME;
-        if (LOG.isWarnEnabled()) {
-          LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-              t.getMessage());
+    public void regist() {
+        if (Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null) {
+            try {
+                XipkiNSSProvider provider = new XipkiNSSProvider();
+                Security.addProvider(provider);
+            } catch (Throwable t) {
+                final String message = "could not add provider " + XipkiNSSProvider.PROVIDER_NAME;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
+                }
+                LOG.debug(message, t);
+            }
         }
-        LOG.debug(message, t);
-      }
     }
-  }
 
-  public void unregist() {
-    if (Security.getProperty(XipkiNSSProvider.PROVIDER_NAME) != null) {
-      Security.removeProvider(XipkiNSSProvider.PROVIDER_NAME);
+    public void unregist() {
+        if (Security.getProperty(XipkiNSSProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(XipkiNSSProvider.PROVIDER_NAME);
+        }
     }
-  }
 
 }

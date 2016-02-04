@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,35 +42,35 @@ package org.xipki.pki.scep.transaction;
 
 public enum CACapability {
 
-  AES ("AES"),
-  DES3 ("DES3"),
-  GetNextCACert ("GetNextCACert"),
-  POSTPKIOperation ("POSTPKIOperation"),
-  Renewal ("Renewal"),
-  SHA1 ("SHA-1"),
-  SHA256 ("SHA-256"),
-  SHA512 ("SHA-512"),
-  Update ("Update");
+    AES ("AES"),
+    DES3 ("DES3"),
+    GetNextCACert ("GetNextCACert"),
+    POSTPKIOperation ("POSTPKIOperation"),
+    Renewal ("Renewal"),
+    SHA1 ("SHA-1"),
+    SHA256 ("SHA-256"),
+    SHA512 ("SHA-512"),
+    Update ("Update");
 
-  private String text;
+    private String text;
 
-  private CACapability(
-      final String text) {
-    this.text = text;
-  }
-
-  public String getText() {
-    return text;
-  }
-
-  public static CACapability valueForText(
-      final String text) {
-    for (CACapability m : values()) {
-      if (m.text.equalsIgnoreCase(text)) {
-        return m;
-      }
+    private CACapability(
+            final String text) {
+        this.text = text;
     }
-    return null;
-  }
+
+    public String getText() {
+        return text;
+    }
+
+    public static CACapability valueForText(
+            final String text) {
+        for (CACapability m : values()) {
+            if (m.text.equalsIgnoreCase(text)) {
+                return m;
+            }
+        }
+        return null;
+    }
 
 }

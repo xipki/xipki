@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,30 +42,30 @@ package org.xipki.pki.scep.transaction;
 
 public enum Operation {
 
-  GetCACaps("GetCACaps"),
-  PKIOperation("PKIOperation"),
-  GetCACert("GetCACert"),
-  GetNextCACert("GetNextCACert");
+    GetCACaps("GetCACaps"),
+    PKIOperation("PKIOperation"),
+    GetCACert("GetCACert"),
+    GetNextCACert("GetNextCACert");
 
-  private final String code;
+    private final String code;
 
-  private Operation(
-      final String code) {
-    this.code = code;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public static Operation valueForCode(
-      final String code) {
-    for (Operation m : values()) {
-      if (code.equalsIgnoreCase(m.code)) {
-        return m;
-      }
+    private Operation(
+            final String code) {
+        this.code = code;
     }
-    return null;
-  }
+
+    public String getCode() {
+        return code;
+    }
+
+    public static Operation valueForCode(
+            final String code) {
+        for (Operation m : values()) {
+            if (code.equalsIgnoreCase(m.code)) {
+                return m;
+            }
+        }
+        return null;
+    }
 
 }

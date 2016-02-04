@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -43,24 +43,24 @@ package org.xipki.pki.ocsp.client.api;
 @SuppressWarnings("serial")
 public class ResponderUnreachableException extends OCSPResponseException {
 
-  public ResponderUnreachableException() {
-    super();
-  }
+    public ResponderUnreachableException() {
+        super();
+    }
 
-  public ResponderUnreachableException(
-      final String message,
-      final Throwable cause) {
-    super(message, cause);
-  }
+    public ResponderUnreachableException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
 
-  public ResponderUnreachableException(
-      final String message) {
-    super(message);
-  }
+    public ResponderUnreachableException(
+            final String message) {
+        super(message);
+    }
 
-  public ResponderUnreachableException(
-      final Throwable cause) {
-    super(cause);
-  }
+    public ResponderUnreachableException(
+            final Throwable cause) {
+        super(cause);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,50 +45,50 @@ import java.util.Map;
 
 public class ParamUtil {
 
-  private ParamUtil() {
-  }
-  public static void assertNotNull(
-      final String parameterName,
-      final Object parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(parameterName + " could not be null");
+    private ParamUtil() {
     }
-  }
-
-  public static void assertNotBlank(
-      final String parameterName,
-      final String parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(parameterName + " could not be null");
+    public static void assertNotNull(
+            final String parameterName,
+            final Object parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
     }
 
-    if (parameter.isEmpty()) {
-      throw new IllegalArgumentException(parameterName + " could not be blank");
-    }
-  }
+    public static void assertNotBlank(
+            final String parameterName,
+            final String parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
 
-  public static void assertNotEmpty(
-      final String parameterName,
-      final Collection<?> parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(parameterName + " could not be null");
-    }
-
-    if (parameter.isEmpty()) {
-      throw new IllegalArgumentException(parameterName + " could not be empty");
-    }
-  }
-
-  public static void assertNotEmpty(
-      final String parameterName,
-      final Map<?, ?> parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(parameterName + " could not be null");
+        if (parameter.isEmpty()) {
+            throw new IllegalArgumentException(parameterName + " could not be blank");
+        }
     }
 
-    if (parameter.isEmpty()) {
-      throw new IllegalArgumentException(parameterName + " could not be empty");
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Collection<?> parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if (parameter.isEmpty()) {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
     }
-  }
+
+    public static void assertNotEmpty(
+            final String parameterName,
+            final Map<?, ?> parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if (parameter.isEmpty()) {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
+    }
 
 }

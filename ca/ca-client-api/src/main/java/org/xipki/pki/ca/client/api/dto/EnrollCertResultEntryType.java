@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,31 +45,31 @@ import org.bouncycastle.asn1.cmp.PKIStatus;
 
 public class EnrollCertResultEntryType extends ResultEntryType {
 
-  private final CMPCertificate cert;
+    private final CMPCertificate cert;
 
-  private final int status;
+    private final int status;
 
-  public EnrollCertResultEntryType(
-      final String id,
-      final CMPCertificate cert) {
-    this(id, cert, PKIStatus.GRANTED);
-  }
+    public EnrollCertResultEntryType(
+            final String id,
+            final CMPCertificate cert) {
+        this(id, cert, PKIStatus.GRANTED);
+    }
 
-  public EnrollCertResultEntryType(
-      final String id,
-      final CMPCertificate cert,
-      final int status) {
-    super(id);
-    this.cert = cert;
-    this.status = status;
-  }
+    public EnrollCertResultEntryType(
+            final String id,
+            final CMPCertificate cert,
+            final int status) {
+        super(id);
+        this.cert = cert;
+        this.status = status;
+    }
 
-  public CMPCertificate getCert() {
-    return cert;
-  }
+    public CMPCertificate getCert() {
+        return cert;
+    }
 
-  public int getStatus() {
-    return status;
-  }
+    public int getStatus() {
+        return status;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,131 +51,131 @@ import java.util.Set;
 
 public class CollectionUtil {
 
-  private CollectionUtil() {
-  }
-
-  public static boolean isEmpty(
-      final Collection<?> c) {
-    return c == null || c.isEmpty();
-  }
-
-  public static boolean isNotEmpty(
-      final Collection<?> c) {
-    return c != null && !c.isEmpty();
-  }
-
-  public static boolean isEmpty(
-      final Map<?, ?> m) {
-    return m == null || m.isEmpty();
-  }
-
-  public static boolean isNotEmpty(
-      final Map<?, ?> m) {
-    return m != null && !m.isEmpty();
-  }
-
-  public static <K, V> Map<K, V> unmodifiableMap(
-      final Map<? extends K, ? extends V> m) {
-    if (m == null) {
-      return null;
+    private CollectionUtil() {
     }
 
-    return Collections.unmodifiableMap(m);
-  }
-
-  public static <K, V> Map<K, V> unmodifiableMap(
-      final Map<? extends K, ? extends V> m,
-      final boolean newMap,
-      final boolean emptyAsNull) {
-    if (m == null) {
-      return null;
+    public static boolean isEmpty(
+            final Collection<?> c) {
+        return c == null || c.isEmpty();
     }
 
-    if (emptyAsNull && m.isEmpty()) {
-      return null;
+    public static boolean isNotEmpty(
+            final Collection<?> c) {
+        return c != null && !c.isEmpty();
     }
 
-    return Collections.unmodifiableMap(
-        newMap
-            ? new HashMap<K, V>(m)
-            : m);
-  }
-
-  public static <T> Set<T> unmodifiableSet(
-      final Set<? extends T> s) {
-    if (s == null) {
-      return null;
+    public static boolean isEmpty(
+            final Map<?, ?> m) {
+        return m == null || m.isEmpty();
     }
 
-    return Collections.unmodifiableSet(s);
-  }
-
-  public static <T> Set<T> unmodifiableSet(
-      final Set<? extends T> s,
-      final boolean newSet,
-      final boolean emptyAsNull) {
-    if (s == null) {
-      return null;
+    public static boolean isNotEmpty(
+            final Map<?, ?> m) {
+        return m != null && !m.isEmpty();
     }
 
-    if (emptyAsNull && s.isEmpty()) {
-      return null;
+    public static <K, V> Map<K, V> unmodifiableMap(
+            final Map<? extends K, ? extends V> m) {
+        if (m == null) {
+            return null;
+        }
+
+        return Collections.unmodifiableMap(m);
     }
 
-    return Collections.unmodifiableSet(
-        newSet
-            ? new HashSet<T>(s)
-            : s);
-  }
+    public static <K, V> Map<K, V> unmodifiableMap(
+            final Map<? extends K, ? extends V> m,
+            final boolean newMap,
+            final boolean emptyAsNull) {
+        if (m == null) {
+            return null;
+        }
 
-  public static <T> Collection<T> unmodifiableCollection(
-      final Collection<? extends T> c) {
-    if (c == null) {
-      return null;
+        if (emptyAsNull && m.isEmpty()) {
+            return null;
+        }
+
+        return Collections.unmodifiableMap(
+                newMap
+                        ? new HashMap<K, V>(m)
+                        : m);
     }
 
-    return Collections.unmodifiableCollection(c);
-  }
+    public static <T> Set<T> unmodifiableSet(
+            final Set<? extends T> s) {
+        if (s == null) {
+            return null;
+        }
 
-  public static <T> Collection<T> unmodifiableCollection(
-      final Collection<? extends T> c,
-      final boolean emptyAsNull) {
-    if (c == null) {
-      return null;
+        return Collections.unmodifiableSet(s);
     }
 
-    if (emptyAsNull && c.isEmpty()) {
-      return null;
+    public static <T> Set<T> unmodifiableSet(
+            final Set<? extends T> s,
+            final boolean newSet,
+            final boolean emptyAsNull) {
+        if (s == null) {
+            return null;
+        }
+
+        if (emptyAsNull && s.isEmpty()) {
+            return null;
+        }
+
+        return Collections.unmodifiableSet(
+                newSet
+                        ? new HashSet<T>(s)
+                        : s);
     }
 
-    return Collections.unmodifiableCollection(c);
-  }
+    public static <T> Collection<T> unmodifiableCollection(
+            final Collection<? extends T> c) {
+        if (c == null) {
+            return null;
+        }
 
-  public static <T> List<T> unmodifiableList(
-      final List<? extends T> l) {
-    if (l == null) {
-      return null;
+        return Collections.unmodifiableCollection(c);
     }
 
-    return Collections.unmodifiableList(l);
-  }
+    public static <T> Collection<T> unmodifiableCollection(
+            final Collection<? extends T> c,
+            final boolean emptyAsNull) {
+        if (c == null) {
+            return null;
+        }
 
-  public static <T> List<T> unmodifiableList(
-      final List<? extends T> l,
-      final boolean newList,
-      final boolean emptyAsNull) {
-    if (l == null) {
-      return null;
+        if (emptyAsNull && c.isEmpty()) {
+            return null;
+        }
+
+        return Collections.unmodifiableCollection(c);
     }
 
-    if (emptyAsNull && l.isEmpty()) {
-      return null;
+    public static <T> List<T> unmodifiableList(
+            final List<? extends T> l) {
+        if (l == null) {
+            return null;
+        }
+
+        return Collections.unmodifiableList(l);
     }
 
-    return Collections.unmodifiableList(
-        newList
-            ? new ArrayList<T>(l)
-            : l);
-  }
+    public static <T> List<T> unmodifiableList(
+            final List<? extends T> l,
+            final boolean newList,
+            final boolean emptyAsNull) {
+        if (l == null) {
+            return null;
+        }
+
+        if (emptyAsNull && l.isEmpty()) {
+            return null;
+        }
+
+        return Collections.unmodifiableList(
+                newList
+                        ? new ArrayList<T>(l)
+                        : l);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,41 +45,41 @@ import org.xipki.commons.common.util.StringUtil;
 
 public class CertprofileInfo {
 
-  private final String name;
+    private final String name;
 
-  private final String type;
+    private final String type;
 
-  private final String conf;
+    private final String conf;
 
-  public CertprofileInfo(
-      final String name,
-      final String type,
-      final String conf) {
-    ParamUtil.assertNotBlank("name", name);
-    this.name = name;
-    if (StringUtil.isBlank(type)) {
-      this.type = null;
-    } else {
-      this.type = type;
+    public CertprofileInfo(
+            final String name,
+            final String type,
+            final String conf) {
+        ParamUtil.assertNotBlank("name", name);
+        this.name = name;
+        if (StringUtil.isBlank(type)) {
+            this.type = null;
+        } else {
+            this.type = type;
+        }
+
+        if (StringUtil.isBlank(conf)) {
+            this.conf = null;
+        } else {
+            this.conf = conf;
+        }
     }
 
-    if (StringUtil.isBlank(conf)) {
-      this.conf = null;
-    } else {
-      this.conf = conf;
+    public String getName() {
+        return name;
     }
-  }
 
-  public String getName() {
-    return name;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public String getType() {
-    return type;
-  }
-
-  public String getConf() {
-    return conf;
-  }
+    public String getConf() {
+        return conf;
+    }
 
 }

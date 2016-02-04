@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,24 +48,24 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
-  private final RSAKeypairGenerator kpGen;
+    private final RSAKeypairGenerator kpGen;
 
-  public P12RSAKeyGenLoadTest(
-      final int keysize,
-      final BigInteger publicExponent,
-      final SecurityFactory securityFactory)
-  throws Exception {
-    super("PKCS#12 RSA key generation\n"
-        + "keysize: " + keysize + "\n"
-        + "public exponent: " + publicExponent,
-        securityFactory);
+    public P12RSAKeyGenLoadTest(
+            final int keysize,
+            final BigInteger publicExponent,
+            final SecurityFactory securityFactory)
+    throws Exception {
+        super("PKCS#12 RSA key generation\n"
+                + "keysize: " + keysize + "\n"
+                + "public exponent: " + publicExponent,
+                securityFactory);
 
-    this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
-  }
+        this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
+    }
 
-  @Override
-  protected P12RawKeypairGenerator getKeypairGenerator() {
-    return kpGen;
-  }
+    @Override
+    protected P12RawKeypairGenerator getKeypairGenerator() {
+        return kpGen;
+    }
 
 }

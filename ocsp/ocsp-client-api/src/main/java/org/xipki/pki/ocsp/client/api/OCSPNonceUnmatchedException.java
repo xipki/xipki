@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,30 +45,30 @@ import org.bouncycastle.util.encoders.Hex;
 @SuppressWarnings("serial")
 public class OCSPNonceUnmatchedException extends OCSPResponseException {
 
-  public OCSPNonceUnmatchedException(
-      final byte[] expected,
-      final byte[] is) {
-    super(buildMessage(expected, is));
-  }
+    public OCSPNonceUnmatchedException(
+            final byte[] expected,
+            final byte[] is) {
+        super(buildMessage(expected, is));
+    }
 
-  private static String buildMessage(
-      final byte[] expected,
-      final byte[] is) {
-    StringBuilder sb = new StringBuilder(100);
-    sb.append("nonce unmatch (received ");
-    if (is == null || is.length == 0) {
-      sb.append("none");
-    } else {
-      sb.append(Hex.toHexString(is));
+    private static String buildMessage(
+            final byte[] expected,
+            final byte[] is) {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("nonce unmatch (received ");
+        if (is == null || is.length == 0) {
+            sb.append("none");
+        } else {
+            sb.append(Hex.toHexString(is));
+        }
+        sb.append(", but expected ");
+        if (expected == null || expected.length == 0) {
+            sb.append("nonce");
+        } else {
+            sb.append(Hex.toHexString(expected));
+        }
+        sb.append(")");
+        return sb.toString();
     }
-    sb.append(", but expected ");
-    if (expected == null || expected.length == 0) {
-      sb.append("nonce");
-    } else {
-      sb.append(Hex.toHexString(expected));
-    }
-    sb.append(")");
-    return sb.toString();
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,59 +50,59 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 
 public class QaCertificatePolicies extends QaExtension {
 
-  public static class QaCertificatePolicyInformation {
+    public static class QaCertificatePolicyInformation {
 
-    private final String policyId;
+        private final String policyId;
 
-    private final QaPolicyQualifiers policyQualifiers;
+        private final QaPolicyQualifiers policyQualifiers;
 
-    public QaCertificatePolicyInformation(
-        final CertificatePolicyInformationType jaxb) {
-      ParamUtil.assertNotNull("jaxb", jaxb);
-      this.policyId = jaxb.getPolicyIdentifier().getValue();
-      if (jaxb.getPolicyQualifiers() == null) {
-        this.policyQualifiers = null;
-      } else {
-        this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
-      }
+        public QaCertificatePolicyInformation(
+                final CertificatePolicyInformationType jaxb) {
+            ParamUtil.assertNotNull("jaxb", jaxb);
+            this.policyId = jaxb.getPolicyIdentifier().getValue();
+            if (jaxb.getPolicyQualifiers() == null) {
+                this.policyQualifiers = null;
+            } else {
+                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
+            }
+        }
+
+        public String getPolicyId() {
+            return policyId;
+        }
+
+        public QaPolicyQualifiers getPolicyQualifiers() {
+            return policyQualifiers;
+        }
+
+    } // class QaCertificatePolicyInformation
+
+    private final List<QaCertificatePolicyInformation> policyInformations;
+
+    public QaCertificatePolicies(
+            final CertificatePolicies jaxb) {
+        List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
+        List<QaCertificatePolicyInformation> list = new LinkedList<>();
+        for (CertificatePolicyInformationType type : types) {
+            list.add(new QaCertificatePolicyInformation(type));
+        }
+
+        this.policyInformations = Collections.unmodifiableList(list);
     }
 
-    public String getPolicyId() {
-      return policyId;
+    public List<QaCertificatePolicyInformation> getPolicyInformations() {
+        return policyInformations;
     }
 
-    public QaPolicyQualifiers getPolicyQualifiers() {
-      return policyQualifiers;
+    public QaCertificatePolicyInformation getPolicyInformation(
+            final String policyId) {
+        for (QaCertificatePolicyInformation entry : policyInformations) {
+            if (entry.getPolicyId().equals(policyId)) {
+                return entry;
+            }
+        }
+
+        return null;
     }
-
-  } // class QaCertificatePolicyInformation
-
-  private final List<QaCertificatePolicyInformation> policyInformations;
-
-  public QaCertificatePolicies(
-      final CertificatePolicies jaxb) {
-    List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
-    List<QaCertificatePolicyInformation> list = new LinkedList<>();
-    for (CertificatePolicyInformationType type : types) {
-      list.add(new QaCertificatePolicyInformation(type));
-    }
-
-    this.policyInformations = Collections.unmodifiableList(list);
-  }
-
-  public List<QaCertificatePolicyInformation> getPolicyInformations() {
-    return policyInformations;
-  }
-
-  public QaCertificatePolicyInformation getPolicyInformation(
-      final String policyId) {
-    for (QaCertificatePolicyInformation entry : policyInformations) {
-      if (entry.getPolicyId().equals(policyId)) {
-        return entry;
-      }
-    }
-
-    return null;
-  }
 
 }

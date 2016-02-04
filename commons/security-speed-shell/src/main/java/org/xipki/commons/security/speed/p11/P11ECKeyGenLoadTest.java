@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,24 +46,24 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
 
-  private final String curveNameOrOid;
+    private final String curveNameOrOid;
 
-  public P11ECKeyGenLoadTest(
-      final P11WritableSlot slot,
-      final String curveNameOrOid)
-  throws Exception {
-    super(slot,
-        "PKCS#11 EC key generation\n"
-            + "curve: " + curveNameOrOid);
-    ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-    this.curveNameOrOid = curveNameOrOid;
-  }
+    public P11ECKeyGenLoadTest(
+            final P11WritableSlot slot,
+            final String curveNameOrOid)
+    throws Exception {
+        super(slot,
+                "PKCS#11 EC key generation\n"
+                        + "curve: " + curveNameOrOid);
+        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
+        this.curveNameOrOid = curveNameOrOid;
+    }
 
-  @Override
-  protected void genKeypair()
-  throws Exception {
-    P11KeyIdentifier keyId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
-    slot.removeKey(keyId);
-  }
+    @Override
+    protected void genKeypair()
+    throws Exception {
+        P11KeyIdentifier keyId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
+        slot.removeKey(keyId);
+    }
 
 }

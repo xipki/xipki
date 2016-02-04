@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -58,108 +58,108 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class HttpsHostnameVerifier implements HostnameVerifier {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
 
-  private boolean enabled = false;
+    private boolean enabled = false;
 
-  private boolean trustAll = false;
+    private boolean trustAll = false;
 
-  private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
+    private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
 
-  private HostnameVerifier oldHostnameVerifier = null;
+    private HostnameVerifier oldHostnameVerifier = null;
 
-  private boolean meAsDefaultHostnameVerifier = false;
+    private boolean meAsDefaultHostnameVerifier = false;
 
-  public void init() {
-    LOG.info("enabled: {}", enabled);
-    LOG.info("trustAll: {}", trustAll);
-    if (enabled) {
-      oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-      LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
-          oldHostnameVerifier);
-      HttpsURLConnection.setDefaultHostnameVerifier(this);
-      meAsDefaultHostnameVerifier = true;
-    }
-  }
-
-  public void shutdown() {
-    if (meAsDefaultHostnameVerifier
-        && HttpsURLConnection.getDefaultHostnameVerifier() == this) {
-      LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
-          oldHostnameVerifier);
-      HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
-      meAsDefaultHostnameVerifier = false;
-    }
-  }
-
-  /**
-   * Verify that the host name is an acceptable match with
-   * the server's authentication scheme.
-   *
-   * @param hostname the host name
-   * @param session SSLSession used on the connection to host
-   * @return true if the host name is acceptable
-   */
-  @Override
-  public boolean verify(
-      final String hostname,
-      final SSLSession session) {
-    if (trustAll) {
-      return true;
+    public void init() {
+        LOG.info("enabled: {}", enabled);
+        LOG.info("trustAll: {}", trustAll);
+        if (enabled) {
+            oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
+            LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
+                    oldHostnameVerifier);
+            HttpsURLConnection.setDefaultHostnameVerifier(this);
+            meAsDefaultHostnameVerifier = true;
+        }
     }
 
-    LOG.info("hostname: {}", hostname);
-    String commonName = null;
-    try {
-      Principal peerPrincipal = session.getPeerPrincipal();
-      if (peerPrincipal == null) {
-        return false;
-      }
-      commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
-      LOG.info("commonName: {}", commonName);
-    } catch (Exception e) {
-      LOG.error("Error: {}", e.getMessage());
-      return false;
+    public void shutdown() {
+        if (meAsDefaultHostnameVerifier
+                && HttpsURLConnection.getDefaultHostnameVerifier() == this) {
+            LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one {}",
+                    oldHostnameVerifier);
+            HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
+            meAsDefaultHostnameVerifier = false;
+        }
     }
 
-    Set<String> hostnames = hostnameMap.get(commonName);
-    return (hostnames == null)
-        ? false
-        : hostnames.contains(hostname);
-  }
+    /**
+     * Verify that the host name is an acceptable match with
+     * the server's authentication scheme.
+     *
+     * @param hostname the host name
+     * @param session SSLSession used on the connection to host
+     * @return true if the host name is acceptable
+     */
+    @Override
+    public boolean verify(
+            final String hostname,
+            final SSLSession session) {
+        if (trustAll) {
+            return true;
+        }
 
-  public void setCommonnameHostMap(
-      final String commonnameHostMap) {
-    hostnameMap.clear();
-    if (StringUtil.isBlank(commonnameHostMap)) {
-      return;
+        LOG.info("hostname: {}", hostname);
+        String commonName = null;
+        try {
+            Principal peerPrincipal = session.getPeerPrincipal();
+            if (peerPrincipal == null) {
+                return false;
+            }
+            commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
+            LOG.info("commonName: {}", commonName);
+        } catch (Exception e) {
+            LOG.error("Error: {}", e.getMessage());
+            return false;
+        }
+
+        Set<String> hostnames = hostnameMap.get(commonName);
+        return (hostnames == null)
+                ? false
+                : hostnames.contains(hostname);
     }
 
-    ConfPairs pairs = new ConfPairs(commonnameHostMap);
-    Set<String> commonNames = pairs.getNames();
-    for (String commonName :commonNames) {
-      String v = pairs.getValue(commonName);
-      Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");
-      hostnameMap.put(commonName, hosts);
+    public void setCommonnameHostMap(
+            final String commonnameHostMap) {
+        hostnameMap.clear();
+        if (StringUtil.isBlank(commonnameHostMap)) {
+            return;
+        }
+
+        ConfPairs pairs = new ConfPairs(commonnameHostMap);
+        Set<String> commonNames = pairs.getNames();
+        for (String commonName :commonNames) {
+            String v = pairs.getValue(commonName);
+            Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");
+            hostnameMap.put(commonName, hosts);
+        }
     }
-  }
 
-  public boolean isEnabled() {
-    return enabled;
-  }
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-  public void setEnabled(
-      final boolean enabled) {
-    this.enabled = enabled;
-  }
+    public void setEnabled(
+            final boolean enabled) {
+        this.enabled = enabled;
+    }
 
-  public boolean isTrustAll() {
-    return trustAll;
-  }
+    public boolean isTrustAll() {
+        return trustAll;
+    }
 
-  public void setTrustAll(
-      final boolean trustAll) {
-    this.trustAll = trustAll;
-  }
+    public void setTrustAll(
+            final boolean trustAll) {
+        this.trustAll = trustAll;
+    }
 
 }

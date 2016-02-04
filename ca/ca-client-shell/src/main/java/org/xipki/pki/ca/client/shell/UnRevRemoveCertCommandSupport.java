@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -57,60 +57,60 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport {
 
-  @Option(name = "--cert", aliases = "-c",
-      description = "certificate file")
-  @Completion(FilePathCompleter.class)
-  protected String certFile;
+    @Option(name = "--cert", aliases = "-c",
+            description = "certificate file")
+    @Completion(FilePathCompleter.class)
+    protected String certFile;
 
-  @Option(name = "--issuer", aliases = "-i",
-      description = "issuer certificate file")
-  @Completion(FilePathCompleter.class)
-  protected String issuerCertFile;
+    @Option(name = "--issuer", aliases = "-i",
+            description = "issuer certificate file")
+    @Completion(FilePathCompleter.class)
+    protected String issuerCertFile;
 
-  @Option(name = "--serial", aliases = "-s",
-      description = "serial number")
-  private String serialNumberS;
+    @Option(name = "--serial", aliases = "-s",
+            description = "serial number")
+    private String serialNumberS;
 
-  private BigInteger serialNumber;
+    private BigInteger serialNumber;
 
-  protected BigInteger getSerialNumber() {
-    if (serialNumber == null) {
-      if (isNotBlank(serialNumberS)) {
-        this.serialNumber = toBigInt(serialNumberS);
-      }
-    }
-    return serialNumber;
-  }
-
-  protected String checkCertificate(
-      final X509Certificate cert,
-      final X509Certificate caCert)
-  throws CertificateEncodingException {
-    if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
-      return "the given certificate is not issued by the given issuer";
+    protected BigInteger getSerialNumber() {
+        if (serialNumber == null) {
+            if (isNotBlank(serialNumberS)) {
+                this.serialNumber = toBigInt(serialNumberS);
+            }
+        }
+        return serialNumber;
     }
 
-    byte[] caSki = X509Util.extractSKI(caCert);
-    byte[] aki = X509Util.extractAKI(cert);
-    if (caSki != null && aki != null) {
-      if (!Arrays.equals(aki, caSki)) {
-        return "the given certificate is not issued by the given issuer";
-      }
-    }
+    protected String checkCertificate(
+            final X509Certificate cert,
+            final X509Certificate caCert)
+    throws CertificateEncodingException {
+        if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
+            return "the given certificate is not issued by the given issuer";
+        }
 
-    try {
-      cert.verify(caCert.getPublicKey(), "BC");
-    } catch (SignatureException ex) {
-      return "could not verify the signaure of given certificate by the issuer";
-    } catch (InvalidKeyException
-        | CertificateException
-        | NoSuchAlgorithmException
-        | NoSuchProviderException ex) {
-      return "could not verify the signaure of given certificate by the issuer: "
-          + ex.getMessage();
-    }
+        byte[] caSki = X509Util.extractSKI(caCert);
+        byte[] aki = X509Util.extractAKI(cert);
+        if (caSki != null && aki != null) {
+            if (!Arrays.equals(aki, caSki)) {
+                return "the given certificate is not issued by the given issuer";
+            }
+        }
 
-    return null;
-  }
+        try {
+            cert.verify(caCert.getPublicKey(), "BC");
+        } catch (SignatureException ex) {
+            return "could not verify the signaure of given certificate by the issuer";
+        } catch (InvalidKeyException
+                | CertificateException
+                | NoSuchAlgorithmException
+                | NoSuchProviderException ex) {
+            return "could not verify the signaure of given certificate by the issuer: "
+                    + ex.getMessage();
+        }
+
+        return null;
+    }
 
 }

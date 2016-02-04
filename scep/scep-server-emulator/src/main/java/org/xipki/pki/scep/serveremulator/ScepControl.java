@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,48 +44,48 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class ScepControl {
 
-  private final boolean sendCACert;
+    private final boolean sendCACert;
 
-  private final boolean pendingCert;
+    private final boolean pendingCert;
 
-  private final boolean useInsecureAlg;
+    private final boolean useInsecureAlg;
 
-  private final boolean sendSignerCert;
+    private final boolean sendSignerCert;
 
-  private final String secret;
+    private final String secret;
 
-  public ScepControl(
-      final boolean sendCACert,
-      final boolean pendingCert,
-      final boolean sendSignerCert,
-      final boolean useInsecureAlg,
-      final String secret) {
-    ParamUtil.assertNotBlank("secret", secret);
-    this.sendCACert = sendCACert;
-    this.pendingCert = pendingCert;
-    this.sendSignerCert = sendSignerCert;
-    this.useInsecureAlg = useInsecureAlg;
-    this.secret = secret;
-  }
+    public ScepControl(
+            final boolean sendCACert,
+            final boolean pendingCert,
+            final boolean sendSignerCert,
+            final boolean useInsecureAlg,
+            final String secret) {
+        ParamUtil.assertNotBlank("secret", secret);
+        this.sendCACert = sendCACert;
+        this.pendingCert = pendingCert;
+        this.sendSignerCert = sendSignerCert;
+        this.useInsecureAlg = useInsecureAlg;
+        this.secret = secret;
+    }
 
-  public boolean isSendCACert() {
-    return sendCACert;
-  }
+    public boolean isSendCACert() {
+        return sendCACert;
+    }
 
-  public boolean isPendingCert() {
-    return pendingCert;
-  }
+    public boolean isPendingCert() {
+        return pendingCert;
+    }
 
-  public boolean isUseInsecureAlg() {
-    return useInsecureAlg;
-  }
+    public boolean isUseInsecureAlg() {
+        return useInsecureAlg;
+    }
 
-  public boolean isSendSignerCert() {
-    return sendSignerCert;
-  }
+    public boolean isSendSignerCert() {
+        return sendSignerCert;
+    }
 
-  public String getSecret() {
-    return secret;
-  }
+    public String getSecret() {
+        return secret;
+    }
 
 }

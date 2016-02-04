@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,22 +44,22 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 
 public class QaAuthorizationTemplate extends QaExtension {
 
-  private final String type;
+    private final String type;
 
-  private final byte[] accessRights;
+    private final byte[] accessRights;
 
-  public QaAuthorizationTemplate(
-      final AuthorizationTemplate jaxb) {
-    this.type = jaxb.getType().getValue();
-    this.accessRights = jaxb.getAccessRights().getValue();
-  }
+    public QaAuthorizationTemplate(
+            final AuthorizationTemplate jaxb) {
+        this.type = jaxb.getType().getValue();
+        this.accessRights = jaxb.getAccessRights().getValue();
+    }
 
-  public String getType() {
-    return type;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public byte[] getAccessRights() {
-    return accessRights;
-  }
+    public byte[] getAccessRights() {
+        return accessRights;
+    }
 
 }

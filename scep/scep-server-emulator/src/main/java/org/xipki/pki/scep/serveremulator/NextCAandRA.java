@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,24 +45,24 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class NextCAandRA {
 
-  private final Certificate cACert;
+    private final Certificate cACert;
 
-  private final Certificate rACert;
+    private final Certificate rACert;
 
-  public NextCAandRA(
-      final Certificate cACert,
-      final Certificate rACert) {
-    ParamUtil.assertNotNull("cACert", cACert);
-    this.cACert = cACert;
-    this.rACert = rACert;
-  }
+    public NextCAandRA(
+            final Certificate cACert,
+            final Certificate rACert) {
+        ParamUtil.assertNotNull("cACert", cACert);
+        this.cACert = cACert;
+        this.rACert = rACert;
+    }
 
-  public Certificate getCACert() {
-    return cACert;
-  }
+    public Certificate getCACert() {
+        return cACert;
+    }
 
-  public Certificate getRACert() {
-    return rACert;
-  }
+    public Certificate getRACert() {
+        return rACert;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,34 +45,34 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 public class ErrorResultEntryType extends ResultEntryType {
 
-  private final PKIStatusInfo statusInfo;
+    private final PKIStatusInfo statusInfo;
 
-  public ErrorResultEntryType(
-      final String id,
-      final PKIStatusInfo statusInfo) {
-    super(id);
-    ParamUtil.assertNotNull("statusInfo", statusInfo);
-    this.statusInfo = statusInfo;
-  }
+    public ErrorResultEntryType(
+            final String id,
+            final PKIStatusInfo statusInfo) {
+        super(id);
+        ParamUtil.assertNotNull("statusInfo", statusInfo);
+        this.statusInfo = statusInfo;
+    }
 
-  public ErrorResultEntryType(
-      final String id,
-      final int status,
-      final int pkiFailureInfo,
-      final String statusMessage) {
-    super(id);
-    this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
-  }
+    public ErrorResultEntryType(
+            final String id,
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage) {
+        super(id);
+        this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
+    }
 
-  public ErrorResultEntryType(
-      final String id,
-      final int status) {
-    super(id);
-    this.statusInfo = new PKIStatusInfo(status);
-  }
+    public ErrorResultEntryType(
+            final String id,
+            final int status) {
+        super(id);
+        this.statusInfo = new PKIStatusInfo(status);
+    }
 
-  public PKIStatusInfo getStatusInfo() {
-    return statusInfo;
-  }
+    public PKIStatusInfo getStatusInfo() {
+        return statusInfo;
+    }
 
 }

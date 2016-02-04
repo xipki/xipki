@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,82 +55,82 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
 
-  private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
+    private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
 
-  private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
+    private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
-  private final URL serverUrl;
+    private final URL serverUrl;
 
-  DefaultHttpX509CmpRequestor(
-      final X509Certificate requestorCert,
-      final X509Certificate responderCert,
-      final String serverUrl,
-      final SecurityFactory securityFactory) {
-    super(requestorCert, responderCert, securityFactory);
-    ParamUtil.assertNotBlank("serverUrl", serverUrl);
+    DefaultHttpX509CmpRequestor(
+            final X509Certificate requestorCert,
+            final X509Certificate responderCert,
+            final String serverUrl,
+            final SecurityFactory securityFactory) {
+        super(requestorCert, responderCert, securityFactory);
+        ParamUtil.assertNotBlank("serverUrl", serverUrl);
 
-    try {
-      this.serverUrl = new URL(serverUrl);
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException("invalid url: " + serverUrl);
-    }
-  }
-
-  DefaultHttpX509CmpRequestor(
-      final ConcurrentContentSigner requestor,
-      final X509Certificate responderCert,
-      final String serverUrl,
-      final SecurityFactory securityFactory,
-      final boolean signRequest) {
-    super(requestor, responderCert, securityFactory, signRequest);
-    ParamUtil.assertNotBlank("serverUrl", serverUrl);
-
-    try {
-      this.serverUrl = new URL(serverUrl);
-    } catch (MalformedURLException ex) {
-      throw new IllegalArgumentException("invalid url: " + serverUrl);
-    }
-  }
-
-  @Override
-  public byte[] send(
-      final byte[] request)
-  throws IOException {
-    HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
-    httpUrlConnection.setDoOutput(true);
-    httpUrlConnection.setUseCaches(false);
-
-    int size = request.length;
-
-    httpUrlConnection.setRequestMethod("POST");
-    httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
-    httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
-    OutputStream outputstream = httpUrlConnection.getOutputStream();
-    outputstream.write(request);
-    outputstream.flush();
-
-    InputStream inputStream = httpUrlConnection.getInputStream();
-    if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-      inputStream.close();
-      throw new IOException("bad response: "
-          + httpUrlConnection.getResponseCode() + "  "
-          + httpUrlConnection.getResponseMessage());
-    }
-    String responseContentType = httpUrlConnection.getContentType();
-    boolean isValidContentType = false;
-    if (responseContentType != null) {
-      if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
-        isValidContentType = true;
-      }
-    }
-    if (!isValidContentType) {
-      inputStream.close();
-      throw new IOException("bad response: mime type "
-          + responseContentType
-          + " not supported!");
+        try {
+            this.serverUrl = new URL(serverUrl);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException("invalid url: " + serverUrl);
+        }
     }
 
-    return IoUtil.read(inputStream);
-  } // method send
+    DefaultHttpX509CmpRequestor(
+            final ConcurrentContentSigner requestor,
+            final X509Certificate responderCert,
+            final String serverUrl,
+            final SecurityFactory securityFactory,
+            final boolean signRequest) {
+        super(requestor, responderCert, securityFactory, signRequest);
+        ParamUtil.assertNotBlank("serverUrl", serverUrl);
+
+        try {
+            this.serverUrl = new URL(serverUrl);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException("invalid url: " + serverUrl);
+        }
+    }
+
+    @Override
+    public byte[] send(
+            final byte[] request)
+    throws IOException {
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
+        httpUrlConnection.setDoOutput(true);
+        httpUrlConnection.setUseCaches(false);
+
+        int size = request.length;
+
+        httpUrlConnection.setRequestMethod("POST");
+        httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
+        httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
+        OutputStream outputstream = httpUrlConnection.getOutputStream();
+        outputstream.write(request);
+        outputstream.flush();
+
+        InputStream inputStream = httpUrlConnection.getInputStream();
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            inputStream.close();
+            throw new IOException("bad response: "
+                    + httpUrlConnection.getResponseCode() + "    "
+                    + httpUrlConnection.getResponseMessage());
+        }
+        String responseContentType = httpUrlConnection.getContentType();
+        boolean isValidContentType = false;
+        if (responseContentType != null) {
+            if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
+                isValidContentType = true;
+            }
+        }
+        if (!isValidContentType) {
+            inputStream.close();
+            throw new IOException("bad response: mime type "
+                    + responseContentType
+                    + " not supported!");
+        }
+
+        return IoUtil.read(inputStream);
+    } // method send
 
 }

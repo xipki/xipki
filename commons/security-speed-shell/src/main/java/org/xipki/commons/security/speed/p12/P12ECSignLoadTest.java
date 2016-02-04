@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,28 +47,28 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
-  public P12ECSignLoadTest(
-      final SecurityFactory securityFactory,
-      final String signatureAlgorithm,
-      final String curveNameOrOid)
-  throws Exception {
-    super(securityFactory, signatureAlgorithm,
-        generateKeystore(curveNameOrOid),
-        "PKCS#12 EC signature creation\n"
-            + "curve: " + curveNameOrOid);
-  }
-
-  private static byte[] generateKeystore(
-      final String curveNameOrOid)
-  throws Exception {
-    byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
-    if (keystoreBytes == null) {
-      P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-        curveNameOrOid, password.toCharArray(), "CN=dummy", null, null,
-        new SecureRandom());
-      keystoreBytes = kpGen.generateIdentity().getKeystore();
+    public P12ECSignLoadTest(
+            final SecurityFactory securityFactory,
+            final String signatureAlgorithm,
+            final String curveNameOrOid)
+    throws Exception {
+        super(securityFactory, signatureAlgorithm,
+                generateKeystore(curveNameOrOid),
+                "PKCS#12 EC signature creation\n"
+                        + "curve: " + curveNameOrOid);
     }
-    return keystoreBytes;
-  }
+
+    private static byte[] generateKeystore(
+            final String curveNameOrOid)
+    throws Exception {
+        byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
+        if (keystoreBytes == null) {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+                curveNameOrOid, password.toCharArray(), "CN=dummy", null, null,
+                new SecureRandom());
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
+    }
 
 }

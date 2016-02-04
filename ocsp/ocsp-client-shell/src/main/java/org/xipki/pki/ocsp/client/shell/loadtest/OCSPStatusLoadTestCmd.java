@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,89 +55,89 @@ import org.xipki.pki.ocsp.client.shell.OCSPStatusCommandSupport;
  */
 
 @Command(scope = "xipki-ocsp", name = "loadtest-status",
-    description = "OCSP Load test")
+        description = "OCSP Load test")
 @Service
 public class OCSPStatusLoadTestCmd extends OCSPStatusCommandSupport {
 
-  @Option(name = "--serial",
-      required = true,
-      description = "serial numbers, comma-separated serial numbers or ranges\n"
-          + "required")
-  private String serialNumbers;
+    @Option(name = "--serial",
+            required = true,
+            description = "serial numbers, comma-separated serial numbers or ranges\n"
+                    + "required")
+    private String serialNumbers;
 
-  @Option(name = "--duration",
-      description = "duration in seconds")
-  private int durationInSecond = 30;
+    @Option(name = "--duration",
+            description = "duration in seconds")
+    private int durationInSecond = 30;
 
-  @Option(name = "--thread",
-      description = "number of threads")
-  private Integer numThreads = 5;
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
 
-  @Option(name = "--url",
-      required = true,
-      description = "OCSP responder URL\n"
-          + "required")
-  private String serverURL;
+    @Option(name = "--url",
+            required = true,
+            description = "OCSP responder URL\n"
+                    + "required")
+    private String serverURL;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    List<Long> serialNumbers = new LinkedList<>();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        List<Long> serialNumbers = new LinkedList<>();
 
-    try {
-      List<String> tokens = split(this.serialNumbers, ",");
-      for (String token : tokens) {
-        List<String> subtokens = split(token.trim(), "- ");
-        int countTokens = subtokens.size();
-        if (countTokens == 1) {
-          serialNumbers.add(Long.parseLong(subtokens.get(0)));
-        } else if (countTokens == 2) {
-          int startSerial = Integer.parseInt(subtokens.get(0).trim());
-          int endSerial = Integer.parseInt(subtokens.get(1).trim());
-          if (startSerial < 1 || endSerial < 1 || startSerial > endSerial) {
-            throw new IllegalCmdParamException(
-                "invalid serial number " + this.serialNumbers);
-          }
-          for (long i = startSerial; i <= endSerial; i++) {
-            serialNumbers.add(i);
-          }
-        } else {
-          throw new IllegalCmdParamException(
-              "invalid serial number " + this.serialNumbers);
+        try {
+            List<String> tokens = split(this.serialNumbers, ",");
+            for (String token : tokens) {
+                List<String> subtokens = split(token.trim(), "- ");
+                int countTokens = subtokens.size();
+                if (countTokens == 1) {
+                    serialNumbers.add(Long.parseLong(subtokens.get(0)));
+                } else if (countTokens == 2) {
+                    int startSerial = Integer.parseInt(subtokens.get(0).trim());
+                    int endSerial = Integer.parseInt(subtokens.get(1).trim());
+                    if (startSerial < 1 || endSerial < 1 || startSerial > endSerial) {
+                        throw new IllegalCmdParamException(
+                                "invalid serial number " + this.serialNumbers);
+                    }
+                    for (long i = startSerial; i <= endSerial; i++) {
+                        serialNumbers.add(i);
+                    }
+                } else {
+                    throw new IllegalCmdParamException(
+                            "invalid serial number " + this.serialNumbers);
+                }
+            } // end for
+        } catch (Exception e) {
+            throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
-      } // end for
-    } catch (Exception e) {
-      throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
-    }
 
-    if (numThreads < 1) {
-      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-    }
+        if (numThreads < 1) {
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+        }
 
-    URL serverUrl;
-    try {
-      serverUrl = new URL(serverURL);
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("invalid URL: " + serverURL);
-    }
+        URL serverUrl;
+        try {
+            serverUrl = new URL(serverURL);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("invalid URL: " + serverURL);
+        }
 
-    StringBuilder description = new StringBuilder();
-    description.append("serial numbers: ").append(this.serialNumbers).append("\n");
-    description.append("issuer cert: ").append(issuerCertFile).append("\n");
-    description.append("server URL: ").append(serverUrl.toString()).append("\n");
-    description.append("hash: ").append(hashAlgo);
+        StringBuilder description = new StringBuilder();
+        description.append("serial numbers: ").append(this.serialNumbers).append("\n");
+        description.append("issuer cert: ").append(issuerCertFile).append("\n");
+        description.append("server URL: ").append(serverUrl.toString()).append("\n");
+        description.append("hash: ").append(hashAlgo);
 
-    X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+        X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
 
-    RequestOptions options = getRequestOptions();
+        RequestOptions options = getRequestOptions();
 
-    OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
-        issuerCert, serverUrl, options, description.toString());
-    loadTest.setDuration(durationInSecond);
-    loadTest.setThreads(numThreads);
-    loadTest.test();
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
+                issuerCert, serverUrl, options, description.toString());
+        loadTest.setDuration(durationInSecond);
+        loadTest.setThreads(numThreads);
+        loadTest.test();
 
-    return null;
-  } // end doExecute
+        return null;
+    } // end doExecute
 
 }

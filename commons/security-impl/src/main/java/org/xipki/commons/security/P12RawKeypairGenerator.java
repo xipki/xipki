@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,106 +50,106 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public abstract class P12RawKeypairGenerator {
 
-  public static class ECKeypairGenerator extends P12RawKeypairGenerator {
+    public static class ECKeypairGenerator extends P12RawKeypairGenerator {
 
-    private final String curveName;
+        private final String curveName;
 
-    private final ASN1ObjectIdentifier curveOid;
+        private final ASN1ObjectIdentifier curveOid;
 
-    public ECKeypairGenerator(
-        final String curveNameOrOid)
-    throws Exception {
-      super();
+        public ECKeypairGenerator(
+                final String curveNameOrOid)
+        throws Exception {
+            super();
 
-      boolean isOid;
-      try {
-        new ASN1ObjectIdentifier(curveNameOrOid);
-        isOid = true;
-      } catch (Exception e) {
-        isOid = false;
-      }
+            boolean isOid;
+            try {
+                new ASN1ObjectIdentifier(curveNameOrOid);
+                isOid = true;
+            } catch (Exception e) {
+                isOid = false;
+            }
 
-      if (isOid) {
-        this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-        this.curveName =  KeyUtil.getCurveName(this.curveOid);
-      } else {
-        this.curveName = curveNameOrOid;
-        this.curveOid =  KeyUtil.getCurveOID(this.curveName);
-        if (this.curveOid == null) {
-          throw new IllegalArgumentException("no OID is defined for the curve "
-              + this.curveName);
+            if (isOid) {
+                this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
+                this.curveName =    KeyUtil.getCurveName(this.curveOid);
+            } else {
+                this.curveName = curveNameOrOid;
+                this.curveOid =    KeyUtil.getCurveOID(this.curveName);
+                if (this.curveOid == null) {
+                    throw new IllegalArgumentException("no OID is defined for the curve "
+                            + this.curveName);
+                }
+            }
         }
-      }
-    }
 
-    @Override
-    public KeyPair genKeypair(
-        final SecureRandom random)
+        @Override
+        public KeyPair genKeypair(
+                final SecureRandom random)
+        throws Exception {
+            return KeyUtil.generateECKeypair(this.curveOid, random);
+        }
+
+    } // class ECKeypairGenerator
+
+    public static class RSAKeypairGenerator extends P12RawKeypairGenerator {
+
+        private final int keysize;
+
+        private final BigInteger publicExponent;
+
+        public RSAKeypairGenerator(
+                final int keysize,
+                final BigInteger publicExponent)
+        throws Exception {
+            super();
+
+            this.keysize = keysize;
+            this.publicExponent = publicExponent;
+        }
+
+        @Override
+        public KeyPair genKeypair(
+                final SecureRandom random)
+        throws Exception {
+            return KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
+        }
+
+    } // class RSAKeypairGenerator
+
+    public static class DSAKeypairGenerator extends P12RawKeypairGenerator {
+
+        private final int pLength;
+
+        private final int qLength;
+
+        public DSAKeypairGenerator(
+                final int pLength,
+                final int qLength)
+        throws Exception {
+            super();
+
+            this.pLength = pLength;
+            this.qLength = qLength;
+        }
+
+        @Override
+        public KeyPair genKeypair(
+                final SecureRandom random)
+        throws Exception {
+            return KeyUtil.generateDSAKeypair(pLength, qLength, random);
+        }
+
+    } // class DSAKeypairGenerator
+
+    public abstract KeyPair genKeypair(
+            SecureRandom random)
+    throws Exception;
+
+    public P12RawKeypairGenerator()
     throws Exception {
-      return KeyUtil.generateECKeypair(this.curveOid, random);
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
     }
-
-  } // class ECKeypairGenerator
-
-  public static class RSAKeypairGenerator extends P12RawKeypairGenerator {
-
-    private final int keysize;
-
-    private final BigInteger publicExponent;
-
-    public RSAKeypairGenerator(
-        final int keysize,
-        final BigInteger publicExponent)
-    throws Exception {
-      super();
-
-      this.keysize = keysize;
-      this.publicExponent = publicExponent;
-    }
-
-    @Override
-    public KeyPair genKeypair(
-        final SecureRandom random)
-    throws Exception {
-      return KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
-    }
-
-  } // class RSAKeypairGenerator
-
-  public static class DSAKeypairGenerator extends P12RawKeypairGenerator {
-
-    private final int pLength;
-
-    private final int qLength;
-
-    public DSAKeypairGenerator(
-        final int pLength,
-        final int qLength)
-    throws Exception {
-      super();
-
-      this.pLength = pLength;
-      this.qLength = qLength;
-    }
-
-    @Override
-    public KeyPair genKeypair(
-        final SecureRandom random)
-    throws Exception {
-      return KeyUtil.generateDSAKeypair(pLength, qLength, random);
-    }
-
-  } // class DSAKeypairGenerator
-
-  public abstract KeyPair genKeypair(
-      SecureRandom random)
-  throws Exception;
-
-  public P12RawKeypairGenerator()
-  throws Exception {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
-    }
-  }
 
 }

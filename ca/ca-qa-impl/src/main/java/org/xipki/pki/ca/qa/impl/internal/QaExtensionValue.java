@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,25 +45,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class QaExtensionValue {
 
-  private final boolean critical;
+    private final boolean critical;
 
-  private final byte[] value;
+    private final byte[] value;
 
-  public QaExtensionValue(
-      final boolean critical,
-      final byte[] value) {
-    ParamUtil.assertNotNull("value", value);
+    public QaExtensionValue(
+            final boolean critical,
+            final byte[] value) {
+        ParamUtil.assertNotNull("value", value);
 
-    this.critical = critical;
-    this.value = Arrays.clone(value);
-  }
+        this.critical = critical;
+        this.value = Arrays.clone(value);
+    }
 
-  public boolean isCritical() {
-    return critical;
-  }
+    public boolean isCritical() {
+        return critical;
+    }
 
-  public byte[] getValue() {
-    return Arrays.clone(value);
-  }
+    public byte[] getValue() {
+        return Arrays.clone(value);
+    }
 
 }

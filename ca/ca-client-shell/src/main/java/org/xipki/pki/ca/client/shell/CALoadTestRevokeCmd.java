@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -58,95 +58,95 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.CALoadTestRevoke;
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-revoke",
-    description = "CA Client Revoke Load test")
+        description = "CA Client Revoke Load test")
 @Service
 public class CALoadTestRevokeCmd extends CALoadTestCommandSupport {
 
-  @Option(name = "--issuer",
-      required = true,
-      description = "issuer certificate file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String issuerCertFile;
+    @Option(name = "--issuer",
+            required = true,
+            description = "issuer certificate file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String issuerCertFile;
 
-  @Option(name = "--duration",
-      description = "maximal duration in seconds")
-  private Integer durationInSecond = 30;
+    @Option(name = "--duration",
+            description = "maximal duration in seconds")
+    private Integer durationInSecond = 30;
 
-  @Option(name = "--thread",
-      description = "number of threads")
-  private Integer numThreads = 5;
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
 
-  @Option(name = "--ca-db",
-      required = true,
-      description = "CA database configuration file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String caDbConfFile;
+    @Option(name = "--ca-db",
+            required = true,
+            description = "CA database configuration file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String caDbConfFile;
 
-  @Option(name = "--max-certs",
-      description = "maximal number of certificates to be revoked\n"
-          + "0 for unlimited")
-  private Integer maxCerts = 0;
+    @Option(name = "--max-certs",
+            description = "maximal number of certificates to be revoked\n"
+                    + "0 for unlimited")
+    private Integer maxCerts = 0;
 
-  @Option(name = "-n",
-      description = "number of certificates to be revoked in one request")
-  private Integer n = 1;
+    @Option(name = "-n",
+            description = "number of certificates to be revoked in one request")
+    private Integer n = 1;
 
-  @Reference(optional = true)
-  private DataSourceFactory dataSourceFactory;
+    @Reference(optional = true)
+    private DataSourceFactory dataSourceFactory;
 
-  @Reference
-  private SecurityFactory securityFactory;
+    @Reference
+    private SecurityFactory securityFactory;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (dataSourceFactory == null) {
-      throw new IllegalStateException("dataSourceFactory is not available");
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (dataSourceFactory == null) {
+            throw new IllegalStateException("dataSourceFactory is not available");
+        }
 
-    if (numThreads < 1) {
-      throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-    }
+        if (numThreads < 1) {
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+        }
 
-    if (durationInSecond < 1) {
-      throw new IllegalCmdParamException("invalid duration " + durationInSecond);
-    }
+        if (durationInSecond < 1) {
+            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
+        }
 
-    StringBuilder description = new StringBuilder();
-    description.append("issuer: ").append(issuerCertFile).append("\n");
-    description.append("cadb: ").append(caDbConfFile).append("\n");
-    description.append("maxCerts: ").append(maxCerts).append("\n");
-    description.append("#certs/req: ").append(n).append("\n");
-    description.append("unit: ").append(n).append(" certificate");
-    if (n > 1) {
-      description.append("s");
-    }
-    description.append("\n");
+        StringBuilder description = new StringBuilder();
+        description.append("issuer: ").append(issuerCertFile).append("\n");
+        description.append("cadb: ").append(caDbConfFile).append("\n");
+        description.append("maxCerts: ").append(maxCerts).append("\n");
+        description.append("#certs/req: ").append(n).append("\n");
+        description.append("unit: ").append(n).append(" certificate");
+        if (n > 1) {
+            description.append("s");
+        }
+        description.append("\n");
 
-    Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
-    Properties props = new Properties();
-    props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
-    props.setProperty("autoCommit", "false");
-    props.setProperty("readOnly", "true");
-    props.setProperty("maximumPoolSize", "1");
-    props.setProperty("minimumIdle", "1");
+        Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
+        Properties props = new Properties();
+        props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
+        props.setProperty("autoCommit", "false");
+        props.setProperty("readOnly", "true");
+        props.setProperty("maximumPoolSize", "1");
+        props.setProperty("minimumIdle", "1");
 
-    DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(
-        null, props, securityFactory.getPasswordResolver());
-    try {
-      CALoadTestRevoke loadTest = new CALoadTestRevoke(
-          caClient, caCert, caDataSource, maxCerts, n, description.toString());
+        DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(
+                null, props, securityFactory.getPasswordResolver());
+        try {
+            CALoadTestRevoke loadTest = new CALoadTestRevoke(
+                    caClient, caCert, caDataSource, maxCerts, n, description.toString());
 
-      loadTest.setDuration(durationInSecond);
-      loadTest.setThreads(numThreads);
-      loadTest.test();
-    } finally {
-      caDataSource.shutdown();
-    }
+            loadTest.setDuration(durationInSecond);
+            loadTest.setThreads(numThreads);
+            loadTest.test();
+        } finally {
+            caDataSource.shutdown();
+        }
 
-    return null;
-  } // method doExecute
+        return null;
+    } // method doExecute
 
 }

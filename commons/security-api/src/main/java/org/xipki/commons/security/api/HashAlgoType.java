@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,65 +42,65 @@ package org.xipki.commons.security.api;
 
 public enum HashAlgoType {
 
-  SHA1  (20, "1.3.14.3.2.26", "SHA1", "S1"),
-  SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
-  SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
-  SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-  SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
+    SHA1    (20, "1.3.14.3.2.26", "SHA1", "S1"),
+    SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
+    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
+    SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
+    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
 
-  private final int length;
+    private final int length;
 
-  private final String oid;
+    private final String oid;
 
-  private final String name;
+    private final String name;
 
-  private final String shortName;
+    private final String shortName;
 
-  private HashAlgoType(
-      final int length,
-      final String oid,
-      final String name,
-      final String shortName) {
-    this.length = length;
-    this.oid = oid;
-    this.name = name;
-    this.shortName = shortName;
-  }
-
-  public int getLength() {
-    return length;
-  }
-
-  public String getOid() {
-    return oid;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getShortName() {
-    return shortName;
-  }
-
-  public static HashAlgoType getHashAlgoType(
-      String nameOrOid) {
-    for (HashAlgoType hashAlgo : values()) {
-      if (hashAlgo.oid.equals(nameOrOid)) {
-        return hashAlgo;
-      }
-
-      if (nameOrOid.indexOf('-') != -1) {
-        nameOrOid = nameOrOid.replace("-", "");
-      }
-
-      if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
-          || hashAlgo.shortName.equalsIgnoreCase(nameOrOid)) {
-        return hashAlgo;
-      }
+    private HashAlgoType(
+            final int length,
+            final String oid,
+            final String name,
+            final String shortName) {
+        this.length = length;
+        this.oid = oid;
+        this.name = name;
+        this.shortName = shortName;
     }
 
-    return null;
-  }
+    public int getLength() {
+        return length;
+    }
+
+    public String getOid() {
+        return oid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public static HashAlgoType getHashAlgoType(
+            String nameOrOid) {
+        for (HashAlgoType hashAlgo : values()) {
+            if (hashAlgo.oid.equals(nameOrOid)) {
+                return hashAlgo;
+            }
+
+            if (nameOrOid.indexOf('-') != -1) {
+                nameOrOid = nameOrOid.replace("-", "");
+            }
+
+            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)
+                    || hashAlgo.shortName.equalsIgnoreCase(nameOrOid)) {
+                return hashAlgo;
+            }
+        }
+
+        return null;
+    }
 
 }

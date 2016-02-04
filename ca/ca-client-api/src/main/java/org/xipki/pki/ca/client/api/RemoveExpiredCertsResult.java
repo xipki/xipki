@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,48 +42,48 @@ package org.xipki.pki.ca.client.api;
 
 public class RemoveExpiredCertsResult {
 
-  private int numOfCerts;
+    private int numOfCerts;
 
-  private long expiredAt;
+    private long expiredAt;
 
-  private String userLike;
+    private String userLike;
 
-  private String certprofile;
+    private String certprofile;
 
-  public int getNumOfCerts() {
-    return numOfCerts;
-  }
+    public int getNumOfCerts() {
+        return numOfCerts;
+    }
 
-  public void setNumOfCerts(
-      final int numOfCerts) {
-    this.numOfCerts = numOfCerts;
-  }
+    public void setNumOfCerts(
+            final int numOfCerts) {
+        this.numOfCerts = numOfCerts;
+    }
 
-  public long getExpiredAt() {
-    return expiredAt;
-  }
+    public long getExpiredAt() {
+        return expiredAt;
+    }
 
-  public void setExpiredAt(
-      final long expiredAt) {
-    this.expiredAt = expiredAt;
-  }
+    public void setExpiredAt(
+            final long expiredAt) {
+        this.expiredAt = expiredAt;
+    }
 
-  public String getUserLike() {
-    return userLike;
-  }
+    public String getUserLike() {
+        return userLike;
+    }
 
-  public void setUserLike(
-      final String userLike) {
-    this.userLike = userLike;
-  }
+    public void setUserLike(
+            final String userLike) {
+        this.userLike = userLike;
+    }
 
-  public String getCertprofile() {
-    return certprofile;
-  }
+    public String getCertprofile() {
+        return certprofile;
+    }
 
-  public void setCertprofile(
-      final String certprofile) {
-    this.certprofile = certprofile;
-  }
+    public void setCertprofile(
+            final String certprofile) {
+        this.certprofile = certprofile;
+    }
 
 }

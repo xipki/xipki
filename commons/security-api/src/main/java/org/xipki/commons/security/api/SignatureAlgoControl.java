@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,28 +42,28 @@ package org.xipki.commons.security.api;
 
 public class SignatureAlgoControl {
 
-  private final boolean rsaMgf1;
+    private final boolean rsaMgf1;
 
-  private final boolean dsaPlain;
+    private final boolean dsaPlain;
 
-  public SignatureAlgoControl() {
-    this.rsaMgf1 = false;
-    this.dsaPlain = false;
-  }
+    public SignatureAlgoControl() {
+        this.rsaMgf1 = false;
+        this.dsaPlain = false;
+    }
 
-  public SignatureAlgoControl(
-      final boolean rsaMgf1,
-      final boolean dsaPlain) {
-    this.rsaMgf1 = rsaMgf1;
-    this.dsaPlain = dsaPlain;
-  }
+    public SignatureAlgoControl(
+            final boolean rsaMgf1,
+            final boolean dsaPlain) {
+        this.rsaMgf1 = rsaMgf1;
+        this.dsaPlain = dsaPlain;
+    }
 
-  public boolean isRsaMgf1() {
-    return rsaMgf1;
-  }
+    public boolean isRsaMgf1() {
+        return rsaMgf1;
+    }
 
-  public boolean isDsaPlain() {
-    return dsaPlain;
-  }
+    public boolean isDsaPlain() {
+        return dsaPlain;
+    }
 
 }

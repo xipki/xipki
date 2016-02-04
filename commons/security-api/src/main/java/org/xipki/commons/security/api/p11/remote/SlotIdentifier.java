@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,10 +53,10 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  *
  * <pre>
  * SlotIdentifier ::= SEQUENCE {
- *   slotIndex     INTEGER OPTIONAL,
- *           -- At least one of slotIndex and slotId must present.
- *   slotId    [1] EXPLICIT INTEGER OPTIONAL
- *   }
+ *     slotIndex         INTEGER OPTIONAL,
+ *                     -- At least one of slotIndex and slotId must present.
+ *     slotId        [1] EXPLICIT INTEGER OPTIONAL
+ *     }
  * </pre>
  *
  * @author Lijun Liao
@@ -65,100 +65,100 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class SlotIdentifier extends ASN1Object {
 
-  private P11SlotIdentifier slotId;
+    private P11SlotIdentifier slotId;
 
-  public SlotIdentifier(
-      final P11SlotIdentifier slotId) {
-    if (slotId == null) {
-      throw new IllegalArgumentException("slotId could not be null");
-    }
-
-    this.slotId = slotId;
-  }
-
-  private SlotIdentifier(
-      final ASN1Sequence seq)
-  throws BadASN1ObjectException {
-    int size = seq.size();
-    if (size < 1) {
-      throw new BadASN1ObjectException("wrong number of elements in sequence");
-    }
-
-    try {
-      Integer slotIndex = null;
-
-      ASN1Encodable slotIdASN1Obj = null;
-      ASN1Encodable obj = seq.getObjectAt(0);
-      if (obj instanceof ASN1Integer) {
-        slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
-        if (size > 1) {
-          slotIdASN1Obj = seq.getObjectAt(1);
+    public SlotIdentifier(
+            final P11SlotIdentifier slotId) {
+        if (slotId == null) {
+            throw new IllegalArgumentException("slotId could not be null");
         }
-      } else {
-        slotIdASN1Obj = obj;
-      }
 
-      Long slotId = null;
+        this.slotId = slotId;
+    }
 
-      if (slotIdASN1Obj instanceof ASN1TaggedObject) {
-        ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
-
-        int tagNo = tagObj.getTagNo();
-        if (tagNo == 1) {
-          ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
-          slotId = i.getPositiveValue().longValue();
-        } else {
-          throw new BadASN1ObjectException("unknown tag " + tagNo);
+    private SlotIdentifier(
+            final ASN1Sequence seq)
+    throws BadASN1ObjectException {
+        int size = seq.size();
+        if (size < 1) {
+            throw new BadASN1ObjectException("wrong number of elements in sequence");
         }
-      }
 
-      this.slotId = new P11SlotIdentifier(slotIndex, slotId);
-    } catch (IllegalArgumentException e) {
-      throw new BadASN1ObjectException(e.getMessage(), e);
+        try {
+            Integer slotIndex = null;
+
+            ASN1Encodable slotIdASN1Obj = null;
+            ASN1Encodable obj = seq.getObjectAt(0);
+            if (obj instanceof ASN1Integer) {
+                slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
+                if (size > 1) {
+                    slotIdASN1Obj = seq.getObjectAt(1);
+                }
+            } else {
+                slotIdASN1Obj = obj;
+            }
+
+            Long slotId = null;
+
+            if (slotIdASN1Obj instanceof ASN1TaggedObject) {
+                ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
+
+                int tagNo = tagObj.getTagNo();
+                if (tagNo == 1) {
+                    ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
+                    slotId = i.getPositiveValue().longValue();
+                } else {
+                    throw new BadASN1ObjectException("unknown tag " + tagNo);
+                }
+            }
+
+            this.slotId = new P11SlotIdentifier(slotIndex, slotId);
+        } catch (IllegalArgumentException e) {
+            throw new BadASN1ObjectException(e.getMessage(), e);
+        }
+    } // constructor
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        if (slotId.getSlotIndex() != null) {
+            vector.add(new ASN1Integer(slotId.getSlotIndex()));
+        }
+
+        if (slotId.getSlotId() != null) {
+            DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
+                    new ASN1Integer(slotId.getSlotId()));
+            vector.add(taggedObj);
+        }
+
+        return new DERSequence(vector);
     }
-  } // constructor
 
-  @Override
-  public ASN1Primitive toASN1Primitive() {
-    ASN1EncodableVector vector = new ASN1EncodableVector();
-    if (slotId.getSlotIndex() != null) {
-      vector.add(new ASN1Integer(slotId.getSlotIndex()));
+    public P11SlotIdentifier getSlotId() {
+        return slotId;
     }
 
-    if (slotId.getSlotId() != null) {
-      DERTaggedObject taggedObj = new DERTaggedObject(true, 1,
-          new ASN1Integer(slotId.getSlotId()));
-      vector.add(taggedObj);
+    public static SlotIdentifier getInstance(
+            final Object obj)
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof SlotIdentifier) {
+            return (SlotIdentifier) obj;
+        }
+
+        try {
+            if (obj instanceof ASN1Sequence) {
+                return new SlotIdentifier((ASN1Sequence) obj);
+            }
+
+            if (obj instanceof byte[]) {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            }
+        } catch (IOException | IllegalArgumentException e) {
+            throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
+        }
+
+        throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): "
+                + obj.getClass().getName());
     }
-
-    return new DERSequence(vector);
-  }
-
-  public P11SlotIdentifier getSlotId() {
-    return slotId;
-  }
-
-  public static SlotIdentifier getInstance(
-      final Object obj)
-  throws BadASN1ObjectException {
-    if (obj == null || obj instanceof SlotIdentifier) {
-      return (SlotIdentifier) obj;
-    }
-
-    try {
-      if (obj instanceof ASN1Sequence) {
-        return new SlotIdentifier((ASN1Sequence) obj);
-      }
-
-      if (obj instanceof byte[]) {
-        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-      }
-    } catch (IOException | IllegalArgumentException e) {
-      throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
-    }
-
-    throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): "
-        + obj.getClass().getName());
-  }
 
 }
