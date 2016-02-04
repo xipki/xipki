@@ -51,7 +51,7 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class LoadTestEntry {
 
-  public static enum RandomDN {
+  public enum RandomDN {
 
     GIVENNAME,
     SURNAME,

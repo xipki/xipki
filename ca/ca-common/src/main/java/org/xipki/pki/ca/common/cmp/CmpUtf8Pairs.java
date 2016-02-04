@@ -71,37 +71,38 @@ public class CmpUtf8Pairs {
   }
 
   public CmpUtf8Pairs(
-      String string) {
+      final String string) {
     if (string == null || string.length() < 2) {
       return;
     }
 
+    String realString = string;
     // remove the ending '%'-symbols
-    while (string.charAt(string.length() - 1) == TOKEN_TERM) {
-      string = string.substring(0, string.length() - 1);
+    while (realString.charAt(realString.length() - 1) == TOKEN_TERM) {
+      realString = realString.substring(0, realString.length() - 1);
     }
 
     // find the position of terminators
     List<Integer> positions = new LinkedList<>();
 
     int idx = 1;
-    int n = string.length();
+    int n = realString.length();
     while (idx < n) {
-      char c = string.charAt(idx++);
+      char c = realString.charAt(idx++);
       if (c == TOKEN_TERM) {
-        char b = string.charAt(idx);
+        char b = realString.charAt(idx);
         if (b < '0' || b > '9') {
           positions.add(idx - 1);
         }
       }
     }
-    positions.add(string.length());
+    positions.add(realString.length());
 
     // parse the token
     int beginIndex = 0;
     for (int i = 0; i < positions.size(); i++) {
       int endIndex = positions.get(i);
-      String token = string.substring(beginIndex, endIndex);
+      String token = realString.substring(beginIndex, endIndex);
 
       int sepIdx = token.indexOf(NAME_TERM);
       if (sepIdx == -1 || sepIdx == token.length() - 1) {
@@ -240,16 +241,17 @@ public class CmpUtf8Pairs {
   } // method main
 
   private static String encodeNameOrValue(
-      String s) {
-    if (s.indexOf("%") != -1) {
-      s = s.replaceAll("%", "%25");
+      final String s) {
+  String realS = s;
+    if (realS.indexOf("%") != -1) {
+      realS = realS.replaceAll("%", "%25");
     }
 
-    if (s.indexOf("?") != -1) {
-      s = s.replaceAll("\\?", "%3f");
+    if (realS.indexOf("?") != -1) {
+      realS = realS.replaceAll("\\?", "%3f");
     }
 
-    return s;
+    return realS;
   }
 
   private static String decodeNameOrValue(

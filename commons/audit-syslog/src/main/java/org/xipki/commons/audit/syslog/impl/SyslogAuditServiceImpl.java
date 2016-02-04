@@ -64,8 +64,6 @@ import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
 
 public class SyslogAuditServiceImpl implements AuditService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
-
   /**
    * The default port is 514.
    */
@@ -91,10 +89,12 @@ public class SyslogAuditServiceImpl implements AuditService {
    */
   public static final String DFLT_MESSAGE_FORMAT = "rfc_5424";
 
+  private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
+
   /**
    * The syslog4j client instance.
    */
-  protected AbstractSyslogMessageSender syslog = null;
+  protected AbstractSyslogMessageSender syslog;
 
   private String host = DFLT_SYSLOG_HOST;
 
@@ -233,62 +233,58 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     LOG.info("initializing: {}", SyslogAuditServiceImpl.class);
 
-    try {
-      MessageFormat msgFormat;
-      if ("rfc3164".equalsIgnoreCase(messageFormat)
-          || "rfc_3164".equalsIgnoreCase(messageFormat)) {
-        msgFormat = MessageFormat.RFC_3164;
-      } else if ("rfc5424".equalsIgnoreCase(messageFormat)
-          || "rfc_5424".equalsIgnoreCase(messageFormat)) {
-        msgFormat = MessageFormat.RFC_5424;
-      } else {
-        LOG.warn("invalid message format '{}', use the default one '{}'",
-            messageFormat, DFLT_MESSAGE_FORMAT);
-        msgFormat = MessageFormat.RFC_5424;
-      }
-
-      if ("udp".equalsIgnoreCase(protocol)) {
-        syslog = new UdpSyslogMessageSender();
-        ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
-      } else if ("tcp".equalsIgnoreCase(protocol)) {
-        syslog = new TcpSyslogMessageSender();
-        ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
-        ((TcpSyslogMessageSender) syslog).setSsl(ssl);
-
-        if (writeRetries > 0) {
-          ((TcpSyslogMessageSender) syslog).setMaxRetryCount(writeRetries);
-        }
-      } else {
-        LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
-        syslog = new UdpSyslogMessageSender();
-        ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
-      }
-
-      syslog.setDefaultMessageHostname(host);
-      syslog.setMessageFormat(msgFormat);
-
-      Facility sysFacility = null;
-      if (notEmpty(facility)) {
-        sysFacility = Facility.fromLabel(facility.toUpperCase());
-      }
-
-      if (sysFacility == null) {
-        LOG.warn("unknown facility, use the default one '{}'", DFLT_SYSLOG_FACILITY);
-        sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
-      }
-
-      if (sysFacility == null) {
-        throw new RuntimeException("should not reach here, sysFacility is null");
-      }
-
-      syslog.setDefaultFacility(sysFacility);
-
-      // after we're finished set initialized to true
-      this.initialized = true;
-      LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
-    } catch (Exception ex) {
-      LOG.error("error while configuring syslog sender: {}", ex.getMessage());
+    MessageFormat msgFormat;
+    if ("rfc3164".equalsIgnoreCase(messageFormat)
+        || "rfc_3164".equalsIgnoreCase(messageFormat)) {
+      msgFormat = MessageFormat.RFC_3164;
+    } else if ("rfc5424".equalsIgnoreCase(messageFormat)
+        || "rfc_5424".equalsIgnoreCase(messageFormat)) {
+      msgFormat = MessageFormat.RFC_5424;
+    } else {
+      LOG.warn("invalid message format '{}', use the default one '{}'",
+          messageFormat, DFLT_MESSAGE_FORMAT);
+      msgFormat = MessageFormat.RFC_5424;
     }
+
+    if ("udp".equalsIgnoreCase(protocol)) {
+      syslog = new UdpSyslogMessageSender();
+      ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
+    } else if ("tcp".equalsIgnoreCase(protocol)) {
+      syslog = new TcpSyslogMessageSender();
+      ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
+      ((TcpSyslogMessageSender) syslog).setSsl(ssl);
+
+      if (writeRetries > 0) {
+        ((TcpSyslogMessageSender) syslog).setMaxRetryCount(writeRetries);
+      }
+    } else {
+      LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
+      syslog = new UdpSyslogMessageSender();
+      ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
+    }
+
+    syslog.setDefaultMessageHostname(host);
+    syslog.setMessageFormat(msgFormat);
+
+    Facility sysFacility = null;
+    if (notEmpty(facility)) {
+      sysFacility = Facility.fromLabel(facility.toUpperCase());
+    }
+
+    if (sysFacility == null) {
+      LOG.warn("unknown facility, use the default one '{}'", DFLT_SYSLOG_FACILITY);
+      sysFacility = Facility.fromLabel(DFLT_SYSLOG_FACILITY.toUpperCase());
+    }
+
+    if (sysFacility == null) {
+      throw new RuntimeException("should not reach here, sysFacility is null");
+    }
+
+    syslog.setDefaultFacility(sysFacility);
+
+    // after we're finished set initialized to true
+    this.initialized = true;
+    LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
   } // method init
 
   public void destroy() {
