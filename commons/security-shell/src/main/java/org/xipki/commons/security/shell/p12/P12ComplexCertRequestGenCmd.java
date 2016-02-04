@@ -63,7 +63,7 @@ import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",

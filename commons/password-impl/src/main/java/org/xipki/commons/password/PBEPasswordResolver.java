@@ -47,7 +47,7 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class PBEPasswordResolver implements SinglePasswordResolver {

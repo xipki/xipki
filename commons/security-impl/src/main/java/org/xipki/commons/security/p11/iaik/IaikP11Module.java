@@ -57,7 +57,7 @@ import iaik.pkcs.pkcs11.TokenException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class IaikP11Module implements P11Module {

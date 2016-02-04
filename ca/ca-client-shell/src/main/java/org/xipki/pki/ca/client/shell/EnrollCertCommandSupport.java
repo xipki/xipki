@@ -98,7 +98,7 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {

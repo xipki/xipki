@@ -86,7 +86,7 @@ import com.caucho.hessian.server.HessianServlet;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CAManagerServlet extends HessianServlet implements HessianCAManager {

@@ -41,7 +41,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {

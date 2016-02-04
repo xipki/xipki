@@ -46,7 +46,7 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "ec-p12",

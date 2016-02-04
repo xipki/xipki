@@ -39,7 +39,7 @@ import org.xipki.pki.scep.transaction.CACapability;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class DESOnlyCATest extends AbstractCATest {

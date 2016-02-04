@@ -46,7 +46,7 @@ import org.xipki.commons.datasource.api.DatabaseType;
  * JDBC error codes for a particular database.
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 public class SQLErrorCodes {
 

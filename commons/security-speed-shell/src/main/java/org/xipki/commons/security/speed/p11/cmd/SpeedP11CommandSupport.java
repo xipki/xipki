@@ -43,7 +43,7 @@ import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {

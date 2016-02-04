@@ -41,7 +41,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class MonetaryValueOption {

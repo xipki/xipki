@@ -41,7 +41,7 @@ import org.xipki.pki.ocsp.qa.api.OcspError;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 @Service
 public class OcspErrorCompleter extends AbstractEnumCompleter {

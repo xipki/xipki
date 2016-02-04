@@ -92,7 +92,7 @@ import org.bouncycastle.math.ec.ECCurve;
  * </pre>
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public final class ECParameters extends AlgorithmParametersSpi {

@@ -53,7 +53,7 @@ import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-cli", name = "enroll",

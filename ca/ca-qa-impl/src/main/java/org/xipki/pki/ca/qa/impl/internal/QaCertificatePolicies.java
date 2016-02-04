@@ -45,7 +45,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class QaCertificatePolicies extends QaExtension {

@@ -81,7 +81,7 @@ public class FileUtils {
    * @param file the file to check
    * @return true if the file is a Symbolic Link
    * @throws IOException if an IO error occurs while checking the file
-   * @since 2.0
+   * @since 2.0.0
    */
   public static boolean isSymlink(
       final File file)

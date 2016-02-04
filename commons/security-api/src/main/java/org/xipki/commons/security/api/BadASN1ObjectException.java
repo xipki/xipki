@@ -37,7 +37,7 @@ package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class BadASN1ObjectException extends Exception {

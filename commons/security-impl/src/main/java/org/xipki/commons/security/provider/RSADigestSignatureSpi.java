@@ -64,7 +64,7 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class RSADigestSignatureSpi extends SignatureSpi {

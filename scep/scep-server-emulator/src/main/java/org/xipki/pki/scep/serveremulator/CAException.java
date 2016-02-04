@@ -37,7 +37,7 @@ package org.xipki.pki.scep.serveremulator;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CAException extends Exception {
