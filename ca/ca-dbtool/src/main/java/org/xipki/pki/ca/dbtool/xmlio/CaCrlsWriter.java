@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,16 +46,16 @@ import javax.xml.stream.XMLStreamException;
 
 public class CaCrlsWriter extends DbiXmlWriter {
 
-  public CaCrlsWriter()
-  throws IOException, XMLStreamException {
-    super("crls", "1");
-  }
+    public CaCrlsWriter()
+    throws IOException, XMLStreamException {
+        super("crls", "1");
+    }
 
-  public void add(
-      final CaCrlType crl)
-  throws InvalidDataObjectException, XMLStreamException {
-    crl.validate();
-    crl.writeTo(this);
-  }
+    public void add(
+            final CaCrlType crl)
+    throws InvalidDataObjectException, XMLStreamException {
+        crl.validate();
+        crl.writeTo(this);
+    }
 
 }

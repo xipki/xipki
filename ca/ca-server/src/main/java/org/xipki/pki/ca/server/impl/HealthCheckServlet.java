@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -58,99 +58,99 @@ import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
 
 public class HealthCheckServlet extends HttpServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final String CT_RESPONSE = "application/json";
+    private static final String CT_RESPONSE = "application/json";
 
-  private CmpResponderManager responderManager;
+    private CmpResponderManager responderManager;
 
-  public HealthCheckServlet() {
-  }
-
-  @Override
-  protected void doGet(
-      final HttpServletRequest request,
-      final HttpServletResponse response)
-  throws ServletException, IOException {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    try {
-      if (responderManager == null) {
-        LOG.error("responderManager in servlet not configured");
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.setContentLength(0);
-        return;
-      }
-
-      String requestURI = request.getRequestURI();
-      String servletPath = request.getServletPath();
-
-      String caName = null;
-      X509CACmpResponder responder = null;
-      int n = servletPath.length();
-      if (requestURI.length() > n + 1) {
-        String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
-        caName = responderManager.getCaNameForAlias(caAlias);
-        if (caName == null) {
-          caName = caAlias;
-        }
-        caName = caName.toUpperCase();
-        responder = responderManager.getX509CACmpResponder(caName);
-      }
-
-      if (caName == null || responder == null || !responder.isInService()) {
-        String auditMessage;
-        if (caName == null) {
-          auditMessage = "n CA is specified";
-        } else if (responder == null) {
-          auditMessage = "unknown CA '" + caName + "'";
-        } else {
-          auditMessage = "CA '" + caName + "' is out of service";
-        }
-        LOG.warn(auditMessage);
-
-        response.setContentLength(0);
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        response.flushBuffer();
-        return;
-      }
-
-      HealthCheckResult healthResult = responder.healthCheck();
-      if (healthResult.isHealthy()) {
-        response.setStatus(HttpServletResponse.SC_OK);
-      } else {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
-
-      response.setContentType(HealthCheckServlet.CT_RESPONSE);
-      byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
-      response.setContentLength(respBytes.length);
-      response.getOutputStream().write(respBytes);
-    } catch (EOFException e) {
-      final String message = "connection reset by peer";
-      if (LOG.isErrorEnabled()) {
-        LOG.warn(LogUtil.buildExceptionLogFormat(message),
-            e.getClass().getName(), e.getMessage());
-      }
-      LOG.debug(message, e);
-
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
-    } catch (Throwable t) {
-      final String message = "Throwable thrown, this should not happen!";
-      LOG.warn(message, t);
-
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
+    public HealthCheckServlet() {
     }
 
-    response.flushBuffer();
-  } // method doGet
+    @Override
+    protected void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        try {
+            if (responderManager == null) {
+                LOG.error("responderManager in servlet not configured");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+                return;
+            }
 
-  public void setResponderManager(
-      final CmpResponderManager responderManager) {
-    this.responderManager = responderManager;
-  }
+            String requestURI = request.getRequestURI();
+            String servletPath = request.getServletPath();
+
+            String caName = null;
+            X509CACmpResponder responder = null;
+            int n = servletPath.length();
+            if (requestURI.length() > n + 1) {
+                String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
+                caName = responderManager.getCaNameForAlias(caAlias);
+                if (caName == null) {
+                    caName = caAlias;
+                }
+                caName = caName.toUpperCase();
+                responder = responderManager.getX509CACmpResponder(caName);
+            }
+
+            if (caName == null || responder == null || !responder.isInService()) {
+                String auditMessage;
+                if (caName == null) {
+                    auditMessage = "n CA is specified";
+                } else if (responder == null) {
+                    auditMessage = "unknown CA '" + caName + "'";
+                } else {
+                    auditMessage = "CA '" + caName + "' is out of service";
+                }
+                LOG.warn(auditMessage);
+
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.flushBuffer();
+                return;
+            }
+
+            HealthCheckResult healthResult = responder.healthCheck();
+            if (healthResult.isHealthy()) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+
+            response.setContentType(HealthCheckServlet.CT_RESPONSE);
+            byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+            response.setContentLength(respBytes.length);
+            response.getOutputStream().write(respBytes);
+        } catch (EOFException e) {
+            final String message = "connection reset by peer";
+            if (LOG.isErrorEnabled()) {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message),
+                        e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        } catch (Throwable t) {
+            final String message = "Throwable thrown, this should not happen!";
+            LOG.warn(message, t);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        }
+
+        response.flushBuffer();
+    } // method doGet
+
+    public void setResponderManager(
+            final CmpResponderManager responderManager) {
+        this.responderManager = responderManager;
+    }
 
 }

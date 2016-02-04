@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -64,163 +64,163 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupport {
 
-  @Option(name = "--resp-issuer",
-      description = "certificate file of the responder's issuer")
-  @Completion(FilePathCompleter.class)
-  private String respIssuerFile;
+    @Option(name = "--resp-issuer",
+            description = "certificate file of the responder's issuer")
+    @Completion(FilePathCompleter.class)
+    private String respIssuerFile;
 
-  @Option(name = "--url",
-      description = "OCSP responder URL")
-  private String serverURL;
+    @Option(name = "--url",
+            description = "OCSP responder URL")
+    private String serverURL;
 
-  @Option(name = "--req-out",
-      description = "where to save the request")
-  @Completion(FilePathCompleter.class)
-  private String reqout;
+    @Option(name = "--req-out",
+            description = "where to save the request")
+    @Completion(FilePathCompleter.class)
+    private String reqout;
 
-  @Option(name = "--resp-out",
-      description = "where to save the response")
-  @Completion(FilePathCompleter.class)
-  private String respout;
+    @Option(name = "--resp-out",
+            description = "where to save the response")
+    @Completion(FilePathCompleter.class)
+    private String respout;
 
-  @Option(name = "--serial", aliases = "-s",
-      multiValued = true,
-      description = "serial number\n"
-          + "(multi-valued)")
-  private List<String> serialNumbers;
+    @Option(name = "--serial", aliases = "-s",
+            multiValued = true,
+            description = "serial number\n"
+                    + "(multi-valued)")
+    private List<String> serialNumbers;
 
-  @Option(name = "--cert", aliases = "-c",
-      multiValued = true,
-      description = "certificate\n"
-          + "(multi-valued)")
-  @Completion(FilePathCompleter.class)
-  private List<String> certFiles;
+    @Option(name = "--cert", aliases = "-c",
+            multiValued = true,
+            description = "certificate\n"
+                    + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
+    private List<String> certFiles;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show status verbosely")
-  protected Boolean verbose = Boolean.FALSE;
+    @Option(name = "--verbose", aliases = "-v",
+            description = "show status verbosely")
+    protected Boolean verbose = Boolean.FALSE;
 
-  protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
+    protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
 
-  static {
-    extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
-    extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
-    extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-    extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
-  }
-
-  protected abstract void checkParameters(
-      X509Certificate respIssuer,
-      List<BigInteger> serialNumbers,
-      Map<BigInteger, byte[]> encodedCerts)
-  throws Exception;
-
-  protected abstract Object processResponse(
-      OCSPResp response,
-      X509Certificate respIssuer,
-      X509Certificate issuer,
-      List<BigInteger> serialNumbers,
-      Map<BigInteger, byte[]> encodedCerts)
-  throws Exception;
-
-  @Override
-  protected final Object doExecute()
-  throws Exception {
-    if (isEmpty(serialNumbers) && isEmpty(certFiles)) {
-      throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
+    static {
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
+        extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
-    X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+    protected abstract void checkParameters(
+            X509Certificate respIssuer,
+            List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts)
+    throws Exception;
 
-    Map<BigInteger, byte[]> encodedCerts = null;
-    List<BigInteger> sns = new LinkedList<>();
-    if (isNotEmpty(certFiles)) {
-      encodedCerts = new HashMap<>(certFiles.size());
+    protected abstract Object processResponse(
+            OCSPResp response,
+            X509Certificate respIssuer,
+            X509Certificate issuer,
+            List<BigInteger> serialNumbers,
+            Map<BigInteger, byte[]> encodedCerts)
+    throws Exception;
 
-      String ocspUrl = null;
-      for (String certFile : certFiles) {
-        byte[] encodedCert = IoUtil.read(certFile);
-        X509Certificate cert = X509Util.parseCert(certFile);
+    @Override
+    protected final Object doExecute()
+    throws Exception {
+        if (isEmpty(serialNumbers) && isEmpty(certFiles)) {
+            throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
+        }
 
-        if (!X509Util.issues(issuerCert, cert)) {
-          throw new IllegalCmdParamException(
-              "certificate " + certFile + " is not issued by the given issuer");
+        X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+
+        Map<BigInteger, byte[]> encodedCerts = null;
+        List<BigInteger> sns = new LinkedList<>();
+        if (isNotEmpty(certFiles)) {
+            encodedCerts = new HashMap<>(certFiles.size());
+
+            String ocspUrl = null;
+            for (String certFile : certFiles) {
+                byte[] encodedCert = IoUtil.read(certFile);
+                X509Certificate cert = X509Util.parseCert(certFile);
+
+                if (!X509Util.issues(issuerCert, cert)) {
+                    throw new IllegalCmdParamException(
+                            "certificate " + certFile + " is not issued by the given issuer");
+                }
+
+                if (isBlank(serverURL)) {
+                    List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
+                    if (ocspUrls.size() > 0) {
+                        String url = ocspUrls.get(0);
+                        if (ocspUrl != null && !ocspUrl.equals(url)) {
+                            throw new IllegalCmdParamException("given certificates have different"
+                                    + " OCSP responder URL in certificate");
+                        } else {
+                            ocspUrl = url;
+                        }
+                    }
+                } // end if
+
+                BigInteger sn = cert.getSerialNumber();
+                sns.add(sn);
+                encodedCerts.put(sn, encodedCert);
+            } // end for
+
+            if (isBlank(serverURL)) {
+                serverURL = ocspUrl;
+            }
+        } else {
+            for (String serialNumber : serialNumbers) {
+                BigInteger sn = toBigInt(serialNumber);
+                sns.add(sn);
+            }
         }
 
         if (isBlank(serverURL)) {
-          List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
-          if (ocspUrls.size() > 0) {
-            String url = ocspUrls.get(0);
-            if (ocspUrl != null && !ocspUrl.equals(url)) {
-              throw new IllegalCmdParamException("given certificates have different"
-                  + " OCSP responder URL in certificate");
-            } else {
-              ocspUrl = url;
-            }
-          }
-        } // end if
-
-        BigInteger sn = cert.getSerialNumber();
-        sns.add(sn);
-        encodedCerts.put(sn, encodedCert);
-      } // end for
-
-      if (isBlank(serverURL)) {
-        serverURL = ocspUrl;
-      }
-    } else {
-      for (String serialNumber : serialNumbers) {
-        BigInteger sn = toBigInt(serialNumber);
-        sns.add(sn);
-      }
-    }
-
-    if (isBlank(serverURL)) {
-      throw new IllegalCmdParamException("could not get URL for the OCSP responder");
-    }
-
-    X509Certificate respIssuer  = null;
-    if (respIssuerFile != null) {
-      respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
-    }
-
-    URL serverUrl = new URL(serverURL);
-
-    RequestOptions options = getRequestOptions();
-
-    checkParameters(respIssuer, sns, encodedCerts);
-
-    boolean saveReq = isNotBlank(reqout);
-    boolean saveResp = isNotBlank(respout);
-    RequestResponseDebug debug = null;
-    if (saveReq || saveResp) {
-      debug = new RequestResponseDebug();
-    }
-
-    OCSPResp response;
-    try {
-      response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
-        options, debug);
-    } finally {
-      if (debug != null && debug.size() > 0) {
-        RequestResponsePair reqResp = debug.get(0);
-        if (saveReq) {
-          byte[] bytes = reqResp.getRequest();
-          if (bytes != null) {
-            IoUtil.save(reqout, bytes);
-          }
+            throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
-        if (saveResp) {
-          byte[] bytes = reqResp.getResponse();
-          if (bytes != null) {
-            IoUtil.save(respout, bytes);
-          }
+        X509Certificate respIssuer    = null;
+        if (respIssuerFile != null) {
+            respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }
-      } // end if
-    } // end finally
 
-    return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
-  } // method doExecute
+        URL serverUrl = new URL(serverURL);
+
+        RequestOptions options = getRequestOptions();
+
+        checkParameters(respIssuer, sns, encodedCerts);
+
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        RequestResponseDebug debug = null;
+        if (saveReq || saveResp) {
+            debug = new RequestResponseDebug();
+        }
+
+        OCSPResp response;
+        try {
+            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
+                options, debug);
+        } finally {
+            if (debug != null && debug.size() > 0) {
+                RequestResponsePair reqResp = debug.get(0);
+                if (saveReq) {
+                    byte[] bytes = reqResp.getRequest();
+                    if (bytes != null) {
+                        IoUtil.save(reqout, bytes);
+                    }
+                }
+
+                if (saveResp) {
+                    byte[] bytes = reqResp.getResponse();
+                    if (bytes != null) {
+                        IoUtil.save(respout, bytes);
+                    }
+                }
+            } // end if
+        } // end finally
+
+        return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
+    } // method doExecute
 
 }

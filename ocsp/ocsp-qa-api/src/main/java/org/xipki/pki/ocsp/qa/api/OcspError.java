@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,43 +42,43 @@ package org.xipki.pki.ocsp.qa.api;
 
 public enum OcspError {
 
-  malformedRequest(1),
-  internalError(2),
-  tryLater(3),
-  sigRequired(4),
-  unauthorized(5);
+    malformedRequest(1),
+    internalError(2),
+    tryLater(3),
+    sigRequired(4),
+    unauthorized(5);
 
-  private final int status;
+    private final int status;
 
-  private OcspError(
-      final int status) {
-    this.status = status;
-  }
-
-  public int getStatus() {
-    return status;
-  }
-
-  public static OcspError getInstance(
-      final String name) {
-    for (OcspError entry : values()) {
-      if (entry.name().equals(name)) {
-        return entry;
-      }
+    private OcspError(
+            final int status) {
+        this.status = status;
     }
 
-    throw new IllegalArgumentException("unknown OCSP error '" + name + "'");
-  }
-
-  public static OcspError getInstanceForCode(
-      final int status) {
-    for (OcspError entry : values()) {
-      if (entry.status == status) {
-        return entry;
-      }
+    public int getStatus() {
+        return status;
     }
 
-    return null;
-  }
+    public static OcspError getInstance(
+            final String name) {
+        for (OcspError entry : values()) {
+            if (entry.name().equals(name)) {
+                return entry;
+            }
+        }
+
+        throw new IllegalArgumentException("unknown OCSP error '" + name + "'");
+    }
+
+    public static OcspError getInstanceForCode(
+            final int status) {
+        for (OcspError entry : values()) {
+            if (entry.status == status) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
 
 }

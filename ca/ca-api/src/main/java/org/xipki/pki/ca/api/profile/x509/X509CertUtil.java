@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -67,138 +67,138 @@ import org.xipki.pki.ca.api.CertprofileException;
 
 public class X509CertUtil {
 
-  public static BasicConstraints createBasicConstraints(
-      final boolean isCa,
-      final Integer pathLen) {
-    BasicConstraints basicConstraints;
-    if (isCa) {
-      if (pathLen != null) {
-        basicConstraints = new BasicConstraints(pathLen);
-      } else {
-        basicConstraints = new BasicConstraints(true);
-      }
-    } else {
-      basicConstraints = new BasicConstraints(false);
-    }
-    return basicConstraints;
-  }
-
-  public static AuthorityInformationAccess createAuthorityInformationAccess(
-      final List<String> caIssuerUris,
-      final List<String> ocspUris) {
-    if (CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris)) {
-      return null;
+    public static BasicConstraints createBasicConstraints(
+            final boolean isCa,
+            final Integer pathLen) {
+        BasicConstraints basicConstraints;
+        if (isCa) {
+            if (pathLen != null) {
+                basicConstraints = new BasicConstraints(pathLen);
+            } else {
+                basicConstraints = new BasicConstraints(true);
+            }
+        } else {
+            basicConstraints = new BasicConstraints(false);
+        }
+        return basicConstraints;
     }
 
-    List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
+    public static AuthorityInformationAccess createAuthorityInformationAccess(
+            final List<String> caIssuerUris,
+            final List<String> ocspUris) {
+        if (CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris)) {
+            return null;
+        }
 
-    if (CollectionUtil.isNotEmpty(caIssuerUris)) {
-      for (String uri : caIssuerUris) {
-        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(
-            new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
-      }
+        List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
+
+        if (CollectionUtil.isNotEmpty(caIssuerUris)) {
+            for (String uri : caIssuerUris) {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(
+                        new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
+            }
+        }
+
+        if (CollectionUtil.isNotEmpty(ocspUris)) {
+            for (String uri : ocspUris) {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
+            }
+        }
+
+        DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
+        return AuthorityInformationAccess.getInstance(seq);
     }
 
-    if (CollectionUtil.isNotEmpty(ocspUris)) {
-      for (String uri : ocspUris) {
-        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
-      }
+    public static CRLDistPoint createCrlDistributionPoints(
+            final List<String> crlUris,
+            final X500Name caSubject,
+            final X500Name crlSignerSubject)
+    throws IOException, CertprofileException {
+        if (CollectionUtil.isEmpty(crlUris)) {
+            return null;
+        }
+
+        int n = crlUris.size();
+        DistributionPoint[] points = new DistributionPoint[1];
+
+        GeneralName[] names = new GeneralName[n];
+        for (int i = 0; i < n; i++) {
+            names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
+        }
+        // Distribution Point
+        GeneralNames gns = new GeneralNames(names);
+        DistributionPointName pointName = new DistributionPointName(gns);
+
+        GeneralNames crlIssuer = null;
+        if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
+            GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
+            crlIssuer = new GeneralNames(crlIssuerName);
+        }
+
+        points[0] = new DistributionPoint(pointName, null, crlIssuer);
+
+        return new CRLDistPoint(points);
     }
 
-    DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
-    return AuthorityInformationAccess.getInstance(seq);
-  }
+    public static CertificatePolicies createCertificatePolicies(
+            final List<CertificatePolicyInformation> policyInfos)
+    throws CertprofileException {
+        if (CollectionUtil.isEmpty(policyInfos)) {
+            return null;
+        }
 
-  public static CRLDistPoint createCrlDistributionPoints(
-      final List<String> crlUris,
-      final X500Name caSubject,
-      final X500Name crlSignerSubject)
-  throws IOException, CertprofileException {
-    if (CollectionUtil.isEmpty(crlUris)) {
-      return null;
+        int n = policyInfos.size();
+        PolicyInformation[] pInfos = new PolicyInformation[n];
+
+        int i = 0;
+        for (CertificatePolicyInformation policyInfo : policyInfos) {
+            String policyId = policyInfo.getCertPolicyId();
+            List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+
+            ASN1Sequence policyQualifiers = null;
+            if (CollectionUtil.isNotEmpty(qualifiers)) {
+                policyQualifiers = createPolicyQualifiers(qualifiers);
+            }
+
+            ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
+            if (policyQualifiers == null) {
+                pInfos[i] = new PolicyInformation(policyOid);
+            } else {
+                pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
+            }
+            i++;
+        }
+
+        return new CertificatePolicies(pInfos);
     }
 
-    int n = crlUris.size();
-    DistributionPoint[] points = new DistributionPoint[1];
+    private static ASN1Sequence createPolicyQualifiers(
+            final List<CertificatePolicyQualifier> qualifiers) {
+        List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
+        for (CertificatePolicyQualifier qualifier : qualifiers) {
+            PolicyQualifierInfo qualifierInfo;
+            if (qualifier.getCpsUri() != null) {
+                qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
+            } else if (qualifier.getUserNotice() != null) {
+                UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+                qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
+                        userNotice);
+            } else {
+                qualifierInfo = null;
+            }
 
-    GeneralName[] names = new GeneralName[n];
-    for (int i = 0; i < n; i++) {
-      names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
-    }
-    // Distribution Point
-    GeneralNames gns = new GeneralNames(names);
-    DistributionPointName pointName = new DistributionPointName(gns);
+            if (qualifierInfo != null) {
+                qualifierInfos.add(qualifierInfo);
+            }
+            //PolicyQualifierId qualifierId
+        }
 
-    GeneralNames crlIssuer = null;
-    if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
-      GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
-      crlIssuer = new GeneralNames(crlIssuerName);
-    }
-
-    points[0] = new DistributionPoint(pointName, null, crlIssuer);
-
-    return new CRLDistPoint(points);
-  }
-
-  public static CertificatePolicies createCertificatePolicies(
-      final List<CertificatePolicyInformation> policyInfos)
-  throws CertprofileException {
-    if (CollectionUtil.isEmpty(policyInfos)) {
-      return null;
+        return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
     }
 
-    int n = policyInfos.size();
-    PolicyInformation[] pInfos = new PolicyInformation[n];
-
-    int i = 0;
-    for (CertificatePolicyInformation policyInfo : policyInfos) {
-      String policyId = policyInfo.getCertPolicyId();
-      List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
-
-      ASN1Sequence policyQualifiers = null;
-      if (CollectionUtil.isNotEmpty(qualifiers)) {
-        policyQualifiers = createPolicyQualifiers(qualifiers);
-      }
-
-      ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
-      if (policyQualifiers == null) {
-        pInfos[i] = new PolicyInformation(policyOid);
-      } else {
-        pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
-      }
-      i++;
+    private X509CertUtil() {
     }
-
-    return new CertificatePolicies(pInfos);
-  }
-
-  private static ASN1Sequence createPolicyQualifiers(
-      final List<CertificatePolicyQualifier> qualifiers) {
-    List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
-    for (CertificatePolicyQualifier qualifier : qualifiers) {
-      PolicyQualifierInfo qualifierInfo;
-      if (qualifier.getCpsUri() != null) {
-        qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
-      } else if (qualifier.getUserNotice() != null) {
-        UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
-        qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
-            userNotice);
-      } else {
-        qualifierInfo = null;
-      }
-
-      if (qualifierInfo != null) {
-        qualifierInfos.add(qualifierInfo);
-      }
-      //PolicyQualifierId qualifierId
-    }
-
-    return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
-  }
-
-  private X509CertUtil() {
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,44 +48,44 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertWithEncoded {
 
-  private final X509Certificate certificate;
+    private final X509Certificate certificate;
 
-  private final String className;
+    private final String className;
 
-  private final byte[] encoded;
+    private final byte[] encoded;
 
-  public CertWithEncoded(
-      final X509Certificate cert)
-  throws CertificateEncodingException {
-    ParamUtil.assertNotNull("cert", cert);
-    this.certificate = cert;
-    this.className = cert.getClass().getName();
-    this.encoded = cert.getEncoded();
-  }
-
-  public X509Certificate getCertificate() {
-    return certificate;
-  }
-
-  public boolean equalsCert(
-      final X509Certificate cert) {
-    if (certificate == cert) {
-      return true;
+    public CertWithEncoded(
+            final X509Certificate cert)
+    throws CertificateEncodingException {
+        ParamUtil.assertNotNull("cert", cert);
+        this.certificate = cert;
+        this.className = cert.getClass().getName();
+        this.encoded = cert.getEncoded();
     }
 
-    if (className.equals(cert.getClass().getName())) {
-      return certificate.equals(cert);
-    } else if (certificate.equals(cert)) {
-      return true;
-    } else {
-      byte[] encodedCert;
-      try {
-        encodedCert = cert.getEncoded();
-      } catch (CertificateEncodingException e) {
-        return false;
-      }
-      return Arrays.equals(encoded, encodedCert);
+    public X509Certificate getCertificate() {
+        return certificate;
     }
-  }
+
+    public boolean equalsCert(
+            final X509Certificate cert) {
+        if (certificate == cert) {
+            return true;
+        }
+
+        if (className.equals(cert.getClass().getName())) {
+            return certificate.equals(cert);
+        } else if (certificate.equals(cert)) {
+            return true;
+        } else {
+            byte[] encodedCert;
+            try {
+                encodedCert = cert.getEncoded();
+            } catch (CertificateEncodingException e) {
+                return false;
+            }
+            return Arrays.equals(encoded, encodedCert);
+        }
+    }
 
 }

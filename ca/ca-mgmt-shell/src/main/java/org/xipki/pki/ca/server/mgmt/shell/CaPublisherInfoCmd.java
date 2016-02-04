@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,38 +51,38 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "capub-info",
-    description = "show information of publisher in given CA")
+        description = "show information of publisher in given CA")
 @Service
 public class CaPublisherInfoCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (caManager.getCA(caName) == null) {
-      throw new UnexpectedException("could not find CA '" + caName + "'");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (caManager.getCA(caName) == null) {
+            throw new UnexpectedException("could not find CA '" + caName + "'");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
+        if (isNotEmpty(entries)) {
+            sb.append("publishers for CA " + caName).append("\n");
+            for (PublisherEntry entry    : entries) {
+                sb.append("\t").append(entry.getName()).append("\n");
+            }
+        } else {
+            sb.append("\tno publisher for CA " + caName + " is configured");
+        }
+
+        out(sb.toString());
+        return null;
     }
-
-    StringBuilder sb = new StringBuilder();
-
-    List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
-    if (isNotEmpty(entries)) {
-      sb.append("publishers for CA " + caName).append("\n");
-      for (PublisherEntry entry  : entries) {
-        sb.append("\t").append(entry.getName()).append("\n");
-      }
-    } else {
-      sb.append("\tno publisher for CA " + caName + " is configured");
-    }
-
-    out(sb.toString());
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,17 +46,17 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 @Service
 public class SigAlgCompleter extends AbstractEnumCompleter {
 
-  public SigAlgCompleter() {
-    String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
-    String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
-    StringBuilder enums = new StringBuilder(200);
-    for (String encAlg : encAlgs) {
-      for (String hashAlg : hashAlgs) {
-        enums.append(hashAlg).append("with").append(encAlg).append(",");
-      }
+    public SigAlgCompleter() {
+        String[] encAlgs = new String[]{"RSA", "RSAandMGF1", "ECDSA", "DSA"};
+        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        StringBuilder enums = new StringBuilder(200);
+        for (String encAlg : encAlgs) {
+            for (String hashAlg : hashAlgs) {
+                enums.append(hashAlg).append("with").append(encAlg).append(",");
+            }
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
-  }
 
 }

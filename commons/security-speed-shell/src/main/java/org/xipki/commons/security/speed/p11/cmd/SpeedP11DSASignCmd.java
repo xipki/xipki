@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,30 +47,30 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-dsa-sign",
-    description = "performance test of PKCS#11 DSA signature creation")
+        description = "performance test of PKCS#11 DSA signature creation")
 public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
-  private Integer pLen = 2048;
+    @Option(name = "--plen",
+            description = "bit length of the prime")
+    private Integer pLen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
-  private Integer qLen;
+    @Option(name = "--qlen",
+            description = "bit length of the sub-prime")
+    private Integer qLen;
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    if (qLen == null) {
-      if (pLen >= 2048) {
-        qLen = 256;
-      } else {
-        qLen = 160;
-      }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        if (qLen == null) {
+            if (pLen >= 2048) {
+                qLen = 256;
+            } else {
+                qLen = 160;
+            }
+        }
+
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen);
     }
-
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen);
-  }
 
 }

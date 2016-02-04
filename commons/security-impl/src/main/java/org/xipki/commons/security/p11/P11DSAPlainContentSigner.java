@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,20 +51,20 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class P11DSAPlainContentSigner extends AbstractP11DSAContentSigner {
 
-  public P11DSAPlainContentSigner(
-      final P11CryptService cryptService,
-      final P11SlotIdentifier slot,
-      final P11KeyIdentifier keyId,
-      final AlgorithmIdentifier signatureAlgId)
-  throws NoSuchAlgorithmException, OperatorCreationException {
-    super(cryptService, slot, keyId, signatureAlgId);
-  }
+    public P11DSAPlainContentSigner(
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException {
+        super(cryptService, slot, keyId, signatureAlgId);
+    }
 
-  @Override
-  protected byte[] CKM_SIGN(
-      final byte[] hashValue)
-  throws SignerException {
-    return cryptService.CKM_DSA_Plain(hashValue, slot, keyId);
-  }
+    @Override
+    protected byte[] CKM_SIGN(
+            final byte[] hashValue)
+    throws SignerException {
+        return cryptService.CKM_DSA_Plain(hashValue, slot, keyId);
+    }
 
 }

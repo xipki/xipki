@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,39 +48,39 @@ import org.xipki.commons.common.util.StringUtil;
 
 class CertWithInfo {
 
-  private final BigInteger serialNumber;
+    private final BigInteger serialNumber;
 
-  private Certificate cert;
+    private Certificate cert;
 
-  private String profileName;
+    private String profileName;
 
-  public CertWithInfo(
-      final BigInteger serialNumber) {
-    ParamUtil.assertNotNull("serialNumber", serialNumber);
-    this.serialNumber = serialNumber;
-  }
+    public CertWithInfo(
+            final BigInteger serialNumber) {
+        ParamUtil.assertNotNull("serialNumber", serialNumber);
+        this.serialNumber = serialNumber;
+    }
 
-  public void setProfileName(
-      final String profileName) {
-    this.profileName = StringUtil.isBlank(profileName)
-        ? null
-        : profileName;
-  }
+    public void setProfileName(
+            final String profileName) {
+        this.profileName = StringUtil.isBlank(profileName)
+                ? null
+                : profileName;
+    }
 
-  public void setCert(Certificate cert) {
-    this.cert = cert;
-  }
+    public void setCert(Certificate cert) {
+        this.cert = cert;
+    }
 
-  public BigInteger getSerialNumber() {
-    return serialNumber;
-  }
+    public BigInteger getSerialNumber() {
+        return serialNumber;
+    }
 
-  public Certificate getCert() {
-    return cert;
-  }
+    public Certificate getCert() {
+        return cert;
+    }
 
-  public String getProfileName() {
-    return profileName;
-  }
+    public String getProfileName() {
+        return profileName;
+    }
 
 } // class CertWithInfo

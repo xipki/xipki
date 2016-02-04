@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,22 +46,22 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "unlock",
-    description = "unlock CA system")
+        description = "unlock CA system")
 @Service
 public class CaSystemUnlockCmd extends CaCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean unlocked = caManager.unlockCA();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean unlocked = caManager.unlockCA();
 
-    if (unlocked) {
-      out("unlocked CA system, calling xipki-ca:restart to restart CA system");
-    } else {
-      throw new UnexpectedException("could not unlock CA system");
+        if (unlocked) {
+            out("unlocked CA system, calling xipki-ca:restart to restart CA system");
+        } else {
+            throw new UnexpectedException("could not unlock CA system");
+        }
+
+        return null;
     }
-
-    return null;
-  }
 
 }

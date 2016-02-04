@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,16 +44,16 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "notify-change",
-    description = "notify the change of CA system")
+        description = "notify the change of CA system")
 @Service
 public class CaSystemNotifyChangeCmd extends CaCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.notifyCAChange();
-    output(b, "notified", "could not notify", "the change of CA system");
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.notifyCAChange();
+        output(b, "notified", "could not notify", "the change of CA system");
+        return null;
+    }
 
 }

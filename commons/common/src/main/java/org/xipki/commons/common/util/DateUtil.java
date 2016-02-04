@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,32 +47,32 @@ import java.util.TimeZone;
 
 public class DateUtil {
 
-  private static final SimpleDateFormat sdf;
+    private static final SimpleDateFormat sdf;
 
-  static {
-    sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-  }
-
-  private DateUtil() {
-  }
-
-  public static Date parseUTCTimeyyyyMMddhhmmss(
-      final String utcTime) {
-    if (utcTime == null || utcTime.length() != 14) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
+    static {
+        sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
-    try {
-      return sdf.parse(utcTime);
-    } catch (ParseException e) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-          + e.getMessage());
-    }
-  }
 
-  public static void main(
-      final String[] args) {
-    System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
-  }
+    private DateUtil() {
+    }
+
+    public static Date parseUTCTimeyyyyMMddhhmmss(
+            final String utcTime) {
+        if (utcTime == null || utcTime.length() != 14) {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
+        }
+        try {
+            return sdf.parse(utcTime);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
+                    + e.getMessage());
+        }
+    }
+
+    public static void main(
+            final String[] args) {
+        System.out.println(parseUTCTimeyyyyMMddhhmmss("20150223134459"));
+    }
 
 }

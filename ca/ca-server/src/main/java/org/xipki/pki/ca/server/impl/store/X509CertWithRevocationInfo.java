@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,44 +45,44 @@ import org.xipki.pki.ca.api.X509CertWithDbId;
 
 public class X509CertWithRevocationInfo {
 
-  private X509CertWithDbId cert;
+    private X509CertWithDbId cert;
 
-  private CertRevocationInfo revInfo;
+    private CertRevocationInfo revInfo;
 
-  private String certprofile;
+    private String certprofile;
 
-  public X509CertWithRevocationInfo() {
-  }
+    public X509CertWithRevocationInfo() {
+    }
 
-  public X509CertWithDbId getCert() {
-    return cert;
-  }
+    public X509CertWithDbId getCert() {
+        return cert;
+    }
 
-  public boolean isRevoked() {
-    return revInfo != null;
-  }
+    public boolean isRevoked() {
+        return revInfo != null;
+    }
 
-  public CertRevocationInfo getRevInfo() {
-    return revInfo;
-  }
+    public CertRevocationInfo getRevInfo() {
+        return revInfo;
+    }
 
-  public void setCert(
-      final X509CertWithDbId cert) {
-    this.cert = cert;
-  }
+    public void setCert(
+            final X509CertWithDbId cert) {
+        this.cert = cert;
+    }
 
-  public void setRevInfo(
-      final CertRevocationInfo revInfo) {
-    this.revInfo = revInfo;
-  }
+    public void setRevInfo(
+            final CertRevocationInfo revInfo) {
+        this.revInfo = revInfo;
+    }
 
-  public String getCertprofile() {
-    return certprofile;
-  }
+    public String getCertprofile() {
+        return certprofile;
+    }
 
-  public void setCertprofile(
-      final String certprofile) {
-    this.certprofile = certprofile;
-  }
+    public void setCertprofile(
+            final String certprofile) {
+        this.certprofile = certprofile;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,40 +46,40 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class QcStatementOption {
 
-  private final QCStatement statement;
+    private final QCStatement statement;
 
-  private final ASN1ObjectIdentifier statementId;
+    private final ASN1ObjectIdentifier statementId;
 
-  private final MonetaryValueOption monetaryValueOption;
+    private final MonetaryValueOption monetaryValueOption;
 
-  public QcStatementOption(
-      final QCStatement statement) {
-    ParamUtil.assertNotNull("statement", statement);
-    this.statement = statement;
-    this.statementId = null;
-    this.monetaryValueOption = null;
-  }
+    public QcStatementOption(
+            final QCStatement statement) {
+        ParamUtil.assertNotNull("statement", statement);
+        this.statement = statement;
+        this.statementId = null;
+        this.monetaryValueOption = null;
+    }
 
-  public QcStatementOption(
-      final ASN1ObjectIdentifier statementId,
-      final MonetaryValueOption monetaryValueOption) {
-    ParamUtil.assertNotNull("statementId", statementId);
-    ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
-    this.statement = null;
-    this.statementId = statementId;
-    this.monetaryValueOption = monetaryValueOption;
-  }
+    public QcStatementOption(
+            final ASN1ObjectIdentifier statementId,
+            final MonetaryValueOption monetaryValueOption) {
+        ParamUtil.assertNotNull("statementId", statementId);
+        ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
+        this.statement = null;
+        this.statementId = statementId;
+        this.monetaryValueOption = monetaryValueOption;
+    }
 
-  public QCStatement getStatement() {
-    return statement;
-  }
+    public QCStatement getStatement() {
+        return statement;
+    }
 
-  public ASN1ObjectIdentifier getStatementId() {
-    return statementId;
-  }
+    public ASN1ObjectIdentifier getStatementId() {
+        return statementId;
+    }
 
-  public MonetaryValueOption getMonetaryValueOption() {
-    return monetaryValueOption;
-  }
+    public MonetaryValueOption getMonetaryValueOption() {
+        return monetaryValueOption;
+    }
 
 }

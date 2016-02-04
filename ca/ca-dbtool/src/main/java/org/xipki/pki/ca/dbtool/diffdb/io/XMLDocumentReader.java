@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -62,56 +62,56 @@ import org.xml.sax.SAXException;
 
 public class XMLDocumentReader {
 
-  private final Document doc;
+    private final Document doc;
 
-  private final XPathFactory xpathfactory;
+    private final XPathFactory xpathfactory;
 
-  public XMLDocumentReader(
-      final InputStream xmlStream,
-      final boolean namespaceAware)
-  throws ParserConfigurationException, SAXException, IOException {
-    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-    builderFactory.setNamespaceAware(namespaceAware);
-    DocumentBuilder newDocumentBuilder = builderFactory.newDocumentBuilder();
-    disableDtdValidation(newDocumentBuilder);
-    doc = newDocumentBuilder.parse(xmlStream);
+    public XMLDocumentReader(
+            final InputStream xmlStream,
+            final boolean namespaceAware)
+    throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        builderFactory.setNamespaceAware(namespaceAware);
+        DocumentBuilder newDocumentBuilder = builderFactory.newDocumentBuilder();
+        disableDtdValidation(newDocumentBuilder);
+        doc = newDocumentBuilder.parse(xmlStream);
 
-    xpathfactory = XPathFactory.newInstance();
-  }
-
-  private static void disableDtdValidation(
-      final DocumentBuilder db) {
-    db.setEntityResolver(new EntityResolver() {
-    @Override
-    public InputSource resolveEntity(
-        final String publicId,
-        final String systemId)
-    throws SAXException, IOException {
-      return new InputSource(new StringReader(""));
-    }
-    });
-  }
-
-  public String getValue(
-      final String xpathExpression)
-  throws XPathExpressionException {
-    Node n = getNode(xpathExpression);
-    return (n != null)
-        ? n.getFirstChild().getTextContent()
-        : null;
-  }
-
-  private Node getNode(
-      final String xpathExpression)
-  throws XPathExpressionException {
-    XPath xpath = xpathfactory.newXPath();
-    XPathExpression xpathE = xpath.compile(xpathExpression);
-    NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
-    if (nl != null && nl.getLength() > 0) {
-      return nl.item(0);
+        xpathfactory = XPathFactory.newInstance();
     }
 
-    return null;
-  }
+    private static void disableDtdValidation(
+            final DocumentBuilder db) {
+        db.setEntityResolver(new EntityResolver() {
+        @Override
+        public InputSource resolveEntity(
+                final String publicId,
+                final String systemId)
+        throws SAXException, IOException {
+            return new InputSource(new StringReader(""));
+        }
+        });
+    }
+
+    public String getValue(
+            final String xpathExpression)
+    throws XPathExpressionException {
+        Node n = getNode(xpathExpression);
+        return (n != null)
+                ? n.getFirstChild().getTextContent()
+                : null;
+    }
+
+    private Node getNode(
+            final String xpathExpression)
+    throws XPathExpressionException {
+        XPath xpath = xpathfactory.newXPath();
+        XPathExpression xpathE = xpath.compile(xpathExpression);
+        NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);
+        if (nl != null && nl.getLength() > 0) {
+            return nl.item(0);
+        }
+
+        return null;
+    }
 
 }

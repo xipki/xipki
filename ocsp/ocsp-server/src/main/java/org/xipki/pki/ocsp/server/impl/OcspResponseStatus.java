@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,32 +42,32 @@ package org.xipki.pki.ocsp.server.impl;
 
 public enum OcspResponseStatus {
 
-  successful(0),
-  malformedRequest(1),
-  internalError(2),
-  tryLater(3),
-  sigRequired(5),
-  unauthorized(6);
+    successful(0),
+    malformedRequest(1),
+    internalError(2),
+    tryLater(3),
+    sigRequired(5),
+    unauthorized(6);
 
-  private final int status;
-  private OcspResponseStatus(
-      final int status) {
-    this.status = status;
-  }
-
-  public int getStatus() {
-    return status;
-  }
-
-  public static OcspResponseStatus getOCSPResponseStatus(
-      final int status) {
-    for (OcspResponseStatus entry : values()) {
-      if (entry.status == status) {
-        return entry;
-      }
+    private final int status;
+    private OcspResponseStatus(
+            final int status) {
+        this.status = status;
     }
 
-    return null;
-  }
+    public int getStatus() {
+        return status;
+    }
+
+    public static OcspResponseStatus getOCSPResponseStatus(
+            final int status) {
+        for (OcspResponseStatus entry : values()) {
+            if (entry.status == status) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
 
 }

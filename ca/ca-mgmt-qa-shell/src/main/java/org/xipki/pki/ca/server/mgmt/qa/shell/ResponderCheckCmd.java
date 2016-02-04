@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,41 +52,41 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "responder-check",
-    description = "check information of responder (QA)")
+        description = "check information of responder (QA)")
 @Service
 public class ResponderCheckCmd extends ResponderUpdateCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking responder " + name);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking responder " + name);
 
-    CmpResponderEntry cr = caManager.getCmpResponder(name);
-    if (cr == null) {
-      throw new CmdFailure("CMP responder named '" + name + "' is not configured");
+        CmpResponderEntry cr = caManager.getCmpResponder(name);
+        if (cr == null) {
+            throw new CmdFailure("CMP responder named '" + name + "' is not configured");
+        }
+
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+            if (cr.getBase64Cert() != null) {
+                throw new CmdFailure("Cert: is configured but expected is none");
+            }
+        } else if (certFile != null) {
+            byte[] ex = IoUtil.read(certFile);
+            if (cr.getBase64Cert() == null) {
+                throw new CmdFailure("Cert: is not configured explicitly as expected");
+            }
+            if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+                throw new CmdFailure("Cert: the expected one and the actual one differ");
+            }
+        }
+
+        String signerConf = getSignerConf();
+        if (signerConf != null) {
+            MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
+        }
+
+        out(" checked responder " + name);
+        return null;
     }
-
-    if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-      if (cr.getBase64Cert() != null) {
-        throw new CmdFailure("Cert: is configured but expected is none");
-      }
-    } else if (certFile != null) {
-      byte[] ex = IoUtil.read(certFile);
-      if (cr.getBase64Cert() == null) {
-        throw new CmdFailure("Cert: is not configured explicitly as expected");
-      }
-      if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
-        throw new CmdFailure("Cert: the expected one and the actual one differ");
-      }
-    }
-
-    String signerConf = getSignerConf();
-    if (signerConf != null) {
-      MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
-    }
-
-    out(" checked responder " + name);
-    return null;
-  }
 
 }

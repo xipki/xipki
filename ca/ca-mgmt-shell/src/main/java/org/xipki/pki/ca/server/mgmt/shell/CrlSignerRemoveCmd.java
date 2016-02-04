@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,20 +47,20 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-rm",
-    description = "remove CRL signer")
+        description = "remove CRL signer")
 @Service
 public class CrlSignerRemoveCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
-  @Completion(CrlSignerNameCompleter.class)
-  private String name;
+    @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
+    @Completion(CrlSignerNameCompleter.class)
+    private String name;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.removeCrlSigner(name);
-    output(b, "removed", "could not remove", "CRL signer " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.removeCrlSigner(name);
+        output(b, "removed", "could not remove", "CRL signer " + name);
+        return null;
+    }
 
 }

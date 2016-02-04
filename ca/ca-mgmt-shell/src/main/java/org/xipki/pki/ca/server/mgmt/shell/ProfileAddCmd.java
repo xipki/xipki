@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,42 +49,42 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
  */
 
 @Command(scope = "xipki-ca", name = "profile-add",
-    description = "add certificate profile")
+        description = "add certificate profile")
 @Service
 public class ProfileAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "profile name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "profile name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--type",
-      required = true,
-      description = "profile type\n"
-          + "(required)")
-  private String type;
+    @Option(name = "--type",
+            required = true,
+            description = "profile type\n"
+                    + "(required)")
+    private String type;
 
-  @Option(name = "--conf",
-      description = "profile configuration")
-  private String conf;
+    @Option(name = "--conf",
+            description = "profile configuration")
+    private String conf;
 
-  @Option(name = "--conf-file",
-      description = "profile configuration file")
-  @Completion(FilePathCompleter.class)
-  private String confFile;
+    @Option(name = "--conf-file",
+            description = "profile configuration file")
+    @Completion(FilePathCompleter.class)
+    private String confFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (conf == null && confFile != null) {
-      conf = new String(IoUtil.read(confFile));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (conf == null && confFile != null) {
+            conf = new String(IoUtil.read(confFile));
+        }
+
+        CertprofileEntry entry = new CertprofileEntry(name, type, conf);
+        boolean b = caManager.addCertprofile(entry);
+        output(b, "added", "could not add", "certificate profile " + name);
+        return null;
     }
-
-    CertprofileEntry entry = new CertprofileEntry(name, type, conf);
-    boolean b = caManager.addCertprofile(entry);
-    output(b, "added", "could not add", "certificate profile " + name);
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,27 +44,27 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 
 public class QaPolicyConstraints extends QaExtension {
 
-  private final Integer requireExplicitPolicy;
+    private final Integer requireExplicitPolicy;
 
-  private final Integer inhibitPolicyMapping;
+    private final Integer inhibitPolicyMapping;
 
-  public QaPolicyConstraints(
-      final PolicyConstraints jaxb) {
-    if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
-      throw new IllegalArgumentException(
-          "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+    public QaPolicyConstraints(
+            final PolicyConstraints jaxb) {
+        if (jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null) {
+            throw new IllegalArgumentException(
+                    "at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+        }
+
+        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
-    this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
-  }
+    public Integer getRequireExplicitPolicy() {
+        return requireExplicitPolicy;
+    }
 
-  public Integer getRequireExplicitPolicy() {
-    return requireExplicitPolicy;
-  }
-
-  public Integer getInhibitPolicyMapping() {
-    return inhibitPolicyMapping;
-  }
+    public Integer getInhibitPolicyMapping() {
+        return inhibitPolicyMapping;
+    }
 
 }

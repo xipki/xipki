@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,29 +42,29 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 public enum CertArt {
 
-  X509PKC(1),
-  X509AC(2),
-  CVC(3);
+    X509PKC(1),
+    X509AC(2),
+    CVC(3);
 
-  private final int code;
+    private final int code;
 
-  private CertArt(
-      final int code) {
-    this.code = code;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public static CertArt getInstance(
-      final int code) {
-    for (CertArt value : values()) {
-      if (value.code == code) {
-        return value;
-      }
+    private CertArt(
+            final int code) {
+        this.code = code;
     }
-    return null;
-  }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static CertArt getInstance(
+            final int code) {
+        for (CertArt value : values()) {
+            if (value.code == code) {
+                return value;
+            }
+        }
+        return null;
+    }
 
 }

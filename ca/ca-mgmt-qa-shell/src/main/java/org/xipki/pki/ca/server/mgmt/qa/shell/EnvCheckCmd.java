@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,23 +46,23 @@ import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "env-check",
-    description = "check information of CA environment parameters (QA)")
+        description = "check information of CA environment parameters (QA)")
 @Service
 public class EnvCheckCmd extends EnvUpdateCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking environment " + name);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking environment " + name);
 
-    String is = caManager.getEnvParam(name);
-    if (!value.equals(is)) {
-      throw new CmdFailure("Environment parameter '" + name + "': is '" + is
-          + "', but expected '" + value + "'");
+        String is = caManager.getEnvParam(name);
+        if (!value.equals(is)) {
+            throw new CmdFailure("Environment parameter '" + name + "': is '" + is
+                    + "', but expected '" + value + "'");
+        }
+
+        out(" checked environment " + name);
+        return null;
     }
-
-    out(" checked environment " + name);
-    return null;
-  }
 
 }

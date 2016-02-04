@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,31 +51,31 @@ import org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "requestor-check",
-    description = "check information of requestors (QA)")
+        description = "check information of requestors (QA)")
 @Service
 public class RequestorCheckCmd extends RequestorUpdateCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking requestor " + name);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking requestor " + name);
 
-    CmpRequestorEntry cr = caManager.getCmpRequestor(name);
-    if (cr == null) {
-      throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
+        CmpRequestorEntry cr = caManager.getCmpRequestor(name);
+        if (cr == null) {
+            throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
+        }
+
+        byte[] ex = IoUtil.read(certFile);
+        if (cr.getBase64Cert() == null) {
+            throw new CmdFailure("Cert: is not configured explicitly as expected");
+        }
+
+        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+            throw new CmdFailure("Cert: the expected one and the actual one differ");
+        }
+
+        out(" checked requestor " + name);
+        return null;
     }
-
-    byte[] ex = IoUtil.read(certFile);
-    if (cr.getBase64Cert() == null) {
-      throw new CmdFailure("Cert: is not configured explicitly as expected");
-    }
-
-    if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
-      throw new CmdFailure("Cert: the expected one and the actual one differ");
-    }
-
-    out(" checked requestor " + name);
-    return null;
-  }
 
 }

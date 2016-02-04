@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,35 +46,35 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
  */
 
 @Command(scope = "xipki-ca", name = "user-add",
-    description = "add user")
+        description = "add user")
 @Service
 public class UserAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "user Name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "user Name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--password",
-      description = "user password")
-  private String password;
+    @Option(name = "--password",
+            description = "user password")
+    private String password;
 
-  @Option(name = "--cn-regex",
-      required = true,
-      description = "regex for the permitted common name")
-  private String cnRegex;
+    @Option(name = "--cn-regex",
+            required = true,
+            description = "regex for the permitted common name")
+    private String cnRegex;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (password == null) {
-      password = new String(readPassword());
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (password == null) {
+            password = new String(readPassword());
+        }
+        AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);
+        boolean b = caManager.addUser(userEntry);
+        output(b, "added", "could not add", "user " + name);
+        return null;
     }
-    AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);
-    boolean b = caManager.addUser(userEntry);
-    output(b, "added", "could not add", "user " + name);
-    return null;
-  }
 
 }

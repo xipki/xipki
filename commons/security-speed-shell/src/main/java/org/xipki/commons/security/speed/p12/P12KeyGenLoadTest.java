@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,39 +47,39 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public abstract class P12KeyGenLoadTest extends LoadExecutor {
 
-  class Testor implements Runnable {
+    class Testor implements Runnable {
 
-    @Override
-    public void run() {
-      P12RawKeypairGenerator kpGen = getKeypairGenerator();
-      while (!stop() && getErrorAccout() < 1) {
-        try {
-          kpGen.genKeypair(securityFactory.getRandom4Key());
-          account(1, 0);
-        } catch (Exception e) {
-          account(1, 1);
+        @Override
+        public void run() {
+            P12RawKeypairGenerator kpGen = getKeypairGenerator();
+            while (!stop() && getErrorAccout() < 1) {
+                try {
+                    kpGen.genKeypair(securityFactory.getRandom4Key());
+                    account(1, 0);
+                } catch (Exception e) {
+                    account(1, 1);
+                }
+            }
         }
-      }
+
+    } // class Testor
+
+    private final SecurityFactory securityFactory;
+
+    public P12KeyGenLoadTest(
+            final String description,
+            final SecurityFactory securityFactory) {
+        super(description);
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
+        this.securityFactory = securityFactory;
     }
 
-  } // class Testor
+    protected abstract P12RawKeypairGenerator getKeypairGenerator();
 
-  private final SecurityFactory securityFactory;
-
-  public P12KeyGenLoadTest(
-      final String description,
-      final SecurityFactory securityFactory) {
-    super(description);
-    ParamUtil.assertNotNull("securityFactory", securityFactory);
-    this.securityFactory = securityFactory;
-  }
-
-  protected abstract P12RawKeypairGenerator getKeypairGenerator();
-
-  @Override
-  protected Runnable getTestor()
-  throws Exception {
-    return new Testor();
-  }
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
+    }
 
 }

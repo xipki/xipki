@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,45 +50,45 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class P11KeyParameter extends AsymmetricKeyParameter {
 
-  private final P11CryptService p11CryptService;
+    private final P11CryptService p11CryptService;
 
-  private final P11SlotIdentifier slot;
+    private final P11SlotIdentifier slot;
 
-  private final P11KeyIdentifier keyId;
+    private final P11KeyIdentifier keyId;
 
-  private P11KeyParameter(
-      final P11CryptService p11CryptService,
-      final P11SlotIdentifier slot,
-      final P11KeyIdentifier keyId) {
-    super(true);
+    private P11KeyParameter(
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId) {
+        super(true);
 
-    this.p11CryptService = p11CryptService;
-    this.slot = slot;
-    this.keyId = keyId;
-  }
+        this.p11CryptService = p11CryptService;
+        this.slot = slot;
+        this.keyId = keyId;
+    }
 
-  public P11CryptService getP11CryptService() {
-    return p11CryptService;
-  }
+    public P11CryptService getP11CryptService() {
+        return p11CryptService;
+    }
 
-  public P11SlotIdentifier getSlot() {
-    return slot;
-  }
+    public P11SlotIdentifier getSlot() {
+        return slot;
+    }
 
-  public P11KeyIdentifier getKeyId() {
-    return keyId;
-  }
+    public P11KeyIdentifier getKeyId() {
+        return keyId;
+    }
 
-  public static P11KeyParameter getInstance(
-      final P11CryptService p11CryptService,
-      final P11SlotIdentifier slot,
-      final P11KeyIdentifier keyId)
-  throws InvalidKeyException {
-    ParamUtil.assertNotNull("p11CryptService", p11CryptService);
-    ParamUtil.assertNotNull("slot", slot);
-    ParamUtil.assertNotNull("keyId", keyId);
+    public static P11KeyParameter getInstance(
+            final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId)
+    throws InvalidKeyException {
+        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("keyId", keyId);
 
-    return new P11KeyParameter(p11CryptService, slot, keyId);
-  }
+        return new P11KeyParameter(p11CryptService, slot, keyId);
+    }
 
 }

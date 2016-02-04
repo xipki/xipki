@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,55 +42,55 @@ package org.xipki.commons.audit.api;
 
 public class AuditEventData {
 
-  private final String name;
+    private final String name;
 
-  private final String value;
+    private final String value;
 
-  public AuditEventData(
-      final String name,
-      final String value) {
-    assertNotEmpty("name", name);
-    assertNotNull("value", value);
-    this.name = name;
-    this.value = value;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(name).append(": ").append(value);
-    return sb.toString();
-  }
-
-  private static void assertNotNull(
-      final String parameterName,
-      final Object parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(
-        String.format("%s could not be null", parameterName));
-    }
-  }
-
-  private static void assertNotEmpty(
-      final String parameterName,
-      final String parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(
-          String.format("%s could not be null", parameterName));
+    public AuditEventData(
+            final String name,
+            final String value) {
+        assertNotEmpty("name", name);
+        assertNotNull("value", value);
+        this.name = name;
+        this.value = value;
     }
 
-    if (parameter.isEmpty()) {
-      throw new IllegalArgumentException(
-          String.format("%s could not be empty", parameterName));
+    public String getName() {
+        return name;
     }
-  }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append(": ").append(value);
+        return sb.toString();
+    }
+
+    private static void assertNotNull(
+            final String parameterName,
+            final Object parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(
+                String.format("%s could not be null", parameterName));
+        }
+    }
+
+    private static void assertNotEmpty(
+            final String parameterName,
+            final String parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(
+                    String.format("%s could not be null", parameterName));
+        }
+
+        if (parameter.isEmpty()) {
+            throw new IllegalArgumentException(
+                    String.format("%s could not be empty", parameterName));
+        }
+    }
 
 }

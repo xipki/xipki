@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,66 +48,66 @@ import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
 
 public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
 
-  private ConcurrentLinkedDeque<AuditService> services =
-      new ConcurrentLinkedDeque<AuditService>();
+    private ConcurrentLinkedDeque<AuditService> services =
+            new ConcurrentLinkedDeque<AuditService>();
 
-  private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
+    private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
-  private boolean auditEnabled;
+    private boolean auditEnabled;
 
-  @Override
-  public AuditService getAuditService() {
-    if (auditEnabled) {
-      return services.isEmpty()
-          ? defaultAuditService
-          : services.getLast();
-    } else {
-      return null;
-    }
-  }
-
-  public void bindService(
-      final AuditService service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("bindService invoked with null.");
-      return;
+    @Override
+    public AuditService getAuditService() {
+        if (auditEnabled) {
+            return services.isEmpty()
+                    ? defaultAuditService
+                    : services.getLast();
+        } else {
+            return null;
+        }
     }
 
-    boolean replaced = services.remove(service);
-    services.add(service);
+    public void bindService(
+            final AuditService service) {
+        //might be null if dependency is optional
+        if (service == null) {
+            LOG.debug("bindService invoked with null.");
+            return;
+        }
 
-    String action = replaced
-        ? "replaced"
-        : "added";
-    LOG.debug("{} AuditService binding for {}", action, service);
-  }
+        boolean replaced = services.remove(service);
+        services.add(service);
 
-  public void unbindService(
-      final AuditService service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("unbindService invoked with null.");
-      return;
+        String action = replaced
+                ? "replaced"
+                : "added";
+        LOG.debug("{} AuditService binding for {}", action, service);
     }
 
-    if (services.remove(service)) {
-      LOG.debug("removed AuditService binding for {}", service);
-    } else {
-      LOG.debug("no AuditService binding found to remove for '{}'", service);
+    public void unbindService(
+            final AuditService service) {
+        //might be null if dependency is optional
+        if (service == null) {
+            LOG.debug("unbindService invoked with null.");
+            return;
+        }
+
+        if (services.remove(service)) {
+            LOG.debug("removed AuditService binding for {}", service);
+        } else {
+            LOG.debug("no AuditService binding found to remove for '{}'", service);
+        }
     }
-  }
 
-  public void setAuditEnabled(
-      final boolean auditEnabled) {
-    this.auditEnabled = auditEnabled;
-  }
+    public void setAuditEnabled(
+            final boolean auditEnabled) {
+        this.auditEnabled = auditEnabled;
+    }
 
-  @Override
-  public boolean isAuditEnabled() {
-    return auditEnabled;
-  }
+    @Override
+    public boolean isAuditEnabled() {
+        return auditEnabled;
+    }
 
 }

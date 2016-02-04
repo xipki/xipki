@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -56,57 +56,57 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "enroll-cert",
-    description = "enroll certificate")
+        description = "enroll certificate")
 @Service
 public class EnrollCertCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outFile;
 
-  @Option(name = "--profile", aliases = "-p",
-      required = true,
-      description = "profile name\n"
-          + "(required)")
-  @Completion(ProfileNameCompleter.class)
-  private String profileName;
+    @Option(name = "--profile", aliases = "-p",
+            required = true,
+            description = "profile name\n"
+                    + "(required)")
+    @Completion(ProfileNameCompleter.class)
+    private String profileName;
 
-  @Option(name = "--user",
-      description = "username")
-  private String user;
+    @Option(name = "--user",
+            description = "username")
+    private String user;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    CAEntry ca = caManager.getCA(caName);
-    if (ca == null) {
-      throw new UnexpectedException("CA " + caName + " not available");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        CAEntry ca = caManager.getCA(caName);
+        if (ca == null) {
+            throw new UnexpectedException("CA " + caName + " not available");
+        }
+
+        byte[] encodedP10Request = IoUtil.read(p10File);
+
+        X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
+                encodedP10Request);
+        saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
+
+        return null;
     }
-
-    byte[] encodedP10Request = IoUtil.read(p10File);
-
-    X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
-        encodedP10Request);
-    saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
-
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,27 +51,27 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
  */
 
 @Command(scope = "xipki-ca", name = "ca-add",
-    description = "add CA")
+        description = "add CA")
 @Service
 public class CaAddCmd extends CaAddOrGenCommandSupport {
 
-  @Option(name = "--cert",
-      description = "CA certificate file")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            description = "CA certificate file")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    X509CAEntry caEntry = getCAEntry();
-    if (certFile != null) {
-      X509Certificate caCert = X509Util.parseCert(certFile);
-      caEntry.setCertificate(caCert);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        X509CAEntry caEntry = getCAEntry();
+        if (certFile != null) {
+            X509Certificate caCert = X509Util.parseCert(certFile);
+            caEntry.setCertificate(caCert);
+        }
+
+        boolean b = caManager.addCA(caEntry);
+        output(b, "added", "could not add", "CA " + caEntry.getName());
+        return null;
     }
-
-    boolean b = caManager.addCA(caEntry);
-    output(b, "added", "could not add", "CA " + caEntry.getName());
-    return null;
-  }
 
 }

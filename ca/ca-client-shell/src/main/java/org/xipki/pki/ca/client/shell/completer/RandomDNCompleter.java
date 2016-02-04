@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,14 +47,14 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
 @Service
 public class RandomDNCompleter extends AbstractEnumCompleter {
 
-  public RandomDNCompleter() {
-    StringBuilder enums = new StringBuilder();
+    public RandomDNCompleter() {
+        StringBuilder enums = new StringBuilder();
 
-    for (RandomDN dn : RandomDN.values()) {
-      enums.append(dn.name()).append(",");
+        for (RandomDN dn : RandomDN.values()) {
+            enums.append(dn.name()).append(",");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,81 +48,81 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 public class IaikP11Util {
 
-  private IaikP11Util() {
-  }
-
-  public static byte[] generateKeyID(
-      final Session session)
-  throws Exception {
-    SecureRandom random = new SecureRandom();
-    byte[] keyID = null;
-    do {
-      keyID = new byte[8];
-      random.nextBytes(keyID);
-    } while (idExists(session, keyID));
-
-    return keyID;
-  }
-
-  public static boolean idExists(
-      final Session session, final byte[] keyID)
-  throws Exception {
-    Key k = new Key();
-    k.getId().setByteArrayValue(keyID);
-
-    session.findObjectsInit(k);
-    Object[] objects = session.findObjects(1);
-    session.findObjectsFinal();
-    if (objects.length > 0) {
-      return true;
+    private IaikP11Util() {
     }
 
-    X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-    c.getId().setByteArrayValue(keyID);
+    public static byte[] generateKeyID(
+            final Session session)
+    throws Exception {
+        SecureRandom random = new SecureRandom();
+        byte[] keyID = null;
+        do {
+            keyID = new byte[8];
+            random.nextBytes(keyID);
+        } while (idExists(session, keyID));
 
-    session.findObjectsInit(c);
-    objects = session.findObjects(1);
-    session.findObjectsFinal();
-
-    return objects.length > 0;
-  }
-
-  public static boolean labelExists(
-      final Session session,
-      final String keyLabel)
-  throws Exception {
-    Key k = new Key();
-    k.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-    session.findObjectsInit(k);
-    Object[] objects = session.findObjects(1);
-    session.findObjectsFinal();
-    if (objects.length > 0) {
-      return true;
+        return keyID;
     }
 
-    X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-    c.getLabel().setCharArrayValue(keyLabel.toCharArray());
+    public static boolean idExists(
+            final Session session, final byte[] keyID)
+    throws Exception {
+        Key k = new Key();
+        k.getId().setByteArrayValue(keyID);
 
-    session.findObjectsInit(c);
-    objects = session.findObjects(1);
-    session.findObjectsFinal();
+        session.findObjectsInit(k);
+        Object[] objects = session.findObjects(1);
+        session.findObjectsFinal();
+        if (objects.length > 0) {
+            return true;
+        }
 
-    return objects.length > 0;
-  }
+        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
+        c.getId().setByteArrayValue(keyID);
 
-  static String eraseSensitiveInfo(
-      final String data) {
-    int index = data.indexOf("password");
-    if (index == -1) {
-      return data;
+        session.findObjectsInit(c);
+        objects = session.findObjects(1);
+        session.findObjectsFinal();
+
+        return objects.length > 0;
     }
 
-    if (index > 1 && data.charAt(index - 1) == '%') {
-      return data.substring(0, index - 1);
-    } else {
-      return data.substring(0, index);
+    public static boolean labelExists(
+            final Session session,
+            final String keyLabel)
+    throws Exception {
+        Key k = new Key();
+        k.getLabel().setCharArrayValue(keyLabel.toCharArray());
+
+        session.findObjectsInit(k);
+        Object[] objects = session.findObjects(1);
+        session.findObjectsFinal();
+        if (objects.length > 0) {
+            return true;
+        }
+
+        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
+        c.getLabel().setCharArrayValue(keyLabel.toCharArray());
+
+        session.findObjectsInit(c);
+        objects = session.findObjects(1);
+        session.findObjectsFinal();
+
+        return objects.length > 0;
     }
-  }
+
+    static String eraseSensitiveInfo(
+            final String data) {
+        int index = data.indexOf("password");
+        if (index == -1) {
+            return data;
+        }
+
+        if (index > 1 && data.charAt(index - 1) == '%') {
+            return data.substring(0, index - 1);
+        } else {
+            return data.substring(0, index);
+        }
+    }
 
 }

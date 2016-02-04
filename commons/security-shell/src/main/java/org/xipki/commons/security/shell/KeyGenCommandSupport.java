@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,22 +49,22 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
 
-  protected Integer getKeyUsage()
-  throws Exception {
-    return KeyUsage.cRLSign
-        | KeyUsage.dataEncipherment
-        | KeyUsage.digitalSignature
-        | KeyUsage.keyAgreement
-        | KeyUsage.keyCertSign
-        | KeyUsage.keyEncipherment;
-  }
+    protected Integer getKeyUsage()
+    throws Exception {
+        return KeyUsage.cRLSign
+                | KeyUsage.dataEncipherment
+                | KeyUsage.digitalSignature
+                | KeyUsage.keyAgreement
+                | KeyUsage.keyCertSign
+                | KeyUsage.keyEncipherment;
+    }
 
-  protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
-  throws Exception {
-    return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
-        ObjectIdentifiers.id_kp_serverAuth,
-        ObjectIdentifiers.id_kp_emailProtection,
-        ObjectIdentifiers.id_kp_OCSPSigning);
-  }
+    protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
+    throws Exception {
+        return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
+                ObjectIdentifiers.id_kp_serverAuth,
+                ObjectIdentifiers.id_kp_emailProtection,
+                ObjectIdentifiers.id_kp_OCSPSigning);
+    }
 
 }

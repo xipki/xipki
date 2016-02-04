@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -73,289 +73,289 @@ import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 public class HttpOcspServlet extends HttpServlet {
 
-  private final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
+    private final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final String CT_REQUEST  = "application/ocsp-request";
+    private static final String CT_REQUEST    = "application/ocsp-request";
 
-  private static final String CT_RESPONSE = "application/ocsp-response";
+    private static final String CT_RESPONSE = "application/ocsp-response";
 
-  private AuditServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
-  private OcspServer server;
+    private OcspServer server;
 
-  public HttpOcspServlet() {
-  }
-
-  public void setServer(
-      final OcspServer server) {
-    this.server = server;
-  }
-
-  @Override
-  protected void doGet(
-      final HttpServletRequest request,
-      final HttpServletResponse response)
-  throws ServletException, IOException {
-    ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-    if (r == null) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
+    public HttpOcspServlet() {
     }
 
-    Responder responder = r.getResponder();
-    if (responder.getRequestOption().supportsHttpGet()) {
-      processRequest(request, response, r, true);
-    } else {
-      super.doGet(request, response);
-    }
-  }
-
-  @Override
-  protected void doPost(
-      final HttpServletRequest request,
-      final HttpServletResponse response)
-  throws ServletException, IOException {
-    ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-    if (r == null) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
+    public void setServer(
+            final OcspServer server) {
+        this.server = server;
     }
 
-    if (StringUtil.isNotBlank(r.getRelativeUri())) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
-    }
-
-    processRequest(request, response, r, false);
-  }
-
-  private void processRequest(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final ResponderAndRelativeUri r,
-      final boolean getMethod)
-  throws ServletException, IOException {
-    Responder responder = r.getResponder();
-    AuditEvent auditEvent = null;
-
-    AuditLevel auditLevel = AuditLevel.INFO;
-    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-    String auditMessage = null;
-
-    long start = 0;
-
-    AuditService auditService = (auditServiceRegister == null)
-        ? null
-        : auditServiceRegister.getAuditService();
-
-    if (auditService != null && responder.getAuditOption() != null) {
-      start = System.currentTimeMillis();
-      auditEvent = new AuditEvent(new Date());
-      auditEvent.setApplicationName("OCSP");
-      auditEvent.setName("PERF");
-    }
-
-    try {
-      if (server == null) {
-        String message = "responder in servlet not configured";
-        LOG.error(message);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.setContentLength(0);
-
-        auditLevel = AuditLevel.ERROR;
-        auditStatus = AuditStatus.FAILED;
-        auditMessage = message;
-        return;
-      }
-
-      InputStream requestStream;
-      if (getMethod) {
-        String relativeUri = r.getRelativeUri();
-
-        // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
-        // POST, we support GET for longer requests anyway.
-        if (relativeUri.length() > responder.getRequestOption().getMaxRequestSize()) {
-          response.setContentLength(0);
-          response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-
-          auditStatus = AuditStatus.FAILED;
-          auditMessage = "request too large";
-          return;
+    @Override
+    protected void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+        if (r == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
-        requestStream = new ByteArrayInputStream(Base64.decode(relativeUri));
-      } else {
-        // accept only "application/ocsp-request" as content type
-        if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
-          response.setContentLength(0);
-          response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-
-          auditStatus = AuditStatus.FAILED;
-          auditMessage = "unsupporte media type " + request.getContentType();
-          return;
-        }
-
-        // request too long
-        if (request.getContentLength() > responder.getRequestOption().getMaxRequestSize()) {
-          response.setContentLength(0);
-          response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-
-          auditStatus = AuditStatus.FAILED;
-          auditMessage = "request too large";
-          return;
-        } // if (CT_REQUEST)
-
-        requestStream = request.getInputStream();
-      } // end if (getMethod)
-
-      OCSPRequest ocspRequest;
-      try {
-        ASN1StreamParser parser = new ASN1StreamParser(requestStream);
-        ocspRequest = OCSPRequest.getInstance(parser.readObject());
-      } catch (Exception e) {
-        response.setContentLength(0);
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-        auditStatus = AuditStatus.FAILED;
-        auditMessage = "bad request";
-
-        final String message = "could not parse the request (OCSPRequest)";
-        if (LOG.isErrorEnabled()) {
-          LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-              e.getMessage());
-        }
-        LOG.debug(message, e);
-
-        return;
-      }
-
-      OCSPReq ocspReq = new OCSPReq(ocspRequest);
-
-      response.setContentType(HttpOcspServlet.CT_RESPONSE);
-
-      OcspRespWithCacheInfo ocspRespWithCacheInfo =
-          server.answer(responder, ocspReq, auditEvent, getMethod);
-      if (ocspRespWithCacheInfo == null) {
-        auditMessage = "processRequest returned null, this should not happen";
-        LOG.error(auditMessage);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.setContentLength(0);
-
-        auditLevel = AuditLevel.ERROR;
-        auditStatus = AuditStatus.FAILED;
-      } else {
-        OCSPResp resp = ocspRespWithCacheInfo.getResponse();
-        byte[] encodedOcspResp = null;
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
-        if (getMethod && cacheInfo != null) {
-          encodedOcspResp = resp.getEncoded();
-          long now = System.currentTimeMillis();
-          // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
-          // the HTTP response.
-          response.setDateHeader("Date", now);
-          // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
-          // last modified the response.
-          response.setDateHeader("Last-Modified", cacheInfo.getThisUpdate());
-          // RFC 5019 6.2: Expires: This date and time will be the same as the
-          // nextUpdate time-stamp in the OCSP
-          // response itself.
-          // This is overridden by max-age on HTTP/1.1 compatible components
-          if (cacheInfo.getNextUpdate() != null) {
-            response.setDateHeader("Expires", cacheInfo.getNextUpdate());
-          }
-          // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
-          // HEX representation of the SHA1 hash of the OCSPResponse structure.
-          response.setHeader("ETag",
-              new StringBuilder(42).append('\\')
-                .append(HashCalculator.hexSha1(encodedOcspResp))
-                .append('\\')
-              .toString());
-
-          // Max age must be in seconds in the cache-control header
-          long maxAge;
-          if (responder.getResponseOption().getCacheMaxAge() != null) {
-            maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
-          } else {
-            maxAge = OcspServer.defaultCacheMaxAge;
-          }
-
-          if (cacheInfo.getNextUpdate() != null) {
-            maxAge = Math.min(maxAge,
-                (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
-          }
-
-          response.setHeader("Cache-Control",
-              new StringBuilder(55).append("max-age=").append(maxAge)
-                .append(",public,no-transform,must-revalidate").toString());
-        } // end if (getMethod && cacheInfo != null)
-
-        if (encodedOcspResp != null) {
-          response.getOutputStream().write(encodedOcspResp);
+        Responder responder = r.getResponder();
+        if (responder.getRequestOption().supportsHttpGet()) {
+            processRequest(request, response, r, true);
         } else {
-          ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
-          asn1Out.writeObject(resp.toASN1Structure());
-          asn1Out.flush();
+            super.doGet(request, response);
         }
-      } // end if (ocspRespWithCacheInfo)
-    } catch (EOFException e) {
-      final String message = "Connection reset by peer";
-      if (LOG.isErrorEnabled()) {
-        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-            e.getMessage());
-      }
-      LOG.debug(message, e);
+    }
 
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
-    } catch (Throwable t) {
-      final String message = "Throwable thrown, this should not happen!";
-      LOG.error(message, t);
+    @Override
+    protected void doPost(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+        if (r == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
+        if (StringUtil.isNotBlank(r.getRelativeUri())) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
-      auditLevel = AuditLevel.ERROR;
-      auditStatus = AuditStatus.FAILED;
-      auditMessage = "internal error";
-    } finally {
-      try {
-        response.flushBuffer();
-      } finally {
-        if (auditEvent != null) {
-          if (auditLevel != null) {
-            auditEvent.setLevel(auditLevel);
-          }
+        processRequest(request, response, r, false);
+    }
 
-          if (auditStatus != null) {
-            auditEvent.setStatus(auditStatus);
-          }
+    private void processRequest(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final ResponderAndRelativeUri r,
+            final boolean getMethod)
+    throws ServletException, IOException {
+        Responder responder = r.getResponder();
+        AuditEvent auditEvent = null;
 
-          if (auditMessage != null) {
-            auditEvent.addEventData(new AuditEventData("message", auditMessage));
-          }
+        AuditLevel auditLevel = AuditLevel.INFO;
+        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
+        String auditMessage = null;
 
-          auditEvent.setDuration(System.currentTimeMillis() - start);
+        long start = 0;
 
-          if (!auditEvent.containsChildAuditEvents()) {
-            auditService.logEvent(auditEvent);
-          } else {
-            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for (AuditEvent event : expandedAuditEvents) {
-              auditService.logEvent(event);
+        AuditService auditService = (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
+
+        if (auditService != null && responder.getAuditOption() != null) {
+            start = System.currentTimeMillis();
+            auditEvent = new AuditEvent(new Date());
+            auditEvent.setApplicationName("OCSP");
+            auditEvent.setName("PERF");
+        }
+
+        try {
+            if (server == null) {
+                String message = "responder in servlet not configured";
+                LOG.error(message);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = message;
+                return;
             }
-          }
-        } // end if (auditEvent != null)
-      } // end inner try
-    } // end external try
-  } // method processRequest
 
-  public void setAuditServiceRegister(
-      final AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
-  }
+            InputStream requestStream;
+            if (getMethod) {
+                String relativeUri = r.getRelativeUri();
+
+                // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
+                // POST, we support GET for longer requests anyway.
+                if (relativeUri.length() > responder.getRequestOption().getMaxRequestSize()) {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "request too large";
+                    return;
+                }
+
+                requestStream = new ByteArrayInputStream(Base64.decode(relativeUri));
+            } else {
+                // accept only "application/ocsp-request" as content type
+                if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "unsupporte media type " + request.getContentType();
+                    return;
+                }
+
+                // request too long
+                if (request.getContentLength() > responder.getRequestOption().getMaxRequestSize()) {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "request too large";
+                    return;
+                } // if (CT_REQUEST)
+
+                requestStream = request.getInputStream();
+            } // end if (getMethod)
+
+            OCSPRequest ocspRequest;
+            try {
+                ASN1StreamParser parser = new ASN1StreamParser(requestStream);
+                ocspRequest = OCSPRequest.getInstance(parser.readObject());
+            } catch (Exception e) {
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = "bad request";
+
+                final String message = "could not parse the request (OCSPRequest)";
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                            e.getMessage());
+                }
+                LOG.debug(message, e);
+
+                return;
+            }
+
+            OCSPReq ocspReq = new OCSPReq(ocspRequest);
+
+            response.setContentType(HttpOcspServlet.CT_RESPONSE);
+
+            OcspRespWithCacheInfo ocspRespWithCacheInfo =
+                    server.answer(responder, ocspReq, auditEvent, getMethod);
+            if (ocspRespWithCacheInfo == null) {
+                auditMessage = "processRequest returned null, this should not happen";
+                LOG.error(auditMessage);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+            } else {
+                OCSPResp resp = ocspRespWithCacheInfo.getResponse();
+                byte[] encodedOcspResp = null;
+                response.setStatus(HttpServletResponse.SC_OK);
+
+                ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
+                if (getMethod && cacheInfo != null) {
+                    encodedOcspResp = resp.getEncoded();
+                    long now = System.currentTimeMillis();
+                    // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
+                    // the HTTP response.
+                    response.setDateHeader("Date", now);
+                    // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
+                    // last modified the response.
+                    response.setDateHeader("Last-Modified", cacheInfo.getThisUpdate());
+                    // RFC 5019 6.2: Expires: This date and time will be the same as the
+                    // nextUpdate time-stamp in the OCSP
+                    // response itself.
+                    // This is overridden by max-age on HTTP/1.1 compatible components
+                    if (cacheInfo.getNextUpdate() != null) {
+                        response.setDateHeader("Expires", cacheInfo.getNextUpdate());
+                    }
+                    // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
+                    // HEX representation of the SHA1 hash of the OCSPResponse structure.
+                    response.setHeader("ETag",
+                            new StringBuilder(42).append('\\')
+                                .append(HashCalculator.hexSha1(encodedOcspResp))
+                                .append('\\')
+                            .toString());
+
+                    // Max age must be in seconds in the cache-control header
+                    long maxAge;
+                    if (responder.getResponseOption().getCacheMaxAge() != null) {
+                        maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
+                    } else {
+                        maxAge = OcspServer.defaultCacheMaxAge;
+                    }
+
+                    if (cacheInfo.getNextUpdate() != null) {
+                        maxAge = Math.min(maxAge,
+                                (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
+                    }
+
+                    response.setHeader("Cache-Control",
+                            new StringBuilder(55).append("max-age=").append(maxAge)
+                                .append(",public,no-transform,must-revalidate").toString());
+                } // end if (getMethod && cacheInfo != null)
+
+                if (encodedOcspResp != null) {
+                    response.getOutputStream().write(encodedOcspResp);
+                } else {
+                    ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
+                    asn1Out.writeObject(resp.toASN1Structure());
+                    asn1Out.flush();
+                }
+            } // end if (ocspRespWithCacheInfo)
+        } catch (EOFException e) {
+            final String message = "Connection reset by peer";
+            if (LOG.isErrorEnabled()) {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        } catch (Throwable t) {
+            final String message = "Throwable thrown, this should not happen!";
+            LOG.error(message, t);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+
+            auditLevel = AuditLevel.ERROR;
+            auditStatus = AuditStatus.FAILED;
+            auditMessage = "internal error";
+        } finally {
+            try {
+                response.flushBuffer();
+            } finally {
+                if (auditEvent != null) {
+                    if (auditLevel != null) {
+                        auditEvent.setLevel(auditLevel);
+                    }
+
+                    if (auditStatus != null) {
+                        auditEvent.setStatus(auditStatus);
+                    }
+
+                    if (auditMessage != null) {
+                        auditEvent.addEventData(new AuditEventData("message", auditMessage));
+                    }
+
+                    auditEvent.setDuration(System.currentTimeMillis() - start);
+
+                    if (!auditEvent.containsChildAuditEvents()) {
+                        auditService.logEvent(auditEvent);
+                    } else {
+                        List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+                        for (AuditEvent event : expandedAuditEvents) {
+                            auditService.logEvent(event);
+                        }
+                    }
+                } // end if (auditEvent != null)
+            } // end inner try
+        } // end external try
+    } // method processRequest
+
+    public void setAuditServiceRegister(
+            final AuditServiceRegister auditServiceRegister) {
+        this.auditServiceRegister = auditServiceRegister;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,37 +49,37 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
  */
 
 @Command(scope = "xipki-ca", name = "requestor-add",
-    description = "add requestor")
+        description = "add requestor")
 @Service
 public class RequestorAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "requestor name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "requestor name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--cert",
-      required = true,
-      description = "requestor certificate file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            required = true,
+            description = "requestor certificate file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-    CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
+        CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
 
-    boolean b;
-    if (entry.getCert() == null) {
-      b = false;
-    } else {
-      b = caManager.addCmpRequestor(entry);
+        boolean b;
+        if (entry.getCert() == null) {
+            b = false;
+        } else {
+            b = caManager.addCmpRequestor(entry);
+        }
+        output(b, "added", "could not add", "CMP requestor " + name);
+        return null;
     }
-    output(b, "added", "could not add", "CMP requestor " + name);
-    return null;
-  }
 
 }

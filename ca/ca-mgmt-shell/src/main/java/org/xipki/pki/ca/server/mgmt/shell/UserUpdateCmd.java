@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,33 +45,33 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "user-up",
-    description = "update user")
+        description = "update user")
 @Service
 public class UserUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "user Name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "user Name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--password",
-      description = "user password, 'NULL' for empty password, 'C' to read from console")
-  private String password;
+    @Option(name = "--password",
+            description = "user password, 'NULL' for empty password, 'C' to read from console")
+    private String password;
 
-  @Option(name = "--cn-regex",
-      description = "regex for the permitted common name, 'NULL' for empty password")
-  private String cnRegex;
+    @Option(name = "--cn-regex",
+            description = "regex for the permitted common name, 'NULL' for empty password")
+    private String cnRegex;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if ("CONSOLE".equalsIgnoreCase(password)) {
-      password = new String(readPassword());
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if ("CONSOLE".equalsIgnoreCase(password)) {
+            password = new String(readPassword());
+        }
+        boolean b = caManager.changeUser(name, password, cnRegex);
+        output(b, "added", "could not add", "user " + name);
+        return null;
     }
-    boolean b = caManager.changeUser(name, password, cnRegex);
-    output(b, "added", "could not add", "user " + name);
-    return null;
-  }
 
 }

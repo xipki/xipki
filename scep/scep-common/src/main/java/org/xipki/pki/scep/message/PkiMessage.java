@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -91,312 +91,312 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class PkiMessage {
 
-  private static final Set<ASN1ObjectIdentifier> scepAttrTypes
-      = new HashSet<ASN1ObjectIdentifier>();
+    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+            = new HashSet<ASN1ObjectIdentifier>();
 
-  private final MessageType messageType;
+    private final MessageType messageType;
 
-  private final Nonce senderNonce;
+    private final Nonce senderNonce;
 
-  private final TransactionId transactionId;
+    private final TransactionId transactionId;
 
-  private Nonce recipientNonce;
+    private Nonce recipientNonce;
 
-  private PkiStatus pkiStatus;
+    private PkiStatus pkiStatus;
 
-  private FailInfo failInfo;
+    private FailInfo failInfo;
 
-  private ASN1Encodable messageData;
+    private ASN1Encodable messageData;
 
-  private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
-      new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+    private final Map<ASN1ObjectIdentifier, ASN1Encodable> signedAttributes =
+            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
-  private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
-      new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
+    private final Map<ASN1ObjectIdentifier, ASN1Encodable> unsignedAttributes =
+            new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
-  static {
-    scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
-    scepAttrTypes.add(ScepObjectIdentifiers.id_messageType);
-    scepAttrTypes.add(ScepObjectIdentifiers.id_pkiStatus);
-    scepAttrTypes.add(ScepObjectIdentifiers.id_recipientNonce);
-    scepAttrTypes.add(ScepObjectIdentifiers.id_senderNonce);
-    scepAttrTypes.add(ScepObjectIdentifiers.id_transactionID);
-    scepAttrTypes.add(CMSAttributes.signingTime);
-  }
-
-  public PkiMessage(
-      final TransactionId transactionId,
-      final MessageType messageType) {
-    ParamUtil.assertNotNull("transactionId", transactionId);
-    ParamUtil.assertNotNull("messageType", messageType);
-
-    this.transactionId = transactionId;
-    this.messageType = messageType;
-    this.senderNonce = Nonce.randomNonce();
-  }
-
-  public PkiMessage(
-      final TransactionId transactionId,
-      final MessageType messageType,
-      final Nonce senderNonce) {
-    ParamUtil.assertNotNull("transactionId", transactionId);
-    ParamUtil.assertNotNull("messageType", messageType);
-    ParamUtil.assertNotNull("senderNonce", senderNonce);
-
-    this.transactionId = transactionId;
-    this.messageType = messageType;
-    this.senderNonce = senderNonce;
-  }
-
-  public TransactionId getTransactionId() {
-    return transactionId;
-  }
-
-  public Nonce getSenderNonce() {
-    return senderNonce;
-  }
-
-  public final MessageType getMessageType() {
-    return messageType;
-  }
-
-  public Nonce getRecipientNonce() {
-    return recipientNonce;
-  }
-
-  public void setRecipientNonce(
-      final Nonce recipientNonce) {
-    this.recipientNonce = recipientNonce;
-  }
-
-  public PkiStatus getPkiStatus() {
-    return pkiStatus;
-  }
-
-  public void setPkiStatus(
-      final PkiStatus pkiStatus) {
-    this.pkiStatus = pkiStatus;
-  }
-
-  public FailInfo getFailInfo() {
-    return failInfo;
-  }
-
-  public void setFailInfo(
-      final FailInfo failInfo) {
-    this.failInfo = failInfo;
-  }
-
-  public ASN1Encodable getMessageData() {
-    return messageData;
-  }
-
-  public void setMessageData(
-      final ASN1Encodable messageData) {
-    this.messageData = messageData;
-  }
-
-  public ASN1Encodable addSignendAttribute(
-      final ASN1ObjectIdentifier type,
-      final ASN1Encodable value) {
-    if (scepAttrTypes.contains(type)) {
-      throw new IllegalArgumentException(
-          "Adding SCEP attribute via addSignedAttribute() method is not permitted");
-    }
-    return signedAttributes.put(type, value);
-  }
-
-  public ASN1Encodable addUnsignendAttribute(
-      final ASN1ObjectIdentifier type,
-      final ASN1Encodable value) {
-    return unsignedAttributes.put(type, value);
-  }
-
-  public ASN1Encodable removeSignedAttribute(
-      final ASN1ObjectIdentifier type) {
-    return signedAttributes.remove(type);
-  }
-
-  public ASN1Encodable removeUnsignedAttribute(
-      final ASN1ObjectIdentifier type) {
-    return unsignedAttributes.remove(type);
-  }
-
-  public ASN1Encodable getSignedAtrributeValue(
-      final ASN1ObjectIdentifier type) {
-    return signedAttributes.get(type);
-  }
-
-  public ASN1Encodable getUnsignedAtrributeValue(
-      final ASN1ObjectIdentifier type) {
-    return unsignedAttributes.get(type);
-  }
-
-  private AttributeTable getSignedAttributes() {
-    ASN1EncodableVector v = new ASN1EncodableVector();
-    // messageType
-    addAttribute(v, ScepObjectIdentifiers.id_messageType,
-        new DERPrintableString(
-            Integer.toString(messageType.getCode())));
-
-    // senderNonce
-    addAttribute(v, ScepObjectIdentifiers.id_senderNonce,
-        new DEROctetString(senderNonce.getBytes()));
-
-    // transactionID
-    addAttribute(v, ScepObjectIdentifiers.id_transactionID,
-        new DERPrintableString(transactionId.getId()));
-
-    // failInfo
-    if (failInfo != null) {
-      addAttribute(v, ScepObjectIdentifiers.id_failInfo,
-          new DERPrintableString(
-              Integer.toString(failInfo.getCode())));
+    static {
+        scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
+        scepAttrTypes.add(ScepObjectIdentifiers.id_messageType);
+        scepAttrTypes.add(ScepObjectIdentifiers.id_pkiStatus);
+        scepAttrTypes.add(ScepObjectIdentifiers.id_recipientNonce);
+        scepAttrTypes.add(ScepObjectIdentifiers.id_senderNonce);
+        scepAttrTypes.add(ScepObjectIdentifiers.id_transactionID);
+        scepAttrTypes.add(CMSAttributes.signingTime);
     }
 
-    // pkiStatus
-    if (pkiStatus != null) {
-      addAttribute(v, ScepObjectIdentifiers.id_pkiStatus,
-          new DERPrintableString(
-              Integer.toString(pkiStatus.getCode())));
+    public PkiMessage(
+            final TransactionId transactionId,
+            final MessageType messageType) {
+        ParamUtil.assertNotNull("transactionId", transactionId);
+        ParamUtil.assertNotNull("messageType", messageType);
+
+        this.transactionId = transactionId;
+        this.messageType = messageType;
+        this.senderNonce = Nonce.randomNonce();
     }
 
-    // recipientNonce
-    if (recipientNonce != null) {
-      addAttribute(v, ScepObjectIdentifiers.id_recipientNonce,
-          new DEROctetString(recipientNonce.getBytes()));
+    public PkiMessage(
+            final TransactionId transactionId,
+            final MessageType messageType,
+            final Nonce senderNonce) {
+        ParamUtil.assertNotNull("transactionId", transactionId);
+        ParamUtil.assertNotNull("messageType", messageType);
+        ParamUtil.assertNotNull("senderNonce", senderNonce);
+
+        this.transactionId = transactionId;
+        this.messageType = messageType;
+        this.senderNonce = senderNonce;
     }
 
-    for (ASN1ObjectIdentifier type : signedAttributes.keySet()) {
-      addAttribute(v, type, signedAttributes.get(type));
-    }
-    return new AttributeTable(v);
-  }
-
-  private AttributeTable getUnsignedAttributes() {
-    if (unsignedAttributes.isEmpty()) {
-      return null;
-    }
-    ASN1EncodableVector v = new ASN1EncodableVector();
-
-    for (ASN1ObjectIdentifier type : unsignedAttributes.keySet()) {
-      addAttribute(v, type, unsignedAttributes.get(type));
-    }
-    return new AttributeTable(v);
-  }
-
-  public ContentInfo encode(
-      final PrivateKey signerKey,
-      final String signatureAlgorithm,
-      final X509Certificate signerCert,
-      final X509Certificate[] signerCertSet,
-      final X509Certificate recipientCert,
-      final ASN1ObjectIdentifier encAlgId)
-  throws MessageEncodingException {
-    ContentSigner signer;
-    try {
-      signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
-    } catch (OperatorCreationException e) {
-      throw new MessageEncodingException(e);
-    }
-    return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
-  }
-
-  public ContentInfo encode(
-      final ContentSigner signer,
-      final X509Certificate signerCert,
-      final X509Certificate[] cmsCertSet,
-      final X509Certificate recipientCert,
-      final ASN1ObjectIdentifier encAlgId)
-  throws MessageEncodingException {
-    CMSTypedData content;
-    if (messageData == null) {
-      content = new CMSAbsentContent();
-    } else {
-      CMSEnvelopedData envelopedData = encrypt(recipientCert, encAlgId);
-      byte[] encoded;
-      try {
-        encoded = envelopedData.getEncoded();
-      } catch (IOException e) {
-        throw new MessageEncodingException(e);
-      }
-      content = new CMSProcessableByteArray(
-          CMSObjectIdentifiers.envelopedData, encoded);
+    public TransactionId getTransactionId() {
+        return transactionId;
     }
 
-    try {
-      CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
-
-      // signerInfo
-      JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
-          new BcDigestCalculatorProvider());
-
-      signerInfoBuilder.setSignedAttributeGenerator(
-          new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
-
-      AttributeTable attrTable = getUnsignedAttributes();
-      if (attrTable != null) {
-        signerInfoBuilder.setUnsignedAttributeGenerator(
-            new SimpleAttributeTableGenerator(attrTable));
-      }
-
-      // certificateSet
-      ScepUtil.addCmsCertSet(generator, cmsCertSet);
-
-      SignerInfoGenerator signerInfo;
-      try {
-        signerInfo = signerInfoBuilder.build(signer, signerCert);
-      } catch (Exception e) {
-        throw new MessageEncodingException(e);
-      }
-
-      generator.addSignerInfoGenerator(signerInfo);
-
-      CMSSignedData signedData = generator.generate(content, true);
-      return signedData.toASN1Structure();
-    } catch (CMSException e) {
-      throw new MessageEncodingException(e);
-    } catch (Exception e) {
-      throw new MessageEncodingException(e);
-    }
-  } // method encode
-
-  private CMSEnvelopedData encrypt(
-      final X509Certificate recipient,
-      final ASN1ObjectIdentifier encAlgId)
-  throws MessageEncodingException {
-    byte[] messageDataBytes;
-    try {
-      messageDataBytes = messageData.toASN1Primitive().getEncoded();
-    } catch (IOException e) {
-      throw new MessageEncodingException(e);
+    public Nonce getSenderNonce() {
+        return senderNonce;
     }
 
-    CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
-    CMSTypedData envelopable = new CMSProcessableByteArray(messageDataBytes);
-    RecipientInfoGenerator recipientGenerator;
-    try {
-      recipientGenerator = new JceKeyTransRecipientInfoGenerator(recipient);
-    } catch (CertificateEncodingException e) {
-      throw new MessageEncodingException(e);
+    public final MessageType getMessageType() {
+        return messageType;
     }
-    edGenerator.addRecipientInfoGenerator(recipientGenerator);
-    try {
 
-      OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(encAlgId).build();
-
-      CMSEnvelopedData pkcsPkiEnvelope = edGenerator.generate(envelopable, encryptor);
-      return pkcsPkiEnvelope;
-    } catch (CMSException e) {
-      throw new MessageEncodingException(e);
+    public Nonce getRecipientNonce() {
+        return recipientNonce;
     }
-  }
 
-  private static void addAttribute(
-      final ASN1EncodableVector v,
-      final ASN1ObjectIdentifier attrType,
-      final ASN1Encodable attrValue) {
-    v.add(new Attribute(attrType, new DERSet(attrValue)));
-  }
+    public void setRecipientNonce(
+            final Nonce recipientNonce) {
+        this.recipientNonce = recipientNonce;
+    }
+
+    public PkiStatus getPkiStatus() {
+        return pkiStatus;
+    }
+
+    public void setPkiStatus(
+            final PkiStatus pkiStatus) {
+        this.pkiStatus = pkiStatus;
+    }
+
+    public FailInfo getFailInfo() {
+        return failInfo;
+    }
+
+    public void setFailInfo(
+            final FailInfo failInfo) {
+        this.failInfo = failInfo;
+    }
+
+    public ASN1Encodable getMessageData() {
+        return messageData;
+    }
+
+    public void setMessageData(
+            final ASN1Encodable messageData) {
+        this.messageData = messageData;
+    }
+
+    public ASN1Encodable addSignendAttribute(
+            final ASN1ObjectIdentifier type,
+            final ASN1Encodable value) {
+        if (scepAttrTypes.contains(type)) {
+            throw new IllegalArgumentException(
+                    "Adding SCEP attribute via addSignedAttribute() method is not permitted");
+        }
+        return signedAttributes.put(type, value);
+    }
+
+    public ASN1Encodable addUnsignendAttribute(
+            final ASN1ObjectIdentifier type,
+            final ASN1Encodable value) {
+        return unsignedAttributes.put(type, value);
+    }
+
+    public ASN1Encodable removeSignedAttribute(
+            final ASN1ObjectIdentifier type) {
+        return signedAttributes.remove(type);
+    }
+
+    public ASN1Encodable removeUnsignedAttribute(
+            final ASN1ObjectIdentifier type) {
+        return unsignedAttributes.remove(type);
+    }
+
+    public ASN1Encodable getSignedAtrributeValue(
+            final ASN1ObjectIdentifier type) {
+        return signedAttributes.get(type);
+    }
+
+    public ASN1Encodable getUnsignedAtrributeValue(
+            final ASN1ObjectIdentifier type) {
+        return unsignedAttributes.get(type);
+    }
+
+    private AttributeTable getSignedAttributes() {
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        // messageType
+        addAttribute(v, ScepObjectIdentifiers.id_messageType,
+                new DERPrintableString(
+                        Integer.toString(messageType.getCode())));
+
+        // senderNonce
+        addAttribute(v, ScepObjectIdentifiers.id_senderNonce,
+                new DEROctetString(senderNonce.getBytes()));
+
+        // transactionID
+        addAttribute(v, ScepObjectIdentifiers.id_transactionID,
+                new DERPrintableString(transactionId.getId()));
+
+        // failInfo
+        if (failInfo != null) {
+            addAttribute(v, ScepObjectIdentifiers.id_failInfo,
+                    new DERPrintableString(
+                            Integer.toString(failInfo.getCode())));
+        }
+
+        // pkiStatus
+        if (pkiStatus != null) {
+            addAttribute(v, ScepObjectIdentifiers.id_pkiStatus,
+                    new DERPrintableString(
+                            Integer.toString(pkiStatus.getCode())));
+        }
+
+        // recipientNonce
+        if (recipientNonce != null) {
+            addAttribute(v, ScepObjectIdentifiers.id_recipientNonce,
+                    new DEROctetString(recipientNonce.getBytes()));
+        }
+
+        for (ASN1ObjectIdentifier type : signedAttributes.keySet()) {
+            addAttribute(v, type, signedAttributes.get(type));
+        }
+        return new AttributeTable(v);
+    }
+
+    private AttributeTable getUnsignedAttributes() {
+        if (unsignedAttributes.isEmpty()) {
+            return null;
+        }
+        ASN1EncodableVector v = new ASN1EncodableVector();
+
+        for (ASN1ObjectIdentifier type : unsignedAttributes.keySet()) {
+            addAttribute(v, type, unsignedAttributes.get(type));
+        }
+        return new AttributeTable(v);
+    }
+
+    public ContentInfo encode(
+            final PrivateKey signerKey,
+            final String signatureAlgorithm,
+            final X509Certificate signerCert,
+            final X509Certificate[] signerCertSet,
+            final X509Certificate recipientCert,
+            final ASN1ObjectIdentifier encAlgId)
+    throws MessageEncodingException {
+        ContentSigner signer;
+        try {
+            signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
+        } catch (OperatorCreationException e) {
+            throw new MessageEncodingException(e);
+        }
+        return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
+    }
+
+    public ContentInfo encode(
+            final ContentSigner signer,
+            final X509Certificate signerCert,
+            final X509Certificate[] cmsCertSet,
+            final X509Certificate recipientCert,
+            final ASN1ObjectIdentifier encAlgId)
+    throws MessageEncodingException {
+        CMSTypedData content;
+        if (messageData == null) {
+            content = new CMSAbsentContent();
+        } else {
+            CMSEnvelopedData envelopedData = encrypt(recipientCert, encAlgId);
+            byte[] encoded;
+            try {
+                encoded = envelopedData.getEncoded();
+            } catch (IOException e) {
+                throw new MessageEncodingException(e);
+            }
+            content = new CMSProcessableByteArray(
+                    CMSObjectIdentifiers.envelopedData, encoded);
+        }
+
+        try {
+            CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+
+            // signerInfo
+            JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
+                    new BcDigestCalculatorProvider());
+
+            signerInfoBuilder.setSignedAttributeGenerator(
+                    new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
+
+            AttributeTable attrTable = getUnsignedAttributes();
+            if (attrTable != null) {
+                signerInfoBuilder.setUnsignedAttributeGenerator(
+                        new SimpleAttributeTableGenerator(attrTable));
+            }
+
+            // certificateSet
+            ScepUtil.addCmsCertSet(generator, cmsCertSet);
+
+            SignerInfoGenerator signerInfo;
+            try {
+                signerInfo = signerInfoBuilder.build(signer, signerCert);
+            } catch (Exception e) {
+                throw new MessageEncodingException(e);
+            }
+
+            generator.addSignerInfoGenerator(signerInfo);
+
+            CMSSignedData signedData = generator.generate(content, true);
+            return signedData.toASN1Structure();
+        } catch (CMSException e) {
+            throw new MessageEncodingException(e);
+        } catch (Exception e) {
+            throw new MessageEncodingException(e);
+        }
+    } // method encode
+
+    private CMSEnvelopedData encrypt(
+            final X509Certificate recipient,
+            final ASN1ObjectIdentifier encAlgId)
+    throws MessageEncodingException {
+        byte[] messageDataBytes;
+        try {
+            messageDataBytes = messageData.toASN1Primitive().getEncoded();
+        } catch (IOException e) {
+            throw new MessageEncodingException(e);
+        }
+
+        CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
+        CMSTypedData envelopable = new CMSProcessableByteArray(messageDataBytes);
+        RecipientInfoGenerator recipientGenerator;
+        try {
+            recipientGenerator = new JceKeyTransRecipientInfoGenerator(recipient);
+        } catch (CertificateEncodingException e) {
+            throw new MessageEncodingException(e);
+        }
+        edGenerator.addRecipientInfoGenerator(recipientGenerator);
+        try {
+
+            OutputEncryptor encryptor = new JceCMSContentEncryptorBuilder(encAlgId).build();
+
+            CMSEnvelopedData pkcsPkiEnvelope = edGenerator.generate(envelopable, encryptor);
+            return pkcsPkiEnvelope;
+        } catch (CMSException e) {
+            throw new MessageEncodingException(e);
+        }
+    }
+
+    private static void addAttribute(
+            final ASN1EncodableVector v,
+            final ASN1ObjectIdentifier attrType,
+            final ASN1Encodable attrValue) {
+        v.add(new Attribute(attrType, new DERSet(attrValue)));
+    }
 
 }

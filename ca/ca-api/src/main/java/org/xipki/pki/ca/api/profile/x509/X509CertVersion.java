@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,29 +42,29 @@ package org.xipki.pki.ca.api.profile.x509;
 
 public enum X509CertVersion {
 
-  V1(1),
-  V2(2),
-  V3(3);
+    V1(1),
+    V2(2),
+    V3(3);
 
-  private int version;
+    private int version;
 
-  private X509CertVersion(
-      final int version) {
-    this.version = version;
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public static X509CertVersion getInstance(
-      final int version) {
-    for (X509CertVersion m : values()) {
-      if (m.version == version) {
-        return m;
-      }
+    private X509CertVersion(
+            final int version) {
+        this.version = version;
     }
-    return null;
-  }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public static X509CertVersion getInstance(
+            final int version) {
+        for (X509CertVersion m : values()) {
+            if (m.version == version) {
+                return m;
+            }
+        }
+        return null;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,9 +45,9 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 public class Pkcs12_SHA256withRSA_Test extends Pkcs12_RSA_Test {
 
-  @Override
-  protected ASN1ObjectIdentifier getSignatureAlgorithm() {
-    return PKCSObjectIdentifiers.sha256WithRSAEncryption;
-  }
+    @Override
+    protected ASN1ObjectIdentifier getSignatureAlgorithm() {
+        return PKCSObjectIdentifiers.sha256WithRSAEncryption;
+    }
 
 }

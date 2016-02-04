@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,52 +48,52 @@ import org.xipki.commons.security.api.SignerException;
 
 public class P11PlainRSASigner implements AsymmetricBlockCipher {
 
-  private P11RSAKeyParameter param;
+    private P11RSAKeyParameter param;
 
-  public P11PlainRSASigner() {
-  }
-
-  @Override
-  public void init(
-      final boolean forEncryption,
-      final CipherParameters param) {
-    if (!forEncryption) {
-      throw new RuntimeCryptoException("verification mode not supported.");
+    public P11PlainRSASigner() {
     }
 
-    if (!(param instanceof P11RSAKeyParameter)) {
-      throw new IllegalArgumentException("invalid param type "  + param.getClass().getName());
+    @Override
+    public void init(
+            final boolean forEncryption,
+            final CipherParameters param) {
+        if (!forEncryption) {
+            throw new RuntimeCryptoException("verification mode not supported.");
+        }
+
+        if (!(param instanceof P11RSAKeyParameter)) {
+            throw new IllegalArgumentException("invalid param type " + param.getClass().getName());
+        }
+        this.param = (P11RSAKeyParameter) param;
     }
-    this.param = (P11RSAKeyParameter) param;
-  }
 
-  @Override
-  public int getInputBlockSize() {
-    return (param.getKeysize() + 7) / 8;
-  }
-
-  @Override
-  public int getOutputBlockSize() {
-    return (param.getKeysize() + 7) / 8;
-  }
-
-  @Override
-  public byte[] processBlock(
-      final byte[] in,
-      final int inOff,
-      final int len)
-  throws InvalidCipherTextException {
-    byte[] content = new byte[getInputBlockSize()];
-    System.arraycopy(in, inOff, content, content.length - len, len);
-
-    try {
-      return param.getP11CryptService().CKM_RSA_X509(
-          content,
-          param.getSlot(),
-          param.getKeyId());
-    } catch (SignerException e) {
-      throw new InvalidCipherTextException(e.getMessage(), e);
+    @Override
+    public int getInputBlockSize() {
+        return (param.getKeysize() + 7) / 8;
     }
-  }
+
+    @Override
+    public int getOutputBlockSize() {
+        return (param.getKeysize() + 7) / 8;
+    }
+
+    @Override
+    public byte[] processBlock(
+            final byte[] in,
+            final int inOff,
+            final int len)
+    throws InvalidCipherTextException {
+        byte[] content = new byte[getInputBlockSize()];
+        System.arraycopy(in, inOff, content, content.length - len, len);
+
+        try {
+            return param.getP11CryptService().CKM_RSA_X509(
+                    content,
+                    param.getSlot(),
+                    param.getKeyId());
+        } catch (SignerException e) {
+            throw new InvalidCipherTextException(e.getMessage(), e);
+        }
+    }
 
 }

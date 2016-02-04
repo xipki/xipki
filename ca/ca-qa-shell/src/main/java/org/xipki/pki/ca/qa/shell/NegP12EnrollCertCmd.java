@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,34 +53,34 @@ import org.xipki.commons.security.api.SignerException;
  */
 
 @Command(scope = "xipki-qa", name = "neg-enroll-p12",
-    description = "enroll certificate (PKCS#12 keystore, negative, for QA)")
+        description = "enroll certificate (PKCS#12 keystore, negative, for QA)")
 @Service
 public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
 
-  @Option(name = "--p12",
-      required = true,
-      description = "PKCS#12 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p12File;
+    @Option(name = "--p12",
+            required = true,
+            description = "PKCS#12 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
-  private String password;
+    @Option(name = "--password",
+            description = "password of the PKCS#12 file")
+    private String password;
 
-  @Override
-  protected ConcurrentContentSigner getSigner(
-      final String hashAlgo,
-      final SignatureAlgoControl signatureAlgoControl)
-  throws SignerException {
-    if (password == null) {
-      password = new String(readPassword());
+    @Override
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl)
+    throws SignerException {
+        if (password == null) {
+            password = new String(readPassword());
+        }
+
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
+                p12File, password, 1);
+        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
+                signatureAlgoControl, (X509Certificate[]) null);
     }
-
-    String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-        p12File, password, 1);
-    return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
-        signatureAlgoControl, (X509Certificate[]) null);
-  }
 
 }

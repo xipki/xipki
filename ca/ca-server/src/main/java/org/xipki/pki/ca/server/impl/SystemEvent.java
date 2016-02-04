@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,32 +42,32 @@ package org.xipki.pki.ca.server.impl;
 
 class SystemEvent {
 
-  private final String name;
+    private final String name;
 
-  private final String owner;
+    private final String owner;
 
-  private final long eventTime;
+    private final long eventTime;
 
-  public SystemEvent(
-      final String name,
-      final String owner,
-      final long eventTime) {
-    super();
-    this.name = name;
-    this.owner = owner;
-    this.eventTime = eventTime;
-  }
+    public SystemEvent(
+            final String name,
+            final String owner,
+            final long eventTime) {
+        super();
+        this.name = name;
+        this.owner = owner;
+        this.eventTime = eventTime;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getOwner() {
-    return owner;
-  }
+    public String getOwner() {
+        return owner;
+    }
 
-  public long getEventTime() {
-    return eventTime;
-  }
+    public long getEventTime() {
+        return eventTime;
+    }
 
 }

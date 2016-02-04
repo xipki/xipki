@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,42 +51,42 @@ import org.xipki.commons.common.RequestResponseDebug;
 
 public interface OCSPRequestor {
 
-  ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
-      = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+    ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
+            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
 
-  ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
-      = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+    ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
+            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
-  OCSPResp ask(
-      X509Certificate issuerCert,
-      X509Certificate cert,
-      URL responderUrl,
-      RequestOptions requestOptions,
-      RequestResponseDebug debug)
-  throws OCSPResponseException, OCSPRequestorException;
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            X509Certificate cert,
+            URL responderUrl,
+            RequestOptions requestOptions,
+            RequestResponseDebug debug)
+    throws OCSPResponseException, OCSPRequestorException;
 
-  OCSPResp ask(
-      X509Certificate issuerCert,
-      X509Certificate[] certs,
-      URL responderUrl,
-      RequestOptions requestOptions,
-      RequestResponseDebug debug)
-  throws OCSPResponseException, OCSPRequestorException;
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            X509Certificate[] certs,
+            URL responderUrl,
+            RequestOptions requestOptions,
+            RequestResponseDebug debug)
+    throws OCSPResponseException, OCSPRequestorException;
 
-  OCSPResp ask(
-      X509Certificate issuerCert,
-      BigInteger serialNumber,
-      URL responderUrl,
-      RequestOptions requestOptions,
-      RequestResponseDebug debug)
-  throws OCSPResponseException, OCSPRequestorException;
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            BigInteger serialNumber,
+            URL responderUrl,
+            RequestOptions requestOptions,
+            RequestResponseDebug debug)
+    throws OCSPResponseException, OCSPRequestorException;
 
-  OCSPResp ask(
-      X509Certificate issuerCert,
-      BigInteger[] serialNumbers,
-      URL responderUrl,
-      RequestOptions requestOptions,
-      RequestResponseDebug debug)
-  throws OCSPResponseException, OCSPRequestorException;
+    OCSPResp ask(
+            X509Certificate issuerCert,
+            BigInteger[] serialNumbers,
+            URL responderUrl,
+            RequestOptions requestOptions,
+            RequestResponseDebug debug)
+    throws OCSPResponseException, OCSPRequestorException;
 
 }

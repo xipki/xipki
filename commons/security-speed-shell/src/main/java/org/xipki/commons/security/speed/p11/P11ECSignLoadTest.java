@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,26 +48,26 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public class P11ECSignLoadTest extends P11SignLoadTest {
 
-  public P11ECSignLoadTest(
-      final SecurityFactory securityFactory,
-      final P11WritableSlot slot,
-      final String signatureAlgorithm,
-      final String curveNameOrOid)
-  throws Exception {
-    super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, curveNameOrOid),
-        "PKCS#11 EC signature creation\n"
-            + "curve: " + curveNameOrOid);
-  }
+    public P11ECSignLoadTest(
+            final SecurityFactory securityFactory,
+            final P11WritableSlot slot,
+            final String signatureAlgorithm,
+            final String curveNameOrOid)
+    throws Exception {
+        super(securityFactory, slot, signatureAlgorithm,
+                generateKey(slot, curveNameOrOid),
+                "PKCS#11 EC signature creation\n"
+                        + "curve: " + curveNameOrOid);
+    }
 
-  private static P11KeyIdentifier generateKey(
-      final P11WritableSlot slot,
-      final String curveNameOrOid)
-  throws Exception {
-    ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-    P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
-        curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);
-    return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
-  }
+    private static P11KeyIdentifier generateKey(
+            final P11WritableSlot slot,
+            final String curveNameOrOid)
+    throws Exception {
+        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
+        P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
+                curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);
+        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+    }
 
 }

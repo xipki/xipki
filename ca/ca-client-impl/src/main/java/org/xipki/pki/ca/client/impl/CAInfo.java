@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,23 +47,23 @@ import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 class CAInfo {
 
-  private final X509Certificate cert;
+    private final X509Certificate cert;
 
-  private final Set<CertprofileInfo> certprofiles;
+    private final Set<CertprofileInfo> certprofiles;
 
-  CAInfo(
-      final X509Certificate cert,
-      final Set<CertprofileInfo> certprofiles) {
-    this.cert = cert;
-    this.certprofiles = certprofiles;
-  }
+    CAInfo(
+            final X509Certificate cert,
+            final Set<CertprofileInfo> certprofiles) {
+        this.cert = cert;
+        this.certprofiles = certprofiles;
+    }
 
-  X509Certificate getCert() {
-    return cert;
-  }
+    X509Certificate getCert() {
+        return cert;
+    }
 
-  Set<CertprofileInfo> getCertprofiles() {
-    return certprofiles;
-  }
+    Set<CertprofileInfo> getCertprofiles() {
+        return certprofiles;
+    }
 
 }

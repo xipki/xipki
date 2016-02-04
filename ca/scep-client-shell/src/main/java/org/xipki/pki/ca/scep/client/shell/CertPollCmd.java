@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -57,50 +57,50 @@ import org.xipki.pki.scep.client.ScepClient;
  */
 
 @Command(scope = "scep", name = "certpoll",
-    description = "poll certificate")
+        description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outputFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
 
-    ScepClient client = getScepClient();
-    X509Certificate caCert = client.getAuthorityCertStore().getCACert();
-    X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+        ScepClient client = getScepClient();
+        X509Certificate caCert = client.getAuthorityCertStore().getCACert();
+        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-    EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
-        csr, caSubject);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
+                csr, caSubject);
+        if (resp.isFailure()) {
+            throw new CmdFailure("server returned 'failure'");
+        }
+
+        if (resp.isPending()) {
+            throw new CmdFailure("server returned 'pending'");
+        }
+
+        List<X509Certificate> certs = resp.getCertificates();
+        if (certs == null || certs.isEmpty()) {
+            throw new CmdFailure("received no certficate from server");
+        }
+
+        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+        return null;
     }
-
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
-    }
-
-    List<X509Certificate> certs = resp.getCertificates();
-    if (certs == null || certs.isEmpty()) {
-      throw new CmdFailure("received no certficate from server");
-    }
-
-    saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
-    return null;
-  }
 
 }

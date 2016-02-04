@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,107 +48,107 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class RdnControl {
 
-  private final int minOccurs;
+    private final int minOccurs;
 
-  private final int maxOccurs;
+    private final int maxOccurs;
 
-  private final ASN1ObjectIdentifier type;
+    private final ASN1ObjectIdentifier type;
 
-  private List<Pattern> patterns;
+    private List<Pattern> patterns;
 
-  private StringType stringType;
+    private StringType stringType;
 
-  private Range stringLengthRange;
+    private Range stringLengthRange;
 
-  private String prefix;
+    private String prefix;
 
-  private String suffix;
+    private String suffix;
 
-  private String group;
+    private String group;
 
-  public RdnControl(
-      final ASN1ObjectIdentifier type) {
-    this(type, 1, 1);
-  }
-
-  public RdnControl(
-      final ASN1ObjectIdentifier type,
-      final int minOccurs,
-      final int maxOccurs) {
-    ParamUtil.assertNotNull("type", type);
-    if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
-      throw new IllegalArgumentException(
-          String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
+    public RdnControl(
+            final ASN1ObjectIdentifier type) {
+        this(type, 1, 1);
     }
-    this.type = type;
-    this.minOccurs = minOccurs;
-    this.maxOccurs = maxOccurs;
-  }
 
-  public int getMinOccurs() {
-    return minOccurs;
-  }
+    public RdnControl(
+            final ASN1ObjectIdentifier type,
+            final int minOccurs,
+            final int maxOccurs) {
+        ParamUtil.assertNotNull("type", type);
+        if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
+            throw new IllegalArgumentException(
+                    String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
+        }
+        this.type = type;
+        this.minOccurs = minOccurs;
+        this.maxOccurs = maxOccurs;
+    }
 
-  public int getMaxOccurs() {
-    return maxOccurs;
-  }
+    public int getMinOccurs() {
+        return minOccurs;
+    }
 
-  public ASN1ObjectIdentifier getType() {
-    return type;
-  }
+    public int getMaxOccurs() {
+        return maxOccurs;
+    }
 
-  public StringType getStringType() {
-    return stringType;
-  }
+    public ASN1ObjectIdentifier getType() {
+        return type;
+    }
 
-  public List<Pattern> getPatterns() {
-    return patterns;
-  }
+    public StringType getStringType() {
+        return stringType;
+    }
 
-  public Range getStringLengthRange() {
-    return stringLengthRange;
-  }
+    public List<Pattern> getPatterns() {
+        return patterns;
+    }
 
-  public void setStringType(
-      final StringType stringType) {
-    this.stringType = stringType;
-  }
+    public Range getStringLengthRange() {
+        return stringLengthRange;
+    }
 
-  public void setStringLengthRange(
-      final Range stringLengthRange) {
-    this.stringLengthRange = stringLengthRange;
-  }
+    public void setStringType(
+            final StringType stringType) {
+        this.stringType = stringType;
+    }
 
-  public void setPatterns(
-      final List<Pattern> patterns) {
-    this.patterns = patterns;
-  }
+    public void setStringLengthRange(
+            final Range stringLengthRange) {
+        this.stringLengthRange = stringLengthRange;
+    }
 
-  public String getPrefix() {
-    return prefix;
-  }
+    public void setPatterns(
+            final List<Pattern> patterns) {
+        this.patterns = patterns;
+    }
 
-  public void setPrefix(
-      final String prefix) {
-    this.prefix = prefix;
-  }
+    public String getPrefix() {
+        return prefix;
+    }
 
-  public String getSuffix() {
-    return suffix;
-  }
+    public void setPrefix(
+            final String prefix) {
+        this.prefix = prefix;
+    }
 
-  public void setSuffix(
-      final String suffix) {
-    this.suffix = suffix;
-  }
+    public String getSuffix() {
+        return suffix;
+    }
 
-  public String getGroup() {
-    return group;
-  }
+    public void setSuffix(
+            final String suffix) {
+        this.suffix = suffix;
+    }
 
-  public void setGroup(
-      final String group) {
-    this.group = group;
-  }
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(
+            final String group) {
+        this.group = group;
+    }
 
 }

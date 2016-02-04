@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,124 +52,124 @@ import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 
 public class CaEntry {
 
-  public static final String FILENAME_OVERVIEW = "overview.properties";
+    public static final String FILENAME_OVERVIEW = "overview.properties";
 
-  public static final String PROPKEY_ACCOUNT = "account";
+    public static final String PROPKEY_ACCOUNT = "account";
 
-  public static final String PROPKEY_ACCOUNT_REVOKED = "account-revoked";
+    public static final String PROPKEY_ACCOUNT_REVOKED = "account-revoked";
 
-  public static final int DFLT_NUM_CERTS_IN_BUNDLE = 100000;
+    public static final int DFLT_NUM_CERTS_IN_BUNDLE = 100000;
 
-  public static final int STREAM_BUFFERSIZE = 1024 * 1024; // 1M
+    public static final int STREAM_BUFFERSIZE = 1024 * 1024; // 1M
 
-  private final int caId;
+    private final int caId;
 
-  private final FileOutputStream certsManifestOs;
+    private final FileOutputStream certsManifestOs;
 
-  private final File caDir;
+    private final File caDir;
 
-  private final File certsDir;
+    private final File certsDir;
 
-  private int numProcessed;
+    private int numProcessed;
 
-  private int numProcessedRevoked;
+    private int numProcessedRevoked;
 
-  private File csvFile;
+    private File csvFile;
 
-  private BufferedOutputStream csvOutputStream;
+    private BufferedOutputStream csvOutputStream;
 
-  private int minIdInCsvFile;
+    private int minIdInCsvFile;
 
-  private int maxIdInCsvFile;
+    private int maxIdInCsvFile;
 
-  private int numInCsvFile;
+    private int numInCsvFile;
 
-  public CaEntry(
-      final int caId,
-      final String caDir)
-  throws IOException {
-    ParamUtil.assertNotNull("caDir", caDir);
+    public CaEntry(
+            final int caId,
+            final String caDir)
+    throws IOException {
+        ParamUtil.assertNotNull("caDir", caDir);
 
-    this.caId = caId;
-    this.caDir = new File(caDir);
-    this.certsDir = new File(caDir, "certs");
-    this.certsDir.mkdirs();
+        this.caId = caId;
+        this.caDir = new File(caDir);
+        this.certsDir = new File(caDir, "certs");
+        this.certsDir.mkdirs();
 
-    this.certsManifestOs = new FileOutputStream(
-        new File(caDir, "certs-manifest"), true);
+        this.certsManifestOs = new FileOutputStream(
+                new File(caDir, "certs-manifest"), true);
 
-    createNewCsvFile();
-  }
-
-  public int getCaId() {
-    return caId;
-  }
-
-  public void addDigestEntry(
-      final int id,
-      final DbDigestEntry reportEntry)
-  throws IOException, InvalidDataObjectException {
-    if (minIdInCsvFile == 0) {
-      minIdInCsvFile = id;
-    } else if (minIdInCsvFile > id) {
-      minIdInCsvFile = id;
+        createNewCsvFile();
     }
 
-    if (maxIdInCsvFile == 0) {
-      maxIdInCsvFile = id;
-    } else if (maxIdInCsvFile < id) {
-      maxIdInCsvFile = id;
+    public int getCaId() {
+        return caId;
     }
-    numInCsvFile++;
 
-    csvOutputStream.write(reportEntry.getEncoded().getBytes());
-    csvOutputStream.write('\n');
+    public void addDigestEntry(
+            final int id,
+            final DbDigestEntry reportEntry)
+    throws IOException, InvalidDataObjectException {
+        if (minIdInCsvFile == 0) {
+            minIdInCsvFile = id;
+        } else if (minIdInCsvFile > id) {
+            minIdInCsvFile = id;
+        }
 
-    if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE) {
-      closeCurrentCsvFile();
-      numInCsvFile = 0;
-      minIdInCsvFile = 0;
-      maxIdInCsvFile = 0;
-      createNewCsvFile();
+        if (maxIdInCsvFile == 0) {
+            maxIdInCsvFile = id;
+        } else if (maxIdInCsvFile < id) {
+            maxIdInCsvFile = id;
+        }
+        numInCsvFile++;
+
+        csvOutputStream.write(reportEntry.getEncoded().getBytes());
+        csvOutputStream.write('\n');
+
+        if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE) {
+            closeCurrentCsvFile();
+            numInCsvFile = 0;
+            minIdInCsvFile = 0;
+            maxIdInCsvFile = 0;
+            createNewCsvFile();
+        }
+        numProcessed++;
+        if (reportEntry.isRevoked()) {
+            numProcessedRevoked++;
+        }
     }
-    numProcessed++;
-    if (reportEntry.isRevoked()) {
-      numProcessedRevoked++;
+
+    public void close()
+    throws IOException {
+        // write the account
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(PROPKEY_ACCOUNT)
+            .append("=").append(numProcessed).append("\n");
+        sb.append(PROPKEY_ACCOUNT_REVOKED)
+            .append("=").append(numProcessedRevoked).append("\n");
+        IoUtil.save(new File(caDir, FILENAME_OVERVIEW),
+                sb.toString().getBytes());
+
+        closeCurrentCsvFile();
+        IoUtil.closeStream(certsManifestOs);
     }
-  }
 
-  public void close()
-  throws IOException {
-    // write the account
-    StringBuilder sb = new StringBuilder(50);
-    sb.append(PROPKEY_ACCOUNT)
-      .append("=").append(numProcessed).append("\n");
-    sb.append(PROPKEY_ACCOUNT_REVOKED)
-      .append("=").append(numProcessedRevoked).append("\n");
-    IoUtil.save(new File(caDir, FILENAME_OVERVIEW),
-        sb.toString().getBytes());
+    private void closeCurrentCsvFile()
+    throws IOException {
+        csvOutputStream.close();
 
-    closeCurrentCsvFile();
-    IoUtil.closeStream(certsManifestOs);
-  }
+        String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile,
+                maxIdInCsvFile, Integer.MAX_VALUE);
+        csvFile.renameTo(new File(caDir, "certs" + File.separator + zipFilename));
+        certsManifestOs.write((zipFilename + "\n").getBytes());
+        certsManifestOs.flush();
+    }
 
-  private void closeCurrentCsvFile()
-  throws IOException {
-    csvOutputStream.close();
-
-    String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile,
-        maxIdInCsvFile, Integer.MAX_VALUE);
-    csvFile.renameTo(new File(caDir, "certs" + File.separator + zipFilename));
-    certsManifestOs.write((zipFilename + "\n").getBytes());
-    certsManifestOs.flush();
-  }
-
-  private void createNewCsvFile()
-  throws IOException {
-    this.csvFile = new File(caDir.getParentFile(),
-        "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
-    csvOutputStream = new BufferedOutputStream(
-        new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
-  }
+    private void createNewCsvFile()
+    throws IOException {
+        this.csvFile = new File(caDir.getParentFile(),
+                "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
+        csvOutputStream = new BufferedOutputStream(
+                new FileOutputStream(this.csvFile), STREAM_BUFFERSIZE);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,71 +47,71 @@ import org.xipki.commons.common.util.ParamUtil;
 
 class CertBasedIdentityStore {
 
-  private final String table;
+    private final String table;
 
-  private final List<CertBasedIdentityEntry> entries;
+    private final List<CertBasedIdentityEntry> entries;
 
-  CertBasedIdentityStore(
-      final String table,
-      final List<CertBasedIdentityEntry> entries) {
-    this.table = table;
-    this.entries = new ArrayList<>(entries.size());
+    CertBasedIdentityStore(
+            final String table,
+            final List<CertBasedIdentityEntry> entries) {
+        this.table = table;
+        this.entries = new ArrayList<>(entries.size());
 
-    for (CertBasedIdentityEntry entry : entries) {
-      addIdentityEntry(entry);
-    }
-  }
-
-  void addIdentityEntry(
-      final CertBasedIdentityEntry entry) {
-    ParamUtil.assertNotNull("entry", entry);
-
-    for (CertBasedIdentityEntry existingEntry : entries) {
-      if (existingEntry.getId() == entry.getId()) {
-        throw new IllegalArgumentException(
-          String.format("%s with the same id %d already available",
-            table, entry.getId()));
-      }
+        for (CertBasedIdentityEntry entry : entries) {
+            addIdentityEntry(entry);
+        }
     }
 
-    entries.add(entry);
-  }
+    void addIdentityEntry(
+            final CertBasedIdentityEntry entry) {
+        ParamUtil.assertNotNull("entry", entry);
 
-  Integer getCaIdForSubject(
-      final String subject) {
-    for (CertBasedIdentityEntry entry : entries) {
-      if (entry.getSubject().equals(subject)) {
-        return entry.getId();
-      }
+        for (CertBasedIdentityEntry existingEntry : entries) {
+            if (existingEntry.getId() == entry.getId()) {
+                throw new IllegalArgumentException(
+                    String.format("%s with the same id %d already available",
+                        table, entry.getId()));
+            }
+        }
+
+        entries.add(entry);
     }
 
-    return null;
-  }
+    Integer getCaIdForSubject(
+            final String subject) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.getSubject().equals(subject)) {
+                return entry.getId();
+            }
+        }
 
-  Integer getCaIdForSha1Fp(
-      final byte[] sha1Fp_cert) {
-    for (CertBasedIdentityEntry entry : entries) {
-      if (entry.matchSha1Fp(sha1Fp_cert)) {
-        return entry.getId();
-      }
+        return null;
     }
 
-    return null;
-  }
+    Integer getCaIdForSha1Fp(
+            final byte[] sha1Fp_cert) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.matchSha1Fp(sha1Fp_cert)) {
+                return entry.getId();
+            }
+        }
 
-  Integer getCaIdForCert(
-      final byte[] encodedCert) {
-    for (CertBasedIdentityEntry entry : entries) {
-      if (entry.matchCert(encodedCert)) {
-        return entry.getId();
-      }
+        return null;
     }
 
-    return null;
-  }
+    Integer getCaIdForCert(
+            final byte[] encodedCert) {
+        for (CertBasedIdentityEntry entry : entries) {
+            if (entry.matchCert(encodedCert)) {
+                return entry.getId();
+            }
+        }
 
-  String getTable() {
-    return table;
-  }
+        return null;
+    }
+
+    String getTable() {
+        return table;
+    }
 
 }

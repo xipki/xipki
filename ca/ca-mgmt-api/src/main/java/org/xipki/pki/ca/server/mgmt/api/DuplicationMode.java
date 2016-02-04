@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,51 +42,51 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 public enum DuplicationMode {
 
-  FORBIDDEN (1, "forbidden"),
-  FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
-  PERMITTED (3, "permitted");
+    FORBIDDEN (1, "forbidden"),
+    FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
+    PERMITTED (3, "permitted");
 
-  private final int mode;
+    private final int mode;
 
-  private final String description;
+    private final String description;
 
-  private DuplicationMode(
-      final int mode,
-      final String description) {
-    this.mode = mode;
-    this.description = description;
-  }
-
-  public int getMode() {
-    return mode;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public static DuplicationMode getInstance(
-      final String text) {
-    for (DuplicationMode value : values()) {
-      if (value.description.equalsIgnoreCase(text)
-          || value.name().equalsIgnoreCase(text)
-          || Integer.toString(value.mode).equalsIgnoreCase(text)) {
-        return value;
-      }
+    private DuplicationMode(
+            final int mode,
+            final String description) {
+        this.mode = mode;
+        this.description = description;
     }
 
-    return null;
-  }
-
-  public static DuplicationMode getInstance(
-      final int mode) {
-    for (DuplicationMode value : values()) {
-      if (mode == value.mode) {
-        return value;
-      }
+    public int getMode() {
+        return mode;
     }
 
-    return null;
-  }
+    public String getDescription() {
+        return description;
+    }
+
+    public static DuplicationMode getInstance(
+            final String text) {
+        for (DuplicationMode value : values()) {
+            if (value.description.equalsIgnoreCase(text)
+                    || value.name().equalsIgnoreCase(text)
+                    || Integer.toString(value.mode).equalsIgnoreCase(text)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    public static DuplicationMode getInstance(
+            final int mode) {
+        for (DuplicationMode value : values()) {
+            if (mode == value.mode) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
 }

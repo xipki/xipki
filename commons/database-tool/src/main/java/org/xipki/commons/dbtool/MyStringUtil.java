@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,27 +42,27 @@ package org.xipki.commons.dbtool;
 
 class MyStringUtil {
 
-  private MyStringUtil() {
-  }
-
-  public static boolean isBlank(
-      final String s) {
-    return s == null || s.isEmpty();
-  }
-
-  public static boolean isNotBlank(
-      final String s) {
-    return s != null && !s.isEmpty();
-  }
-
-  public static boolean startsWithIgnoreCase(
-      final String s,
-      final String prefix) {
-    if (s.length() < prefix.length()) {
-      return false;
+    private MyStringUtil() {
     }
 
-    return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
-  }
+    public static boolean isBlank(
+            final String s) {
+        return s == null || s.isEmpty();
+    }
+
+    public static boolean isNotBlank(
+            final String s) {
+        return s != null && !s.isEmpty();
+    }
+
+    public static boolean startsWithIgnoreCase(
+            final String s,
+            final String prefix) {
+        if (s.length() < prefix.length()) {
+            return false;
+        }
+
+        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+    }
 
 }

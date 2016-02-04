@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -56,58 +56,58 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "ca-info",
-    description = "show information of CA")
+        description = "show information of CA")
 @Service
 public class CaInfoCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", description = "CA name")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Argument(index = 0, name = "name", description = "CA name")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show CA information verbosely")
-  private Boolean verbose = Boolean.FALSE;
+    @Option(name = "--verbose", aliases = "-v",
+            description = "show CA information verbosely")
+    private Boolean verbose = Boolean.FALSE;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    StringBuilder sb = new StringBuilder();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        StringBuilder sb = new StringBuilder();
 
-    if (caName == null) {
-      Set<String> names = caManager.getCaNames();
-      int n = names.size();
-      if (n == 0 || n == 1) {
-        sb.append((n == 0)
-            ? "no"
-            : "1");
-        sb.append(" CA is configured\n");
-      } else {
-        sb.append(n).append(" CAs are configured:\n");
-      }
+        if (caName == null) {
+            Set<String> names = caManager.getCaNames();
+            int n = names.size();
+            if (n == 0 || n == 1) {
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" CA is configured\n");
+            } else {
+                sb.append(n).append(" CAs are configured:\n");
+            }
 
-      List<String> sorted = new ArrayList<>(names);
-      Collections.sort(sorted);
-      for (String paramName : sorted) {
-        sb.append("\t").append(paramName);
-        Set<String> aliases = caManager.getAliasesForCA(paramName);
-        if (CollectionUtil.isNotEmpty(aliases)) {
-          sb.append(" (aliases: ").append(toString(aliases)).append(")");
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+            for (String paramName : sorted) {
+                sb.append("\t").append(paramName);
+                Set<String> aliases = caManager.getAliasesForCA(paramName);
+                if (CollectionUtil.isNotEmpty(aliases)) {
+                    sb.append(" (aliases: ").append(toString(aliases)).append(")");
+                }
+                sb.append("\n");
+            }
+        } else {
+            CAEntry entry = caManager.getCA(caName);
+            if (entry == null) {
+                throw new UnexpectedException("could not find CA '" + caName + "'");
+            } else {
+                Set<String> aliases = caManager.getAliasesForCA(caName);
+                sb.append("aliases: ").append(toString(aliases)).append("\n");
+                sb.append(entry.toString(verbose.booleanValue()));
+            }
         }
-        sb.append("\n");
-      }
-    } else {
-      CAEntry entry = caManager.getCA(caName);
-      if (entry == null) {
-        throw new UnexpectedException("could not find CA '" + caName + "'");
-      } else {
-        Set<String> aliases = caManager.getAliasesForCA(caName);
-        sb.append("aliases: ").append(toString(aliases)).append("\n");
-        sb.append(entry.toString(verbose.booleanValue()));
-      }
-    }
 
-    out(sb.toString());
-    return null;
-  } // method doExecute
+        out(sb.toString());
+        return null;
+    } // method doExecute
 
 }

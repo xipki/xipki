@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -59,53 +59,53 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "jscep", name = "certpoll",
-    description = "poll certificate")
+        description = "poll certificate")
 @Service
 public class CertPollCmd extends ClientCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outputFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 
-    Client client = getScepClient();
+        Client client = getScepClient();
 
-    TransactionId transId = TransactionId.createTransactionId(
-        CertificationRequestUtils.getPublicKey(csr), "SHA-1");
-    EnrollmentResponse resp = client.poll(getIdentityCert(),
-        getIdentityKey(),
-        new X500Principal(csr.getSubject().getEncoded()),
-        transId);
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+        TransactionId transId = TransactionId.createTransactionId(
+                CertificationRequestUtils.getPublicKey(csr), "SHA-1");
+        EnrollmentResponse resp = client.poll(getIdentityCert(),
+                getIdentityKey(),
+                new X500Principal(csr.getSubject().getEncoded()),
+                transId);
+        if (resp.isFailure()) {
+            throw new CmdFailure("server returned 'failure'");
+        }
+
+        if (resp.isPending()) {
+            throw new CmdFailure("server returned 'pending'");
+        }
+
+        X509Certificate cert = extractEECerts(resp.getCertStore());
+
+        if (cert == null) {
+            throw new Exception("received no certificate");
+        }
+
+        saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
+        return null;
     }
-
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
-    }
-
-    X509Certificate cert = extractEECerts(resp.getCertStore());
-
-    if (cert == null) {
-      throw new Exception("received no certificate");
-    }
-
-    saveVerbose("saved polled certificate to file", new File(outputFile), cert.getEncoded());
-    return null;
-  }
 
 }

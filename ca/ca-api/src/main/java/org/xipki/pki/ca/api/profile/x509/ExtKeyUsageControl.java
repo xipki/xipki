@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,24 +45,24 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ExtKeyUsageControl {
 
-  private final ASN1ObjectIdentifier extKeyUsage;
+    private final ASN1ObjectIdentifier extKeyUsage;
 
-  private final boolean required;
+    private final boolean required;
 
-  public ExtKeyUsageControl(
-      final ASN1ObjectIdentifier extKeyUsage,
-      final boolean required) {
-    ParamUtil.assertNotNull("extKeyUsage", extKeyUsage);
-    this.extKeyUsage = extKeyUsage;
-    this.required = required;
-  }
+    public ExtKeyUsageControl(
+            final ASN1ObjectIdentifier extKeyUsage,
+            final boolean required) {
+        ParamUtil.assertNotNull("extKeyUsage", extKeyUsage);
+        this.extKeyUsage = extKeyUsage;
+        this.required = required;
+    }
 
-  public ASN1ObjectIdentifier getExtKeyUsage() {
-    return extKeyUsage;
-  }
+    public ASN1ObjectIdentifier getExtKeyUsage() {
+        return extKeyUsage;
+    }
 
-  public boolean isRequired() {
-    return required;
-  }
+    public boolean isRequired() {
+        return required;
+    }
 
 }

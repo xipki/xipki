@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,72 +51,72 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
 public class CmpResponderEntryWrapper {
 
-  private CmpResponderEntry dbEntry;
+    private CmpResponderEntry dbEntry;
 
-  private ConcurrentContentSigner signer;
+    private ConcurrentContentSigner signer;
 
-  private X500Name subjectAsX500Name;
+    private X500Name subjectAsX500Name;
 
-  private GeneralName subjectAsGeneralName;
+    private GeneralName subjectAsGeneralName;
 
-  public CmpResponderEntryWrapper() {
-  }
-
-  public void setDbEntry(
-      final CmpResponderEntry dbEntry) {
-    this.dbEntry = dbEntry;
-    signer = null;
-    if (dbEntry.getCertificate() != null) {
-      subjectAsX500Name = X500Name.getInstance(
-          dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
-      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
-    }
-  }
-
-  public ConcurrentContentSigner getSigner() {
-    return signer;
-  }
-
-  public void initSigner(
-      final SecurityFactory securityFactory)
-  throws SignerException {
-    if (signer != null) {
-      return;
+    public CmpResponderEntryWrapper() {
     }
 
-    if (dbEntry == null) {
-      throw new SignerException("dbEntry is null");
+    public void setDbEntry(
+            final CmpResponderEntry dbEntry) {
+        this.dbEntry = dbEntry;
+        signer = null;
+        if (dbEntry.getCertificate() != null) {
+            subjectAsX500Name = X500Name.getInstance(
+                    dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
+            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+        }
     }
 
-    X509Certificate responderCert = dbEntry.getCertificate();
-    dbEntry.setConfFaulty(true);
-    signer = securityFactory.createSigner(
-        dbEntry.getType(), dbEntry.getConf(), responderCert);
-    dbEntry.setConfFaulty(false);
-    if (dbEntry.getBase64Cert() == null) {
-      dbEntry.setCertificate(signer.getCertificate());
-      subjectAsX500Name = X500Name.getInstance(
-          signer.getCertificateAsBCObject().getSubject());
-      subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+    public ConcurrentContentSigner getSigner() {
+        return signer;
     }
-  } // method initSigner
 
-  public CmpResponderEntry getDbEntry() {
-    return dbEntry;
-  }
+    public void initSigner(
+            final SecurityFactory securityFactory)
+    throws SignerException {
+        if (signer != null) {
+            return;
+        }
 
-  public boolean isHealthy() {
-    return (signer == null)
-        ? false
-        : signer.isHealthy();
-  }
+        if (dbEntry == null) {
+            throw new SignerException("dbEntry is null");
+        }
 
-  public GeneralName getSubjectAsGeneralName() {
-    return subjectAsGeneralName;
-  }
+        X509Certificate responderCert = dbEntry.getCertificate();
+        dbEntry.setConfFaulty(true);
+        signer = securityFactory.createSigner(
+                dbEntry.getType(), dbEntry.getConf(), responderCert);
+        dbEntry.setConfFaulty(false);
+        if (dbEntry.getBase64Cert() == null) {
+            dbEntry.setCertificate(signer.getCertificate());
+            subjectAsX500Name = X500Name.getInstance(
+                    signer.getCertificateAsBCObject().getSubject());
+            subjectAsGeneralName = new GeneralName(subjectAsX500Name);
+        }
+    } // method initSigner
 
-  public X500Name getSubjectAsX500Name() {
-    return subjectAsX500Name;
-  }
+    public CmpResponderEntry getDbEntry() {
+        return dbEntry;
+    }
+
+    public boolean isHealthy() {
+        return (signer == null)
+                ? false
+                : signer.isHealthy();
+    }
+
+    public GeneralName getSubjectAsGeneralName() {
+        return subjectAsGeneralName;
+    }
+
+    public X500Name getSubjectAsX500Name() {
+        return subjectAsX500Name;
+    }
 
 }

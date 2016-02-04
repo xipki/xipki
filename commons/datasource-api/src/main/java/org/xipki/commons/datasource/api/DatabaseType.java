@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,42 +42,42 @@ package org.xipki.commons.datasource.api;
 
 public enum DatabaseType {
 
-  H2,
-  DB2,
-  HSQL,
-  MYSQL,
-  ORACLE,
-  POSTGRES,
-  UNKNOWN;
+    H2,
+    DB2,
+    HSQL,
+    MYSQL,
+    ORACLE,
+    POSTGRES,
+    UNKNOWN;
 
-  public static DatabaseType getDataSourceForDriver(
-      final String driverClass) {
-    return getDatabaseType(driverClass);
-  }
-
-  public static DatabaseType getDataSourceForDataSource(
-      final String dataSourceClass) {
-    return getDatabaseType(dataSourceClass);
-  }
-
-  private static DatabaseType getDatabaseType(
-      final String className) {
-    if (className.contains("db2.")) {
-      return DatabaseType.DB2;
+    public static DatabaseType getDataSourceForDriver(
+            final String driverClass) {
+        return getDatabaseType(driverClass);
     }
-    if (className.contains("h2.")) {
-      return DatabaseType.H2;
-    } else if (className.contains("hsqldb.")) {
-      return DatabaseType.HSQL;
-    } else if (className.contains("mysql.")) {
-      return DatabaseType.MYSQL;
-    } else if (className.contains("oracle.")) {
-      return DatabaseType.ORACLE;
-    } else if (className.contains("postgres.") || className.contains("postgresql.")) {
-      return DatabaseType.POSTGRES;
-    } else {
-      return DatabaseType.UNKNOWN;
+
+    public static DatabaseType getDataSourceForDataSource(
+            final String dataSourceClass) {
+        return getDatabaseType(dataSourceClass);
     }
-  }
+
+    private static DatabaseType getDatabaseType(
+            final String className) {
+        if (className.contains("db2.")) {
+            return DatabaseType.DB2;
+        }
+        if (className.contains("h2.")) {
+            return DatabaseType.H2;
+        } else if (className.contains("hsqldb.")) {
+            return DatabaseType.HSQL;
+        } else if (className.contains("mysql.")) {
+            return DatabaseType.MYSQL;
+        } else if (className.contains("oracle.")) {
+            return DatabaseType.ORACLE;
+        } else if (className.contains("postgres.") || className.contains("postgresql.")) {
+            return DatabaseType.POSTGRES;
+        } else {
+            return DatabaseType.UNKNOWN;
+        }
+    }
 
 }

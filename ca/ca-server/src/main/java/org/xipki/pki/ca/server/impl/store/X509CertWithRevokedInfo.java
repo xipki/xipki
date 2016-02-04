@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,23 +44,23 @@ import org.xipki.pki.ca.api.X509CertWithDbId;
 
 public class X509CertWithRevokedInfo {
 
-  private final X509CertWithDbId cert;
+    private final X509CertWithDbId cert;
 
-  private final boolean revoked;
+    private final boolean revoked;
 
-  public X509CertWithRevokedInfo(
-      final X509CertWithDbId cert,
-      final boolean revoked) {
-    this.cert = cert;
-    this.revoked = revoked;
-  }
+    public X509CertWithRevokedInfo(
+            final X509CertWithDbId cert,
+            final boolean revoked) {
+        this.cert = cert;
+        this.revoked = revoked;
+    }
 
-  public X509CertWithDbId getCert() {
-    return cert;
-  }
+    public X509CertWithDbId getCert() {
+        return cert;
+    }
 
-  public boolean isRevoked() {
-    return revoked;
-  }
+    public boolean isRevoked() {
+        return revoked;
+    }
 
 }

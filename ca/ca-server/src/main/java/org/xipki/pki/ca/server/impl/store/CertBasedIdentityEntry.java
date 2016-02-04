@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,42 +46,42 @@ import org.bouncycastle.util.encoders.Base64;
 
 class CertBasedIdentityEntry {
 
-  private final int id;
+    private final int id;
 
-  private final String subject;
+    private final String subject;
 
-  private final byte[] sha1Fp;
+    private final byte[] sha1Fp;
 
-  private final byte[] cert;
+    private final byte[] cert;
 
-  CertBasedIdentityEntry(
-      final int id,
-      final String subject,
-      final String b64Sha1Fp,
-      final String b64Cert) {
-    super();
-    this.id = id;
-    this.subject = subject;
-    this.sha1Fp = Base64.decode(b64Sha1Fp);
-    this.cert = Base64.decode(b64Cert);
-  }
+    CertBasedIdentityEntry(
+            final int id,
+            final String subject,
+            final String b64Sha1Fp,
+            final String b64Cert) {
+        super();
+        this.id = id;
+        this.subject = subject;
+        this.sha1Fp = Base64.decode(b64Sha1Fp);
+        this.cert = Base64.decode(b64Cert);
+    }
 
-  int getId() {
-    return id;
-  }
+    int getId() {
+        return id;
+    }
 
-  String getSubject() {
-    return subject;
-  }
+    String getSubject() {
+        return subject;
+    }
 
-  boolean matchSha1Fp(
-      final byte[] sha1Fp) {
-    return Arrays.equals(this.sha1Fp, sha1Fp);
-  }
+    boolean matchSha1Fp(
+            final byte[] sha1Fp) {
+        return Arrays.equals(this.sha1Fp, sha1Fp);
+    }
 
-  boolean matchCert(
-      final byte[] encodedCert) {
-    return Arrays.equals(this.cert, encodedCert);
-  }
+    boolean matchCert(
+            final byte[] encodedCert) {
+        return Arrays.equals(this.cert, encodedCert);
+    }
 
 }

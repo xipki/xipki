@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,13 +42,13 @@ package org.xipki.pki.scep.util;
 
 public class ScepConstants {
 
-  public static final String CT_x_x509_next_ca_cert = "application/x-x509-next-ca-cert";
-  public static final String CT_x_x509_ca_cert = "application/x-x509-ca-cert";
-  public static final String CT_x_x509_ca_ra_cert = "application/x-x509-ca-ra-cert";
-  public static final String CT_x_pki_message = "application/x-pki-message";
-  public static final String CT_text_palin = "text/plain";
+    public static final String CT_x_x509_next_ca_cert = "application/x-x509-next-ca-cert";
+    public static final String CT_x_x509_ca_cert = "application/x-x509-ca-cert";
+    public static final String CT_x_x509_ca_ra_cert = "application/x-x509-ca-ra-cert";
+    public static final String CT_x_pki_message = "application/x-pki-message";
+    public static final String CT_text_palin = "text/plain";
 
-  private ScepConstants() {
-  }
+    private ScepConstants() {
+    }
 
 }

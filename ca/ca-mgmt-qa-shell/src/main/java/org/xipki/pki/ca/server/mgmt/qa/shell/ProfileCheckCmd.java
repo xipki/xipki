@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,41 +48,41 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "profile-check",
-    description = "check information of profiles (QA)")
+        description = "check information of profiles (QA)")
 @Service
 public class ProfileCheckCmd extends ProfileUpdateCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking profile " + name);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking profile " + name);
 
-    if (type == null && conf == null && confFile == null) {
-      System.out.println("nothing to update");
-      return null;
+        if (type == null && conf == null && confFile == null) {
+            System.out.println("nothing to update");
+            return null;
+        }
+
+        if (conf == null && confFile != null) {
+            conf = new String(IoUtil.read(confFile));
+        }
+
+        CertprofileEntry cp = caManager.getCertprofile(name);
+        if (cp == null) {
+            throw new CmdFailure("certificate profile named '" + name + "' is not configured");
+        }
+
+        if (cp.getType() != null) {
+            String ex = type;
+            String is = cp.getType();
+            MgmtQAShellUtil.assertEquals("type", ex, is);
+        }
+
+        String ex = conf;
+        String is = cp.getConf();
+        MgmtQAShellUtil.assertEquals("conf", ex, is);
+
+        out(" checked profile " + name);
+        return null;
     }
-
-    if (conf == null && confFile != null) {
-      conf = new String(IoUtil.read(confFile));
-    }
-
-    CertprofileEntry cp = caManager.getCertprofile(name);
-    if (cp == null) {
-      throw new CmdFailure("certificate profile named '" + name + "' is not configured");
-    }
-
-    if (cp.getType() != null) {
-      String ex = type;
-      String is = cp.getType();
-      MgmtQAShellUtil.assertEquals("type", ex, is);
-    }
-
-    String ex = conf;
-    String is = cp.getConf();
-    MgmtQAShellUtil.assertEquals("conf", ex, is);
-
-    out(" checked profile " + name);
-    return null;
-  }
 
 }

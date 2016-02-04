@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,20 +49,20 @@ import org.xipki.commons.security.speed.p12.P12ECKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-gen-p12",
-    description = "performance test of PKCS#12 EC key generation")
+        description = "performance test of PKCS#12 EC key generation")
 public class SpeedP12ECKeyGenCmd extends SingleSpeedCommandSupport {
 
-  @Option(name = "--curve",
-      required = true,
-      description = "EC curve name\n"
-          + "(required)")
-  @Completion(ECCurveNameCompleter.class)
-  private String curveName;
+    @Option(name = "--curve",
+            required = true,
+            description = "EC curve name\n"
+                    + "(required)")
+    @Completion(ECCurveNameCompleter.class)
+    private String curveName;
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    return new P12ECKeyGenLoadTest(curveName, securityFactory);
-  }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        return new P12ECKeyGenLoadTest(curveName, securityFactory);
+    }
 
 }

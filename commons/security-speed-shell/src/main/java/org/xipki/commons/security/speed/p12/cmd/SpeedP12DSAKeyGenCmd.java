@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,29 +47,29 @@ import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen-p12",
-    description = "performance test of PKCS#12 DSA key generation")
+        description = "performance test of PKCS#12 DSA key generation")
 public class SpeedP12DSAKeyGenCmd extends SingleSpeedCommandSupport {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
-  private Integer pLen = 2048;
+    @Option(name = "--plen",
+            description = "bit length of the prime")
+    private Integer pLen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
-  private Integer qLen;
+    @Option(name = "--qlen",
+            description = "bit length of the sub-prime")
+    private Integer qLen;
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    if (qLen == null) {
-      if (pLen >= 2048) {
-        qLen = 256;
-      } else {
-        qLen = 160;
-      }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        if (qLen == null) {
+            if (pLen >= 2048) {
+                qLen = 256;
+            } else {
+                qLen = 160;
+            }
+        }
+
+        return new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory);
     }
-
-    return new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory);
-  }
 
 }

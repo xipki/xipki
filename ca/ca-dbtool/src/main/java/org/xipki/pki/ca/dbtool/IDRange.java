@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,27 +42,27 @@ package org.xipki.pki.ca.dbtool;
 
 public class IDRange {
 
-  private final int from;
+    private final int from;
 
-  private final int to;
+    private final int to;
 
-  public IDRange(
-      final int from,
-      final int to) {
-    if (from > to) {
-      throw new IllegalArgumentException(
-          "from could not be greater than to: " + from + " > " + to);
+    public IDRange(
+            final int from,
+            final int to) {
+        if (from > to) {
+            throw new IllegalArgumentException(
+                    "from could not be greater than to: " + from + " > " + to);
+        }
+        this.from = from;
+        this.to = to;
     }
-    this.from = from;
-    this.to = to;
-  }
 
-  public int getFrom() {
-    return from;
-  }
+    public int getFrom() {
+        return from;
+    }
 
-  public int getTo() {
-    return to;
-  }
+    public int getTo() {
+        return to;
+    }
 
 }

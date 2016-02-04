@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,69 +48,69 @@ import org.xipki.pki.ocsp.api.CertprofileOption;
 
 class Responder {
 
-  private final ResponderOption responderOption;
+    private final ResponderOption responderOption;
 
-  private final RequestOption requestOption;
+    private final RequestOption requestOption;
 
-  private final ResponseOption responseOption;
+    private final ResponseOption responseOption;
 
-  private final AuditOption auditOption;
+    private final AuditOption auditOption;
 
-  private final CertprofileOption certprofileOption;
+    private final CertprofileOption certprofileOption;
 
-  private final ResponderSigner signer;
+    private final ResponderSigner signer;
 
-  private final List<CertStatusStore> stores;
+    private final List<CertStatusStore> stores;
 
-  Responder(
-      final ResponderOption responderOption,
-      final RequestOption requestOption,
-      final ResponseOption responseOption,
-      final AuditOption auditOption,
-      final CertprofileOption certprofileOption,
-      final ResponderSigner signer,
-      final List<CertStatusStore> stores) {
-    ParamUtil.assertNotNull("responderOption", responderOption);
-    ParamUtil.assertNotNull("requestOption", requestOption);
-    ParamUtil.assertNotNull("responseOption", responseOption);
-    ParamUtil.assertNotNull("signer", signer);
-    ParamUtil.assertNotEmpty("stores", stores);
+    Responder(
+            final ResponderOption responderOption,
+            final RequestOption requestOption,
+            final ResponseOption responseOption,
+            final AuditOption auditOption,
+            final CertprofileOption certprofileOption,
+            final ResponderSigner signer,
+            final List<CertStatusStore> stores) {
+        ParamUtil.assertNotNull("responderOption", responderOption);
+        ParamUtil.assertNotNull("requestOption", requestOption);
+        ParamUtil.assertNotNull("responseOption", responseOption);
+        ParamUtil.assertNotNull("signer", signer);
+        ParamUtil.assertNotEmpty("stores", stores);
 
-    this.responderOption = responderOption;
-    this.requestOption = requestOption;
-    this.responseOption = responseOption;
-    this.auditOption = auditOption;
-    this.certprofileOption = certprofileOption;
-    this.signer = signer;
-    this.stores = stores;
-  }
+        this.responderOption = responderOption;
+        this.requestOption = requestOption;
+        this.responseOption = responseOption;
+        this.auditOption = auditOption;
+        this.certprofileOption = certprofileOption;
+        this.signer = signer;
+        this.stores = stores;
+    }
 
-  public ResponderOption getResponderOption() {
-    return responderOption;
-  }
+    public ResponderOption getResponderOption() {
+        return responderOption;
+    }
 
-  public RequestOption getRequestOption() {
-    return requestOption;
-  }
+    public RequestOption getRequestOption() {
+        return requestOption;
+    }
 
-  public ResponseOption getResponseOption() {
-    return responseOption;
-  }
+    public ResponseOption getResponseOption() {
+        return responseOption;
+    }
 
-  public AuditOption getAuditOption() {
-    return auditOption;
-  }
+    public AuditOption getAuditOption() {
+        return auditOption;
+    }
 
-  public CertprofileOption getCertprofileOption() {
-    return certprofileOption;
-  }
+    public CertprofileOption getCertprofileOption() {
+        return certprofileOption;
+    }
 
-  public ResponderSigner getSigner() {
-    return signer;
-  }
+    public ResponderSigner getSigner() {
+        return signer;
+    }
 
-  public List<CertStatusStore> getStores() {
-    return stores;
-  }
+    public List<CertStatusStore> getStores() {
+        return stores;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,32 +47,32 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 public class CertOrError {
 
-  private final Certificate certificate;
+    private final Certificate certificate;
 
-  private final PKIStatusInfo error;
+    private final PKIStatusInfo error;
 
-  public CertOrError(
-      final Certificate certificate) {
-    ParamUtil.assertNotNull("certificate", certificate);
+    public CertOrError(
+            final Certificate certificate) {
+        ParamUtil.assertNotNull("certificate", certificate);
 
-    this.certificate = certificate;
-    this.error = null;
-  }
+        this.certificate = certificate;
+        this.error = null;
+    }
 
-  public CertOrError(
-      final PKIStatusInfo error) {
-    ParamUtil.assertNotNull("error", error);
+    public CertOrError(
+            final PKIStatusInfo error) {
+        ParamUtil.assertNotNull("error", error);
 
-    this.certificate = null;
-    this.error = error;
-  }
+        this.certificate = null;
+        this.error = error;
+    }
 
-  public Certificate getCertificate() {
-    return certificate;
-  }
+    public Certificate getCertificate() {
+        return certificate;
+    }
 
-  public PKIStatusInfo getError() {
-    return error;
-  }
+    public PKIStatusInfo getError() {
+        return error;
+    }
 
 }

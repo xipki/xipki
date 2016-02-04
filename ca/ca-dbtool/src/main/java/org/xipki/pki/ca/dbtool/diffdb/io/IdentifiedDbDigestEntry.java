@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,33 +44,33 @@ import org.xipki.pki.ca.dbtool.QueueEntry;
 
 public class IdentifiedDbDigestEntry implements QueueEntry {
 
-  private final DbDigestEntry content;
+    private final DbDigestEntry content;
 
-  private Integer caId;
+    private Integer caId;
 
-  private final int id;
+    private final int id;
 
-  public IdentifiedDbDigestEntry(
-      final DbDigestEntry content,
-      final int id) {
-    this.content = content;
-    this.id = id;
-  }
+    public IdentifiedDbDigestEntry(
+            final DbDigestEntry content,
+            final int id) {
+        this.content = content;
+        this.id = id;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public DbDigestEntry getContent() {
-    return content;
-  }
+    public DbDigestEntry getContent() {
+        return content;
+    }
 
-  public void setCaId(Integer caId) {
-    this.caId = caId;
-  }
+    public void setCaId(Integer caId) {
+        this.caId = caId;
+    }
 
-  public Integer getCaId() {
-    return caId;
-  }
+    public Integer getCaId() {
+        return caId;
+    }
 
 }

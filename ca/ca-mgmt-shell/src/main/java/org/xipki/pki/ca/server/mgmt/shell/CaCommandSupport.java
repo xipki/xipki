@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,49 +49,49 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
 
 public abstract class CaCommandSupport extends XipkiCommandSupport {
 
-  @Reference
-  protected CAManager caManager;
+    @Reference
+    protected CAManager caManager;
 
-  protected static String getRealString(
-      final String s) {
-    return CAManager.NULL.equalsIgnoreCase(s)
-        ? null
-        : s;
-  }
-
-  protected static String toString(
-      final Collection<? extends Object> c) {
-    if (c == null) {
-      return "null";
+    protected static String getRealString(
+            final String s) {
+        return CAManager.NULL.equalsIgnoreCase(s)
+                ? null
+                : s;
     }
 
-    StringBuilder sb = new StringBuilder();
-    sb.append("{");
-    int n = c.size();
+    protected static String toString(
+            final Collection<? extends Object> c) {
+        if (c == null) {
+            return "null";
+        }
 
-    int i = 0;
-    for (Object o : c) {
-      sb.append(o);
-      if (i < n - 1) {
-        sb.append(", ");
-      }
-      i++;
-    }
-    sb.append("}");
-    return sb.toString();
-  }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int n = c.size();
 
-  protected void output(
-      final boolean successful,
-      final String posPrefix,
-      final String negPrefix,
-      final String message)
-  throws CmdFailure {
-    if (successful) {
-      out(posPrefix + " " + message);
-    } else {
-      throw new CmdFailure(negPrefix + " " + message);
+        int i = 0;
+        for (Object o : c) {
+            sb.append(o);
+            if (i < n - 1) {
+                sb.append(", ");
+            }
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
     }
-  }
+
+    protected void output(
+            final boolean successful,
+            final String posPrefix,
+            final String negPrefix,
+            final String message)
+    throws CmdFailure {
+        if (successful) {
+            out(posPrefix + " " + message);
+        } else {
+            throw new CmdFailure(negPrefix + " " + message);
+        }
+    }
 
 }

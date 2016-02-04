@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,48 +49,48 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class EnrollCertRequestType {
 
-  public enum Type {
+    public enum Type {
 
-    CERT_REQ,
-    KEY_UPDATE,
-    CROSS_CERT_REQ;
+        CERT_REQ,
+        KEY_UPDATE,
+        CROSS_CERT_REQ;
 
-  } // enum Type
+    } // enum Type
 
-  private final Type type;
+    private final Type type;
 
-  private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
+    private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
-  public EnrollCertRequestType(
-      final Type type) {
-    ParamUtil.assertNotNull("type", type);
-    this.type = type;
-  }
-
-  public Type getType() {
-    return type;
-  }
-
-  public boolean addRequestEntry(
-      final EnrollCertRequestEntryType requestEntry) {
-    String id = requestEntry.getId();
-    ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
-    for (EnrollCertRequestEntryType re : requestEntries) {
-      if (re.getId().equals(id)) {
-        return false;
-      }
-
-      if (re.getCertReq().getCertReqId().equals(certReqId)) {
-        return false;
-      }
+    public EnrollCertRequestType(
+            final Type type) {
+        ParamUtil.assertNotNull("type", type);
+        this.type = type;
     }
 
-    requestEntries.add(requestEntry);
-    return true;
-  }
+    public Type getType() {
+        return type;
+    }
 
-  public List<EnrollCertRequestEntryType> getRequestEntries() {
-    return Collections.unmodifiableList(requestEntries);
-  }
+    public boolean addRequestEntry(
+            final EnrollCertRequestEntryType requestEntry) {
+        String id = requestEntry.getId();
+        ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
+        for (EnrollCertRequestEntryType re : requestEntries) {
+            if (re.getId().equals(id)) {
+                return false;
+            }
+
+            if (re.getCertReq().getCertReqId().equals(certReqId)) {
+                return false;
+            }
+        }
+
+        requestEntries.add(requestEntry);
+        return true;
+    }
+
+    public List<EnrollCertRequestEntryType> getRequestEntries() {
+        return Collections.unmodifiableList(requestEntries);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,24 +48,24 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 
 public class OCSPUtils {
 
-  private OCSPUtils() {
-  }
-
-  public static BasicOCSPResp extractBasicOCSPResp(
-      final OCSPResp response)
-  throws OCSPResponseException {
-    int status = response.getStatus();
-    if (status == 0) {
-      BasicOCSPResp basicOCSPResp;
-      try {
-        basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
-      } catch (OCSPException e) {
-        throw new InvalidOCSPResponseException(e.getMessage(), e);
-      }
-      return basicOCSPResp;
-    } else {
-      throw new OCSPResponseUnsuccessfulException(status);
+    private OCSPUtils() {
     }
-  }
+
+    public static BasicOCSPResp extractBasicOCSPResp(
+            final OCSPResp response)
+    throws OCSPResponseException {
+        int status = response.getStatus();
+        if (status == 0) {
+            BasicOCSPResp basicOCSPResp;
+            try {
+                basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
+            } catch (OCSPException e) {
+                throw new InvalidOCSPResponseException(e.getMessage(), e);
+            }
+            return basicOCSPResp;
+        } else {
+            throw new OCSPResponseUnsuccessfulException(status);
+        }
+    }
 
 }

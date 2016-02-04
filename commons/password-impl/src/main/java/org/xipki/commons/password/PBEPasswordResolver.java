@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,141 +52,141 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 public class PBEPasswordResolver implements SinglePasswordResolver {
 
-  private static final int iterationCount = 2000;
+    private static final int iterationCount = 2000;
 
-  private char[] masterPassword;
+    private char[] masterPassword;
 
-  private final Object masterPasswordLock = new Object();
+    private final Object masterPasswordLock = new Object();
 
-  private PasswordCallback masterPwdCallback;
+    private PasswordCallback masterPwdCallback;
 
-  protected char[] getMasterPassword()
-  throws PasswordResolverException {
-    synchronized (masterPasswordLock) {
-      if (masterPassword == null) {
-        if (masterPwdCallback == null) {
-          throw new PasswordResolverException(
-              "masterPasswordCallback is not initialized");
+    protected char[] getMasterPassword()
+    throws PasswordResolverException {
+        synchronized (masterPasswordLock) {
+            if (masterPassword == null) {
+                if (masterPwdCallback == null) {
+                    throw new PasswordResolverException(
+                            "masterPasswordCallback is not initialized");
+                }
+                this.masterPassword = masterPwdCallback.getPassword(
+                        "Please enter the master password");
+            }
+            return masterPassword;
         }
-        this.masterPassword = masterPwdCallback.getPassword(
-            "Please enter the master password");
-      }
-      return masterPassword;
-    }
-  }
-
-  public void clearMasterPassword() {
-    masterPassword = null;
-  }
-
-  public PBEPasswordResolver() {
-  }
-
-  @Override
-  public boolean canResolveProtocol(
-      final String protocol) {
-    return "PBE".equalsIgnoreCase(protocol);
-  }
-
-  @Override
-  public char[] resolvePassword(
-      final String passwordHint)
-  throws PasswordResolverException {
-    return resolvePassword(getMasterPassword(), passwordHint);
-  }
-
-  public void setMasterPasswordCallback(
-      String masterPasswordCallback) {
-    if (masterPasswordCallback == null) {
-      return;
     }
 
-    masterPasswordCallback = masterPasswordCallback.trim();
-    if (StringUtil.isBlank(masterPasswordCallback)) {
-      return;
+    public void clearMasterPassword() {
+        masterPassword = null;
     }
 
-    String className;
-    String conf = null;
-
-    int delimIndex = masterPasswordCallback.indexOf(' ');
-    if (delimIndex == -1) {
-      className = masterPasswordCallback;
-    } else {
-      className = masterPasswordCallback.substring(0, delimIndex);
-      conf = masterPasswordCallback.substring(delimIndex + 1);
+    public PBEPasswordResolver() {
     }
 
-    try {
-      Class<?> clazz = Class.forName(className);
-      Object obj = clazz.newInstance();
-      if (obj instanceof PasswordCallback) {
-        ((PasswordCallback) obj).init(conf);
-        this.masterPwdCallback = (PasswordCallback) obj;
-      } else {
-        throw new IllegalArgumentException(
-            "invalid masterPasswordCallback configuration "
-            + masterPasswordCallback);
-      }
-
-    } catch (Exception e) {
-      throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-          + masterPasswordCallback
-          + ", " + e.getClass().getName() + ": " + e.getMessage());
-    }
-  } // method setMasterPasswordCallback
-
-  public static char[] resolvePassword(
-      final char[] masterPassword,
-      final String passwordHint)
-  throws PasswordResolverException {
-    byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
-    int n = bytes.length;
-    if (n <= 16 && n != 0) {
-      throw new PasswordResolverException("invalid length of the encrypted password");
+    @Override
+    public boolean canResolveProtocol(
+            final String protocol) {
+        return "PBE".equalsIgnoreCase(protocol);
     }
 
-    byte[] salt = Arrays.copyOf(bytes, 16);
-    byte[] cipherText = Arrays.copyOfRange(bytes, 16, n);
-
-    byte[] pwd;
-    try {
-      pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
-          salt);
-    } catch (GeneralSecurityException e) {
-      throw new PasswordResolverException("could not decrypt the password: "
-          + e.getMessage());
+    @Override
+    public char[] resolvePassword(
+            final String passwordHint)
+    throws PasswordResolverException {
+        return resolvePassword(getMasterPassword(), passwordHint);
     }
 
-    char[] ret = new char[pwd.length];
-    for (int i = 0; i < pwd.length; i++) {
-      ret[i] = (char) pwd[i];
+    public void setMasterPasswordCallback(
+            String masterPasswordCallback) {
+        if (masterPasswordCallback == null) {
+            return;
+        }
+
+        masterPasswordCallback = masterPasswordCallback.trim();
+        if (StringUtil.isBlank(masterPasswordCallback)) {
+            return;
+        }
+
+        String className;
+        String conf = null;
+
+        int delimIndex = masterPasswordCallback.indexOf(' ');
+        if (delimIndex == -1) {
+            className = masterPasswordCallback;
+        } else {
+            className = masterPasswordCallback.substring(0, delimIndex);
+            conf = masterPasswordCallback.substring(delimIndex + 1);
+        }
+
+        try {
+            Class<?> clazz = Class.forName(className);
+            Object obj = clazz.newInstance();
+            if (obj instanceof PasswordCallback) {
+                ((PasswordCallback) obj).init(conf);
+                this.masterPwdCallback = (PasswordCallback) obj;
+            } else {
+                throw new IllegalArgumentException(
+                        "invalid masterPasswordCallback configuration "
+                        + masterPasswordCallback);
+            }
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
+                    + masterPasswordCallback
+                    + ", " + e.getClass().getName() + ": " + e.getMessage());
+        }
+    } // method setMasterPasswordCallback
+
+    public static char[] resolvePassword(
+            final char[] masterPassword,
+            final String passwordHint)
+    throws PasswordResolverException {
+        byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
+        int n = bytes.length;
+        if (n <= 16 && n != 0) {
+            throw new PasswordResolverException("invalid length of the encrypted password");
+        }
+
+        byte[] salt = Arrays.copyOf(bytes, 16);
+        byte[] cipherText = Arrays.copyOfRange(bytes, 16, n);
+
+        byte[] pwd;
+        try {
+            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
+                    salt);
+        } catch (GeneralSecurityException e) {
+            throw new PasswordResolverException("could not decrypt the password: "
+                    + e.getMessage());
+        }
+
+        char[] ret = new char[pwd.length];
+        for (int i = 0; i < pwd.length; i++) {
+            ret[i] = (char) pwd[i];
+        }
+
+        return ret;
+    } // method resolvePassword
+
+    public static String encryptPassword(
+            final char[] masterPassword,
+            final char[] password)
+    throws PasswordResolverException {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        byte[] encrypted;
+        try {
+            encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
+                    masterPassword, iterationCount, salt);
+        } catch (GeneralSecurityException e) {
+            throw new PasswordResolverException("could not encrypt the password: "
+                    + e.getMessage());
+        }
+
+        byte[] encryptedWithSalt = new byte[salt.length + encrypted.length];
+        System.arraycopy(salt, 0, encryptedWithSalt, 0, salt.length);
+        System.arraycopy(encrypted, 0, encryptedWithSalt, salt.length, encrypted.length);
+        String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
+        return pbeText;
     }
-
-    return ret;
-  } // method resolvePassword
-
-  public static String encryptPassword(
-      final char[] masterPassword,
-      final char[] password)
-  throws PasswordResolverException {
-    SecureRandom random = new SecureRandom();
-    byte[] salt = new byte[16];
-    random.nextBytes(salt);
-    byte[] encrypted;
-    try {
-      encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
-          masterPassword, iterationCount, salt);
-    } catch (GeneralSecurityException e) {
-      throw new PasswordResolverException("could not encrypt the password: "
-          + e.getMessage());
-    }
-
-    byte[] encryptedWithSalt = new byte[salt.length + encrypted.length];
-    System.arraycopy(salt, 0, encryptedWithSalt, 0, salt.length);
-    System.arraycopy(encrypted, 0, encryptedWithSalt, salt.length, encrypted.length);
-    String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
-    return pbeText;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,20 +47,20 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
  */
 
 @Command(scope = "xipki-db", name = "initdb-ca",
-    description = "reset and initialize the CA database")
+        description = "reset and initialize the CA database")
 @Service
 public class InitDbCaCmd extends LiquibaseCommandSupport {
 
-  private static final String schemaFile = "xipki/sql/ca-init.xml";
+    private static final String schemaFile = "xipki/sql/ca-init.xml";
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-    LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-    resetAndInit(dbConf, schemaFile);
-    return null;
-  }
+        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+        resetAndInit(dbConf, schemaFile);
+        return null;
+    }
 
 }

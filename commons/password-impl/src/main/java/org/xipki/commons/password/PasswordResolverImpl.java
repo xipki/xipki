@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,68 +50,68 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 public class PasswordResolverImpl implements PasswordResolver {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
 
-  private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
-      new ConcurrentLinkedQueue<SinglePasswordResolver>();
+    private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
+            new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
-  public PasswordResolverImpl() {
-  }
-
-  public void bindService(
-      final SinglePasswordResolver service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("bindService invoked with null.");
-      return;
+    public PasswordResolverImpl() {
     }
 
-    boolean replaced = resolvers.remove(service);
-    resolvers.add(service);
-    String txt = replaced
-        ? "replaced"
-        : "added";
-    LOG.debug("{} SinglePasswordResolver binding for {}",
-        txt, service);
-  }
+    public void bindService(
+            final SinglePasswordResolver service) {
+        //might be null if dependency is optional
+        if (service == null) {
+            LOG.debug("bindService invoked with null.");
+            return;
+        }
 
-  public void unbindService(
-      final SinglePasswordResolver service) {
-    //might be null if dependency is optional
-    if (service == null) {
-      LOG.debug("unbindService invoked with null.");
-      return;
+        boolean replaced = resolvers.remove(service);
+        resolvers.add(service);
+        String txt = replaced
+                ? "replaced"
+                : "added";
+        LOG.debug("{} SinglePasswordResolver binding for {}",
+                txt, service);
     }
 
-    try {
-      if (resolvers.remove(service)) {
-        LOG.debug("removed SinglePasswordResolver binding for {}", service);
-      } else {
-        LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
-      }
-    } catch (Exception e) {
-      LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
-    }
-  }
+    public void unbindService(
+            final SinglePasswordResolver service) {
+        //might be null if dependency is optional
+        if (service == null) {
+            LOG.debug("unbindService invoked with null.");
+            return;
+        }
 
-  @Override
-  public char[] resolvePassword(
-      final String passwordHint)
-  throws PasswordResolverException {
-    int index = passwordHint.indexOf(':');
-    if (index == -1) {
-      return passwordHint.toCharArray();
-    }
-
-    String protocol = passwordHint.substring(0, index);
-
-    for (SinglePasswordResolver resolver : resolvers) {
-      if (resolver.canResolveProtocol(protocol)) {
-        return resolver.resolvePassword(passwordHint);
-      }
+        try {
+            if (resolvers.remove(service)) {
+                LOG.debug("removed SinglePasswordResolver binding for {}", service);
+            } else {
+                LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
+            }
+        } catch (Exception e) {
+            LOG.debug("caught Exception({}). service is probably destroyed.", e.getMessage());
+        }
     }
 
-    return passwordHint.toCharArray();
-  }
+    @Override
+    public char[] resolvePassword(
+            final String passwordHint)
+    throws PasswordResolverException {
+        int index = passwordHint.indexOf(':');
+        if (index == -1) {
+            return passwordHint.toCharArray();
+        }
+
+        String protocol = passwordHint.substring(0, index);
+
+        for (SinglePasswordResolver resolver : resolvers) {
+            if (resolver.canResolveProtocol(protocol)) {
+                return resolver.resolvePassword(passwordHint);
+            }
+        }
+
+        return passwordHint.toCharArray();
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,71 +55,71 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
 
-  @Option(name = "--slot",
-      required = true,
-      description = "slot index\n"
-          + "(required)")
-  protected Integer slotIndex;
+    @Option(name = "--slot",
+            required = true,
+            description = "slot index\n"
+                    + "(required)")
+    protected Integer slotIndex;
 
-  @Option(name = "--key-label",
-      required = true,
-      description = "label of the PKCS#11 objects\n"
-          + "(required)")
-  protected String label;
+    @Option(name = "--key-label",
+            required = true,
+            description = "label of the PKCS#11 objects\n"
+                    + "(required)")
+    protected String label;
 
-  @Option(name = "--no-cert",
-      required = false,
-      description = "Generate only keypair without self-signed certificate")
-  protected Boolean noCert = Boolean.FALSE;
+    @Option(name = "--no-cert",
+            required = false,
+            description = "Generate only keypair without self-signed certificate")
+    protected Boolean noCert = Boolean.FALSE;
 
-  @Option(name = "--subject", aliases = "-s",
-      description = "subject in the self-signed certificate")
-  protected String subject;
+    @Option(name = "--subject", aliases = "-s",
+            description = "subject in the self-signed certificate")
+    protected String subject;
 
-  @Option(name = "--cert-out",
-      description = "where to save the self-signed certificate")
-  @Completion(FilePathCompleter.class)
-  protected String outputFilename;
+    @Option(name = "--cert-out",
+            description = "where to save the self-signed certificate")
+    @Completion(FilePathCompleter.class)
+    protected String outputFilename;
 
-  @Option(name = "--module",
-      description = "Name of the PKCS#11 module.")
-  @Completion(P11ModuleNameCompleter.class)
-  protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    @Option(name = "--module",
+            description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-  protected String getSubject() {
-    if (isBlank(subject)) {
-      return "CN=" + label;
-    }
-    return subject;
-  }
-
-  protected P11SlotIdentifier getSlotId() {
-    return new P11SlotIdentifier(slotIndex, null);
-  }
-
-  protected void finalize(
-      final P11KeyIdentifier keyId)
-  throws Exception {
-    out("generate PKCS#11 key");
-    out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
-    out("\tkey label: " + keyId.getKeyLabel());
-
-    securityFactory.getP11CryptService(moduleName).refresh();
-  }
-
-  protected void finalize(
-      final P11KeypairGenerationResult keyAndCert)
-  throws Exception {
-    out("generate PKCS#11 key");
-    out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
-    out("\tkey label: " + keyAndCert.getLabel());
-    if (outputFilename != null) {
-      File certFile = new File(outputFilename);
-      saveVerbose("\tsaved self-signed certificate to file", certFile,
-          keyAndCert.getCertificate().getEncoded());
+    protected String getSubject() {
+        if (isBlank(subject)) {
+            return "CN=" + label;
+        }
+        return subject;
     }
 
-    securityFactory.getP11CryptService(moduleName).refresh();
-  }
+    protected P11SlotIdentifier getSlotId() {
+        return new P11SlotIdentifier(slotIndex, null);
+    }
+
+    protected void finalize(
+            final P11KeyIdentifier keyId)
+    throws Exception {
+        out("generate PKCS#11 key");
+        out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
+        out("\tkey label: " + keyId.getKeyLabel());
+
+        securityFactory.getP11CryptService(moduleName).refresh();
+    }
+
+    protected void finalize(
+            final P11KeypairGenerationResult keyAndCert)
+    throws Exception {
+        out("generate PKCS#11 key");
+        out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
+        out("\tkey label: " + keyAndCert.getLabel());
+        if (outputFilename != null) {
+            File certFile = new File(outputFilename);
+            saveVerbose("\tsaved self-signed certificate to file", certFile,
+                    keyAndCert.getCertificate().getEncoded());
+        }
+
+        securityFactory.getP11CryptService(moduleName).refresh();
+    }
 
 }

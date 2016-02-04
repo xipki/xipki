@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -57,52 +57,52 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outputFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-  protected abstract EnrollmentResponse requestCertificate(
-      Client client,
-      PKCS10CertificationRequest csr,
-      PrivateKey identityKey,
-      X509Certificate identityCert)
-  throws ClientException, TransactionException;
+    protected abstract EnrollmentResponse requestCertificate(
+            Client client,
+            PKCS10CertificationRequest csr,
+            PrivateKey identityKey,
+            X509Certificate identityCert)
+    throws ClientException, TransactionException;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Client client = getScepClient();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Client client = getScepClient();
 
-    PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
+        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
 
-    EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-        getIdentityCert());
-    if (resp.isFailure()) {
-      throw new CmdFailure("server returned 'failure'");
+        EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
+                getIdentityCert());
+        if (resp.isFailure()) {
+            throw new CmdFailure("server returned 'failure'");
+        }
+
+        if (resp.isPending()) {
+            throw new CmdFailure("server returned 'pending'");
+        }
+
+        X509Certificate cert = extractEECerts(resp.getCertStore());
+
+        if (cert == null) {
+            throw new Exception("received no certificate");
+        }
+
+        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+        return null;
     }
-
-    if (resp.isPending()) {
-      throw new CmdFailure("server returned 'pending'");
-    }
-
-    X509Certificate cert = extractEECerts(resp.getCertStore());
-
-    if (cert == null) {
-      throw new Exception("received no certificate");
-    }
-
-    saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
-    return null;
-  }
 
 }

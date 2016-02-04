@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,23 +47,23 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "scep-rm",
-    description = "remove SCEP")
+        description = "remove SCEP")
 @Service
 public class ScepRemoveCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "SCEP CA name\n"
-          + "(required)")
-  @Completion(ScepNameCompleter.class)
-  private String name;
+    @Option(name = "--ca",
+            required = true,
+            description = "SCEP CA name\n"
+                    + "(required)")
+    @Completion(ScepNameCompleter.class)
+    private String name;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.removeScep(name);
-    output(b, "removed", "could not remove", "SCEP for CA " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.removeScep(name);
+        output(b, "removed", "could not remove", "SCEP for CA " + name);
+        return null;
+    }
 
 }

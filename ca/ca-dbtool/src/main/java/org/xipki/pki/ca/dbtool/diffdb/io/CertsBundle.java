@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,37 +47,37 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertsBundle {
 
-  private int numSkipped;
+    private int numSkipped;
 
-  private Map<Long, DbDigestEntry> certs;
+    private Map<Long, DbDigestEntry> certs;
 
-  private List<Long> serialNumbers;
+    private List<Long> serialNumbers;
 
-  public CertsBundle(
-      final int numSkipped,
-      final Map<Long, DbDigestEntry> certs,
-      final List<Long> serialNumbers) {
-    if (numSkipped < 0) {
-      throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
+    public CertsBundle(
+            final int numSkipped,
+            final Map<Long, DbDigestEntry> certs,
+            final List<Long> serialNumbers) {
+        if (numSkipped < 0) {
+            throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
+        }
+
+        ParamUtil.assertNotEmpty("certs", certs);
+        ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
+
+        this.certs = certs;
+        this.serialNumbers = serialNumbers;
     }
 
-    ParamUtil.assertNotEmpty("certs", certs);
-    ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
+    public int getNumSkipped() {
+        return numSkipped;
+    }
 
-    this.certs = certs;
-    this.serialNumbers = serialNumbers;
-  }
+    public Map<Long, DbDigestEntry> getCerts() {
+        return certs;
+    }
 
-  public int getNumSkipped() {
-    return numSkipped;
-  }
-
-  public Map<Long, DbDigestEntry> getCerts() {
-    return certs;
-  }
-
-  public List<Long> getSerialNumbers() {
-    return serialNumbers;
-  }
+    public List<Long> getSerialNumbers() {
+        return serialNumbers;
+    }
 
 }

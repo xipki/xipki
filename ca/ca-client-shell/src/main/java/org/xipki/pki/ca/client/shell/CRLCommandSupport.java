@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,57 +55,57 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 public abstract class CRLCommandSupport extends ClientCommandSupport {
 
-  @Option(name = "--ca",
-      description = "CA name\n"
-          + "(required if multiple CAs are configured)")
-  @Completion(CaNameCompleter.class)
-  protected String caName;
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "(required if multiple CAs are configured)")
+    @Completion(CaNameCompleter.class)
+    protected String caName;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the CRL\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  protected String outFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the CRL\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    protected String outFile;
 
-  protected abstract X509CRL retrieveCrl()
-  throws CAClientException, PKIErrorException;
+    protected abstract X509CRL retrieveCrl()
+    throws CAClientException, PKIErrorException;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Set<String> caNames = caClient.getCaNames();
-    if (isEmpty(caNames)) {
-      throw new CmdFailure("no CA is configured");
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Set<String> caNames = caClient.getCaNames();
+        if (isEmpty(caNames)) {
+            throw new CmdFailure("no CA is configured");
+        }
 
-    if (caName != null && !caNames.contains(caName)) {
-      throw new IllegalCmdParamException("CA " + caName
-          + " is not within the configured CAs " + caNames);
-    }
+        if (caName != null && !caNames.contains(caName)) {
+            throw new IllegalCmdParamException("CA " + caName
+                    + " is not within the configured CAs " + caNames);
+        }
 
-    if (caName == null) {
-      if (caNames.size() == 1) {
-        caName = caNames.iterator().next();
-      } else {
-        throw new IllegalCmdParamException("no caname is specified, one of "
-            + caNames + " is required");
-      }
-    }
+        if (caName == null) {
+            if (caNames.size() == 1) {
+                caName = caNames.iterator().next();
+            } else {
+                throw new IllegalCmdParamException("no caname is specified, one of "
+                        + caNames + " is required");
+            }
+        }
 
-    X509CRL crl = null;
-    try {
-      crl = retrieveCrl();
-    } catch (PKIErrorException ex) {
-      throw new CmdFailure("received no CRL from server: " + ex.getMessage());
-    }
+        X509CRL crl = null;
+        try {
+            crl = retrieveCrl();
+        } catch (PKIErrorException ex) {
+            throw new CmdFailure("received no CRL from server: " + ex.getMessage());
+        }
 
-    if (crl == null) {
-      throw new CmdFailure("received no CRL from server");
-    }
+        if (crl == null) {
+            throw new CmdFailure("received no CRL from server");
+        }
 
-    saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
-    return null;
-  } // method doExecute
+        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+        return null;
+    } // method doExecute
 
 }

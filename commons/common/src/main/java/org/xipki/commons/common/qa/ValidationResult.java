@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,50 +49,50 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ValidationResult {
 
-  private final List<ValidationIssue> validationIssues;
+    private final List<ValidationIssue> validationIssues;
 
-  private final List<ValidationIssue> failedValidationIssues;
+    private final List<ValidationIssue> failedValidationIssues;
 
-  private final List<ValidationIssue> successfulValidationIssues;
+    private final List<ValidationIssue> successfulValidationIssues;
 
-  public ValidationResult(
-      final ValidationIssue validationIssues) {
-    this(Arrays.asList(validationIssues));
-  }
-
-  public ValidationResult(
-      final List<ValidationIssue> validationIssues) {
-    ParamUtil.assertNotEmpty("validationIssues", validationIssues);
-
-    List<ValidationIssue> failedIssues = new LinkedList<>();
-    List<ValidationIssue> successfulIssues = new LinkedList<>();
-    for (ValidationIssue issue : validationIssues) {
-      if (issue.isFailed()) {
-        failedIssues.add(issue);
-      } else {
-        successfulIssues.add(issue);
-      }
+    public ValidationResult(
+            final ValidationIssue validationIssues) {
+        this(Arrays.asList(validationIssues));
     }
 
-    this.validationIssues = validationIssues;
-    this.failedValidationIssues = failedIssues;
-    this.successfulValidationIssues = successfulIssues;
-  }
+    public ValidationResult(
+            final List<ValidationIssue> validationIssues) {
+        ParamUtil.assertNotEmpty("validationIssues", validationIssues);
 
-  public boolean isAllSuccessful() {
-    return CollectionUtil.isEmpty(failedValidationIssues);
-  }
+        List<ValidationIssue> failedIssues = new LinkedList<>();
+        List<ValidationIssue> successfulIssues = new LinkedList<>();
+        for (ValidationIssue issue : validationIssues) {
+            if (issue.isFailed()) {
+                failedIssues.add(issue);
+            } else {
+                successfulIssues.add(issue);
+            }
+        }
 
-  public List<ValidationIssue> getValidationIssues() {
-    return validationIssues;
-  }
+        this.validationIssues = validationIssues;
+        this.failedValidationIssues = failedIssues;
+        this.successfulValidationIssues = successfulIssues;
+    }
 
-  public List<ValidationIssue> getFailedValidationIssues() {
-    return failedValidationIssues;
-  }
+    public boolean isAllSuccessful() {
+        return CollectionUtil.isEmpty(failedValidationIssues);
+    }
 
-  public List<ValidationIssue> getSuccessfulValidationIssues() {
-    return successfulValidationIssues;
-  }
+    public List<ValidationIssue> getValidationIssues() {
+        return validationIssues;
+    }
+
+    public List<ValidationIssue> getFailedValidationIssues() {
+        return failedValidationIssues;
+    }
+
+    public List<ValidationIssue> getSuccessfulValidationIssues() {
+        return successfulValidationIssues;
+    }
 
 }

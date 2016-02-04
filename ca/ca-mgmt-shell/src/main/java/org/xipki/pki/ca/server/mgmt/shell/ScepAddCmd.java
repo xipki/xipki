@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,69 +53,69 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "scep-add",
-    description = "add SCEP")
+        description = "add SCEP")
 @Service
 public class ScepAddCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(ScepNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(ScepNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--resp-type",
-      required = true,
-      description = "type of the responder\n"
-          + "(required)")
-  @Completion(SignerTypeCompleter.class)
-  private String responderType;
+    @Option(name = "--resp-type",
+            required = true,
+            description = "type of the responder\n"
+                    + "(required)")
+    @Completion(SignerTypeCompleter.class)
+    private String responderType;
 
-  @Option(name = "--resp-conf",
-      required = true,
-      description = "conf of the responder\n"
-          + "(required)")
-  private String responderConf;
+    @Option(name = "--resp-conf",
+            required = true,
+            description = "conf of the responder\n"
+                    + "(required)")
+    private String responderConf;
 
-  @Option(name = "--resp-cert",
-      description = "responder certificate file")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--resp-cert",
+            description = "responder certificate file")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--control",
-      required = false,
-      description = "SCEP control")
-  private String scepControl;
+    @Option(name = "--control",
+            required = false,
+            description = "SCEP control")
+    private String scepControl;
 
-  private PasswordResolver passwordResolver;
+    private PasswordResolver passwordResolver;
 
-  public void setPasswordResolver(
-      final PasswordResolver passwordResolver) {
-    this.passwordResolver = passwordResolver;
-  }
-
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    String base64Cert = null;
-    if (certFile != null) {
-      base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver) {
+        this.passwordResolver = passwordResolver;
     }
 
-    if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
-      responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
-          passwordResolver);
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        String base64Cert = null;
+        if (certFile != null) {
+            base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
+        }
 
-    ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
-        scepControl);
-    if (entry.isFaulty()) {
-      throw new InvalidConfException("certificate is invalid");
-    }
+        if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
+            responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
+                    passwordResolver);
+        }
 
-    boolean b = caManager.addScep(entry);
-    output(b, "added", "could not add", "SCEP responder " + caName);
-    return null;
-  }
+        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
+                scepControl);
+        if (entry.isFaulty()) {
+            throw new InvalidConfException("certificate is invalid");
+        }
+
+        boolean b = caManager.addScep(entry);
+        output(b, "added", "could not add", "SCEP responder " + caName);
+        return null;
+    }
 
 }

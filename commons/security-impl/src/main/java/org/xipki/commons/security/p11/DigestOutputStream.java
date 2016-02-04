@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,45 +47,45 @@ import org.bouncycastle.crypto.Digest;
 
 public class DigestOutputStream extends OutputStream {
 
-  private Digest digest;
+    private Digest digest;
 
-  public DigestOutputStream(
-      final Digest digest) {
-    this.digest = digest;
-  }
+    public DigestOutputStream(
+            final Digest digest) {
+        this.digest = digest;
+    }
 
-  public void reset() {
-    digest.reset();
-  }
+    public void reset() {
+        digest.reset();
+    }
 
-  @Override
-  public void write(
-      final byte[] bytes,
-      final int off,
-      final int len)
-  throws IOException {
-    digest.update(bytes, off, len);
-  }
+    @Override
+    public void write(
+            final byte[] bytes,
+            final int off,
+            final int len)
+    throws IOException {
+        digest.update(bytes, off, len);
+    }
 
-  @Override
-  public void write(
-      final byte[] bytes)
-  throws IOException {
-    digest.update(bytes, 0, bytes.length);
-  }
+    @Override
+    public void write(
+            final byte[] bytes)
+    throws IOException {
+        digest.update(bytes, 0, bytes.length);
+    }
 
-  @Override
-  public void write(
-      final int b)
-  throws IOException {
-    digest.update((byte) b);
-  }
+    @Override
+    public void write(
+            final int b)
+    throws IOException {
+        digest.update((byte) b);
+    }
 
-  public byte[] digest() {
-    byte[] result = new byte[digest.getDigestSize()];
-    digest.doFinal(result, 0);
-    reset();
-    return result;
-  }
+    public byte[] digest() {
+        byte[] result = new byte[digest.getDigestSize()];
+        digest.doFinal(result, 0);
+        reset();
+        return result;
+    }
 
 }

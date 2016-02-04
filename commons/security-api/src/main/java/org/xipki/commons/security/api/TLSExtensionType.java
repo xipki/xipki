@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,41 +42,41 @@ package org.xipki.commons.security.api;
 
 public class TLSExtensionType implements Comparable<TLSExtensionType> {
 
-  public static final TLSExtensionType server_name
-      = new TLSExtensionType(0, "server_name");
-  public static final TLSExtensionType max_fragment_length
-      = new TLSExtensionType(1, "max_fragment_length");
-  public static final TLSExtensionType client_certificate_url
-      = new TLSExtensionType(2, "client_certificate_url");
-  public static final TLSExtensionType trusted_ca_keys
-      = new TLSExtensionType(3, "trusted_ca_keys");
-  public static final TLSExtensionType truncated_hmac
-      = new TLSExtensionType(4, "truncated_hmac");
-  public static final TLSExtensionType status_request
-      = new TLSExtensionType(5, "status_request");
+    public static final TLSExtensionType server_name
+            = new TLSExtensionType(0, "server_name");
+    public static final TLSExtensionType max_fragment_length
+            = new TLSExtensionType(1, "max_fragment_length");
+    public static final TLSExtensionType client_certificate_url
+            = new TLSExtensionType(2, "client_certificate_url");
+    public static final TLSExtensionType trusted_ca_keys
+            = new TLSExtensionType(3, "trusted_ca_keys");
+    public static final TLSExtensionType truncated_hmac
+            = new TLSExtensionType(4, "truncated_hmac");
+    public static final TLSExtensionType status_request
+            = new TLSExtensionType(5, "status_request");
 
-  private final int code;
-  private final String name;
+    private final int code;
+    private final String name;
 
-  private TLSExtensionType(
-      final int code,
-      final String name) {
-    this.code = code;
-    this.name = name;
-  }
+    private TLSExtensionType(
+            final int code,
+            final String name) {
+        this.code = code;
+        this.name = name;
+    }
 
-  public int getCode() {
-    return code;
-  }
+    public int getCode() {
+        return code;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  @Override
-  public int compareTo(
-      final TLSExtensionType o) {
-    return Integer.valueOf(code).compareTo(o.code);
-  }
+    @Override
+    public int compareTo(
+            final TLSExtensionType o) {
+        return Integer.valueOf(code).compareTo(o.code);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,13 +47,13 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 @Service
 public class ValidityModeCompleter extends AbstractEnumCompleter {
 
-  public ValidityModeCompleter() {
-    StringBuilder enums = new StringBuilder();
-    for (ValidityMode mode : ValidityMode.values()) {
-      enums.append(mode.name()).append(",");
+    public ValidityModeCompleter() {
+        StringBuilder enums = new StringBuilder();
+        for (ValidityMode mode : ValidityMode.values()) {
+            enums.append(mode.name()).append(",");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-    enums.deleteCharAt(enums.length() - 1);
-    setTokens(enums.toString());
-  }
 
 }

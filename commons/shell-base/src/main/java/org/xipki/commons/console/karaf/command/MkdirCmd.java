@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,31 +50,31 @@ import org.xipki.commons.console.karaf.completer.DirPathCompleter;
  */
 
 @Command(scope = "xipki-cmd", name = "mkdir",
-    description = "make directories")
+        description = "make directories")
 @Service
 public class MkdirCmd extends XipkiCommandSupport {
 
-  @Argument(index = 0, name = "directory_name",
-      required = true,
-      description = "directory\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String dirName;
+    @Argument(index = 0, name = "directory_name",
+            required = true,
+            description = "directory\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String dirName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    File target = new File(expandFilepath(dirName));
-    if (target.exists()) {
-      if (!target.isDirectory()) {
-        System.err.println(dirName + " exists but is not a directory, cannot override it");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        File target = new File(expandFilepath(dirName));
+        if (target.exists()) {
+            if (!target.isDirectory()) {
+                System.err.println(dirName + " exists but is not a directory, cannot override it");
+                return null;
+            }
+        } else {
+            target.mkdirs();
+        }
+
         return null;
-      }
-    } else {
-      target.mkdirs();
     }
-
-    return null;
-  }
 
 }

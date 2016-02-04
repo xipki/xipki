@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,39 +53,39 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-export",
-    description = "export publisher configuration")
+        description = "export publisher configuration")
 @Service
 public class PublisherExportCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "publisher name\n"
-          + "(required)")
-  @Completion(PublisherNameCompleter.class)
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "publisher name\n"
+                    + "(required)")
+    @Completion(PublisherNameCompleter.class)
+    private String name;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the publisher configuration\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String confFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the publisher configuration\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String confFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    PublisherEntry entry = caManager.getPublisher(name);
-    if (entry == null) {
-      throw new IllegalCmdParamException("no publisher named " + name + " is defined");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        PublisherEntry entry = caManager.getPublisher(name);
+        if (entry == null) {
+            throw new IllegalCmdParamException("no publisher named " + name + " is defined");
+        }
+
+        if (StringUtil.isBlank(entry.getConf())) {
+            out("publisher does not have conf");
+        } else {
+            saveVerbose("saved publisher configuration to", new File(confFile),
+                    entry.getConf().getBytes("UTF-8"));
+        }
+        return null;
     }
-
-    if (StringUtil.isBlank(entry.getConf())) {
-      out("publisher does not have conf");
-    } else {
-      saveVerbose("saved publisher configuration to", new File(confFile),
-          entry.getConf().getBytes("UTF-8"));
-    }
-    return null;
-  }
 
 }

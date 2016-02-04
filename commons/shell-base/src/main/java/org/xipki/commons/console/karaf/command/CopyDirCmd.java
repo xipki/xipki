@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,51 +51,51 @@ import org.xipki.commons.console.karaf.intern.FileUtils;
  */
 
 @Command(scope = "xipki-cmd", name = "copy-dir",
-    description = "copy content of the directory to destination")
+        description = "copy content of the directory to destination")
 @Service
 public class CopyDirCmd extends XipkiCommandSupport {
 
-  @Argument(index = 0, name = "source directory",
-      required = true,
-      description = "content of this directory will be copied\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String source;
+    @Argument(index = 0, name = "source directory",
+            required = true,
+            description = "content of this directory will be copied\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String source;
 
-  @Argument(index = 1, name = "destination",
-      required = true,
-      description = "destination directory\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String dest;
+    @Argument(index = 1, name = "destination",
+            required = true,
+            description = "destination directory\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String dest;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    File sourceDir = new File(expandFilepath(source));
-    if (!sourceDir.exists()) {
-      System.err.println(source + " does not exist");
-      return null;
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        File sourceDir = new File(expandFilepath(source));
+        if (!sourceDir.exists()) {
+            System.err.println(source + " does not exist");
+            return null;
+        }
 
-    if (!sourceDir.isDirectory()) {
-      System.err.println(source + " is not a directory");
-      return null;
-    }
+        if (!sourceDir.isDirectory()) {
+            System.err.println(source + " is not a directory");
+            return null;
+        }
 
-    File destDir = new File(dest);
-    if (destDir.exists()) {
-      if (destDir.isFile()) {
-        System.err.println(dest + " is not a directory");
+        File destDir = new File(dest);
+        if (destDir.exists()) {
+            if (destDir.isFile()) {
+                System.err.println(dest + " is not a directory");
+                return null;
+            }
+        } else {
+            destDir.mkdirs();
+        }
+
+        FileUtils.copyDirectory(sourceDir, destDir);
+
         return null;
-      }
-    } else {
-      destDir.mkdirs();
     }
-
-    FileUtils.copyDirectory(sourceDir, destDir);
-
-    return null;
-  }
 
 }

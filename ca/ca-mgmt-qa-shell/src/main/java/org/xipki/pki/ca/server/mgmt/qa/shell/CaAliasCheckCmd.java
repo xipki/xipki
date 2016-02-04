@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,35 +49,35 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-caqa", name = "caalias-check",
-    description = "check CA aliases (QA)")
+        description = "check CA aliases (QA)")
 @Service
 public class CaAliasCheckCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--alias",
-      required = true,
-      description = "alias name\n"
-          + "(required)")
-  private String aliasName;
+    @Option(name = "--alias",
+            required = true,
+            description = "alias name\n"
+                    + "(required)")
+    private String aliasName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
-    String _caName = caManager.getCaNameForAlias(aliasName);
-    if (_caName == null) {
-      throw new CmdFailure("alias '" + aliasName + "' is not configured");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
+        String _caName = caManager.getCaNameForAlias(aliasName);
+        if (_caName == null) {
+            throw new CmdFailure("alias '" + aliasName + "' is not configured");
+        }
+
+        MgmtQAShellUtil.assertEquals("CA name", caName, _caName);
+        out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
+        return null;
     }
-
-    MgmtQAShellUtil.assertEquals("CA name", caName, _caName);
-    out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
-    return null;
-  }
 
 }

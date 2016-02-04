@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,29 +49,29 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public class P11RSASignLoadTest extends P11SignLoadTest {
 
-  public P11RSASignLoadTest(
-      final SecurityFactory securityFactory,
-      final P11WritableSlot slot,
-      final String signatureAlgorithm,
-      final int keysize,
-      final BigInteger publicExponent)
-  throws Exception {
-    super(securityFactory, slot, signatureAlgorithm,
-        generateKey(slot, keysize, publicExponent),
-        "PKCS#11 RSA signature creation\n"
-            + "keysize: " + keysize + "\n"
-            + "public exponent: " + publicExponent);
-  }
+    public P11RSASignLoadTest(
+            final SecurityFactory securityFactory,
+            final P11WritableSlot slot,
+            final String signatureAlgorithm,
+            final int keysize,
+            final BigInteger publicExponent)
+    throws Exception {
+        super(securityFactory, slot, signatureAlgorithm,
+                generateKey(slot, keysize, publicExponent),
+                "PKCS#11 RSA signature creation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
+    }
 
-  private static P11KeyIdentifier generateKey(
-      final P11WritableSlot slot,
-      final int keysize,
-      final BigInteger publicExponent)
-  throws Exception {
-    P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
-        keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
-        null, null, null);
-    return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
-  }
+    private static P11KeyIdentifier generateKey(
+            final P11WritableSlot slot,
+            final int keysize,
+            final BigInteger publicExponent)
+    throws Exception {
+        P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
+                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
+                null, null, null);
+        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+    }
 
 }

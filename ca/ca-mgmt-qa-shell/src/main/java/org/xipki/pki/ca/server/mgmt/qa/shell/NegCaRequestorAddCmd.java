@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,22 +46,22 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorAddCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-careq-add",
-    description = "add requestor to CA")
+        description = "add requestor to CA")
 @Service
 public class NegCaRequestorAddCmd extends CaRequestorAddCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("neg-careq-add");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("neg-careq-add");
 
-    try {
-      super.doExecute();
-    } catch (Exception e) {
-      return null;
+        try {
+            super.doExecute();
+        } catch (Exception e) {
+            return null;
+        }
+
+        throw new CmdFailure("exception expected, but received none");
     }
-
-    throw new CmdFailure("exception expected, but received none");
-  }
 
 }

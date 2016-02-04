@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -76,250 +76,250 @@ import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 abstract class DbDigestReader implements DigestReader {
 
-  interface Retriever extends Runnable {
-  } // interface Retriever
+    interface Retriever extends Runnable {
+    } // interface Retriever
 
-  private class Dispatcher implements Runnable {
+    private class Dispatcher implements Runnable {
+
+        @Override
+        public void run() {
+            while (nextId <= maxId && !stopMe.stopMe()) {
+                int n = 0;
+                for (int i = 0; i < numThreads; i++) {
+                    if (nextId <= maxId) {
+                        n++;
+                        inQueue.add(new IDRange(nextId, nextId + 999));
+                        nextId += 1000;
+                    } else {
+                        break;
+                    }
+                }
+
+                List<DigestDBEntrySet> results = new ArrayList<>(n);
+                for (int i = 0; i < n; i++) {
+                    try {
+                        results.add(outQueue.take());
+                    } catch (InterruptedException e) {
+                        exception = e;
+                        return;
+                    }
+                }
+
+                for (DigestDBEntrySet result : results) {
+                    if (result.getException() != null) {
+                        exception = new DataAccessException(
+                                "error while reading from ID " + result.getStartId()
+                                    + ": " + result.getException().getMessage(),
+                                result.getException());
+                        return;
+                    }
+                }
+
+                Collections.sort(results);
+                for (DigestDBEntrySet result : results) {
+                    for (IdentifiedDbDigestEntry entry : result.getEntries()) {
+                        try {
+                            fixedSizedCerts.offer(entry, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            exception = e;
+                            return;
+                        }
+                    }
+                }
+            } // method run
+
+            endReached.set(true);
+            try {
+                fixedSizedCerts.offer(EndOfQueue.INSTANCE, Integer.MAX_VALUE,
+                        TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                exception = e;
+                return;
+            }
+        }
+
+    } // class Dispatcher
+
+    private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
+
+    protected final BlockingQueue<IDRange> inQueue;
+
+    protected final BlockingQueue<DigestDBEntrySet> outQueue;
+
+    private final int numThreads;
+
+    private ExecutorService executor;
+
+    private List<Retriever> retrievers;
+
+    protected final DataSourceWrapper datasource;
+
+    protected final X509Certificate caCert;
+
+    private final boolean revokedOnly;
+
+    private final int totalAccount;
+
+    private final String caSubjectName;
+
+    private final int minId;
+
+    private final int maxId;
+
+    private final AtomicBoolean endReached = new AtomicBoolean(false);
+
+    private Exception exception;
+
+    protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
+
+    private int nextId;
+
+    protected final StopMe stopMe;
+
+    public DbDigestReader(
+            final DataSourceWrapper datasource,
+            final X509Certificate caCert,
+            final boolean revokedOnly,
+            final int totalAccount,
+            final int minId,
+            final int maxId,
+            final int numThreads,
+            final int numCertsToPredicate,
+            final StopMe stopMe)
+    throws DataAccessException, CertificateException, IOException {
+        ParamUtil.assertNotNull("datasource", datasource);
+        this.datasource = datasource;
+        this.totalAccount = totalAccount;
+        this.revokedOnly = revokedOnly;
+        this.numThreads = numThreads;
+        this.caCert = caCert;
+        this.caSubjectName = X509Util.getRFC4519Name(caCert.getSubjectX500Principal());
+        this.minId = minId;
+        this.maxId = maxId;
+        this.nextId = minId;
+
+        this.stopMe = stopMe;
+        this.inQueue = new LinkedBlockingDeque<>();
+        this.outQueue = new LinkedBlockingDeque<>();
+        this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);
+    }
+
+    boolean init() {
+        retrievers = new ArrayList<>(numThreads);
+
+        try {
+            for (int i = 0; i < numThreads; i++) {
+                Retriever retriever = getRetriever();
+                retrievers.add(retriever);
+            }
+
+            executor = Executors.newFixedThreadPool(numThreads + 1);
+            for (Runnable runnable : retrievers) {
+                executor.execute(runnable);
+            }
+
+            executor.execute(new Dispatcher());
+            return true;
+        } catch (Exception e) {
+            LOG.error("could not initialize DbDigestReader", e);
+            close();
+            return false;
+        }
+    }
+
+    protected abstract Retriever getRetriever()
+    throws DataAccessException;
+
+    protected abstract int getNumSkippedCerts(
+            final int fromId,
+            final int toId,
+            final int numCerts)
+    throws DataAccessException;
 
     @Override
-    public void run() {
-      while (nextId <= maxId && !stopMe.stopMe()) {
-        int n = 0;
-        for (int i = 0; i < numThreads; i++) {
-          if (nextId <= maxId) {
-            n++;
-            inQueue.add(new IDRange(nextId, nextId + 999));
-            nextId += 1000;
-          } else {
-            break;
-          }
-        }
-
-        List<DigestDBEntrySet> results = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-          try {
-            results.add(outQueue.take());
-          } catch (InterruptedException e) {
-            exception = e;
-            return;
-          }
-        }
-
-        for (DigestDBEntrySet result : results) {
-          if (result.getException() != null) {
-            exception = new DataAccessException(
-                "error while reading from ID " + result.getStartId()
-                  + ": " + result.getException().getMessage(),
-                result.getException());
-            return;
-          }
-        }
-
-        Collections.sort(results);
-        for (DigestDBEntrySet result : results) {
-          for (IdentifiedDbDigestEntry entry : result.getEntries()) {
-            try {
-              fixedSizedCerts.offer(entry, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-              exception = e;
-              return;
-            }
-          }
-        }
-      } // method run
-
-      endReached.set(true);
-      try {
-        fixedSizedCerts.offer(EndOfQueue.INSTANCE, Integer.MAX_VALUE,
-            TimeUnit.MILLISECONDS);
-      } catch (InterruptedException e) {
-        exception = e;
-        return;
-      }
+    public X509Certificate getCaCert() {
+        return caCert;
     }
 
-  } // class Dispatcher
-
-  private static Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
-
-  protected final BlockingQueue<IDRange> inQueue;
-
-  protected final BlockingQueue<DigestDBEntrySet> outQueue;
-
-  private final int numThreads;
-
-  private ExecutorService executor;
-
-  private List<Retriever> retrievers;
-
-  protected final DataSourceWrapper datasource;
-
-  protected final X509Certificate caCert;
-
-  private final boolean revokedOnly;
-
-  private final int totalAccount;
-
-  private final String caSubjectName;
-
-  private final int minId;
-
-  private final int maxId;
-
-  private final AtomicBoolean endReached = new AtomicBoolean(false);
-
-  private Exception exception;
-
-  protected final ArrayBlockingQueue<QueueEntry> fixedSizedCerts;
-
-  private int nextId;
-
-  protected final StopMe stopMe;
-
-  public DbDigestReader(
-      final DataSourceWrapper datasource,
-      final X509Certificate caCert,
-      final boolean revokedOnly,
-      final int totalAccount,
-      final int minId,
-      final int maxId,
-      final int numThreads,
-      final int numCertsToPredicate,
-      final StopMe stopMe)
-  throws DataAccessException, CertificateException, IOException {
-    ParamUtil.assertNotNull("datasource", datasource);
-    this.datasource = datasource;
-    this.totalAccount = totalAccount;
-    this.revokedOnly = revokedOnly;
-    this.numThreads = numThreads;
-    this.caCert = caCert;
-    this.caSubjectName = X509Util.getRFC4519Name(caCert.getSubjectX500Principal());
-    this.minId = minId;
-    this.maxId = maxId;
-    this.nextId = minId;
-
-    this.stopMe = stopMe;
-    this.inQueue = new LinkedBlockingDeque<>();
-    this.outQueue = new LinkedBlockingDeque<>();
-    this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);
-  }
-
-  boolean init() {
-    retrievers = new ArrayList<>(numThreads);
-
-    try {
-      for (int i = 0; i < numThreads; i++) {
-        Retriever retriever = getRetriever();
-        retrievers.add(retriever);
-      }
-
-      executor = Executors.newFixedThreadPool(numThreads + 1);
-      for (Runnable runnable : retrievers) {
-        executor.execute(runnable);
-      }
-
-      executor.execute(new Dispatcher());
-      return true;
-    } catch (Exception e) {
-      LOG.error("could not initialize DbDigestReader", e);
-      close();
-      return false;
-    }
-  }
-
-  protected abstract Retriever getRetriever()
-  throws DataAccessException;
-
-  protected abstract int getNumSkippedCerts(
-      final int fromId,
-      final int toId,
-      final int numCerts)
-  throws DataAccessException;
-
-  @Override
-  public X509Certificate getCaCert() {
-    return caCert;
-  }
-
-  @Override
-  public String getCaSubjectName() {
-    return caSubjectName;
-  }
-
-  @Override
-  public int getTotalAccount() {
-    return totalAccount;
-  }
-
-  @Override
-  public synchronized CertsBundle nextCerts(
-      final int n)
-  throws Exception {
-    if (endReached.get() && fixedSizedCerts.isEmpty()) {
-      return null;
+    @Override
+    public String getCaSubjectName() {
+        return caSubjectName;
     }
 
-    if (exception != null) {
-      throw exception;
+    @Override
+    public int getTotalAccount() {
+        return totalAccount;
     }
 
-    List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
-    int k = 0;
-    while (true) {
-      QueueEntry next = null;
-      while (next == null) {
-        next = fixedSizedCerts.poll(1, TimeUnit.SECONDS);
+    @Override
+    public synchronized CertsBundle nextCerts(
+            final int n)
+    throws Exception {
+        if (endReached.get() && fixedSizedCerts.isEmpty()) {
+            return null;
+        }
+
         if (exception != null) {
-          throw exception;
+            throw exception;
         }
-      }
 
-      if (next instanceof EndOfQueue) {
-        break;
-      }
+        List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
+        int k = 0;
+        while (true) {
+            QueueEntry next = null;
+            while (next == null) {
+                next = fixedSizedCerts.poll(1, TimeUnit.SECONDS);
+                if (exception != null) {
+                    throw exception;
+                }
+            }
 
-      entries.add((IdentifiedDbDigestEntry) next);
-      k++;
-      if (k >= n) {
-        break;
-      }
+            if (next instanceof EndOfQueue) {
+                break;
+            }
+
+            entries.add((IdentifiedDbDigestEntry) next);
+            k++;
+            if (k >= n) {
+                break;
+            }
+        }
+
+        if (k == 0) {
+            return null;
+        }
+
+        int numSkipped = 0;
+        if (revokedOnly) {
+            numSkipped = getNumSkippedCerts(entries.get(0).getId(),
+                    entries.get(k - 1).getId(), k);
+        }
+
+        List<Long> serialNumbers = new ArrayList<>(k);
+        Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
+        for (IdentifiedDbDigestEntry m : entries) {
+            long sn = m.getContent().getSerialNumber();
+            serialNumbers.add(sn);
+            certsMap.put(sn, m.getContent());
+        }
+
+        return new CertsBundle(numSkipped, certsMap, serialNumbers);
+    } // method nextCerts
+
+    public void close() {
+        if (executor != null) {
+            executor.shutdownNow();
+        }
     }
 
-    if (k == 0) {
-      return null;
+    public int getMinId() {
+        return minId;
     }
 
-    int numSkipped = 0;
-    if (revokedOnly) {
-      numSkipped = getNumSkippedCerts(entries.get(0).getId(),
-          entries.get(k - 1).getId(), k);
+    protected static void releaseResources(
+            final Statement ps,
+            final ResultSet rs) {
+        DbToolBase.releaseResources(ps, rs);
     }
-
-    List<Long> serialNumbers = new ArrayList<>(k);
-    Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
-    for (IdentifiedDbDigestEntry m : entries) {
-      long sn = m.getContent().getSerialNumber();
-      serialNumbers.add(sn);
-      certsMap.put(sn, m.getContent());
-    }
-
-    return new CertsBundle(numSkipped, certsMap, serialNumbers);
-  } // method nextCerts
-
-  public void close() {
-    if (executor != null) {
-      executor.shutdownNow();
-    }
-  }
-
-  public int getMinId() {
-    return minId;
-  }
-
-  protected static void releaseResources(
-      final Statement ps,
-      final ResultSet rs) {
-    DbToolBase.releaseResources(ps, rs);
-  }
 
 }

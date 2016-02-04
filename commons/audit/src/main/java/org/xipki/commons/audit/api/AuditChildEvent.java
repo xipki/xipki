@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,77 +46,77 @@ import java.util.List;
 
 public class AuditChildEvent {
 
-  /**
-   * The data array belonging to the event.
-   */
-  private final List<AuditEventData> eventDatas = new LinkedList<>();
+    /**
+     * The data array belonging to the event.
+     */
+    private final List<AuditEventData> eventDatas = new LinkedList<>();
 
-  /**
-   * The AuditLevel this Event belongs to.
-   */
-  private AuditLevel level;
+    /**
+     * The AuditLevel this Event belongs to.
+     */
+    private AuditLevel level;
 
-  private AuditStatus status;
+    private AuditStatus status;
 
-  public AuditChildEvent() {
-    this.level = AuditLevel.INFO;
-  }
-
-  public AuditLevel getLevel() {
-    return level;
-  }
-
-  public void setLevel(
-      AuditLevel level) {
-    this.level = level;
-  }
-
-  public List<AuditEventData> getEventDatas() {
-    return Collections.unmodifiableList(eventDatas);
-  }
-
-  public AuditEventData removeEventData(
-      final String eventDataName) {
-    AuditEventData tbr = null;
-    for (AuditEventData ed : eventDatas) {
-      if (ed.getName().equals(eventDataName)) {
-        tbr = ed;
-      }
+    public AuditChildEvent() {
+        this.level = AuditLevel.INFO;
     }
 
-    if (tbr != null) {
-      eventDatas.remove(tbr);
+    public AuditLevel getLevel() {
+        return level;
     }
 
-    return tbr;
-  }
-
-  public AuditEventData addEventData(
-      final AuditEventData eventData) {
-    int idx = -1;
-    for (int i = 0; i < eventDatas.size(); i++) {
-      AuditEventData ed = eventDatas.get(i);
-      if (ed.getName().equals(eventData.getName())) {
-        idx = i;
-        break;
-      }
+    public void setLevel(
+            AuditLevel level) {
+        this.level = level;
     }
 
-    AuditEventData ret = null;
-    if (idx != -1) {
-      ret = eventDatas.get(idx);
+    public List<AuditEventData> getEventDatas() {
+        return Collections.unmodifiableList(eventDatas);
     }
-    eventDatas.add(eventData);
-    return ret;
-  }
 
-  public AuditStatus getStatus() {
-    return status;
-  }
+    public AuditEventData removeEventData(
+            final String eventDataName) {
+        AuditEventData tbr = null;
+        for (AuditEventData ed : eventDatas) {
+            if (ed.getName().equals(eventDataName)) {
+                tbr = ed;
+            }
+        }
 
-  public void setStatus(
-      final AuditStatus status) {
-    this.status = status;
-  }
+        if (tbr != null) {
+            eventDatas.remove(tbr);
+        }
+
+        return tbr;
+    }
+
+    public AuditEventData addEventData(
+            final AuditEventData eventData) {
+        int idx = -1;
+        for (int i = 0; i < eventDatas.size(); i++) {
+            AuditEventData ed = eventDatas.get(i);
+            if (ed.getName().equals(eventData.getName())) {
+                idx = i;
+                break;
+            }
+        }
+
+        AuditEventData ret = null;
+        if (idx != -1) {
+            ret = eventDatas.get(idx);
+        }
+        eventDatas.add(eventData);
+        return ret;
+    }
+
+    public AuditStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(
+            final AuditStatus status) {
+        this.status = status;
+    }
 
 }

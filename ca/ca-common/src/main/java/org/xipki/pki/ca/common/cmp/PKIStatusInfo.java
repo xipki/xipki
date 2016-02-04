@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,57 +45,57 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 public class PKIStatusInfo {
 
-  private final int status;
+    private final int status;
 
-  private final int pkiFailureInfo;
+    private final int pkiFailureInfo;
 
-  private final String statusMessage;
+    private final String statusMessage;
 
-  public PKIStatusInfo(
-      final int status,
-      final int pkiFailureInfo,
-      final String statusMessage) {
-    this.status = status;
-    this.pkiFailureInfo = pkiFailureInfo;
-    this.statusMessage = statusMessage;
-  }
-
-  public PKIStatusInfo(
-      final int status) {
-    this.status = status;
-    this.pkiFailureInfo = 0;
-    this.statusMessage = null;
-  }
-
-  public PKIStatusInfo(
-      final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
-    this.status = bcPKIStatusInfo.getStatus().intValue();
-    if (bcPKIStatusInfo.getFailInfo() != null) {
-      this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
-    } else {
-      this.pkiFailureInfo = 0;
+    public PKIStatusInfo(
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage) {
+        this.status = status;
+        this.pkiFailureInfo = pkiFailureInfo;
+        this.statusMessage = statusMessage;
     }
-    PKIFreeText text = bcPKIStatusInfo.getStatusString();
-    this.statusMessage = (text == null)
-        ? null
-        : text.getStringAt(0).getString();
-  }
 
-  public int getStatus() {
-    return status;
-  }
+    public PKIStatusInfo(
+            final int status) {
+        this.status = status;
+        this.pkiFailureInfo = 0;
+        this.statusMessage = null;
+    }
 
-  public int getPkiFailureInfo() {
-    return pkiFailureInfo;
-  }
+    public PKIStatusInfo(
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
+        this.status = bcPKIStatusInfo.getStatus().intValue();
+        if (bcPKIStatusInfo.getFailInfo() != null) {
+            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
+        } else {
+            this.pkiFailureInfo = 0;
+        }
+        PKIFreeText text = bcPKIStatusInfo.getStatusString();
+        this.statusMessage = (text == null)
+                ? null
+                : text.getStringAt(0).getString();
+    }
 
-  public String getStatusMessage() {
-    return statusMessage;
-  }
+    public int getStatus() {
+        return status;
+    }
 
-  @Override
-  public String toString() {
-    return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
-  }
+    public int getPkiFailureInfo() {
+        return pkiFailureInfo;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    @Override
+    public String toString() {
+        return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
+    }
 
 }

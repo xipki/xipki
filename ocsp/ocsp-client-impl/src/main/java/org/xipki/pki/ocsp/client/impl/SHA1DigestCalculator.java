@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,14 +47,14 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 
 class SHA1DigestCalculator extends AbstractDigestCalculator {
 
-  @Override
-  protected ASN1ObjectIdentifier getObjectIdentifier() {
-    return OIWObjectIdentifiers.idSHA1;
-  }
+    @Override
+    protected ASN1ObjectIdentifier getObjectIdentifier() {
+        return OIWObjectIdentifiers.idSHA1;
+    }
 
-  @Override
-  protected Digest getDigester() {
-    return new SHA1Digest();
-  }
+    @Override
+    protected Digest getDigester() {
+        return new SHA1Digest();
+    }
 
 }

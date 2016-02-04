@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,41 +48,41 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 public class RevokeCertRequestEntryType extends IssuerSerialEntryType {
 
-  private final int reason;
+    private final int reason;
 
-  private final Date invalidityDate;
+    private final Date invalidityDate;
 
-  public RevokeCertRequestEntryType(
-      final String id,
-      final X509Certificate cert,
-      final int reason,
-      final Date invalidityDate) {
-    this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-        cert.getSerialNumber(), reason, invalidityDate);
-  }
-
-  public RevokeCertRequestEntryType(
-      final String id,
-      final X500Name issuer,
-      final BigInteger serialNumber,
-      final int reason,
-      final Date invalidityDate) {
-    super(id, issuer, serialNumber);
-
-    if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-      throw new IllegalArgumentException("invalid reason: " + reason);
+    public RevokeCertRequestEntryType(
+            final String id,
+            final X509Certificate cert,
+            final int reason,
+            final Date invalidityDate) {
+        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+                cert.getSerialNumber(), reason, invalidityDate);
     }
 
-    this.reason = reason;
-    this.invalidityDate = invalidityDate;
-  }
+    public RevokeCertRequestEntryType(
+            final String id,
+            final X500Name issuer,
+            final BigInteger serialNumber,
+            final int reason,
+            final Date invalidityDate) {
+        super(id, issuer, serialNumber);
 
-  public int getReason() {
-    return reason;
-  }
+        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
+            throw new IllegalArgumentException("invalid reason: " + reason);
+        }
 
-  public Date getInvalidityDate() {
-    return invalidityDate;
-  }
+        this.reason = reason;
+        this.invalidityDate = invalidityDate;
+    }
+
+    public int getReason() {
+        return reason;
+    }
+
+    public Date getInvalidityDate() {
+        return invalidityDate;
+    }
 
 }

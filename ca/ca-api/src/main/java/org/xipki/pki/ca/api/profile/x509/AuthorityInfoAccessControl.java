@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,23 +42,23 @@ package org.xipki.pki.ca.api.profile.x509;
 
 public class AuthorityInfoAccessControl {
 
-  private final boolean includesCaIssuers;
+    private final boolean includesCaIssuers;
 
-  private final boolean includesOcsp;
+    private final boolean includesOcsp;
 
-  public AuthorityInfoAccessControl(
-      final boolean includesCaIssuers,
-      final boolean includesOcsp) {
-    this.includesCaIssuers = includesCaIssuers;
-    this.includesOcsp = includesOcsp;
-  }
+    public AuthorityInfoAccessControl(
+            final boolean includesCaIssuers,
+            final boolean includesOcsp) {
+        this.includesCaIssuers = includesCaIssuers;
+        this.includesOcsp = includesOcsp;
+    }
 
-  public boolean includesCaIssuers() {
-    return includesCaIssuers;
-  }
+    public boolean includesCaIssuers() {
+        return includesCaIssuers;
+    }
 
-  public boolean includesOcsp() {
-    return includesOcsp;
-  }
+    public boolean includesOcsp() {
+        return includesOcsp;
+    }
 
 }

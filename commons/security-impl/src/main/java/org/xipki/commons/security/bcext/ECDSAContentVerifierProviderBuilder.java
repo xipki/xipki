@@ -22,31 +22,31 @@ import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 
 public class ECDSAContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
 
-  private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
+    private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-  public ECDSAContentVerifierProviderBuilder(
-      final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
-    this.digestAlgorithmFinder = digestAlgorithmFinder;
-  }
-
-  protected Signer createSigner(
-      final AlgorithmIdentifier sigAlgId)
-  throws OperatorCreationException {
-    AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-    if (digAlg == null) {
-      throw new OperatorCreationException(
-          "could not retrieve digest algorithm from the signature algorithm "
-          + sigAlgId.getAlgorithm().getId());
+    public ECDSAContentVerifierProviderBuilder(
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+        this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
-    Digest dig = digestProvider.get(digAlg);
 
-    return new DSADigestSigner(new ECDSASigner(), dig);
-  }
+    protected Signer createSigner(
+            final AlgorithmIdentifier sigAlgId)
+    throws OperatorCreationException {
+        AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+        if (digAlg == null) {
+            throw new OperatorCreationException(
+                    "could not retrieve digest algorithm from the signature algorithm "
+                    + sigAlgId.getAlgorithm().getId());
+        }
+        Digest dig = digestProvider.get(digAlg);
 
-  protected AsymmetricKeyParameter extractKeyParameters(
-      final SubjectPublicKeyInfo publicKeyInfo)
-  throws IOException {
-    return PublicKeyFactory.createKey(publicKeyInfo);
-  }
+        return new DSADigestSigner(new ECDSASigner(), dig);
+    }
+
+    protected AsymmetricKeyParameter extractKeyParameters(
+            final SubjectPublicKeyInfo publicKeyInfo)
+    throws IOException {
+        return PublicKeyFactory.createKey(publicKeyInfo);
+    }
 
 }

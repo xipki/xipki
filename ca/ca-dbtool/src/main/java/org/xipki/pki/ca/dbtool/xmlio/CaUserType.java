@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,82 +44,82 @@ import javax.xml.stream.XMLStreamException;
 
 public class CaUserType extends DbDataObject {
 
-  public static final String TAG_ROOT = "user";
+    public static final String TAG_ROOT = "user";
 
-  public static final String TAG_id = "id";
+    public static final String TAG_id = "id";
 
-  private Integer id;
+    private Integer id;
 
-  public static final String TAG_name = "name";
+    public static final String TAG_name = "name";
 
-  private String name;
+    private String name;
 
-  public static final String TAG_password = "password";
+    public static final String TAG_password = "password";
 
-  private String password;
+    private String password;
 
-  public static final String TAG_cnRegex = "cnRegex";
+    public static final String TAG_cnRegex = "cnRegex";
 
-  private String cnRegex;
+    private String cnRegex;
 
-  public Integer getId() {
-    return id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setId(
-      final int id) {
-    this.id = id;
-  }
+    public void setId(
+            final int id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(
-      final String name) {
-    this.name = name;
-  }
+    public void setName(
+            final String name) {
+        this.name = name;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public void setPassword(
-      final String password) {
-    this.password = password;
-  }
+    public void setPassword(
+            final String password) {
+        this.password = password;
+    }
 
-  public String getCnRegex() {
-    return cnRegex;
-  }
+    public String getCnRegex() {
+        return cnRegex;
+    }
 
-  public void setCnRegex(
-      final String cnRegex) {
-    this.cnRegex = cnRegex;
-  }
+    public void setCnRegex(
+            final String cnRegex) {
+        this.cnRegex = cnRegex;
+    }
 
-  @Override
-  public void validate()
-  throws InvalidDataObjectException {
-    assertNotNull("id", id);
-    assertNotBlank("name", name);
-    assertNotBlank("password", password);
-    assertNotBlank("cnRegex", cnRegex);
-  }
+    @Override
+    public void validate()
+    throws InvalidDataObjectException {
+        assertNotNull("id", id);
+        assertNotBlank("name", name);
+        assertNotBlank("password", password);
+        assertNotBlank("cnRegex", cnRegex);
+    }
 
-  @Override
-  public void writeTo(
-      final DbiXmlWriter writer)
-  throws InvalidDataObjectException, XMLStreamException {
-    validate();
+    @Override
+    public void writeTo(
+            final DbiXmlWriter writer)
+    throws InvalidDataObjectException, XMLStreamException {
+        validate();
 
-    writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_id, id);
-    writeIfNotNull(writer, TAG_name, name);
-    writeIfNotNull(writer, TAG_password, password);
-    writeIfNotNull(writer, TAG_cnRegex, cnRegex);
-    writer.writeEndElement();
-    writer.writeNewline();
-  }
+        writer.writeStartElement(TAG_ROOT);
+        writeIfNotNull(writer, TAG_id, id);
+        writeIfNotNull(writer, TAG_name, name);
+        writeIfNotNull(writer, TAG_password, password);
+        writeIfNotNull(writer, TAG_cnRegex, cnRegex);
+        writer.writeEndElement();
+        writer.writeNewline();
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,72 +52,72 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class X509Cert {
 
-  private final X509Certificate cert;
+    private final X509Certificate cert;
 
-  private final String subject;
+    private final String subject;
 
-  private final byte[] encodedCert;
+    private final byte[] encodedCert;
 
-  private final byte[] subjectKeyIdentifer;
+    private final byte[] subjectKeyIdentifer;
 
-  private final X500Name subjectAsX500Name;
+    private final X500Name subjectAsX500Name;
 
-  public X509Cert(
-      final X509Certificate cert) {
-    this(cert, null);
-  }
-
-  public X509Cert(
-      final X509Certificate cert,
-      final byte[] encodedCert) {
-    ParamUtil.assertNotNull("cert", cert);
-
-    this.cert = cert;
-    X500Principal x500Subject = cert.getSubjectX500Principal();
-    this.subject = X509Util.getRFC4519Name(x500Subject);
-    this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
-    try {
-      this.subjectKeyIdentifer = X509Util.extractSKI(cert);
-    } catch (CertificateEncodingException ex) {
-      throw new RuntimeException(
-        String.format("CertificateEncodingException: %s", ex.getMessage()));
+    public X509Cert(
+            final X509Certificate cert) {
+        this(cert, null);
     }
 
-    if (encodedCert == null) {
-      try {
-        this.encodedCert = cert.getEncoded();
-      } catch (CertificateEncodingException ex) {
-        throw new RuntimeException(
-          String.format("CertificateEncodingException: %s", ex.getMessage()));
-      }
-    } else {
-      this.encodedCert = encodedCert;
+    public X509Cert(
+            final X509Certificate cert,
+            final byte[] encodedCert) {
+        ParamUtil.assertNotNull("cert", cert);
+
+        this.cert = cert;
+        X500Principal x500Subject = cert.getSubjectX500Principal();
+        this.subject = X509Util.getRFC4519Name(x500Subject);
+        this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
+        try {
+            this.subjectKeyIdentifer = X509Util.extractSKI(cert);
+        } catch (CertificateEncodingException ex) {
+            throw new RuntimeException(
+                String.format("CertificateEncodingException: %s", ex.getMessage()));
+        }
+
+        if (encodedCert == null) {
+            try {
+                this.encodedCert = cert.getEncoded();
+            } catch (CertificateEncodingException ex) {
+                throw new RuntimeException(
+                    String.format("CertificateEncodingException: %s", ex.getMessage()));
+            }
+        } else {
+            this.encodedCert = encodedCert;
+        }
     }
-  }
 
-  public X509Certificate getCert() {
-    return cert;
-  }
+    public X509Certificate getCert() {
+        return cert;
+    }
 
-  public byte[] getEncodedCert() {
-    return encodedCert;
-  }
+    public byte[] getEncodedCert() {
+        return encodedCert;
+    }
 
-  public String getSubject() {
-    return subject;
-  }
+    public String getSubject() {
+        return subject;
+    }
 
-  public X500Name getSubjectAsX500Name() {
-    return subjectAsX500Name;
-  }
+    public X500Name getSubjectAsX500Name() {
+        return subjectAsX500Name;
+    }
 
-  public byte[] getSubjectKeyIdentifier() {
-    return Arrays.clone(subjectKeyIdentifer);
-  }
+    public byte[] getSubjectKeyIdentifier() {
+        return Arrays.clone(subjectKeyIdentifer);
+    }
 
-  @Override
-  public String toString() {
-    return cert.toString();
-  }
+    @Override
+    public String toString() {
+        return cert.toString();
+    }
 
 }

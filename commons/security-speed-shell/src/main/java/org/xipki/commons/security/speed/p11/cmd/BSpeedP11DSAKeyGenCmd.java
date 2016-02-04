@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,26 +49,26 @@ import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
-    description = "performance test of PKCS#11 DSA key generation (batch)")
+        description = "performance test of PKCS#11 DSA key generation (batch)")
 public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
 
-  @Override
-  protected List<LoadExecutor> getTesters()
-  throws Exception {
-    List<LoadExecutor> ret = new LinkedList<>();
-    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+    @Override
+    protected List<LoadExecutor> getTesters()
+    throws Exception {
+        List<LoadExecutor> ret = new LinkedList<>();
+        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-    for (int i = 0; i < pqLens.length; i += 2) {
-      int pLen = pqLens[i];
-      int qLen = pqLens[i + 1];
+        for (int i = 0; i < pqLens.length; i += 2) {
+            int pLen = pqLens[i];
+            int qLen = pqLens[i + 1];
 
-      ret.add(
-          new P11DSAKeyGenLoadTest(slot, pLen, qLen));
+            ret.add(
+                    new P11DSAKeyGenLoadTest(slot, pLen, qLen));
+        }
+
+        return ret;
     }
-
-    return ret;
-  }
 
 }

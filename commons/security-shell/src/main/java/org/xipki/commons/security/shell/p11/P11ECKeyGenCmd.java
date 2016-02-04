@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,31 +50,31 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  */
 
 @Command(scope = "xipki-tk", name = "ec",
-    description = "generate EC keypair in PKCS#11 device")
+        description = "generate EC keypair in PKCS#11 device")
 @Service
 public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
 
-  @Option(name = "--curve",
-      required = true,
-      description = "EC curve name\n"
-          + "(required)")
-  @Completion(ECCurveNameCompleter.class)
-  private String curveName;
+    @Option(name = "--curve",
+            required = true,
+            description = "EC curve name\n"
+                    + "(required)")
+    @Completion(ECCurveNameCompleter.class)
+    private String curveName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    if (noCert) {
-      P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
-      finalize(keyId);
-    } else {
-      P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
-          curveName, label, getSubject(),
-          getKeyUsage(), getExtendedKeyUsage());
-      finalize(keyAndCert);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        if (noCert) {
+            P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
+            finalize(keyId);
+        } else {
+            P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
+                    curveName, label, getSubject(),
+                    getKeyUsage(), getExtendedKeyUsage());
+            finalize(keyAndCert);
+        }
+        return null;
     }
-    return null;
-  }
 
 }

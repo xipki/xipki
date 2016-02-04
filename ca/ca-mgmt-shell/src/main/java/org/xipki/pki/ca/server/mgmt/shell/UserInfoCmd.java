@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,27 +48,27 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
  */
 
 @Command(scope = "xipki-ca", name = "user-info",
-    description = "show information of user")
+        description = "show information of user")
 @Service
 public class UserInfoCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", required = true, description = "user name")
-  private String name;
+    @Argument(index = 0, name = "name", required = true, description = "user name")
+    private String name;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    StringBuilder sb = new StringBuilder();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        StringBuilder sb = new StringBuilder();
 
-    UserEntry userEntry = caManager.getUser(name);
-    if (userEntry == null) {
-      throw new UnexpectedException("\tno user named '" + name + "' is configured");
-    } else {
-      sb.append(name).append("\n\t").append(userEntry);
+        UserEntry userEntry = caManager.getUser(name);
+        if (userEntry == null) {
+            throw new UnexpectedException("\tno user named '" + name + "' is configured");
+        } else {
+            sb.append(name).append("\n\t").append(userEntry);
+        }
+
+        out(sb.toString());
+        return null;
     }
-
-    out(sb.toString());
-    return null;
-  }
 
 }

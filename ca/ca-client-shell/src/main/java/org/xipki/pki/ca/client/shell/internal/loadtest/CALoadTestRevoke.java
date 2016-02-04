@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -73,228 +73,228 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
 
 public class CALoadTestRevoke extends LoadExecutor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestRevoke.class);
 
-  private static final CRLReason[] REASONS = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
-        CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
-        CRLReason.CERTIFICATE_HOLD,  CRLReason.PRIVILEGE_WITHDRAWN};
+    private static final CRLReason[] REASONS = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+            CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+            CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN};
 
-  private final CAClient caClient;
+    private final CAClient caClient;
 
-  private final DataSourceWrapper caDataSource;
+    private final DataSourceWrapper caDataSource;
 
-  private final X500Name caSubject;
+    private final X500Name caSubject;
 
-  private final Set<Long> excludeSerials = new HashSet<>();
+    private final Set<Long> excludeSerials = new HashSet<>();
 
-  private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
 
-  private final int caInfoId;
+    private final int caInfoId;
 
-  private final long minSerial;
+    private final long minSerial;
 
-  private final long maxSerial;
+    private final long maxSerial;
 
-  private final int maxCerts;
+    private final int maxCerts;
 
-  private final int n;
+    private final int n;
 
-  private AtomicInteger processedCerts = new AtomicInteger(0);
+    private AtomicInteger processedCerts = new AtomicInteger(0);
 
-  private long nextStartSerial;
+    private long nextStartSerial;
 
-  private boolean noUnrevokedCerts;
+    private boolean noUnrevokedCerts;
 
-  public CALoadTestRevoke(
-      final CAClient caClient,
-      final Certificate caCert,
-      final DataSourceWrapper caDataSource,
-      final int maxCerts,
-      final int n,
-      final String description)
-  throws Exception {
-    super(description);
-    ParamUtil.assertNotNull("caClient", caClient);
-    ParamUtil.assertNotNull("caCert", caCert);
-    ParamUtil.assertNotNull("caDataSource", caDataSource);
-    if (n < 1) {
-      throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
-    }
-    this.n = n;
+    public CALoadTestRevoke(
+            final CAClient caClient,
+            final Certificate caCert,
+            final DataSourceWrapper caDataSource,
+            final int maxCerts,
+            final int n,
+            final String description)
+    throws Exception {
+        super(description);
+        ParamUtil.assertNotNull("caClient", caClient);
+        ParamUtil.assertNotNull("caCert", caCert);
+        ParamUtil.assertNotNull("caDataSource", caDataSource);
+        if (n < 1) {
+            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+        }
+        this.n = n;
 
-    this.caClient = caClient;
-    this.caDataSource = caDataSource;
-    this.caSubject = caCert.getSubject();
-    this.maxCerts = maxCerts;
-    if (caCert.getIssuer().equals(caCert.getSubject())) {
-      this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
-    }
+        this.caClient = caClient;
+        this.caDataSource = caDataSource;
+        this.caSubject = caCert.getSubject();
+        this.maxCerts = maxCerts;
+        if (caCert.getIssuer().equals(caCert.getSubject())) {
+            this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
+        }
 
-    String b64Sha1Fp = HashCalculator.base64Sha1(caCert.getEncoded());
-    String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
-    Statement stmt = caDataSource.getConnection().createStatement();
-    try {
-      ResultSet rs = stmt.executeQuery(sql);
-      if (rs.next()) {
-        caInfoId = rs.getInt("ID");
-      } else {
-        throw new Exception("CA Certificate and database configuration does not match");
-      }
-      rs.close();
+        String b64Sha1Fp = HashCalculator.base64Sha1(caCert.getEncoded());
+        String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
+        Statement stmt = caDataSource.getConnection().createStatement();
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                caInfoId = rs.getInt("ID");
+            } else {
+                throw new Exception("CA Certificate and database configuration does not match");
+            }
+            rs.close();
 
-      sql = "SELECT MIN(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
-      rs = stmt.executeQuery(sql);
-      rs.next();
-      minSerial = rs.getLong(1);
-      nextStartSerial = minSerial;
+            sql = "SELECT MIN(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            minSerial = rs.getLong(1);
+            nextStartSerial = minSerial;
 
-      sql = "SELECT MAX(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
-      rs = stmt.executeQuery(sql);
-      rs.next();
-      maxSerial = rs.getLong(1);
-    } finally {
-      caDataSource.releaseResources(stmt, null);
-    }
-  } // constructor
+            sql = "SELECT MAX(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            maxSerial = rs.getLong(1);
+        } finally {
+            caDataSource.releaseResources(stmt, null);
+        }
+    } // constructor
 
-  class Testor implements Runnable {
+    class Testor implements Runnable {
+
+        @Override
+        public void run() {
+            while (!stop() && getErrorAccout() < 1) {
+                List<Long> serialNumbers;
+                try {
+                    serialNumbers = nextSerials();
+                } catch (DataAccessException ex) {
+                    account(1, 1);
+                    break;
+                }
+
+                if (CollectionUtil.isEmpty(serialNumbers)) {
+                    break;
+                }
+
+                boolean successful = testNext(serialNumbers);
+                int numFailed = successful
+                        ? 0
+                        : 1;
+                account(1, numFailed);
+            }
+        }
+
+        private boolean testNext(
+                final List<Long> serialNumbers) {
+            RevokeCertRequestType request = new RevokeCertRequestType();
+            int id = 1;
+            for (Long serialNumber : serialNumbers) {
+                CRLReason reason = REASONS[(int) (serialNumber % REASONS.length)];
+                RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
+                        Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
+                        reason.getCode(), null);
+                request.addRequestEntry(entry);
+            }
+
+            Map<String, CertIdOrError> result;
+            try {
+                result = caClient.revokeCerts(request, null);
+            } catch (CAClientException | PKIErrorException e) {
+                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+                return false;
+            } catch (Throwable t) {
+                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+                return false;
+            }
+
+            if (result == null) {
+                return false;
+            }
+
+            int nSuccess = 0;
+            for (CertIdOrError entry : result.values()) {
+                if (entry.getCertId() != null) {
+                    nSuccess++;
+                }
+            }
+            return nSuccess == serialNumbers.size();
+        } // method testNext
+
+    } // class Testor
 
     @Override
-    public void run() {
-      while (!stop() && getErrorAccout() < 1) {
-        List<Long> serialNumbers;
-        try {
-          serialNumbers = nextSerials();
-        } catch (DataAccessException ex) {
-          account(1, 1);
-          break;
-        }
-
-        if (CollectionUtil.isEmpty(serialNumbers)) {
-          break;
-        }
-
-        boolean successful = testNext(serialNumbers);
-        int numFailed = successful
-            ? 0
-            : 1;
-        account(1, numFailed);
-      }
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
     }
 
-    private boolean testNext(
-        final List<Long> serialNumbers) {
-      RevokeCertRequestType request = new RevokeCertRequestType();
-      int id = 1;
-      for (Long serialNumber : serialNumbers) {
-        CRLReason reason = REASONS[(int) (serialNumber % REASONS.length)];
-        RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
-            Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
-            reason.getCode(), null);
-        request.addRequestEntry(entry);
-      }
-
-      Map<String, CertIdOrError> result;
-      try {
-        result = caClient.revokeCerts(request, null);
-      } catch (CAClientException | PKIErrorException e) {
-        LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-        return false;
-      } catch (Throwable t) {
-        LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-        return false;
-      }
-
-      if (result == null) {
-        return false;
-      }
-
-      int nSuccess = 0;
-      for (CertIdOrError entry : result.values()) {
-        if (entry.getCertId() != null) {
-          nSuccess++;
-        }
-      }
-      return nSuccess == serialNumbers.size();
-    } // method testNext
-
-  } // class Testor
-
-  @Override
-  protected Runnable getTestor()
-  throws Exception {
-    return new Testor();
-  }
-
-  private List<Long> nextSerials()
-  throws DataAccessException {
-    List<Long> ret = new ArrayList<>(n);
-    for (int i = 0; i < n; i++) {
-      Long serial = nextSerial();
-      if (serial != null) {
-        ret.add(serial);
-      } else {
-        break;
-      }
-    }
-    return ret;
-  }
-
-  private Long nextSerial()
-  throws DataAccessException {
-    synchronized (caDataSource) {
-      if (maxCerts > 0) {
-        int num = processedCerts.getAndAdd(1);
-        if (num >= maxCerts) {
-          return null;
-        }
-      }
-
-      Long firstSerial = serials.pollFirst();
-      if (firstSerial != null) {
-        return firstSerial;
-      }
-
-      if (!noUnrevokedCerts) {
-        String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
-            + " AND SN > " + (nextStartSerial - 1)
-            + " AND SN < " + (maxSerial + 1);
-        sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        int i = 0;
-        try {
-          stmt = caDataSource.getConnection().prepareStatement(sql);
-          rs = stmt.executeQuery();
-          while (rs.next()) {
-            i++;
-            long serial = rs.getLong("SN");
-            if (serial + 1 > nextStartSerial) {
-              nextStartSerial = serial + 1;
+    private List<Long> nextSerials()
+    throws DataAccessException {
+        List<Long> ret = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            Long serial = nextSerial();
+            if (serial != null) {
+                ret.add(serial);
+            } else {
+                break;
             }
-            if (!excludeSerials.contains(serial)) {
-              serials.addLast(serial);
-            }
-          }
-        } catch (SQLException e) {
-          throw caDataSource.translate(sql, e);
-        } finally {
-          caDataSource.releaseResources(stmt, rs);
         }
-
-        if (i == 0) {
-          System.out.println("no unrevoked certificate");
-          System.out.flush();
-        }
-
-        if (i < 1000) {
-          noUnrevokedCerts = true;
-        }
-      }
-
-      return serials.pollFirst();
+        return ret;
     }
-  } // method nextSerial
+
+    private Long nextSerial()
+    throws DataAccessException {
+        synchronized (caDataSource) {
+            if (maxCerts > 0) {
+                int num = processedCerts.getAndAdd(1);
+                if (num >= maxCerts) {
+                    return null;
+                }
+            }
+
+            Long firstSerial = serials.pollFirst();
+            if (firstSerial != null) {
+                return firstSerial;
+            }
+
+            if (!noUnrevokedCerts) {
+                String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
+                        + " AND SN > " + (nextStartSerial - 1)
+                        + " AND SN < " + (maxSerial + 1);
+                sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
+                PreparedStatement stmt = null;
+                ResultSet rs = null;
+
+                int i = 0;
+                try {
+                    stmt = caDataSource.getConnection().prepareStatement(sql);
+                    rs = stmt.executeQuery();
+                    while (rs.next()) {
+                        i++;
+                        long serial = rs.getLong("SN");
+                        if (serial + 1 > nextStartSerial) {
+                            nextStartSerial = serial + 1;
+                        }
+                        if (!excludeSerials.contains(serial)) {
+                            serials.addLast(serial);
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw caDataSource.translate(sql, e);
+                } finally {
+                    caDataSource.releaseResources(stmt, rs);
+                }
+
+                if (i == 0) {
+                    System.out.println("no unrevoked certificate");
+                    System.out.flush();
+                }
+
+                if (i < 1000) {
+                    noUnrevokedCerts = true;
+                }
+            }
+
+            return serials.pollFirst();
+        }
+    } // method nextSerial
 
 }

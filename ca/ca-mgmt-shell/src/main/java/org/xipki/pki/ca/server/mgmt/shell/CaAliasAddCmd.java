@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,30 +47,30 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "caalias-add",
-    description = "add CA alias")
+        description = "add CA alias")
 @Service
 public class CaAliasAddCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--alias",
-      required = true,
-      description = "CA alias\n"
-          + "(required)")
-  private String caAlias;
+    @Option(name = "--alias",
+            required = true,
+            description = "CA alias\n"
+                    + "(required)")
+    private String caAlias;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.addCaAlias(caAlias, caName);
-    output(b, "added", "could not add",
-        "CA alias " + caAlias + " associated with CA " + caName);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.addCaAlias(caAlias, caName);
+        output(b, "added", "could not add",
+                "CA alias " + caAlias + " associated with CA " + caName);
+        return null;
+    }
 
 }

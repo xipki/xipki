@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,32 +49,32 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12DSASignLoadTest extends P12SignLoadTest {
 
-  public P12DSASignLoadTest(
-      final SecurityFactory securityFactory,
-      final String signatureAlgorithm,
-      final int pLength,
-      final int qLength)
-  throws Exception {
-    super(securityFactory, signatureAlgorithm,
-        generateKeystore(pLength, qLength),
-        "PKCS#12 DSA signature creation\n"
-          + "pLength: " + pLength + "\n"
-          + "qLength: " + qLength);
-  }
-
-  private static byte[] generateKeystore(
-      final int pLength,
-      final int qLength)
-  throws Exception {
-    byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
-    if (keystoreBytes == null) {
-      P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
-          pLength, qLength, password.toCharArray(), "CN=dummy",
-          (Integer) null, (List<ASN1ObjectIdentifier>) null,
-          new SecureRandom());
-      keystoreBytes = kpGen.generateIdentity().getKeystore();
+    public P12DSASignLoadTest(
+            final SecurityFactory securityFactory,
+            final String signatureAlgorithm,
+            final int pLength,
+            final int qLength)
+    throws Exception {
+        super(securityFactory, signatureAlgorithm,
+                generateKeystore(pLength, qLength),
+                "PKCS#12 DSA signature creation\n"
+                    + "pLength: " + pLength + "\n"
+                    + "qLength: " + qLength);
     }
-    return keystoreBytes;
-  }
+
+    private static byte[] generateKeystore(
+            final int pLength,
+            final int qLength)
+    throws Exception {
+        byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
+        if (keystoreBytes == null) {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
+                    pLength, qLength, password.toCharArray(), "CN=dummy",
+                    (Integer) null, (List<ASN1ObjectIdentifier>) null,
+                    new SecureRandom());
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
+    }
 
 }

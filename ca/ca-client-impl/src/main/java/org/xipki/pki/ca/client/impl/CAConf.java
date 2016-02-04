@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,143 +53,143 @@ import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 class CAConf {
 
-  private final String name;
+    private final String name;
 
-  private final String url;
+    private final String url;
 
-  private final String healthUrl;
+    private final String healthUrl;
 
-  private final String requestorName;
+    private final String requestorName;
 
-  private X509CmpRequestor requestor;
+    private X509CmpRequestor requestor;
 
-  private boolean certAutoconf;
+    private boolean certAutoconf;
 
-  private boolean certprofilesAutoconf;
+    private boolean certprofilesAutoconf;
 
-  private X509Certificate cert;
+    private X509Certificate cert;
 
-  private final X509Certificate responder;
+    private final X509Certificate responder;
 
-  private X500Name subject;
+    private X500Name subject;
 
-  private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
+    private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
-  CAConf(
-      final String name,
-      final String url,
-      final String healthUrl,
-      final String requestorName,
-      final X509Certificate responder) {
-    ParamUtil.assertNotBlank("name", name);
-    ParamUtil.assertNotBlank("url", url);
-    ParamUtil.assertNotNull("requestorName", requestorName);
-    ParamUtil.assertNotNull("responder", responder);
+    CAConf(
+            final String name,
+            final String url,
+            final String healthUrl,
+            final String requestorName,
+            final X509Certificate responder) {
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("url", url);
+        ParamUtil.assertNotNull("requestorName", requestorName);
+        ParamUtil.assertNotNull("responder", responder);
 
-    this.name = name;
-    this.url = url;
-    this.requestorName = requestorName;
-    this.responder = responder;
-    if (StringUtil.isBlank(healthUrl)) {
-      this.healthUrl = url.replace("cmp", "health");
-    } else {
-      this.healthUrl = healthUrl;
+        this.name = name;
+        this.url = url;
+        this.requestorName = requestorName;
+        this.responder = responder;
+        if (StringUtil.isBlank(healthUrl)) {
+            this.healthUrl = url.replace("cmp", "health");
+        } else {
+            this.healthUrl = healthUrl;
+        }
     }
-  }
 
-  public String getName() {
-    return name;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public String getHealthUrl() {
-    return healthUrl;
-  }
-
-  public void setCert(
-      final X509Certificate cert) {
-    this.cert = cert;
-    if (cert != null) {
-      this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-    } else {
-      this.subject = null;
+    public String getName() {
+        return name;
     }
-  }
 
-  public void setCertprofiles(
-      final Set<CertprofileInfo> certProfiles) {
-    if (profiles == null) {
-      this.profiles = Collections.emptyMap();
-    } else {
-      this.profiles = new HashMap<>();
-      for (CertprofileInfo m : certProfiles) {
-        this.profiles.put(m.getName(), m);
-      }
+    public String getUrl() {
+        return url;
     }
-  }
 
-  public X509Certificate getCert() {
-    return cert;
-  }
+    public String getHealthUrl() {
+        return healthUrl;
+    }
 
-  public X500Name getSubject() {
-    return subject;
-  }
+    public void setCert(
+            final X509Certificate cert) {
+        this.cert = cert;
+        if (cert != null) {
+            this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        } else {
+            this.subject = null;
+        }
+    }
 
-  public Set<String> getProfileNames() {
-    return profiles.keySet();
-  }
+    public void setCertprofiles(
+            final Set<CertprofileInfo> certProfiles) {
+        if (profiles == null) {
+            this.profiles = Collections.emptyMap();
+        } else {
+            this.profiles = new HashMap<>();
+            for (CertprofileInfo m : certProfiles) {
+                this.profiles.put(m.getName(), m);
+            }
+        }
+    }
 
-  public boolean supportsProfile(
-      final String profileName) {
-    return profiles.containsKey(profileName);
-  }
+    public X509Certificate getCert() {
+        return cert;
+    }
 
-  public CertprofileInfo getProfile(
-      final String profileName) {
-    return profiles.get(profileName);
-  }
+    public X500Name getSubject() {
+        return subject;
+    }
 
-  public boolean isCAInfoConfigured() {
-    return cert != null;
-  }
+    public Set<String> getProfileNames() {
+        return profiles.keySet();
+    }
 
-  public X509Certificate getResponder() {
-    return responder;
-  }
+    public boolean supportsProfile(
+            final String profileName) {
+        return profiles.containsKey(profileName);
+    }
 
-  public boolean isCertAutoconf() {
-    return certAutoconf;
-  }
+    public CertprofileInfo getProfile(
+            final String profileName) {
+        return profiles.get(profileName);
+    }
 
-  public void setCertAutoconf(
-      final boolean autoconf) {
-    this.certAutoconf = autoconf;
-  }
+    public boolean isCAInfoConfigured() {
+        return cert != null;
+    }
 
-  public boolean isCertprofilesAutoconf() {
-    return certprofilesAutoconf;
-  }
+    public X509Certificate getResponder() {
+        return responder;
+    }
 
-  public void setCertprofilesAutoconf(
-      final boolean autoconf) {
-    this.certprofilesAutoconf = autoconf;
-  }
+    public boolean isCertAutoconf() {
+        return certAutoconf;
+    }
 
-  public void setRequestor(
-      final X509CmpRequestor requestor) {
-    this.requestor = requestor;
-  }
+    public void setCertAutoconf(
+            final boolean autoconf) {
+        this.certAutoconf = autoconf;
+    }
 
-  public String getRequestorName() {
-    return requestorName;
-  }
+    public boolean isCertprofilesAutoconf() {
+        return certprofilesAutoconf;
+    }
 
-  public X509CmpRequestor getRequestor() {
-    return requestor;
-  }
+    public void setCertprofilesAutoconf(
+            final boolean autoconf) {
+        this.certprofilesAutoconf = autoconf;
+    }
+
+    public void setRequestor(
+            final X509CmpRequestor requestor) {
+        this.requestor = requestor;
+    }
+
+    public String getRequestorName() {
+        return requestorName;
+    }
+
+    public X509CmpRequestor getRequestor() {
+        return requestor;
+    }
 
 }

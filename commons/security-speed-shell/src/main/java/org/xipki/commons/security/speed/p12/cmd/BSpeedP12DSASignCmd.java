@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,25 +48,25 @@ import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign-p12",
-    description = "performance test of PKCS#12 DSA signature creation")
+        description = "performance test of PKCS#12 DSA signature creation")
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
-  @Override
-  protected List<LoadExecutor> getTesters()
-  throws Exception {
-    List<LoadExecutor> ret = new LinkedList<>();
-    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
-    for (int i = 0; i < pqLens.length; i += 2) {
-      int pLen = pqLens[i];
-      int qLen = pqLens[i + 1];
-      if (pLen == 1024) {
-        sigAlgo = "SHA1withDSA";
-      }
+    @Override
+    protected List<LoadExecutor> getTesters()
+    throws Exception {
+        List<LoadExecutor> ret = new LinkedList<>();
+        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+        for (int i = 0; i < pqLens.length; i += 2) {
+            int pLen = pqLens[i];
+            int qLen = pqLens[i + 1];
+            if (pLen == 1024) {
+                sigAlgo = "SHA1withDSA";
+            }
 
-      ret.add(
-          new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen));
+            ret.add(
+                    new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen));
+        }
+        return ret;
     }
-    return ret;
-  }
 
 }

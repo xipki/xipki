@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,21 +46,21 @@ import java.security.Provider;
 
 public class XipkiSunECProvider extends Provider {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public static final String NAME = "XiPKI-SunEC";
+    public static final String NAME = "XiPKI-SunEC";
 
-  public static final double VERSION = 1.0;
+    public static final double VERSION = 1.0;
 
-  public XipkiSunECProvider() {
-    super(NAME, VERSION, NAME + " (version " + VERSION + ")");
+    public XipkiSunECProvider() {
+        super(NAME, VERSION, NAME + " (version " + VERSION + ")");
 
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      public Object run() {
-        put("AlgorithmParameters.EC", ECParameters.class.getName());
-        return null;
-      }
-    });
-  }
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                put("AlgorithmParameters.EC", ECParameters.class.getName());
+                return null;
+            }
+        });
+    }
 
 }

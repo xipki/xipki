@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,41 +54,41 @@ import org.xipki.commons.security.api.util.X509Util;
  */
 //FIXME: use different label if CA key label already exists.
 @Command(scope = "xipki-tk", name = "update-cert",
-    description = "update certificate in PKCS#11 device")
+        description = "update certificate in PKCS#11 device")
 @Service
 public class P11CertUpdateCmd extends P11SecurityCommandSupport {
 
-  @Option(name = "--cert",
-      required = true,
-      description = "certificate file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            required = true,
+            description = "certificate file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--ca-cert",
-      multiValued = true,
-      description = "CA Certificate files\n"
-          + "(multi-valued)")
-  @Completion(FilePathCompleter.class)
-  private Set<String> caCertFiles;
+    @Option(name = "--ca-cert",
+            multiValued = true,
+            description = "CA Certificate files\n"
+                    + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
+    private Set<String> caCertFiles;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-    X509Certificate newCert = X509Util.parseCert(certFile);
-    Set<X509Certificate> caCerts = new HashSet<>();
-    if (isNotEmpty(caCertFiles)) {
-      for (String caCertFile : caCertFiles) {
-        caCerts.add(X509Util.parseCert(caCertFile));
-      }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        X509Certificate newCert = X509Util.parseCert(certFile);
+        Set<X509Certificate> caCerts = new HashSet<>();
+        if (isNotEmpty(caCertFiles)) {
+            for (String caCertFile : caCertFiles) {
+                caCerts.add(X509Util.parseCert(caCertFile));
+            }
+        }
+
+        slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
+        securityFactory.getP11CryptService(moduleName).refresh();
+        out("updated certificate");
+        return null;
     }
-
-    slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
-    securityFactory.getP11CryptService(moduleName).refresh();
-    out("updated certificate");
-    return null;
-  }
 
 }

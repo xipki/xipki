@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,53 +55,53 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
  */
 
 @Command(scope = "xipki-ca", name = "responder-add",
-    description = "add responder")
+        description = "add responder")
 @Service
 public class ResponderAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "responder name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "responder name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--signer-type",
-      required = true,
-      description = "type of the responder signer\n"
-          + "(required)")
-  @Completion(SignerTypeCompleter.class)
-  private String signerType;
+    @Option(name = "--signer-type",
+            required = true,
+            description = "type of the responder signer\n"
+                    + "(required)")
+    @Completion(SignerTypeCompleter.class)
+    private String signerType;
 
-  @Option(name = "--signer-conf",
-      description = "conf of the responder signer")
-  private String signerConf;
+    @Option(name = "--signer-conf",
+            description = "conf of the responder signer")
+    private String signerConf;
 
-  @Option(name = "--cert",
-      description = "responder certificate file")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            description = "responder certificate file")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Reference
-  private PasswordResolver passwordResolver;
+    @Reference
+    private PasswordResolver passwordResolver;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    String base64Cert = null;
-    X509Certificate signerCert = null;
-    if (certFile != null) {
-      signerCert = X509Util.parseCert(certFile);
-      base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        String base64Cert = null;
+        X509Certificate signerCert = null;
+        if (certFile != null) {
+            signerCert = X509Util.parseCert(certFile);
+            base64Cert = IoUtil.base64Encode(signerCert.getEncoded(), false);
+        }
+
+        if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+        }
+        CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
+
+        boolean b = caManager.addCmpResponder(entry);
+        output(b, "added", "could not add", "CMP responder " + name);
+        return null;
     }
-
-    if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-      signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
-    }
-    CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
-
-    boolean b = caManager.addCmpResponder(entry);
-    output(b, "added", "could not add", "CMP responder " + name);
-    return null;
-  }
 
 }

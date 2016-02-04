@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -65,95 +65,95 @@ import org.xipki.pki.ca.dbtool.jaxb.ocsp.ObjectFactory;
 
 public class OcspDbExportWorker extends DbPortWorker {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
 
-  private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper dataSource;
 
-  private final Marshaller marshaller;
+    private final Marshaller marshaller;
 
-  private final Unmarshaller unmarshaller;
+    private final Unmarshaller unmarshaller;
 
-  private final String destFolder;
+    private final String destFolder;
 
-  private final boolean resume;
+    private final boolean resume;
 
-  private final int numCertsInBundle;
+    private final int numCertsInBundle;
 
-  private final int numCertsPerSelect;
+    private final int numCertsPerSelect;
 
-  private final boolean evaluateOnly;
+    private final boolean evaluateOnly;
 
-  public OcspDbExportWorker(
-      final DataSourceFactory dataSourceFactory,
-      final PasswordResolver passwordResolver,
-      final String dbConfFile,
-      final String destFolder,
-      final boolean resume,
-      final int numCertsInBundle,
-      final int numCertsPerSelect,
-      final boolean evaluateOnly)
-  throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-    Properties props = DbPorter.getDbConfProperties(
-        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-    this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+    public OcspDbExportWorker(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final String dbConfFile,
+            final String destFolder,
+            final boolean resume,
+            final int numCertsInBundle,
+            final int numCertsPerSelect,
+            final boolean evaluateOnly)
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
 
-    JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-    marshaller = jaxbContext.createMarshaller();
-    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-    Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
-    marshaller.setSchema(schema);
+        Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
+        marshaller.setSchema(schema);
 
-    unmarshaller = jaxbContext.createUnmarshaller();
-    unmarshaller.setSchema(schema);
-    this.evaluateOnly = evaluateOnly;
+        unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(schema);
+        this.evaluateOnly = evaluateOnly;
 
-    File f = new File(destFolder);
-    if (!f.exists()) {
-      f.mkdirs();
-    } else {
-      if (!f.isDirectory()) {
-        throw new IOException(destFolder + " is not a folder");
-      }
+        File f = new File(destFolder);
+        if (!f.exists()) {
+            f.mkdirs();
+        } else {
+            if (!f.isDirectory()) {
+                throw new IOException(destFolder + " is not a folder");
+            }
 
-      if (!f.canWrite()) {
-        throw new IOException(destFolder + " is not writable");
-      }
+            if (!f.canWrite()) {
+                throw new IOException(destFolder + " is not writable");
+            }
+        }
+
+        if (!resume) {
+            String[] children = f.list();
+            if (children != null && children.length > 0) {
+                throw new IOException(destFolder + " is not empty");
+            }
+        }
+        this.resume = resume;
+        this.destFolder = destFolder;
+        this.numCertsInBundle = numCertsInBundle;
+        this.numCertsPerSelect = numCertsPerSelect;
+    } // constructor
+
+    @Override
+    public void doRun(
+            final AtomicBoolean stopMe)
+    throws Exception {
+        long start = System.currentTimeMillis();
+        try {
+            // CertStore
+            OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
+                    dataSource, marshaller, unmarshaller, destFolder,
+                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
+            certStoreExporter.export();
+            certStoreExporter.shutdown();
+        } finally {
+            try {
+                dataSource.shutdown();
+            } catch (Throwable e) {
+                LOG.error("dataSource.shutdown()", e);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        }
     }
-
-    if (!resume) {
-      String[] children = f.list();
-      if (children != null && children.length > 0) {
-        throw new IOException(destFolder + " is not empty");
-      }
-    }
-    this.resume = resume;
-    this.destFolder = destFolder;
-    this.numCertsInBundle = numCertsInBundle;
-    this.numCertsPerSelect = numCertsPerSelect;
-  } // constructor
-
-  @Override
-  public void doRun(
-      final AtomicBoolean stopMe)
-  throws Exception {
-    long start = System.currentTimeMillis();
-    try {
-      // CertStore
-      OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-          dataSource, marshaller, unmarshaller, destFolder,
-          numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
-      certStoreExporter.export();
-      certStoreExporter.shutdown();
-    } finally {
-      try {
-        dataSource.shutdown();
-      } catch (Throwable e) {
-        LOG.error("dataSource.shutdown()", e);
-      }
-      long end = System.currentTimeMillis();
-      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-    }
-  }
 
 }

@@ -23,162 +23,162 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class DSAPlainDigestSigner implements Signer {
 
-  private final Digest digest;
+    private final Digest digest;
 
-  private final DSA dsaSigner;
+    private final DSA dsaSigner;
 
-  private boolean forSigning;
+    private boolean forSigning;
 
-  private int keyBitLen;
+    private int keyBitLen;
 
-  public DSAPlainDigestSigner(
-      final DSA signer,
-      final Digest digest) {
-    this.digest = digest;
-    this.dsaSigner = signer;
-  }
-
-  public void init(
-      final boolean forSigning,
-      final CipherParameters parameters) {
-    this.forSigning = forSigning;
-
-    AsymmetricKeyParameter k;
-
-    if (parameters instanceof ParametersWithRandom) {
-      k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
-    } else {
-      k = (AsymmetricKeyParameter) parameters;
+    public DSAPlainDigestSigner(
+            final DSA signer,
+            final Digest digest) {
+        this.digest = digest;
+        this.dsaSigner = signer;
     }
 
-    ParamUtil.assertNotNull("k", k);
-    if (k instanceof ECPublicKeyParameters) {
-      keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
-    } else if (k instanceof ECPrivateKeyParameters) {
-      keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
-    } else if (k instanceof DSAPublicKeyParameters) {
-      keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
-    } else if (k instanceof DSAPrivateKeyParameters) {
-      keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
-    } else {
-      throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
+    public void init(
+            final boolean forSigning,
+            final CipherParameters parameters) {
+        this.forSigning = forSigning;
+
+        AsymmetricKeyParameter k;
+
+        if (parameters instanceof ParametersWithRandom) {
+            k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
+        } else {
+            k = (AsymmetricKeyParameter) parameters;
+        }
+
+        ParamUtil.assertNotNull("k", k);
+        if (k instanceof ECPublicKeyParameters) {
+            keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
+        } else if (k instanceof ECPrivateKeyParameters) {
+            keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
+        } else if (k instanceof DSAPublicKeyParameters) {
+            keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
+        } else if (k instanceof DSAPrivateKeyParameters) {
+            keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
+        } else {
+            throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
+        }
+
+        if (forSigning && !k.isPrivate()) {
+            throw new IllegalArgumentException("Signing Requires Private Key.");
+        }
+
+        if (!forSigning && k.isPrivate()) {
+            throw new IllegalArgumentException("Verification Requires Public Key.");
+        }
+
+        reset();
+
+        dsaSigner.init(forSigning, parameters);
     }
 
-    if (forSigning && !k.isPrivate()) {
-      throw new IllegalArgumentException("Signing Requires Private Key.");
+    /**
+     * update the internal digest with the byte b
+     */
+    public void update(
+            final byte input) {
+        digest.update(input);
     }
 
-    if (!forSigning && k.isPrivate()) {
-      throw new IllegalArgumentException("Verification Requires Public Key.");
+    /**
+     * update the internal digest with the byte array in
+     */
+    public void update(
+            final byte[]    input,
+            final int inOff,
+            final int length) {
+        digest.update(input, inOff, length);
     }
 
-    reset();
+    /**
+     * Generate a signature for the message we've been loaded with using
+     * the key we were initialised with.
+     */
+    public byte[] generateSignature() {
+        if (!forSigning) {
+            throw new IllegalStateException(
+                    "DSADigestSigner not initialised for signature generation.");
+        }
 
-    dsaSigner.init(forSigning, parameters);
-  }
+        byte[] hash = new byte[digest.getDigestSize()];
+        digest.doFinal(hash, 0);
 
-  /**
-   * update the internal digest with the byte b
-   */
-  public void update(
-      final byte input) {
-    digest.update(input);
-  }
+        BigInteger[] sig = dsaSigner.generateSignature(hash);
 
-  /**
-   * update the internal digest with the byte array in
-   */
-  public void update(
-      final byte[]  input,
-      final int inOff,
-      final int length) {
-    digest.update(input, inOff, length);
-  }
-
-  /**
-   * Generate a signature for the message we've been loaded with using
-   * the key we were initialised with.
-   */
-  public byte[] generateSignature() {
-    if (!forSigning) {
-      throw new IllegalStateException(
-          "DSADigestSigner not initialised for signature generation.");
+        try {
+            return encode(sig[0], sig[1]);
+        } catch (IOException e) {
+            throw new IllegalStateException("unable to encode signature");
+        }
     }
 
-    byte[] hash = new byte[digest.getDigestSize()];
-    digest.doFinal(hash, 0);
+    public boolean verifySignature(
+            final byte[] signature) {
+        if (forSigning) {
+            throw new IllegalStateException("DSADigestSigner not initialised for verification");
+        }
 
-    BigInteger[] sig = dsaSigner.generateSignature(hash);
+        byte[] hash = new byte[digest.getDigestSize()];
+        digest.doFinal(hash, 0);
 
-    try {
-      return encode(sig[0], sig[1]);
-    } catch (IOException e) {
-      throw new IllegalStateException("unable to encode signature");
-    }
-  }
-
-  public boolean verifySignature(
-      final byte[] signature) {
-    if (forSigning) {
-      throw new IllegalStateException("DSADigestSigner not initialised for verification");
-    }
-
-    byte[] hash = new byte[digest.getDigestSize()];
-    digest.doFinal(hash, 0);
-
-    try {
-      BigInteger[] sig = decode(signature);
-      return dsaSigner.verifySignature(hash, sig[0], sig[1]);
-    } catch (IOException e) {
-      return false;
-    }
-  }
-
-  public void reset() {
-    digest.reset();
-  }
-
-  private byte[] encode(
-      final BigInteger r,
-      final BigInteger s)
-  throws IOException {
-    int blockSize = (keyBitLen + 7) / 8;
-    if ((r.bitLength() + 7) / 8 > blockSize) {
-      throw new IOException("r is too long");
+        try {
+            BigInteger[] sig = decode(signature);
+            return dsaSigner.verifySignature(hash, sig[0], sig[1]);
+        } catch (IOException e) {
+            return false;
+        }
     }
 
-    if ((s.bitLength() + 7) / 8 > blockSize) {
-      throw new IOException("s is too long");
+    public void reset() {
+        digest.reset();
     }
 
-    byte[] ret = new byte[2 * blockSize];
+    private byte[] encode(
+            final BigInteger r,
+            final BigInteger s)
+    throws IOException {
+        int blockSize = (keyBitLen + 7) / 8;
+        if ((r.bitLength() + 7) / 8 > blockSize) {
+            throw new IOException("r is too long");
+        }
 
-    byte[] bytes = r.toByteArray();
-    int srcOffset = Math.max(0, bytes.length - blockSize);
-    System.arraycopy(bytes, srcOffset, ret, 0, bytes.length - srcOffset);
+        if ((s.bitLength() + 7) / 8 > blockSize) {
+            throw new IOException("s is too long");
+        }
 
-    bytes = s.toByteArray();
-    srcOffset = Math.max(0, bytes.length - blockSize);
-    System.arraycopy(bytes, srcOffset, ret, blockSize, bytes.length - srcOffset);
-    return ret;
-  }
+        byte[] ret = new byte[2 * blockSize];
 
-  private BigInteger[] decode(
-      final byte[] encoding)
-  throws IOException {
-    int blockSize = (keyBitLen + 7) / 8;
-    if (encoding.length != 2 * blockSize) {
-      throw new IOException("invalid length of signature");
+        byte[] bytes = r.toByteArray();
+        int srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, ret, 0, bytes.length - srcOffset);
+
+        bytes = s.toByteArray();
+        srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, ret, blockSize, bytes.length - srcOffset);
+        return ret;
     }
 
-    BigInteger[] ret = new BigInteger[2];
-    byte[] buffer = new  byte[blockSize];
-    System.arraycopy(encoding, 0, buffer, 0, blockSize);
-    ret[0] = new BigInteger(1, buffer);
+    private BigInteger[] decode(
+            final byte[] encoding)
+    throws IOException {
+        int blockSize = (keyBitLen + 7) / 8;
+        if (encoding.length != 2 * blockSize) {
+            throw new IOException("invalid length of signature");
+        }
 
-    System.arraycopy(encoding, blockSize, buffer, 0, blockSize);
-    ret[1] = new BigInteger(1, buffer);
-    return ret;
-  }
+        BigInteger[] ret = new BigInteger[2];
+        byte[] buffer = new    byte[blockSize];
+        System.arraycopy(encoding, 0, buffer, 0, blockSize);
+        ret[0] = new BigInteger(1, buffer);
+
+        System.arraycopy(encoding, blockSize, buffer, 0, blockSize);
+        ret[1] = new BigInteger(1, buffer);
+        return ret;
+    }
 
 }

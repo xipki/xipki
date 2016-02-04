@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,30 +54,30 @@ import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 @Service
 public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
 
-  @Override
-  protected Set<String> getEnums() {
-    Set<String> curveNames = new HashSet<>();
-    Enumeration<?> names = X962NamedCurves.getNames();
-    while (names.hasMoreElements()) {
-      curveNames.add((String) names.nextElement());
-    }
+    @Override
+    protected Set<String> getEnums() {
+        Set<String> curveNames = new HashSet<>();
+        Enumeration<?> names = X962NamedCurves.getNames();
+        while (names.hasMoreElements()) {
+            curveNames.add((String) names.nextElement());
+        }
 
-    names = SECNamedCurves.getNames();
-    while (names.hasMoreElements()) {
-      curveNames.add((String) names.nextElement());
-    }
+        names = SECNamedCurves.getNames();
+        while (names.hasMoreElements()) {
+            curveNames.add((String) names.nextElement());
+        }
 
-    names = TeleTrusTNamedCurves.getNames();
-    while (names.hasMoreElements()) {
-      curveNames.add((String) names.nextElement());
-    }
+        names = TeleTrusTNamedCurves.getNames();
+        while (names.hasMoreElements()) {
+            curveNames.add((String) names.nextElement());
+        }
 
-    names = NISTNamedCurves.getNames();
-    while (names.hasMoreElements()) {
-      curveNames.add((String) names.nextElement());
-    }
+        names = NISTNamedCurves.getNames();
+        while (names.hasMoreElements()) {
+            curveNames.add((String) names.nextElement());
+        }
 
-    return curveNames;
-  }
+        return curveNames;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,26 +45,26 @@ import org.xipki.pki.ca.api.profile.DirectoryStringType;
 
 public class QaDirectoryString {
 
-  private final DirectoryStringType type;
+    private final DirectoryStringType type;
 
-  private final String text;
+    private final String text;
 
-  public QaDirectoryString(
-      final DirectoryStringType type,
-      final String text) {
-    ParamUtil.assertNotNull("type", type);
-    ParamUtil.assertNotBlank("text", text);
+    public QaDirectoryString(
+            final DirectoryStringType type,
+            final String text) {
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotBlank("text", text);
 
-    this.type = type;
-    this.text = text;
-  }
+        this.type = type;
+        this.text = text;
+    }
 
-  public DirectoryStringType getType() {
-    return type;
-  }
+    public DirectoryStringType getType() {
+        return type;
+    }
 
-  public String getText() {
-    return text;
-  }
+    public String getText() {
+        return text;
+    }
 
 }

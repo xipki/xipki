@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,30 +47,30 @@ import org.xipki.commons.common.util.CollectionUtil;
 
 public class GeneralNameMode {
 
-  private final GeneralNameTag tag;
+    private final GeneralNameTag tag;
 
-  // not applied to all tags, currently only for tag otherName
-  private final Set<ASN1ObjectIdentifier> allowedTypes;
+    // not applied to all tags, currently only for tag otherName
+    private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-  public GeneralNameMode(
-      final GeneralNameTag tag) {
-    this.tag = tag;
-    this.allowedTypes = null;
-  }
+    public GeneralNameMode(
+            final GeneralNameTag tag) {
+        this.tag = tag;
+        this.allowedTypes = null;
+    }
 
-  public GeneralNameMode(
-      final GeneralNameTag tag,
-      final Set<ASN1ObjectIdentifier> allowedTypes) {
-    this.tag = tag;
-    this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
-  }
+    public GeneralNameMode(
+            final GeneralNameTag tag,
+            final Set<ASN1ObjectIdentifier> allowedTypes) {
+        this.tag = tag;
+        this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
+    }
 
-  public GeneralNameTag getTag() {
-    return tag;
-  }
+    public GeneralNameTag getTag() {
+        return tag;
+    }
 
-  public Set<ASN1ObjectIdentifier> getAllowedTypes() {
-    return allowedTypes;
-  }
+    public Set<ASN1ObjectIdentifier> getAllowedTypes() {
+        return allowedTypes;
+    }
 
 }

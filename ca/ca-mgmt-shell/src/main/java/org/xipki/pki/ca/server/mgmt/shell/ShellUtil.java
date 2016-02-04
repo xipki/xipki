@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,50 +49,50 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 class ShellUtil {
 
-  private ShellUtil() {
-  }
-
-  static String canonicalizeSignerConf(
-      final String keystoreType,
-      final String signerConf,
-      final PasswordResolver passwordResolver)
-  throws Exception {
-    if (!signerConf.contains("file:") && !signerConf.contains("base64:")
-        && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
-      return signerConf;
+    private ShellUtil() {
     }
 
-    ConfPairs pairs = new ConfPairs(signerConf);
-    String keystoreConf = pairs.getValue("keystore");
-    String passwordHint = pairs.getValue("password");
-    String keyLabel   = pairs.getValue("key-label");
+    static String canonicalizeSignerConf(
+            final String keystoreType,
+            final String signerConf,
+            final PasswordResolver passwordResolver)
+    throws Exception {
+        if (!signerConf.contains("file:") && !signerConf.contains("base64:")
+                && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
+            return signerConf;
+        }
 
-    if (passwordHint == null) {
-      throw new IllegalArgumentException("password is not set in " + signerConf);
-    }
+        ConfPairs pairs = new ConfPairs(signerConf);
+        String keystoreConf = pairs.getValue("keystore");
+        String passwordHint = pairs.getValue("password");
+        String keyLabel     = pairs.getValue("key-label");
 
-    byte[] keystoreBytes;
-    if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
-      String keystoreFile = keystoreConf.substring("file:".length());
-      keystoreBytes = IoUtil.read(keystoreFile);
-    } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
-      keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
-    } else {
-      return signerConf;
-    }
+        if (passwordHint == null) {
+            throw new IllegalArgumentException("password is not set in " + signerConf);
+        }
 
-    char[] password;
-    if (passwordResolver == null) {
-      password = passwordHint.toCharArray();
-    } else {
-      password = passwordResolver.resolvePassword(passwordHint);
-    }
+        byte[] keystoreBytes;
+        if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
+            String keystoreFile = keystoreConf.substring("file:".length());
+            keystoreBytes = IoUtil.read(keystoreFile);
+        } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
+            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+        } else {
+            return signerConf;
+        }
 
-    keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
-        keystoreBytes, keyLabel, password);
+        char[] password;
+        if (passwordResolver == null) {
+            password = passwordHint.toCharArray();
+        } else {
+            password = passwordResolver.resolvePassword(passwordHint);
+        }
 
-    pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
-    return pairs.getEncoded();
-  } // method doExecute
+        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel, password);
+
+        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return pairs.getEncoded();
+    } // method doExecute
 
 }

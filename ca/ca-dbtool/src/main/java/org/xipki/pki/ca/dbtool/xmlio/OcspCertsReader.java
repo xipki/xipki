@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,90 +48,90 @@ import javax.xml.stream.XMLStreamReader;
 
 public class OcspCertsReader extends DbiXmlReader {
 
-  public OcspCertsReader(
-      final InputStream xmlStream)
-  throws XMLStreamException, InvalidDataObjectException {
-    super("certs", xmlStream);
-  }
+    public OcspCertsReader(
+            final InputStream xmlStream)
+    throws XMLStreamException, InvalidDataObjectException {
+        super("certs", xmlStream);
+    }
 
-  @Override
-  protected DbDataObject retrieveNext(
-      final XMLStreamReader reader)
-  throws InvalidDataObjectException, XMLStreamException {
-    OcspCertType ret = null;
-    StringBuilder buffer = new StringBuilder();
-    int lastEvent = -1;
+    @Override
+    protected DbDataObject retrieveNext(
+            final XMLStreamReader reader)
+    throws InvalidDataObjectException, XMLStreamException {
+        OcspCertType ret = null;
+        StringBuilder buffer = new StringBuilder();
+        int lastEvent = -1;
 
-    while (reader.hasNext()) {
-      int event = reader.next();
-      String tagContent = null;
+        while (reader.hasNext()) {
+            int event = reader.next();
+            String tagContent = null;
 
-      if (event != XMLStreamConstants.CHARACTERS) {
-        tagContent = buffer.toString();
+            if (event != XMLStreamConstants.CHARACTERS) {
+                tagContent = buffer.toString();
 
-        if (lastEvent == XMLStreamConstants.CHARACTERS) {
-          buffer.delete(0, buffer.length());
-        }
-      }
+                if (lastEvent == XMLStreamConstants.CHARACTERS) {
+                    buffer.delete(0, buffer.length());
+                }
+            }
 
-      lastEvent = event;
+            lastEvent = event;
 
-      switch (event) {
-      case XMLStreamConstants.START_ELEMENT:
-        if (OcspCertType.TAG_ROOT.equals(reader.getLocalName())) {
-          ret = new OcspCertType();
-        }
-        break;
-      case XMLStreamConstants.CHARACTERS:
-        buffer.append(reader.getText());
-        break;
-      case XMLStreamConstants.END_ELEMENT:
-        if (ret == null) {
-          break;
-        }
+            switch (event) {
+            case XMLStreamConstants.START_ELEMENT:
+                if (OcspCertType.TAG_ROOT.equals(reader.getLocalName())) {
+                    ret = new OcspCertType();
+                }
+                break;
+            case XMLStreamConstants.CHARACTERS:
+                buffer.append(reader.getText());
+                break;
+            case XMLStreamConstants.END_ELEMENT:
+                if (ret == null) {
+                    break;
+                }
 
-        switch (reader.getLocalName()) {
-        case OcspCertType.TAG_ROOT:
-          ret.validate();
-          return ret;
-        case OcspCertType.TAG_file:
-          ret.setFile(tagContent);
-          break;
-        case OcspCertType.TAG_id:
-          ret.setId(Integer.parseInt(tagContent));
-          break;
-        case OcspCertType.TAG_iid:
-          ret.setIid(Integer.parseInt(tagContent));
-          break;
-        case OcspCertType.TAG_profile:
-          ret.setProfile(tagContent);
-          break;
-        case OcspCertType.TAG_rev:
-          ret.setRev(Boolean.parseBoolean(tagContent));
-          break;
-        case OcspCertType.TAG_rit:
-          ret.setRit(Long.parseLong(tagContent));
-          break;
-        case OcspCertType.TAG_rr:
-          ret.setRr(Integer.parseInt(tagContent));
-          break;
-        case OcspCertType.TAG_rt:
-          ret.setRt(Long.parseLong(tagContent));
-          break;
-        case OcspCertType.TAG_sn:
-          ret.setSn(tagContent);
-          break;
-        case OcspCertType.TAG_update:
-          ret.setUpdate(Long.parseLong(tagContent));
-          break;
-        default:
-          break;
-        } // end switch (reader.getLocalName())
-      default:
-        break;
-      } // end switch (event)
-    } // end while
-    return null;
-  } // method retrieveNext
+                switch (reader.getLocalName()) {
+                case OcspCertType.TAG_ROOT:
+                    ret.validate();
+                    return ret;
+                case OcspCertType.TAG_file:
+                    ret.setFile(tagContent);
+                    break;
+                case OcspCertType.TAG_id:
+                    ret.setId(Integer.parseInt(tagContent));
+                    break;
+                case OcspCertType.TAG_iid:
+                    ret.setIid(Integer.parseInt(tagContent));
+                    break;
+                case OcspCertType.TAG_profile:
+                    ret.setProfile(tagContent);
+                    break;
+                case OcspCertType.TAG_rev:
+                    ret.setRev(Boolean.parseBoolean(tagContent));
+                    break;
+                case OcspCertType.TAG_rit:
+                    ret.setRit(Long.parseLong(tagContent));
+                    break;
+                case OcspCertType.TAG_rr:
+                    ret.setRr(Integer.parseInt(tagContent));
+                    break;
+                case OcspCertType.TAG_rt:
+                    ret.setRt(Long.parseLong(tagContent));
+                    break;
+                case OcspCertType.TAG_sn:
+                    ret.setSn(tagContent);
+                    break;
+                case OcspCertType.TAG_update:
+                    ret.setUpdate(Long.parseLong(tagContent));
+                    break;
+                default:
+                    break;
+                } // end switch (reader.getLocalName())
+            default:
+                break;
+            } // end switch (event)
+        } // end while
+        return null;
+    } // method retrieveNext
 
 }

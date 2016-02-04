@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,36 +50,36 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 
 public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
 
-  private P11Control p11Control;
+    private P11Control p11Control;
 
-  @Override
-  public void init(
-      final P11Control p11Control) {
-    ParamUtil.assertNotNull("p11Control", p11Control);
-    this.p11Control = p11Control;
-    IaikP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
-  }
-
-  @Override
-  public P11CryptService createP11CryptService(
-      String moduleName)
-  throws SignerException {
-    if (p11Control == null) {
-      throw new IllegalStateException("please call init() first");
+    @Override
+    public void init(
+            final P11Control p11Control) {
+        ParamUtil.assertNotNull("p11Control", p11Control);
+        this.p11Control = p11Control;
+        IaikP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
     }
 
-    ParamUtil.assertNotNull("moduleName", moduleName);
+    @Override
+    public P11CryptService createP11CryptService(
+            String moduleName)
+    throws SignerException {
+        if (p11Control == null) {
+            throw new IllegalStateException("please call init() first");
+        }
 
-    if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-      moduleName = p11Control.getDefaultModuleName();
+        ParamUtil.assertNotNull("moduleName", moduleName);
+
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
+            moduleName = p11Control.getDefaultModuleName();
+        }
+
+        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+        if (conf == null) {
+            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
+        }
+
+        return IaikP11CryptService.getInstance(conf);
     }
-
-    P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-    if (conf == null) {
-      throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
-    }
-
-    return IaikP11CryptService.getInstance(conf);
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -63,129 +63,129 @@ import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 public class DbDigestDiffWorker extends DbPortWorker {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestDiffWorker.class);
 
-  private final boolean revokedOnly;
+    private final boolean revokedOnly;
 
-  private final String refDirname;
+    private final String refDirname;
 
-  private final DataSourceWrapper refDatasource;
+    private final DataSourceWrapper refDatasource;
 
-  private final Set<byte[]> includeCACerts;
+    private final Set<byte[]> includeCACerts;
 
-  private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper dataSource;
 
-  private final String reportDir;
+    private final String reportDir;
 
-  private final int numCertsPerSelect;
+    private final int numCertsPerSelect;
 
-  private final int numRefThreads;
+    private final int numRefThreads;
 
-  private final int numTargetThreads;
+    private final int numTargetThreads;
 
-  public DbDigestDiffWorker(
-      final DataSourceFactory dataSourceFactory,
-      final PasswordResolver passwordResolver,
-      final boolean revokedOnly,
-      final String refDirname,
-      final String refDbConfFile,
-      final String dbConfFile,
-      final String reportDirName,
-      final int numCertsPerSelect,
-      final int numRefThreads,
-      final int numTargetThreads,
-      final Set<byte[]> includeCACerts)
-  throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-    boolean validRef = false;
-    if (refDirname == null) {
-      validRef = (refDbConfFile != null);
-    } else {
-      validRef = (refDbConfFile == null);
-    }
-
-    if (!validRef) {
-      throw new IllegalArgumentException(
-          "Exactly one of refDirname and refDbConffile must be not null");
-    }
-
-    this.includeCACerts = includeCACerts;
-
-    File f = new File(reportDirName);
-    if (!f.exists()) {
-      f.mkdirs();
-    } else {
-      if (!f.isDirectory()) {
-        throw new IOException(reportDirName + " is not a folder");
-      }
-
-      if (!f.canWrite()) {
-        throw new IOException(reportDirName + " is not writable");
-      }
-    }
-
-    String[] children = f.list();
-    if (children != null && children.length > 0) {
-      throw new IOException(reportDirName + " is not empty");
-    }
-
-    Properties props = DbPorter.getDbConfProperties(
-        new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-    this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-
-    this.revokedOnly = revokedOnly;
-    if (refDirname != null) {
-      this.refDirname = refDirname;
-      this.refDatasource = null;
-    } else {
-      this.refDirname = null;
-      Properties refProps = DbPorter.getDbConfProperties(
-          new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
-      this.refDatasource = dataSourceFactory.createDataSource(
-          null, refProps, passwordResolver);
-    }
-
-    this.reportDir = reportDirName;
-    this.numCertsPerSelect = numCertsPerSelect;
-    this.numRefThreads = numRefThreads;
-    this.numTargetThreads = numTargetThreads;
-  } // constructor DbDigestDiffWorker
-
-  @Override
-  public void doRun(
-      final AtomicBoolean stopMe)
-  throws Exception {
-    long start = System.currentTimeMillis();
-
-    try {
-      DbDigestDiff diff;
-      if (refDirname != null) {
-        diff = DbDigestDiff.getInstanceForDirRef(
-          refDirname, dataSource, reportDir, revokedOnly, stopMe,
-          numCertsPerSelect, numRefThreads, numTargetThreads);
-      } else {
-        diff = DbDigestDiff.getInstanceForDbRef(
-          refDatasource, dataSource, reportDir, revokedOnly, stopMe,
-          numCertsPerSelect, numRefThreads, numTargetThreads);
-      }
-      diff.setIncludeCACerts(includeCACerts);
-      diff.diff();
-    } finally {
-      if (refDatasource != null) {
-        try {
-          refDatasource.shutdown();
-        } catch (Throwable e) {
-          LOG.error("refDatasource.shutdown()", e);
+    public DbDigestDiffWorker(
+            final DataSourceFactory dataSourceFactory,
+            final PasswordResolver passwordResolver,
+            final boolean revokedOnly,
+            final String refDirname,
+            final String refDbConfFile,
+            final String dbConfFile,
+            final String reportDirName,
+            final int numCertsPerSelect,
+            final int numRefThreads,
+            final int numTargetThreads,
+            final Set<byte[]> includeCACerts)
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        boolean validRef = false;
+        if (refDirname == null) {
+            validRef = (refDbConfFile != null);
+        } else {
+            validRef = (refDbConfFile == null);
         }
-      }
 
-      try {
-        dataSource.shutdown();
-      } catch (Throwable e) {
-        LOG.error("dataSource.shutdown()", e);
-      }
-      long end = System.currentTimeMillis();
-      System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
-    }
-  } // method doRun
+        if (!validRef) {
+            throw new IllegalArgumentException(
+                    "Exactly one of refDirname and refDbConffile must be not null");
+        }
+
+        this.includeCACerts = includeCACerts;
+
+        File f = new File(reportDirName);
+        if (!f.exists()) {
+            f.mkdirs();
+        } else {
+            if (!f.isDirectory()) {
+                throw new IOException(reportDirName + " is not a folder");
+            }
+
+            if (!f.canWrite()) {
+                throw new IOException(reportDirName + " is not writable");
+            }
+        }
+
+        String[] children = f.list();
+        if (children != null && children.length > 0) {
+            throw new IOException(reportDirName + " is not empty");
+        }
+
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+
+        this.revokedOnly = revokedOnly;
+        if (refDirname != null) {
+            this.refDirname = refDirname;
+            this.refDatasource = null;
+        } else {
+            this.refDirname = null;
+            Properties refProps = DbPorter.getDbConfProperties(
+                    new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
+            this.refDatasource = dataSourceFactory.createDataSource(
+                    null, refProps, passwordResolver);
+        }
+
+        this.reportDir = reportDirName;
+        this.numCertsPerSelect = numCertsPerSelect;
+        this.numRefThreads = numRefThreads;
+        this.numTargetThreads = numTargetThreads;
+    } // constructor DbDigestDiffWorker
+
+    @Override
+    public void doRun(
+            final AtomicBoolean stopMe)
+    throws Exception {
+        long start = System.currentTimeMillis();
+
+        try {
+            DbDigestDiff diff;
+            if (refDirname != null) {
+                diff = DbDigestDiff.getInstanceForDirRef(
+                    refDirname, dataSource, reportDir, revokedOnly, stopMe,
+                    numCertsPerSelect, numRefThreads, numTargetThreads);
+            } else {
+                diff = DbDigestDiff.getInstanceForDbRef(
+                    refDatasource, dataSource, reportDir, revokedOnly, stopMe,
+                    numCertsPerSelect, numRefThreads, numTargetThreads);
+            }
+            diff.setIncludeCACerts(includeCACerts);
+            diff.diff();
+        } finally {
+            if (refDatasource != null) {
+                try {
+                    refDatasource.shutdown();
+                } catch (Throwable e) {
+                    LOG.error("refDatasource.shutdown()", e);
+                }
+            }
+
+            try {
+                dataSource.shutdown();
+            } catch (Throwable e) {
+                LOG.error("dataSource.shutdown()", e);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
+        }
+    } // method doRun
 
 }

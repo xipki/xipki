@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,42 +49,42 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-add",
-    description = "add publisher")
+        description = "add publisher")
 @Service
 public class PublisherAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "publisher Name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "publisher Name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--type",
-      required = true,
-      description = "publisher type\n"
-          + "(required)")
-  private String type;
+    @Option(name = "--type",
+            required = true,
+            description = "publisher type\n"
+                    + "(required)")
+    private String type;
 
-  @Option(name = "--conf",
-      description = "publisher configuration")
-  private String conf;
+    @Option(name = "--conf",
+            description = "publisher configuration")
+    private String conf;
 
-  @Option(name = "--conf-file",
-      description = "publisher configuration file")
-  @Completion(FilePathCompleter.class)
-  private String confFile;
+    @Option(name = "--conf-file",
+            description = "publisher configuration file")
+    @Completion(FilePathCompleter.class)
+    private String confFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (conf == null && confFile != null) {
-      conf = new String(IoUtil.read(confFile));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (conf == null && confFile != null) {
+            conf = new String(IoUtil.read(confFile));
+        }
+
+        PublisherEntry entry = new PublisherEntry(name, type, conf);
+        boolean b = caManager.addPublisher(entry);
+        output(b, "added", "could not add", "publisher " + name);
+        return null;
     }
-
-    PublisherEntry entry = new PublisherEntry(name, type, conf);
-    boolean b = caManager.addPublisher(entry);
-    output(b, "added", "could not add", "publisher " + name);
-    return null;
-  }
 
 }

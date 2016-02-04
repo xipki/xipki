@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,25 +42,25 @@ package org.xipki.pki.ca.server.impl;
 
 public class KnowCertResult {
 
-  public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
+    public static final KnowCertResult UNKNOWN = new KnowCertResult(false, null);
 
-  private final boolean known;
+    private final boolean known;
 
-  private final String user;
+    private final String user;
 
-  public KnowCertResult(
-      final boolean known,
-      final String user) {
-    this.known = known;
-    this.user = user;
-  }
+    public KnowCertResult(
+            final boolean known,
+            final String user) {
+        this.known = known;
+        this.user = user;
+    }
 
-  public boolean isKnown() {
-    return known;
-  }
+    public boolean isKnown() {
+        return known;
+    }
 
-  public String getUser() {
-    return user;
-  }
+    public String getUser() {
+        return user;
+    }
 
 }

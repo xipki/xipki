@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,31 +47,31 @@ import org.xipki.commons.common.LoadExecutor;
 
 public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
 
-  @Option(name = "--duration",
-      description = "duration in seconds for each test case")
-  private Integer durationInSecond = 10;
+    @Option(name = "--duration",
+            description = "duration in seconds for each test case")
+    private Integer durationInSecond = 10;
 
-  @Option(name = "--thread",
-      description = "number of threads")
-  private Integer numThreads = 5;
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
 
-  protected abstract List<LoadExecutor> getTesters()
-  throws Exception;
+    protected abstract List<LoadExecutor> getTesters()
+    throws Exception;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    List<LoadExecutor> testers = getTesters();
-    for (LoadExecutor tester : testers) {
-      tester.setDuration(durationInSecond);
-      tester.setThreads(Math.min(20, numThreads));
-      System.out.println("============================================");
-      tester.test();
-      if (tester.isInterrupted()) {
-        throw new InterruptedException("cancelled by the user");
-      }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        List<LoadExecutor> testers = getTesters();
+        for (LoadExecutor tester : testers) {
+            tester.setDuration(durationInSecond);
+            tester.setThreads(Math.min(20, numThreads));
+            System.out.println("============================================");
+            tester.test();
+            if (tester.isInterrupted()) {
+                throw new InterruptedException("cancelled by the user");
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,26 +44,26 @@ import java.security.cert.X509Certificate;
 
 public class X509CertWithDbId extends X509Cert {
 
-  private Integer certId;
+    private Integer certId;
 
-  public X509CertWithDbId(
-      final X509Certificate cert) {
-    super(cert);
-  }
+    public X509CertWithDbId(
+            final X509Certificate cert) {
+        super(cert);
+    }
 
-  public X509CertWithDbId(
-      final X509Certificate cert,
-      final byte[] encodedCert) {
-    super(cert, encodedCert);
-  }
+    public X509CertWithDbId(
+            final X509Certificate cert,
+            final byte[] encodedCert) {
+        super(cert, encodedCert);
+    }
 
-  public Integer getCertId() {
-    return certId;
-  }
+    public Integer getCertId() {
+        return certId;
+    }
 
-  public void setCertId(
-      final Integer certId) {
-    this.certId = certId;
-  }
+    public void setCertId(
+            final Integer certId) {
+        this.certId = certId;
+    }
 
 }

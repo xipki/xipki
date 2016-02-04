@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,107 +52,107 @@ import org.xipki.commons.security.api.HashAlgoType;
 
 public abstract class CertStatusStore {
 
-  protected static final long DAY = 24L * 60 * 60 * 1000;
+    protected static final long DAY = 24L * 60 * 60 * 1000;
 
-  private final String name;
+    private final String name;
 
-  private boolean unknownSerialAsGood;
+    private boolean unknownSerialAsGood;
 
-  private int retentionInterval;
+    private int retentionInterval;
 
-  private boolean includeArchiveCutoff;
+    private boolean includeArchiveCutoff;
 
-  private boolean includeCrlID;
+    private boolean includeCrlID;
 
-  private AuditServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
-  public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
+    public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
-  public abstract boolean canResolveIssuer(
-      HashAlgoType hashAlgo,
-      byte[] issuerNameHash,
-      byte[] issuerKeyHash);
+    public abstract boolean canResolveIssuer(
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
+            byte[] issuerKeyHash);
 
-  public abstract CertStatusInfo getCertStatus(
-      HashAlgoType hashAlgo,
-      byte[] issuerNameHash,
-      byte[] issuerKeyHash,
-      BigInteger serialNumber,
-      boolean includeCertHash,
-      HashAlgoType certHashAlg,
-      CertprofileOption certprofileOption)
-  throws CertStatusStoreException;
+    public abstract CertStatusInfo getCertStatus(
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
+            byte[] issuerKeyHash,
+            BigInteger serialNumber,
+            boolean includeCertHash,
+            HashAlgoType certHashAlg,
+            CertprofileOption certprofileOption)
+    throws CertStatusStoreException;
 
-  public abstract void init(
-      String conf,
-      DataSourceWrapper datasource)
-  throws CertStatusStoreException;
+    public abstract void init(
+            String conf,
+            DataSourceWrapper datasource)
+    throws CertStatusStoreException;
 
-  public abstract CertRevocationInfo getCARevocationInfo(
-      HashAlgoType hashAlgo,
-      byte[] issuerNameHash,
-      byte[] issuerKeyHash);
+    public abstract CertRevocationInfo getCARevocationInfo(
+            HashAlgoType hashAlgo,
+            byte[] issuerNameHash,
+            byte[] issuerKeyHash);
 
-  public abstract void shutdown()
-  throws CertStatusStoreException;
+    public abstract void shutdown()
+    throws CertStatusStoreException;
 
-  public abstract boolean isHealthy();
+    public abstract boolean isHealthy();
 
-  protected CertStatusStore(
-      final String name) {
-    ParamUtil.assertNotBlank("name", name);
-    this.name = name;
-  }
+    protected CertStatusStore(
+            final String name) {
+        ParamUtil.assertNotBlank("name", name);
+        this.name = name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setAuditServiceRegister(
-      final AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
-  }
+    public void setAuditServiceRegister(
+            final AuditServiceRegister auditServiceRegister) {
+        this.auditServiceRegister = auditServiceRegister;
+    }
 
-  public AuditService getAuditService() {
-    return (auditServiceRegister == null)
-        ? null
-        : auditServiceRegister.getAuditService();
-  }
+    public AuditService getAuditService() {
+        return (auditServiceRegister == null)
+                ? null
+                : auditServiceRegister.getAuditService();
+    }
 
-  public boolean isUnknownSerialAsGood() {
-    return unknownSerialAsGood;
-  }
+    public boolean isUnknownSerialAsGood() {
+        return unknownSerialAsGood;
+    }
 
-  public void setUnknownSerialAsGood(
-      final boolean unknownSerialAsGood) {
-    this.unknownSerialAsGood = unknownSerialAsGood;
-  }
+    public void setUnknownSerialAsGood(
+            final boolean unknownSerialAsGood) {
+        this.unknownSerialAsGood = unknownSerialAsGood;
+    }
 
-  public boolean isIncludeArchiveCutoff() {
-    return includeArchiveCutoff;
-  }
+    public boolean isIncludeArchiveCutoff() {
+        return includeArchiveCutoff;
+    }
 
-  public void setIncludeArchiveCutoff(
-      final boolean includeArchiveCutoff) {
-    this.includeArchiveCutoff = includeArchiveCutoff;
-  }
+    public void setIncludeArchiveCutoff(
+            final boolean includeArchiveCutoff) {
+        this.includeArchiveCutoff = includeArchiveCutoff;
+    }
 
-  public int getRetentionInterval() {
-    return retentionInterval;
-  }
+    public int getRetentionInterval() {
+        return retentionInterval;
+    }
 
-  public void setRetentionInterval(
-      final int retentionInterval) {
-    this.retentionInterval = retentionInterval;
-  }
+    public void setRetentionInterval(
+            final int retentionInterval) {
+        this.retentionInterval = retentionInterval;
+    }
 
-  public boolean isIncludeCrlID() {
-    return includeCrlID;
-  }
+    public boolean isIncludeCrlID() {
+        return includeCrlID;
+    }
 
-  public void setIncludeCrlID(
-      final boolean includeCrlID) {
-    this.includeCrlID = includeCrlID;
-  }
+    public void setIncludeCrlID(
+            final boolean includeCrlID) {
+        this.includeCrlID = includeCrlID;
+    }
 
 }
