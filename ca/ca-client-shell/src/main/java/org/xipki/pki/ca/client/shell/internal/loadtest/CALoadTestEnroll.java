@@ -61,7 +61,7 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CALoadTestEnroll extends LoadExecutor {

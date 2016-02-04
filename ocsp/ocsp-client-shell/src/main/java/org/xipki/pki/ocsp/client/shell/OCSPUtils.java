@@ -43,7 +43,7 @@ import org.xipki.pki.ocsp.client.api.OCSPResponseException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class OCSPUtils {

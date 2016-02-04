@@ -79,7 +79,7 @@ import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class OcspQAImpl implements OcspQA {

@@ -66,7 +66,7 @@ import org.xipki.commons.common.util.LogUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class HttpCmpServlet extends HttpServlet {

@@ -74,7 +74,7 @@ import org.xipki.pki.scep.util.ScepConstants;
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.ext
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class ScepServlet extends HttpServlet {

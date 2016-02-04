@@ -43,7 +43,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class QaTlsFeature extends QaExtension {

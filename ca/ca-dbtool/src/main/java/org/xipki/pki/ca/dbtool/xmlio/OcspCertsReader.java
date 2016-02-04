@@ -43,7 +43,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class OcspCertsReader extends DbiXmlReader {

@@ -37,7 +37,7 @@ package org.xipki.pki.ocsp.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class CertStatusStoreException extends Exception {

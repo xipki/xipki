@@ -37,7 +37,7 @@ package org.xipki.pki.ocsp.client.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public abstract class OCSPResponseException extends Exception {

@@ -42,7 +42,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class IssuerSerialEntryType extends ResultEntryType {

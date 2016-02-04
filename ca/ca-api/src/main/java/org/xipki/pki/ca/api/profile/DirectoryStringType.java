@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public enum DirectoryStringType {

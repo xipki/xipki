@@ -47,7 +47,7 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "scep", name = "update-req",

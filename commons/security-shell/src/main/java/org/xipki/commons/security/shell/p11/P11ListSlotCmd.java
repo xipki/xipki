@@ -78,7 +78,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "list",

@@ -46,7 +46,7 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class TransactionId {

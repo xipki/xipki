@@ -39,7 +39,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class QaInhibitAnyPolicy extends QaExtension {

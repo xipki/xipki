@@ -66,7 +66,7 @@ import org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-qa", name = "ocsp-status",

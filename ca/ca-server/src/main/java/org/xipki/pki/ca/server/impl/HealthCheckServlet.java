@@ -53,7 +53,7 @@ import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class HealthCheckServlet extends HttpServlet {

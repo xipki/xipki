@@ -60,7 +60,7 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * </pre>
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class SlotIdentifier extends ASN1Object {

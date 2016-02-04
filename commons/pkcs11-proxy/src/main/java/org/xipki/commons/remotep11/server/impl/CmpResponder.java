@@ -76,7 +76,7 @@ import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class CmpResponder {

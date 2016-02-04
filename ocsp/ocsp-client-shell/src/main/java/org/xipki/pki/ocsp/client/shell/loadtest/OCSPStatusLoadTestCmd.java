@@ -51,7 +51,7 @@ import org.xipki.pki.ocsp.client.shell.OCSPStatusCommandSupport;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-ocsp", name = "loadtest-status",

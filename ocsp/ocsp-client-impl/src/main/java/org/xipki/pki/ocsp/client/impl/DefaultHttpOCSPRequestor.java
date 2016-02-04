@@ -48,7 +48,7 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor {

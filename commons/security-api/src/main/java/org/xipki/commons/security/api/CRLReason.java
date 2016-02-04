@@ -48,7 +48,7 @@ import java.util.Map;
  * Profile</a>.
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public enum CRLReason {

@@ -41,7 +41,7 @@ import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Service
