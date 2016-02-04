@@ -409,7 +409,7 @@ public class SubjectChecker {
     throws BadCertTemplateException {
         String atvTextValue = _atvTextValue;
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!SubjectDnSpec.p_dateOfBirth.matcher(atvTextValue).matches()) {
+            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
                 throw new BadCertTemplateException(
                         "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
             }
