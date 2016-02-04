@@ -46,7 +46,7 @@ import org.xipki.commons.security.speed.p12.P12RSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen-p12",

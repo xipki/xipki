@@ -48,7 +48,7 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "rm-cert",

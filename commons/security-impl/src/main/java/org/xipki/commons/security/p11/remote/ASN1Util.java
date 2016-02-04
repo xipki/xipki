@@ -47,7 +47,7 @@ import org.xipki.commons.security.api.BadASN1ObjectException;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class ASN1Util {

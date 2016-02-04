@@ -50,7 +50,7 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  * org.bouncycastle.crypto counterparts.
  *
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 public class RSAUtil {
 

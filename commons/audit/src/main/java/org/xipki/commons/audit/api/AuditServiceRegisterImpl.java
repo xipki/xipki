@@ -43,7 +43,7 @@ import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class AuditServiceRegisterImpl implements AuditServiceRegister {

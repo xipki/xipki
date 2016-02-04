@@ -59,7 +59,7 @@ import org.xipki.commons.security.p11.P11RSAKeyParameter;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class RSAPSSSignatureSpi extends SignatureSpi {

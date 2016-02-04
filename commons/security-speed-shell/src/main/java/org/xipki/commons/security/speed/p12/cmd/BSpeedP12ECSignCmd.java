@@ -47,7 +47,7 @@ import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-sign-p12",

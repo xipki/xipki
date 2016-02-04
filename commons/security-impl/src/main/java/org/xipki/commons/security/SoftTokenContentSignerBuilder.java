@@ -100,7 +100,7 @@ import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 public class SoftTokenContentSignerBuilder {

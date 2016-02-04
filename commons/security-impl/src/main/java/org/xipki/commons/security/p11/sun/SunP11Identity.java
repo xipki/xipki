@@ -60,7 +60,7 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 class SunP11Identity implements Comparable<SunP11Identity> {

@@ -46,7 +46,7 @@ import org.bouncycastle.crypto.Digest;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 abstract class AbstractECDSASignatureSpi extends SignatureSpi {

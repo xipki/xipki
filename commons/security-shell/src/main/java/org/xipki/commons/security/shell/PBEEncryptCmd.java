@@ -41,7 +41,7 @@ import org.xipki.commons.password.PBEPasswordResolver;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 
 @Command(scope = "xipki-tk", name = "pbe-enc",

@@ -54,7 +54,7 @@ import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
- * @since 2.0
+ * @since 2.0.0
  */
 @Command(scope = "xipki-tk", name = "update-cert-p12",
     description = "update certificate in PKCS#12 keystore")
