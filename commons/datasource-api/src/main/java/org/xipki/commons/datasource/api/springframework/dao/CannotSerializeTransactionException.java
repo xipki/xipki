@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,24 +28,24 @@ package org.xipki.commons.datasource.api.springframework.dao;
 @SuppressWarnings("serial")
 public class CannotSerializeTransactionException extends PessimisticLockingFailureException {
 
-  /**
-   * Constructor for could notSerializeTransactionException.
-   * @param msg the detail message
-   */
-  public CannotSerializeTransactionException(
-      final String msg) {
-    super(msg);
-  }
+    /**
+     * Constructor for could notSerializeTransactionException.
+     * @param msg the detail message
+     */
+    public CannotSerializeTransactionException(
+            final String msg) {
+        super(msg);
+    }
 
-  /**
-   * Constructor for could notSerializeTransactionException.
-   * @param msg the detail message
-   * @param cause the root cause from the data access API in use
-   */
-  public CannotSerializeTransactionException(
-      final String msg,
-      final Throwable cause) {
-    super(msg, cause);
-  }
+    /**
+     * Constructor for could notSerializeTransactionException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public CannotSerializeTransactionException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
+    }
 
 }

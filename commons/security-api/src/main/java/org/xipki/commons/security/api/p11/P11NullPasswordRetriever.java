@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,13 +46,13 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 public class P11NullPasswordRetriever implements P11PasswordRetriever {
 
-  public static final P11NullPasswordRetriever INSTANCE = new P11NullPasswordRetriever();
+    public static final P11NullPasswordRetriever INSTANCE = new P11NullPasswordRetriever();
 
-  @Override
-  public List<char[]> getPassword(
-      final P11SlotIdentifier slotId)
-  throws PasswordResolverException {
-    return null;
-  }
+    @Override
+    public List<char[]> getPassword(
+            final P11SlotIdentifier slotId)
+    throws PasswordResolverException {
+        return null;
+    }
 
 }

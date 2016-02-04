@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,45 +51,45 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11Control {
 
-  private final String defaultModuleName;
+    private final String defaultModuleName;
 
-  private final Map<String, P11ModuleConf> moduleConfs;
+    private final Map<String, P11ModuleConf> moduleConfs;
 
-  private final Set<String> moduleNames;
+    private final Set<String> moduleNames;
 
-  public P11Control(
-      final String defaultModuleName,
-      final Set<P11ModuleConf> moduleConfs) {
-    ParamUtil.assertNotBlank("defaultModuleName", defaultModuleName);
+    public P11Control(
+            final String defaultModuleName,
+            final Set<P11ModuleConf> moduleConfs) {
+        ParamUtil.assertNotBlank("defaultModuleName", defaultModuleName);
 
-    this.defaultModuleName = defaultModuleName;
-    if (CollectionUtil.isEmpty(moduleConfs)) {
-      this.moduleConfs = Collections.emptyMap();
-      this.moduleNames = Collections.emptySet();
-    } else {
-      this.moduleConfs = new HashMap<>(moduleConfs.size());
-      Set<String> _moduleNames = new HashSet<>();
-      for (P11ModuleConf conf : moduleConfs) {
-        this.moduleConfs.put(conf.getName(), conf);
-        _moduleNames.add(conf.getName());
-      }
-      this.moduleNames = Collections.unmodifiableSet(_moduleNames);
+        this.defaultModuleName = defaultModuleName;
+        if (CollectionUtil.isEmpty(moduleConfs)) {
+            this.moduleConfs = Collections.emptyMap();
+            this.moduleNames = Collections.emptySet();
+        } else {
+            this.moduleConfs = new HashMap<>(moduleConfs.size());
+            Set<String> _moduleNames = new HashSet<>();
+            for (P11ModuleConf conf : moduleConfs) {
+                this.moduleConfs.put(conf.getName(), conf);
+                _moduleNames.add(conf.getName());
+            }
+            this.moduleNames = Collections.unmodifiableSet(_moduleNames);
+        }
     }
-  }
 
-  public String getDefaultModuleName() {
-    return defaultModuleName;
-  }
+    public String getDefaultModuleName() {
+        return defaultModuleName;
+    }
 
-  public P11ModuleConf getModuleConf(
-      final String moduleName) {
-    return (moduleConfs == null)
-        ? null
-        : moduleConfs.get(moduleName);
-  }
+    public P11ModuleConf getModuleConf(
+            final String moduleName) {
+        return (moduleConfs == null)
+                ? null
+                : moduleConfs.get(moduleName);
+    }
 
-  public Set<String> getModuleNames() {
-    return moduleNames;
-  }
+    public Set<String> getModuleNames() {
+        return moduleNames;
+    }
 
 }

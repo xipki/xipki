@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,8 +42,8 @@ package org.xipki.commons.password.api;
 
 public interface PasswordResolver {
 
-  char[] resolvePassword(
-      String passwordHint)
-  throws PasswordResolverException;
+    char[] resolvePassword(
+            String passwordHint)
+    throws PasswordResolverException;
 
 }

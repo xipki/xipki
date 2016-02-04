@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,21 +46,21 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class XipkiProviderRegister {
 
-  public void regist() {
-    if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
-      Security.addProvider(new XipkiProvider());
+    public void regist() {
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new XipkiProvider());
+        }
     }
-  }
 
-  public void unregist() {
-    if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
-      Security.removeProvider(XipkiProvider.PROVIDER_NAME);
+    public void unregist() {
+        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(XipkiProvider.PROVIDER_NAME);
+        }
     }
-  }
 
-  public void setSecurityFactory(
-      final SecurityFactory securityFactory) {
-    XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
-  }
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory) {
+        XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
+    }
 
 }

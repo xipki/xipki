@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,23 +42,23 @@ package org.xipki.commons.common.qa;
 
 public class MeasurePoint {
 
-  private final long measureTime;
+    private final long measureTime;
 
-  private final long measureAccount;
+    private final long measureAccount;
 
-  public MeasurePoint(
-      final long measureTime,
-      final long measureAccount) {
-    this.measureTime = measureTime;
-    this.measureAccount = measureAccount;
-  }
+    public MeasurePoint(
+            final long measureTime,
+            final long measureAccount) {
+        this.measureTime = measureTime;
+        this.measureAccount = measureAccount;
+    }
 
-  public long getMeasureTime() {
-    return measureTime;
-  }
+    public long getMeasureTime() {
+        return measureTime;
+    }
 
-  public long getMeasureAccount() {
-    return measureAccount;
-  }
+    public long getMeasureAccount() {
+        return measureAccount;
+    }
 
 }

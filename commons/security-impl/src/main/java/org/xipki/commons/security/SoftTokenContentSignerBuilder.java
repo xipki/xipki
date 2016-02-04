@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -105,388 +105,388 @@ import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
 
 public class SoftTokenContentSignerBuilder {
 
-  private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
+    private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
-    private RSAContentSignerBuilder(
-        final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, NoSuchPaddingException {
-      super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-    }
-
-    protected Signer createSigner(
-        final AlgorithmIdentifier sigAlgId,
-        final AlgorithmIdentifier digAlgId)
-    throws OperatorCreationException {
-      if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid RSA signature algirthm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
-      }
-
-      if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-        if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null) {
-          NssPlainRSASigner plainRSASigner;
-          try {
-            plainRSASigner = new NssPlainRSASigner();
-          } catch (NoSuchAlgorithmException e) {
-            throw new OperatorCreationException(e.getMessage(), e);
-          } catch (NoSuchProviderException e) {
-            throw new OperatorCreationException(e.getMessage(), e);
-          } catch (NoSuchPaddingException e) {
-            throw new OperatorCreationException(e.getMessage(), e);
-          }
-          return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
-        } else {
-          return SignerUtil.createPSSRSASigner(sigAlgId);
+        private RSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId)
+        throws NoSuchAlgorithmException, NoSuchPaddingException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
         }
-      } else {
-        Digest dig = digestProvider.get(digAlgId);
-        return new RSADigestSigner(dig);
-      }
-    }
 
-  } // class RSAContentSignerBuilder
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid RSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
 
-  private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
-
-    private final boolean plain;
-
-    private DSAContentSignerBuilder(
-        final AlgorithmIdentifier signatureAlgId,
-        final boolean plain)
-    throws NoSuchAlgorithmException {
-      super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-      this.plain = plain;
-    }
-
-    protected Signer createSigner(
-        final AlgorithmIdentifier sigAlgId,
-        final AlgorithmIdentifier digAlgId)
-    throws OperatorCreationException {
-      if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid DSA signature algirthm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
-      }
-
-      Digest dig = digestProvider.get(digAlgId);
-      DSASigner dsaSigner = new DSASigner();
-      if (plain) {
-        return new DSAPlainDigestSigner(dsaSigner, dig);
-      } else {
-        return new DSADigestSigner(dsaSigner, dig);
-      }
-    }
-
-  } // class DSAContentSignerBuilder
-
-  private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
-
-    private final boolean plain;
-
-    private ECDSAContentSignerBuilder(
-        final AlgorithmIdentifier signatureAlgId,
-        final boolean plain)
-    throws NoSuchAlgorithmException {
-      super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
-      this.plain = plain;
-    }
-
-    protected Signer createSigner(
-        final AlgorithmIdentifier sigAlgId,
-        final AlgorithmIdentifier digAlgId)
-    throws OperatorCreationException {
-      if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
-        throw new OperatorCreationException(
-            "the given algorithm is not a valid EC signature algirthm '"
-            + sigAlgId.getAlgorithm().getId() + "'");
-      }
-
-      Digest dig = digestProvider.get(digAlgId);
-      ECDSASigner dsaSigner = new ECDSASigner();
-
-      if (plain) {
-        return new DSAPlainDigestSigner(dsaSigner, dig);
-      } else {
-        return new DSADigestSigner(dsaSigner, dig);
-      }
-    }
-
-  } // class ECDSAContentSignerBuilder
-
-  public static class NssPlainRSASigner implements AsymmetricBlockCipher {
-
-    private static final String algorithm = "RSA/ECB/NoPadding";
-
-    private Cipher cipher;
-
-    private RSAKeyParameters key;
-
-    public NssPlainRSASigner()
-    throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-      cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
-    }
-
-    @Override
-    public void init(
-        final boolean forEncryption,
-        final CipherParameters param) {
-      if (!forEncryption) {
-        throw new RuntimeCryptoException("verification mode not supported.");
-      }
-
-      if (param instanceof ParametersWithRandom) {
-        ParametersWithRandom rParam = (ParametersWithRandom) param;
-
-        key = (RSAKeyParameters) rParam.getParameters();
-      } else {
-        key = (RSAKeyParameters) param;
-      }
-
-      RSAPrivateKey signingKey;
-      if (key instanceof RSAPrivateCrtKeyParameters) {
-        signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
-      } else {
-        signingKey = new BCRSAPrivateKey(key);
-      }
-
-      try {
-        cipher.init(Cipher.ENCRYPT_MODE, signingKey);
-      } catch (InvalidKeyException e) {
-        e.printStackTrace();
-        throw new RuntimeCryptoException("could not initialize the cipher: "
-            + e.getMessage());
-      }
-    }
-
-    @Override
-    public int getInputBlockSize() {
-      return (key.getModulus().bitLength() + 7) / 8;
-    }
-
-    @Override
-    public int getOutputBlockSize() {
-      return (key.getModulus().bitLength() + 7) / 8;
-    }
-
-    @Override
-    public byte[] processBlock(
-        final byte[] in,
-        final int inOff,
-        final int len)
-    throws InvalidCipherTextException {
-      try {
-        return cipher.doFinal(in, 0, in.length);
-      } catch (IllegalBlockSizeException | BadPaddingException e) {
-        throw new InvalidCipherTextException(e.getMessage(), e);
-      }
-    }
-
-  } // class NssPlainRSASigner
-
-  private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
-
-  public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
-
-  public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
-
-  private final PrivateKey key;
-
-  private final X509Certificate[] certificateChain;
-
-  public SoftTokenContentSignerBuilder(
-      final PrivateKey privateKey)
-  throws SignerException {
-    this.key = privateKey;
-    this.certificateChain = null;
-  }
-
-  public SoftTokenContentSignerBuilder(
-      final String keystoreType,
-      final InputStream keystoreStream,
-      final char[] keystorePassword,
-      String keyname,
-      final char[] keyPassword,
-      final X509Certificate[] certificateChain)
-  throws SignerException {
-    if (!("PKCS12".equalsIgnoreCase(keystoreType)
-        || "JKS".equalsIgnoreCase(keystoreType))) {
-      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
-    }
-
-    ParamUtil.assertNotNull("keystoreStream", keystoreStream);
-    ParamUtil.assertNotNull("keystorePassword", keystorePassword);
-    ParamUtil.assertNotNull("keyPassword", keyPassword);
-
-    try {
-      KeyStore ks;
-      if ("JKS".equalsIgnoreCase(keystoreType)) {
-        ks = KeyStore.getInstance(keystoreType);
-      } else {
-        ks = KeyStore.getInstance(keystoreType, "BC");
-      }
-      ks.load(keystoreStream, keystorePassword);
-
-      if (keyname == null) {
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
-          if (ks.isKeyEntry(alias)) {
-            keyname = alias;
-            break;
-          }
+            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+                if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null) {
+                    NssPlainRSASigner plainRSASigner;
+                    try {
+                        plainRSASigner = new NssPlainRSASigner();
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchProviderException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchPaddingException e) {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    }
+                    return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
+                } else {
+                    return SignerUtil.createPSSRSASigner(sigAlgId);
+                }
+            } else {
+                Digest dig = digestProvider.get(digAlgId);
+                return new RSADigestSigner(dig);
+            }
         }
-      } else {
-        if (!ks.isKeyEntry(keyname)) {
-          throw new SignerException("unknown key named " + keyname);
+
+    } // class RSAContentSignerBuilder
+
+    private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
+
+        private final boolean plain;
+
+        private DSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
+        throws NoSuchAlgorithmException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
         }
-      }
 
-      this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid DSA signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
 
-      if (!(key instanceof RSAPrivateKey
-          || key instanceof DSAPrivateKey
-          || key instanceof ECPrivateKey)) {
-        throw new SignerException("unsupported key " + key.getClass().getName());
-      }
-
-      Set<Certificate> caCerts = new HashSet<>();
-
-      X509Certificate cert;
-      int n = (certificateChain == null)
-          ? 0
-          : certificateChain.length;
-      if (n > 0) {
-        cert = certificateChain[0];
-        if (n > 1) {
-          for (int i = 1; i < n; i++) {
-            caCerts.add(certificateChain[i]);
-          }
+            Digest dig = digestProvider.get(digAlgId);
+            DSASigner dsaSigner = new DSASigner();
+            if (plain) {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            } else {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
         }
-      } else {
-        cert = (X509Certificate) ks.getCertificate(keyname);
-      }
 
-      Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
-      if (certsInKeystore.length > 1) {
-        for (int i = 1; i < certsInKeystore.length; i++) {
-          caCerts.add(certsInKeystore[i]);
+    } // class DSAContentSignerBuilder
+
+    private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
+
+        private final boolean plain;
+
+        private ECDSAContentSignerBuilder(
+                final AlgorithmIdentifier signatureAlgId,
+                final boolean plain)
+        throws NoSuchAlgorithmException {
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            this.plain = plain;
         }
-      }
 
-      this.certificateChain = X509Util.buildCertPath(cert, caCerts);
-    } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
-        | CertificateException | IOException | UnrecoverableKeyException
-        | ClassCastException e) {
-      throw new SignerException(e.getMessage(), e);
+        protected Signer createSigner(
+                final AlgorithmIdentifier sigAlgId,
+                final AlgorithmIdentifier digAlgId)
+        throws OperatorCreationException {
+            if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
+                throw new OperatorCreationException(
+                        "the given algorithm is not a valid EC signature algirthm '"
+                        + sigAlgId.getAlgorithm().getId() + "'");
+            }
+
+            Digest dig = digestProvider.get(digAlgId);
+            ECDSASigner dsaSigner = new ECDSASigner();
+
+            if (plain) {
+                return new DSAPlainDigestSigner(dsaSigner, dig);
+            } else {
+                return new DSADigestSigner(dsaSigner, dig);
+            }
+        }
+
+    } // class ECDSAContentSignerBuilder
+
+    public static class NssPlainRSASigner implements AsymmetricBlockCipher {
+
+        private static final String algorithm = "RSA/ECB/NoPadding";
+
+        private Cipher cipher;
+
+        private RSAKeyParameters key;
+
+        public NssPlainRSASigner()
+        throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
+            cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
+        }
+
+        @Override
+        public void init(
+                final boolean forEncryption,
+                final CipherParameters param) {
+            if (!forEncryption) {
+                throw new RuntimeCryptoException("verification mode not supported.");
+            }
+
+            if (param instanceof ParametersWithRandom) {
+                ParametersWithRandom rParam = (ParametersWithRandom) param;
+
+                key = (RSAKeyParameters) rParam.getParameters();
+            } else {
+                key = (RSAKeyParameters) param;
+            }
+
+            RSAPrivateKey signingKey;
+            if (key instanceof RSAPrivateCrtKeyParameters) {
+                signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
+            } else {
+                signingKey = new BCRSAPrivateKey(key);
+            }
+
+            try {
+                cipher.init(Cipher.ENCRYPT_MODE, signingKey);
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+                throw new RuntimeCryptoException("could not initialize the cipher: "
+                        + e.getMessage());
+            }
+        }
+
+        @Override
+        public int getInputBlockSize() {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public int getOutputBlockSize() {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public byte[] processBlock(
+                final byte[] in,
+                final int inOff,
+                final int len)
+        throws InvalidCipherTextException {
+            try {
+                return cipher.doFinal(in, 0, in.length);
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                throw new InvalidCipherTextException(e.getMessage(), e);
+            }
+        }
+
+    } // class NssPlainRSASigner
+
+    private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
+
+    public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
+
+    public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
+
+    private final PrivateKey key;
+
+    private final X509Certificate[] certificateChain;
+
+    public SoftTokenContentSignerBuilder(
+            final PrivateKey privateKey)
+    throws SignerException {
+        this.key = privateKey;
+        this.certificateChain = null;
     }
-  }
 
-  public ConcurrentContentSigner createSigner(
-      final AlgorithmIdentifier signatureAlgId,
-      final int parallelism,
-      final SecureRandom random)
-  throws OperatorCreationException, NoSuchPaddingException {
-    if (parallelism < 1) {
-      throw new IllegalArgumentException("non-positive parallelism is not allowed: "
-          + parallelism);
-    }
+    public SoftTokenContentSignerBuilder(
+            final String keystoreType,
+            final InputStream keystoreStream,
+            final char[] keystorePassword,
+            String keyname,
+            final char[] keyPassword,
+            final X509Certificate[] certificateChain)
+    throws SignerException {
+        if (!("PKCS12".equalsIgnoreCase(keystoreType)
+                || "JKS".equalsIgnoreCase(keystoreType))) {
+            throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
+        }
 
-    List<ContentSigner> signers = new ArrayList<>(parallelism);
+        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
+        ParamUtil.assertNotNull("keystorePassword", keystorePassword);
+        ParamUtil.assertNotNull("keyPassword", keyPassword);
 
-    ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-
-    if (Security.getProvider(PROVIDER_XIPKI_NSS) != null
-        && !algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)
-        && !(key instanceof ECPrivateKey)) {
-      String algoName;
-      try {
-        algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
-      } catch (NoSuchAlgorithmException e) {
-        throw new OperatorCreationException(e.getMessage());
-      }
-
-      boolean useGivenProvider = true;
-      for (int i = 0; i < parallelism; i++) {
         try {
-          Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
-          signature.initSign(key);
-          if (i == 0) {
-            signature.update(new byte[]{1, 2, 3, 4});
-            signature.sign();
-          }
-          ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
-          signers.add(signer);
-        } catch (Exception e) {
-          useGivenProvider = false;
-          signers.clear();
-          break;
-        }
-      }
+            KeyStore ks;
+            if ("JKS".equalsIgnoreCase(keystoreType)) {
+                ks = KeyStore.getInstance(keystoreType);
+            } else {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
+            ks.load(keystoreStream, keystorePassword);
 
-      if (useGivenProvider) {
-        LOG.info("use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
-      } else {
-        LOG.info("could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
-      }
+            if (keyname == null) {
+                Enumeration<String> aliases = ks.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    if (ks.isKeyEntry(alias)) {
+                        keyname = alias;
+                        break;
+                    }
+                }
+            } else {
+                if (!ks.isKeyEntry(keyname)) {
+                    throw new SignerException("unknown key named " + keyname);
+                }
+            }
+
+            this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
+
+            if (!(key instanceof RSAPrivateKey
+                    || key instanceof DSAPrivateKey
+                    || key instanceof ECPrivateKey)) {
+                throw new SignerException("unsupported key " + key.getClass().getName());
+            }
+
+            Set<Certificate> caCerts = new HashSet<>();
+
+            X509Certificate cert;
+            int n = (certificateChain == null)
+                    ? 0
+                    : certificateChain.length;
+            if (n > 0) {
+                cert = certificateChain[0];
+                if (n > 1) {
+                    for (int i = 1; i < n; i++) {
+                        caCerts.add(certificateChain[i]);
+                    }
+                }
+            } else {
+                cert = (X509Certificate) ks.getCertificate(keyname);
+            }
+
+            Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
+            if (certsInKeystore.length > 1) {
+                for (int i = 1; i < certsInKeystore.length; i++) {
+                    caCerts.add(certsInKeystore[i]);
+                }
+            }
+
+            this.certificateChain = X509Util.buildCertPath(cert, caCerts);
+        } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
+                | CertificateException | IOException | UnrecoverableKeyException
+                | ClassCastException e) {
+            throw new SignerException(e.getMessage(), e);
+        }
     }
 
-    if (CollectionUtil.isEmpty(signers)) {
-      BcContentSignerBuilder signerBuilder;
-      AsymmetricKeyParameter keyparam;
-      try {
-        if (key instanceof RSAPrivateKey) {
-          keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-          signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
-        } else if (key instanceof DSAPrivateKey) {
-          keyparam = DSAUtil.generatePrivateKeyParameter(key);
-          signerBuilder = new DSAContentSignerBuilder(signatureAlgId,
-              AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
-        } else if (key instanceof ECPrivateKey) {
-          keyparam = ECUtil.generatePrivateKeyParameter(key);
-          signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
-              AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+    public ConcurrentContentSigner createSigner(
+            final AlgorithmIdentifier signatureAlgId,
+            final int parallelism,
+            final SecureRandom random)
+    throws OperatorCreationException, NoSuchPaddingException {
+        if (parallelism < 1) {
+            throw new IllegalArgumentException("non-positive parallelism is not allowed: "
+                    + parallelism);
+        }
+
+        List<ContentSigner> signers = new ArrayList<>(parallelism);
+
+        ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
+
+        if (Security.getProvider(PROVIDER_XIPKI_NSS) != null
+                && !algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)
+                && !(key instanceof ECPrivateKey)) {
+            String algoName;
+            try {
+                algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
+            } catch (NoSuchAlgorithmException e) {
+                throw new OperatorCreationException(e.getMessage());
+            }
+
+            boolean useGivenProvider = true;
+            for (int i = 0; i < parallelism; i++) {
+                try {
+                    Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
+                    signature.initSign(key);
+                    if (i == 0) {
+                        signature.update(new byte[]{1, 2, 3, 4});
+                        signature.sign();
+                    }
+                    ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
+                    signers.add(signer);
+                } catch (Exception e) {
+                    useGivenProvider = false;
+                    signers.clear();
+                    break;
+                }
+            }
+
+            if (useGivenProvider) {
+                LOG.info("use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+            } else {
+                LOG.info("could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+            }
+        }
+
+        if (CollectionUtil.isEmpty(signers)) {
+            BcContentSignerBuilder signerBuilder;
+            AsymmetricKeyParameter keyparam;
+            try {
+                if (key instanceof RSAPrivateKey) {
+                    keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
+                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
+                } else if (key instanceof DSAPrivateKey) {
+                    keyparam = DSAUtil.generatePrivateKeyParameter(key);
+                    signerBuilder = new DSAContentSignerBuilder(signatureAlgId,
+                            AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+                } else if (key instanceof ECPrivateKey) {
+                    keyparam = ECUtil.generatePrivateKeyParameter(key);
+                    signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
+                            AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+                } else {
+                    throw new OperatorCreationException("unsupported key "
+                            + key.getClass().getName());
+                }
+            } catch (InvalidKeyException e) {
+                throw new OperatorCreationException("invalid key", e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new OperatorCreationException("no such algorithm", e);
+            }
+
+            for (int i = 0; i < parallelism; i++) {
+                if (random != null) {
+                    signerBuilder.setSecureRandom(random);
+                }
+
+                ContentSigner signer = signerBuilder.build(keyparam);
+                signers.add(signer);
+            }
+        }
+
+        ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
+        if (certificateChain != null) {
+            concurrentSigner.setCertificateChain(certificateChain);
+        }
+        return concurrentSigner;
+    } // createSigner
+
+    public X509Certificate getCert() {
+        if (certificateChain != null && certificateChain.length > 0) {
+            return certificateChain[0];
         } else {
-          throw new OperatorCreationException("unsupported key "
-              + key.getClass().getName());
+            return null;
         }
-      } catch (InvalidKeyException e) {
-        throw new OperatorCreationException("invalid key", e);
-      } catch (NoSuchAlgorithmException e) {
-        throw new OperatorCreationException("no such algorithm", e);
-      }
-
-      for (int i = 0; i < parallelism; i++) {
-        if (random != null) {
-          signerBuilder.setSecureRandom(random);
-        }
-
-        ContentSigner signer = signerBuilder.build(keyparam);
-        signers.add(signer);
-      }
     }
 
-    ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
-    if (certificateChain != null) {
-      concurrentSigner.setCertificateChain(certificateChain);
+    public X509Certificate[] getCertificateChain() {
+        return certificateChain;
     }
-    return concurrentSigner;
-  } // createSigner
 
-  public X509Certificate getCert() {
-    if (certificateChain != null && certificateChain.length > 0) {
-      return certificateChain[0];
-    } else {
-      return null;
+    public PrivateKey getKey() {
+        return key;
     }
-  }
-
-  public X509Certificate[] getCertificateChain() {
-    return certificateChain;
-  }
-
-  public PrivateKey getKey() {
-    return key;
-  }
 
 }

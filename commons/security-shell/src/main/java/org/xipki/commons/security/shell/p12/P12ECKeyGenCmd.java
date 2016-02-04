@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,28 +50,28 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
  */
 
 @Command(scope = "xipki-tk", name = "ec-p12",
-    description = "generate EC keypair in PKCS#12 keystore")
+        description = "generate EC keypair in PKCS#12 keystore")
 @Service
 public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
 
-  @Option(name = "--curve",
-      required = true,
-      description = "EC curve name or OID\n"
-          + "(required)")
-  @Completion(ECCurveNameCompleter.class)
-  private String curveName;
+    @Option(name = "--curve",
+            required = true,
+            description = "EC curve name or OID\n"
+                    + "(required)")
+    @Completion(ECCurveNameCompleter.class)
+    private String curveName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-        curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage(),
-        securityFactory.getRandom4Key());
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+                curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage(),
+                securityFactory.getRandom4Key());
 
-    P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-    saveKeyAndCert(keyAndCert);
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
 
-    return null;
-  }
+        return null;
+    }
 
 }

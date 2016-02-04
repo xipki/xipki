@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,21 +46,21 @@ import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-rsa-sign-p12",
-    description = "performance test of PKCS#12 RSA signature creation")
+        description = "performance test of PKCS#12 RSA signature creation")
 public class SpeedP12RSASignCmd extends SpeedP12SignCommandSupport {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
-  private Integer keysize = 2048;
+    @Option(name = "--key-size",
+            description = "keysize in bit")
+    private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
-  private String publicExponent = "0x10001";
+    @Option(name = "-e",
+            description = "public exponent")
+    private String publicExponent = "0x10001";
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    return new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
-  }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        return new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
+    }
 
 }

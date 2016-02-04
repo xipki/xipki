@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,45 +48,45 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
-  class Testor implements Runnable {
+    class Testor implements Runnable {
 
-    @Override
-    public void run() {
-      while (!stop() && getErrorAccout() < 1) {
-        try {
-          genKeypair();
-          account(1, 0);
-        } catch (Exception e) {
-          account(1, 1);
+        @Override
+        public void run() {
+            while (!stop() && getErrorAccout() < 1) {
+                try {
+                    genKeypair();
+                    account(1, 0);
+                } catch (Exception e) {
+                    account(1, 1);
+                }
+            }
         }
-      }
+
+    } // class Testor
+
+    protected final P11WritableSlot slot;
+
+    private AtomicLong l = new AtomicLong(System.currentTimeMillis());
+
+    protected abstract void genKeypair()
+    throws Exception;
+
+    public P11KeyGenLoadTest(
+            final P11WritableSlot slot,
+            final String description) {
+        super(description);
+        ParamUtil.assertNotNull("slot", slot);
+        this.slot = slot;
     }
 
-  } // class Testor
+    protected String getDummyLabel() {
+        return "loadtest-" + l.getAndIncrement();
+    }
 
-  protected final P11WritableSlot slot;
-
-  private AtomicLong l = new AtomicLong(System.currentTimeMillis());
-
-  protected abstract void genKeypair()
-  throws Exception;
-
-  public P11KeyGenLoadTest(
-      final P11WritableSlot slot,
-      final String description) {
-    super(description);
-    ParamUtil.assertNotNull("slot", slot);
-    this.slot = slot;
-  }
-
-  protected String getDummyLabel() {
-    return "loadtest-" + l.getAndIncrement();
-  }
-
-  @Override
-  protected Runnable getTestor()
-  throws Exception {
-    return new Testor();
-  }
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
+    }
 
 }

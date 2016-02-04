@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,47 +49,47 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class ScepServerContainer {
 
-  private Server server;
+    private Server server;
 
-  public ScepServerContainer(
-      final int port,
-      final ScepServer scepServer)
-  throws Exception {
-    this(port, Arrays.asList(scepServer));
-  }
-
-  public ScepServerContainer(
-      final int port,
-      final List<ScepServer> scepServers)
-  throws Exception {
-    Server server = new Server(port);
-
-    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-    context.setContextPath("/");
-    server.setHandler(context);
-
-    for (ScepServer m : scepServers) {
-      String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
-      ScepServlet servlet = m.getServlet();
-      context.addServlet(new ServletHolder(servlet), servletPattern);
+    public ScepServerContainer(
+            final int port,
+            final ScepServer scepServer)
+    throws Exception {
+        this(port, Arrays.asList(scepServer));
     }
 
-    this.server = server;
-  }
+    public ScepServerContainer(
+            final int port,
+            final List<ScepServer> scepServers)
+    throws Exception {
+        Server server = new Server(port);
 
-  public void start()
-  throws Exception {
-    try {
-      server.start();
-    } catch (Exception e) {
-      server.stop();
-      throw e;
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        server.setHandler(context);
+
+        for (ScepServer m : scepServers) {
+            String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
+            ScepServlet servlet = m.getServlet();
+            context.addServlet(new ServletHolder(servlet), servletPattern);
+        }
+
+        this.server = server;
     }
-  }
 
-  public void stop()
-  throws Exception {
-    server.stop();
-  }
+    public void start()
+    throws Exception {
+        try {
+            server.start();
+        } catch (Exception e) {
+            server.stop();
+            throw e;
+        }
+    }
+
+    public void stop()
+    throws Exception {
+        server.stop();
+    }
 
 }

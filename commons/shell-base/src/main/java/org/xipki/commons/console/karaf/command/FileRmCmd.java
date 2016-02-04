@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,53 +52,53 @@ import org.xipki.commons.console.karaf.intern.FileUtils;
  */
 
 @Command(scope = "xipki-cmd", name = "rm",
-    description = "remove file or directory")
+        description = "remove file or directory")
 @Service
 public class FileRmCmd extends XipkiCommandSupport {
 
-  @Argument(index = 0, name = "file",
-      required = true,
-      description = "file or directory to be deleted\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String targetPath;
+    @Argument(index = 0, name = "file",
+            required = true,
+            description = "file or directory to be deleted\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String targetPath;
 
-  @Option(name = "--recursive", aliases = "-r",
-      description = "remove directories and their contents recursively")
-  private Boolean recursive = Boolean.FALSE;
+    @Option(name = "--recursive", aliases = "-r",
+            description = "remove directories and their contents recursively")
+    private Boolean recursive = Boolean.FALSE;
 
-  @Option(name = "--force", aliases = "-f",
-      description = "ignore nonexistent files, never prompt")
-  private Boolean force = Boolean.FALSE;
+    @Option(name = "--force", aliases = "-f",
+            description = "ignore nonexistent files, never prompt")
+    private Boolean force = Boolean.FALSE;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    File target = new File(expandFilepath(targetPath));
-    if (!target.exists()) {
-      return null;
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        File target = new File(expandFilepath(targetPath));
+        if (!target.exists()) {
+            return null;
+        }
 
-    if (target.isDirectory()) {
-      if (!recursive) {
-        out("Please use option--recursive to delete directory");
+        if (target.isDirectory()) {
+            if (!recursive) {
+                out("Please use option--recursive to delete directory");
+                return null;
+            }
+
+            if (force || confirm(
+                    "Do you want to remove directory " + targetPath + " [yes/no]?", 3)) {
+                FileUtils.deleteDirectory(target);
+                out("removed directory " + targetPath);
+            }
+        } else {
+            if (force || confirm(
+                    "Do you want o remove file " + targetPath + " [yes/no]?", 3)) {
+                target.delete();
+                out("removed file " + targetPath);
+            }
+        }
+
         return null;
-      }
-
-      if (force || confirm(
-          "Do you want to remove directory " + targetPath + " [yes/no]?", 3)) {
-        FileUtils.deleteDirectory(target);
-        out("removed directory " + targetPath);
-      }
-    } else {
-      if (force || confirm(
-          "Do you want o remove file " + targetPath + " [yes/no]?", 3)) {
-        target.delete();
-        out("removed file " + targetPath);
-      }
     }
-
-    return null;
-  }
 
 }

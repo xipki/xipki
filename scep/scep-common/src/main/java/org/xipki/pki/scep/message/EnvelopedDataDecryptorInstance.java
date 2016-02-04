@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,25 +51,25 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public final class EnvelopedDataDecryptorInstance {
 
-  private final RecipientId recipientId;
+    private final RecipientId recipientId;
 
-  private final KeyTransRecipient recipient;
+    private final KeyTransRecipient recipient;
 
-  public EnvelopedDataDecryptorInstance(
-    final X509Certificate recipientCert,
-    final PrivateKey privKey) {
-    ParamUtil.assertNotNull("recipientCert", recipientCert);
-    ParamUtil.assertNotNull("privKey", privKey);
-    this.recipientId = new JceKeyTransRecipientId(recipientCert);
-    this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
-  }
+    public EnvelopedDataDecryptorInstance(
+        final X509Certificate recipientCert,
+        final PrivateKey privKey) {
+        ParamUtil.assertNotNull("recipientCert", recipientCert);
+        ParamUtil.assertNotNull("privKey", privKey);
+        this.recipientId = new JceKeyTransRecipientId(recipientCert);
+        this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
+    }
 
-  public KeyTransRecipient getRecipient() {
-    return recipient;
-  }
+    public KeyTransRecipient getRecipient() {
+        return recipient;
+    }
 
-  public RecipientId getRecipientId() {
-    return recipientId;
-  }
+    public RecipientId getRecipientId() {
+        return recipientId;
+    }
 
 }

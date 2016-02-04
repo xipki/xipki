@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,63 +54,63 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class PasswordBasedEncryption {
 
-  private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
+    private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
-  private static AtomicBoolean initialized = new AtomicBoolean(false);
+    private static AtomicBoolean initialized = new AtomicBoolean(false);
 
-  private PasswordBasedEncryption() {
-  }
-
-  private static void init() {
-    synchronized (initialized) {
-      if (initialized.get()) {
-        return;
-      }
-
-      if (Security.getProperty("BC") == null) {
-        Security.addProvider(new BouncyCastleProvider());
-      }
-
-      initialized.set(true);
+    private PasswordBasedEncryption() {
     }
-  }
 
-  public static byte[] encrypt(
-      final byte[] plaintext,
-      final char[] password,
-      final int iterationCount,
-      final byte[] salt)
-  throws GeneralSecurityException {
-    init();
-    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+    private static void init() {
+        synchronized (initialized) {
+            if (initialized.get()) {
+                return;
+            }
 
-    PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
-    SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
+            if (Security.getProperty("BC") == null) {
+                Security.addProvider(new BouncyCastleProvider());
+            }
 
-    Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-    PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
-    cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
-    pbeKeySpec.clearPassword();
+            initialized.set(true);
+        }
+    }
 
-    return cipher.doFinal(plaintext);
-  }
+    public static byte[] encrypt(
+            final byte[] plaintext,
+            final char[] password,
+            final int iterationCount,
+            final byte[] salt)
+    throws GeneralSecurityException {
+        init();
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
 
-  public static byte[] decrypt(
-      final byte[] cipherText,
-      final char[] password,
-      final int iterationCount,
-      byte[] salt)
-  throws GeneralSecurityException {
-    init();
-    PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
+        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
+        SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
-    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
-    SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
+        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+        cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
+        pbeKeySpec.clearPassword();
 
-    Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-    PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
-    cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
-    return cipher.doFinal(cipherText);
-  }
+        return cipher.doFinal(plaintext);
+    }
+
+    public static byte[] decrypt(
+            final byte[] cipherText,
+            final char[] password,
+            final int iterationCount,
+            byte[] salt)
+    throws GeneralSecurityException {
+        init();
+        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
+
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+        SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
+
+        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
+        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+        cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
+        return cipher.doFinal(cipherText);
+    }
 
 }

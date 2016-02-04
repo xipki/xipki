@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,178 +50,178 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 public interface DataSourceWrapper {
 
-  String getDatasourceName();
+    String getDatasourceName();
 
-  int getMaximumPoolSize();
+    int getMaximumPoolSize();
 
-  Connection getConnection()
-  throws DataAccessException;
+    Connection getConnection()
+    throws DataAccessException;
 
-  void returnConnection(
-      Connection conn);
+    void returnConnection(
+            Connection conn);
 
-  void shutdown();
+    void shutdown();
 
-  DatabaseType getDatabaseType();
+    DatabaseType getDatabaseType();
 
-  Statement createStatement(
-      Connection conn)
-  throws DataAccessException;
+    Statement createStatement(
+            Connection conn)
+    throws DataAccessException;
 
-  PreparedStatement prepareStatement(
-      Connection conn,
-      String sqlQuery)
-  throws DataAccessException;
+    PreparedStatement prepareStatement(
+            Connection conn,
+            String sqlQuery)
+    throws DataAccessException;
 
-  void releaseResources(
-      Statement ps,
-      ResultSet rs);
+    void releaseResources(
+            Statement ps,
+            ResultSet rs);
 
-  String createFetchFirstSelectSQL(
-      String coreSql,
-      int rows);
+    String createFetchFirstSelectSQL(
+            String coreSql,
+            int rows);
 
-  String createFetchFirstSelectSQL(
-      String coreSql,
-      int rows,
-      String orderBy);
+    String createFetchFirstSelectSQL(
+            String coreSql,
+            int rows,
+            String orderBy);
 
-  long getMin(
-      Connection conn,
-      String table,
-      String column)
-  throws DataAccessException;
+    long getMin(
+            Connection conn,
+            String table,
+            String column)
+    throws DataAccessException;
 
-  long getMax(
-      Connection conn,
-      String table,
-      String column)
-  throws DataAccessException;
+    long getMax(
+            Connection conn,
+            String table,
+            String column)
+    throws DataAccessException;
 
-  long getMin(
-      Connection conn,
-      String table,
-      String column,
-      String condition)
-  throws DataAccessException;
+    long getMin(
+            Connection conn,
+            String table,
+            String column,
+            String condition)
+    throws DataAccessException;
 
-  long getMax(
-      Connection conn,
-      String table,
-      String column,
-      String condition)
-  throws DataAccessException;
+    long getMax(
+            Connection conn,
+            String table,
+            String column,
+            String condition)
+    throws DataAccessException;
 
-  int getCount(
-      Connection conn,
-      String table)
-  throws DataAccessException;
+    int getCount(
+            Connection conn,
+            String table)
+    throws DataAccessException;
 
-  boolean columnExists(
-      Connection conn,
-      String table,
-      String column,
-      Object value)
-  throws DataAccessException;
+    boolean columnExists(
+            Connection conn,
+            String table,
+            String column,
+            Object value)
+    throws DataAccessException;
 
-  boolean tableHasColumn(
-      Connection conn,
-      String table,
-      String column)
-  throws DataAccessException;
+    boolean tableHasColumn(
+            Connection conn,
+            String table,
+            String column)
+    throws DataAccessException;
 
-  boolean tableExists(
-      Connection conn,
-      String table)
-  throws DataAccessException;
+    boolean tableExists(
+            Connection conn,
+            String table)
+    throws DataAccessException;
 
-  void dropAndCreateSequence(
-      String sequenceName,
-      long startValue)
-  throws DataAccessException;
+    void dropAndCreateSequence(
+            String sequenceName,
+            long startValue)
+    throws DataAccessException;
 
-  void createSequence(
-      String sequenceName,
-      long startValue)
-  throws DataAccessException;
+    void createSequence(
+            String sequenceName,
+            long startValue)
+    throws DataAccessException;
 
-  void dropSequence(
-      String sequenceName)
-  throws DataAccessException;
+    void dropSequence(
+            String sequenceName)
+    throws DataAccessException;
 
-  void setLastUsedSeqValue(
-      String sequenceName,
-      long sequenceValue);
+    void setLastUsedSeqValue(
+            String sequenceName,
+            long sequenceValue);
 
-  long nextSeqValue(
-      Connection conn,
-      String sequenceName)
-  throws DataAccessException;
+    long nextSeqValue(
+            Connection conn,
+            String sequenceName)
+    throws DataAccessException;
 
-  DataAccessException translate(
-      String sql,
-      SQLException ex);
+    DataAccessException translate(
+            String sql,
+            SQLException ex);
 
-  boolean deleteFromTable(
-      Connection conn,
-      String table,
-      String idColumn,
-      int id);
+    boolean deleteFromTable(
+            Connection conn,
+            String table,
+            String idColumn,
+            int id);
 
-  void dropPrimaryKey(
-      Connection conn,
-      String primaryKeyName,
-      String table)
-  throws DataAccessException;
+    void dropPrimaryKey(
+            Connection conn,
+            String primaryKeyName,
+            String table)
+    throws DataAccessException;
 
-  void addPrimaryKey(
-      Connection conn,
-      String primaryKeyName,
-      String table,
-      String... columns)
-  throws DataAccessException;
+    void addPrimaryKey(
+            Connection conn,
+            String primaryKeyName,
+            String table,
+            String... columns)
+    throws DataAccessException;
 
-  void dropForeignKeyConstraint(
-      Connection conn,
-      String constraintName,
-      String baseTable)
-  throws DataAccessException;
+    void dropForeignKeyConstraint(
+            Connection conn,
+            String constraintName,
+            String baseTable)
+    throws DataAccessException;
 
-  void addForeignKeyConstraint(
-      Connection conn,
-      String constraintName,
-      String baseTable,
-      String baseColumn,
-      String referencedTable,
-      String referencedColumn,
-      String onDeleteAction,
-      String onUpdateAction)
-  throws DataAccessException;
+    void addForeignKeyConstraint(
+            Connection conn,
+            String constraintName,
+            String baseTable,
+            String baseColumn,
+            String referencedTable,
+            String referencedColumn,
+            String onDeleteAction,
+            String onUpdateAction)
+    throws DataAccessException;
 
-  void dropIndex(
-      Connection conn,
-      String indexName,
-      String table)
-  throws DataAccessException;
+    void dropIndex(
+            Connection conn,
+            String indexName,
+            String table)
+    throws DataAccessException;
 
-  void createIndex(
-      Connection conn,
-      String indexName,
-      String table,
-      String column)
-  throws DataAccessException;
+    void createIndex(
+            Connection conn,
+            String indexName,
+            String table,
+            String column)
+    throws DataAccessException;
 
-  void dropUniqueConstrain(
-      Connection conn,
-      String constraintName,
-      String table)
-  throws DataAccessException;
+    void dropUniqueConstrain(
+            Connection conn,
+            String constraintName,
+            String table)
+    throws DataAccessException;
 
-  void addUniqueConstrain(
-      Connection conn,
-      String constraintName,
-      String table,
-      String... columns)
-  throws DataAccessException;
+    void addUniqueConstrain(
+            Connection conn,
+            String constraintName,
+            String table,
+            String... columns)
+    throws DataAccessException;
 
 }

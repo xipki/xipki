@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,165 +53,165 @@ import org.xipki.commons.common.util.StringUtil;
 
 public abstract class LoadExecutor {
 
-  private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
+    private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
-  private static final int DEFAULT_DURATION = 30; // 30 seconds
+    private static final int DEFAULT_DURATION = 30; // 30 seconds
 
-  private static final int DEFAULT_THREADS = 25;
+    private static final int DEFAULT_THREADS = 25;
 
-  private boolean interrupted = false;
+    private boolean interrupted = false;
 
-  private String description;
+    private String description;
 
-  private final ProcessLog processLog;
+    private final ProcessLog processLog;
 
-  private int duration = DEFAULT_DURATION; // in seconds
+    private int duration = DEFAULT_DURATION; // in seconds
 
-  private int threads = DEFAULT_THREADS;
+    private int threads = DEFAULT_THREADS;
 
-  private AtomicLong errorAccount = new AtomicLong(0);
+    private AtomicLong errorAccount = new AtomicLong(0);
 
-  private String unit = "";
+    private String unit = "";
 
-  public LoadExecutor(
-      final String description) {
-    ParamUtil.assertNotNull("description", description);
-    this.description = description;
-    this.processLog = new ProcessLog(0);
-  }
-
-  protected abstract Runnable getTestor()
-  throws Exception;
-
-  public void test() {
-    System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
-    List<Runnable> runnables = new ArrayList<>(threads);
-    for (int i = 0; i < threads; i++) {
-      Runnable runnable;
-      try {
-        runnable = getTestor();
-      } catch (Exception e) {
-        System.err.println("could not initialize Testor\nError message: " + e.getMessage());
-        return;
-      }
-
-      runnables.add(runnable);
+    public LoadExecutor(
+            final String description) {
+        ParamUtil.assertNotNull("description", description);
+        this.description = description;
+        this.processLog = new ProcessLog(0);
     }
 
-    StringBuilder sb = new StringBuilder();
-    if (StringUtil.isNotBlank(description)) {
-      sb.append(description);
-      char c = description.charAt(description.length() - 1);
-      if (c != '\n') {
-        sb.append('\n');
-      }
-    }
-    sb.append("threads: ").append(threads).append("\n");
-    sb.append("duration: ").append(StringUtil.formatTime(duration, false));
-    System.out.println(sb.toString());
+    protected abstract Runnable getTestor()
+    throws Exception;
 
-    resetStartTime();
+    public void test() {
+        System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
+        List<Runnable> runnables = new ArrayList<>(threads);
+        for (int i = 0; i < threads; i++) {
+            Runnable runnable;
+            try {
+                runnable = getTestor();
+            } catch (Exception e) {
+                System.err.println("could not initialize Testor\nError message: " + e.getMessage());
+                return;
+            }
 
-    ExecutorService executor = Executors.newFixedThreadPool(threads);
-    for (Runnable runnable : runnables) {
-      executor.execute(runnable);
-    }
-
-    executor.shutdown();
-    printHeader();
-    while (true) {
-      printStatus();
-      try {
-        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-        if (terminated) {
-          break;
+            runnables.add(runnable);
         }
-      } catch (InterruptedException e) {
-        interrupted = true;
-      }
+
+        StringBuilder sb = new StringBuilder();
+        if (StringUtil.isNotBlank(description)) {
+            sb.append(description);
+            char c = description.charAt(description.length() - 1);
+            if (c != '\n') {
+                sb.append('\n');
+            }
+        }
+        sb.append("threads: ").append(threads).append("\n");
+        sb.append("duration: ").append(StringUtil.formatTime(duration, false));
+        System.out.println(sb.toString());
+
+        resetStartTime();
+
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        for (Runnable runnable : runnables) {
+            executor.execute(runnable);
+        }
+
+        executor.shutdown();
+        printHeader();
+        while (true) {
+            printStatus();
+            try {
+                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+                if (terminated) {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                interrupted = true;
+            }
+        }
+
+        printStatus();
+        printSummary();
+
+        System.getProperties().remove(PROPKEY_LOADTEST);
+    } // method test
+
+    public boolean isInterrupted() {
+        return interrupted;
     }
 
-    printStatus();
-    printSummary();
-
-    System.getProperties().remove(PROPKEY_LOADTEST);
-  } // method test
-
-  public boolean isInterrupted() {
-    return interrupted;
-  }
-
-  public void setDuration(
-      final int duration) {
-    if (duration > 0) {
-      this.duration = duration;
+    public void setDuration(
+            final int duration) {
+        if (duration > 0) {
+            this.duration = duration;
+        }
     }
-  }
 
-  public void setThreads(
-      final int threads) {
-    if (threads > 0) {
-      this.threads = threads;
+    public void setThreads(
+            final int threads) {
+        if (threads > 0) {
+            this.threads = threads;
+        }
     }
-  }
 
-  public long getErrorAccout() {
-    return errorAccount.get();
-  }
-
-  protected void account(
-      final int all,
-      final int failed) {
-    processLog.addNumProcessed(all);
-    errorAccount.addAndGet(failed);
-  }
-
-  protected void resetStartTime() {
-    processLog.reset();
-  }
-
-  protected boolean stop() {
-    return interrupted
-        || errorAccount.get() > 0
-        || System.currentTimeMillis() - processLog.getStartTime() >= duration * 1000L;
-  }
-
-  protected void printHeader() {
-    processLog.printHeader();
-  }
-
-  protected void printStatus() {
-    processLog.printStatus();
-  }
-
-  public void setUnit(
-      final String unit) {
-    if (unit != null) {
-      this.unit = unit;
+    public long getErrorAccout() {
+        return errorAccount.get();
     }
-  }
 
-  protected void printSummary() {
-    processLog.printTrailer();
-
-    final long account = processLog.getNumProcessed();
-    StringBuilder sb = new StringBuilder();
-    long elapsedTimeMs = processLog.getTotalElapsedTime();
-    sb.append("finished in " + StringUtil.formatTime(elapsedTimeMs / 1000, false) + "\n");
-    sb.append("account: " + account + " " + unit + "\n");
-    sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
-    sb.append("average: " + processLog.getTotalAverageSpeed() + " " + unit + "/s\n");
-    System.out.println(sb.toString());
-  }
-
-  protected static long getSecureIndex() {
-    SecureRandom random = new SecureRandom();
-    while (true) {
-      long l = random.nextLong();
-      if (l > 0) {
-        return l;
-      }
+    protected void account(
+            final int all,
+            final int failed) {
+        processLog.addNumProcessed(all);
+        errorAccount.addAndGet(failed);
     }
-  }
+
+    protected void resetStartTime() {
+        processLog.reset();
+    }
+
+    protected boolean stop() {
+        return interrupted
+                || errorAccount.get() > 0
+                || System.currentTimeMillis() - processLog.getStartTime() >= duration * 1000L;
+    }
+
+    protected void printHeader() {
+        processLog.printHeader();
+    }
+
+    protected void printStatus() {
+        processLog.printStatus();
+    }
+
+    public void setUnit(
+            final String unit) {
+        if (unit != null) {
+            this.unit = unit;
+        }
+    }
+
+    protected void printSummary() {
+        processLog.printTrailer();
+
+        final long account = processLog.getNumProcessed();
+        StringBuilder sb = new StringBuilder();
+        long elapsedTimeMs = processLog.getTotalElapsedTime();
+        sb.append("finished in " + StringUtil.formatTime(elapsedTimeMs / 1000, false) + "\n");
+        sb.append("account: " + account + " " + unit + "\n");
+        sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
+        sb.append("average: " + processLog.getTotalAverageSpeed() + " " + unit + "/s\n");
+        System.out.println(sb.toString());
+    }
+
+    protected static long getSecureIndex() {
+        SecureRandom random = new SecureRandom();
+        while (true) {
+            long l = random.nextLong();
+            if (l > 0) {
+                return l;
+            }
+        }
+    }
 
 }

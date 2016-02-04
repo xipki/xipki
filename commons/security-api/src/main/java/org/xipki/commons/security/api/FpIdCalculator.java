@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,75 +53,75 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class FpIdCalculator {
 
-  private final static int parallelism = 50;
+    private final static int parallelism = 50;
 
-  private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
+    private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
 
-  private FpIdCalculator() {
-  }
-
-  private static BlockingDeque<Digest> getMD5MessageDigests() {
-    BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-    for (int i = 0; i < parallelism; i++) {
-      Digest md = new SHA1Digest();
-      mds.addLast(md);
-    }
-    return mds;
-  }
-
-  /**
-   * @return long represented of the first 8 bytes
-   */
-  public static long hash(
-      final String data) {
-    ParamUtil.assertNotNull("data", data);
-    byte[] encoded;
-    try {
-      encoded = data.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      encoded = data.getBytes();
-    }
-    return hash(encoded);
-  }
-
-  /**
-   * @return long represented of the first 8 bytes
-   */
-  public static long hash(
-      final byte[] data) {
-    ParamUtil.assertNotNull("data", data);
-
-    Digest md = null;
-    for (int i = 0; i < 3; i++) {
-      try {
-        md = mds.poll(10, TimeUnit.SECONDS);
-        break;
-      } catch (InterruptedException e) {
-      }
+    private FpIdCalculator() {
     }
 
-    if (md == null) {
-      throw new RuntimeOperatorException("could not get idle MessageDigest");
+    private static BlockingDeque<Digest> getMD5MessageDigests() {
+        BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
+        for (int i = 0; i < parallelism; i++) {
+            Digest md = new SHA1Digest();
+            mds.addLast(md);
+        }
+        return mds;
     }
 
-    try {
-      md.reset();
-      md.update(data, 0, data.length);
-      byte[] b = new byte[md.getDigestSize()];
-      md.doFinal(b, 0);
-
-      return bytesToLong(b);
-    } finally {
-      mds.addLast(md);
+    /**
+     * @return long represented of the first 8 bytes
+     */
+    public static long hash(
+            final String data) {
+        ParamUtil.assertNotNull("data", data);
+        byte[] encoded;
+        try {
+            encoded = data.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            encoded = data.getBytes();
+        }
+        return hash(encoded);
     }
-  }
 
-  private static long bytesToLong(
-      final byte[] bytes) {
-    ByteBuffer buffer = ByteBuffer.allocate(8);
-    buffer.put(bytes, 0, 8);
-    buffer.flip(); //need flip
-    return buffer.getLong();
-  }
+    /**
+     * @return long represented of the first 8 bytes
+     */
+    public static long hash(
+            final byte[] data) {
+        ParamUtil.assertNotNull("data", data);
+
+        Digest md = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                md = mds.poll(10, TimeUnit.SECONDS);
+                break;
+            } catch (InterruptedException e) {
+            }
+        }
+
+        if (md == null) {
+            throw new RuntimeOperatorException("could not get idle MessageDigest");
+        }
+
+        try {
+            md.reset();
+            md.update(data, 0, data.length);
+            byte[] b = new byte[md.getDigestSize()];
+            md.doFinal(b, 0);
+
+            return bytesToLong(b);
+        } finally {
+            mds.addLast(md);
+        }
+    }
+
+    private static long bytesToLong(
+            final byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.put(bytes, 0, 8);
+        buffer.flip(); //need flip
+        return buffer.getLong();
+    }
 
 }

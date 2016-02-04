@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,48 +50,48 @@ import org.xipki.commons.password.api.PasswordResolver;
 
 public interface ConcurrentContentSigner {
 
-  AlgorithmIdentifier getAlgorithmIdentifier();
+    AlgorithmIdentifier getAlgorithmIdentifier();
 
-  /**
-   *
-   * @return the private key if possible. {@code null} may be returned.
-   */
-  PrivateKey getPrivateKey();
+    /**
+     *
+     * @return the private key if possible. {@code null} may be returned.
+     */
+    PrivateKey getPrivateKey();
 
-  X509Certificate getCertificate();
+    X509Certificate getCertificate();
 
-  X509CertificateHolder getCertificateAsBCObject();
+    X509CertificateHolder getCertificateAsBCObject();
 
-  void setCertificateChain(
-      X509Certificate[] certchain);
+    void setCertificateChain(
+            X509Certificate[] certchain);
 
-  X509Certificate[] getCertificateChain();
+    X509Certificate[] getCertificateChain();
 
-  X509CertificateHolder[] getCertificateChainAsBCObjects();
+    X509CertificateHolder[] getCertificateChainAsBCObjects();
 
-  void initialize(
-      String conf,
-      PasswordResolver passwordResolver)
-  throws SignerException;
+    void initialize(
+            String conf,
+            PasswordResolver passwordResolver)
+    throws SignerException;
 
-  ContentSigner borrowContentSigner()
-  throws NoIdleSignerException;
+    ContentSigner borrowContentSigner()
+    throws NoIdleSignerException;
 
-  /**
-   *
-   * @param timeout timeout in milliseconds, 0 for infinitely
-   * @return
-   * @throws InterruptedException
-   */
-  ContentSigner borrowContentSigner(
-      int timeout)
-  throws NoIdleSignerException;
+    /**
+     *
+     * @param timeout timeout in milliseconds, 0 for infinitely
+     * @return
+     * @throws InterruptedException
+     */
+    ContentSigner borrowContentSigner(
+            int timeout)
+    throws NoIdleSignerException;
 
-  void returnContentSigner(
-      ContentSigner signer);
+    void returnContentSigner(
+            ContentSigner signer);
 
-  boolean isHealthy();
+    boolean isHealthy();
 
-  void shutdown();
+    void shutdown();
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,18 +45,18 @@ import org.xipki.commons.password.OBFPasswordResolver;
  */
 
 @Command(scope = "xipki-tk", name = "obfuscate",
-    description = "obfuscate password")
+        description = "obfuscate password")
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    char[] password = readPassword("Please enter the password");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        char[] password = readPassword("Please enter the password");
 
-    String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
-    out("the obfuscated password is: '" + passwordHint + "'");
-    return null;
-  }
+        String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
+        out("the obfuscated password is: '" + passwordHint + "'");
+        return null;
+    }
 
 }

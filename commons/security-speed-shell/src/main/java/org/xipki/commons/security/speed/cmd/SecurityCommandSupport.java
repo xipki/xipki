@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,48 +55,48 @@ import org.xipki.commons.security.p11.keystore.KeystoreP11ModulePool;
 
 public abstract class SecurityCommandSupport extends XipkiCommandSupport {
 
-  @Reference
-  protected SecurityFactory securityFactory;
+    @Reference
+    protected SecurityFactory securityFactory;
 
-  protected P11Module getP11Module(
-      final String moduleName)
-  throws Exception {
-    // this call initialization method
-    P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
-    if (p11CryptService == null) {
-      throw new SignerException("could not initialize P11CryptService " + moduleName);
+    protected P11Module getP11Module(
+            final String moduleName)
+    throws Exception {
+        // this call initialization method
+        P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
+        if (p11CryptService == null) {
+            throw new SignerException("could not initialize P11CryptService " + moduleName);
+        }
+
+        P11Module module;
+        String pkcs11Provider = securityFactory.getPkcs11Provider();
+        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
+            // the returned object could not be null
+            module = IaikP11ModulePool.getInstance().getModule(moduleName);
+        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
+            module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
+        } else {
+            throw new SignerException("PKCS11 provider " + pkcs11Provider + " is not accepted");
+        }
+
+        return module;
+
     }
 
-    P11Module module;
-    String pkcs11Provider = securityFactory.getPkcs11Provider();
-    if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-      // the returned object could not be null
-      module = IaikP11ModulePool.getInstance().getModule(moduleName);
-    } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-      module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
-    } else {
-      throw new SignerException("PKCS11 provider " + pkcs11Provider + " is not accepted");
+    protected P11WritableSlot getP11WritablSlot(
+            final String moduleName,
+            final int slotIndex)
+    throws Exception {
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+        P11Module module = getP11Module(moduleName);
+        if (module == null) {
+            throw new SignerException("module " + moduleName + " does not exist");
+        }
+        P11WritableSlot slot = module.getSlot(slotId);
+        if (slot == null) {
+            throw new SignerException("could not get slot " + slotIndex + " of module "
+                    + moduleName);
+        }
+        return slot;
     }
-
-    return module;
-
-  }
-
-  protected P11WritableSlot getP11WritablSlot(
-      final String moduleName,
-      final int slotIndex)
-  throws Exception {
-    P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-    P11Module module = getP11Module(moduleName);
-    if (module == null) {
-      throw new SignerException("module " + moduleName + " does not exist");
-    }
-    P11WritableSlot slot = module.getSlot(slotId);
-    if (slot == null) {
-      throw new SignerException("could not get slot " + slotIndex + " of module "
-          + moduleName);
-    }
-    return slot;
-  }
 
 }

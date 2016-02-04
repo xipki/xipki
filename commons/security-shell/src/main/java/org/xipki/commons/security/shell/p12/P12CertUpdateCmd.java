@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -57,82 +57,82 @@ import org.xipki.commons.security.api.util.X509Util;
  * @since 2.0.0
  */
 @Command(scope = "xipki-tk", name = "update-cert-p12",
-    description = "update certificate in PKCS#12 keystore")
+        description = "update certificate in PKCS#12 keystore")
 @Service
 public class P12CertUpdateCmd extends P12SecurityCommandSupport {
 
-  @Option(name = "--cert",
-      required = true,
-      description = "certificate file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            required = true,
+            description = "certificate file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--ca-cert",
-      multiValued = true,
-      description = "CA Certificate file\n"
-          + "(multi-valued)")
-  @Completion(FilePathCompleter.class)
-  private Set<String> caCertFiles;
+    @Option(name = "--ca-cert",
+            multiValued = true,
+            description = "CA Certificate file\n"
+                    + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
+    private Set<String> caCertFiles;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    KeyStore ks = getKeyStore();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        KeyStore ks = getKeyStore();
 
-    char[] pwd = getPassword();
-    X509Certificate newCert = X509Util.parseCert(certFile);
+        char[] pwd = getPassword();
+        X509Certificate newCert = X509Util.parseCert(certFile);
 
-    assertMatch(newCert, new String(pwd));
+        assertMatch(newCert, new String(pwd));
 
-    String keyname = null;
-    Enumeration<String> aliases = ks.aliases();
-    while (aliases.hasMoreElements()) {
-      String alias = aliases.nextElement();
-      if (ks.isKeyEntry(alias)) {
-        keyname = alias;
-        break;
-      }
+        String keyname = null;
+        Enumeration<String> aliases = ks.aliases();
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            if (ks.isKeyEntry(alias)) {
+                keyname = alias;
+                break;
+            }
+        }
+
+        if (keyname == null) {
+            throw new SignerException("could not find private key");
+        }
+
+        Key key = ks.getKey(keyname, pwd);
+        Set<X509Certificate> caCerts = new HashSet<>();
+        if (isNotEmpty(caCertFiles)) {
+            for (String caCertFile : caCertFiles) {
+                caCerts.add(X509Util.parseCert(caCertFile));
+            }
+        }
+        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
+
+        ks.setKeyEntry(keyname, key, pwd, certChain);
+
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(p12File);
+            ks.store(fOut, pwd);
+            out("updated certificate");
+            return null;
+        } finally {
+            if (fOut != null) {
+                fOut.close();
+            }
+        }
     }
 
-    if (keyname == null) {
-      throw new SignerException("could not find private key");
+    private void assertMatch(
+            final X509Certificate cert,
+            final String password)
+    throws SignerException {
+        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
+        if (password != null) {
+            pairs.putPair("password", new String(password));
+        }
+
+        securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", null, cert);
     }
-
-    Key key = ks.getKey(keyname, pwd);
-    Set<X509Certificate> caCerts = new HashSet<>();
-    if (isNotEmpty(caCertFiles)) {
-      for (String caCertFile : caCertFiles) {
-        caCerts.add(X509Util.parseCert(caCertFile));
-      }
-    }
-    X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-
-    ks.setKeyEntry(keyname, key, pwd, certChain);
-
-    FileOutputStream fOut = null;
-    try {
-      fOut = new FileOutputStream(p12File);
-      ks.store(fOut, pwd);
-      out("updated certificate");
-      return null;
-    } finally {
-      if (fOut != null) {
-        fOut.close();
-      }
-    }
-  }
-
-  private void assertMatch(
-      final X509Certificate cert,
-      final String password)
-  throws SignerException {
-    ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
-    if (password != null) {
-      pairs.putPair("password", new String(password));
-    }
-
-    securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", null, cert);
-  }
 
 }

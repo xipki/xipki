@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,28 +46,28 @@ import org.bouncycastle.cert.X509CertificateHolder;
 
 public class P12KeypairGenerationResult extends KeypairGenerationResult {
 
-  private final byte[] keystore;
+    private final byte[] keystore;
 
-  private KeyStore keystoreObject;
+    private KeyStore keystoreObject;
 
-  public P12KeypairGenerationResult(
-      final byte[] keystore,
-      final X509CertificateHolder certificate) {
-    super(certificate);
-    this.keystore = keystore;
-  }
+    public P12KeypairGenerationResult(
+            final byte[] keystore,
+            final X509CertificateHolder certificate) {
+        super(certificate);
+        this.keystore = keystore;
+    }
 
-  public byte[] getKeystore() {
-    return keystore;
-  }
+    public byte[] getKeystore() {
+        return keystore;
+    }
 
-  public KeyStore getKeystoreObject() {
-    return keystoreObject;
-  }
+    public KeyStore getKeystoreObject() {
+        return keystoreObject;
+    }
 
-  public void setKeystoreObject(
-      final KeyStore keystoreObject) {
-    this.keystoreObject = keystoreObject;
-  }
+    public void setKeystoreObject(
+            final KeyStore keystoreObject) {
+        this.keystoreObject = keystoreObject;
+    }
 
 }

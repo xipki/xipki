@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,51 +42,51 @@ package org.xipki.pki.scep.transaction;
 
 public enum FailInfo {
 
-  /**
-   * Unrecognized or unsupported algorithm identifier
-   */
-  badAlg (0),
+    /**
+     * Unrecognized or unsupported algorithm identifier
+     */
+    badAlg (0),
 
-  /**
-   * integrity check failed
-   */
-  badMessageCheck (1),
+    /**
+     * integrity check failed
+     */
+    badMessageCheck (1),
 
-  /**
-   * transaction not permitted or supported
-   */
-  badRequest (2),
+    /**
+     * transaction not permitted or supported
+     */
+    badRequest (2),
 
-  /**
-   * The signingTime attribute from the CMS, authenticatedAttributes was not sufficiently
-   * close to the system time
-   */
-  badTime (3),
+    /**
+     * The signingTime attribute from the CMS, authenticatedAttributes was not sufficiently
+     * close to the system time
+     */
+    badTime (3),
 
-  /**
-   * No certificate could be identified matching the provided criteria
-   */
-  badCertId (4);
+    /**
+     * No certificate could be identified matching the provided criteria
+     */
+    badCertId (4);
 
-  private final int code;
+    private final int code;
 
-  private FailInfo(
-      final int code) {
-    this.code = code;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public static FailInfo valueForCode(
-      final int code) {
-    for (FailInfo m : values()) {
-      if (m.code == code) {
-        return m;
-      }
+    private FailInfo(
+            final int code) {
+        this.code = code;
     }
-    return null;
-  }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static FailInfo valueForCode(
+            final int code) {
+        for (FailInfo m : values()) {
+            if (m.code == code) {
+                return m;
+            }
+        }
+        return null;
+    }
 
 }

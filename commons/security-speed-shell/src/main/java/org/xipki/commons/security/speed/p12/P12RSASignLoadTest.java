@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,31 +48,31 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12RSASignLoadTest extends P12SignLoadTest {
 
-  public P12RSASignLoadTest(
-      final SecurityFactory securityFactory,
-      final String signatureAlgorithm,
-      final int keysize,
-      final BigInteger publicExponent)
-  throws Exception {
-    super(securityFactory, signatureAlgorithm,
-        generateKeystore(keysize, publicExponent),
-        "PKCS#12 RSA signature creation\n"
-            + "keysize: " + keysize + "\n"
-            + "public exponent: " + publicExponent);
-  }
-
-  private static byte[] generateKeystore(
-      final int keysize,
-      final BigInteger publicExponent)
-  throws Exception {
-    byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
-    if (keystoreBytes == null) {
-      P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
-          keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null,
-          new SecureRandom());
-      keystoreBytes = kpGen.generateIdentity().getKeystore();
+    public P12RSASignLoadTest(
+            final SecurityFactory securityFactory,
+            final String signatureAlgorithm,
+            final int keysize,
+            final BigInteger publicExponent)
+    throws Exception {
+        super(securityFactory, signatureAlgorithm,
+                generateKeystore(keysize, publicExponent),
+                "PKCS#12 RSA signature creation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
     }
-    return keystoreBytes;
-  }
+
+    private static byte[] generateKeystore(
+            final int keysize,
+            final BigInteger publicExponent)
+    throws Exception {
+        byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
+        if (keystoreBytes == null) {
+            P12KeypairGenerator kpGen = new P12KeypairGenerator.RSAIdentityGenerator(
+                    keysize, publicExponent, password.toCharArray(), "CN=dummy", null, null,
+                    new SecureRandom());
+            keystoreBytes = kpGen.generateIdentity().getKeystore();
+        }
+        return keystoreBytes;
+    }
 
 }

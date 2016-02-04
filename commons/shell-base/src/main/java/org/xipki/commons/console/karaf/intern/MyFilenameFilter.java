@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,32 +45,32 @@ import java.util.regex.Pattern;
  */
 public class MyFilenameFilter implements FilenameFilter {
 
-  private static final Pattern ignorePattern;
+    private static final Pattern ignorePattern;
 
-  static {
-    String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
-    if (ignoreRegex == null) {
-      if (!Configuration.isWindows()) {
-        ignoreRegex = "\\..*";
-      }
+    static {
+        String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
+        if (ignoreRegex == null) {
+            if (!Configuration.isWindows()) {
+                ignoreRegex = "\\..*";
+            }
+        }
+
+        if (ignoreRegex == null || ignoreRegex.isEmpty()) {
+            ignorePattern = null;
+        } else {
+            ignorePattern = Pattern.compile(ignoreRegex);
+        }
     }
 
-    if (ignoreRegex == null || ignoreRegex.isEmpty()) {
-      ignorePattern = null;
-    } else {
-      ignorePattern = Pattern.compile(ignoreRegex);
-    }
-  }
+    @Override
+    public boolean accept(
+            final File dir,
+            final String name) {
+        if (ignorePattern == null) {
+            return true;
+        }
 
-  @Override
-  public boolean accept(
-      final File dir,
-      final String name) {
-    if (ignorePattern == null) {
-      return true;
+        return !ignorePattern.matcher(name).matches();
     }
-
-    return !ignorePattern.matcher(name).matches();
-  }
 
 }

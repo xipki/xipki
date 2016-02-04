@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,13 +44,13 @@ import org.xipki.pki.scep.transaction.CACapability;
 
 public class MD5OnlyCATest extends AbstractCATest {
 
-  protected boolean useInsecureAlgorithms() {
-    return true;
-  }
+    protected boolean useInsecureAlgorithms() {
+        return true;
+    }
 
-  @Override
-  protected CACapability[] getExcludedCACaps() {
-    return new CACapability[]{CACapability.SHA1, CACapability.SHA256, CACapability.SHA512};
-  }
+    @Override
+    protected CACapability[] getExcludedCACaps() {
+        return new CACapability[]{CACapability.SHA1, CACapability.SHA256, CACapability.SHA512};
+    }
 
 }

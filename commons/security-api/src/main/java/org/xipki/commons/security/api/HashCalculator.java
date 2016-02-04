@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -58,134 +58,134 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class HashCalculator {
 
-  private final static int parallelism = 50;
+    private final static int parallelism = 50;
 
-  private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
-      new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
+            new ConcurrentHashMap<>();
 
-  static {
-    mdsMap.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
-    mdsMap.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
-    mdsMap.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
-    mdsMap.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
-    mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
-  }
-
-  private HashCalculator() {
-  }
-
-  private static BlockingDeque<Digest> getMessageDigests(
-      final HashAlgoType hashAlgo) {
-    BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-    for (int i = 0; i < parallelism; i++) {
-      Digest md;
-      switch (hashAlgo) {
-        case SHA1:
-          md = new SHA1Digest();
-          break;
-        case SHA224:
-          md = new SHA224Digest();
-          break;
-        case SHA256:
-          md = new SHA256Digest();
-          break;
-        case SHA384:
-          md = new SHA384Digest();
-          break;
-        case SHA512:
-          md = new SHA512Digest();
-          break;
-        default:
-          throw new RuntimeException(
-              "should not reach here, unknown HashAlgoType " + hashAlgo);
-      }
-      mds.addLast(md);
-    }
-    return mds;
-  }
-
-  public static String base64Sha1(
-      final byte[] data) {
-    return base64Hash(HashAlgoType.SHA1, data);
-  }
-
-  public static String hexSha1(
-      final byte[] data) {
-    return hexHash(HashAlgoType.SHA1, data);
-  }
-
-  public static byte[] sha1(
-      final byte[] data) {
-    return hash(HashAlgoType.SHA1, data);
-  }
-
-  public static String base64Sha256(
-      final byte[] data) {
-    return base64Hash(HashAlgoType.SHA256, data);
-  }
-
-  public static String hexSha256(
-      final byte[] data) {
-    return hexHash(HashAlgoType.SHA256, data);
-  }
-
-  public static byte[] sha256(
-      final HashAlgoType hashAlgoType,
-      final byte[] data) {
-    return hash(HashAlgoType.SHA256, data);
-  }
-
-  public static String hexHash(
-      final HashAlgoType hashAlgoType,
-      final byte[] data) {
-    byte[] bytes = hash(hashAlgoType, data);
-    return (bytes == null)
-        ? null
-        : Hex.toHexString(bytes).toUpperCase();
-  }
-
-  public static String base64Hash(
-      final HashAlgoType hashAlgoType,
-      final byte[] data) {
-    byte[] bytes = hash(hashAlgoType, data);
-    return (bytes == null)
-        ? null
-        : Base64.getEncoder().encodeToString(bytes);
-  }
-
-  public static byte[] hash(
-      final HashAlgoType hashAlgoType,
-      final byte[] data) {
-    ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
-    ParamUtil.assertNotNull("data", data);
-    if (!mdsMap.containsKey(hashAlgoType)) {
-      throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
+    static {
+        mdsMap.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
+        mdsMap.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
+        mdsMap.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
+        mdsMap.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
+        mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
     }
 
-    BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
-
-    Digest md = null;
-    for (int i = 0; i < 3; i++) {
-      try {
-        md = mds.poll(10, TimeUnit.SECONDS);
-        break;
-      } catch (InterruptedException e) {
-      }
+    private HashCalculator() {
     }
 
-    if (md == null) {
-      throw new RuntimeOperatorException("could not get idle MessageDigest");
+    private static BlockingDeque<Digest> getMessageDigests(
+            final HashAlgoType hashAlgo) {
+        BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
+        for (int i = 0; i < parallelism; i++) {
+            Digest md;
+            switch (hashAlgo) {
+                case SHA1:
+                    md = new SHA1Digest();
+                    break;
+                case SHA224:
+                    md = new SHA224Digest();
+                    break;
+                case SHA256:
+                    md = new SHA256Digest();
+                    break;
+                case SHA384:
+                    md = new SHA384Digest();
+                    break;
+                case SHA512:
+                    md = new SHA512Digest();
+                    break;
+                default:
+                    throw new RuntimeException(
+                            "should not reach here, unknown HashAlgoType " + hashAlgo);
+            }
+            mds.addLast(md);
+        }
+        return mds;
     }
 
-    try {
-      md.reset();
-      md.update(data, 0, data.length);
-      byte[] b = new byte[md.getDigestSize()];
-      md.doFinal(b, 0);
-      return b;
-    } finally {
-      mds.addLast(md);
+    public static String base64Sha1(
+            final byte[] data) {
+        return base64Hash(HashAlgoType.SHA1, data);
     }
-  } // method hash
+
+    public static String hexSha1(
+            final byte[] data) {
+        return hexHash(HashAlgoType.SHA1, data);
+    }
+
+    public static byte[] sha1(
+            final byte[] data) {
+        return hash(HashAlgoType.SHA1, data);
+    }
+
+    public static String base64Sha256(
+            final byte[] data) {
+        return base64Hash(HashAlgoType.SHA256, data);
+    }
+
+    public static String hexSha256(
+            final byte[] data) {
+        return hexHash(HashAlgoType.SHA256, data);
+    }
+
+    public static byte[] sha256(
+            final HashAlgoType hashAlgoType,
+            final byte[] data) {
+        return hash(HashAlgoType.SHA256, data);
+    }
+
+    public static String hexHash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data) {
+        byte[] bytes = hash(hashAlgoType, data);
+        return (bytes == null)
+                ? null
+                : Hex.toHexString(bytes).toUpperCase();
+    }
+
+    public static String base64Hash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data) {
+        byte[] bytes = hash(hashAlgoType, data);
+        return (bytes == null)
+                ? null
+                : Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public static byte[] hash(
+            final HashAlgoType hashAlgoType,
+            final byte[] data) {
+        ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
+        ParamUtil.assertNotNull("data", data);
+        if (!mdsMap.containsKey(hashAlgoType)) {
+            throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
+        }
+
+        BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
+
+        Digest md = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                md = mds.poll(10, TimeUnit.SECONDS);
+                break;
+            } catch (InterruptedException e) {
+            }
+        }
+
+        if (md == null) {
+            throw new RuntimeOperatorException("could not get idle MessageDigest");
+        }
+
+        try {
+            md.reset();
+            md.update(data, 0, data.length);
+            byte[] b = new byte[md.getDigestSize()];
+            md.doFinal(b, 0);
+            return b;
+        } finally {
+            mds.addLast(md);
+        }
+    } // method hash
 
 }

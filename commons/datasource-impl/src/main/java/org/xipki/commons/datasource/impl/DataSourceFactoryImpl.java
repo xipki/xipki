@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,91 +55,91 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 public class DataSourceFactoryImpl implements DataSourceFactory {
 
-  @Override
-  public DataSourceWrapper createDataSourceForFile(
-      final String name,
-      final String confFile,
-      final PasswordResolver passwordResolver)
-  throws DataAccessException, PasswordResolverException, IOException {
-    assertNotNull("confFile", confFile);
+    @Override
+    public DataSourceWrapper createDataSourceForFile(
+            final String name,
+            final String confFile,
+            final PasswordResolver passwordResolver)
+    throws DataAccessException, PasswordResolverException, IOException {
+        assertNotNull("confFile", confFile);
 
-    FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
-    return createDataSource(name, fIn, passwordResolver);
-  }
-
-  @Override
-  public DataSourceWrapper createDataSource(
-      final String name,
-      final InputStream conf,
-      final PasswordResolver passwordResolver)
-  throws DataAccessException, PasswordResolverException, IOException {
-    assertNotNull("conf", conf);
-
-    Properties config = new Properties();
-    try {
-      config.load(conf);
-    } finally {
-      try {
-        conf.close();
-      } catch (Exception e) {
-      }
+        FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
+        return createDataSource(name, fIn, passwordResolver);
     }
 
-    return createDataSource(name, config, passwordResolver);
-  } // method createDataSource
+    @Override
+    public DataSourceWrapper createDataSource(
+            final String name,
+            final InputStream conf,
+            final PasswordResolver passwordResolver)
+    throws DataAccessException, PasswordResolverException, IOException {
+        assertNotNull("conf", conf);
 
-  @Override
-  public DataSourceWrapper createDataSource(
-      final String name,
-      final Properties conf,
-      final PasswordResolver passwordResolver)
-  throws DataAccessException, PasswordResolverException {
-    assertNotNull("conf", conf);
+        Properties config = new Properties();
+        try {
+            config.load(conf);
+        } finally {
+            try {
+                conf.close();
+            } catch (Exception e) {
+            }
+        }
 
-    DatabaseType databaseType;
-    String className = conf.getProperty("dataSourceClassName");
-    if (className != null) {
-      databaseType = DatabaseType.getDataSourceForDataSource(className);
+        return createDataSource(name, config, passwordResolver);
+    } // method createDataSource
 
-    } else {
-      className = conf.getProperty("driverClassName");
-      databaseType = DatabaseType.getDataSourceForDriver(className);
+    @Override
+    public DataSourceWrapper createDataSource(
+            final String name,
+            final Properties conf,
+            final PasswordResolver passwordResolver)
+    throws DataAccessException, PasswordResolverException {
+        assertNotNull("conf", conf);
+
+        DatabaseType databaseType;
+        String className = conf.getProperty("dataSourceClassName");
+        if (className != null) {
+            databaseType = DatabaseType.getDataSourceForDataSource(className);
+
+        } else {
+            className = conf.getProperty("driverClassName");
+            databaseType = DatabaseType.getDataSourceForDriver(className);
+        }
+
+        String password = conf.getProperty("password");
+        if (password != null) {
+            if (passwordResolver != null) {
+                password = new String(passwordResolver.resolvePassword(password));
+            }
+            conf.setProperty("password", password);
+        }
+
+        password = conf.getProperty("dataSource.password");
+        if (password != null) {
+            if (passwordResolver != null) {
+                password = new String(passwordResolver.resolvePassword(password));
+            }
+            conf.setProperty("dataSource.password", password);
+        }
+
+        return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
+    } // method createDataSource
+
+    private static void assertNotNull(
+            final String parameterName,
+            final Object parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
     }
 
-    String password = conf.getProperty("password");
-    if (password != null) {
-      if (passwordResolver != null) {
-        password = new String(passwordResolver.resolvePassword(password));
-      }
-      conf.setProperty("password", password);
+    private static String expandFilepath(
+            final String path) {
+        if (path.startsWith("~" + File.separator)) {
+            return System.getProperty("user.home") + path.substring(1);
+        } else {
+            return path;
+        }
     }
-
-    password = conf.getProperty("dataSource.password");
-    if (password != null) {
-      if (passwordResolver != null) {
-        password = new String(passwordResolver.resolvePassword(password));
-      }
-      conf.setProperty("dataSource.password", password);
-    }
-
-    return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
-  } // method createDataSource
-
-  private static void assertNotNull(
-      final String parameterName,
-      final Object parameter) {
-    if (parameter == null) {
-      throw new IllegalArgumentException(parameterName + " could not be null");
-    }
-  }
-
-  private static String expandFilepath(
-      final String path) {
-    if (path.startsWith("~" + File.separator)) {
-      return System.getProperty("user.home") + path.substring(1);
-    } else {
-      return path;
-    }
-  }
 
 }

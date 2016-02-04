@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,45 +52,45 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public final class EnvelopedDataDecryptor {
 
-  private final List<EnvelopedDataDecryptorInstance> decryptors;
+    private final List<EnvelopedDataDecryptorInstance> decryptors;
 
-  public EnvelopedDataDecryptor(
-      final List<EnvelopedDataDecryptorInstance> decryptors) {
-    ParamUtil.assertNotEmpty("decryptors", decryptors);
-    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
-  }
-
-  public EnvelopedDataDecryptor(
-      final EnvelopedDataDecryptorInstance decryptor) {
-    ParamUtil.assertNotNull("decryptor", decryptor);
-    this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
-    this.decryptors.add(decryptor);
-  }
-
-  public byte[] decrypt(
-      final CMSEnvelopedData envData)
-  throws MessageDecodingException {
-    final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
-    RecipientInformation recipientInfo = null;
-    EnvelopedDataDecryptorInstance decryptor = null;
-    for (EnvelopedDataDecryptorInstance m : decryptors) {
-      recipientInfo = recipientInfos.get(m.getRecipientId());
-      if (recipientInfo != null) {
-        decryptor = m;
-        break;
-      }
+    public EnvelopedDataDecryptor(
+            final List<EnvelopedDataDecryptorInstance> decryptors) {
+        ParamUtil.assertNotEmpty("decryptors", decryptors);
+        this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
-    if (recipientInfo == null) {
-      throw new MessageDecodingException(
-          "missing expected key transfer recipient");
+    public EnvelopedDataDecryptor(
+            final EnvelopedDataDecryptorInstance decryptor) {
+        ParamUtil.assertNotNull("decryptor", decryptor);
+        this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
+        this.decryptors.add(decryptor);
     }
 
-    try {
-      return recipientInfo.getContent(decryptor.getRecipient());
-    } catch (CMSException e) {
-      throw new MessageDecodingException("could not decrypt the envelopedData");
+    public byte[] decrypt(
+            final CMSEnvelopedData envData)
+    throws MessageDecodingException {
+        final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
+        RecipientInformation recipientInfo = null;
+        EnvelopedDataDecryptorInstance decryptor = null;
+        for (EnvelopedDataDecryptorInstance m : decryptors) {
+            recipientInfo = recipientInfos.get(m.getRecipientId());
+            if (recipientInfo != null) {
+                decryptor = m;
+                break;
+            }
+        }
+
+        if (recipientInfo == null) {
+            throw new MessageDecodingException(
+                    "missing expected key transfer recipient");
+        }
+
+        try {
+            return recipientInfo.getContent(decryptor.getRecipient());
+        } catch (CMSException e) {
+            throw new MessageDecodingException("could not decrypt the envelopedData");
+        }
     }
-  }
 
 }

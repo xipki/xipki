@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,35 +48,35 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
  */
 
 @Command(scope = "xipki-tk", name = "rsa-p12",
-    description = "generate RSA keypair in PKCS#12 keystore")
+        description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
-  private Integer keysize = 2048;
+    @Option(name = "--key-size",
+            description = "keysize in bit")
+    private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
-  private String publicExponent = "0x10001";
+    @Option(name = "-e",
+            description = "public exponent")
+    private String publicExponent = "0x10001";
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (keysize % 1024 != 0) {
-      throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (keysize % 1024 != 0) {
+            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
+        }
+
+        P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
+                keysize, toBigInt(publicExponent),
+                getPassword(), subject,
+                getKeyUsage(), getExtendedKeyUsage(),
+                securityFactory.getRandom4Key());
+
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
+
+        return null;
     }
-
-    P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-        keysize, toBigInt(publicExponent),
-        getPassword(), subject,
-        getKeyUsage(), getExtendedKeyUsage(),
-        securityFactory.getRandom4Key());
-
-    P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-    saveKeyAndCert(keyAndCert);
-
-    return null;
-  }
 
 }

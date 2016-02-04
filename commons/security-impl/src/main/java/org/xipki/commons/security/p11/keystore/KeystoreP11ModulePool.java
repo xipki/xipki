@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,88 +52,88 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 
 public class KeystoreP11ModulePool {
 
-  private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11ModulePool.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11ModulePool.class);
 
-  private final Map<String, KeystoreP11Module> modules = new HashMap<>();
+    private final Map<String, KeystoreP11Module> modules = new HashMap<>();
 
-  private String defaultModuleName;
+    private String defaultModuleName;
 
-  private static KeystoreP11ModulePool INSTANCE = new KeystoreP11ModulePool();
+    private static KeystoreP11ModulePool INSTANCE = new KeystoreP11ModulePool();
 
-  public synchronized void removeModule(
-      final String moduleName) {
-    KeystoreP11Module module = modules.remove(moduleName);
-    if (module == null && defaultModuleName != null
-        && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-      module = modules.remove(defaultModuleName);
+    public synchronized void removeModule(
+            final String moduleName) {
+        KeystoreP11Module module = modules.remove(moduleName);
+        if (module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
+            module = modules.remove(defaultModuleName);
+        }
+
+        if (module == null) {
+            return;
+        }
+
+        try {
+            LOG.info("removed module {}", moduleName);
+            module.close();
+            LOG.info("finalized module {}", moduleName);
+        } catch (Throwable t) {
+            final String message = "could not finalize the module " + moduleName;
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message),
+                        t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
+        }
     }
 
-    if (module == null) {
-      return;
+    public KeystoreP11Module getModule(
+            final String moduleName)
+    throws SignerException {
+        KeystoreP11Module module = modules.get(moduleName);
+        if (module == null && defaultModuleName != null
+                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
+            module = modules.get(defaultModuleName);
+        }
+        return module;
     }
 
-    try {
-      LOG.info("removed module {}", moduleName);
-      module.close();
-      LOG.info("finalized module {}", moduleName);
-    } catch (Throwable t) {
-      final String message = "could not finalize the module " + moduleName;
-      if (LOG.isWarnEnabled()) {
-        LOG.warn(LogUtil.buildExceptionLogFormat(message),
-            t.getClass().getName(), t.getMessage());
-      }
-      LOG.debug(message, t);
-    }
-  }
+    public synchronized KeystoreP11Module getModule(
+            final P11ModuleConf moduleConf)
+    throws SignerException {
+        KeystoreP11Module extModule = modules.get(moduleConf.getName());
+        if (extModule == null) {
+            extModule = new KeystoreP11Module(moduleConf);
+            modules.put(moduleConf.getName(), extModule);
+        }
 
-  public KeystoreP11Module getModule(
-      final String moduleName)
-  throws SignerException {
-    KeystoreP11Module module = modules.get(moduleName);
-    if (module == null && defaultModuleName != null
-        && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-      module = modules.get(defaultModuleName);
-    }
-    return module;
-  }
-
-  public synchronized KeystoreP11Module getModule(
-      final P11ModuleConf moduleConf)
-  throws SignerException {
-    KeystoreP11Module extModule = modules.get(moduleConf.getName());
-    if (extModule == null) {
-      extModule = new KeystoreP11Module(moduleConf);
-      modules.put(moduleConf.getName(), extModule);
+        return extModule;
     }
 
-    return extModule;
-  }
-
-  @Override
-  protected void finalize()
-  throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
-  public synchronized void shutdown() {
-    for (String pk11Lib : modules.keySet()) {
-      modules.get(pk11Lib).close();
+    @Override
+    protected void finalize()
+    throws Throwable {
+        super.finalize();
+        shutdown();
     }
-    modules.clear();
-  }
 
-  public String getDefaultModuleName() {
-    return defaultModuleName;
-  }
+    public synchronized void shutdown() {
+        for (String pk11Lib : modules.keySet()) {
+            modules.get(pk11Lib).close();
+        }
+        modules.clear();
+    }
 
-  public void setDefaultModuleName(
-      final String defaultModuleName) {
-    this.defaultModuleName = defaultModuleName;
-  }
+    public String getDefaultModuleName() {
+        return defaultModuleName;
+    }
 
-  public static KeystoreP11ModulePool getInstance() {
-    return INSTANCE;
-  }
+    public void setDefaultModuleName(
+            final String defaultModuleName) {
+        this.defaultModuleName = defaultModuleName;
+    }
+
+    public static KeystoreP11ModulePool getInstance() {
+        return INSTANCE;
+    }
 
 }

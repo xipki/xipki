@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,58 +51,58 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class TransactionId {
 
-  private static final SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
 
-  private final String id;
+    private final String id;
 
-  public TransactionId(
-      final String id) {
-    ParamUtil.assertNotBlank("id", id);
-    this.id = id;
-  }
-
-  private TransactionId(
-      final byte[] bytes) {
-    ParamUtil.assertNotNull("bytes", bytes);
-    if (bytes.length < 1) {
-      throw new IllegalArgumentException("bytes could not be null");
-    }
-    this.id = Hex.toHexString(bytes);
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public static TransactionId randomTransactionId() {
-    byte[] bytes = new byte[20];
-    random.nextBytes(bytes);
-    return new TransactionId(bytes);
-  }
-
-  public static TransactionId sha1TransactionId(
-      final SubjectPublicKeyInfo spk)
-  throws InvalidKeySpecException {
-    ParamUtil.assertNotNull("spk", spk);
-    byte[] encoded;
-    try {
-      encoded = spk.getEncoded();
-    } catch (IOException e) {
-      throw new InvalidKeySpecException("IO exception while ");
+    public TransactionId(
+            final String id) {
+        ParamUtil.assertNotBlank("id", id);
+        this.id = id;
     }
 
-    return sha1TransactionId(encoded);
-  }
+    private TransactionId(
+            final byte[] bytes) {
+        ParamUtil.assertNotNull("bytes", bytes);
+        if (bytes.length < 1) {
+            throw new IllegalArgumentException("bytes could not be null");
+        }
+        this.id = Hex.toHexString(bytes);
+    }
 
-  public static TransactionId sha1TransactionId(
-      final byte[] content) {
-    ParamUtil.assertNotNull("content", content);
-    SHA1Digest dgst = new SHA1Digest();
-    dgst.update(content, 0, content.length);
-    final int size = 20;
-    byte[] digest = new byte[size];
-    dgst.doFinal(digest, 0);
-    return new TransactionId(digest);
-  }
+    public String getId() {
+        return id;
+    }
+
+    public static TransactionId randomTransactionId() {
+        byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+        return new TransactionId(bytes);
+    }
+
+    public static TransactionId sha1TransactionId(
+            final SubjectPublicKeyInfo spk)
+    throws InvalidKeySpecException {
+        ParamUtil.assertNotNull("spk", spk);
+        byte[] encoded;
+        try {
+            encoded = spk.getEncoded();
+        } catch (IOException e) {
+            throw new InvalidKeySpecException("IO exception while ");
+        }
+
+        return sha1TransactionId(encoded);
+    }
+
+    public static TransactionId sha1TransactionId(
+            final byte[] content) {
+        ParamUtil.assertNotNull("content", content);
+        SHA1Digest dgst = new SHA1Digest();
+        dgst.update(content, 0, content.length);
+        final int size = 20;
+        byte[] digest = new byte[size];
+        dgst.doFinal(digest, 0);
+        return new TransactionId(digest);
+    }
 
 }

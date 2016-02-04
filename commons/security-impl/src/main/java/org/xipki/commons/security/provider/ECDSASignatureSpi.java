@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,65 +51,65 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 
 class ECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
-  static public class SHA1 extends ECDSASignatureSpi {
+    static public class SHA1 extends ECDSASignatureSpi {
 
-    public SHA1() {
-      super(new SHA1Digest());
+        public SHA1() {
+            super(new SHA1Digest());
+        }
+
+    } // class SHA1
+
+    static public class NONE extends ECDSASignatureSpi {
+
+        public NONE() {
+            super(new NullDigest());
+        }
+
+    } // class NONE
+
+    static public class SHA224 extends ECDSASignatureSpi {
+
+        public SHA224() {
+            super(new SHA224Digest());
+        }
+
+    } // class SHA224
+
+    static public class SHA256 extends ECDSASignatureSpi {
+
+        public SHA256() {
+            super(new SHA256Digest());
+        }
+
+    } // class SHA256
+
+    static public class SHA384 extends ECDSASignatureSpi {
+
+        public SHA384() {
+            super(new SHA384Digest());
+        }
+
+    } // class SHA384
+
+    static public class SHA512 extends ECDSASignatureSpi {
+
+        public SHA512() {
+            super(new SHA512Digest());
+        }
+
+    } // class SHA512
+
+    static public class RIPEMD160 extends ECDSASignatureSpi {
+
+        public RIPEMD160() {
+            super(new RIPEMD160Digest());
+        }
+
+    } // class RIPEMD160
+
+    ECDSASignatureSpi(
+            final Digest digest) {
+        super(digest, true);
     }
-
-  } // class SHA1
-
-  static public class NONE extends ECDSASignatureSpi {
-
-    public NONE() {
-      super(new NullDigest());
-    }
-
-  } // class NONE
-
-  static public class SHA224 extends ECDSASignatureSpi {
-
-    public SHA224() {
-      super(new SHA224Digest());
-    }
-
-  } // class SHA224
-
-  static public class SHA256 extends ECDSASignatureSpi {
-
-    public SHA256() {
-      super(new SHA256Digest());
-    }
-
-  } // class SHA256
-
-  static public class SHA384 extends ECDSASignatureSpi {
-
-    public SHA384() {
-      super(new SHA384Digest());
-    }
-
-  } // class SHA384
-
-  static public class SHA512 extends ECDSASignatureSpi {
-
-    public SHA512() {
-      super(new SHA512Digest());
-    }
-
-  } // class SHA512
-
-  static public class RIPEMD160 extends ECDSASignatureSpi {
-
-    public RIPEMD160() {
-      super(new RIPEMD160Digest());
-    }
-
-  } // class RIPEMD160
-
-  ECDSASignatureSpi(
-      final Digest digest) {
-    super(digest, true);
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,17 +45,17 @@ import org.xipki.commons.security.api.SignerException;
 
 public class P11DSAX962Signer extends AbstractP11DSASigner {
 
-  public P11DSAX962Signer(
-      final Digest digest) {
-    super(digest);
-  }
+    public P11DSAX962Signer(
+            final Digest digest) {
+        super(digest);
+    }
 
-  @Override
-  protected byte[] sign(
-      final byte[] hashValue)
-  throws SignerException {
-    return param.getP11CryptService().CKM_DSA_X962(hashValue, param.getSlot(),
-        param.getKeyId());
-  }
+    @Override
+    protected byte[] sign(
+            final byte[] hashValue)
+    throws SignerException {
+        return param.getP11CryptService().CKM_DSA_X962(hashValue, param.getSlot(),
+                param.getKeyId());
+    }
 
 }

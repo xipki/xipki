@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,41 +50,41 @@ import org.xipki.commons.security.shell.SecurityCommandSupport;
 
 public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
 
-  @Option(name = "--p12",
-      required = true,
-      description = "PKCS#12 keystore file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  protected String p12File;
+    @Option(name = "--p12",
+            required = true,
+            description = "PKCS#12 keystore file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    protected String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
-  protected String password;
+    @Option(name = "--password",
+            description = "password of the PKCS#12 file")
+    protected String password;
 
-  protected char[] getPassword() {
-    char[] pwdInChar = readPasswordIfNotSet(password);
-    if (pwdInChar != null) {
-      password = new String(pwdInChar);
-    }
-    return pwdInChar;
-  }
-
-  protected KeyStore getKeyStore()
-  throws Exception {
-    KeyStore ks;
-
-    FileInputStream fIn = null;
-    try {
-      fIn = new FileInputStream(expandFilepath(p12File));
-      ks = KeyStore.getInstance("PKCS12", "BC");
-      ks.load(fIn, getPassword());
-    } finally {
-      if (fIn != null) {
-        fIn.close();
-      }
+    protected char[] getPassword() {
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if (pwdInChar != null) {
+            password = new String(pwdInChar);
+        }
+        return pwdInChar;
     }
 
-    return ks;
-  }
+    protected KeyStore getKeyStore()
+    throws Exception {
+        KeyStore ks;
+
+        FileInputStream fIn = null;
+        try {
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        } finally {
+            if (fIn != null) {
+                fIn.close();
+            }
+        }
+
+        return ks;
+    }
 
 }
