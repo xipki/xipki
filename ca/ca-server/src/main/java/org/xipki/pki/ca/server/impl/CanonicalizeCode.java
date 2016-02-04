@@ -286,7 +286,7 @@ public class CanonicalizeCode {
             lineNumbers.add(lineNumber);
             continue;
           } else {
-                                                // check whether the number of leading spaces is multiple of 4
+            // check whether the number of leading spaces is multiple of 4
             int numLeadingSpaces = 0;
             char c = 'Z';
             for (int i = 0; i < line.length(); i++) {
@@ -362,7 +362,7 @@ public class CanonicalizeCode {
   private static String canonicalizeLine(
       final String line) {
     if (line.trim().startsWith("//")) {
-                        // comments
+      // comments
       String nline = line.replace("  ", "    ");
       return removeTrailingSpaces(nline);
     }
