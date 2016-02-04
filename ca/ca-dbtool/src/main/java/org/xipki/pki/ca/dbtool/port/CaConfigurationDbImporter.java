@@ -111,7 +111,7 @@ class CaConfigurationDbImporter extends DbPorter {
         try {
             @SuppressWarnings("unchecked")
             JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
-                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
+                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CONFIGURATION));
             caconf = root.getValue();
         } catch (JAXBException e) {
             throw XMLUtil.convert(e);
@@ -124,19 +124,19 @@ class CaConfigurationDbImporter extends DbPorter {
 
         System.out.println("importing CA configuration to database");
         try {
-            import_cmpcontrol(caconf.getCmpcontrols());
-            import_responder(caconf.getResponders());
-            import_environment(caconf.getEnvironments());
-            import_requestor(caconf.getRequestors());
-            import_publisher(caconf.getPublishers());
-            import_profile(caconf.getProfiles());
-            import_crlsigner(caconf.getCrlsigners());
-            import_ca(caconf.getCas());
-            import_caalias(caconf.getCaaliases());
-            import_ca_has_requestor(caconf.getCaHasRequestors());
-            import_ca_has_publisher(caconf.getCaHasPublishers());
-            import_ca_has_certprofile(caconf.getCaHasProfiles());
-            import_scep(caconf.getSceps());
+            importCmpcontrol(caconf.getCmpcontrols());
+            importResponder(caconf.getResponders());
+            importEnvironment(caconf.getEnvironments());
+            importRequestor(caconf.getRequestors());
+            importPublisher(caconf.getPublishers());
+            importProfile(caconf.getProfiles());
+            importCrlsigner(caconf.getCrlsigners());
+            importCa(caconf.getCas());
+            importCaalias(caconf.getCaaliases());
+            importCaHasRequestor(caconf.getCaHasRequestors());
+            importCaHasPublisher(caconf.getCaHasPublishers());
+            importCaHasCertprofile(caconf.getCaHasProfiles());
+            importScep(caconf.getSceps());
         } catch (Exception e) {
             System.err.println("error while importing CA configuration to database. message: "
                     + e.getMessage());
@@ -145,7 +145,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported CA configuration to database");
     } // method importToDB
 
-    private void import_cmpcontrol(
+    private void importCmpcontrol(
             final Cmpcontrols controls)
     throws DataAccessException {
         System.out.println("importing table CMPCONTROL");
@@ -173,9 +173,9 @@ class CaConfigurationDbImporter extends DbPorter {
             }
         }
         System.out.println(" imported table CMPCONTROL");
-    } // method import_cmpcontrol
+    } // method importCmpcontrol
 
-    private void import_responder(
+    private void importResponder(
             final Responders responders)
     throws DataAccessException, IOException {
         System.out.println("importing table RESPONDER");
@@ -209,9 +209,9 @@ class CaConfigurationDbImporter extends DbPorter {
         }
 
         System.out.println(" imported table RESPONDER");
-    } // method import_responder
+    } // method importResponder
 
-    private void import_environment(
+    private void importEnvironment(
             final Environments environments)
     throws DataAccessException {
         System.out.println("importing table ENVIRONMENT");
@@ -235,9 +235,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table ENVIRONMENT");
-    } // method import_environment
+    } // method importEnvironment
 
-    private void import_crlsigner(
+    private void importCrlsigner(
             final Crlsigners crlsigners)
     throws DataAccessException, IOException {
         System.out.println("importing table CRLSIGNER");
@@ -266,9 +266,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CRLSIGNER");
-    } // method import_crlsigner
+    } // method importCrlsigner
 
-    private void import_requestor(
+    private void importRequestor(
             final Requestors requestors)
     throws DataAccessException, IOException {
         System.out.println("importing table REQUESTOR");
@@ -294,9 +294,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table REQUESTOR");
-    } // method import_requestor
+    } // method importRequestor
 
-    private void import_publisher(
+    private void importPublisher(
             final Publishers publishers)
     throws DataAccessException, IOException {
         System.out.println("importing table PUBLISHER");
@@ -322,9 +322,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table PUBLISHER");
-    } // method import_publisher
+    } // method importPublisher
 
-    private void import_profile(
+    private void importProfile(
             final Profiles profiles)
     throws DataAccessException, IOException {
         System.out.println("importing table PROFILE");
@@ -360,9 +360,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table PROFILE");
-    } // method import_profile
+    } // method importProfile
 
-    private void import_ca(
+    private void importCa(
             final Cas cas)
     throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
@@ -440,9 +440,9 @@ class CaConfigurationDbImporter extends DbPorter {
         }
 
         System.out.println(" imported table CA");
-    } // method import_ca
+    } // method importCa
 
-    private void import_caalias(
+    private void importCaalias(
             final Caaliases caaliases)
     throws DataAccessException {
         System.out.println("importing table CAALIAS");
@@ -465,10 +465,10 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CAALIAS");
-    } // method import_caalias
+    } // method importCaalias
 
-    private void import_ca_has_requestor(
-            final CaHasRequestors ca_has_requestors)
+    private void importCaHasRequestor(
+            final CaHasRequestors caHasRequestors)
     throws DataAccessException {
         System.out.println("importing table CA_HAS_REQUESTOR");
         final String sql =
@@ -476,7 +476,7 @@ class CaConfigurationDbImporter extends DbPorter {
                 + " VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
-            for (CaHasRequestorType entry : ca_has_requestors.getCaHasRequestor()) {
+            for (CaHasRequestorType entry : caHasRequestors.getCaHasRequestor()) {
                 try {
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
@@ -497,16 +497,16 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_REQUESTOR");
-    } // method import_ca_has_requestor
+    } // method importCaHasRequestor
 
-    private void import_ca_has_publisher(
-            final CaHasPublishers ca_has_publishers)
+    private void importCaHasPublisher(
+            final CaHasPublishers caHasPublishers)
     throws Exception {
         System.out.println("importing table CA_HAS_PUBLISHER");
         final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
-            for (CaHasPublisherType entry : ca_has_publishers.getCaHasPublisher()) {
+            for (CaHasPublisherType entry : caHasPublishers.getCaHasPublisher()) {
                 try {
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
@@ -523,17 +523,17 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_PUBLISHER");
-    } // method import_ca_has_publisher
+    } // method importCaHasPublisher
 
-    private void import_ca_has_certprofile(
-            final CaHasProfiles ca_has_certprofiles)
+    private void importCaHasCertprofile(
+            final CaHasProfiles caHasCertprofiles)
     throws DataAccessException {
         System.out.println("importing table CA_HAS_PROFILE");
         final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
                 + " VALUES (?, ?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
-            for (CaHasProfileType entry : ca_has_certprofiles.getCaHasProfile()) {
+            for (CaHasProfileType entry : caHasCertprofiles.getCaHasProfile()) {
                 try {
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
@@ -552,9 +552,9 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table CA_HAS_PROFILE");
-    } // method import_ca_has_certprofile
+    } // method importCaHasCertprofile
 
-    private void import_scep(
+    private void importScep(
             final Sceps sceps)
     throws DataAccessException, IOException {
         System.out.println("importing table SCEP");
@@ -580,6 +580,6 @@ class CaConfigurationDbImporter extends DbPorter {
             releaseResources(ps, null);
         }
         System.out.println(" imported table SCEP");
-    } // method import_scep
+    } // method importScep
 
 }

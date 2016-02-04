@@ -42,7 +42,7 @@ package org.xipki.pki.ca.api;
 
 public class OperationException extends Exception {
 
-    public static enum ErrorCode {
+    public enum ErrorCode {
 
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,

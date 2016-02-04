@@ -91,12 +91,12 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
-    protected EnvParameterResolver parameterResolver;
-
-    protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
+    protected EnvParameterResolver envParameterResolver;
 
     protected BaseX509Certprofile() {
     }
+
+    protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
     protected String[] sortRdns(
             final RdnControl control,
@@ -254,8 +254,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     @Override
     public void setEnvParameterResolver(
-            final EnvParameterResolver parameterResolver) {
-        this.parameterResolver = parameterResolver;
+            final EnvParameterResolver envParameterResolver) {
+        this.envParameterResolver = envParameterResolver;
     }
 
     @Override
@@ -459,7 +459,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             throw new BadCertTemplateException("Value of RDN dateOfBirth has incorrect syntax");
         }
 
-        if (!SubjectDnSpec.p_dateOfBirth.matcher(text).matches()) {
+        if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(text).matches()) {
             throw new BadCertTemplateException(
                     "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
         }
@@ -535,13 +535,13 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             String suffix = option.getSuffix();
 
             if (prefix != null || suffix != null) {
-                String _text = ttext.toLowerCase();
-                if (prefix != null && _text.startsWith(prefix.toLowerCase())) {
+                String localText = ttext.toLowerCase();
+                if (prefix != null && localText.startsWith(prefix.toLowerCase())) {
                     ttext = ttext.substring(prefix.length());
-                    _text = ttext.toLowerCase();
+                    localText = ttext.toLowerCase();
                 }
 
-                if (suffix != null && _text.endsWith(suffix.toLowerCase())) {
+                if (suffix != null && localText.endsWith(suffix.toLowerCase())) {
                     ttext = ttext.substring(0, ttext.length() - suffix.length());
                 }
             }

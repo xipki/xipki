@@ -490,18 +490,18 @@ public final class CAClientImpl implements CAClient {
             final String username,
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException {
-    String realCaName = caName;
-        if (realCaName == null) {
-            realCaName = getCANameForProfile(profile);
-            if (realCaName == null) {
+        String localCaName = caName;
+        if (localCaName == null) {
+            localCaName = getCANameForProfile(profile);
+            if (localCaName == null) {
                 throw new CAClientException("cert profile " + profile
                         + " is not supported by any CA");
             }
         }
 
-        CAConf ca = casMap.get(realCaName.trim());
+        CAConf ca = casMap.get(localCaName.trim());
         if (ca == null) {
-            throw new CAClientException("could not find CA named " + realCaName);
+            throw new CAClientException("could not find CA named " + localCaName);
         }
 
         final String id = "cert-1";
@@ -513,7 +513,7 @@ public final class CAClientImpl implements CAClient {
             throw new CAClientException(e.getMessage(), e);
         }
 
-        return parseEnrollCertResult((EnrollCertResultType) result, realCaName);
+        return parseEnrollCertResult((EnrollCertResultType) result, localCaName);
     } // method requestCert
 
     @Override
@@ -530,13 +530,13 @@ public final class CAClientImpl implements CAClient {
             return null;
         }
 
-        String realCaName = caName;
-        boolean b = (realCaName != null);
-        if (realCaName == null) {
+        String localCaName = caName;
+        boolean b = (localCaName != null);
+        if (localCaName == null) {
             // detect the CA name
             String profile = requestEntries.get(0).getCertprofile();
-            realCaName = getCANameForProfile(profile);
-            if (realCaName == null) {
+            localCaName = getCANameForProfile(profile);
+            if (localCaName == null) {
                 throw new CAClientException("cert profile " + profile
                         + " is not supported by any CA");
             }
@@ -546,13 +546,13 @@ public final class CAClientImpl implements CAClient {
             // make sure that all requests are targeted on the same CA
             for (EnrollCertRequestEntryType entry : request.getRequestEntries()) {
                 String profile = entry.getCertprofile();
-                checkCertprofileSupportInCA(profile, realCaName);
+                checkCertprofileSupportInCA(profile, localCaName);
             }
         }
 
-        CAConf ca = casMap.get(realCaName.trim());
+        CAConf ca = casMap.get(localCaName.trim());
         if (ca == null) {
-            throw new CAClientException("could not find CA named " + realCaName);
+            throw new CAClientException("could not find CA named " + localCaName);
         }
 
         EnrollCertResultType result;
@@ -562,22 +562,22 @@ public final class CAClientImpl implements CAClient {
             throw new CAClientException(e.getMessage(), e);
         }
 
-        return parseEnrollCertResult((EnrollCertResultType) result, realCaName);
+        return parseEnrollCertResult((EnrollCertResultType) result, localCaName);
     } // method requestCerts
 
     private void checkCertprofileSupportInCA(
             final String certprofile,
             final String caName)
     throws CAClientException {
-    String realCaName = caName;
-        if (realCaName != null) {
-            CAConf ca = casMap.get(realCaName.trim());
+        String localCaName = caName;
+        if (localCaName != null) {
+            CAConf ca = casMap.get(localCaName.trim());
             if (ca == null) {
-                throw new CAClientException("unknown ca: " + realCaName);
+                throw new CAClientException("unknown ca: " + localCaName);
             } else {
                 if (!ca.supportsProfile(certprofile)) {
                     throw new CAClientException("cert profile " + certprofile
-                            + " is not supported by the CA " + realCaName);
+                            + " is not supported by the CA " + localCaName);
                 }
             }
             return;
@@ -588,8 +588,8 @@ public final class CAClientImpl implements CAClient {
                 continue;
             }
             if (ca.supportsProfile(certprofile)) {
-                if (realCaName == null) {
-                    realCaName = ca.getName();
+                if (localCaName == null) {
+                    localCaName = ca.getName();
                 } else {
                     throw new CAClientException("cert profile " + certprofile
                             + " supported by more than one CA, please specify the CA name.");
@@ -597,7 +597,7 @@ public final class CAClientImpl implements CAClient {
             }
         }
 
-        if (realCaName == null) {
+        if (localCaName == null) {
             throw new CAClientException("unsupported cert profile " + certprofile);
         }
     } // method checkCertprofileSupportInCA
@@ -819,21 +819,21 @@ public final class CAClientImpl implements CAClient {
             final String caName,
             final String username)
     throws CAClientException {
-    String realCaName = caName;
-        if (realCaName == null) {
+        String localCaName = caName;
+        if (localCaName == null) {
             // detect the CA name
-            realCaName = getCANameForProfile(profileName);
-            if (realCaName == null) {
+            localCaName = getCANameForProfile(profileName);
+            if (localCaName == null) {
                 throw new CAClientException("cert profile " + profileName
                         + " is not supported by any CA");
             }
         } else {
-            checkCertprofileSupportInCA(profileName, realCaName);
+            checkCertprofileSupportInCA(profileName, localCaName);
         }
 
-        CAConf ca = casMap.get(realCaName.trim());
+        CAConf ca = casMap.get(localCaName.trim());
         if (ca == null) {
-            throw new CAClientException("could not find CA named " + realCaName);
+            throw new CAClientException("could not find CA named " + localCaName);
         }
 
         PKIMessage pkiMessage;

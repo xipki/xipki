@@ -68,13 +68,13 @@ public class TargetDigestRetriever {
 
         private Connection conn;
 
-        private PreparedStatement singleSelectStmt = null;
+        private PreparedStatement singleSelectStmt;
 
-        private PreparedStatement inArraySelectStmt = null;
+        private PreparedStatement inArraySelectStmt;
 
-        private PreparedStatement rangeSelectStmt = null;
+        private PreparedStatement rangeSelectStmt;
 
-        public Retriever()
+        Retriever()
         throws DataAccessException {
             conn = datasource.getConnection();
 

@@ -47,7 +47,8 @@ public enum RequestType {
     SCEP(3);
 
     private final int code;
-    private RequestType(
+
+    RequestType(
             final int code) {
         this.code = code;
     }

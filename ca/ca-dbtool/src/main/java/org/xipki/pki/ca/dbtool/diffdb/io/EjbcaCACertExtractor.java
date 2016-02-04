@@ -55,10 +55,10 @@ public class EjbcaCACertExtractor {
     throws Exception {
         XMLDocumentReader cadataReader = new XMLDocumentReader(
                 new ByteArrayInputStream(caData.getBytes()), false);
-        final String XPATH_CERT =
+        final String xpathCert =
                 "/java/object/void[string[position()=1]='certificatechain']/object/void"
                 + "/string[1]";
-        String b64Cert = cadataReader.getValue(XPATH_CERT);
+        String b64Cert = cadataReader.getValue(xpathCert);
         if (b64Cert == null) {
             throw new Exception("Could not extract CA certificate");
         }

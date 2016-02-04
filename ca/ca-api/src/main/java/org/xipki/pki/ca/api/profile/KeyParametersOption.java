@@ -335,7 +335,7 @@ public class KeyParametersOption {
 
     } // class GostParametersOption
 
-    public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
+    public static final AllowAllParametersOption ALLOW_ALL = new AllowAllParametersOption();
 
     private KeyParametersOption() {
     }

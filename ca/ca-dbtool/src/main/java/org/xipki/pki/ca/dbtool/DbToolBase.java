@@ -73,11 +73,11 @@ public class DbToolBase {
 
     protected final DataSourceWrapper dataSource;
 
+    protected final String baseDir;
+
     protected Connection connection;
 
     private boolean connectionAutoCommit;
-
-    protected final String baseDir;
 
     public DbToolBase(
             final DataSourceWrapper dataSource,

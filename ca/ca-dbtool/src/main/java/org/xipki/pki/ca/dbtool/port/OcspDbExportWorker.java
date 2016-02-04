@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -134,8 +133,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     } // constructor
 
     @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
+    public void doRun()
     throws Exception {
         long start = System.currentTimeMillis();
         try {

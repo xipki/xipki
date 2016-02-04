@@ -40,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -151,8 +150,7 @@ public class CaDbExportWorker extends DbPortWorker {
     } // method checkDestFolder
 
     @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
+    public void doRun()
     throws Exception {
         long start = System.currentTimeMillis();
         try {

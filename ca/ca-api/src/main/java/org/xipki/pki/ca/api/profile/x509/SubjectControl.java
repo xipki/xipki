@@ -92,7 +92,7 @@ public class SubjectControl {
 
         this.types = Collections.unmodifiableList(sortedOids);
 
-        Set<String> groups = new HashSet<>();
+        Set<String> groupSet = new HashSet<>();
         this.groupTypes = new HashMap<>();
 
         for (ASN1ObjectIdentifier type : controls.keySet()) {
@@ -101,17 +101,17 @@ public class SubjectControl {
                 continue;
             }
 
-            groups.add(group);
+            groupSet.add(group);
             typeGroups.put(type, group);
-            Set<ASN1ObjectIdentifier> types = groupTypes.get(group);
-            if (types == null) {
-                types = new HashSet<>();
-                groupTypes.put(group, types);
+            Set<ASN1ObjectIdentifier> typeSet = groupTypes.get(group);
+            if (typeSet == null) {
+                typeSet = new HashSet<>();
+                groupTypes.put(group, typeSet);
             }
-            types.add(type);
+            typeSet.add(type);
         }
 
-        this.groups = Collections.unmodifiableSet(groups);
+        this.groups = Collections.unmodifiableSet(groupSet);
     } // constructor
 
     public RdnControl getControl(

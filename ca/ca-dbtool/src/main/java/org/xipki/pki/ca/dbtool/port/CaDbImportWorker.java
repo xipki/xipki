@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -75,23 +74,23 @@ public class CaDbImportWorker extends DbPortWorker {
 
     private static class CAInfoBundle {
 
-        private final String CA_name;
+        private final String caName;
 
-        private final long CA_nextSerial;
+        private final long caNextSerial;
 
         private final byte[] cert;
 
-        private long should_CA_nextSerial;
+        private long shouldCaNextSerial;
 
-        private Integer CA_id;
+        private Integer caId;
 
-        public CAInfoBundle(
-                final String CA_name,
-                final long CA_nextSerial,
+        CAInfoBundle(
+                final String caName,
+                final long caNextSerial,
                 final byte[] cert) {
-            this.CA_name = CA_name;
-            this.CA_nextSerial = CA_nextSerial;
-            this.should_CA_nextSerial = CA_nextSerial;
+            this.caName = caName;
+            this.caNextSerial = caNextSerial;
+            this.shouldCaNextSerial = caNextSerial;
             this.cert = cert;
         }
 
@@ -133,8 +132,7 @@ public class CaDbImportWorker extends DbPortWorker {
     }
 
     @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
+    public void doRun()
     throws Exception {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume) {
@@ -180,7 +178,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
     private void createSerialNumberSequences()
     throws DataAccessException {
-        List<CAInfoBundle> CAInfoBundles = new LinkedList<>();
+        List<CAInfoBundle> caInfoBundles = new LinkedList<>();
 
         // create the sequence for the certificate serial numbers
         Connection conn = dataSource.getConnection();
@@ -197,15 +195,15 @@ public class CaDbImportWorker extends DbPortWorker {
                     continue;
                 }
 
-                String CA_name = rs.getString("NAME");
+                String caName = rs.getString("NAME");
                 byte[] cert = Base64.decode(rs.getString("CERT"));
-                CAInfoBundle entry = new CAInfoBundle(CA_name, nextSerial, cert);
-                CAInfoBundles.add(entry);
+                CAInfoBundle entry = new CAInfoBundle(caName, nextSerial, cert);
+                caInfoBundles.add(entry);
             }
 
             rs.close();
 
-            if (CollectionUtil.isEmpty(CAInfoBundles)) {
+            if (CollectionUtil.isEmpty(caInfoBundles)) {
                 return;
             }
 
@@ -215,9 +213,9 @@ public class CaDbImportWorker extends DbPortWorker {
             while (rs.next()) {
                 byte[] cert = Base64.decode(rs.getString("CERT"));
                 int id = rs.getInt("ID");
-                for (CAInfoBundle entry : CAInfoBundles) {
+                for (CAInfoBundle entry : caInfoBundles) {
                     if (Arrays.equals(cert, entry.cert)) {
-                        entry.CA_id = id;
+                        entry.caId = id;
                         break;
                     }
                 }
@@ -229,16 +227,16 @@ public class CaDbImportWorker extends DbPortWorker {
             // get the maximal serial number
             sql = "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            for (CAInfoBundle entry : CAInfoBundles) {
-                ps.setInt(1, entry.CA_id);
+            for (CAInfoBundle entry : caInfoBundles) {
+                ps.setInt(1, entry.caId);
                 rs = ps.executeQuery();
                 if (!rs.next()) {
                     continue;
                 }
 
                 long maxSerial = rs.getLong(1);
-                if (maxSerial + 1 > entry.CA_nextSerial) {
-                    entry.should_CA_nextSerial = maxSerial + 1;
+                if (maxSerial + 1 > entry.caNextSerial) {
+                    entry.shouldCaNextSerial = maxSerial + 1;
                 }
                 rs.close();
             }
@@ -246,10 +244,10 @@ public class CaDbImportWorker extends DbPortWorker {
 
             sql = "UPDATE CA SET NEXT_SN=? WHERE NAME=?";
             ps = conn.prepareStatement(sql);
-            for (CAInfoBundle entry : CAInfoBundles) {
-                if (entry.CA_nextSerial != entry.should_CA_nextSerial) {
-                    ps.setLong(1, entry.should_CA_nextSerial);
-                    ps.setString(2, entry.CA_name);
+            for (CAInfoBundle entry : caInfoBundles) {
+                if (entry.caNextSerial != entry.shouldCaNextSerial) {
+                    ps.setLong(1, entry.shouldCaNextSerial);
+                    ps.setString(2, entry.caName);
                     ps.executeUpdate();
                 }
             }
@@ -260,9 +258,9 @@ public class CaDbImportWorker extends DbPortWorker {
         }
 
         // create the sequences
-        for (CAInfoBundle entry : CAInfoBundles) {
-            long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
-            String seqName = IoUtil.convertSequenceName("SN_" + entry.CA_name);
+        for (CAInfoBundle entry : caInfoBundles) {
+            long nextSerial = Math.max(entry.caNextSerial, entry.shouldCaNextSerial);
+            String seqName = IoUtil.convertSequenceName("SN_" + entry.caName);
             dataSource.dropAndCreateSequence(seqName, nextSerial);
         }
     } // method createSerialNumberSequences

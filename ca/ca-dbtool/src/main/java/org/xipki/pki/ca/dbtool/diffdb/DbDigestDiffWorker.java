@@ -40,7 +40,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBException;
 
@@ -151,8 +150,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
     } // constructor DbDigestDiffWorker
 
     @Override
-    public void doRun(
-            final AtomicBoolean stopMe)
+    public void doRun()
     throws Exception {
         long start = System.currentTimeMillis();
 

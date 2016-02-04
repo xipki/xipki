@@ -123,14 +123,17 @@ import org.xml.sax.SAXException;
 
 public class XmlX509CertprofileUtil {
 
-    private final static Object jaxbUnmarshallerLock = new Object();
+    private static final Object JAXB_LOCK = new Object();
 
     private static Unmarshaller jaxbUnmarshaller;
+
+    private XmlX509CertprofileUtil() {
+    }
 
     public static X509ProfileType parse(
             final InputStream xmlConfStream)
     throws CertprofileException {
-        synchronized (jaxbUnmarshallerLock) {
+        synchronized (JAXB_LOCK) {
             JAXBElement<?> rootElement;
             try {
                 if (jaxbUnmarshaller == null) {
@@ -563,7 +566,7 @@ public class XmlX509CertprofileUtil {
             final AlgorithmType type)
     throws CertprofileException {
         if (type.getParameters() == null || type.getParameters().getAny() == null) {
-            return KeyParametersOption.allowAll;
+            return KeyParametersOption.ALLOW_ALL;
         }
 
         Object paramsObj = type.getParameters().getAny();
@@ -688,9 +691,6 @@ public class XmlX509CertprofileUtil {
                 throw new RuntimeException(
                     "should not reach here, undefined StringType " + jaxbType);
         }
-    }
-
-    private XmlX509CertprofileUtil() {
     }
 
 }

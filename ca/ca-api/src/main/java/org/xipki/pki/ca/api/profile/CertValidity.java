@@ -49,14 +49,15 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertValidity implements Comparable<CertValidity>, Serializable {
 
-    public static enum Unit {
+    public enum Unit {
 
         YEAR("y"),
         DAY("d"),
         HOUR("h");
 
         private String suffix;
-        private Unit(
+
+        Unit(
                 String suffix) {
             this.suffix = suffix;
         }
@@ -71,10 +72,21 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
     private static final long SECOND = 1000L;
 
-    private static final TimeZone utc = TimeZone.getTimeZone("UTC");
+    private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
     private final int validity;
     private final Unit unit;
+
+    public CertValidity(
+            final int validity,
+            final Unit unit) {
+        if (validity < 1) {
+            throw new IllegalArgumentException("validity could not be less than 1");
+        }
+        ParamUtil.assertNotNull("unit", unit);
+        this.validity = validity;
+        this.unit = unit;
+    }
 
     public static CertValidity getInstance(
             final String validityS) {
@@ -110,17 +122,6 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         return new CertValidity(validity, unit);
     } // method getInstance
 
-    public CertValidity(
-            final int validity,
-            final Unit unit) {
-        if (validity < 1) {
-            throw new IllegalArgumentException("validity could not be less than 1");
-        }
-        ParamUtil.assertNotNull("unit", unit);
-        this.validity = validity;
-        this.unit = unit;
-    }
-
     public int getValidity() {
         return validity;
     }
@@ -137,7 +138,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             case DAY:
                 return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
             case YEAR:
-                Calendar cal = Calendar.getInstance(utc);
+                Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
                 cal.setTime(referenceDate);
                 cal.add(Calendar.YEAR, validity);
                 cal.add(Calendar.SECOND, -1);

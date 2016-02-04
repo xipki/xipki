@@ -49,9 +49,9 @@ public abstract class DbPortWorker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
 
-    private Exception exception;
+    protected final AtomicBoolean stopMe = new AtomicBoolean(false);
 
-    private final AtomicBoolean stopMe = new AtomicBoolean(false);
+    private Exception exception;
 
     public DbPortWorker() {
     }
@@ -68,15 +68,14 @@ public abstract class DbPortWorker implements Runnable {
     @Override
     public void run() {
         try {
-            doRun(stopMe);
+            doRun();
         } catch (Exception e) {
             LOG.error("exception thrown", e);
             exception = e;
         }
     }
 
-    protected abstract void doRun(
-            AtomicBoolean stopMe)
+    protected abstract void doRun()
     throws Exception;
 
 }
