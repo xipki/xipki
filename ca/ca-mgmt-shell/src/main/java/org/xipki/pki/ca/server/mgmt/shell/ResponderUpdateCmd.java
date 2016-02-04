@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -59,66 +59,66 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "responder-up",
-    description = "update responder")
+        description = "update responder")
 @Service
 public class ResponderUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "responder name\n"
-          + "(required)")
-  @Completion(ResponderNameCompleter.class)
-  protected String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "responder name\n"
+                    + "(required)")
+    @Completion(ResponderNameCompleter.class)
+    protected String name;
 
-  @Option(name = "--signer-type",
-      description = "type of the responder signer")
-  @Completion(SignerTypeCompleter.class)
-  protected String signerType;
+    @Option(name = "--signer-type",
+            description = "type of the responder signer")
+    @Completion(SignerTypeCompleter.class)
+    protected String signerType;
 
-  @Option(name = "--signer-conf",
-      description = "conf of the responder signer or 'NULL'")
-  private String signerConf;
+    @Option(name = "--signer-conf",
+            description = "conf of the responder signer or 'NULL'")
+    private String signerConf;
 
-  @Option(name = "--cert",
-      description = "requestor certificate file or 'NULL'")
-  @Completion(FilePathCompleter.class)
-  protected String certFile;
+    @Option(name = "--cert",
+            description = "requestor certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
+    protected String certFile;
 
-  @Reference
-  protected PasswordResolver passwordResolver;
+    @Reference
+    protected PasswordResolver passwordResolver;
 
-  protected String getSignerConf()
-  throws Exception {
-    if (signerConf == null) {
-      return signerConf;
-    }
-    String _signerType = signerType;
-    if (_signerType == null) {
-      CmpResponderEntry entry = caManager.getCmpResponder(name);
-      if (entry == null) {
-        throw new IllegalCmdParamException("please specify the signerType");
-      }
-      _signerType = entry.getType();
-    }
+    protected String getSignerConf()
+    throws Exception {
+        if (signerConf == null) {
+            return signerConf;
+        }
+        String _signerType = signerType;
+        if (_signerType == null) {
+            CmpResponderEntry entry = caManager.getCmpResponder(name);
+            if (entry == null) {
+                throw new IllegalCmdParamException("please specify the signerType");
+            }
+            _signerType = entry.getType();
+        }
 
-    return ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
-  }
-
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    String cert = null;
-    if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-      cert = CAManager.NULL;
-    } else if (certFile != null) {
-      byte[] certBytes = IoUtil.read(certFile);
-      X509Util.parseCert(new ByteArrayInputStream(certBytes));
-      cert = Base64.toBase64String(certBytes);
+        return ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
     }
 
-    boolean b = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
-    output(b, "updated", "could not update", "CMP responder " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        String cert = null;
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+            cert = CAManager.NULL;
+        } else if (certFile != null) {
+            byte[] certBytes = IoUtil.read(certFile);
+            X509Util.parseCert(new ByteArrayInputStream(certBytes));
+            cert = Base64.toBase64String(certBytes);
+        }
+
+        boolean b = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
+        output(b, "updated", "could not update", "CMP responder " + name);
+        return null;
+    }
 
 }

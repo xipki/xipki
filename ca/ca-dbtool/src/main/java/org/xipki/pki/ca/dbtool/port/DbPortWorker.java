@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,36 +47,36 @@ import org.slf4j.LoggerFactory;
 
 public abstract class DbPortWorker implements Runnable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbPorter.class);
 
-  private Exception exception;
+    private Exception exception;
 
-  private final AtomicBoolean stopMe = new AtomicBoolean(false);
+    private final AtomicBoolean stopMe = new AtomicBoolean(false);
 
-  public DbPortWorker() {
-  }
-
-  public final Exception getException() {
-    return exception;
-  }
-
-  public void setStopMe(
-      final boolean b) {
-    this.stopMe.set(b);
-  }
-
-  @Override
-  public void run() {
-    try {
-      doRun(stopMe);
-    } catch (Exception e) {
-      LOG.error("exception thrown", e);
-      exception = e;
+    public DbPortWorker() {
     }
-  }
 
-  protected abstract void doRun(
-      AtomicBoolean stopMe)
-  throws Exception;
+    public final Exception getException() {
+        return exception;
+    }
+
+    public void setStopMe(
+            final boolean b) {
+        this.stopMe.set(b);
+    }
+
+    @Override
+    public void run() {
+        try {
+            doRun(stopMe);
+        } catch (Exception e) {
+            LOG.error("exception thrown", e);
+            exception = e;
+        }
+    }
+
+    protected abstract void doRun(
+            AtomicBoolean stopMe)
+    throws Exception;
 
 }

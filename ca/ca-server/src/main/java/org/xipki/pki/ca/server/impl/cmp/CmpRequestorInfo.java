@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,35 +47,35 @@ import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 public class CmpRequestorInfo implements RequestorInfo {
 
-  private final CAHasRequestorEntry caHasRequestor;
+    private final CAHasRequestorEntry caHasRequestor;
 
-  private final X509CertWithDbId cert;
+    private final X509CertWithDbId cert;
 
-  public CmpRequestorInfo(
-      final CAHasRequestorEntry caHasRequestor,
-      final X509CertWithDbId cert) {
-    ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
-    ParamUtil.assertNotNull("cert", cert);
-    this.caHasRequestor = caHasRequestor;
-    this.cert = cert;
-  }
+    public CmpRequestorInfo(
+            final CAHasRequestorEntry caHasRequestor,
+            final X509CertWithDbId cert) {
+        ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
+        ParamUtil.assertNotNull("cert", cert);
+        this.caHasRequestor = caHasRequestor;
+        this.cert = cert;
+    }
 
-  public CAHasRequestorEntry getCaHasRequestor() {
-    return caHasRequestor;
-  }
+    public CAHasRequestorEntry getCaHasRequestor() {
+        return caHasRequestor;
+    }
 
-  public X509CertWithDbId getCert() {
-    return cert;
-  }
+    public X509CertWithDbId getCert() {
+        return cert;
+    }
 
-  @Override
-  public String getName() {
-    return caHasRequestor.getRequestorName();
-  }
+    @Override
+    public String getName() {
+        return caHasRequestor.getRequestorName();
+    }
 
-  @Override
-  public boolean isRa() {
-    return caHasRequestor.isRa();
-  }
+    @Override
+    public boolean isRa() {
+        return caHasRequestor.isRa();
+    }
 
 }

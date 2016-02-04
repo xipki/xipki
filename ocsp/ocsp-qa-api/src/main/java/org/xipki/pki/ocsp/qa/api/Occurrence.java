@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,19 +42,19 @@ package org.xipki.pki.ocsp.qa.api;
 
 public enum Occurrence {
 
-  required,
-  optional,
-  forbidden;
+    required,
+    optional,
+    forbidden;
 
-  public static Occurrence getInstance(
-      final String name) {
-    for (Occurrence entry : values()) {
-      if (entry.name().equals(name)) {
-        return entry;
-      }
+    public static Occurrence getInstance(
+            final String name) {
+        for (Occurrence entry : values()) {
+            if (entry.name().equals(name)) {
+                return entry;
+            }
+        }
+
+        return null;
     }
-
-    return null;
-  }
 
 }

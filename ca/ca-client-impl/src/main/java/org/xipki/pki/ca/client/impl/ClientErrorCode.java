@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,14 +42,14 @@ package org.xipki.pki.ca.client.impl;
 
 public class ClientErrorCode {
 
-  /**
-   * Intern status to indicate that there are errors in the response.
-   */
-  public static final int PKISTATUS_RESPONSE_ERROR = -1;
+    /**
+     * Intern status to indicate that there are errors in the response.
+     */
+    public static final int PKISTATUS_RESPONSE_ERROR = -1;
 
-  public static final int PKISTATUS_NO_ANSWER = -2;
+    public static final int PKISTATUS_NO_ANSWER = -2;
 
-  private ClientErrorCode() {
-  }
+    private ClientErrorCode() {
+    }
 
 }

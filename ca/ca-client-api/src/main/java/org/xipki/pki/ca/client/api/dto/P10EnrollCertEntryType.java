@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,26 +45,26 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P10EnrollCertEntryType {
 
-  private final CertificationRequest p10Request;
+    private final CertificationRequest p10Request;
 
-  private final String profile;
+    private final String profile;
 
-  public P10EnrollCertEntryType(
-      final CertificationRequest p10Request,
-      final String profile) {
-    ParamUtil.assertNotNull("p10Request", p10Request);
-    ParamUtil.assertNotBlank("profile", profile);
+    public P10EnrollCertEntryType(
+            final CertificationRequest p10Request,
+            final String profile) {
+        ParamUtil.assertNotNull("p10Request", p10Request);
+        ParamUtil.assertNotBlank("profile", profile);
 
-    this.p10Request = p10Request;
-    this.profile = profile;
-  }
+        this.p10Request = p10Request;
+        this.profile = profile;
+    }
 
-  public CertificationRequest getP10Request() {
-    return p10Request;
-  }
+    public CertificationRequest getP10Request() {
+        return p10Request;
+    }
 
-  public String getProfile() {
-    return profile;
-  }
+    public String getProfile() {
+        return profile;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,50 +45,50 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 
 public class QaGeneralSubtree {
 
-  private final GeneralSubtreeBaseType jaxb;
+    private final GeneralSubtreeBaseType jaxb;
 
-  public QaGeneralSubtree(
-      final GeneralSubtreeBaseType jaxb) {
-    ParamUtil.assertNotNull("jaxb", jaxb);
-    Integer i = jaxb.getMinimum();
-    if (i != null && i < 0) {
-      throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+    public QaGeneralSubtree(
+            final GeneralSubtreeBaseType jaxb) {
+        ParamUtil.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if (i != null && i < 0) {
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+        }
+
+        i = jaxb.getMaximum();
+        if (i != null && i < 0) {
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        }
+
+        this.jaxb = jaxb;
     }
 
-    i = jaxb.getMaximum();
-    if (i != null && i < 0) {
-      throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+    public String getRfc822Name() {
+        return jaxb.getRfc822Name();
     }
 
-    this.jaxb = jaxb;
-  }
+    public String getDNSName() {
+        return jaxb.getDNSName();
+    }
 
-  public String getRfc822Name() {
-    return jaxb.getRfc822Name();
-  }
+    public String getDirectoryName() {
+        return jaxb.getDirectoryName();
+    }
 
-  public String getDNSName() {
-    return jaxb.getDNSName();
-  }
+    public String getUri() {
+        return jaxb.getUri();
+    }
 
-  public String getDirectoryName() {
-    return jaxb.getDirectoryName();
-  }
+    public String getIpAddress() {
+        return jaxb.getIpAddress();
+    }
 
-  public String getUri() {
-    return jaxb.getUri();
-  }
+    public Integer getMinimum() {
+        return jaxb.getMinimum();
+    }
 
-  public String getIpAddress() {
-    return jaxb.getIpAddress();
-  }
-
-  public Integer getMinimum() {
-    return jaxb.getMinimum();
-  }
-
-  public Integer getMaximum() {
-    return jaxb.getMaximum();
-  }
+    public Integer getMaximum() {
+        return jaxb.getMaximum();
+    }
 
 }

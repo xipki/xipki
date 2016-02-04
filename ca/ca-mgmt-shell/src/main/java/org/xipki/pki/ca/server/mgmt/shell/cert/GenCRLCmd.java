@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,15 +46,15 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "gencrl",
-    description = "generate CRL")
+        description = "generate CRL")
 @Service
 public class GenCRLCmd extends CRLCommandSupport {
 
-  @Override
-  protected X509CRL retrieveCRL(
-      final String caName)
-  throws Exception {
-    return caManager.generateCRLonDemand(caName);
-  }
+    @Override
+    protected X509CRL retrieveCRL(
+            final String caName)
+    throws Exception {
+        return caManager.generateCRLonDemand(caName);
+    }
 
 }

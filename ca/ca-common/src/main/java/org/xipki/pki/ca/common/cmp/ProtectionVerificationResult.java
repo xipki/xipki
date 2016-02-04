@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,25 +44,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ProtectionVerificationResult {
 
-  private final Object requestor;
+    private final Object requestor;
 
-  private final ProtectionResult protectionResult;
+    private final ProtectionResult protectionResult;
 
-  public ProtectionVerificationResult(
-      final Object requestor,
-      final ProtectionResult protectionResult) {
-    ParamUtil.assertNotNull("protectionResult", protectionResult);
+    public ProtectionVerificationResult(
+            final Object requestor,
+            final ProtectionResult protectionResult) {
+        ParamUtil.assertNotNull("protectionResult", protectionResult);
 
-    this.requestor = requestor;
-    this.protectionResult = protectionResult;
-  }
+        this.requestor = requestor;
+        this.protectionResult = protectionResult;
+    }
 
-  public Object getRequestor() {
-    return requestor;
-  }
+    public Object getRequestor() {
+        return requestor;
+    }
 
-  public ProtectionResult getProtectionResult() {
-    return protectionResult;
-  }
+    public ProtectionResult getProtectionResult() {
+        return protectionResult;
+    }
 
 }

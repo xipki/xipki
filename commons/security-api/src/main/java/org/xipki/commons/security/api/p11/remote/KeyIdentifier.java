@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,9 +50,9 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
  *
  * <pre>
  * SlotIdentifier ::= CHOICE {
- *   keyLabel   UTF8STRING,
- *   keyId    OCTET STRING
- *   }
+ *     keyLabel     UTF8STRING,
+ *     keyId        OCTET STRING
+ *     }
  * </pre>
  *
  * @author Lijun Liao
@@ -61,57 +61,57 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 
 public class KeyIdentifier extends ASN1Object {
 
-  private P11KeyIdentifier keyId;
+    private P11KeyIdentifier keyId;
 
-  public KeyIdentifier(
-      final P11KeyIdentifier keyId) {
-    if (keyId == null) {
-      throw new IllegalArgumentException("keyId could not be null");
+    public KeyIdentifier(
+            final P11KeyIdentifier keyId) {
+        if (keyId == null) {
+            throw new IllegalArgumentException("keyId could not be null");
+        }
+
+        this.keyId = keyId;
     }
 
-    this.keyId = keyId;
-  }
-
-  @Override
-  public ASN1Primitive toASN1Primitive() {
-    if (keyId.getKeyLabel() != null) {
-      return new DERUTF8String(keyId.getKeyLabel());
-    } else {
-      return new DEROctetString(keyId.getKeyId());
-    }
-  }
-
-  public P11KeyIdentifier getKeyId() {
-    return keyId;
-  }
-
-  public static KeyIdentifier getInstance(
-      final Object obj)
-  throws BadASN1ObjectException {
-    if (obj == null || obj instanceof KeyIdentifier) {
-      return (KeyIdentifier) obj;
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        if (keyId.getKeyLabel() != null) {
+            return new DERUTF8String(keyId.getKeyLabel());
+        } else {
+            return new DEROctetString(keyId.getKeyId());
+        }
     }
 
-    try {
-      if (obj instanceof ASN1OctetString) {
-        byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
-        P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
-        return new KeyIdentifier(keyIdentifier);
-      } else if (obj instanceof ASN1String) {
-        String keyLabel = ((ASN1String) obj).getString();
-        P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
-        return new KeyIdentifier(keyIdentifier);
-      }
-
-      if (obj instanceof byte[]) {
-        return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-      }
-    } catch (IllegalArgumentException | IOException e) {
-      throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
+    public P11KeyIdentifier getKeyId() {
+        return keyId;
     }
 
-    throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): "
-        + obj.getClass().getName());
-  }
+    public static KeyIdentifier getInstance(
+            final Object obj)
+    throws BadASN1ObjectException {
+        if (obj == null || obj instanceof KeyIdentifier) {
+            return (KeyIdentifier) obj;
+        }
+
+        try {
+            if (obj instanceof ASN1OctetString) {
+                byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
+                P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
+                return new KeyIdentifier(keyIdentifier);
+            } else if (obj instanceof ASN1String) {
+                String keyLabel = ((ASN1String) obj).getString();
+                P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
+                return new KeyIdentifier(keyIdentifier);
+            }
+
+            if (obj instanceof byte[]) {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            }
+        } catch (IllegalArgumentException | IOException e) {
+            throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
+        }
+
+        throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): "
+                + obj.getClass().getName());
+    }
 
 }

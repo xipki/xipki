@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,27 +50,27 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "scep-info",
-    description = "show information of SCEP")
+        description = "show information of SCEP")
 @Service
 public class ScepInfoCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "SCEP CA name\n"
-          + "(required)")
-  @Completion(ScepNameCompleter.class)
-  private String name;
+    @Option(name = "--ca",
+            required = true,
+            description = "SCEP CA name\n"
+                    + "(required)")
+    @Completion(ScepNameCompleter.class)
+    private String name;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    ScepEntry scep = caManager.getScepEntry(name);
-    if (scep == null) {
-      throw new UnexpectedException("could not find SCEP '" + name + "'");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        ScepEntry scep = caManager.getScepEntry(name);
+        if (scep == null) {
+            throw new UnexpectedException("could not find SCEP '" + name + "'");
+        }
+
+        System.out.println(scep.toString());
+        return null;
     }
-
-    System.out.println(scep.toString());
-    return null;
-  }
 
 }

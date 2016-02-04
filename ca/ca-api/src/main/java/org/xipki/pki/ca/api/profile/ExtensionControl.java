@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,31 +42,31 @@ package org.xipki.pki.ca.api.profile;
 
 public class ExtensionControl {
 
-  private final boolean critical;
+    private final boolean critical;
 
-  private final boolean required;
+    private final boolean required;
 
-  private final boolean request;
+    private final boolean request;
 
-  public ExtensionControl(
-      final boolean critical,
-      final boolean required,
-      final boolean request) {
-    this.critical = critical;
-    this.required = required;
-    this.request = request;
-  }
+    public ExtensionControl(
+            final boolean critical,
+            final boolean required,
+            final boolean request) {
+        this.critical = critical;
+        this.required = required;
+        this.request = request;
+    }
 
-  public boolean isCritical() {
-    return critical;
-  }
+    public boolean isCritical() {
+        return critical;
+    }
 
-  public boolean isRequired() {
-    return required;
-  }
+    public boolean isRequired() {
+        return required;
+    }
 
-  public boolean isRequest() {
-    return request;
-  }
+    public boolean isRequest() {
+        return request;
+    }
 
 }

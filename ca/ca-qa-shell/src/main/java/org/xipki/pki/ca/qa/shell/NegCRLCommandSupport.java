@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,48 +52,48 @@ import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 
 public abstract class NegCRLCommandSupport extends ClientCommandSupport {
 
-  @Option(name = "--ca",
-      description = "CA name\n"
-          + "required if multiple CAs are configured")
-  private String caName;
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "required if multiple CAs are configured")
+    private String caName;
 
-  protected abstract X509CRL retrieveCRL(
-      String caName)
-  throws CAClientException, PKIErrorException;
+    protected abstract X509CRL retrieveCRL(
+            String caName)
+    throws CAClientException, PKIErrorException;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Set<String> caNames = caClient.getCaNames();
-    if (isEmpty(caNames)) {
-      throw new IllegalCmdParamException("no CA is configured");
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Set<String> caNames = caClient.getCaNames();
+        if (isEmpty(caNames)) {
+            throw new IllegalCmdParamException("no CA is configured");
+        }
 
-    if (caName != null && !caNames.contains(caName)) {
-      throw new IllegalCmdParamException("CA " + caName
-          + " is not within the configured CAs " + caNames);
-    }
+        if (caName != null && !caNames.contains(caName)) {
+            throw new IllegalCmdParamException("CA " + caName
+                    + " is not within the configured CAs " + caNames);
+        }
 
-    if (caName == null) {
-      if (caNames.size() == 1) {
-        caName = caNames.iterator().next();
-      } else {
-        throw new IllegalCmdParamException("no caname is specified, one of "
-            + caNames + " is required");
-      }
-    }
+        if (caName == null) {
+            if (caNames.size() == 1) {
+                caName = caNames.iterator().next();
+            } else {
+                throw new IllegalCmdParamException("no caname is specified, one of "
+                        + caNames + " is required");
+            }
+        }
 
-    X509CRL crl = null;
-    try {
-      crl = retrieveCRL(caName);
-    } catch (PKIErrorException e) {
-    }
+        X509CRL crl = null;
+        try {
+            crl = retrieveCRL(caName);
+        } catch (PKIErrorException e) {
+        }
 
-    if (crl != null) {
-      throw new CmdFailure("no CRL is expected, but received one");
-    }
+        if (crl != null) {
+            throw new CmdFailure("no CRL is expected, but received one");
+        }
 
-    return null;
-  } // method doExecute
+        return null;
+    } // method doExecute
 
 }

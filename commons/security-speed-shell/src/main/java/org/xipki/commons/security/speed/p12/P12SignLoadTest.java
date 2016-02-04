@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -59,98 +59,98 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public abstract class P12SignLoadTest extends LoadExecutor {
 
-  class Testor implements Runnable {
+    class Testor implements Runnable {
+
+        @Override
+        public void run() {
+            ContentSigner singleSigner;
+            try {
+                singleSigner = signer.borrowContentSigner();
+            } catch (NoIdleSignerException e) {
+                account(1, 1);
+                return;
+            }
+
+            while (!stop() && getErrorAccout() < 1) {
+                try {
+                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
+                    singleSigner.getSignature();
+                    account(1, 0);
+                } catch (Exception e) {
+                    account(1, 1);
+                }
+            }
+
+            signer.returnContentSigner(singleSigner);
+        }
+
+    } // class Testor
+
+    private final ConcurrentContentSigner signer;
+
+    protected final static String password = "1234";
+
+    public P12SignLoadTest(
+            final SecurityFactory securityFactory,
+            final String signatureAlgorithm,
+            final byte[] keystore,
+            final String description)
+    throws Exception {
+        super(description);
+
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.assertNotNull("keystore", keystore);
+
+        String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
+                new ByteArrayInputStream(keystore), password, signatureAlgorithm, 20);
+        this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
+    }
 
     @Override
-    public void run() {
-      ContentSigner singleSigner;
-      try {
-        singleSigner = signer.borrowContentSigner();
-      } catch (NoIdleSignerException e) {
-        account(1, 1);
-        return;
-      }
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
+    }
 
-      while (!stop() && getErrorAccout() < 1) {
+    protected static byte[] getPrecomputedRSAKeystore(
+            final int keysize,
+            final BigInteger publicExponent)
+    throws IOException {
+        return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
+            + ".p12");
+    }
+
+    protected static byte[] getPrecomputedDSAKeystore(
+            final int pLength,
+            final int qLength)
+    throws IOException {
+        return getPrecomputedKeystore("dsa-" + pLength + "-" + qLength + ".p12");
+    }
+
+    protected static byte[] getPrecomputedECKeystore(
+            final String curveNamOrOid)
+    throws IOException {
+        ASN1ObjectIdentifier oid = null;
         try {
-          singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-          singleSigner.getSignature();
-          account(1, 0);
+            new ASN1ObjectIdentifier(curveNamOrOid);
         } catch (Exception e) {
-          account(1, 1);
+            oid = KeyUtil.getCurveOID(curveNamOrOid);
         }
-      }
+        if (oid == null) {
+            return null;
+        }
 
-      signer.returnContentSigner(singleSigner);
+        return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
     }
 
-  } // class Testor
-
-  private final ConcurrentContentSigner signer;
-
-  protected final static String password = "1234";
-
-  public P12SignLoadTest(
-      final SecurityFactory securityFactory,
-      final String signatureAlgorithm,
-      final byte[] keystore,
-      final String description)
-  throws Exception {
-    super(description);
-
-    ParamUtil.assertNotNull("securityFactory", securityFactory);
-    ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
-    ParamUtil.assertNotNull("keystore", keystore);
-
-    String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
-        new ByteArrayInputStream(keystore), password, signatureAlgorithm, 20);
-    this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
-  }
-
-  @Override
-  protected Runnable getTestor()
-  throws Exception {
-    return new Testor();
-  }
-
-  protected static byte[] getPrecomputedRSAKeystore(
-      final int keysize,
-      final BigInteger publicExponent)
-  throws IOException {
-    return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
-      + ".p12");
-  }
-
-  protected static byte[] getPrecomputedDSAKeystore(
-      final int pLength,
-      final int qLength)
-  throws IOException {
-    return getPrecomputedKeystore("dsa-" + pLength + "-" + qLength + ".p12");
-  }
-
-  protected static byte[] getPrecomputedECKeystore(
-      final String curveNamOrOid)
-  throws IOException {
-    ASN1ObjectIdentifier oid = null;
-    try {
-      new ASN1ObjectIdentifier(curveNamOrOid);
-    } catch (Exception e) {
-      oid = KeyUtil.getCurveOID(curveNamOrOid);
+    private static byte[] getPrecomputedKeystore(
+            final String filename)
+    throws IOException {
+        InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
+        return (in == null)
+                ? null
+                : IoUtil.read(in);
     }
-    if (oid == null) {
-      return null;
-    }
-
-    return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
-  }
-
-  private static byte[] getPrecomputedKeystore(
-      final String filename)
-  throws IOException {
-    InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
-    return (in == null)
-        ? null
-        : IoUtil.read(in);
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,51 +49,51 @@ import org.xipki.commons.common.util.CollectionUtil;
 
 public class CertprofileOption {
 
-  private final Set<String> includes;
+    private final Set<String> includes;
 
-  private final Set<String> excludes;
+    private final Set<String> excludes;
 
-  public CertprofileOption(
-      final Collection<String> includes,
-      final Collection<String> excludes) {
-    if (CollectionUtil.isEmpty(includes)) {
-      this.includes = null;
-    } else {
-      this.includes = Collections.unmodifiableSet(
-          new HashSet<>(includes));
+    public CertprofileOption(
+            final Collection<String> includes,
+            final Collection<String> excludes) {
+        if (CollectionUtil.isEmpty(includes)) {
+            this.includes = null;
+        } else {
+            this.includes = Collections.unmodifiableSet(
+                    new HashSet<>(includes));
+        }
+
+        if (CollectionUtil.isEmpty(excludes)) {
+            this.excludes = null;
+        } else {
+            this.excludes = Collections.unmodifiableSet(
+                    new HashSet<>(excludes));
+        }
     }
 
-    if (CollectionUtil.isEmpty(excludes)) {
-      this.excludes = null;
-    } else {
-      this.excludes = Collections.unmodifiableSet(
-          new HashSet<>(excludes));
-    }
-  }
-
-  public Set<String> getIncludes() {
-    return includes;
-  }
-
-  public Set<String> getExcludes() {
-    return excludes;
-  }
-
-  public boolean include(
-      final String certprofile) {
-    if (includes == null) {
-      return (excludes == null)
-          ? true
-          : !excludes.contains(certprofile);
+    public Set<String> getIncludes() {
+        return includes;
     }
 
-    if (!includes.contains(certprofile)) {
-      return false;
+    public Set<String> getExcludes() {
+        return excludes;
     }
 
-    return (excludes == null)
-        ? true
-        : !excludes.contains(certprofile);
-  }
+    public boolean include(
+            final String certprofile) {
+        if (includes == null) {
+            return (excludes == null)
+                    ? true
+                    : !excludes.contains(certprofile);
+        }
+
+        if (!includes.contains(certprofile)) {
+            return false;
+        }
+
+        return (excludes == null)
+                ? true
+                : !excludes.contains(certprofile);
+    }
 
 }

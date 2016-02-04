@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,78 +49,78 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 public class ScepHttpResponse {
 
-  private final String contentType;
+    private final String contentType;
 
-  private final int contentLength;
+    private final int contentLength;
 
-  private final InputStream content;
+    private final InputStream content;
 
-  private String contentEncoding;
+    private String contentEncoding;
 
-  public ScepHttpResponse(
-      final String contentType,
-      final int contentLength,
-      final InputStream content) {
-    this.contentType = contentType;
-    this.content = content;
-    this.contentLength = contentLength;
-  }
-
-  public ScepHttpResponse(
-      final String contentType,
-      final int contentLength,
-      final byte[] contentBytes) {
-    this.contentType = contentType;
-    this.content = new ByteArrayInputStream(contentBytes);
-    this.contentLength = contentLength;
-  }
-
-  public String getContentType() {
-    return contentType;
-  }
-
-  public int getContentLength() {
-    return contentLength;
-  }
-
-  public String getEncoding() {
-    return contentEncoding;
-  }
-
-  public void setContentEncoding(
-      final String contentEncoding) {
-    this.contentEncoding = contentEncoding;
-  }
-
-  public InputStream getContent() {
-    return content;
-  }
-
-  public byte[] getContentBytes()
-  throws ScepClientException {
-    if (content == null) {
-      return null;
+    public ScepHttpResponse(
+            final String contentType,
+            final int contentLength,
+            final InputStream content) {
+        this.contentType = contentType;
+        this.content = content;
+        this.contentLength = contentLength;
     }
 
-    try {
-      ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      int readed = 0;
-      byte[] buffer = new byte[2048];
-      while ((readed = content.read(buffer)) != -1) {
-        bout.write(buffer, 0, readed);
-      }
+    public ScepHttpResponse(
+            final String contentType,
+            final int contentLength,
+            final byte[] contentBytes) {
+        this.contentType = contentType;
+        this.content = new ByteArrayInputStream(contentBytes);
+        this.contentLength = contentLength;
+    }
 
-      return bout.toByteArray();
-    } catch (IOException e) {
-      throw new ScepClientException(e);
-    } finally {
-      if (content != null) {
-        try {
-          content.close();
-        } catch (IOException e) {
+    public String getContentType() {
+        return contentType;
+    }
+
+    public int getContentLength() {
+        return contentLength;
+    }
+
+    public String getEncoding() {
+        return contentEncoding;
+    }
+
+    public void setContentEncoding(
+            final String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public InputStream getContent() {
+        return content;
+    }
+
+    public byte[] getContentBytes()
+    throws ScepClientException {
+        if (content == null) {
+            return null;
         }
-      }
+
+        try {
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            int readed = 0;
+            byte[] buffer = new byte[2048];
+            while ((readed = content.read(buffer)) != -1) {
+                bout.write(buffer, 0, readed);
+            }
+
+            return bout.toByteArray();
+        } catch (IOException e) {
+            throw new ScepClientException(e);
+        } finally {
+            if (content != null) {
+                try {
+                    content.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
-  }
 
 }

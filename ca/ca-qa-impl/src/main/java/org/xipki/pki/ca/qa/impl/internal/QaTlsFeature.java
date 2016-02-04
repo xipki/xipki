@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,18 +48,18 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 
 public class QaTlsFeature extends QaExtension {
 
-  private final Set<Integer> features;
+    private final Set<Integer> features;
 
-  public QaTlsFeature(
-      final TlsFeature jaxb) {
-    this.features = new HashSet<>();
-    for (IntWithDescType m : jaxb.getFeature()) {
-      features.add(m.getValue());
+    public QaTlsFeature(
+            final TlsFeature jaxb) {
+        this.features = new HashSet<>();
+        for (IntWithDescType m : jaxb.getFeature()) {
+            features.add(m.getValue());
+        }
     }
-  }
 
-  public Set<Integer> getFeatures() {
-    return features;
-  }
+    public Set<Integer> getFeatures() {
+        return features;
+    }
 
 }

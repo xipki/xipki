@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,25 +42,25 @@ package org.xipki.pki.ca.api;
 
 public class BadFormatException extends Exception {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public BadFormatException() {
-  }
+    public BadFormatException() {
+    }
 
-  public BadFormatException(
-      final String message) {
-    super(message);
-  }
+    public BadFormatException(
+            final String message) {
+        super(message);
+    }
 
-  public BadFormatException(
-      final Throwable cause) {
-    super(cause);
-  }
+    public BadFormatException(
+            final Throwable cause) {
+        super(cause);
+    }
 
-  public BadFormatException(
-      final String message,
-      final Throwable cause) {
-    super(message, cause);
-  }
+    public BadFormatException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
 
 }

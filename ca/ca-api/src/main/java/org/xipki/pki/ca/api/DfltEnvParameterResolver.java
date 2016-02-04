@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,40 +46,40 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DfltEnvParameterResolver implements EnvParameterResolver {
 
-  private final Map<String, String> envParameters = new ConcurrentHashMap<>();
+    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
-  public DfltEnvParameterResolver() {
-  }
+    public DfltEnvParameterResolver() {
+    }
 
-  @Override
-  public String getParameterValue(
-      final String parameterName) {
-    return envParameters.get(parameterName);
-  }
+    @Override
+    public String getParameterValue(
+            final String parameterName) {
+        return envParameters.get(parameterName);
+    }
 
-  @Override
-  public Set<String> getAllParameterNames() {
-    return envParameters.keySet();
-  }
+    @Override
+    public Set<String> getAllParameterNames() {
+        return envParameters.keySet();
+    }
 
-  public String getEnvParam(
-      final String name) {
-    return envParameters.get(name);
-  }
+    public String getEnvParam(
+            final String name) {
+        return envParameters.get(name);
+    }
 
-  public void addEnvParam(
-      final String name,
-      final String value) {
-    envParameters.put(name, value);
-  }
+    public void addEnvParam(
+            final String name,
+            final String value) {
+        envParameters.put(name, value);
+    }
 
-  public void clear() {
-    envParameters.clear();
-  }
+    public void clear() {
+        envParameters.clear();
+    }
 
-  public String removeEnvParam(
-      final String name) {
-    return envParameters.remove(name);
-  }
+    public String removeEnvParam(
+            final String name) {
+        return envParameters.remove(name);
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,20 +47,20 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaAliasCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "caalias-rm",
-    description = "remove CA alias")
+        description = "remove CA alias")
 @Service
 public class CaAliasRemoveCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "alias", description = "CA alias", required = true)
-  @Completion(CaAliasCompleter.class)
-  private String caAlias;
+    @Argument(index = 0, name = "alias", description = "CA alias", required = true)
+    @Completion(CaAliasCompleter.class)
+    private String caAlias;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.removeCaAlias(caAlias);
-    output(b, "removed", "could not remove", "CA alias " + caAlias);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.removeCaAlias(caAlias);
+        output(b, "removed", "could not remove", "CA alias " + caAlias);
+        return null;
+    }
 
 }

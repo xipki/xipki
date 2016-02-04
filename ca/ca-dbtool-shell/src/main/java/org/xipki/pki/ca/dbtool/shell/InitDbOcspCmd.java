@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,26 +47,26 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
  */
 
 @Command(scope = "xipki-db", name = "initdb-ocsp",
-    description = "reset and initialize the OCSP databases")
+        description = "reset and initialize the OCSP databases")
 @Service
 public class InitDbOcspCmd extends LiquibaseCommandSupport {
 
-  private static final String schemaFile = "xipki/sql/ocsp-init.xml";
+    private static final String schemaFile = "xipki/sql/ocsp-init.xml";
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-    for (String dbName : dbConfs.keySet()) {
-      if (!dbName.toLowerCase().contains("ocsp")) {
-        continue;
-      }
+        for (String dbName : dbConfs.keySet()) {
+            if (!dbName.toLowerCase().contains("ocsp")) {
+                continue;
+            }
 
-      LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-      resetAndInit(dbConf, schemaFile);
+            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
+            resetAndInit(dbConf, schemaFile);
+        }
+        return null;
     }
-    return null;
-  }
 
 }

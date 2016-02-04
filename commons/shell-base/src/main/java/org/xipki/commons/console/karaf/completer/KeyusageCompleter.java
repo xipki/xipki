@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,19 +51,19 @@ import org.xipki.commons.security.api.KeyUsage;
 @Service
 public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-  private static final Set<String> usages;
+    private static final Set<String> usages;
 
-  static {
-    Set<String> set = new HashSet<>();
-    for (KeyUsage usage : KeyUsage.values()) {
-      set.add(usage.getName());
+    static {
+        Set<String> set = new HashSet<>();
+        for (KeyUsage usage : KeyUsage.values()) {
+            set.add(usage.getName());
+        }
+        usages = Collections.unmodifiableSet(set);
     }
-    usages = Collections.unmodifiableSet(set);
-  }
 
-  @Override
-  protected Set<String> getEnums() {
-    return usages;
-  }
+    @Override
+    protected Set<String> getEnums() {
+        return usages;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,48 +45,48 @@ import java.util.List;
 
 public class DigestDBEntrySet implements Comparable<DigestDBEntrySet> {
 
-  private final int startId;
+    private final int startId;
 
-  private Exception exception;
+    private Exception exception;
 
-  private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
+    private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
-  public DigestDBEntrySet(
-      final int startId) {
-    this.startId = startId;
-  }
-
-  public void setException(
-      final Exception exception) {
-    this.exception = exception;
-  }
-
-  public Exception getException() {
-    return exception;
-  }
-
-  public void addEntry(
-      final IdentifiedDbDigestEntry entry) {
-    entries.add(entry);
-  }
-
-  public int getStartId() {
-    return startId;
-  }
-
-  public List<IdentifiedDbDigestEntry> getEntries() {
-    return entries;
-  }
-
-  @Override
-  public int compareTo(DigestDBEntrySet o) {
-    if (startId < o.startId) {
-      return -1;
-    } else if (startId == o.startId) {
-      return 0;
-    } else {
-      return 1;
+    public DigestDBEntrySet(
+            final int startId) {
+        this.startId = startId;
     }
-  }
+
+    public void setException(
+            final Exception exception) {
+        this.exception = exception;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void addEntry(
+            final IdentifiedDbDigestEntry entry) {
+        entries.add(entry);
+    }
+
+    public int getStartId() {
+        return startId;
+    }
+
+    public List<IdentifiedDbDigestEntry> getEntries() {
+        return entries;
+    }
+
+    @Override
+    public int compareTo(DigestDBEntrySet o) {
+        if (startId < o.startId) {
+            return -1;
+        } else if (startId == o.startId) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 
 }

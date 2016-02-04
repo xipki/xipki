@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,19 +42,19 @@ package org.xipki.pki.ca.api.profile.x509;
 
 public enum SpecialX509CertprofileBehavior {
 
-  gematik_gSMC_K;
+    gematik_gSMC_K;
 
-  public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
+    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
 
-  public static SpecialX509CertprofileBehavior getInstance(
-      final String behavior) {
-    for (SpecialX509CertprofileBehavior b : values()) {
-      if (b.name().equalsIgnoreCase(behavior)) {
-        return b;
-      }
+    public static SpecialX509CertprofileBehavior getInstance(
+            final String behavior) {
+        for (SpecialX509CertprofileBehavior b : values()) {
+            if (b.name().equalsIgnoreCase(behavior)) {
+                return b;
+            }
+        }
+
+        return null;
     }
-
-    return null;
-  }
 
 }

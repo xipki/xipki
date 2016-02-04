@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,63 +47,63 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ChangeScepEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final String caName;
+    private final String caName;
 
-  private String responderType;
+    private String responderType;
 
-  private String responderConf;
+    private String responderConf;
 
-  private String base64Cert;
+    private String base64Cert;
 
-  private String control;
+    private String control;
 
-  public ChangeScepEntry(
-      final String caName)
-  throws InvalidConfException {
-    ParamUtil.assertNotBlank("caName", caName);
-    this.caName = caName.toUpperCase();
-  }
+    public ChangeScepEntry(
+            final String caName)
+    throws InvalidConfException {
+        ParamUtil.assertNotBlank("caName", caName);
+        this.caName = caName.toUpperCase();
+    }
 
-  public String getCaName() {
-    return caName;
-  }
+    public String getCaName() {
+        return caName;
+    }
 
-  public String getResponderType() {
-    return responderType;
-  }
+    public String getResponderType() {
+        return responderType;
+    }
 
-  public void setResponderType(
-      final String responderType) {
-    this.responderType = responderType;
-  }
+    public void setResponderType(
+            final String responderType) {
+        this.responderType = responderType;
+    }
 
-  public String getResponderConf() {
-    return responderConf;
-  }
+    public String getResponderConf() {
+        return responderConf;
+    }
 
-  public void setResponderConf(
-      final String responderConf) {
-    this.responderConf = responderConf;
-  }
+    public void setResponderConf(
+            final String responderConf) {
+        this.responderConf = responderConf;
+    }
 
-  public String getBase64Cert() {
-    return base64Cert;
-  }
+    public String getBase64Cert() {
+        return base64Cert;
+    }
 
-  public void setBase64Cert(
-      final String base64Cert) {
-    this.base64Cert = base64Cert;
-  }
+    public void setBase64Cert(
+            final String base64Cert) {
+        this.base64Cert = base64Cert;
+    }
 
-  public String getControl() {
-    return control;
-  }
+    public String getControl() {
+        return control;
+    }
 
-  public void setControl(
-      final String control) {
-    this.control = control;
-  }
+    public void setControl(
+            final String control) {
+        this.control = control;
+    }
 
 }

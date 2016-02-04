@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,30 +45,30 @@ import java.util.List;
 
 public class RequestResponseDebug {
 
-  private final List<RequestResponsePair> pairs = new LinkedList<>();
+    private final List<RequestResponsePair> pairs = new LinkedList<>();
 
-  public void add(
-      final RequestResponsePair pair) {
-    pairs.add(pair);
-  }
+    public void add(
+            final RequestResponsePair pair) {
+        pairs.add(pair);
+    }
 
-  public int size() {
-    return pairs.size();
-  }
+    public int size() {
+        return pairs.size();
+    }
 
-  public RequestResponsePair get(
-      final int index) {
-    return pairs.get(index);
-  }
+    public RequestResponsePair get(
+            final int index) {
+        return pairs.get(index);
+    }
 
-  public boolean remove(
-      final RequestResponsePair pair) {
-    return pairs.remove(pair);
-  }
+    public boolean remove(
+            final RequestResponsePair pair) {
+        return pairs.remove(pair);
+    }
 
-  public RequestResponsePair remove(
-      final int index) {
-    return pairs.remove(index);
-  }
+    public RequestResponsePair remove(
+            final int index) {
+        return pairs.remove(index);
+    }
 
 }

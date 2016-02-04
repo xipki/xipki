@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -61,140 +61,140 @@ import org.xipki.pki.ca.api.profile.GeneralNameMode;
 
 public abstract class X509Certprofile {
 
-  public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
+    public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
 
-  private TimeZone timeZone = TimeZone.getTimeZone("UTC");
+    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
-  public boolean isOnlyForRA() {
-    return false;
-  }
-
-  public void shutdown() {
-  }
-
-  public X509CertVersion getVersion() {
-    return X509CertVersion.V3;
-  }
-
-  public List<String> getSignatureAlgorithms() {
-    return null;
-  }
-
-  public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
-    return null;
-  }
-
-  /**
-   * Whether include subject and serial number of the issuer certificate in the
-   * AuthorityKeyIdentifier extension.
-   */
-  public boolean includeIssuerAndSerialInAki() {
-    return false;
-  }
-
-  public AuthorityInfoAccessControl getAiaControl() {
-    return null;
-  }
-
-  public String incSerialNumber(
-      final String currentSerialNumber)
-  throws BadFormatException {
-    try {
-      int currentSN = (currentSerialNumber == null)
-          ? 0
-          : Integer.parseInt(currentSerialNumber.trim());
-      return Integer.toString(currentSN + 1);
-    } catch (NumberFormatException e) {
-      throw new BadFormatException(
-        String.format("invalid serialNumber attribute %s", currentSerialNumber));
+    public boolean isOnlyForRA() {
+        return false;
     }
-  }
 
-  public boolean isDuplicateKeyPermitted() {
-    return true;
-  }
+    public void shutdown() {
+    }
 
-  public boolean isDuplicateSubjectPermitted() {
-    return true;
-  }
+    public X509CertVersion getVersion() {
+        return X509CertVersion.V3;
+    }
 
-  /**
-   * Whether the subject attribute serialNumber in request is permitted
-   */
-  public boolean isSerialNumberInReqPermitted() {
-    return true;
-  }
+    public List<String> getSignatureAlgorithms() {
+        return null;
+    }
 
-  public String getParameter(
-      final String paramName) {
-    return null;
-  }
+    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
+        return null;
+    }
 
-  public boolean hasMidnightNotBefore() {
-    return false;
-  }
+    /**
+     * Whether include subject and serial number of the issuer certificate in the
+     * AuthorityKeyIdentifier extension.
+     */
+    public boolean includeIssuerAndSerialInAki() {
+        return false;
+    }
 
-  public TimeZone getTimezone() {
-    return timeZone;
-  }
+    public AuthorityInfoAccessControl getAiaControl() {
+        return null;
+    }
 
-  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
-    return null;
-  }
+    public String incSerialNumber(
+            final String currentSerialNumber)
+    throws BadFormatException {
+        try {
+            int currentSN = (currentSerialNumber == null)
+                    ? 0
+                    : Integer.parseInt(currentSerialNumber.trim());
+            return Integer.toString(currentSN + 1);
+        } catch (NumberFormatException e) {
+            throw new BadFormatException(
+                String.format("invalid serialNumber attribute %s", currentSerialNumber));
+        }
+    }
 
-  public Set<GeneralNameMode> getSubjectAltNameModes() {
-    return null;
-  }
+    public boolean isDuplicateKeyPermitted() {
+        return true;
+    }
 
-  /**
-   * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
-   */
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
-    return null;
-  }
+    public boolean isDuplicateSubjectPermitted() {
+        return true;
+    }
 
-  public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
+    /**
+     * Whether the subject attribute serialNumber in request is permitted
+     */
+    public boolean isSerialNumberInReqPermitted() {
+        return true;
+    }
 
-  public abstract void initialize(
-      String data)
-  throws CertprofileException;
+    public String getParameter(
+            final String paramName) {
+        return null;
+    }
 
-  public abstract boolean isCA();
+    public boolean hasMidnightNotBefore() {
+        return false;
+    }
 
-  public abstract Set<KeyUsageControl> getKeyUsage();
+    public TimeZone getTimezone() {
+        return timeZone;
+    }
 
-  public abstract Integer getPathLenBasicConstraint();
+    public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
+        return null;
+    }
 
-  public abstract void setEnvParameterResolver(
-      EnvParameterResolver parameterResolver);
+    public Set<GeneralNameMode> getSubjectAltNameModes() {
+        return null;
+    }
 
-  public abstract Date getNotBefore(Date notBefore);
+    /**
+     * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
+     */
+    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
+        return null;
+    }
 
-  public abstract CertValidity getValidity();
+    public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
-  public abstract SubjectPublicKeyInfo checkPublicKey(
-      SubjectPublicKeyInfo publicKey)
-  throws BadCertTemplateException;
+    public abstract void initialize(
+            String data)
+    throws CertprofileException;
 
-  public abstract SubjectInfo getSubject(
-      X500Name requestedSubject)
-  throws CertprofileException, BadCertTemplateException;
+    public abstract boolean isCA();
 
-  public abstract ExtensionValues getExtensions(
-      Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-      X500Name requestedSubject,
-      Extensions requestExtensions,
-      Date notBefore,
-      Date notAfter)
-  throws CertprofileException, BadCertTemplateException;
+    public abstract Set<KeyUsageControl> getKeyUsage();
 
-  public abstract boolean incSerialNumberIfSubjectExists();
+    public abstract Integer getPathLenBasicConstraint();
 
-  /**
-   * @return maximal size of the certificate, 0 or negative value indicates accepting all sizes.
-   */
-  public int getMaxCertSize() {
-    return 0;
-  }
+    public abstract void setEnvParameterResolver(
+            EnvParameterResolver parameterResolver);
+
+    public abstract Date getNotBefore(Date notBefore);
+
+    public abstract CertValidity getValidity();
+
+    public abstract SubjectPublicKeyInfo checkPublicKey(
+            SubjectPublicKeyInfo publicKey)
+    throws BadCertTemplateException;
+
+    public abstract SubjectInfo getSubject(
+            X500Name requestedSubject)
+    throws CertprofileException, BadCertTemplateException;
+
+    public abstract ExtensionValues getExtensions(
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+            X500Name requestedSubject,
+            Extensions requestExtensions,
+            Date notBefore,
+            Date notAfter)
+    throws CertprofileException, BadCertTemplateException;
+
+    public abstract boolean incSerialNumberIfSubjectExists();
+
+    /**
+     * @return maximal size of the certificate, 0 or negative value indicates accepting all sizes.
+     */
+    public int getMaxCertSize() {
+        return 0;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,37 +47,37 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class Nonce {
 
-  private static final SecureRandom random = new SecureRandom();
+    private static final SecureRandom random = new SecureRandom();
 
-  private static final int NONCE_LEN = 16;
+    private static final int NONCE_LEN = 16;
 
-  private final byte[] bytes;
+    private final byte[] bytes;
 
-  private Nonce(
-      final byte[] bytes,
-      final boolean cloneBytes) {
-    ParamUtil.assertNotNull("bytes", bytes);
-    if (bytes.length != 16) {
-      throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
+    private Nonce(
+            final byte[] bytes,
+            final boolean cloneBytes) {
+        ParamUtil.assertNotNull("bytes", bytes);
+        if (bytes.length != 16) {
+            throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
+        }
+        this.bytes = cloneBytes
+                ? Arrays.clone(bytes)
+                : bytes;
     }
-    this.bytes = cloneBytes
-        ? Arrays.clone(bytes)
-        : bytes;
-  }
 
-  public Nonce(
-      final byte[] bytes) {
-    this(bytes, true);
-  }
+    public Nonce(
+            final byte[] bytes) {
+        this(bytes, true);
+    }
 
-  public byte[] getBytes() {
-    return Arrays.clone(bytes);
-  }
+    public byte[] getBytes() {
+        return Arrays.clone(bytes);
+    }
 
-  public static Nonce randomNonce() {
-    byte[] bytes = new byte[NONCE_LEN];
-    random.nextBytes(bytes);
-    return new Nonce(bytes, false);
-  }
+    public static Nonce randomNonce() {
+        byte[] bytes = new byte[NONCE_LEN];
+        random.nextBytes(bytes);
+        return new Nonce(bytes, false);
+    }
 
 }

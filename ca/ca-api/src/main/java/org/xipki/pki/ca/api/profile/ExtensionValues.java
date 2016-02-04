@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,50 +51,50 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ExtensionValues {
 
-  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
+    private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-  public boolean addExtension(
-      final ASN1ObjectIdentifier type,
-      final boolean critical,
-      final ASN1Encodable value) {
-    ParamUtil.assertNotNull("type", type);
-    ParamUtil.assertNotNull("value", value);
-    if (extensions.containsKey(type)) {
-      return false;
+    public boolean addExtension(
+            final ASN1ObjectIdentifier type,
+            final boolean critical,
+            final ASN1Encodable value) {
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotNull("value", value);
+        if (extensions.containsKey(type)) {
+            return false;
+        }
+        extensions.put(type, new ExtensionValue(critical, value));
+        return true;
     }
-    extensions.put(type, new ExtensionValue(critical, value));
-    return true;
-  }
 
-  public boolean addExtension(
-      final ASN1ObjectIdentifier type,
-      final ExtensionValue value) {
-    ParamUtil.assertNotNull("type", type);
-    ParamUtil.assertNotNull("value", value);
-    if (extensions.containsKey(type)) {
-      return false;
+    public boolean addExtension(
+            final ASN1ObjectIdentifier type,
+            final ExtensionValue value) {
+        ParamUtil.assertNotNull("type", type);
+        ParamUtil.assertNotNull("value", value);
+        if (extensions.containsKey(type)) {
+            return false;
+        }
+        extensions.put(type, value);
+        return true;
     }
-    extensions.put(type, value);
-    return true;
-  }
 
-  public Set<ASN1ObjectIdentifier> getExtensionTypes() {
-    return Collections.unmodifiableSet(extensions.keySet());
-  }
+    public Set<ASN1ObjectIdentifier> getExtensionTypes() {
+        return Collections.unmodifiableSet(extensions.keySet());
+    }
 
-  public ExtensionValue getExtensionValue(
-      final ASN1ObjectIdentifier type) {
-    return extensions.get(type);
-  }
+    public ExtensionValue getExtensionValue(
+            final ASN1ObjectIdentifier type) {
+        return extensions.get(type);
+    }
 
-  public boolean removeExtensionTuple(
-      final ASN1ObjectIdentifier type) {
-    return extensions.remove(type) != null;
-  }
+    public boolean removeExtensionTuple(
+            final ASN1ObjectIdentifier type) {
+        return extensions.remove(type) != null;
+    }
 
-  public boolean containsExtension(
-      final ASN1ObjectIdentifier type) {
-    return extensions.containsKey(type);
-  }
+    public boolean containsExtension(
+            final ASN1ObjectIdentifier type) {
+        return extensions.containsKey(type);
+    }
 
 }

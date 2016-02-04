@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,19 +45,19 @@ import org.xipki.commons.password.PBEPasswordResolver;
  */
 
 @Command(scope = "xipki-tk", name = "pbe-enc",
-    description = "encrypt password with master password")
+        description = "encrypt password with master password")
 @Service
 public class PBEEncryptCmd extends SecurityCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    char[] masterPassword = readPassword("Please enter the master password");
-    char[] password = readPassword("Please enter the password");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        char[] masterPassword = readPassword("Please enter the master password");
+        char[] password = readPassword("Please enter the password");
 
-    String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
-    out("the encrypted password is: '" + passwordHint + "'");
-    return null;
-  }
+        String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
+        out("the encrypted password is: '" + passwordHint + "'");
+        return null;
+    }
 
 }

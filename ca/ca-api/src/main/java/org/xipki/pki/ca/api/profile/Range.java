@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,63 +42,63 @@ package org.xipki.pki.ca.api.profile;
 
 public class Range {
 
-  private Integer min;
+    private Integer min;
 
-  private Integer max;
+    private Integer max;
 
-  public Range(
-      final Integer min,
-      final Integer max) {
-    setRange(min, max);
-  }
-
-  public Integer getMin() {
-    return min;
-  }
-
-  public Integer getMax() {
-    return max;
-  }
-
-  public void setRange(
-      final Integer min,
-      final Integer max) {
-    if (min == null && max == null) {
-      throw new IllegalArgumentException("min and max cannot be both null");
-    }
-    if (min != null && max != null && min > max) {
-      throw new IllegalArgumentException(
-        String.format("min cannot be greater than max: %d > %d", min, max));
-    }
-    this.min = min;
-    this.max = max;
-  }
-
-  public boolean match(
-      final int val) {
-    if (min != null && val < min) {
-      return false;
-    }
-    if (max != null && val > max) {
-      return false;
+    public Range(
+            final Integer min,
+            final Integer max) {
+        setRange(min, max);
     }
 
-    return true;
-  }
+    public Integer getMin() {
+        return min;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("[");
-    if (min != null) {
-      sb.append(min);
+    public Integer getMax() {
+        return max;
     }
-    sb.append(", ");
-    if (max != null) {
-      sb.append(max);
+
+    public void setRange(
+            final Integer min,
+            final Integer max) {
+        if (min == null && max == null) {
+            throw new IllegalArgumentException("min and max cannot be both null");
+        }
+        if (min != null && max != null && min > max) {
+            throw new IllegalArgumentException(
+                String.format("min cannot be greater than max: %d > %d", min, max));
+        }
+        this.min = min;
+        this.max = max;
     }
-    sb.append("]");
-    return sb.toString();
-  }
+
+    public boolean match(
+            final int val) {
+        if (min != null && val < min) {
+            return false;
+        }
+        if (max != null && val > max) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        if (min != null) {
+            sb.append(min);
+        }
+        sb.append(", ");
+        if (max != null) {
+            sb.append(max);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 
 }

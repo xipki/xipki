@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,36 +45,36 @@ import java.security.SecureRandom;
 
 class RandomSNGenerator {
 
-  private final SecureRandom random;
+    private final SecureRandom random;
 
-  private static RandomSNGenerator instance = null;
+    private static RandomSNGenerator instance = null;
 
-  private RandomSNGenerator() {
-    this.random = new SecureRandom();
-  }
-
-  public BigInteger getSerialNumber() {
-    while (true) {
-      byte[] rdnBytes = new byte[8];
-      random.nextBytes(rdnBytes);
-      byte[] positiveRdnBytes = new byte[9];
-      System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
-      BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
-      if (serial.testBit(63)) {
-        serial = serial.clearBit(63);
-      }
-      // make sure serial != 0
-      if (serial.bitLength() != 0) {
-        return serial;
-      }
+    private RandomSNGenerator() {
+        this.random = new SecureRandom();
     }
-  }
 
-  public static synchronized RandomSNGenerator getInstance() {
-    if (instance == null) {
-      instance = new RandomSNGenerator();
+    public BigInteger getSerialNumber() {
+        while (true) {
+            byte[] rdnBytes = new byte[8];
+            random.nextBytes(rdnBytes);
+            byte[] positiveRdnBytes = new byte[9];
+            System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
+            BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
+            if (serial.testBit(63)) {
+                serial = serial.clearBit(63);
+            }
+            // make sure serial != 0
+            if (serial.bitLength() != 0) {
+                return serial;
+            }
+        }
     }
-    return instance;
-  }
+
+    public static synchronized RandomSNGenerator getInstance() {
+        if (instance == null) {
+            instance = new RandomSNGenerator();
+        }
+        return instance;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,46 +49,46 @@ import org.xipki.commons.security.api.HashCalculator;
 
 public class IssuerFilter {
 
-  private final Set<String> includeSha1Fps;
+    private final Set<String> includeSha1Fps;
 
-  private final Set<String> excludeSha1Fps;
+    private final Set<String> excludeSha1Fps;
 
-  public IssuerFilter(
-      final Set<X509Certificate> includes,
-      final Set<X509Certificate> excludes)
-  throws CertificateEncodingException {
-    if (includes == null) {
-      includeSha1Fps = null;
-    } else {
-      includeSha1Fps = new HashSet<>(includes.size());
-      for (X509Certificate include : includes) {
-        String sha1Fp = HashCalculator.base64Sha1(include.getEncoded());
-        includeSha1Fps.add(sha1Fp);
-      }
+    public IssuerFilter(
+            final Set<X509Certificate> includes,
+            final Set<X509Certificate> excludes)
+    throws CertificateEncodingException {
+        if (includes == null) {
+            includeSha1Fps = null;
+        } else {
+            includeSha1Fps = new HashSet<>(includes.size());
+            for (X509Certificate include : includes) {
+                String sha1Fp = HashCalculator.base64Sha1(include.getEncoded());
+                includeSha1Fps.add(sha1Fp);
+            }
+        }
+
+        if (excludes == null) {
+            excludeSha1Fps = null;
+        } else {
+            excludeSha1Fps = new HashSet<>(excludes.size());
+            for (X509Certificate exclude : excludes) {
+                String sha1Fp = HashCalculator.base64Sha1(exclude.getEncoded());
+                excludeSha1Fps.add(sha1Fp);
+            }
+        }
     }
 
-    if (excludes == null) {
-      excludeSha1Fps = null;
-    } else {
-      excludeSha1Fps = new HashSet<>(excludes.size());
-      for (X509Certificate exclude : excludes) {
-        String sha1Fp = HashCalculator.base64Sha1(exclude.getEncoded());
-        excludeSha1Fps.add(sha1Fp);
-      }
+    public boolean includeIssuerWithSha1Fp(
+            final String sha1Fp) {
+        if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
+            if (excludeSha1Fps == null) {
+                return true;
+            } else {
+                return !excludeSha1Fps.contains(sha1Fp);
+            }
+        } else {
+            return false;
+        }
     }
-  }
-
-  public boolean includeIssuerWithSha1Fp(
-      final String sha1Fp) {
-    if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
-      if (excludeSha1Fps == null) {
-        return true;
-      } else {
-        return !excludeSha1Fps.contains(sha1Fp);
-      }
-    } else {
-      return false;
-    }
-  }
 
 }

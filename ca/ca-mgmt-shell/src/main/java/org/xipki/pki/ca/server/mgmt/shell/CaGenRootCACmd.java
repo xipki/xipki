@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,40 +52,40 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
  */
 
 @Command(scope = "xipki-ca", name = "gen-rca",
-    description = "generate selfsigned CA")
+        description = "generate selfsigned CA")
 @Service
 public class CaGenRootCACmd extends CaAddOrGenCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request of the Root CA\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10ReqFile;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request of the Root CA\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10ReqFile;
 
-  @Option(name = "--profile",
-      required = true,
-      description = "profile of the Root CA\n"
-          + "(required)")
-  private String rcaProfile;
+    @Option(name = "--profile",
+            required = true,
+            description = "profile of the Root CA\n"
+                    + "(required)")
+    private String rcaProfile;
 
-  @Option(name = "--out", aliases = "-o",
-      description = "where to save the generated CA certificate")
-  @Completion(FilePathCompleter.class)
-  private String rcaCertOutFile;
+    @Option(name = "--out", aliases = "-o",
+            description = "where to save the generated CA certificate")
+    @Completion(FilePathCompleter.class)
+    private String rcaCertOutFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    X509CAEntry caEntry = getCAEntry();
-    byte[] p10Req = IoUtil.read(p10ReqFile);
-    X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
-    if (rcaCertOutFile != null) {
-      saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
-          rcaCert.getEncoded());
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        X509CAEntry caEntry = getCAEntry();
+        byte[] p10Req = IoUtil.read(p10ReqFile);
+        X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
+        if (rcaCertOutFile != null) {
+            saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
+                    rcaCert.getEncoded());
+        }
+        out("generated root CA " + caEntry.getName());
+        return null;
     }
-    out("generated root CA " + caEntry.getName());
-    return null;
-  }
 
 }

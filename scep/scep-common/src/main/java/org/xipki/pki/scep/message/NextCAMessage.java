@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -69,103 +69,103 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class NextCAMessage {
 
-  private X509Certificate caCert;
+    private X509Certificate caCert;
 
-  private List<X509Certificate> raCerts;
+    private List<X509Certificate> raCerts;
 
-  public NextCAMessage() {
-  }
-
-  public X509Certificate getCaCert() {
-    return caCert;
-  }
-
-  public void setCaCert(
-      final X509Certificate caCert) {
-    this.caCert = caCert;
-  }
-
-  public List<X509Certificate> getRaCerts() {
-    return raCerts;
-  }
-
-  public void setRaCerts(
-      final List<X509Certificate> raCerts) {
-    if (raCerts == null || raCerts.isEmpty()) {
-      this.raCerts = null;
-    } else {
-      this.raCerts = Collections.unmodifiableList(
-          new ArrayList<X509Certificate>(raCerts));
+    public NextCAMessage() {
     }
-  }
 
-  public ContentInfo encode(
-      final PrivateKey signingKey,
-      final X509Certificate signerCert,
-      final X509Certificate[] cmsCertSet)
-  throws MessageEncodingException {
-    try {
-      byte[] degenratedSignedDataBytes;
-      try {
-        CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
-        degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
-        if (raCerts != null && !raCerts.isEmpty()) {
-          for (X509Certificate m : raCerts) {
-            degenerateSignedData.addCertificate(
-                new X509CertificateHolder(m.getEncoded()));
-          }
+    public X509Certificate getCaCert() {
+        return caCert;
+    }
+
+    public void setCaCert(
+            final X509Certificate caCert) {
+        this.caCert = caCert;
+    }
+
+    public List<X509Certificate> getRaCerts() {
+        return raCerts;
+    }
+
+    public void setRaCerts(
+            final List<X509Certificate> raCerts) {
+        if (raCerts == null || raCerts.isEmpty()) {
+            this.raCerts = null;
+        } else {
+            this.raCerts = Collections.unmodifiableList(
+                    new ArrayList<X509Certificate>(raCerts));
         }
-
-        degenratedSignedDataBytes = degenerateSignedData.generate(
-            new CMSAbsentContent()).getEncoded();
-      } catch (CertificateEncodingException e) {
-        throw new MessageEncodingException(e.getMessage(), e);
-      }
-
-      CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
-
-      // I don't known which hash algorithm is supported by the client, use SHA-1
-      String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgoType.SHA1);
-      ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
-
-      // signerInfo
-      JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
-          new BcDigestCalculatorProvider());
-
-      signerInfoBuilder.setSignedAttributeGenerator(
-          new DefaultSignedAttributeTableGenerator());
-
-      SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert);
-      generator.addSignerInfoGenerator(signerInfo);
-
-      CMSTypedData cmsContent = new CMSProcessableByteArray(
-          CMSObjectIdentifiers.signedData,
-          degenratedSignedDataBytes);
-
-      // certificateSet
-      ScepUtil.addCmsCertSet(generator, cmsCertSet);
-      return generator.generate(cmsContent, true).toASN1Structure();
-    } catch (CMSException e) {
-      throw new MessageEncodingException(e);
-    } catch (CertificateEncodingException e) {
-      throw new MessageEncodingException(e);
-    } catch (IOException e) {
-      throw new MessageEncodingException(e);
-    } catch (OperatorCreationException e) {
-      throw new MessageEncodingException(e);
     }
-  } // method encode
 
-  private static String getSignatureAlgorithm(
-      final PrivateKey key,
-      final HashAlgoType hashAlgo) {
-    String algorithm = key.getAlgorithm();
-    if ("RSA".equalsIgnoreCase(algorithm)) {
-      return hashAlgo.getName() + "withRSA";
-    } else {
-      throw new UnsupportedOperationException(
-          "getSignatureAlgorithm() for non-RSA is not supported yet.");
+    public ContentInfo encode(
+            final PrivateKey signingKey,
+            final X509Certificate signerCert,
+            final X509Certificate[] cmsCertSet)
+    throws MessageEncodingException {
+        try {
+            byte[] degenratedSignedDataBytes;
+            try {
+                CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
+                degenerateSignedData.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
+                if (raCerts != null && !raCerts.isEmpty()) {
+                    for (X509Certificate m : raCerts) {
+                        degenerateSignedData.addCertificate(
+                                new X509CertificateHolder(m.getEncoded()));
+                    }
+                }
+
+                degenratedSignedDataBytes = degenerateSignedData.generate(
+                        new CMSAbsentContent()).getEncoded();
+            } catch (CertificateEncodingException e) {
+                throw new MessageEncodingException(e.getMessage(), e);
+            }
+
+            CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+
+            // I don't known which hash algorithm is supported by the client, use SHA-1
+            String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgoType.SHA1);
+            ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
+
+            // signerInfo
+            JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
+                    new BcDigestCalculatorProvider());
+
+            signerInfoBuilder.setSignedAttributeGenerator(
+                    new DefaultSignedAttributeTableGenerator());
+
+            SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert);
+            generator.addSignerInfoGenerator(signerInfo);
+
+            CMSTypedData cmsContent = new CMSProcessableByteArray(
+                    CMSObjectIdentifiers.signedData,
+                    degenratedSignedDataBytes);
+
+            // certificateSet
+            ScepUtil.addCmsCertSet(generator, cmsCertSet);
+            return generator.generate(cmsContent, true).toASN1Structure();
+        } catch (CMSException e) {
+            throw new MessageEncodingException(e);
+        } catch (CertificateEncodingException e) {
+            throw new MessageEncodingException(e);
+        } catch (IOException e) {
+            throw new MessageEncodingException(e);
+        } catch (OperatorCreationException e) {
+            throw new MessageEncodingException(e);
+        }
+    } // method encode
+
+    private static String getSignatureAlgorithm(
+            final PrivateKey key,
+            final HashAlgoType hashAlgo) {
+        String algorithm = key.getAlgorithm();
+        if ("RSA".equalsIgnoreCase(algorithm)) {
+            return hashAlgo.getName() + "withRSA";
+        } else {
+            throw new UnsupportedOperationException(
+                    "getSignatureAlgorithm() for non-RSA is not supported yet.");
+        }
     }
-  }
 
 }

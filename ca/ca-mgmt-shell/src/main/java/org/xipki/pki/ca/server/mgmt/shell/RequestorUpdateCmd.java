@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -52,32 +52,32 @@ import org.xipki.commons.security.api.util.X509Util;
  */
 
 @Command(scope = "xipki-ca", name = "requestor-up",
-    description = "update requestor")
+        description = "update requestor")
 @Service
 public class RequestorUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "requestor name\n"
-          + "(required)")
-  protected String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "requestor name\n"
+                    + "(required)")
+    protected String name;
 
-  @Option(name = "--cert",
-      required = true,
-      description = "requestor certificate file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  protected String certFile;
+    @Option(name = "--cert",
+            required = true,
+            description = "requestor certificate file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    protected String certFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    // check if the certificate is valid
-    byte[] certBytes = IoUtil.read(certFile);
-    X509Util.parseCert(new ByteArrayInputStream(certBytes));
-    boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
-    output(b, "updated", "could not update", "CMP requestor " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        // check if the certificate is valid
+        byte[] certBytes = IoUtil.read(certFile);
+        X509Util.parseCert(new ByteArrayInputStream(certBytes));
+        boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
+        output(b, "updated", "could not update", "CMP requestor " + name);
+        return null;
+    }
 
 }

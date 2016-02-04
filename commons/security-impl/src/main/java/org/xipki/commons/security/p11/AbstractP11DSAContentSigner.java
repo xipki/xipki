@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -61,75 +61,75 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 abstract class AbstractP11DSAContentSigner implements ContentSigner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);
 
-  private final AlgorithmIdentifier algorithmIdentifier;
+    private final AlgorithmIdentifier algorithmIdentifier;
 
-  private final DigestOutputStream outputStream;
+    private final DigestOutputStream outputStream;
 
-  protected final P11CryptService cryptService;
+    protected final P11CryptService cryptService;
 
-  protected final P11SlotIdentifier slot;
+    protected final P11SlotIdentifier slot;
 
-  protected final P11KeyIdentifier keyId;
+    protected final P11KeyIdentifier keyId;
 
-  protected abstract byte[] CKM_SIGN(
-      final byte[] hashValue)
-  throws SignerException;
+    protected abstract byte[] CKM_SIGN(
+            final byte[] hashValue)
+    throws SignerException;
 
-  protected AbstractP11DSAContentSigner(
-      final P11CryptService cryptService,
-      final P11SlotIdentifier slot,
-      final P11KeyIdentifier keyId,
-      final AlgorithmIdentifier signatureAlgId)
-  throws NoSuchAlgorithmException, OperatorCreationException {
-    ParamUtil.assertNotNull("slot", slot);
-    ParamUtil.assertNotNull("cryptService", cryptService);
-    ParamUtil.assertNotNull("keyId", keyId);
-    ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
+    protected AbstractP11DSAContentSigner(
+            final P11CryptService cryptService,
+            final P11SlotIdentifier slot,
+            final P11KeyIdentifier keyId,
+            final AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException {
+        ParamUtil.assertNotNull("slot", slot);
+        ParamUtil.assertNotNull("cryptService", cryptService);
+        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
 
-    this.slot = slot;
-    this.algorithmIdentifier = signatureAlgId;
-    this.keyId = keyId;
-    this.cryptService = cryptService;
+        this.slot = slot;
+        this.algorithmIdentifier = signatureAlgId;
+        this.keyId = keyId;
+        this.cryptService = cryptService;
 
-    AlgorithmIdentifier digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(
-        signatureAlgId);
+        AlgorithmIdentifier digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(
+                signatureAlgId);
 
-    Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+        Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
 
-    this.outputStream = new DigestOutputStream(digest);
-  }
-
-  @Override
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return algorithmIdentifier;
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
-    outputStream.reset();
-    return outputStream;
-  }
-
-  @Override
-  public byte[] getSignature() {
-    byte[] hashValue = outputStream.digest();
-    try {
-      return CKM_SIGN(hashValue);
-    } catch (SignerException e) {
-      LOG.warn("SignerException: {}", e.getMessage());
-      LOG.debug("SignerException", e);
-      throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-    } catch (Throwable t) {
-      final String message = "Throwable";
-      if (LOG.isWarnEnabled()) {
-        LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-            t.getMessage());
-      }
-      LOG.debug(message, t);
-      throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());
+        this.outputStream = new DigestOutputStream(digest);
     }
-  }
+
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return algorithmIdentifier;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        outputStream.reset();
+        return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+        byte[] hashValue = outputStream.digest();
+        try {
+            return CKM_SIGN(hashValue);
+        } catch (SignerException e) {
+            LOG.warn("SignerException: {}", e.getMessage());
+            LOG.debug("SignerException", e);
+            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
+        } catch (Throwable t) {
+            final String message = "Throwable";
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        t.getMessage());
+            }
+            LOG.debug(message, t);
+            throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());
+        }
+    }
 
 }

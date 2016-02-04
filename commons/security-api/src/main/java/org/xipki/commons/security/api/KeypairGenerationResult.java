@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,15 +44,15 @@ import org.bouncycastle.cert.X509CertificateHolder;
 
 public abstract class KeypairGenerationResult {
 
-  private final X509CertificateHolder certificate;
+    private final X509CertificateHolder certificate;
 
-  protected KeypairGenerationResult(
-      final X509CertificateHolder certificate) {
-    this.certificate = certificate;
-  }
+    protected KeypairGenerationResult(
+            final X509CertificateHolder certificate) {
+        this.certificate = certificate;
+    }
 
-  public X509CertificateHolder getCertificate() {
-    return certificate;
-  }
+    public X509CertificateHolder getCertificate() {
+        return certificate;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,34 +50,34 @@ import org.bouncycastle.operator.DigestCalculator;
 
 public abstract class AbstractDigestCalculator implements DigestCalculator {
 
-  private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+    private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-  protected abstract ASN1ObjectIdentifier getObjectIdentifier();
+    protected abstract ASN1ObjectIdentifier getObjectIdentifier();
 
-  protected abstract Digest getDigester();
+    protected abstract Digest getDigester();
 
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return new AlgorithmIdentifier(getObjectIdentifier());
-  }
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return new AlgorithmIdentifier(getObjectIdentifier());
+    }
 
-  public OutputStream getOutputStream() {
-    return bOut;
-  }
+    public OutputStream getOutputStream() {
+        return bOut;
+    }
 
-  public byte[] getDigest() {
-    byte[] bytes = bOut.toByteArray();
+    public byte[] getDigest() {
+        byte[] bytes = bOut.toByteArray();
 
-    bOut.reset();
+        bOut.reset();
 
-    Digest digester = getDigester();
+        Digest digester = getDigester();
 
-    digester.update(bytes, 0, bytes.length);
+        digester.update(bytes, 0, bytes.length);
 
-    byte[] digest = new byte[digester.getDigestSize()];
+        byte[] digest = new byte[digester.getDigestSize()];
 
-    digester.doFinal(digest, 0);
+        digester.doFinal(digest, 0);
 
-    return digest;
-  }
+        return digest;
+    }
 
 }

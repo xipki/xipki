@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,21 +49,21 @@ import org.xipki.pki.ocsp.server.impl.jaxb.MappingType;
 
 class AuditOption {
 
-  private final Map<String, String> certprofileMapping;
+    private final Map<String, String> certprofileMapping;
 
-  public AuditOption(
-      final AuditOptionType conf) {
-    Map<String, String> map = new ConcurrentHashMap<>();
-    if (conf.getCertprofileMappings() != null) {
-      for (MappingType m : conf.getCertprofileMappings().getMapping()) {
-        map.put(m.getFrom(), m.getTo());
-      }
+    public AuditOption(
+            final AuditOptionType conf) {
+        Map<String, String> map = new ConcurrentHashMap<>();
+        if (conf.getCertprofileMappings() != null) {
+            for (MappingType m : conf.getCertprofileMappings().getMapping()) {
+                map.put(m.getFrom(), m.getTo());
+            }
+        }
+        this.certprofileMapping = Collections.unmodifiableMap(map);
     }
-    this.certprofileMapping = Collections.unmodifiableMap(map);
-  }
 
-  public Map<String, String> getCertprofileMapping() {
-    return certprofileMapping;
-  }
+    public Map<String, String> getCertprofileMapping() {
+        return certprofileMapping;
+    }
 
 }

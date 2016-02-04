@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,132 +51,132 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class LoadTestEntry {
 
-  public enum RandomDN {
+    public enum RandomDN {
 
-    GIVENNAME,
-    SURNAME,
-    STREET,
-    POSTALCODE,
-    O,
-    OU,
-    CN;
+        GIVENNAME,
+        SURNAME,
+        STREET,
+        POSTALCODE,
+        O,
+        OU,
+        CN;
 
-    public static RandomDN getInstance(
-        final String text) {
-      ParamUtil.assertNotNull("text", text);
-      for (RandomDN value : values()) {
-        if (value.name().equalsIgnoreCase(text)) {
-          return value;
-        }
-      }
-      return null;
-    }
-
-  } // enum RandomDN
-
-  private static class IncreasableSubject {
-
-    private final X500Name subjectTemplate;
-
-    private final ASN1ObjectIdentifier subjectRDNForIncrement;
-
-    private IncreasableSubject(
-        final String subjectTemplate,
-        final RandomDN randomDN) {
-      this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
-
-      switch (randomDN) {
-        case GIVENNAME:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
-          break;
-        case SURNAME:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_SURNAME;
-          break;
-        case STREET:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_STREET;
-          break;
-        case POSTALCODE:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
-          break;
-        case O:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
-          break;
-        case OU:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
-          break;
-        case CN:
-          this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
-          break;
-        default:
-          throw new RuntimeException("should not reach here, unknown RandomDN "
-              + randomDN);
-      }
-
-      if (this.subjectRDNForIncrement != null
-          && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0) {
-        throw new IllegalArgumentException("subjectTemplate does not contain DN field "
-            + ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
-      }
-    }
-
-    private X500Name getX500Name(
-        final long index) {
-      RDN[] baseRDNs = subjectTemplate.getRDNs();
-
-      final int n = baseRDNs.length;
-      RDN[] newRDNS = new RDN[n];
-
-      boolean incremented = false;
-      for (int i = 0; i < n; i++) {
-        RDN rdn = baseRDNs[i];
-        if (!incremented) {
-          if (rdn.getFirst().getType().equals(subjectRDNForIncrement)) {
-            String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
-            rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
-            incremented = true;
-          }
+        public static RandomDN getInstance(
+                final String text) {
+            ParamUtil.assertNotNull("text", text);
+            for (RandomDN value : values()) {
+                if (value.name().equalsIgnoreCase(text)) {
+                    return value;
+                }
+            }
+            return null;
         }
 
-        newRDNS[i] = rdn;
-      }
-      return new X500Name(newRDNS);
+    } // enum RandomDN
+
+    private static class IncreasableSubject {
+
+        private final X500Name subjectTemplate;
+
+        private final ASN1ObjectIdentifier subjectRDNForIncrement;
+
+        private IncreasableSubject(
+                final String subjectTemplate,
+                final RandomDN randomDN) {
+            this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
+
+            switch (randomDN) {
+                case GIVENNAME:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
+                    break;
+                case SURNAME:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_SURNAME;
+                    break;
+                case STREET:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_STREET;
+                    break;
+                case POSTALCODE:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
+                    break;
+                case O:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
+                    break;
+                case OU:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
+                    break;
+                case CN:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
+                    break;
+                default:
+                    throw new RuntimeException("should not reach here, unknown RandomDN "
+                            + randomDN);
+            }
+
+            if (this.subjectRDNForIncrement != null
+                    && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0) {
+                throw new IllegalArgumentException("subjectTemplate does not contain DN field "
+                        + ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
+            }
+        }
+
+        private X500Name getX500Name(
+                final long index) {
+            RDN[] baseRDNs = subjectTemplate.getRDNs();
+
+            final int n = baseRDNs.length;
+            RDN[] newRDNS = new RDN[n];
+
+            boolean incremented = false;
+            for (int i = 0; i < n; i++) {
+                RDN rdn = baseRDNs[i];
+                if (!incremented) {
+                    if (rdn.getFirst().getType().equals(subjectRDNForIncrement)) {
+                        String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
+                        rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
+                        incremented = true;
+                    }
+                }
+
+                newRDNS[i] = rdn;
+            }
+            return new X500Name(newRDNS);
+        }
+
+    } // class IncreasableSubject
+
+    private final String certprofile;
+
+    private final KeyEntry keyEntry;
+
+    private final IncreasableSubject subject;
+
+    public LoadTestEntry(
+            final String certprofile,
+            final KeyEntry keyEntry,
+            final String subjectTemplate,
+            final RandomDN randomDN) {
+        ParamUtil.assertNotBlank("certprofile", certprofile);
+        ParamUtil.assertNotNull("keyEntry", keyEntry);
+        ParamUtil.assertNotNull("subjectTemplate", subjectTemplate);
+        ParamUtil.assertNotNull("randomDN", randomDN);
+
+        this.certprofile = certprofile;
+        this.keyEntry = keyEntry;
+        this.subject = new IncreasableSubject(subjectTemplate, randomDN);
     }
 
-  } // class IncreasableSubject
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
+            final long index) {
+        return keyEntry.getSubjectPublicKeyInfo(index);
+    }
 
-  private final String certprofile;
+    public X500Name getX500Name(
+            final long index) {
+        return subject.getX500Name(index);
+    }
 
-  private final KeyEntry keyEntry;
-
-  private final IncreasableSubject subject;
-
-  public LoadTestEntry(
-      final String certprofile,
-      final KeyEntry keyEntry,
-      final String subjectTemplate,
-      final RandomDN randomDN) {
-    ParamUtil.assertNotBlank("certprofile", certprofile);
-    ParamUtil.assertNotNull("keyEntry", keyEntry);
-    ParamUtil.assertNotNull("subjectTemplate", subjectTemplate);
-    ParamUtil.assertNotNull("randomDN", randomDN);
-
-    this.certprofile = certprofile;
-    this.keyEntry = keyEntry;
-    this.subject = new IncreasableSubject(subjectTemplate, randomDN);
-  }
-
-  public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-      final long index) {
-    return keyEntry.getSubjectPublicKeyInfo(index);
-  }
-
-  public X500Name getX500Name(
-      final long index) {
-    return subject.getX500Name(index);
-  }
-
-  public String getCertprofile() {
-    return certprofile;
-  }
+    public String getCertprofile() {
+        return certprofile;
+    }
 
 }

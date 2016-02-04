@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,47 +54,47 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  */
 public class RSAUtil {
 
-  public static final ASN1ObjectIdentifier[] rsaOids = {
-    PKCSObjectIdentifiers.rsaEncryption,
-    X509ObjectIdentifiers.id_ea_rsa,
-    PKCSObjectIdentifiers.id_RSAES_OAEP,
-    PKCSObjectIdentifiers.id_RSASSA_PSS
-  };
+    public static final ASN1ObjectIdentifier[] rsaOids = {
+        PKCSObjectIdentifiers.rsaEncryption,
+        X509ObjectIdentifiers.id_ea_rsa,
+        PKCSObjectIdentifiers.id_RSAES_OAEP,
+        PKCSObjectIdentifiers.id_RSASSA_PSS
+    };
 
-  private RSAUtil() {
-  }
-
-  public static boolean isRsaOid(
-      final ASN1ObjectIdentifier algOid) {
-    for (int i = 0; i != rsaOids.length; i++) {
-      if (algOid.equals(rsaOids[i])) {
-        return true;
-      }
+    private RSAUtil() {
     }
 
-    return false;
-  }
+    public static boolean isRsaOid(
+            final ASN1ObjectIdentifier algOid) {
+        for (int i = 0; i != rsaOids.length; i++) {
+            if (algOid.equals(rsaOids[i])) {
+                return true;
+            }
+        }
 
-  static RSAKeyParameters generatePublicKeyParameter(
-      final RSAPublicKey key) {
-    return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
-
-  }
-
-  static RSAKeyParameters generatePrivateKeyParameter(
-      final RSAPrivateKey key) {
-    if (key instanceof RSAPrivateCrtKey) {
-      RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
-
-      return new RSAPrivateCrtKeyParameters(k.getModulus(),
-        k.getPublicExponent(), k.getPrivateExponent(),
-        k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
-        k.getCrtCoefficient());
-    } else {
-      RSAPrivateKey k = key;
-
-      return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+        return false;
     }
-  }
+
+    static RSAKeyParameters generatePublicKeyParameter(
+            final RSAPublicKey key) {
+        return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
+
+    }
+
+    static RSAKeyParameters generatePrivateKeyParameter(
+            final RSAPrivateKey key) {
+        if (key instanceof RSAPrivateCrtKey) {
+            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
+
+            return new RSAPrivateCrtKeyParameters(k.getModulus(),
+                k.getPublicExponent(), k.getPrivateExponent(),
+                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
+                k.getCrtCoefficient());
+        } else {
+            RSAPrivateKey k = key;
+
+            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+        }
+    }
 
 }

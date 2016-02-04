@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,49 +54,49 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-info",
-    description = "show information of CMP control")
+        description = "show information of CMP control")
 @Service
 public class CmpControlInfoCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", description = "CMP control name")
-  @Completion(CmpControlNameCompleter.class)
-  private String name;
+    @Argument(index = 0, name = "name", description = "CMP control name")
+    @Completion(CmpControlNameCompleter.class)
+    private String name;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    StringBuilder sb = new StringBuilder();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        StringBuilder sb = new StringBuilder();
 
-    if (name == null) {
-      Set<String> names = caManager.getCmpControlNames();
-      int n = names.size();
+        if (name == null) {
+            Set<String> names = caManager.getCmpControlNames();
+            int n = names.size();
 
-      if (n == 0 || n == 1) {
-        sb.append((n == 0)
-            ? "no"
-            : "1");
-        sb.append(" CMP control is configured\n");
-      } else {
-        sb.append(n).append(" CMP controls are configured:\n");
-      }
+            if (n == 0 || n == 1) {
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" CMP control is configured\n");
+            } else {
+                sb.append(n).append(" CMP controls are configured:\n");
+            }
 
-      List<String> sorted = new ArrayList<>(names);
-      Collections.sort(sorted);
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
 
-      for (String m : sorted) {
-        sb.append("\t").append(m).append("\n");
-      }
-    } else {
-      CmpControlEntry entry = caManager.getCmpControl(name);
-      if (entry == null) {
-        throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
-      } else {
-        sb.append(entry.toString());
-      }
-    }
+            for (String m : sorted) {
+                sb.append("\t").append(m).append("\n");
+            }
+        } else {
+            CmpControlEntry entry = caManager.getCmpControl(name);
+            if (entry == null) {
+                throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
+            } else {
+                sb.append(entry.toString());
+            }
+        }
 
-    out(sb.toString());
-    return null;
-  } // method doExecute
+        out(sb.toString());
+        return null;
+    } // method doExecute
 
 }

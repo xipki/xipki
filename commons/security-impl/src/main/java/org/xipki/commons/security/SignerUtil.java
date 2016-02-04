@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -79,172 +79,172 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 public class SignerUtil {
 
-  private SignerUtil() {
-  }
-
-  static public RSAKeyParameters generateRSAPublicKeyParameter(
-      final RSAPublicKey key) {
-    return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
-
-  }
-
-  static public RSAKeyParameters generateRSAPrivateKeyParameter(
-      final RSAPrivateKey key) {
-    if (key instanceof RSAPrivateCrtKey) {
-      RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
-
-      return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
-          k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
-          k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
-    } else {
-      RSAPrivateKey k = key;
-
-      return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
-    }
-  }
-
-  static public PSSSigner createPSSRSASigner(
-      final AlgorithmIdentifier sigAlgId)
-  throws OperatorCreationException {
-    return createPSSRSASigner(sigAlgId, null);
-  }
-
-  static public PSSSigner createPSSRSASigner(
-      final AlgorithmIdentifier sigAlgId,
-      final  AsymmetricBlockCipher cipher)
-  throws OperatorCreationException {
-    if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-      throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
-        + " is not allowed");
+    private SignerUtil() {
     }
 
-    BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
-    AlgorithmIdentifier digAlgId;
-    try {
-      digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
-    } catch (NoSuchAlgorithmException e) {
-      throw new OperatorCreationException(e.getMessage(), e);
-    }
-    Digest dig = digestProvider.get(digAlgId);
+    static public RSAKeyParameters generateRSAPublicKeyParameter(
+            final RSAPublicKey key) {
+        return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
-    RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
-
-    AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
-        param.getMaskGenAlgorithm().getParameters());
-    Digest mfgDig = digestProvider.get(mfgDigAlgId);
-
-    int saltSize = param.getSaltLength().intValue();
-    int trailerField = param.getTrailerField().intValue();
-
-    AsymmetricBlockCipher _cipher = (cipher == null)
-        ? new RSABlindedEngine()
-        : cipher;
-
-    return new PSSSigner(_cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
-  }
-
-  static private byte getTrailer(
-      final int trailerField) {
-    if (trailerField == 1) {
-      return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
     }
 
-    throw new IllegalArgumentException("unknown trailer field");
-  }
+    static public RSAKeyParameters generateRSAPrivateKeyParameter(
+            final RSAPrivateKey key) {
+        if (key instanceof RSAPrivateCrtKey) {
+            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
-  public static  boolean verifyPOP(
-      final CertificationRequest p10Request) {
-    PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
-    return verifyPOP(p10Req);
-  }
+            return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
+                    k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
+                    k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
+        } else {
+            RSAPrivateKey k = key;
 
-  public static  boolean verifyPOP(
-      final PKCS10CertificationRequest p10Request) {
-    try {
-      SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
-      PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
-
-      ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
-      return p10Request.isSignatureValid(cvp);
-    } catch (OperatorCreationException | InvalidKeyException | PKCSException
-        | NoSuchAlgorithmException | InvalidKeySpecException e) {
-      return false;
-    }
-  }
-
-  public static byte[] pkcs1padding(
-      final byte[] in,
-      final int blockSize)
-  throws SignerException {
-    int inLen = in.length;
-
-    if (inLen + 3 > blockSize) {
-      throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
-          + inLen);
+            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+        }
     }
 
-    byte[]  block = new byte[blockSize];
-
-    block[0] = 0x00;
-    block[1] = 0x01;            // type code 1
-
-    for (int i = 2; i != block.length - inLen - 1; i++) {
-      block[i] = (byte) 0xFF;
+    static public PSSSigner createPSSRSASigner(
+            final AlgorithmIdentifier sigAlgId)
+    throws OperatorCreationException {
+        return createPSSRSASigner(sigAlgId, null);
     }
 
-    block[block.length - inLen - 1] = 0x00;     // mark the end of the padding
-    System.arraycopy(in, 0, block, block.length - inLen, inLen);
-    return block;
-  }
+    static public PSSSigner createPSSRSASigner(
+            final AlgorithmIdentifier sigAlgId,
+            final    AsymmetricBlockCipher cipher)
+    throws OperatorCreationException {
+        if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+            throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
+                + " is not allowed");
+        }
 
-  public static byte[] convertPlainDSASigX962(
-      final byte[] signature)
-  throws SignerException {
-    byte[] ba = new byte[signature.length / 2];
-    ASN1EncodableVector sigder = new ASN1EncodableVector();
+        BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
+        AlgorithmIdentifier digAlgId;
+        try {
+            digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
+        } catch (NoSuchAlgorithmException e) {
+            throw new OperatorCreationException(e.getMessage(), e);
+        }
+        Digest dig = digestProvider.get(digAlgId);
 
-    System.arraycopy(signature, 0, ba, 0, ba.length);
-    sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+        RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
 
-    System.arraycopy(signature, ba.length, ba, 0, ba.length);
-    sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+        AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
+                param.getMaskGenAlgorithm().getParameters());
+        Digest mfgDig = digestProvider.get(mfgDigAlgId);
 
-    DERSequence seq = new DERSequence(sigder);
-    try {
-      return seq.getEncoded();
-    } catch (IOException e) {
-      throw new SignerException("IOException, message: " + e.getMessage(), e);
-    }
-  }
+        int saltSize = param.getSaltLength().intValue();
+        int trailerField = param.getTrailerField().intValue();
 
-  public static byte[] convertX962DSASigToPlain(
-      final byte[] x962Signature,
-      final int keyBitLen)
-  throws SignerException {
-    final int blockSize = (keyBitLen + 7) / 8;
-    ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
-    if (seq.size() != 2) {
-      throw new IllegalArgumentException("invalid X962Signature");
-    }
-    BigInteger r = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-    BigInteger s = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
-    int rBitLen = r.bitLength();
-    int sBitLen = s.bitLength();
-    int bitLen = Math.max(rBitLen, sBitLen);
-    if ((bitLen + 7) / 8 > blockSize) {
-      throw new SignerException("signature is too large");
+        AsymmetricBlockCipher _cipher = (cipher == null)
+                ? new RSABlindedEngine()
+                : cipher;
+
+        return new PSSSigner(_cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
 
-    byte[] plainSignature = new byte[2 * blockSize];
+    static private byte getTrailer(
+            final int trailerField) {
+        if (trailerField == 1) {
+            return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
+        }
 
-    byte[] bytes = r.toByteArray();
-    int srcOffset = Math.max(0, bytes.length - blockSize);
-    System.arraycopy(bytes, srcOffset, plainSignature, 0, bytes.length - srcOffset);
+        throw new IllegalArgumentException("unknown trailer field");
+    }
 
-    bytes = s.toByteArray();
-    srcOffset = Math.max(0, bytes.length - blockSize);
-    System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
-    return plainSignature;
-  }
+    public static    boolean verifyPOP(
+            final CertificationRequest p10Request) {
+        PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
+        return verifyPOP(p10Req);
+    }
+
+    public static    boolean verifyPOP(
+            final PKCS10CertificationRequest p10Request) {
+        try {
+            SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
+            PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
+
+            ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
+            return p10Request.isSignatureValid(cvp);
+        } catch (OperatorCreationException | InvalidKeyException | PKCSException
+                | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            return false;
+        }
+    }
+
+    public static byte[] pkcs1padding(
+            final byte[] in,
+            final int blockSize)
+    throws SignerException {
+        int inLen = in.length;
+
+        if (inLen + 3 > blockSize) {
+            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
+                    + inLen);
+        }
+
+        byte[]    block = new byte[blockSize];
+
+        block[0] = 0x00;
+        block[1] = 0x01;                        // type code 1
+
+        for (int i = 2; i != block.length - inLen - 1; i++) {
+            block[i] = (byte) 0xFF;
+        }
+
+        block[block.length - inLen - 1] = 0x00;         // mark the end of the padding
+        System.arraycopy(in, 0, block, block.length - inLen, inLen);
+        return block;
+    }
+
+    public static byte[] convertPlainDSASigX962(
+            final byte[] signature)
+    throws SignerException {
+        byte[] ba = new byte[signature.length / 2];
+        ASN1EncodableVector sigder = new ASN1EncodableVector();
+
+        System.arraycopy(signature, 0, ba, 0, ba.length);
+        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+
+        System.arraycopy(signature, ba.length, ba, 0, ba.length);
+        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
+
+        DERSequence seq = new DERSequence(sigder);
+        try {
+            return seq.getEncoded();
+        } catch (IOException e) {
+            throw new SignerException("IOException, message: " + e.getMessage(), e);
+        }
+    }
+
+    public static byte[] convertX962DSASigToPlain(
+            final byte[] x962Signature,
+            final int keyBitLen)
+    throws SignerException {
+        final int blockSize = (keyBitLen + 7) / 8;
+        ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
+        if (seq.size() != 2) {
+            throw new IllegalArgumentException("invalid X962Signature");
+        }
+        BigInteger r = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+        BigInteger s = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
+        int rBitLen = r.bitLength();
+        int sBitLen = s.bitLength();
+        int bitLen = Math.max(rBitLen, sBitLen);
+        if ((bitLen + 7) / 8 > blockSize) {
+            throw new SignerException("signature is too large");
+        }
+
+        byte[] plainSignature = new byte[2 * blockSize];
+
+        byte[] bytes = r.toByteArray();
+        int srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, plainSignature, 0, bytes.length - srcOffset);
+
+        bytes = s.toByteArray();
+        srcOffset = Math.max(0, bytes.length - blockSize);
+        System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
+        return plainSignature;
+    }
 
 }

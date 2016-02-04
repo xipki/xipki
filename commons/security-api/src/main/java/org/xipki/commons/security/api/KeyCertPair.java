@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,25 +47,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class KeyCertPair {
 
-  private final PrivateKey privateKey;
+    private final PrivateKey privateKey;
 
-  private final X509Certificate certificate;
+    private final X509Certificate certificate;
 
-  public KeyCertPair(
-      final PrivateKey privateKey,
-      final X509Certificate certificate) {
-    ParamUtil.assertNotNull("privateKey", privateKey);
-    ParamUtil.assertNotNull("certificate", certificate);
-    this.privateKey = privateKey;
-    this.certificate = certificate;
-  }
+    public KeyCertPair(
+            final PrivateKey privateKey,
+            final X509Certificate certificate) {
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotNull("certificate", certificate);
+        this.privateKey = privateKey;
+        this.certificate = certificate;
+    }
 
-  public PrivateKey getPrivateKey() {
-    return privateKey;
-  }
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
 
-  public X509Certificate getCertificate() {
-    return certificate;
-  }
+    public X509Certificate getCertificate() {
+        return certificate;
+    }
 
 }

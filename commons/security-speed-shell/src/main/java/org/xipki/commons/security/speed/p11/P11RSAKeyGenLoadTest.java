@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,28 +47,28 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
-  private final int keysize;
+    private final int keysize;
 
-  private final BigInteger publicExponent;
+    private final BigInteger publicExponent;
 
-  public P11RSAKeyGenLoadTest(
-      final P11WritableSlot slot,
-      final int keysize,
-      final BigInteger publicExponent)
-  throws Exception {
-    super(slot,
-        "PKCS#11 RSA key generation\n"
-            + "keysize: " + keysize + "\n"
-            + "public exponent: " + publicExponent);
-    this.keysize = keysize;
-    this.publicExponent = publicExponent;
-  }
+    public P11RSAKeyGenLoadTest(
+            final P11WritableSlot slot,
+            final int keysize,
+            final BigInteger publicExponent)
+    throws Exception {
+        super(slot,
+                "PKCS#11 RSA key generation\n"
+                        + "keysize: " + keysize + "\n"
+                        + "public exponent: " + publicExponent);
+        this.keysize = keysize;
+        this.publicExponent = publicExponent;
+    }
 
-  @Override
-  protected void genKeypair()
-  throws Exception {
-    P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, publicExponent, getDummyLabel());
-    slot.removeKey(keyId);
-  }
+    @Override
+    protected void genKeypair()
+    throws Exception {
+        P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, publicExponent, getDummyLabel());
+        slot.removeKey(keyId);
+    }
 
 }

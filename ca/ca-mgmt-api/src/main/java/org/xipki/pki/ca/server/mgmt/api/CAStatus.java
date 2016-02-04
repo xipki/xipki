@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,29 +42,29 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 public enum CAStatus {
 
-  ACTIVE ("active"),
-  INACTIVE ("inactive");
+    ACTIVE ("active"),
+    INACTIVE ("inactive");
 
-  private String status;
+    private String status;
 
-  private CAStatus(
-      final String status) {
-    this.status = status;
-  }
-
-  public String getStatus() {
-    return status;
-  }
-
-  public static CAStatus getCAStatus(
-      final String status) {
-    for (CAStatus value : values()) {
-      if (value.status.equalsIgnoreCase(status)) {
-        return value;
-      }
+    private CAStatus(
+            final String status) {
+        this.status = status;
     }
 
-    return null;
-  }
+    public String getStatus() {
+        return status;
+    }
+
+    public static CAStatus getCAStatus(
+            final String status) {
+        for (CAStatus value : values()) {
+            if (value.status.equalsIgnoreCase(status)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
 }

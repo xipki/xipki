@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,8 +46,8 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 @Service
 public class PermissionCompleter extends AbstractEnumCompleter {
 
-  public PermissionCompleter() {
-    setTokens(
-      "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
-  }
+    public PermissionCompleter() {
+        setTokens(
+            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all");
+    }
 }

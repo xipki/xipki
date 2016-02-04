@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,29 +42,29 @@ package org.xipki.pki.ca.api;
 
 public enum RequestType {
 
-  CA(1),
-  CMP(2),
-  SCEP(3);
+    CA(1),
+    CMP(2),
+    SCEP(3);
 
-  private final int code;
-  private RequestType(
-      final int code) {
-    this.code = code;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public static RequestType getInstance(
-      final int code) {
-    for (RequestType value : values()) {
-      if (code == value.code) {
-        return value;
-      }
+    private final int code;
+    private RequestType(
+            final int code) {
+        this.code = code;
     }
 
-    return null;
-  }
+    public int getCode() {
+        return code;
+    }
+
+    public static RequestType getInstance(
+            final int code) {
+        for (RequestType value : values()) {
+            if (code == value.code) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
 }

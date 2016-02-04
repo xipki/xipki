@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -79,292 +79,292 @@ import org.xipki.pki.scep.util.ScepConstants;
 
 public class ScepServlet extends HttpServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private static final String CGI_PROGRAM = "/pkiclient.exe";
+    private static final String CGI_PROGRAM = "/pkiclient.exe";
 
-  private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
+    private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
-  private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
+    private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
 
-  private AuditServiceRegister auditServiceRegister;
+    private AuditServiceRegister auditServiceRegister;
 
-  private CAManagerImpl responderManager;
+    private CAManagerImpl responderManager;
 
-  public ScepServlet() {
-  }
-
-  @Override
-  public void doGet(
-      final HttpServletRequest request,
-      final HttpServletResponse response)
-  throws ServletException, IOException {
-    service(request, response, false);
-  }
-
-  @Override
-  public void doPost(
-      final HttpServletRequest request,
-      final HttpServletResponse response)
-  throws ServletException, IOException {
-    service(request, response, true);
-  }
-
-  private void service(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final boolean post)
-  throws ServletException, IOException {
-    String requestURI = request.getRequestURI();
-    String servletPath = request.getServletPath();
-
-    int n = servletPath.length();
-
-    String scepName = null;
-    String certProfileName = null;
-    if (requestURI.length() > n + 1) {
-      String scepPath = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
-      if (scepPath.endsWith(CGI_PROGRAM)) {
-        String path = scepPath.substring(0, scepPath.length() - CGI_PROGRAM_LEN);
-        String[] tokens = path.split("/");
-        if (tokens.length == 2) {
-          scepName = tokens[0];
-          certProfileName = tokens[1];
-        }
-      } // end if
-    } // end if
-
-    if (scepName == null) {
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
+    public ScepServlet() {
     }
 
-    AuditService auditService = auditServiceRegister.getAuditService();
-    AuditEvent auditEvent = (auditService != null)
-        ? new AuditEvent(new Date())
-        : null;
-    if (auditEvent != null) {
-      auditEvent.setApplicationName("SCEP");
-      auditEvent.setName("PERF");
-      auditEvent.addEventData(new AuditEventData("NAME", scepName + "/" + certProfileName));
+    @Override
+    public void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        service(request, response, false);
     }
 
-    AuditLevel auditLevel = AuditLevel.INFO;
-    AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
-    String auditMessage = null;
+    @Override
+    public void doPost(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        service(request, response, true);
+    }
 
-    //OutputStream respStream = response.getOutputStream();
+    private void service(
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final boolean post)
+    throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String servletPath = request.getServletPath();
 
-    try {
-      if (responderManager == null) {
-        auditMessage = "responderManager in servlet not configured";
-        LOG.error(auditMessage);
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        response.setContentLength(0);
+        int n = servletPath.length();
 
-        auditLevel = AuditLevel.ERROR;
-        auditStatus = AuditStatus.FAILED;
-        return;
-      }
+        String scepName = null;
+        String certProfileName = null;
+        if (requestURI.length() > n + 1) {
+            String scepPath = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
+            if (scepPath.endsWith(CGI_PROGRAM)) {
+                String path = scepPath.substring(0, scepPath.length() - CGI_PROGRAM_LEN);
+                String[] tokens = path.split("/");
+                if (tokens.length == 2) {
+                    scepName = tokens[0];
+                    certProfileName = tokens[1];
+                }
+            } // end if
+        } // end if
 
-      String realScepName = responderManager.getCaNameForAlias(scepName);
-      if (realScepName != null) {
-        scepName = realScepName;
-      }
-      Scep responder = responderManager.getScep(scepName);
-      if (responder == null || responder.getStatus() != CAStatus.ACTIVE
-          || !responder.supportsCertProfile(certProfileName)) {
-        auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
-        LOG.warn(auditMessage);
-
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        response.setContentLength(0);
-
-        auditStatus = AuditStatus.FAILED;
-        return;
-      }
-
-      String operation = request.getParameter("operation");
-      auditEvent.addEventData(new AuditEventData("operation", operation));
-
-      if ("PKIOperation".equalsIgnoreCase(operation)) {
-        CMSSignedData reqMessage;
-        // parse the request
-        try {
-          byte[] content;
-          if (post) {
-            content = IoUtil.read(request.getInputStream());
-          } else {
-            String b64 = request.getParameter("message");
-            content = Base64.decode(b64);
-          }
-
-          reqMessage = new CMSSignedData(content);
-        } catch (Exception e) {
-          final String message = "invalid request";
-          if (LOG.isErrorEnabled()) {
-            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                e.getMessage());
-          }
-          LOG.debug(message, e);
-
-          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-          response.setContentLength(0);
-
-          auditMessage = message;
-          auditStatus = AuditStatus.FAILED;
-          return;
+        if (scepName == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
-        ContentInfo ci;
-        try {
-          ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
-        } catch (MessageDecodingException e) {
-          final String message = "could not decrypt and/or verify the request";
-          if (LOG.isErrorEnabled()) {
-            LOG.error(LogUtil.buildExceptionLogFormat(message),
-                e.getClass().getName(), e.getMessage());
-          }
-          LOG.debug(message, e);
-
-          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-          response.setContentLength(0);
-
-          auditMessage = message;
-          auditStatus = AuditStatus.FAILED;
-          return;
-        } catch (OperationException e) {
-          final String message = "system internal error";
-          if (LOG.isErrorEnabled()) {
-            LOG.error(LogUtil.buildExceptionLogFormat(message),
-                e.getClass().getName(), e.getMessage());
-          }
-          LOG.debug(message, e);
-
-          response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          response.setContentLength(0);
-
-          auditMessage = message;
-          auditStatus = AuditStatus.FAILED;
-          return;
-        }
-        response.setContentType(CT_RESPONSE);
-
-        ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
-        asn1Out.writeObject(ci);
-        asn1Out.flush();
-      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
-        // CA-Ident is ignored
-        response.setContentType(ScepConstants.CT_text_palin);
-        byte[] caCapsBytes = responder.getCaCaps().getBytes();
-
-        response.getOutputStream().write(caCapsBytes);
-      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
-        // CA-Ident is ignored
-        byte[] respBytes = responder.getCACertResp().getBytes();
-        response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
-        response.setContentLength(respBytes.length);
-        response.getOutputStream().write(respBytes);
-      } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentLength(0);
-
-        auditMessage = "SCEP operation '" + operation + "' is not permitted";
-        auditStatus = AuditStatus.FAILED;
-        return;
-      } else {
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentLength(0);
-
-        auditMessage = "unknown SCEP operation '" + operation + "'";
-        auditStatus = AuditStatus.FAILED;
-        return;
-      }
-    } catch (EOFException e) {
-      final String message = "connection reset by peer";
-      if (LOG.isErrorEnabled()) {
-        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-            e.getMessage());
-      }
-      LOG.debug(message, e);
-
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
-    } catch (Throwable t) {
-      final String message = "Throwable thrown, this should not happen!";
-      LOG.error(message, t);
-
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.setContentLength(0);
-      auditLevel = AuditLevel.ERROR;
-      auditStatus = AuditStatus.FAILED;
-      auditMessage = "internal error";
-    } finally {
-      try {
-        response.flushBuffer();
-      } finally {
+        AuditService auditService = auditServiceRegister.getAuditService();
+        AuditEvent auditEvent = (auditService != null)
+                ? new AuditEvent(new Date())
+                : null;
         if (auditEvent != null) {
-          audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+            auditEvent.setApplicationName("SCEP");
+            auditEvent.setName("PERF");
+            auditEvent.addEventData(new AuditEventData("NAME", scepName + "/" + certProfileName));
         }
-      }
+
+        AuditLevel auditLevel = AuditLevel.INFO;
+        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
+        String auditMessage = null;
+
+        //OutputStream respStream = response.getOutputStream();
+
+        try {
+            if (responderManager == null) {
+                auditMessage = "responderManager in servlet not configured";
+                LOG.error(auditMessage);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+                return;
+            }
+
+            String realScepName = responderManager.getCaNameForAlias(scepName);
+            if (realScepName != null) {
+                scepName = realScepName;
+            }
+            Scep responder = responderManager.getScep(scepName);
+            if (responder == null || responder.getStatus() != CAStatus.ACTIVE
+                    || !responder.supportsCertProfile(certProfileName)) {
+                auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
+                LOG.warn(auditMessage);
+
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentLength(0);
+
+                auditStatus = AuditStatus.FAILED;
+                return;
+            }
+
+            String operation = request.getParameter("operation");
+            auditEvent.addEventData(new AuditEventData("operation", operation));
+
+            if ("PKIOperation".equalsIgnoreCase(operation)) {
+                CMSSignedData reqMessage;
+                // parse the request
+                try {
+                    byte[] content;
+                    if (post) {
+                        content = IoUtil.read(request.getInputStream());
+                    } else {
+                        String b64 = request.getParameter("message");
+                        content = Base64.decode(b64);
+                    }
+
+                    reqMessage = new CMSSignedData(content);
+                } catch (Exception e) {
+                    final String message = "invalid request";
+                    if (LOG.isErrorEnabled()) {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                                e.getMessage());
+                    }
+                    LOG.debug(message, e);
+
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setContentLength(0);
+
+                    auditMessage = message;
+                    auditStatus = AuditStatus.FAILED;
+                    return;
+                }
+
+                ContentInfo ci;
+                try {
+                    ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
+                } catch (MessageDecodingException e) {
+                    final String message = "could not decrypt and/or verify the request";
+                    if (LOG.isErrorEnabled()) {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.setContentLength(0);
+
+                    auditMessage = message;
+                    auditStatus = AuditStatus.FAILED;
+                    return;
+                } catch (OperationException e) {
+                    final String message = "system internal error";
+                    if (LOG.isErrorEnabled()) {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentLength(0);
+
+                    auditMessage = message;
+                    auditStatus = AuditStatus.FAILED;
+                    return;
+                }
+                response.setContentType(CT_RESPONSE);
+
+                ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
+                asn1Out.writeObject(ci);
+                asn1Out.flush();
+            } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
+                // CA-Ident is ignored
+                response.setContentType(ScepConstants.CT_text_palin);
+                byte[] caCapsBytes = responder.getCaCaps().getBytes();
+
+                response.getOutputStream().write(caCapsBytes);
+            } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
+                // CA-Ident is ignored
+                byte[] respBytes = responder.getCACertResp().getBytes();
+                response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
+                response.setContentLength(respBytes.length);
+                response.getOutputStream().write(respBytes);
+            } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentLength(0);
+
+                auditMessage = "SCEP operation '" + operation + "' is not permitted";
+                auditStatus = AuditStatus.FAILED;
+                return;
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentLength(0);
+
+                auditMessage = "unknown SCEP operation '" + operation + "'";
+                auditStatus = AuditStatus.FAILED;
+                return;
+            }
+        } catch (EOFException e) {
+            final String message = "connection reset by peer";
+            if (LOG.isErrorEnabled()) {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                        e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        } catch (Throwable t) {
+            final String message = "Throwable thrown, this should not happen!";
+            LOG.error(message, t);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+            auditLevel = AuditLevel.ERROR;
+            auditStatus = AuditStatus.FAILED;
+            auditMessage = "internal error";
+        } finally {
+            try {
+                response.flushBuffer();
+            } finally {
+                if (auditEvent != null) {
+                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+                }
+            }
+        }
+    } // method service
+
+    protected PKIMessage generatePKIMessage(
+            final InputStream is)
+    throws IOException {
+        ASN1InputStream asn1Stream = new ASN1InputStream(is);
+
+        try {
+            return PKIMessage.getInstance(asn1Stream.readObject());
+        } finally {
+            try {
+                asn1Stream.close();
+            } catch (Exception e) {
+            }
+        }
+    } // method generatePKIMessage
+
+    public void setResponderManager(
+            final CAManagerImpl responderManager) {
+        this.responderManager = responderManager;
     }
-  } // method service
 
-  protected PKIMessage generatePKIMessage(
-      final InputStream is)
-  throws IOException {
-    ASN1InputStream asn1Stream = new ASN1InputStream(is);
-
-    try {
-      return PKIMessage.getInstance(asn1Stream.readObject());
-    } finally {
-      try {
-        asn1Stream.close();
-      } catch (Exception e) {
-      }
-    }
-  } // method generatePKIMessage
-
-  public void setResponderManager(
-      final CAManagerImpl responderManager) {
-    this.responderManager = responderManager;
-  }
-
-  public void setAuditServiceRegister(
-      final AuditServiceRegister auditServiceRegister) {
-    this.auditServiceRegister = auditServiceRegister;
-  }
-
-  private static void audit(
-      final AuditService auditService,
-      final AuditEvent auditEvent,
-      final AuditLevel auditLevel,
-      final AuditStatus auditStatus,
-      final String auditMessage) {
-    if (auditLevel != null) {
-      auditEvent.setLevel(auditLevel);
+    public void setAuditServiceRegister(
+            final AuditServiceRegister auditServiceRegister) {
+        this.auditServiceRegister = auditServiceRegister;
     }
 
-    if (auditStatus != null) {
-      auditEvent.setStatus(auditStatus);
-    }
+    private static void audit(
+            final AuditService auditService,
+            final AuditEvent auditEvent,
+            final AuditLevel auditLevel,
+            final AuditStatus auditStatus,
+            final String auditMessage) {
+        if (auditLevel != null) {
+            auditEvent.setLevel(auditLevel);
+        }
 
-    if (auditMessage != null) {
-      auditEvent.addEventData(new AuditEventData("message", auditMessage));
-    }
+        if (auditStatus != null) {
+            auditEvent.setStatus(auditStatus);
+        }
 
-    auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
+        if (auditMessage != null) {
+            auditEvent.addEventData(new AuditEventData("message", auditMessage));
+        }
 
-    if (!auditEvent.containsChildAuditEvents()) {
-      auditService.logEvent(auditEvent);
-    } else {
-      List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-      for (AuditEvent event : expandedAuditEvents) {
-        auditService.logEvent(event);
-      }
-    }
-  } // method audit
+        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
+
+        if (!auditEvent.containsChildAuditEvents()) {
+            auditService.logEvent(auditEvent);
+        } else {
+            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+            for (AuditEvent event : expandedAuditEvents) {
+                auditService.logEvent(event);
+            }
+        }
+    } // method audit
 
 }

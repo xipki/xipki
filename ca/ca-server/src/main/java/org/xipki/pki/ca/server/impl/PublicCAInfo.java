@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -62,166 +62,166 @@ import org.xipki.pki.ca.api.X509Cert;
 
 class PublicCAInfo {
 
-  private final X500Principal subject;
+    private final X500Principal subject;
 
-  private final X500Name x500Subject;
+    private final X500Name x500Subject;
 
-  private final String c14nSubject;
+    private final String c14nSubject;
 
-  private final byte[] subjectKeyIdentifier;
+    private final byte[] subjectKeyIdentifier;
 
-  private final GeneralNames  subjectAltName;
+    private final GeneralNames    subjectAltName;
 
-  private final BigInteger serialNumber;
+    private final BigInteger serialNumber;
 
-  private final X509Cert caCertificate;
+    private final X509Cert caCertificate;
 
-  private X509Certificate crlSignerCertificate;
+    private X509Certificate crlSignerCertificate;
 
-  private final List<String> caCertUris;
+    private final List<String> caCertUris;
 
-  private final List<String> ocspUris;
+    private final List<String> ocspUris;
 
-  private final List<String> crlUris;
+    private final List<String> crlUris;
 
-  private final List<String> deltaCrlUris;
+    private final List<String> deltaCrlUris;
 
-  public PublicCAInfo(
-      final X509Certificate caCertificate,
-      final List<String> caCertUris,
-      final List<String> ocspUris,
-      final List<String> crlUris,
-      final List<String> deltaCrlUris)
-  throws OperationException {
-    ParamUtil.assertNotNull("caCertificate", caCertificate);
-    this.caCertificate = new X509Cert(caCertificate);
-    this.serialNumber = caCertificate.getSerialNumber();
-    this.subject = caCertificate.getSubjectX500Principal();
-    this.x500Subject = X500Name.getInstance(subject.getEncoded());
-    this.c14nSubject = X509Util.canonicalizName(x500Subject);
-    try {
-      this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
-    } catch (CertificateEncodingException e) {
-      throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+    public PublicCAInfo(
+            final X509Certificate caCertificate,
+            final List<String> caCertUris,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
+    throws OperationException {
+        ParamUtil.assertNotNull("caCertificate", caCertificate);
+        this.caCertificate = new X509Cert(caCertificate);
+        this.serialNumber = caCertificate.getSerialNumber();
+        this.subject = caCertificate.getSubjectX500Principal();
+        this.x500Subject = X500Name.getInstance(subject.getEncoded());
+        this.c14nSubject = X509Util.canonicalizName(x500Subject);
+        try {
+            this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
+        } catch (CertificateEncodingException e) {
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+        }
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+
+        byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
+                Extension.subjectAlternativeName.getId());
+        if (encodedSubjectAltName == null) {
+            subjectAltName = null;
+        } else {
+            try {
+                subjectAltName = GeneralNames.getInstance(
+                        X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
+            } catch (IOException e) {
+                throw new OperationException(ErrorCode.INVALID_EXTENSION,
+                        "invalid SubjectAltName extension in CA certificate");
+            }
+        }
+    } // constructor
+
+    public PublicCAInfo(
+            final X500Name subject,
+            final BigInteger serialNumber,
+            final GeneralNames subjectAltName,
+            final byte[] subjectKeyIdentifier,
+            final List<String> caCertUris,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
+    throws OperationException {
+        ParamUtil.assertNotNull("subject", subject);
+        ParamUtil.assertNotNull("serialNumber", serialNumber);
+
+        this.caCertificate = null;
+        this.x500Subject = subject;
+        this.c14nSubject = X509Util.canonicalizName(subject);
+        try {
+            this.subject = new X500Principal(subject.getEncoded());
+        } catch (IOException e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "invalid SubjectAltName extension in CA certificate");
+        }
+
+        if (subjectKeyIdentifier == null) {
+            this.subjectKeyIdentifier = null;
+        } else {
+            this.subjectKeyIdentifier = Arrays.clone(subjectKeyIdentifier);
+        }
+
+        this.serialNumber = serialNumber;
+        this.subjectAltName = subjectAltName;
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+    } // constructor
+
+    public List<String> getCaCertUris() {
+        return caCertUris;
     }
-    this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
-    this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
-    this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
-    this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
 
-    byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
-        Extension.subjectAlternativeName.getId());
-    if (encodedSubjectAltName == null) {
-      subjectAltName = null;
-    } else {
-      try {
-        subjectAltName = GeneralNames.getInstance(
-            X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
-      } catch (IOException e) {
-        throw new OperationException(ErrorCode.INVALID_EXTENSION,
-            "invalid SubjectAltName extension in CA certificate");
-      }
-    }
-  } // constructor
-
-  public PublicCAInfo(
-      final X500Name subject,
-      final BigInteger serialNumber,
-      final GeneralNames subjectAltName,
-      final byte[] subjectKeyIdentifier,
-      final List<String> caCertUris,
-      final List<String> ocspUris,
-      final List<String> crlUris,
-      final List<String> deltaCrlUris)
-  throws OperationException {
-    ParamUtil.assertNotNull("subject", subject);
-    ParamUtil.assertNotNull("serialNumber", serialNumber);
-
-    this.caCertificate = null;
-    this.x500Subject = subject;
-    this.c14nSubject = X509Util.canonicalizName(subject);
-    try {
-      this.subject = new X500Principal(subject.getEncoded());
-    } catch (IOException e) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "invalid SubjectAltName extension in CA certificate");
+    public List<String> getOcspUris() {
+        return ocspUris;
     }
 
-    if (subjectKeyIdentifier == null) {
-      this.subjectKeyIdentifier = null;
-    } else {
-      this.subjectKeyIdentifier = Arrays.clone(subjectKeyIdentifier);
+    public List<String> getCrlUris() {
+        return crlUris;
     }
 
-    this.serialNumber = serialNumber;
-    this.subjectAltName = subjectAltName;
-    this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
-    this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
-    this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
-    this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
-  } // constructor
-
-  public List<String> getCaCertUris() {
-    return caCertUris;
-  }
-
-  public List<String> getOcspUris() {
-    return ocspUris;
-  }
-
-  public List<String> getCrlUris() {
-    return crlUris;
-  }
-
-  public List<String> getDeltaCrlUris() {
-    return deltaCrlUris;
-  }
-
-  public X509Certificate getCrlSignerCertificate() {
-    return crlSignerCertificate;
-  }
-
-  public void setCrlSignerCertificate(
-      final X509Certificate crlSignerCert) {
-    if (caCertificate.equals(crlSignerCert)) {
-      this.crlSignerCertificate = null;
-    } else {
-      this.crlSignerCertificate = crlSignerCert;
+    public List<String> getDeltaCrlUris() {
+        return deltaCrlUris;
     }
-  }
 
-  public X500Principal getSubject() {
-    return subject;
-  }
-
-  public X500Name getX500Subject() {
-    return x500Subject;
-  }
-
-  public String getC14nSubject() {
-    return c14nSubject;
-  }
-
-  public GeneralNames getSubjectAltName() {
-    return subjectAltName;
-  }
-
-  public byte[] getSubjectKeyIdentifer() {
-    if (caCertificate != null) {
-      return caCertificate.getSubjectKeyIdentifier();
-    } else {
-      return (subjectKeyIdentifier == null)
-          ? null
-          : Arrays.clone(subjectKeyIdentifier);
+    public X509Certificate getCrlSignerCertificate() {
+        return crlSignerCertificate;
     }
-  }
 
-  public BigInteger getSerialNumber() {
-    return serialNumber;
-  }
+    public void setCrlSignerCertificate(
+            final X509Certificate crlSignerCert) {
+        if (caCertificate.equals(crlSignerCert)) {
+            this.crlSignerCertificate = null;
+        } else {
+            this.crlSignerCertificate = crlSignerCert;
+        }
+    }
 
-  public X509Cert getCaCertificate() {
-    return caCertificate;
-  }
+    public X500Principal getSubject() {
+        return subject;
+    }
+
+    public X500Name getX500Subject() {
+        return x500Subject;
+    }
+
+    public String getC14nSubject() {
+        return c14nSubject;
+    }
+
+    public GeneralNames getSubjectAltName() {
+        return subjectAltName;
+    }
+
+    public byte[] getSubjectKeyIdentifer() {
+        if (caCertificate != null) {
+            return caCertificate.getSubjectKeyIdentifier();
+        } else {
+            return (subjectKeyIdentifier == null)
+                    ? null
+                    : Arrays.clone(subjectKeyIdentifier);
+        }
+    }
+
+    public BigInteger getSerialNumber() {
+        return serialNumber;
+    }
+
+    public X509Cert getCaCertificate() {
+        return caCertificate;
+    }
 
 }

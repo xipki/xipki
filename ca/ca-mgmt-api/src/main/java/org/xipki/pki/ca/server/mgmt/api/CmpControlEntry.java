@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,48 +46,48 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CmpControlEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final String name;
+    private final String name;
 
-  private final String conf;
+    private final String conf;
 
-  private boolean faulty;
+    private boolean faulty;
 
-  public CmpControlEntry(
-      final String name,
-      final String conf) {
-    ParamUtil.assertNotBlank("name", name);
-    ParamUtil.assertNotBlank("conf", conf);
-    this.name = name;
-    this.conf = conf;
-  }
+    public CmpControlEntry(
+            final String name,
+            final String conf) {
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("conf", conf);
+        this.name = name;
+        this.conf = conf;
+    }
 
-  public boolean isFaulty() {
-    return faulty;
-  }
+    public boolean isFaulty() {
+        return faulty;
+    }
 
-  public void setFaulty(
-      final boolean faulty) {
-    this.faulty = faulty;
-  }
+    public void setFaulty(
+            final boolean faulty) {
+        this.faulty = faulty;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getConf() {
-    return conf;
-  }
+    public String getConf() {
+        return conf;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(200);
-    sb.append("  name: ").append(name).append('\n');
-    sb.append("faulty: ").append(faulty).append('\n');
-    sb.append("  conf: ").append(conf);
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("    name: ").append(name).append('\n');
+        sb.append("faulty: ").append(faulty).append('\n');
+        sb.append("    conf: ").append(conf);
 
-    return sb.toString();
-  }
+        return sb.toString();
+    }
 
 }

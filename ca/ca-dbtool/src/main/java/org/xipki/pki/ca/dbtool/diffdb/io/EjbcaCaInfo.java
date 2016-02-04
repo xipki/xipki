@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,38 +46,38 @@ import org.xipki.commons.security.api.HashCalculator;
 
 public class EjbcaCaInfo {
 
-  private final int caId;
+    private final int caId;
 
-  private final X500Name subject;
+    private final X500Name subject;
 
-  private final String hexSha1;
+    private final String hexSha1;
 
-  private final String caDirname;
+    private final String caDirname;
 
-  public EjbcaCaInfo(
-      final int caId,
-      final byte[] certBytes,
-      final String caDirname) {
-    this.caId = caId;
-    this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
-    this.subject = Certificate.getInstance(certBytes).getSubject();
-    this.caDirname = caDirname;
-  }
+    public EjbcaCaInfo(
+            final int caId,
+            final byte[] certBytes,
+            final String caDirname) {
+        this.caId = caId;
+        this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
+        this.subject = Certificate.getInstance(certBytes).getSubject();
+        this.caDirname = caDirname;
+    }
 
-  public int getCaId() {
-    return caId;
-  }
+    public int getCaId() {
+        return caId;
+    }
 
-  public X500Name getSubject() {
-    return subject;
-  }
+    public X500Name getSubject() {
+        return subject;
+    }
 
-  public String getHexSha1() {
-    return hexSha1;
-  }
+    public String getHexSha1() {
+        return hexSha1;
+    }
 
-  public String getCaDirname() {
-    return caDirname;
-  }
+    public String getCaDirname() {
+        return caDirname;
+    }
 
 }

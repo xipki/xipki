@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,24 +48,24 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "ca-unrevoke",
-    description = "unrevoke CA")
+        description = "unrevoke CA")
 @Service
 public class CaUnrevokeCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", description = "CA name", required = true)
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (!caManager.getCaNames().contains(caName)) {
-      throw new IllegalCmdParamException("invalid CA name " + caName);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (!caManager.getCaNames().contains(caName)) {
+            throw new IllegalCmdParamException("invalid CA name " + caName);
+        }
+
+        boolean b = caManager.unrevokeCa(caName);
+        output(b, "unrevoked", "could not unrevoke", "CA " + caName);
+        return null;
     }
-
-    boolean b = caManager.unrevokeCa(caName);
-    output(b, "unrevoked", "could not unrevoke", "CA " + caName);
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,42 +48,42 @@ import org.xipki.commons.security.api.P12KeypairGenerationResult;
  */
 
 @Command(scope = "xipki-tk", name = "dsa-p12",
-    description = "generate RSA keypair in PKCS#12 keystore")
+        description = "generate RSA keypair in PKCS#12 keystore")
 @Service
 public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
-  private Integer pLen = 2048;
+    @Option(name = "--plen",
+            description = "bit length of the prime")
+    private Integer pLen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
-  private Integer qLen;
+    @Option(name = "--qlen",
+            description = "bit length of the sub-prime")
+    private Integer qLen;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (pLen % 1024 != 0) {
-      throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (pLen % 1024 != 0) {
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+        }
+
+        if (qLen == null) {
+            if (pLen >= 2048) {
+                qLen = 256;
+            } else {
+                qLen = 160;
+            }
+        }
+
+        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
+                pLen, qLen, getPassword(), subject,
+                getKeyUsage(), getExtendedKeyUsage(),
+                securityFactory.getRandom4Key());
+
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
+
+        return null;
     }
-
-    if (qLen == null) {
-      if (pLen >= 2048) {
-        qLen = 256;
-      } else {
-        qLen = 160;
-      }
-    }
-
-    P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
-        pLen, qLen, getPassword(), subject,
-        getKeyUsage(), getExtendedKeyUsage(),
-        securityFactory.getRandom4Key());
-
-    P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-    saveKeyAndCert(keyAndCert);
-
-    return null;
-  }
 
 }

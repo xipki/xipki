@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,62 +53,62 @@ import org.xipki.commons.console.karaf.intern.FileUtils;
  */
 
 @Command(scope = "xipki-cmd", name = "copy-file",
-    description = "copy file")
+        description = "copy file")
 @Service
 public class CopyFileCmd extends XipkiCommandSupport {
 
-  @Argument(index = 0, name = "source file",
-      required = true,
-      description = "file to be copied\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String source;
+    @Argument(index = 0, name = "source file",
+            required = true,
+            description = "file to be copied\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String source;
 
-  @Argument(index = 1, name = "destination",
-      required = true,
-      description = "destination directory or file\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String dest;
+    @Argument(index = 1, name = "destination",
+            required = true,
+            description = "destination directory or file\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String dest;
 
-  @Option(name = "--recursive", aliases = "-r",
-      description = "copy directories and their contents recursively")
-  private Boolean recursive = Boolean.FALSE;
+    @Option(name = "--recursive", aliases = "-r",
+            description = "copy directories and their contents recursively")
+    private Boolean recursive = Boolean.FALSE;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    File sourceFile = new File(expandFilepath(source));
-    if (!sourceFile.exists()) {
-      System.err.println(source + " does not exist");
-      return null;
-    }
-
-    if (!sourceFile.isFile()) {
-      System.err.println(source + " is not a file");
-      return null;
-    }
-
-    File destFile = new File(dest);
-    if (destFile.exists()) {
-      if (!destFile.isFile()) {
-        System.err.println("cannot override an existing directory by a file");
-        return null;
-      } else {
-        if (!confirm("Do you want to override the file " + dest, 3)) {
-          return null;
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        File sourceFile = new File(expandFilepath(source));
+        if (!sourceFile.exists()) {
+            System.err.println(source + " does not exist");
+            return null;
         }
-      }
-    } else {
-      File parent = destFile.getParentFile();
-      if (parent != null) {
-        parent.mkdirs();
-      }
+
+        if (!sourceFile.isFile()) {
+            System.err.println(source + " is not a file");
+            return null;
+        }
+
+        File destFile = new File(dest);
+        if (destFile.exists()) {
+            if (!destFile.isFile()) {
+                System.err.println("cannot override an existing directory by a file");
+                return null;
+            } else {
+                if (!confirm("Do you want to override the file " + dest, 3)) {
+                    return null;
+                }
+            }
+        } else {
+            File parent = destFile.getParentFile();
+            if (parent != null) {
+                parent.mkdirs();
+            }
+        }
+
+        FileUtils.copyFile(sourceFile, destFile, true);
+
+        return null;
     }
-
-    FileUtils.copyFile(sourceFile, destFile, true);
-
-    return null;
-  }
 
 }

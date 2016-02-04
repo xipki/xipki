@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,23 +46,23 @@ import org.bouncycastle.asn1.x509.Certificate;
 
 public class RAEmulator {
 
-  private final PrivateKey rAKey;
+    private final PrivateKey rAKey;
 
-  private final Certificate rACert;
+    private final Certificate rACert;
 
-  public RAEmulator(
-      final PrivateKey rAKey,
-      final Certificate rACert) {
-    this.rAKey = rAKey;
-    this.rACert = rACert;
-  }
+    public RAEmulator(
+            final PrivateKey rAKey,
+            final Certificate rACert) {
+        this.rAKey = rAKey;
+        this.rACert = rACert;
+    }
 
-  public PrivateKey getRAKey() {
-    return rAKey;
-  }
+    public PrivateKey getRAKey() {
+        return rAKey;
+    }
 
-  public Certificate getRACert() {
-    return rACert;
-  }
+    public Certificate getRACert() {
+        return rACert;
+    }
 
 }

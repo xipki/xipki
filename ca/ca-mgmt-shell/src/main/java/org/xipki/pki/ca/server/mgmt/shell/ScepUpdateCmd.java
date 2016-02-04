@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -59,92 +59,92 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "scep-up",
-    description = "Update SCEP")
+        description = "Update SCEP")
 @Service
 public class ScepUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(ScepNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(ScepNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--resp-type",
-      description = "type of the responder")
-  @Completion(SignerTypeCompleter.class)
-  private String responderType;
+    @Option(name = "--resp-type",
+            description = "type of the responder")
+    @Completion(SignerTypeCompleter.class)
+    private String responderType;
 
-  @Option(name = "--resp-conf",
-      description = "conf of the responder")
-  private String responderConf;
+    @Option(name = "--resp-conf",
+            description = "conf of the responder")
+    private String responderConf;
 
-  @Option(name = "--resp-cert",
-      description = "responder certificate file or 'NULL'")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--resp-cert",
+            description = "responder certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--control",
-      description = "SCEP control or 'NULL'")
-  private String control;
+    @Option(name = "--control",
+            description = "SCEP control or 'NULL'")
+    private String control;
 
-  private PasswordResolver passwordResolver;
+    private PasswordResolver passwordResolver;
 
-  public void setPasswordResolver(
-      final PasswordResolver passwordResolver) {
-    this.passwordResolver = passwordResolver;
-  }
-
-  private String getResponderConf()
-  throws Exception {
-    if (responderConf == null) {
-      return responderConf;
-    }
-    String _respType = responderType;
-    if (_respType == null) {
-      ScepEntry entry = caManager.getScepEntry(caName);
-      if (entry == null) {
-        throw new IllegalCmdParamException("please specify the responderType");
-      }
-      _respType = entry.getResponderType();
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver) {
+        this.passwordResolver = passwordResolver;
     }
 
-    return ShellUtil.canonicalizeSignerConf(_respType, responderConf, passwordResolver);
-  }
+    private String getResponderConf()
+    throws Exception {
+        if (responderConf == null) {
+            return responderConf;
+        }
+        String _respType = responderType;
+        if (_respType == null) {
+            ScepEntry entry = caManager.getScepEntry(caName);
+            if (entry == null) {
+                throw new IllegalCmdParamException("please specify the responderType");
+            }
+            _respType = entry.getResponderType();
+        }
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    String certConf = null;
-    if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-      certConf = CAManager.NULL;
-    } else if (certFile != null) {
-      byte[] certBytes = IoUtil.read(certFile);
-      X509Util.parseCert(new ByteArrayInputStream(certBytes));
-      certConf = Base64.toBase64String(certBytes);
+        return ShellUtil.canonicalizeSignerConf(_respType, responderConf, passwordResolver);
     }
 
-    ChangeScepEntry entry = new ChangeScepEntry(caName);
-    if (responderType != null) {
-      entry.setResponderType(responderType);
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        String certConf = null;
+        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+            certConf = CAManager.NULL;
+        } else if (certFile != null) {
+            byte[] certBytes = IoUtil.read(certFile);
+            X509Util.parseCert(new ByteArrayInputStream(certBytes));
+            certConf = Base64.toBase64String(certBytes);
+        }
 
-    String conf = getResponderConf();
-    if (conf != null) {
-      entry.setResponderConf(conf);
-    }
+        ChangeScepEntry entry = new ChangeScepEntry(caName);
+        if (responderType != null) {
+            entry.setResponderType(responderType);
+        }
 
-    if (certConf != null) {
-      entry.setBase64Cert(certConf);
-    }
+        String conf = getResponderConf();
+        if (conf != null) {
+            entry.setResponderConf(conf);
+        }
 
-    if (control != null) {
-      entry.setControl(control);
-    }
+        if (certConf != null) {
+            entry.setBase64Cert(certConf);
+        }
 
-    boolean b = caManager.changeScep(entry);
-    output(b, "updated", "could not update", "SCEP responder " + caName);
-    return null;
-  } // method doExecute
+        if (control != null) {
+            entry.setControl(control);
+        }
+
+        boolean b = caManager.changeScep(entry);
+        output(b, "updated", "could not update", "SCEP responder " + caName);
+        return null;
+    } // method doExecute
 
 }

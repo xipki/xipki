@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,58 +47,58 @@ import org.xipki.commons.common.util.ParamUtil;
 
 class NameIdStore {
 
-  private final String table;
+    private final String table;
 
-  private final Map<String, Integer> entries;
+    private final Map<String, Integer> entries;
 
-  NameIdStore(
-      final String table,
-      final Map<String, Integer> entries) {
-    this.table = table;
-    this.entries = new HashMap<>();
+    NameIdStore(
+            final String table,
+            final Map<String, Integer> entries) {
+        this.table = table;
+        this.entries = new HashMap<>();
 
-    for (String name : entries.keySet()) {
-      addEntry(name, entries.get(name));
-    }
-  }
-
-  void addEntry(
-      final String name,
-      final Integer id) {
-    ParamUtil.assertNotBlank("name", name);
-    ParamUtil.assertNotNull("id", id);
-
-    if (entries.containsKey(name)) {
-      throw new IllegalArgumentException(
-          "entry with the same name " + name + " already available");
+        for (String name : entries.keySet()) {
+            addEntry(name, entries.get(name));
+        }
     }
 
-    if (entries.containsValue(id)) {
-      throw new IllegalArgumentException(
-          "entry with the same id " + id + " already available");
+    void addEntry(
+            final String name,
+            final Integer id) {
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotNull("id", id);
+
+        if (entries.containsKey(name)) {
+            throw new IllegalArgumentException(
+                    "entry with the same name " + name + " already available");
+        }
+
+        if (entries.containsValue(id)) {
+            throw new IllegalArgumentException(
+                    "entry with the same id " + id + " already available");
+        }
+
+        entries.put(name, id);
     }
 
-    entries.put(name, id);
-  }
+    String getName(
+            final Integer id) {
+        for (String name : entries.keySet()) {
+            if (id == entries.get(name)) {
+                return name;
+            }
+        }
 
-  String getName(
-      final Integer id) {
-    for (String name : entries.keySet()) {
-      if (id == entries.get(name)) {
-        return name;
-      }
+        return null;
     }
 
-    return null;
-  }
+    Integer getId(
+            final String name) {
+        return entries.get(name);
+    }
 
-  Integer getId(
-      final String name) {
-    return entries.get(name);
-  }
-
-  public String getTable() {
-    return table;
-  }
+    public String getTable() {
+        return table;
+    }
 
 }

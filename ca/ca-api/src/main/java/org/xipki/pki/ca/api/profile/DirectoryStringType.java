@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,25 +48,25 @@ import org.bouncycastle.asn1.DERUTF8String;
 
 public enum DirectoryStringType {
 
-  teletexString,
-  printableString,
-  utf8String,
-  bmpString;
+    teletexString,
+    printableString,
+    utf8String,
+    bmpString;
 
-  public ASN1Encodable createDirectoryString(
-      final String text) {
-    if (teletexString == this) {
-      return new DERT61String(text);
-    } else if (printableString == this) {
-      return new DERPrintableString(text);
-    } else if (utf8String == this) {
-      return new DERUTF8String(text);
-    } else if (bmpString == this) {
-      return new DERBMPString(text);
-    } else {
-      throw new RuntimeException("should not reach here, unkown DirectoryStringType '"
-          + text + "'");
+    public ASN1Encodable createDirectoryString(
+            final String text) {
+        if (teletexString == this) {
+            return new DERT61String(text);
+        } else if (printableString == this) {
+            return new DERPrintableString(text);
+        } else if (utf8String == this) {
+            return new DERUTF8String(text);
+        } else if (bmpString == this) {
+            return new DERBMPString(text);
+        } else {
+            throw new RuntimeException("should not reach here, unkown DirectoryStringType '"
+                    + text + "'");
+        }
     }
-  }
 
 }

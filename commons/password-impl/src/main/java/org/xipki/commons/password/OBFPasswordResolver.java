@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,77 +46,77 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
  * @since 2.0.0
  */
 
-public class OBFPasswordResolver  implements SinglePasswordResolver {
+public class OBFPasswordResolver    implements SinglePasswordResolver {
 
-  public static final String __OBFUSCATE = "OBF:";
+    public static final String __OBFUSCATE = "OBF:";
 
-  @Override
-  public boolean canResolveProtocol(
-      final String protocol) {
-    return "OBF".equalsIgnoreCase(protocol);
-  }
-
-  @Override
-  public char[] resolvePassword(
-      final String passwordHint)
-  throws PasswordResolverException {
-    return deobfuscate(passwordHint).toCharArray();
-  }
-
-  public static String obfuscate(
-      final String s) {
-    StringBuilder buf = new StringBuilder();
-    byte[] b = s.getBytes(StandardCharsets.UTF_8);
-
-    buf.append(__OBFUSCATE);
-    for (int i = 0; i < b.length; i++) {
-      byte b1 = b[i];
-      byte b2 = b[b.length - (i + 1)];
-      if (b1 < 0 || b2 < 0) {
-        int i0 = (0xff & b1) * 256 + (0xff & b2);
-        String x = Integer.toString(i0, 36).toLowerCase();
-        buf.append("U0000", 0, 5 - x.length());
-        buf.append(x);
-      } else {
-        int i1 = 127 + b1 + b2;
-        int i2 = 127 + b1 - b2;
-        int i0 = i1 * 256 + i2;
-        String x = Integer.toString(i0, 36).toLowerCase();
-
-        buf.append("000", 0, 4 - x.length());
-        buf.append(x);
-      }
-    } // end for
-    return buf.toString();
-  }
-
-  /*------------------------------------------------------------ */
-  public static String deobfuscate(
-      String s) {
-    if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE)) {
-      s = s.substring(4);
+    @Override
+    public boolean canResolveProtocol(
+            final String protocol) {
+        return "OBF".equalsIgnoreCase(protocol);
     }
 
-    byte[] b = new byte[s.length() / 2];
-    int l = 0;
-    for (int i = 0; i < s.length(); i += 4) {
-      if (s.charAt(i) == 'U') {
-        i++;
-        String x = s.substring(i, i + 4);
-        int i0 = Integer.parseInt(x, 36);
-        byte bx = (byte) (i0 >> 8);
-        b[l++] = bx;
-      } else {
-        String x = s.substring(i, i + 4);
-        int i0 = Integer.parseInt(x, 36);
-        int i1 = (i0 / 256);
-        int i2 = (i0 % 256);
-        byte bx = (byte) ((i1 + i2 - 254) / 2);
-        b[l++] = bx;
-      }
-    } // end for
+    @Override
+    public char[] resolvePassword(
+            final String passwordHint)
+    throws PasswordResolverException {
+        return deobfuscate(passwordHint).toCharArray();
+    }
 
-    return new String(b, 0, l, StandardCharsets.UTF_8);
-  }
+    public static String obfuscate(
+            final String s) {
+        StringBuilder buf = new StringBuilder();
+        byte[] b = s.getBytes(StandardCharsets.UTF_8);
+
+        buf.append(__OBFUSCATE);
+        for (int i = 0; i < b.length; i++) {
+            byte b1 = b[i];
+            byte b2 = b[b.length - (i + 1)];
+            if (b1 < 0 || b2 < 0) {
+                int i0 = (0xff & b1) * 256 + (0xff & b2);
+                String x = Integer.toString(i0, 36).toLowerCase();
+                buf.append("U0000", 0, 5 - x.length());
+                buf.append(x);
+            } else {
+                int i1 = 127 + b1 + b2;
+                int i2 = 127 + b1 - b2;
+                int i0 = i1 * 256 + i2;
+                String x = Integer.toString(i0, 36).toLowerCase();
+
+                buf.append("000", 0, 4 - x.length());
+                buf.append(x);
+            }
+        } // end for
+        return buf.toString();
+    }
+
+    /*------------------------------------------------------------ */
+    public static String deobfuscate(
+            String s) {
+        if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE)) {
+            s = s.substring(4);
+        }
+
+        byte[] b = new byte[s.length() / 2];
+        int l = 0;
+        for (int i = 0; i < s.length(); i += 4) {
+            if (s.charAt(i) == 'U') {
+                i++;
+                String x = s.substring(i, i + 4);
+                int i0 = Integer.parseInt(x, 36);
+                byte bx = (byte) (i0 >> 8);
+                b[l++] = bx;
+            } else {
+                String x = s.substring(i, i + 4);
+                int i0 = Integer.parseInt(x, 36);
+                int i1 = (i0 / 256);
+                int i2 = (i0 % 256);
+                byte bx = (byte) ((i1 + i2 - 254) / 2);
+                b[l++] = bx;
+            }
+        } // end for
+
+        return new String(b, 0, l, StandardCharsets.UTF_8);
+    }
 
 }

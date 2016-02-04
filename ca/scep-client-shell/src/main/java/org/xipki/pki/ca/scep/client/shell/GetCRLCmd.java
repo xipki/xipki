@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,37 +54,37 @@ import org.xipki.pki.scep.client.ScepClient;
  */
 
 @Command(scope = "scep", name = "getcrl",
-    description = "download CRL")
+        description = "download CRL")
 @Service
 public class GetCRLCmd extends ClientCommandSupport {
 
-  @Option(name = "--cert", aliases = "-c",
-      required = true,
-      description = "certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert", aliases = "-c",
+            required = true,
+            description = "certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--out", aliases = "-o",
-      required = true,
-      description = "where to save the certificate\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String outputFile;
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
-    ScepClient client = getScepClient();
-    X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
-        cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
-    if (crl == null) {
-      throw new CmdFailure("received no CRL from server");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
+        ScepClient client = getScepClient();
+        X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
+                cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
+        if (crl == null) {
+            throw new CmdFailure("received no CRL from server");
+        }
+
+        saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
+        return null;
     }
-
-    saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
-    return null;
-  }
 
 }

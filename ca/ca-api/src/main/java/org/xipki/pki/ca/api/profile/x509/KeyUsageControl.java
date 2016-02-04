@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,24 +45,24 @@ import org.xipki.commons.security.api.KeyUsage;
 
 public class KeyUsageControl {
 
-  private final KeyUsage keyUsage;
+    private final KeyUsage keyUsage;
 
-  private final boolean required;
+    private final boolean required;
 
-  public KeyUsageControl(
-      final KeyUsage keyUsage,
-      final boolean required) {
-    ParamUtil.assertNotNull("keyUsage", keyUsage);
-    this.keyUsage = keyUsage;
-    this.required = required;
-  }
+    public KeyUsageControl(
+            final KeyUsage keyUsage,
+            final boolean required) {
+        ParamUtil.assertNotNull("keyUsage", keyUsage);
+        this.keyUsage = keyUsage;
+        this.required = required;
+    }
 
-  public KeyUsage getKeyUsage() {
-    return keyUsage;
-  }
+    public KeyUsage getKeyUsage() {
+        return keyUsage;
+    }
 
-  public boolean isRequired() {
-    return required;
-  }
+    public boolean isRequired() {
+        return required;
+    }
 
 }

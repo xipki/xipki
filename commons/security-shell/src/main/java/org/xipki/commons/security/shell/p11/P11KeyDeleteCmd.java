@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,23 +46,23 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  */
 
 @Command(scope = "xipki-tk", name = "delete-key",
-    description = "generate EC keypair in PKCS#11 device")
+        description = "generate EC keypair in PKCS#11 device")
 @Service
 public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-    boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
-    if (deleted) {
-      securityFactory.getP11CryptService(moduleName).refresh();
-      out("deleted key and certificates");
-    } else {
-      out("could not delete key and certificate that do not exist");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
+        if (deleted) {
+            securityFactory.getP11CryptService(moduleName).refresh();
+            out("deleted key and certificates");
+        } else {
+            out("could not delete key and certificate that do not exist");
+        }
+        return null;
     }
-    return null;
-  }
 
 }

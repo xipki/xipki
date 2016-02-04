@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,49 +44,49 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 
 class OcspRespWithCacheInfo {
 
-  final static class ResponseCacheInfo {
+    final static class ResponseCacheInfo {
 
-    private final long thisUpdate;
+        private final long thisUpdate;
 
-    private Long nextUpdate;
+        private Long nextUpdate;
 
-    ResponseCacheInfo(
-        final long thisUpdate) {
-      this.thisUpdate = thisUpdate;
+        ResponseCacheInfo(
+                final long thisUpdate) {
+            this.thisUpdate = thisUpdate;
+        }
+
+        public long getThisUpdate() {
+            return thisUpdate;
+        }
+
+        public void setNextUpdate(
+                final Long nextUpdate) {
+            this.nextUpdate = nextUpdate;
+        }
+
+        public Long getNextUpdate() {
+            return nextUpdate;
+        }
+
+    } // class ResponseCacheInfo
+
+    private final OCSPResp response;
+
+    private final ResponseCacheInfo cacheInfo;
+
+    public OcspRespWithCacheInfo(
+            final OCSPResp response,
+            final ResponseCacheInfo cacheInfo) {
+        this.response = response;
+        this.cacheInfo = cacheInfo;
     }
 
-    public long getThisUpdate() {
-      return thisUpdate;
+    public OCSPResp getResponse() {
+        return response;
     }
 
-    public void setNextUpdate(
-        final Long nextUpdate) {
-      this.nextUpdate = nextUpdate;
+    public ResponseCacheInfo getCacheInfo() {
+        return cacheInfo;
     }
-
-    public Long getNextUpdate() {
-      return nextUpdate;
-    }
-
-  } // class ResponseCacheInfo
-
-  private final OCSPResp response;
-
-  private final ResponseCacheInfo cacheInfo;
-
-  public OcspRespWithCacheInfo(
-      final OCSPResp response,
-      final ResponseCacheInfo cacheInfo) {
-    this.response = response;
-    this.cacheInfo = cacheInfo;
-  }
-
-  public OCSPResp getResponse() {
-    return response;
-  }
-
-  public ResponseCacheInfo getCacheInfo() {
-    return cacheInfo;
-  }
 
 }

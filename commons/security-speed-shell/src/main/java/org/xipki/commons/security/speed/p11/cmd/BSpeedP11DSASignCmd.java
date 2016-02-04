@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,28 +49,28 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
-    description = "performance test of PKCS#11 DSA signature creation (batch)")
+        description = "performance test of PKCS#11 DSA signature creation (batch)")
 public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
 
-  @Override
-  protected List<LoadExecutor> getTesters()
-  throws Exception {
-    List<LoadExecutor> ret = new LinkedList<>();
-    int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+    @Override
+    protected List<LoadExecutor> getTesters()
+    throws Exception {
+        List<LoadExecutor> ret = new LinkedList<>();
+        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-    for (int i = 0; i < pqLens.length; i += 2) {
-      int pLen = pqLens[i];
-      int qLen = pqLens[i + 1];
-      if (pLen == 1024) {
-        sigAlgo = "SHA1withDSA";
-      }
+        for (int i = 0; i < pqLens.length; i += 2) {
+            int pLen = pqLens[i];
+            int qLen = pqLens[i + 1];
+            if (pLen == 1024) {
+                sigAlgo = "SHA1withDSA";
+            }
 
-      ret.add(
-          new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen));
+            ret.add(
+                    new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen));
+        }
+        return ret;
     }
-    return ret;
-  }
 
 }

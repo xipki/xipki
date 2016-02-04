@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -74,253 +74,253 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "ca-up",
-    description = "update CA")
+        description = "update CA")
 @Service
 public class CaUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--status",
-      description = "CA status")
-  @Completion(CaStatusCompleter.class)
-  private String caStatus;
+    @Option(name = "--status",
+            description = "CA status")
+    @Completion(CaStatusCompleter.class)
+    private String caStatus;
 
-  @Option(name = "--ca-cert-uri",
-      multiValued = true,
-      description = "CA certificate URI\n"
-          + "(multi-valued)")
-  private List<String> caCertUris;
+    @Option(name = "--ca-cert-uri",
+            multiValued = true,
+            description = "CA certificate URI\n"
+                    + "(multi-valued)")
+    private List<String> caCertUris;
 
-  @Option(name = "--ocsp-uri",
-      multiValued = true,
-      description = "OCSP URI or 'NULL'\n"
-          + "(multi-valued)")
-  private List<String> ocspUris;
+    @Option(name = "--ocsp-uri",
+            multiValued = true,
+            description = "OCSP URI or 'NULL'\n"
+                    + "(multi-valued)")
+    private List<String> ocspUris;
 
-  @Option(name = "--crl-uri",
-      multiValued = true,
-      description = "CRL distribution point URI or 'NULL'\n"
-          + "(multi-valued)")
-  private List<String> crlUris;
+    @Option(name = "--crl-uri",
+            multiValued = true,
+            description = "CRL distribution point URI or 'NULL'\n"
+                    + "(multi-valued)")
+    private List<String> crlUris;
 
-  @Option(name = "--deltacrl-uri",
-      multiValued = true,
-      description = "delta CRL distribution point URI or 'NULL'\n"
-          + "(multi-valued)")
-  private List<String> deltaCrlUris;
+    @Option(name = "--deltacrl-uri",
+            multiValued = true,
+            description = "delta CRL distribution point URI or 'NULL'\n"
+                    + "(multi-valued)")
+    private List<String> deltaCrlUris;
 
-  @Option(name = "--permission",
-      multiValued = true,
-      description = "permission\n"
-          + "(multi-valued)")
-  @Completion(PermissionCompleter.class)
-  private Set<String> permissions;
+    @Option(name = "--permission",
+            multiValued = true,
+            description = "permission\n"
+                    + "(multi-valued)")
+    @Completion(PermissionCompleter.class)
+    private Set<String> permissions;
 
-  @Option(name = "--max-validity",
-      description = "maximal validity")
-  private String maxValidity;
+    @Option(name = "--max-validity",
+            description = "maximal validity")
+    private String maxValidity;
 
-  @Option(name = "--expiration-period",
-      description = "days before expiration time of CA to issue certificates")
-  private Integer expirationPeriod;
+    @Option(name = "--expiration-period",
+            description = "days before expiration time of CA to issue certificates")
+    private Integer expirationPeriod;
 
-  @Option(name = "--keep-expired-certs",
-      description = "days to keep expired certificates")
-  private Integer keepExpiredCertInDays;
+    @Option(name = "--keep-expired-certs",
+            description = "days to keep expired certificates")
+    private Integer keepExpiredCertInDays;
 
-  @Option(name = "--crl-signer",
-      description = "CRL signer name or 'NULL'")
-  @Completion(CrlSignerNamePlusNullCompleter.class)
-  private String crlSignerName;
+    @Option(name = "--crl-signer",
+            description = "CRL signer name or 'NULL'")
+    @Completion(CrlSignerNamePlusNullCompleter.class)
+    private String crlSignerName;
 
-  @Option(name = "--responder",
-      description = "Responder name or 'NULL'")
-  @Completion(ResponderNamePlusNullCompleter.class)
-  private String responderName;
+    @Option(name = "--responder",
+            description = "Responder name or 'NULL'")
+    @Completion(ResponderNamePlusNullCompleter.class)
+    private String responderName;
 
-  @Option(name = "--cmp-control",
-      description = "CMP control name or 'NULL'")
-  @Completion(CmpControlNamePlusNullCompleter.class)
-  private String cmpControlName;
+    @Option(name = "--cmp-control",
+            description = "CMP control name or 'NULL'")
+    @Completion(CmpControlNamePlusNullCompleter.class)
+    private String cmpControlName;
 
-  @Option(name = "--num-crls",
-      description = "number of CRLs to be kept in database")
-  private Integer numCrls;
+    @Option(name = "--num-crls",
+            description = "number of CRLs to be kept in database")
+    private Integer numCrls;
 
-  @Option(name = "--cert",
-      description = "CA certificate file")
-  @Completion(FilePathCompleter.class)
-  private String certFile;
+    @Option(name = "--cert",
+            description = "CA certificate file")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-  @Option(name = "--signer-type",
-      description = "CA signer type")
-  @Completion(SignerTypeCompleter.class)
-  private String signerType;
+    @Option(name = "--signer-type",
+            description = "CA signer type")
+    @Completion(SignerTypeCompleter.class)
+    private String signerType;
 
-  @Option(name = "--signer-conf",
-      description = "CA signer configuration or 'NULL'")
-  private String signerConf;
+    @Option(name = "--signer-conf",
+            description = "CA signer configuration or 'NULL'")
+    private String signerConf;
 
-  @Option(name = "--duplicate-key",
-      description = "mode of duplicate key")
-  @Completion(DuplicationModeCompleter.class)
-  private String duplicateKeyS;
+    @Option(name = "--duplicate-key",
+            description = "mode of duplicate key")
+    @Completion(DuplicationModeCompleter.class)
+    private String duplicateKeyS;
 
-  @Option(name = "--duplicate-subject",
-      description = "mode of duplicate subject")
-  @Completion(DuplicationModeCompleter.class)
-  private String duplicateSubjectS;
+    @Option(name = "--duplicate-subject",
+            description = "mode of duplicate subject")
+    @Completion(DuplicationModeCompleter.class)
+    private String duplicateSubjectS;
 
-  @Option(name = "--validity-mode",
-      description = "mode of valditity")
-  @Completion(ValidityModeCompleter.class)
-  private String validityModeS;
+    @Option(name = "--validity-mode",
+            description = "mode of valditity")
+    @Completion(ValidityModeCompleter.class)
+    private String validityModeS;
 
-  @Option(name = "--extra-control",
-      description = "extra control")
-  private String extraControl;
+    @Option(name = "--extra-control",
+            description = "extra control")
+    private String extraControl;
 
-  @Reference
-  private PasswordResolver passwordResolver;
+    @Reference
+    private PasswordResolver passwordResolver;
 
-  protected X509ChangeCAEntry getChangeCAEntry()
-  throws Exception {
-    X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
-    if (caStatus != null) {
-      entry.setStatus(CAStatus.getCAStatus(caStatus));
-    }
-
-    if (expirationPeriod != null && expirationPeriod < 0) {
-      throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
-    } else {
-      entry.setExpirationPeriod(expirationPeriod);
-    }
-
-    if (keepExpiredCertInDays != null) {
-      entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
-    }
-
-    if (certFile != null) {
-      entry.setCert(X509Util.parseCert(certFile));
-    }
-
-    if (signerConf != null) {
-      String _signerType = signerType;
-      if (_signerType == null) {
-        CAEntry caEntry = caManager.getCA(caName);
-        if (caEntry == null) {
-          throw new IllegalCmdParamException("please specify the signerType");
+    protected X509ChangeCAEntry getChangeCAEntry()
+    throws Exception {
+        X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
+        if (caStatus != null) {
+            entry.setStatus(CAStatus.getCAStatus(caStatus));
         }
-        _signerType = caEntry.getSignerType();
-      }
 
-      signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf,
-          passwordResolver);
-      entry.setSignerConf(signerConf);
-    }
-
-    if (duplicateKeyS != null) {
-      DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
-      if (duplicateMode == null) {
-        throw new IllegalCmdParamException("invalid duplication mode " + duplicateKeyS);
-      }
-      entry.setDuplicateKeyMode(duplicateMode);
-    }
-
-    if (duplicateSubjectS != null) {
-      DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
-      if (duplicateMode == null) {
-        throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
-      }
-      entry.setDuplicateSubjectMode(duplicateMode);
-    }
-
-    if (permissions != null && permissions.size() > 0) {
-      Set<Permission> _permissions = new HashSet<>();
-      for (String permission : permissions) {
-        Permission _permission = Permission.getPermission(permission);
-        if (_permission == null) {
-          throw new IllegalCmdParamException("invalid permission: " + permission);
+        if (expirationPeriod != null && expirationPeriod < 0) {
+            throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
+        } else {
+            entry.setExpirationPeriod(expirationPeriod);
         }
-        _permissions.add(_permission);
-      }
-      entry.setPermissions(_permissions);
-    }
 
-    entry.setCrlUris(getUris(crlUris));
-    entry.setDeltaCrlUris(getUris(deltaCrlUris));
-    entry.setOcspUris(getUris(ocspUris));
-    entry.setCacertUris(getUris(caCertUris));
-
-    if (validityModeS != null) {
-      ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-      if (validityMode == null) {
-        throw new IllegalCmdParamException("invalid validity mode: " + validityModeS);
-      }
-      entry.setValidityMode(validityMode);
-    }
-
-    if (maxValidity != null) {
-      entry.setMaxValidity(CertValidity.getInstance(maxValidity));
-    }
-
-    if (crlSignerName != null) {
-      entry.setCrlSignerName(crlSignerName);
-    }
-
-    if (cmpControlName != null) {
-      entry.setCmpControlName(cmpControlName);
-    }
-
-    if (responderName != null) {
-      entry.setResponderName(responderName);
-    }
-
-    if (extraControl != null) {
-      entry.setExtraControl(extraControl);
-    }
-
-    if (numCrls != null) {
-      entry.setNumCrls(numCrls);
-    }
-
-    return entry;
-  } // method getChangeCAEntry
-
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.changeCA(getChangeCAEntry());
-    output(b, "updated", "could not update", "CA " + caName);
-    return null;
-  }
-
-  private static List<String> getUris(
-      final List<String> uris) {
-    if (uris == null) {
-      return null;
-    }
-
-    boolean clearUris = false;
-    if (uris != null) {
-      for (String uri : uris) {
-        if (CAManager.NULL.equalsIgnoreCase(uri)) {
-          clearUris = true;
-          break;
+        if (keepExpiredCertInDays != null) {
+            entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
         }
-      }
+
+        if (certFile != null) {
+            entry.setCert(X509Util.parseCert(certFile));
+        }
+
+        if (signerConf != null) {
+            String _signerType = signerType;
+            if (_signerType == null) {
+                CAEntry caEntry = caManager.getCA(caName);
+                if (caEntry == null) {
+                    throw new IllegalCmdParamException("please specify the signerType");
+                }
+                _signerType = caEntry.getSignerType();
+            }
+
+            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf,
+                    passwordResolver);
+            entry.setSignerConf(signerConf);
+        }
+
+        if (duplicateKeyS != null) {
+            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
+            if (duplicateMode == null) {
+                throw new IllegalCmdParamException("invalid duplication mode " + duplicateKeyS);
+            }
+            entry.setDuplicateKeyMode(duplicateMode);
+        }
+
+        if (duplicateSubjectS != null) {
+            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
+            if (duplicateMode == null) {
+                throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
+            }
+            entry.setDuplicateSubjectMode(duplicateMode);
+        }
+
+        if (permissions != null && permissions.size() > 0) {
+            Set<Permission> _permissions = new HashSet<>();
+            for (String permission : permissions) {
+                Permission _permission = Permission.getPermission(permission);
+                if (_permission == null) {
+                    throw new IllegalCmdParamException("invalid permission: " + permission);
+                }
+                _permissions.add(_permission);
+            }
+            entry.setPermissions(_permissions);
+        }
+
+        entry.setCrlUris(getUris(crlUris));
+        entry.setDeltaCrlUris(getUris(deltaCrlUris));
+        entry.setOcspUris(getUris(ocspUris));
+        entry.setCacertUris(getUris(caCertUris));
+
+        if (validityModeS != null) {
+            ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
+            if (validityMode == null) {
+                throw new IllegalCmdParamException("invalid validity mode: " + validityModeS);
+            }
+            entry.setValidityMode(validityMode);
+        }
+
+        if (maxValidity != null) {
+            entry.setMaxValidity(CertValidity.getInstance(maxValidity));
+        }
+
+        if (crlSignerName != null) {
+            entry.setCrlSignerName(crlSignerName);
+        }
+
+        if (cmpControlName != null) {
+            entry.setCmpControlName(cmpControlName);
+        }
+
+        if (responderName != null) {
+            entry.setResponderName(responderName);
+        }
+
+        if (extraControl != null) {
+            entry.setExtraControl(extraControl);
+        }
+
+        if (numCrls != null) {
+            entry.setNumCrls(numCrls);
+        }
+
+        return entry;
+    } // method getChangeCAEntry
+
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.changeCA(getChangeCAEntry());
+        output(b, "updated", "could not update", "CA " + caName);
+        return null;
     }
 
-    if (clearUris) {
-      return Collections.emptyList();
-    } else {
-      return new ArrayList<>(uris);
+    private static List<String> getUris(
+            final List<String> uris) {
+        if (uris == null) {
+            return null;
+        }
+
+        boolean clearUris = false;
+        if (uris != null) {
+            for (String uri : uris) {
+                if (CAManager.NULL.equalsIgnoreCase(uri)) {
+                    clearUris = true;
+                    break;
+                }
+            }
+        }
+
+        if (clearUris) {
+            return Collections.emptyList();
+        } else {
+            return new ArrayList<>(uris);
+        }
     }
-  }
 
 }

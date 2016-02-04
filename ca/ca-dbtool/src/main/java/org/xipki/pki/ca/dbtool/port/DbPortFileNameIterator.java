@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,58 +49,58 @@ import org.xipki.commons.common.util.StringUtil;
 
 public class DbPortFileNameIterator implements Iterator<String> {
 
-  private BufferedReader reader;
+    private BufferedReader reader;
 
-  private String nextFilename;
+    private String nextFilename;
 
-  public DbPortFileNameIterator(
-      final String filename)
-  throws IOException {
-    this.reader = new BufferedReader(new FileReader(filename));
-    this.nextFilename = readNextFilenameLine();
-  }
-
-  @Override
-  public boolean hasNext() {
-    return nextFilename != null;
-  }
-
-  @Override
-  public String next() {
-    String s = nextFilename;
-    nextFilename = null;
-    try {
-      nextFilename = readNextFilenameLine();
-    } catch (IOException e) {
-      throw new RuntimeException("error while reading next file name");
-    }
-    return s;
-  }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException("remove is not supported");
-  }
-
-  public void close() {
-    try {
-      reader.close();
-    } catch (Throwable t) {
-    }
-  }
-
-  private String readNextFilenameLine()
-  throws IOException {
-    String line;
-    while ((line = reader.readLine()) != null) {
-      line = line.trim();
-      if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
-        continue;
-      }
-      return line;
+    public DbPortFileNameIterator(
+            final String filename)
+    throws IOException {
+        this.reader = new BufferedReader(new FileReader(filename));
+        this.nextFilename = readNextFilenameLine();
     }
 
-    return null;
-  }
+    @Override
+    public boolean hasNext() {
+        return nextFilename != null;
+    }
+
+    @Override
+    public String next() {
+        String s = nextFilename;
+        nextFilename = null;
+        try {
+            nextFilename = readNextFilenameLine();
+        } catch (IOException e) {
+            throw new RuntimeException("error while reading next file name");
+        }
+        return s;
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("remove is not supported");
+    }
+
+    public void close() {
+        try {
+            reader.close();
+        } catch (Throwable t) {
+        }
+    }
+
+    private String readNextFilenameLine()
+    throws IOException {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
+                continue;
+            }
+            return line;
+        }
+
+        return null;
+    }
 
 }

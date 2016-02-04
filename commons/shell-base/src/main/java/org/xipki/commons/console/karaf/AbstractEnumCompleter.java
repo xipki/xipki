@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,27 +51,27 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 public abstract class AbstractEnumCompleter implements Completer {
 
-  private final List<String> enums = new LinkedList<>();
+    private final List<String> enums = new LinkedList<>();
 
-  protected void setTokens(
-      final String tokens) {
-    enums.clear();
-    StringTokenizer st = new StringTokenizer(tokens, ", ");
-    while (st.hasMoreTokens()) {
-      enums.add(st.nextToken());
+    protected void setTokens(
+            final String tokens) {
+        enums.clear();
+        StringTokenizer st = new StringTokenizer(tokens, ", ");
+        while (st.hasMoreTokens()) {
+            enums.add(st.nextToken());
+        }
     }
-  }
 
-  @Override
-  public int complete(
-      final Session session,
-      final CommandLine commandLine,
-      final List<String> candidates) {
-    StringsCompleter delegate = new StringsCompleter();
-    for (String entry : enums) {
-      delegate.getStrings().add(entry);
+    @Override
+    public int complete(
+            final Session session,
+            final CommandLine commandLine,
+            final List<String> candidates) {
+        StringsCompleter delegate = new StringsCompleter();
+        for (String entry : enums) {
+            delegate.getStrings().add(entry);
+        }
+        return delegate.complete(session, commandLine, candidates);
     }
-    return delegate.complete(session, commandLine, candidates);
-  }
 
 }

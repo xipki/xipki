@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,29 +47,29 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-up",
-    description = "update CMP control")
+        description = "update CMP control")
 @Service
 public class CmpControlUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "CMP control name\n"
-          + "(required)")
-  @Completion(CmpControlNameCompleter.class)
-  protected String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "CMP control name\n"
+                    + "(required)")
+    @Completion(CmpControlNameCompleter.class)
+    protected String name;
 
-  @Option(name = "--conf",
-      required = true,
-      description = "CMP control configuration\n"
-          + "(required)")
-  protected String conf;
+    @Option(name = "--conf",
+            required = true,
+            description = "CMP control configuration\n"
+                    + "(required)")
+    protected String conf;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.changeCmpControl(name, conf);
-    output(b, "updated", "could not update", "CMP control " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.changeCmpControl(name, conf);
+        output(b, "updated", "could not update", "CMP control " + name);
+        return null;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,37 +51,37 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "careq-info",
-    description = "show information of requestor in CA")
+        description = "show information of requestor in CA")
 @Service
 public class CaRequestorInfoCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (caManager.getCA(caName) == null) {
-      throw new UnexpectedException("could not find CA '" + caName + "'");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (caManager.getCA(caName) == null) {
+            throw new UnexpectedException("could not find CA '" + caName + "'");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        if (isNotEmpty(entries)) {
+            sb.append("requestors trusted by CA " + caName).append("\n");
+            for (CAHasRequestorEntry entry    : entries) {
+                sb.append("\t").append(entry).append("\n");
+            }
+        } else {
+            sb.append("\tno requestor for CA " + caName + " is configured");
+        }
+        out(sb.toString());
+        return null;
     }
-
-    StringBuilder sb = new StringBuilder();
-
-    Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-    if (isNotEmpty(entries)) {
-      sb.append("requestors trusted by CA " + caName).append("\n");
-      for (CAHasRequestorEntry entry  : entries) {
-        sb.append("\t").append(entry).append("\n");
-      }
-    } else {
-      sb.append("\tno requestor for CA " + caName + " is configured");
-    }
-    out(sb.toString());
-    return null;
-  }
 
 }

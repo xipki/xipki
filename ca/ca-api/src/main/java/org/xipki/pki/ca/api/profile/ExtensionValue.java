@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,25 +45,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ExtensionValue {
 
-  private final boolean critical;
+    private final boolean critical;
 
-  private final ASN1Encodable value;
+    private final ASN1Encodable value;
 
-  public ExtensionValue(
-      final boolean critical,
-      final ASN1Encodable value) {
-    ParamUtil.assertNotNull("value", value);
+    public ExtensionValue(
+            final boolean critical,
+            final ASN1Encodable value) {
+        ParamUtil.assertNotNull("value", value);
 
-    this.critical = critical;
-    this.value = value;
-  }
+        this.critical = critical;
+        this.value = value;
+    }
 
-  public boolean isCritical() {
-    return critical;
-  }
+    public boolean isCritical() {
+        return critical;
+    }
 
-  public ASN1Encodable getValue() {
-    return value;
-  }
+    public ASN1Encodable getValue() {
+        return value;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,48 +50,48 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 
 public class QaNameConstraints extends QaExtension {
 
-  private final List<QaGeneralSubtree> permittedSubtrees;
+    private final List<QaGeneralSubtree> permittedSubtrees;
 
-  private final List<QaGeneralSubtree> excludedSubtrees;
+    private final List<QaGeneralSubtree> excludedSubtrees;
 
-  public QaNameConstraints(
-      final NameConstraints jaxb) {
-    if (jaxb.getPermittedSubtrees() != null
-        && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase())) {
-      List<QaGeneralSubtree> list = new LinkedList<>();
-      List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
-      for (GeneralSubtreeBaseType base : bases) {
-        list.add(new QaGeneralSubtree(base));
-      }
-      this.permittedSubtrees = Collections.unmodifiableList(list);
-    } else {
-      permittedSubtrees = null;
+    public QaNameConstraints(
+            final NameConstraints jaxb) {
+        if (jaxb.getPermittedSubtrees() != null
+                && CollectionUtil.isNotEmpty(jaxb.getPermittedSubtrees().getBase())) {
+            List<QaGeneralSubtree> list = new LinkedList<>();
+            List<GeneralSubtreeBaseType> bases =    jaxb.getPermittedSubtrees().getBase();
+            for (GeneralSubtreeBaseType base : bases) {
+                list.add(new QaGeneralSubtree(base));
+            }
+            this.permittedSubtrees = Collections.unmodifiableList(list);
+        } else {
+            permittedSubtrees = null;
+        }
+
+        if (jaxb.getExcludedSubtrees() != null
+                && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase())) {
+            List<QaGeneralSubtree> list = new LinkedList<>();
+            List<GeneralSubtreeBaseType> bases =    jaxb.getExcludedSubtrees().getBase();
+            for (GeneralSubtreeBaseType base : bases) {
+                list.add(new QaGeneralSubtree(base));
+            }
+            this.excludedSubtrees = Collections.unmodifiableList(list);
+        } else {
+            excludedSubtrees = null;
+        }
+
+        if (permittedSubtrees == null && excludedSubtrees == null) {
+            throw new IllegalArgumentException(
+                    "at least one of permittedSubtrees and excludesSubtrees should be non-null");
+        }
     }
 
-    if (jaxb.getExcludedSubtrees() != null
-        && CollectionUtil.isNotEmpty(jaxb.getExcludedSubtrees().getBase())) {
-      List<QaGeneralSubtree> list = new LinkedList<>();
-      List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
-      for (GeneralSubtreeBaseType base : bases) {
-        list.add(new QaGeneralSubtree(base));
-      }
-      this.excludedSubtrees = Collections.unmodifiableList(list);
-    } else {
-      excludedSubtrees = null;
+    public List<QaGeneralSubtree> getPermittedSubtrees() {
+        return permittedSubtrees;
     }
 
-    if (permittedSubtrees == null && excludedSubtrees == null) {
-      throw new IllegalArgumentException(
-          "at least one of permittedSubtrees and excludesSubtrees should be non-null");
+    public List<QaGeneralSubtree> getExcludedSubtrees() {
+        return excludedSubtrees;
     }
-  }
-
-  public List<QaGeneralSubtree> getPermittedSubtrees() {
-    return permittedSubtrees;
-  }
-
-  public List<QaGeneralSubtree> getExcludedSubtrees() {
-    return excludedSubtrees;
-  }
 
 }

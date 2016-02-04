@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -121,468 +121,468 @@ import org.xipki.commons.common.util.StringUtil;
 
 public class CRLControl implements Serializable {
 
-  public static enum UpdateMode implements Serializable {
+    public static enum UpdateMode implements Serializable {
 
-    interval,
-    onDemand;
+        interval,
+        onDemand;
 
-    public static UpdateMode getUpdateMode(
-        final String mode) {
-      for (UpdateMode v : values()) {
-        if (v.name().equalsIgnoreCase(mode)) {
-          return v;
+        public static UpdateMode getUpdateMode(
+                final String mode) {
+            for (UpdateMode v : values()) {
+                if (v.name().equalsIgnoreCase(mode)) {
+                    return v;
+                }
+            }
+
+            return null;
         }
-      }
 
-      return null;
-    }
+    } // enum UpdateMode
 
-  } // enum UpdateMode
+    public static class HourMinute {
 
-  public static class HourMinute {
+        private final int hour;
 
-    private final int hour;
+        private final int minute;
 
-    private final int minute;
+        public HourMinute(
+                final int hour,
+                final int minute)
+        throws IllegalArgumentException {
+            if (hour < 0 | hour > 23) {
+                throw new IllegalArgumentException("invalid hour " + hour);
+            }
 
-    public HourMinute(
-        final int hour,
-        final int minute)
-    throws IllegalArgumentException {
-      if (hour < 0 | hour > 23) {
-        throw new IllegalArgumentException("invalid hour " + hour);
-      }
+            if (minute < 0 | minute > 59) {
+                throw new IllegalArgumentException("invalid minute " + minute);
+            }
 
-      if (minute < 0 | minute > 59) {
-        throw new IllegalArgumentException("invalid minute " + minute);
-      }
+            this.hour = hour;
+            this.minute = minute;
+        }
 
-      this.hour = hour;
-      this.minute = minute;
-    }
+        public int getHour() {
+            return hour;
+        }
 
-    public int getHour() {
-      return hour;
-    }
+        public int getMinute() {
+            return minute;
+        }
 
-    public int getMinute() {
-      return minute;
-    }
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(100);
+            if (hour < 10) {
+                sb.append("0");
+            }
+            sb.append(hour);
+            sb.append(":");
+            if (minute < 10) {
+                sb.append("0");
+            }
+            sb.append(minute);
+            return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof HourMinute)) {
+                return false;
+            }
+
+            HourMinute b = (HourMinute) obj;
+            return hour == b.hour && minute == b.minute;
+        }
+
+    } // class HourMinute
+
+    private static final long serialVersionUID = 1L;
+
+    public static final String KEY_updateMode = "updateMode";
+
+    public static final String KEY_extensions = "extensions";
+
+    public static final String KEY_expiredCerts_included = "expiredCerts.included";
+
+    public static final String KEY_xipki_certset = "xipki.certset";
+
+    public static final String KEY_xipki_certset_certs = "xipki.certset.certs";
+
+    public static final String KEY_xipki_certset_profilename = "xipki.certset.profilename";
+
+    public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
+
+    public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
+
+    public static final String KEY_overlap_minutes = "overlap.minutes";
+
+    public static final String KEY_interval_minutes = "interval.minutes";
+
+    public static final String KEY_interval_time = "interval.time";
+
+    public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
+
+    public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
+
+    public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
+
+    public static final String KEY_excludeReason = "excludeReason";
+
+    public static final String KEY_invalidityDate = "invalidityDate";
+
+    private UpdateMode updateMode = UpdateMode.interval;
+
+    private boolean xipkiCertsetIncluded = false;
+
+    private boolean xipkiCertsetCertIncluded = true;
+
+    private boolean xipkiCertsetProfilenameIncluded = true;
+
+    private boolean includeExpiredCerts = false;
+
+    private int fullCRLIntervals = 1;
+
+    private int deltaCRLIntervals = 0;
+
+    private int overlapMinutes = 10;
+
+    private boolean extendedNextUpdate = false;
+
+    private Integer intervalMinutes;
+
+    private HourMinute intervalDayTime;
+
+    private boolean onlyContainsUserCerts = false;
+
+    private boolean onlyContainsCACerts = false;
+
+    private boolean excludeReason = false;
+
+    private TripleState invalidityDateMode = TripleState.OPTIONAL;
+
+    private final Set<String> extensionOIDs;
+
+    public CRLControl(
+            final String conf)
+    throws InvalidConfException {
+        ParamUtil.assertNotBlank("conf", conf);
+        ConfPairs props;
+        try {
+            props = new ConfPairs(conf);
+        } catch (RuntimeException e) {
+            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
+        }
+
+        String s = props.getValue(KEY_updateMode);
+        if (s == null) {
+            this.updateMode = UpdateMode.interval;
+        } else {
+            this.updateMode = UpdateMode.getUpdateMode(s);
+            if (this.updateMode == null) {
+                throw new InvalidConfException("invalid " + KEY_updateMode + ": " + s);
+            }
+        }
+
+        s = props.getValue(KEY_invalidityDate);
+        if (s != null) {
+            this.invalidityDateMode = TripleState.fromValue(s);
+        }
+
+        this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
+
+        this.xipkiCertsetIncluded = getBoolean(props, KEY_xipki_certset, false);
+
+        this.xipkiCertsetCertIncluded = getBoolean(props, KEY_xipki_certset_certs, true);
+
+        this.xipkiCertsetProfilenameIncluded = getBoolean(props,
+                KEY_xipki_certset_profilename, true);
+
+        s = props.getValue(KEY_extensions);
+        if (s == null) {
+            this.extensionOIDs = Collections.emptySet();
+        } else {
+            Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
+            // check the OID
+            for (String extensionOID : extensionOIDs) {
+                try {
+                    new ASN1ObjectIdentifier(extensionOID);
+                } catch (IllegalArgumentException e) {
+                    throw new InvalidConfException(extensionOID + " is not a valid OID");
+                }
+            }
+            this.extensionOIDs = extensionOIDs;
+        }
+
+        this.onlyContainsCACerts = getBoolean(props, KEY_onlyContainsCACerts, false);
+        this.onlyContainsUserCerts = getBoolean(props, KEY_onlyContainsUserCerts, false);
+        this.excludeReason = getBoolean(props, KEY_excludeReason, false);
+
+        if (this.updateMode != UpdateMode.onDemand) {
+            this.fullCRLIntervals = getInteger(props, KEY_fullCRL_intervals, 1);
+            this.deltaCRLIntervals = getInteger(props, KEY_deltaCRL_intervals, 0);
+            this.extendedNextUpdate = getBoolean(props, KEY_fullCRL_extendedNextUpdate, false);
+            this.overlapMinutes = getInteger(props, KEY_overlap_minutes, 60);
+            s = props.getValue(KEY_interval_time);
+            if (s != null) {
+                List<String> tokens = StringUtil.split(s.trim(), ":");
+                if (tokens.size() != 2) {
+                    throw new InvalidConfException(
+                            "invalid " + KEY_interval_time + ": '" + s + "'");
+                }
+
+                try {
+                    int hour = Integer.parseInt(tokens.get(0));
+                    int minute = Integer.parseInt(tokens.get(1));
+                    this.intervalDayTime = new HourMinute(hour, minute);
+                } catch (IllegalArgumentException e) {
+                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '"
+                            + s + "'");
+                }
+            } else {
+                int minutes = getInteger(props, KEY_interval_minutes, 0);
+                if (minutes < this.overlapMinutes + 30) {
+                    throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '"
+                            + minutes + " is less than than 30 + " + this.overlapMinutes);
+                }
+                this.intervalMinutes = minutes;
+            }
+        }
+
+        validate();
+    } // constructor
+
+    public String getConf() {
+        ConfPairs pairs = new ConfPairs();
+        pairs.putPair(KEY_updateMode, updateMode.name());
+        pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
+        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
+        pairs.putPair(KEY_xipki_certset_certs, Boolean.toString(xipkiCertsetCertIncluded));
+        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
+        pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
+        pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
+        pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
+        pairs.putPair(KEY_invalidityDate, invalidityDateMode.name());
+        if (updateMode != UpdateMode.onDemand) {
+            pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
+            pairs.putPair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
+            pairs.putPair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
+
+            if (intervalDayTime != null) {
+                pairs.putPair(KEY_interval_time, intervalDayTime.toString());
+            }
+
+            if (intervalMinutes != null) {
+                pairs.putPair(KEY_interval_minutes, intervalMinutes.toString());
+            }
+        }
+
+        if (CollectionUtil.isNotEmpty(extensionOIDs)) {
+            StringBuilder extensionsSb = new StringBuilder(200);
+            for (String oid : extensionOIDs) {
+                extensionsSb.append(oid).append(",");
+            }
+            extensionsSb.deleteCharAt(extensionsSb.length() - 1);
+            pairs.putPair(KEY_extensions, extensionsSb.toString());
+        }
+
+        return pairs.getEncoded();
+    } // method getConf
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder(100);
-      if (hour < 10) {
-        sb.append("0");
-      }
-      sb.append(hour);
-      sb.append(":");
-      if (minute < 10) {
-        sb.append("0");
-      }
-      sb.append(minute);
-      return sb.toString();
+        return getConf();
+    }
+
+    public UpdateMode getUpdateMode() {
+        return updateMode;
+    }
+
+    public boolean isXipkiCertsetIncluded() {
+        return xipkiCertsetIncluded;
+    }
+
+    public boolean isXipkiCertsetCertIncluded() {
+        return xipkiCertsetCertIncluded;
+    }
+
+    public boolean isXipkiCertsetProfilenameIncluded() {
+        return xipkiCertsetProfilenameIncluded;
+    }
+
+    public boolean isIncludeExpiredCerts() {
+        return includeExpiredCerts;
+    }
+
+    public int getFullCRLIntervals() {
+        return fullCRLIntervals;
+    }
+
+    public int getDeltaCRLIntervals() {
+        return deltaCRLIntervals;
+    }
+
+    public int getOverlapMinutes() {
+        return overlapMinutes;
+    }
+
+    public Integer getIntervalMinutes() {
+        return intervalMinutes;
+    }
+
+    public HourMinute getIntervalDayTime() {
+        return intervalDayTime;
+    }
+
+    public Set<String> getExtensionOIDs() {
+        return extensionOIDs;
+    }
+
+    public boolean isExtendedNextUpdate() {
+        return extendedNextUpdate;
+    }
+
+    public boolean isOnlyContainsUserCerts() {
+        return onlyContainsUserCerts;
+    }
+
+    public boolean isOnlyContainsCACerts() {
+        return onlyContainsCACerts;
+    }
+
+    public boolean isExcludeReason() {
+        return excludeReason;
+    }
+
+    public TripleState getInvalidityDateMode() {
+        return invalidityDateMode;
+    }
+
+    public void validate()
+    throws InvalidConfException {
+        if (onlyContainsCACerts && onlyContainsUserCerts) {
+            throw new InvalidConfException(
+                    "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
+        }
+
+        if (updateMode == UpdateMode.onDemand) {
+            return;
+        }
+
+        if (fullCRLIntervals < deltaCRLIntervals) {
+            throw new InvalidConfException(
+                    "fullCRLIntervals could not be less than deltaCRLIntervals "
+                    + fullCRLIntervals + " < " + deltaCRLIntervals);
+        }
+
+        if (fullCRLIntervals < 1) {
+            throw new InvalidConfException(
+                    "fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
+        }
+
+        if (deltaCRLIntervals < 0) {
+            throw new InvalidConfException(
+                    "deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
+        }
     }
 
     @Override
     public int hashCode() {
-      return toString().hashCode();
+        return toString().hashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof HourMinute)) {
-        return false;
-      }
-
-      HourMinute b = (HourMinute) obj;
-      return hour == b.hour && minute == b.minute;
-    }
-
-  } // class HourMinute
-
-  private static final long serialVersionUID = 1L;
-
-  public static final String KEY_updateMode = "updateMode";
-
-  public static final String KEY_extensions = "extensions";
-
-  public static final String KEY_expiredCerts_included = "expiredCerts.included";
-
-  public static final String KEY_xipki_certset = "xipki.certset";
-
-  public static final String KEY_xipki_certset_certs = "xipki.certset.certs";
-
-  public static final String KEY_xipki_certset_profilename = "xipki.certset.profilename";
-
-  public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
-
-  public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
-
-  public static final String KEY_overlap_minutes = "overlap.minutes";
-
-  public static final String KEY_interval_minutes = "interval.minutes";
-
-  public static final String KEY_interval_time = "interval.time";
-
-  public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
-
-  public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
-
-  public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
-
-  public static final String KEY_excludeReason = "excludeReason";
-
-  public static final String KEY_invalidityDate = "invalidityDate";
-
-  private UpdateMode updateMode = UpdateMode.interval;
-
-  private boolean xipkiCertsetIncluded = false;
-
-  private boolean xipkiCertsetCertIncluded = true;
-
-  private boolean xipkiCertsetProfilenameIncluded = true;
-
-  private boolean includeExpiredCerts = false;
-
-  private int fullCRLIntervals = 1;
-
-  private int deltaCRLIntervals = 0;
-
-  private int overlapMinutes = 10;
-
-  private boolean extendedNextUpdate = false;
-
-  private Integer intervalMinutes;
-
-  private HourMinute intervalDayTime;
-
-  private boolean onlyContainsUserCerts = false;
-
-  private boolean onlyContainsCACerts = false;
-
-  private boolean excludeReason = false;
-
-  private TripleState invalidityDateMode = TripleState.OPTIONAL;
-
-  private final Set<String> extensionOIDs;
-
-  public CRLControl(
-      final String conf)
-  throws InvalidConfException {
-    ParamUtil.assertNotBlank("conf", conf);
-    ConfPairs props;
-    try {
-      props = new ConfPairs(conf);
-    } catch (RuntimeException e) {
-      throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
-    }
-
-    String s = props.getValue(KEY_updateMode);
-    if (s == null) {
-      this.updateMode = UpdateMode.interval;
-    } else {
-      this.updateMode = UpdateMode.getUpdateMode(s);
-      if (this.updateMode == null) {
-        throw new InvalidConfException("invalid " + KEY_updateMode + ": " + s);
-      }
-    }
-
-    s = props.getValue(KEY_invalidityDate);
-    if (s != null) {
-      this.invalidityDateMode = TripleState.fromValue(s);
-    }
-
-    this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
-
-    this.xipkiCertsetIncluded = getBoolean(props, KEY_xipki_certset, false);
-
-    this.xipkiCertsetCertIncluded = getBoolean(props, KEY_xipki_certset_certs, true);
-
-    this.xipkiCertsetProfilenameIncluded = getBoolean(props,
-        KEY_xipki_certset_profilename, true);
-
-    s = props.getValue(KEY_extensions);
-    if (s == null) {
-      this.extensionOIDs = Collections.emptySet();
-    } else {
-      Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
-      // check the OID
-      for (String extensionOID : extensionOIDs) {
-        try {
-          new ASN1ObjectIdentifier(extensionOID);
-        } catch (IllegalArgumentException e) {
-          throw new InvalidConfException(extensionOID + " is not a valid OID");
-        }
-      }
-      this.extensionOIDs = extensionOIDs;
-    }
-
-    this.onlyContainsCACerts = getBoolean(props, KEY_onlyContainsCACerts, false);
-    this.onlyContainsUserCerts = getBoolean(props, KEY_onlyContainsUserCerts, false);
-    this.excludeReason = getBoolean(props, KEY_excludeReason, false);
-
-    if (this.updateMode != UpdateMode.onDemand) {
-      this.fullCRLIntervals = getInteger(props, KEY_fullCRL_intervals, 1);
-      this.deltaCRLIntervals = getInteger(props, KEY_deltaCRL_intervals, 0);
-      this.extendedNextUpdate = getBoolean(props, KEY_fullCRL_extendedNextUpdate, false);
-      this.overlapMinutes = getInteger(props, KEY_overlap_minutes, 60);
-      s = props.getValue(KEY_interval_time);
-      if (s != null) {
-        List<String> tokens = StringUtil.split(s.trim(), ":");
-        if (tokens.size() != 2) {
-          throw new InvalidConfException(
-              "invalid " + KEY_interval_time + ": '" + s + "'");
+    public boolean equals(
+            final Object obj) {
+        if (!(obj instanceof CRLControl)) {
+            return false;
         }
 
-        try {
-          int hour = Integer.parseInt(tokens.get(0));
-          int minute = Integer.parseInt(tokens.get(1));
-          this.intervalDayTime = new HourMinute(hour, minute);
-        } catch (IllegalArgumentException e) {
-          throw new InvalidConfException("invalid " + KEY_interval_time + ": '"
-              + s + "'");
+        CRLControl b = (CRLControl) obj;
+        if (deltaCRLIntervals != b.deltaCRLIntervals
+                || xipkiCertsetIncluded != b.xipkiCertsetIncluded
+                || xipkiCertsetCertIncluded != b.xipkiCertsetCertIncluded
+                || xipkiCertsetProfilenameIncluded != b.xipkiCertsetProfilenameIncluded
+                || extendedNextUpdate != b.extendedNextUpdate
+                || fullCRLIntervals != b.fullCRLIntervals
+                || includeExpiredCerts != b.includeExpiredCerts
+                || onlyContainsCACerts != b.onlyContainsCACerts
+                || onlyContainsUserCerts != b.onlyContainsUserCerts) {
+            return false;
         }
-      } else {
-        int minutes = getInteger(props, KEY_interval_minutes, 0);
-        if (minutes < this.overlapMinutes + 30) {
-          throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '"
-              + minutes + " is less than than 30 + " + this.overlapMinutes);
+
+        if (extensionOIDs == null) {
+            if (b.extensionOIDs != null) {
+                return false;
+            }
+        } else if (!extensionOIDs.equals(b.extensionOIDs)) {
+            return false;
         }
-        this.intervalMinutes = minutes;
-      }
+
+        if (intervalMinutes == null) {
+            if (b.intervalMinutes != null) {
+                return false;
+            }
+        } else if (!intervalMinutes.equals(b.intervalMinutes)) {
+            return false;
+        }
+
+        if (intervalDayTime == null) {
+            if (b.intervalDayTime != null) {
+                return false;
+            }
+        } else if (!intervalDayTime.equals(b.intervalDayTime)) {
+            return false;
+        }
+
+        if (updateMode == null) {
+            if (b.updateMode != null) {
+                return false;
+            }
+        } else if (!updateMode.equals(b.updateMode)) {
+            return false;
+        }
+
+        return true;
+    } // method equals
+
+    private static int getInteger(
+            final ConfPairs props,
+            final String propKey,
+            final int dfltValue)
+    throws InvalidConfException {
+        String s = props.getValue(propKey);
+        if (s != null) {
+            try {
+                return Integer.parseInt(s.trim());
+            } catch (NumberFormatException e) {
+                throw new InvalidConfException(propKey + " does not have numeric value: " + s);
+            }
+        }
+        return dfltValue;
     }
 
-    validate();
-  } // constructor
-
-  public String getConf() {
-    ConfPairs pairs = new ConfPairs();
-    pairs.putPair(KEY_updateMode, updateMode.name());
-    pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
-    pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
-    pairs.putPair(KEY_xipki_certset_certs, Boolean.toString(xipkiCertsetCertIncluded));
-    pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
-    pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
-    pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
-    pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
-    pairs.putPair(KEY_invalidityDate, invalidityDateMode.name());
-    if (updateMode != UpdateMode.onDemand) {
-      pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
-      pairs.putPair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
-      pairs.putPair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
-
-      if (intervalDayTime != null) {
-        pairs.putPair(KEY_interval_time, intervalDayTime.toString());
-      }
-
-      if (intervalMinutes != null) {
-        pairs.putPair(KEY_interval_minutes, intervalMinutes.toString());
-      }
+    private static boolean getBoolean(
+            final ConfPairs props,
+            final String propKey,
+            final boolean dfltValue)
+    throws InvalidConfException {
+        String s = props.getValue(propKey);
+        if (s != null) {
+            s = s.trim();
+            if ("true".equalsIgnoreCase(s)) {
+                return Boolean.TRUE;
+            } else if ("false".equalsIgnoreCase(s)) {
+                return Boolean.FALSE;
+            } else {
+                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+            }
+        }
+        return dfltValue;
     }
-
-    if (CollectionUtil.isNotEmpty(extensionOIDs)) {
-      StringBuilder extensionsSb = new StringBuilder(200);
-      for (String oid : extensionOIDs) {
-        extensionsSb.append(oid).append(",");
-      }
-      extensionsSb.deleteCharAt(extensionsSb.length() - 1);
-      pairs.putPair(KEY_extensions, extensionsSb.toString());
-    }
-
-    return pairs.getEncoded();
-  } // method getConf
-
-  @Override
-  public String toString() {
-    return getConf();
-  }
-
-  public UpdateMode getUpdateMode() {
-    return updateMode;
-  }
-
-  public boolean isXipkiCertsetIncluded() {
-    return xipkiCertsetIncluded;
-  }
-
-  public boolean isXipkiCertsetCertIncluded() {
-    return xipkiCertsetCertIncluded;
-  }
-
-  public boolean isXipkiCertsetProfilenameIncluded() {
-    return xipkiCertsetProfilenameIncluded;
-  }
-
-  public boolean isIncludeExpiredCerts() {
-    return includeExpiredCerts;
-  }
-
-  public int getFullCRLIntervals() {
-    return fullCRLIntervals;
-  }
-
-  public int getDeltaCRLIntervals() {
-    return deltaCRLIntervals;
-  }
-
-  public int getOverlapMinutes() {
-    return overlapMinutes;
-  }
-
-  public Integer getIntervalMinutes() {
-    return intervalMinutes;
-  }
-
-  public HourMinute getIntervalDayTime() {
-    return intervalDayTime;
-  }
-
-  public Set<String> getExtensionOIDs() {
-    return extensionOIDs;
-  }
-
-  public boolean isExtendedNextUpdate() {
-    return extendedNextUpdate;
-  }
-
-  public boolean isOnlyContainsUserCerts() {
-    return onlyContainsUserCerts;
-  }
-
-  public boolean isOnlyContainsCACerts() {
-    return onlyContainsCACerts;
-  }
-
-  public boolean isExcludeReason() {
-    return excludeReason;
-  }
-
-  public TripleState getInvalidityDateMode() {
-    return invalidityDateMode;
-  }
-
-  public void validate()
-  throws InvalidConfException {
-    if (onlyContainsCACerts && onlyContainsUserCerts) {
-      throw new InvalidConfException(
-          "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
-    }
-
-    if (updateMode == UpdateMode.onDemand) {
-      return;
-    }
-
-    if (fullCRLIntervals < deltaCRLIntervals) {
-      throw new InvalidConfException(
-          "fullCRLIntervals could not be less than deltaCRLIntervals "
-          + fullCRLIntervals + " < " + deltaCRLIntervals);
-    }
-
-    if (fullCRLIntervals < 1) {
-      throw new InvalidConfException(
-          "fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
-    }
-
-    if (deltaCRLIntervals < 0) {
-      throw new InvalidConfException(
-          "deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    return toString().hashCode();
-  }
-
-  @Override
-  public boolean equals(
-      final Object obj) {
-    if (!(obj instanceof CRLControl)) {
-      return false;
-    }
-
-    CRLControl b = (CRLControl) obj;
-    if (deltaCRLIntervals != b.deltaCRLIntervals
-        || xipkiCertsetIncluded != b.xipkiCertsetIncluded
-        || xipkiCertsetCertIncluded != b.xipkiCertsetCertIncluded
-        || xipkiCertsetProfilenameIncluded != b.xipkiCertsetProfilenameIncluded
-        || extendedNextUpdate != b.extendedNextUpdate
-        || fullCRLIntervals != b.fullCRLIntervals
-        || includeExpiredCerts != b.includeExpiredCerts
-        || onlyContainsCACerts != b.onlyContainsCACerts
-        || onlyContainsUserCerts != b.onlyContainsUserCerts) {
-      return false;
-    }
-
-    if (extensionOIDs == null) {
-      if (b.extensionOIDs != null) {
-        return false;
-      }
-    } else if (!extensionOIDs.equals(b.extensionOIDs)) {
-      return false;
-    }
-
-    if (intervalMinutes == null) {
-      if (b.intervalMinutes != null) {
-        return false;
-      }
-    } else if (!intervalMinutes.equals(b.intervalMinutes)) {
-      return false;
-    }
-
-    if (intervalDayTime == null) {
-      if (b.intervalDayTime != null) {
-        return false;
-      }
-    } else if (!intervalDayTime.equals(b.intervalDayTime)) {
-      return false;
-    }
-
-    if (updateMode == null) {
-      if (b.updateMode != null) {
-        return false;
-      }
-    } else if (!updateMode.equals(b.updateMode)) {
-      return false;
-    }
-
-    return true;
-  } // method equals
-
-  private static int getInteger(
-      final ConfPairs props,
-      final String propKey,
-      final int dfltValue)
-  throws InvalidConfException {
-    String s = props.getValue(propKey);
-    if (s != null) {
-      try {
-        return Integer.parseInt(s.trim());
-      } catch (NumberFormatException e) {
-        throw new InvalidConfException(propKey + " does not have numeric value: " + s);
-      }
-    }
-    return dfltValue;
-  }
-
-  private static boolean getBoolean(
-      final ConfPairs props,
-      final String propKey,
-      final boolean dfltValue)
-  throws InvalidConfException {
-    String s = props.getValue(propKey);
-    if (s != null) {
-      s = s.trim();
-      if ("true".equalsIgnoreCase(s)) {
-        return Boolean.TRUE;
-      } else if ("false".equalsIgnoreCase(s)) {
-        return Boolean.FALSE;
-      } else {
-        throw new InvalidConfException(propKey + " does not have boolean value: " + s);
-      }
-    }
-    return dfltValue;
-  }
 
 }

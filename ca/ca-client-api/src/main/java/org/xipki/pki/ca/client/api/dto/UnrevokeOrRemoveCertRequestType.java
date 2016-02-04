@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,21 +46,21 @@ import java.util.List;
 
 public class UnrevokeOrRemoveCertRequestType {
 
-  private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
+    private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
 
-  public boolean addRequestEntry(
-      final IssuerSerialEntryType requestEntry) {
-    for (IssuerSerialEntryType re : requestEntries) {
-      if (re.getId().equals(requestEntry.getId())) {
-        return false;
-      }
+    public boolean addRequestEntry(
+            final IssuerSerialEntryType requestEntry) {
+        for (IssuerSerialEntryType re : requestEntries) {
+            if (re.getId().equals(requestEntry.getId())) {
+                return false;
+            }
+        }
+
+        requestEntries.add(requestEntry);
+        return true;
     }
 
-    requestEntries.add(requestEntry);
-    return true;
-  }
-
-  public List<IssuerSerialEntryType> getRequestEntries() {
-    return Collections.unmodifiableList(requestEntries);
-  }
+    public List<IssuerSerialEntryType> getRequestEntries() {
+        return Collections.unmodifiableList(requestEntries);
+    }
 }

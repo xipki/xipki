@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,25 +44,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 class ResponderAndRelativeUri {
 
-  private final Responder responder;
+    private final Responder responder;
 
-  private final String relativeUri;
+    private final String relativeUri;
 
-  public ResponderAndRelativeUri(
-      final Responder responder,
-      final String relativeUri) {
-    ParamUtil.assertNotNull("responder", responder);
-    ParamUtil.assertNotNull("relativeUri", relativeUri);
-    this.responder = responder;
-    this.relativeUri = relativeUri;
-  }
+    public ResponderAndRelativeUri(
+            final Responder responder,
+            final String relativeUri) {
+        ParamUtil.assertNotNull("responder", responder);
+        ParamUtil.assertNotNull("relativeUri", relativeUri);
+        this.responder = responder;
+        this.relativeUri = relativeUri;
+    }
 
-  public Responder getResponder() {
-    return responder;
-  }
+    public Responder getResponder() {
+        return responder;
+    }
 
-  public String getRelativeUri() {
-    return relativeUri;
-  }
+    public String getRelativeUri() {
+        return relativeUri;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,23 +47,23 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class EjbcaCACertExtractor {
 
-  private EjbcaCACertExtractor() {
-  }
-
-  public static X509Certificate extractCACert(
-      final String caData)
-  throws Exception {
-    XMLDocumentReader cadataReader = new XMLDocumentReader(
-        new ByteArrayInputStream(caData.getBytes()), false);
-    final String XPATH_CERT =
-        "/java/object/void[string[position()=1]='certificatechain']/object/void"
-        + "/string[1]";
-    String b64Cert = cadataReader.getValue(XPATH_CERT);
-    if (b64Cert == null) {
-      throw new Exception("Could not extract CA certificate");
+    private EjbcaCACertExtractor() {
     }
 
-    return X509Util.parseBase64EncodedCert(b64Cert);
-  }
+    public static X509Certificate extractCACert(
+            final String caData)
+    throws Exception {
+        XMLDocumentReader cadataReader = new XMLDocumentReader(
+                new ByteArrayInputStream(caData.getBytes()), false);
+        final String XPATH_CERT =
+                "/java/object/void[string[position()=1]='certificatechain']/object/void"
+                + "/string[1]";
+        String b64Cert = cadataReader.getValue(XPATH_CERT);
+        if (b64Cert == null) {
+            throw new Exception("Could not extract CA certificate");
+        }
+
+        return X509Util.parseBase64EncodedCert(b64Cert);
+    }
 
 }

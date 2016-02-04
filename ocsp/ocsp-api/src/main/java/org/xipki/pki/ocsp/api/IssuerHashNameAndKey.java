@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,39 +47,39 @@ import org.xipki.commons.security.api.HashAlgoType;
 
 public class IssuerHashNameAndKey {
 
-  private final HashAlgoType algo;
+    private final HashAlgoType algo;
 
-  private final byte[] issuerNameHash;
+    private final byte[] issuerNameHash;
 
-  private final byte[] issuerKeyHash;
+    private final byte[] issuerKeyHash;
 
-  public IssuerHashNameAndKey(
-      final HashAlgoType algo,
-      final byte[] issuerNameHash,
-      final byte[] issuerKeyHash) {
-    ParamUtil.assertNotNull("algo", algo);
+    public IssuerHashNameAndKey(
+            final HashAlgoType algo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash) {
+        ParamUtil.assertNotNull("algo", algo);
 
-    int len = algo.getLength();
-    if (issuerNameHash == null || issuerNameHash.length != len) {
-      throw new IllegalArgumentException("issuerNameash is invalid");
+        int len = algo.getLength();
+        if (issuerNameHash == null || issuerNameHash.length != len) {
+            throw new IllegalArgumentException("issuerNameash is invalid");
+        }
+
+        if (issuerKeyHash == null || issuerKeyHash.length != len) {
+            throw new IllegalArgumentException("issuerKeyHash is invalid");
+        }
+
+        this.algo = algo;
+        this.issuerNameHash = Arrays.copyOf(issuerNameHash, len);
+        this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
     }
 
-    if (issuerKeyHash == null || issuerKeyHash.length != len) {
-      throw new IllegalArgumentException("issuerKeyHash is invalid");
+    public boolean match(
+            final HashAlgoType algo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash) {
+        return this.algo == algo
+                && Arrays.equals(this.issuerNameHash, issuerNameHash)
+                && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
-
-    this.algo = algo;
-    this.issuerNameHash = Arrays.copyOf(issuerNameHash, len);
-    this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
-  }
-
-  public boolean match(
-      final HashAlgoType algo,
-      final byte[] issuerNameHash,
-      final byte[] issuerKeyHash) {
-    return this.algo == algo
-        && Arrays.equals(this.issuerNameHash, issuerNameHash)
-        && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
-  }
 
 }

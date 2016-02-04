@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,27 +48,27 @@ import org.xipki.commons.password.OBFPasswordResolver;
  */
 
 @Command(scope = "xipki-tk", name = "deobfuscate",
-    description = "deobfuscate password")
+        description = "deobfuscate password")
 @Service
 public class DeobfuscateCmd extends SecurityCommandSupport {
 
-  @Option(name = "--password",
-      required = true,
-      description = "obfuscated password, starts with OBF:\n"
-          + "(required)")
-  private String passwordHint;
+    @Option(name = "--password",
+            required = true,
+            description = "obfuscated password, starts with OBF:\n"
+                    + "(required)")
+    private String passwordHint;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
-      throw new IllegalCmdParamException("encrypted password '" + passwordHint
-          + "' does not start with OBF:");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint
+                    + "' does not start with OBF:");
+        }
+
+        String password = OBFPasswordResolver.deobfuscate(passwordHint);
+        out("the deobfuscated password is: '" + new String(password) + "'");
+        return null;
     }
-
-    String password = OBFPasswordResolver.deobfuscate(passwordHint);
-    out("the deobfuscated password is: '" + new String(password) + "'");
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,21 +49,21 @@ import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign",
-    description = "performance test of PKCS#11 EC signature creation")
+        description = "performance test of PKCS#11 EC signature creation")
 public class SpeedP11ECSignCmd extends SpeedP11SignCommandSupport {
 
-  @Option(name = "--curve",
-      required = true,
-      description = "EC curve name\n"
-          + "(required)")
-  @Completion(ECCurveNameCompleter.class)
-  private String curveName;
+    @Option(name = "--curve",
+            required = true,
+            description = "EC curve name\n"
+                    + "(required)")
+    @Completion(ECCurveNameCompleter.class)
+    private String curveName;
 
-  @Override
-  protected LoadExecutor getTester()
-  throws Exception {
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName);
-  }
+    @Override
+    protected LoadExecutor getTester()
+    throws Exception {
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName);
+    }
 
 }

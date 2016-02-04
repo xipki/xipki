@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -60,155 +60,155 @@ import org.xml.sax.SAXException;
 
 public class DbPorter extends DbToolBase {
 
-  public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
+    public static final String FILENAME_CA_Configuration = "ca-configuration.xml";
 
-  public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
+    public static final String FILENAME_CA_CertStore = "ca-certstore.xml";
 
-  public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
+    public static final String FILENAME_OCSP_CertStore = "ocsp-certstore.xml";
 
-  public static final String DIRNAME_CRL = "crl";
+    public static final String DIRNAME_CRL = "crl";
 
-  public static final String DIRNAME_CERT = "cert";
+    public static final String DIRNAME_CERT = "cert";
 
-  public static final String PREFIX_FILENAME_CERTS = "certs-";
+    public static final String PREFIX_FILENAME_CERTS = "certs-";
 
-  public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
+    public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
 
-  public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
+    public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
 
-  public static final String MSG_CERTS_FINISHED = "certs.finished";
+    public static final String MSG_CERTS_FINISHED = "certs.finished";
 
-  public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
+    public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
-  private static final String CERTS_DIRNAME = "certs";
+    private static final String CERTS_DIRNAME = "certs";
 
-  private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
+    private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
 
-  public static final int VERSION = 1;
+    public static final int VERSION = 1;
 
-  protected final boolean evaulateOnly;
+    protected final boolean evaulateOnly;
 
-  protected final String certsDir;
+    protected final String certsDir;
 
-  protected final String certsListFile;
+    protected final String certsListFile;
 
-  protected final int dbSchemaVersion;
+    protected final int dbSchemaVersion;
 
-  protected final int maxX500nameLen;
+    protected final int maxX500nameLen;
 
-  public DbPorter(
-      final DataSourceWrapper dataSource,
-      final String baseDir,
-      final AtomicBoolean stopMe,
-      final boolean evaluateOnly)
-  throws DataAccessException {
-    super(dataSource, baseDir, stopMe);
+    public DbPorter(
+            final DataSourceWrapper dataSource,
+            final String baseDir,
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
+    throws DataAccessException {
+        super(dataSource, baseDir, stopMe);
 
-    this.evaulateOnly = evaluateOnly;
-    this.certsDir = this.baseDir + File.separator + CERTS_DIRNAME;
-    this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
+        this.evaulateOnly = evaluateOnly;
+        this.certsDir = this.baseDir + File.separator + CERTS_DIRNAME;
+        this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
 
-    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
-    String s = dbSchemaInfo.getVariableValue("VERSION");
-    this.dbSchemaVersion = Integer.parseInt(s);
-    s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
-    this.maxX500nameLen = Integer.parseInt(s);
-  }
-
-  protected FileOrValueType buildFileOrValue(
-      final String content,
-      final String fileName)
-  throws IOException {
-    if (content == null) {
-      return null;
+        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
+        String s = dbSchemaInfo.getVariableValue("VERSION");
+        this.dbSchemaVersion = Integer.parseInt(s);
+        s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        this.maxX500nameLen = Integer.parseInt(s);
     }
 
-    FileOrValueType ret = new FileOrValueType();
-    if (content.length() < 256) {
-      ret.setValue(content);
-      return ret;
+    protected FileOrValueType buildFileOrValue(
+            final String content,
+            final String fileName)
+    throws IOException {
+        if (content == null) {
+            return null;
+        }
+
+        FileOrValueType ret = new FileOrValueType();
+        if (content.length() < 256) {
+            ret.setValue(content);
+            return ret;
+        }
+
+        File file = new File(baseDir, fileName);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+
+        IoUtil.save(file, content.getBytes("UTF-8"));
+
+        ret.setFile(fileName);
+        return ret;
     }
 
-    File file = new File(baseDir, fileName);
-    File parent = file.getParentFile();
-    if (parent != null && !parent.exists()) {
-      parent.mkdirs();
+    protected String getValue(
+            final FileOrValueType fileOrValue)
+    throws IOException {
+        if (fileOrValue == null) {
+            return null;
+        }
+
+        if (fileOrValue.getValue() != null) {
+            return fileOrValue.getValue();
+        }
+
+        File file = new File(baseDir, fileOrValue.getFile());
+        return new String(IoUtil.read(file), "UTF-8");
     }
 
-    IoUtil.save(file, content.getBytes("UTF-8"));
-
-    ret.setFile(fileName);
-    return ret;
-  }
-
-  protected String getValue(
-      final FileOrValueType fileOrValue)
-  throws IOException {
-    if (fileOrValue == null) {
-      return null;
+    protected String getImportingText() {
+        return evaulateOnly
+                ? "evaluating import "
+                : "importing ";
     }
 
-    if (fileOrValue.getValue() != null) {
-      return fileOrValue.getValue();
+    protected String getImportedText() {
+        return evaulateOnly
+                ? " evaluated import "
+                : " imported ";
     }
 
-    File file = new File(baseDir, fileOrValue.getFile());
-    return new String(IoUtil.read(file), "UTF-8");
-  }
-
-  protected String getImportingText() {
-    return evaulateOnly
-        ? "evaluating import "
-        : "importing ";
-  }
-
-  protected String getImportedText() {
-    return evaulateOnly
-        ? " evaluated import "
-        : " imported ";
-  }
-
-  protected String getExportingText() {
-    return evaulateOnly
-        ? "evaluating export "
-        : "exporting ";
-  }
-
-  protected String getExportedText() {
-    return evaulateOnly
-        ? " evaluated export "
-        : " exported ";
-  }
-
-  public static final Schema retrieveSchema(
-      final String schemaPath)
-  throws JAXBException {
-    URL schemaUrl = DbPorter.class.getResource(schemaPath);
-    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    try {
-      return schemaFact.newSchema(schemaUrl);
-    } catch (SAXException e) {
-      throw new JAXBException(
-          "error while loading schemas for the specified classes\nDetails:\n"
-          + e.getMessage());
+    protected String getExportingText() {
+        return evaulateOnly
+                ? "evaluating export "
+                : "exporting ";
     }
-  }
 
-  public static void echoToFile(
-      final String content,
-      final File file)
-  throws IOException {
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(file);
-      out.write(content.getBytes());
-    } finally {
-      if (out != null) {
-        out.flush();
-        out.close();
-      }
+    protected String getExportedText() {
+        return evaulateOnly
+                ? " evaluated export "
+                : " exported ";
     }
-  }
+
+    public static final Schema retrieveSchema(
+            final String schemaPath)
+    throws JAXBException {
+        URL schemaUrl = DbPorter.class.getResource(schemaPath);
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try {
+            return schemaFact.newSchema(schemaUrl);
+        } catch (SAXException e) {
+            throw new JAXBException(
+                    "error while loading schemas for the specified classes\nDetails:\n"
+                    + e.getMessage());
+        }
+    }
+
+    public static void echoToFile(
+            final String content,
+            final File file)
+    throws IOException {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            out.write(content.getBytes());
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
+    }
 
 }

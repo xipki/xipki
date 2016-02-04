@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,47 +53,47 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 public abstract class DbPortCommandSupport extends XipkiCommandSupport {
 
-  @Reference
-  protected DataSourceFactory dataSourceFactory;
+    @Reference
+    protected DataSourceFactory dataSourceFactory;
 
-  @Reference
-  protected PasswordResolver passwordResolver;
+    @Reference
+    protected PasswordResolver passwordResolver;
 
-  public DbPortCommandSupport() {
-  }
+    public DbPortCommandSupport() {
+    }
 
-  protected abstract DbPortWorker getDbPortWorker()
-  throws Exception;
+    protected abstract DbPortWorker getDbPortWorker()
+    throws Exception;
 
-  protected Object doExecute()
-  throws Exception {
-    ExecutorService executor = Executors.newFixedThreadPool(1);
-    DbPortWorker myRun = getDbPortWorker();
-    executor.execute(myRun);
+    protected Object doExecute()
+    throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        DbPortWorker myRun = getDbPortWorker();
+        executor.execute(myRun);
 
-    executor.shutdown();
-    while (true) {
-      try {
-        boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-        if (terminated) {
-          break;
+        executor.shutdown();
+        while (true) {
+            try {
+                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+                if (terminated) {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                myRun.setStopMe(true);
+            }
         }
-      } catch (InterruptedException e) {
-        myRun.setStopMe(true);
-      }
+
+        Exception e = myRun.getException();
+        if (e != null) {
+            String errMsg = e.getMessage();
+            if (StringUtil.isBlank(errMsg)) {
+                errMsg = "ERROR";
+            }
+
+            System.err.println(errMsg);
+        }
+
+        return null;
     }
-
-    Exception e = myRun.getException();
-    if (e != null) {
-      String errMsg = e.getMessage();
-      if (StringUtil.isBlank(errMsg)) {
-        errMsg = "ERROR";
-      }
-
-      System.err.println(errMsg);
-    }
-
-    return null;
-  }
 
 }

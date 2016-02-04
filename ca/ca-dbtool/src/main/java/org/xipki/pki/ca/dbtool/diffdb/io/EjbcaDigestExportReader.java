@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -67,235 +67,235 @@ import org.xipki.pki.ca.dbtool.IDRange;
 
 public class EjbcaDigestExportReader {
 
-  private class Retriever implements Runnable {
+    private class Retriever implements Runnable {
 
-    private Connection conn;
+        private Connection conn;
 
-    private PreparedStatement selectCertStmt;
+        private PreparedStatement selectCertStmt;
 
-    private PreparedStatement selectRawCertStmt;
+        private PreparedStatement selectRawCertStmt;
 
-    public Retriever()
-    throws DataAccessException {
-      this.conn = datasource.getConnection();
-      try {
-        selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-        selectRawCertStmt = datasource.prepareStatement(conn, selectRawCertSql);
-      } catch (DataAccessException e) {
-        DbToolBase.releaseResources(selectCertStmt, null);
-        DbToolBase.releaseResources(selectRawCertStmt, null);
-        datasource.returnConnection(conn);
-        throw e;
-      }
-    }
-
-    @Override
-    public void run() {
-      while (!stop.get()) {
-        try {
-          IDRange idRange = inQueue.take();
-          query(idRange);
-        } catch (InterruptedException e) {
-          LOG.error("InterruptedException", e);
-        }
-      }
-
-      DbToolBase.releaseResources(selectCertStmt, null);
-      datasource.returnConnection(conn);
-      selectCertStmt = null;
-    }
-
-    private void query(
-        final IDRange idRange) {
-      DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
-
-      ResultSet rs = null;
-      try {
-        selectCertStmt.setInt(1, idRange.getFrom());
-        selectCertStmt.setInt(2, idRange.getTo() + 1);
-
-        rs = selectCertStmt.executeQuery();
-
-        int id;
-        String hexCaFp;
-        String hexCertFp;
-
-        while (rs.next()) {
-          id = rs.getInt("id");
-          hexCaFp = rs.getString("cAFingerprint");
-          hexCertFp = rs.getString("fingerprint");
-
-          EjbcaCaInfo caInfo = null;
-
-          if (!hexCaFp.equals(hexCertFp)) {
-            caInfo = fpCaInfoMap.get(hexCaFp);
-          }
-
-          if (caInfo == null) {
-            LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
-            selectRawCertStmt.setInt(1, id);
-
-            ResultSet certRs = selectRawCertStmt.executeQuery();
-
-            if (certRs.next()) {
-              String b64Cert = certRs.getString("base64Cert");
-              Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
-              for (EjbcaCaInfo entry : fpCaInfoMap.values()) {
-                if (entry.getSubject().equals(cert.getIssuer())) {
-                  caInfo = entry;
-                  break;
-                }
-              }
+        public Retriever()
+        throws DataAccessException {
+            this.conn = datasource.getConnection();
+            try {
+                selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
+                selectRawCertStmt = datasource.prepareStatement(conn, selectRawCertSql);
+            } catch (DataAccessException e) {
+                DbToolBase.releaseResources(selectCertStmt, null);
+                DbToolBase.releaseResources(selectRawCertStmt, null);
+                datasource.returnConnection(conn);
+                throw e;
             }
-            certRs.close();
-          }
-
-          if (caInfo == null) {
-            LOG.error("FOUND no CA for Cert with id '{}'", id);
-            numSkippedCerts.incrementAndGet();
-            continue;
-          }
-
-          String hash = Base64.toBase64String(Hex.decode(hexCertFp));
-
-          String s = rs.getString("serialNumber");
-          long serial = Long.parseLong(s);
-
-          int status = rs.getInt("status");
-          boolean revoked = (status == 40);
-
-          Integer revReason = null;
-          Long revTime = null;
-          Long revInvTime = null;
-
-          if (revoked) {
-            revReason = rs.getInt("revocationReason");
-            long rev_timeInMs = rs.getLong("revocationDate");
-            // rev_time is milliseconds, convert it to seconds
-            revTime = rev_timeInMs / 1000;
-          }
-
-          DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
-              revInvTime, hash);
-
-          IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
-          idCert.setCaId(caInfo.getCaId());
-
-          result.addEntry(idCert);
         }
-      } catch (Exception e) {
-        if (e instanceof SQLException) {
-          e = datasource.translate(selectCertSql, (SQLException) e);
+
+        @Override
+        public void run() {
+            while (!stop.get()) {
+                try {
+                    IDRange idRange = inQueue.take();
+                    query(idRange);
+                } catch (InterruptedException e) {
+                    LOG.error("InterruptedException", e);
+                }
+            }
+
+            DbToolBase.releaseResources(selectCertStmt, null);
+            datasource.returnConnection(conn);
+            selectCertStmt = null;
         }
-        result.setException(e);
-      } finally {
-        outQueue.add(result);
-        DbToolBase.releaseResources(null, rs);
-      }
-    } // method query
 
-  } // class Retriever
+        private void query(
+                final IDRange idRange) {
+            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
 
-  private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExportReader.class);
+            ResultSet rs = null;
+            try {
+                selectCertStmt.setInt(1, idRange.getFrom());
+                selectCertStmt.setInt(2, idRange.getTo() + 1);
 
-  protected final AtomicBoolean stop = new AtomicBoolean(false);
+                rs = selectCertStmt.executeQuery();
 
-  protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
+                int id;
+                String hexCaFp;
+                String hexCertFp;
 
-  protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+                while (rs.next()) {
+                    id = rs.getInt("id");
+                    hexCaFp = rs.getString("cAFingerprint");
+                    hexCertFp = rs.getString("fingerprint");
 
-  private final int numThreads;
+                    EjbcaCaInfo caInfo = null;
 
-  private ExecutorService executor;
+                    if (!hexCaFp.equals(hexCertFp)) {
+                        caInfo = fpCaInfoMap.get(hexCaFp);
+                    }
 
-  private final List<Retriever> retrievers;
+                    if (caInfo == null) {
+                        LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
+                        selectRawCertStmt.setInt(1, id);
 
-  private final DataSourceWrapper datasource;
+                        ResultSet certRs = selectRawCertStmt.executeQuery();
 
-  private final Map<String, EjbcaCaInfo> fpCaInfoMap;
+                        if (certRs.next()) {
+                            String b64Cert = certRs.getString("base64Cert");
+                            Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
+                            for (EjbcaCaInfo entry : fpCaInfoMap.values()) {
+                                if (entry.getSubject().equals(cert.getIssuer())) {
+                                    caInfo = entry;
+                                    break;
+                                }
+                            }
+                        }
+                        certRs.close();
+                    }
 
-  private final String selectCertSql;
+                    if (caInfo == null) {
+                        LOG.error("FOUND no CA for Cert with id '{}'", id);
+                        numSkippedCerts.incrementAndGet();
+                        continue;
+                    }
 
-  private final String selectRawCertSql;
+                    String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
-  private final AtomicInteger numSkippedCerts = new AtomicInteger(0);
+                    String s = rs.getString("serialNumber");
+                    long serial = Long.parseLong(s);
 
-  public EjbcaDigestExportReader(
-      final DataSourceWrapper datasource,
-      final Map<String, EjbcaCaInfo> fpCaInfoMap,
-      final int numThreads)
-  throws Exception {
-    this.datasource = datasource;
-    this.numThreads = numThreads;
-    this.fpCaInfoMap = fpCaInfoMap;
+                    int status = rs.getInt("status");
+                    boolean revoked = (status == 40);
 
-    selectCertSql =
-        "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
-        + " revocationDate"
-        + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
+                    Integer revReason = null;
+                    Long revTime = null;
+                    Long revInvTime = null;
 
-    selectRawCertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+                    if (revoked) {
+                        revReason = rs.getInt("revocationReason");
+                        long rev_timeInMs = rs.getLong("revocationDate");
+                        // rev_time is milliseconds, convert it to seconds
+                        revTime = rev_timeInMs / 1000;
+                    }
 
-    retrievers = new ArrayList<>(numThreads);
+                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                            revInvTime, hash);
 
-    for (int i = 0; i < numThreads; i++) {
-      Retriever retriever = new Retriever();
-      retrievers.add(retriever);
+                    IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
+                    idCert.setCaId(caInfo.getCaId());
+
+                    result.addEntry(idCert);
+                }
+            } catch (Exception e) {
+                if (e instanceof SQLException) {
+                    e = datasource.translate(selectCertSql, (SQLException) e);
+                }
+                result.setException(e);
+            } finally {
+                outQueue.add(result);
+                DbToolBase.releaseResources(null, rs);
+            }
+        } // method query
+
+    } // class Retriever
+
+    private static final Logger LOG = LoggerFactory.getLogger(EjbcaDigestExportReader.class);
+
+    protected final AtomicBoolean stop = new AtomicBoolean(false);
+
+    protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
+
+    protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+
+    private final int numThreads;
+
+    private ExecutorService executor;
+
+    private final List<Retriever> retrievers;
+
+    private final DataSourceWrapper datasource;
+
+    private final Map<String, EjbcaCaInfo> fpCaInfoMap;
+
+    private final String selectCertSql;
+
+    private final String selectRawCertSql;
+
+    private final AtomicInteger numSkippedCerts = new AtomicInteger(0);
+
+    public EjbcaDigestExportReader(
+            final DataSourceWrapper datasource,
+            final Map<String, EjbcaCaInfo> fpCaInfoMap,
+            final int numThreads)
+    throws Exception {
+        this.datasource = datasource;
+        this.numThreads = numThreads;
+        this.fpCaInfoMap = fpCaInfoMap;
+
+        selectCertSql =
+                "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
+                + " revocationDate"
+                + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
+
+        selectRawCertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
+
+        retrievers = new ArrayList<>(numThreads);
+
+        for (int i = 0; i < numThreads; i++) {
+            Retriever retriever = new Retriever();
+            retrievers.add(retriever);
+        }
+
+        executor = Executors.newFixedThreadPool(numThreads);
+        for (Runnable runnable : retrievers) {
+            executor.execute(runnable);
+        }
+    } // constructor
+
+    public List<IdentifiedDbDigestEntry> readCerts(
+            final List<IDRange> idRanges)
+    throws DataAccessException {
+        int n = idRanges.size();
+        for (IDRange range : idRanges) {
+            inQueue.add(range);
+        }
+
+        List<DigestDBEntrySet> results = new ArrayList<>(n);
+        int numCerts = 0;
+        for (int i = 0; i < n; i++) {
+            try {
+                DigestDBEntrySet result = outQueue.take();
+                numCerts += result.getEntries().size();
+                results.add(result);
+            } catch (InterruptedException e) {
+                throw new DataAccessException("InterruptedException " + e.getMessage(), e);
+            }
+        }
+
+        Collections.sort(results);
+        List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
+
+        for (DigestDBEntrySet result : results) {
+            if (result.getException() != null) {
+                throw new DataAccessException(
+                        "error while reading from ID " + result.getStartId()
+                            + ": " + result.getException().getMessage(),
+                        result.getException());
+            }
+
+            ret.addAll(result.getEntries());
+        }
+
+        return ret;
+    } // method readCerts
+
+    public int getNumThreads() {
+        return numThreads;
     }
 
-    executor = Executors.newFixedThreadPool(numThreads);
-    for (Runnable runnable : retrievers) {
-      executor.execute(runnable);
-    }
-  } // constructor
-
-  public List<IdentifiedDbDigestEntry> readCerts(
-      final List<IDRange> idRanges)
-  throws DataAccessException {
-    int n = idRanges.size();
-    for (IDRange range : idRanges) {
-      inQueue.add(range);
+    public int getNumSkippedCerts() {
+        return numSkippedCerts.get();
     }
 
-    List<DigestDBEntrySet> results = new ArrayList<>(n);
-    int numCerts = 0;
-    for (int i = 0; i < n; i++) {
-      try {
-        DigestDBEntrySet result = outQueue.take();
-        numCerts += result.getEntries().size();
-        results.add(result);
-      } catch (InterruptedException e) {
-        throw new DataAccessException("InterruptedException " + e.getMessage(), e);
-      }
+    public void stop() {
+        stop.set(true);
+        executor.shutdownNow();
     }
-
-    Collections.sort(results);
-    List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
-
-    for (DigestDBEntrySet result : results) {
-      if (result.getException() != null) {
-        throw new DataAccessException(
-            "error while reading from ID " + result.getStartId()
-              + ": " + result.getException().getMessage(),
-            result.getException());
-      }
-
-      ret.addAll(result.getEntries());
-    }
-
-    return ret;
-  } // method readCerts
-
-  public int getNumThreads() {
-    return numThreads;
-  }
-
-  public int getNumSkippedCerts() {
-    return numSkippedCerts.get();
-  }
-
-  public void stop() {
-    stop.set(true);
-    executor.shutdownNow();
-  }
 }

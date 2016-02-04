@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -54,46 +54,46 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 public class DbSchemaInfo {
 
-  private final Map<String, String> variables = new HashMap<>();
+    private final Map<String, String> variables = new HashMap<>();
 
-  public DbSchemaInfo(
-      final DataSourceWrapper dataSource)
-  throws DataAccessException {
-    final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
-    Connection c = dataSource.getConnection();
-    if (c == null) {
-      throw new DataAccessException("could not get connection");
+    public DbSchemaInfo(
+            final DataSourceWrapper dataSource)
+    throws DataAccessException {
+        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        Connection c = dataSource.getConnection();
+        if (c == null) {
+            throw new DataAccessException("could not get connection");
+        }
+
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = dataSource.createStatement(c);
+            if (stmt == null) {
+                throw new DataAccessException("could not create statement");
+            }
+
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name = rs.getString("NAME");
+                String value = rs.getString("VALUE2");
+                variables.put(name, value);
+            }
+        } catch (SQLException e) {
+            throw dataSource.translate(sql, e);
+        } finally {
+            dataSource.releaseResources(stmt, rs);
+        }
+    } // constructor
+
+    public Set<String> getVariableNames() {
+        return Collections.unmodifiableSet(variables.keySet());
     }
 
-    Statement stmt = null;
-    ResultSet rs = null;
-
-    try {
-      stmt = dataSource.createStatement(c);
-      if (stmt == null) {
-        throw new DataAccessException("could not create statement");
-      }
-
-      rs = stmt.executeQuery(sql);
-      while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-        variables.put(name, value);
-      }
-    } catch (SQLException e) {
-      throw dataSource.translate(sql, e);
-    } finally {
-      dataSource.releaseResources(stmt, rs);
+    public String getVariableValue(
+            final String variableName) {
+        return variables.get(variableName);
     }
-  } // constructor
-
-  public Set<String> getVariableNames() {
-    return Collections.unmodifiableSet(variables.keySet());
-  }
-
-  public String getVariableValue(
-      final String variableName) {
-    return variables.get(variableName);
-  }
 
 }

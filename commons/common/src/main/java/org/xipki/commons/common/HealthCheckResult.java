@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -53,327 +53,327 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class HealthCheckResult {
 
-  private String name;
+    private String name;
 
-  private boolean healthy = false;
+    private boolean healthy = false;
 
-  private Map<String, Object> statuses = new ConcurrentHashMap<>();
+    private Map<String, Object> statuses = new ConcurrentHashMap<>();
 
-  private List<HealthCheckResult> childChecks = new LinkedList<>();
+    private List<HealthCheckResult> childChecks = new LinkedList<>();
 
-  /**
-   * Name of the check result
-   * @param name
-   */
-  public HealthCheckResult(
-      final String name) {
-    ParamUtil.assertNotBlank("name", name);
-    this.name = name;
-  }
-
-  public void setHealthy(
-      final boolean healthy) {
-    this.healthy = healthy;
-  }
-
-  public void clearStatuses() {
-    this.statuses.clear();
-  }
-
-  public Object getStatus(
-      final String statusName) {
-    return (statusName == null)
-        ? null
-        : statuses.get(statusName);
-  }
-
-  public void clearChildChecks() {
-    this.childChecks.clear();
-  }
-
-  public void addChildCheck(
-      final HealthCheckResult childCheck) {
-    this.childChecks.add(childCheck);
-  }
-
-  public Set<String> getStatusNames() {
-    return statuses.keySet();
-  }
-
-  public boolean isHealthy() {
-    return healthy;
-  }
-
-  public Map<String, Object> getStatuses() {
-    return Collections.unmodifiableMap(statuses);
-  }
-
-  public String toJsonMessage(
-      final boolean pretty) {
-    return toJsonMessage(0, pretty);
-  }
-
-  private String toJsonMessage(
-      final int level,
-      final boolean pretty) {
-    // Non root check requires always a name
-    StringBuilder sb = new StringBuilder(1000);
-    if (pretty) {
-      addIndent(sb, level);
-    }
-    if (level > 0) {
-      sb.append("\"").append(name).append("\":");
-    }
-    sb.append("{");
-
-    boolean lastElement = true;
-    if (lastElement && CollectionUtil.isNotEmpty(statuses)) {
-      lastElement = false;
-    }
-    if (lastElement && CollectionUtil.isNotEmpty(childChecks)) {
-      lastElement = false;
-    }
-    append(sb, "healthy", healthy, level + 1, pretty, lastElement);
-
-    Set<String> names = statuses.keySet();
-    int size = names.size();
-    int count = 0;
-    for (String name : names) {
-      count++;
-      append(sb, name, statuses.get(name), level + 1, pretty,
-          CollectionUtil.isEmpty(childChecks) && count == size);
+    /**
+     * Name of the check result
+     * @param name
+     */
+    public HealthCheckResult(
+            final String name) {
+        ParamUtil.assertNotBlank("name", name);
+        this.name = name;
     }
 
-    if (CollectionUtil.isNotEmpty(childChecks)) {
-      if (pretty) {
-        sb.append("\n");
-        addIndent(sb, level + 1);
-      }
+    public void setHealthy(
+            final boolean healthy) {
+        this.healthy = healthy;
+    }
 
-      sb.append("\"checks\":{");
-      if (pretty) {
-        sb.append("\n");
-      }
+    public void clearStatuses() {
+        this.statuses.clear();
+    }
 
-      int n = childChecks.size();
-      for (int i = 0; i < n; i++) {
-        HealthCheckResult childCheck = childChecks.get(i);
-        if (i > 0) {
-          sb.append("\n");
+    public Object getStatus(
+            final String statusName) {
+        return (statusName == null)
+                ? null
+                : statuses.get(statusName);
+    }
+
+    public void clearChildChecks() {
+        this.childChecks.clear();
+    }
+
+    public void addChildCheck(
+            final HealthCheckResult childCheck) {
+        this.childChecks.add(childCheck);
+    }
+
+    public Set<String> getStatusNames() {
+        return statuses.keySet();
+    }
+
+    public boolean isHealthy() {
+        return healthy;
+    }
+
+    public Map<String, Object> getStatuses() {
+        return Collections.unmodifiableMap(statuses);
+    }
+
+    public String toJsonMessage(
+            final boolean pretty) {
+        return toJsonMessage(0, pretty);
+    }
+
+    private String toJsonMessage(
+            final int level,
+            final boolean pretty) {
+        // Non root check requires always a name
+        StringBuilder sb = new StringBuilder(1000);
+        if (pretty) {
+            addIndent(sb, level);
         }
-        sb.append(childCheck.toJsonMessage(level + 2, pretty));
-        if (i < n - 1) {
-          sb.append(",");
+        if (level > 0) {
+            sb.append("\"").append(name).append("\":");
         }
-      }
+        sb.append("{");
 
-      if (pretty) {
-        sb.append("\n");
-        addIndent(sb, level + 1);
-      }
-      sb.append("}");
-    }
+        boolean lastElement = true;
+        if (lastElement && CollectionUtil.isNotEmpty(statuses)) {
+            lastElement = false;
+        }
+        if (lastElement && CollectionUtil.isNotEmpty(childChecks)) {
+            lastElement = false;
+        }
+        append(sb, "healthy", healthy, level + 1, pretty, lastElement);
 
-    if (pretty) {
-      sb.append("\n");
-      addIndent(sb, level);
-    }
-    sb.append("}");
-    return sb.toString();
-  } // method toJsonMessage
+        Set<String> names = statuses.keySet();
+        int size = names.size();
+        int count = 0;
+        for (String name : names) {
+            count++;
+            append(sb, name, statuses.get(name), level + 1, pretty,
+                    CollectionUtil.isEmpty(childChecks) && count == size);
+        }
 
-  private static void append(
-      final StringBuilder sb,
-      final String name,
-      final Object value,
-      final int level,
-      final boolean pretty,
-      final boolean lastElement) {
-    if (pretty) {
-      sb.append("\n");
-      addIndent(sb, level);
-    }
-    sb.append("\"").append(name).append("\":");
+        if (CollectionUtil.isNotEmpty(childChecks)) {
+            if (pretty) {
+                sb.append("\n");
+                addIndent(sb, level + 1);
+            }
 
-    if (value == null) {
-      sb.append("null");
-    } else if (value instanceof Number) {
-      sb.append(value);
-    } else if (value instanceof Boolean) {
-      sb.append(value);
-    } else {
-      sb.append("\"").append(value).append("\"");
-    }
+            sb.append("\"checks\":{");
+            if (pretty) {
+                sb.append("\n");
+            }
 
-    if (!lastElement) {
-      sb.append(",");
-    }
-  } // method append
+            int n = childChecks.size();
+            for (int i = 0; i < n; i++) {
+                HealthCheckResult childCheck = childChecks.get(i);
+                if (i > 0) {
+                    sb.append("\n");
+                }
+                sb.append(childCheck.toJsonMessage(level + 2, pretty));
+                if (i < n - 1) {
+                    sb.append(",");
+                }
+            }
 
-  private static void addIndent(
-      final StringBuilder buffer,
-      final int level) {
-    if (level == 0) {
-      return;
-    }
+            if (pretty) {
+                sb.append("\n");
+                addIndent(sb, level + 1);
+            }
+            sb.append("}");
+        }
 
-    for (int i = 0; i < level; i++) {
-      buffer.append("  ");
-    }
-  }
+        if (pretty) {
+            sb.append("\n");
+            addIndent(sb, level);
+        }
+        sb.append("}");
+        return sb.toString();
+    } // method toJsonMessage
 
-  public static HealthCheckResult getInstanceFromJsonMessage(
-      final String name,
-      final String jsonMessage) {
-    // remove white spaces and line breaks
-    String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
-    if (!jsonMsg.startsWith("{\"healthy\":")) {
-      throw new IllegalArgumentException("invalid healthcheck message");
-    }
+    private static void append(
+            final StringBuilder sb,
+            final String name,
+            final Object value,
+            final int level,
+            final boolean pretty,
+            final boolean lastElement) {
+        if (pretty) {
+            sb.append("\n");
+            addIndent(sb, level);
+        }
+        sb.append("\"").append(name).append("\":");
 
-    int startIdx = "{\"healthy\":".length();
-    int endIdx = jsonMsg.indexOf(',', startIdx);
-    boolean containsChildChecks = true;
-    if (endIdx == -1) {
-      endIdx = jsonMsg.indexOf('}', startIdx);
-      containsChildChecks = false;
-    }
-
-    if (endIdx == -1) {
-      throw new IllegalArgumentException("invalid healthcheck message");
-    }
-
-    String s = jsonMsg.substring(startIdx, endIdx);
-
-    boolean healthy;
-    if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
-      healthy = Boolean.parseBoolean(s);
-    } else {
-      throw new IllegalArgumentException("invalid healthcheck message");
-    }
-
-    HealthCheckResult result = new HealthCheckResult(name);
-    result.setHealthy(healthy);
-
-    if (!containsChildChecks) {
-      return result;
-    }
-
-    if (!jsonMsg.startsWith("\"checks\":", endIdx + 1)) {
-      return result;
-    }
-
-    String checksBlock = getBlock(jsonMsg, endIdx + 1 + "\"checks\":".length());
-    Map<String, String> childBlocks = getChildBlocks(
-        checksBlock.substring(1, checksBlock.length() - 1));
-    for (String childBlockName : childBlocks.keySet()) {
-      HealthCheckResult childResult = getInstanceFromJsonMessage(childBlockName,
-          childBlocks.get(childBlockName));
-      result.addChildCheck(childResult);
-    }
-
-    return result;
-  }
-
-  private static Map<String, String> getChildBlocks(
-      final String block) {
-    Map<String, String> childBlocks = new HashMap<>();
-
-    int offset = 0;
-    while (true) {
-      int idx = block.indexOf('"', offset + 1);
-      String blockName = block.substring(offset + 1, idx);
-      String blockValue = getBlock(block, offset + blockName.length() + 3);
-      childBlocks.put(blockName, blockValue);
-
-      offset += blockName.length() + 4 + blockValue.length();
-      if (offset >=  block.length() - 1) {
-        break;
-      }
-    }
-
-    return childBlocks;
-  } // method getInstanceFromJsonMessage
-
-  private static String getBlock(
-      final String text,
-      final int offset) {
-    if (!text.startsWith("{", offset)) {
-      throw new IllegalArgumentException("invalid text: '" + text + "'");
-    }
-
-    StringBuilder sb = new StringBuilder("{");
-    final int n = text.length();
-    if (n < 2) {
-      throw new IllegalArgumentException("invalid text: '" + text + "'");
-    }
-
-    char c;
-    int m = 0;
-    for (int i = offset + 1; i < n; i++) {
-      c = text.charAt(i);
-      sb.append(c);
-
-      if (c == '{') {
-        m++;
-      } else if (c == '}') {
-        if (m == 0) {
-          return sb.toString();
+        if (value == null) {
+            sb.append("null");
+        } else if (value instanceof Number) {
+            sb.append(value);
+        } else if (value instanceof Boolean) {
+            sb.append(value);
         } else {
-          m--;
+            sb.append("\"").append(value).append("\"");
         }
-      } // end if
-    } // end for
 
-    throw new IllegalArgumentException("invalid text: '" + text + "'");
-  } // method getBlock
+        if (!lastElement) {
+            sb.append(",");
+        }
+    } // method append
 
-  public static void main(
-      final String[] args) {
-    String jm1 = "{\"healthy\":true}";
-    String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"
-        + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
-        + "\"childcheck2\":{\"healthy\":false}}}";
-    System.out.println(getBlock(jm1, 0));
-    System.out.println(getBlock(jm2, 25));
-    getInstanceFromJsonMessage("default", jm1);
-    getInstanceFromJsonMessage("default", jm2);
+    private static void addIndent(
+            final StringBuilder buffer,
+            final int level) {
+        if (level == 0) {
+            return;
+        }
 
-    HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
-    checkResult.setHealthy(false);
+        for (int i = 0; i < level; i++) {
+            buffer.append("    ");
+        }
+    }
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(true));
+    public static HealthCheckResult getInstanceFromJsonMessage(
+            final String name,
+            final String jsonMessage) {
+        // remove white spaces and line breaks
+        String jsonMsg = jsonMessage.replaceAll(" |\t|\r|\n", "");
+        if (!jsonMsg.startsWith("{\"healthy\":")) {
+            throw new IllegalArgumentException("invalid healthcheck message");
+        }
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(false));
+        int startIdx = "{\"healthy\":".length();
+        int endIdx = jsonMsg.indexOf(',', startIdx);
+        boolean containsChildChecks = true;
+        if (endIdx == -1) {
+            endIdx = jsonMsg.indexOf('}', startIdx);
+            containsChildChecks = false;
+        }
 
-    checkResult = new HealthCheckResult("mycheck-positive");
-    checkResult.setHealthy(true);
+        if (endIdx == -1) {
+            throw new IllegalArgumentException("invalid healthcheck message");
+        }
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(true));
+        String s = jsonMsg.substring(startIdx, endIdx);
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(false));
+        boolean healthy;
+        if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
+            healthy = Boolean.parseBoolean(s);
+        } else {
+            throw new IllegalArgumentException("invalid healthcheck message");
+        }
 
-    HealthCheckResult childCheck = new HealthCheckResult("childcheck");
-    checkResult.addChildCheck(childCheck);
-    childCheck.setHealthy(false);
+        HealthCheckResult result = new HealthCheckResult(name);
+        result.setHealthy(healthy);
 
-    HealthCheckResult childCheck2 = new HealthCheckResult("childcheck2");
-    checkResult.addChildCheck(childCheck2);
-    childCheck.setHealthy(false);
+        if (!containsChildChecks) {
+            return result;
+        }
 
-    HealthCheckResult childChildCheck = new HealthCheckResult("childChildCheck");
-    childCheck.addChildCheck(childChildCheck);
-    childChildCheck.setHealthy(false);
+        if (!jsonMsg.startsWith("\"checks\":", endIdx + 1)) {
+            return result;
+        }
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(true));
+        String checksBlock = getBlock(jsonMsg, endIdx + 1 + "\"checks\":".length());
+        Map<String, String> childBlocks = getChildBlocks(
+                checksBlock.substring(1, checksBlock.length() - 1));
+        for (String childBlockName : childBlocks.keySet()) {
+            HealthCheckResult childResult = getInstanceFromJsonMessage(childBlockName,
+                    childBlocks.get(childBlockName));
+            result.addChildCheck(childResult);
+        }
 
-    System.out.println();
-    System.out.println(checkResult.toJsonMessage(false));
-  } // method main
+        return result;
+    }
+
+    private static Map<String, String> getChildBlocks(
+            final String block) {
+        Map<String, String> childBlocks = new HashMap<>();
+
+        int offset = 0;
+        while (true) {
+            int idx = block.indexOf('"', offset + 1);
+            String blockName = block.substring(offset + 1, idx);
+            String blockValue = getBlock(block, offset + blockName.length() + 3);
+            childBlocks.put(blockName, blockValue);
+
+            offset += blockName.length() + 4 + blockValue.length();
+            if (offset >=    block.length() - 1) {
+                break;
+            }
+        }
+
+        return childBlocks;
+    } // method getInstanceFromJsonMessage
+
+    private static String getBlock(
+            final String text,
+            final int offset) {
+        if (!text.startsWith("{", offset)) {
+            throw new IllegalArgumentException("invalid text: '" + text + "'");
+        }
+
+        StringBuilder sb = new StringBuilder("{");
+        final int n = text.length();
+        if (n < 2) {
+            throw new IllegalArgumentException("invalid text: '" + text + "'");
+        }
+
+        char c;
+        int m = 0;
+        for (int i = offset + 1; i < n; i++) {
+            c = text.charAt(i);
+            sb.append(c);
+
+            if (c == '{') {
+                m++;
+            } else if (c == '}') {
+                if (m == 0) {
+                    return sb.toString();
+                } else {
+                    m--;
+                }
+            } // end if
+        } // end for
+
+        throw new IllegalArgumentException("invalid text: '" + text + "'");
+    } // method getBlock
+
+    public static void main(
+            final String[] args) {
+        String jm1 = "{\"healthy\":true}";
+        String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"
+                + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
+                + "\"childcheck2\":{\"healthy\":false}}}";
+        System.out.println(getBlock(jm1, 0));
+        System.out.println(getBlock(jm2, 25));
+        getInstanceFromJsonMessage("default", jm1);
+        getInstanceFromJsonMessage("default", jm2);
+
+        HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
+        checkResult.setHealthy(false);
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(true));
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(false));
+
+        checkResult = new HealthCheckResult("mycheck-positive");
+        checkResult.setHealthy(true);
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(true));
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(false));
+
+        HealthCheckResult childCheck = new HealthCheckResult("childcheck");
+        checkResult.addChildCheck(childCheck);
+        childCheck.setHealthy(false);
+
+        HealthCheckResult childCheck2 = new HealthCheckResult("childcheck2");
+        checkResult.addChildCheck(childCheck2);
+        childCheck.setHealthy(false);
+
+        HealthCheckResult childChildCheck = new HealthCheckResult("childChildCheck");
+        childCheck.addChildCheck(childChildCheck);
+        childChildCheck.setHealthy(false);
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(true));
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(false));
+    } // method main
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,34 +47,34 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "publisher-check",
-    description = "check information of publishers (QA)")
+        description = "check information of publishers (QA)")
 @Service
 public class PublisherCheckCmd extends PublisherUpdateCmd {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    out("checking publisher " + name);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        out("checking publisher " + name);
 
-    PublisherEntry cp = caManager.getPublisher(name);
-    if (cp == null) {
-      throw new CmdFailure("publisher named '" + name + "' is not configured");
+        PublisherEntry cp = caManager.getPublisher(name);
+        if (cp == null) {
+            throw new CmdFailure("publisher named '" + name + "' is not configured");
+        }
+
+        if (cp.getType() != null) {
+            String ex = type;
+            String is = cp.getType();
+            MgmtQAShellUtil.assertEquals("type", ex, is);
+        }
+
+        if (cp.getConf() != null) {
+            String ex = conf;
+            String is = cp.getConf();
+            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+        }
+
+        out(" checked publisher " + name);
+        return null;
     }
-
-    if (cp.getType() != null) {
-      String ex = type;
-      String is = cp.getType();
-      MgmtQAShellUtil.assertEquals("type", ex, is);
-    }
-
-    if (cp.getConf() != null) {
-      String ex = conf;
-      String is = cp.getConf();
-      MgmtQAShellUtil.assertEquals("signer conf", ex, is);
-    }
-
-    out(" checked publisher " + name);
-    return null;
-  }
 
 }

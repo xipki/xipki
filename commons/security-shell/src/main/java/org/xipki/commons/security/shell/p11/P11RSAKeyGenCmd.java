@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,39 +49,39 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  */
 
 @Command(scope = "xipki-tk", name = "rsa",
-    description = "generate RSA keypair in PKCS#11 device")
+        description = "generate RSA keypair in PKCS#11 device")
 @Service
 public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
 
-  @Option(name = "--key-size",
-      description = "keysize in bit")
-  private Integer keysize = 2048;
+    @Option(name = "--key-size",
+            description = "keysize in bit")
+    private Integer keysize = 2048;
 
-  @Option(name = "-e",
-      description = "public exponent")
-  private String publicExponent = "0x10001";
+    @Option(name = "-e",
+            description = "public exponent")
+    private String publicExponent = "0x10001";
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (keysize % 1024 != 0) {
-      throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (keysize % 1024 != 0) {
+            throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
+        }
+
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        if (noCert) {
+            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+                    label);
+            finalize(keyId);
+        } else {
+            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
+                    keysize, toBigInt(publicExponent),
+                    label, getSubject(),
+                    getKeyUsage(),
+                    getExtendedKeyUsage());
+            finalize(keyAndCert);
+        }
+        return null;
     }
-
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    if (noCert) {
-      P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-          label);
-      finalize(keyId);
-    } else {
-      P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-          keysize, toBigInt(publicExponent),
-          label, getSubject(),
-          getKeyUsage(),
-          getExtendedKeyUsage());
-      finalize(keyAndCert);
-    }
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,25 +45,25 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class SubjectInfo {
 
-  private final X500Name grantedSubject;
+    private final X500Name grantedSubject;
 
-  private final String warning;
+    private final String warning;
 
-  public SubjectInfo(
-      final X500Name grantedSubject,
-      final String warning) {
-    ParamUtil.assertNotNull("grantedSubject", grantedSubject);
+    public SubjectInfo(
+            final X500Name grantedSubject,
+            final String warning) {
+        ParamUtil.assertNotNull("grantedSubject", grantedSubject);
 
-    this.grantedSubject = grantedSubject;
-    this.warning = warning;
-  }
+        this.grantedSubject = grantedSubject;
+        this.warning = warning;
+    }
 
-  public X500Name getGrantedSubject() {
-    return grantedSubject;
-  }
+    public X500Name getGrantedSubject() {
+        return grantedSubject;
+    }
 
-  public String getWarning() {
-    return warning;
-  }
+    public String getWarning() {
+        return warning;
+    }
 
 }

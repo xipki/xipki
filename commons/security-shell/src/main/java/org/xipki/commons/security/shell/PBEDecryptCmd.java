@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,28 +48,28 @@ import org.xipki.commons.password.PBEPasswordResolver;
  */
 
 @Command(scope = "xipki-tk", name = "pbe-dec",
-    description = "decrypt password with master password")
+        description = "decrypt password with master password")
 @Service
 public class PBEDecryptCmd extends SecurityCommandSupport {
 
-  @Option(name = "--password",
-      required = true,
-      description = "encrypted password, starts with PBE:\n"
-          + "(required)")
-  private String passwordHint;
+    @Option(name = "--password",
+            required = true,
+            description = "encrypted password, starts with PBE:\n"
+                    + "(required)")
+    private String passwordHint;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
-      throw new IllegalCmdParamException("encrypted password '" + passwordHint
-          + "' does not start with PBE:");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
+            throw new IllegalCmdParamException("encrypted password '" + passwordHint
+                    + "' does not start with PBE:");
+        }
+
+        char[] masterPassword = readPassword("please enter the master password");
+        char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
+        out("the decrypted password is: '" + new String(password) + "'");
+        return null;
     }
-
-    char[] masterPassword = readPassword("please enter the master password");
-    char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
-    out("the decrypted password is: '" + new String(password) + "'");
-    return null;
-  }
 
 }

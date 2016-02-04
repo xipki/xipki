@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,44 +50,44 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
  */
 
 @Command(scope = "xipki-db", name = "export-ca",
-    description = "export CA database")
+        description = "export CA database")
 @Service
 public class ExportCaCmd extends DbPortCommandSupport {
 
-  private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
+    private static final String DFLT_DBCONF_FILE = "xipki/ca-config/ca-db.properties";
 
-  @Option(name = "--db-conf",
-      description = "database configuration file")
-  @Completion(FilePathCompleter.class)
-  private String dbconfFile = DFLT_DBCONF_FILE;
+    @Option(name = "--db-conf",
+            description = "database configuration file")
+    @Completion(FilePathCompleter.class)
+    private String dbconfFile = DFLT_DBCONF_FILE;
 
-  @Option(name = "--out-dir",
-      required = true,
-      description = "output directory\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String outdir;
+    @Option(name = "--out-dir",
+            required = true,
+            description = "output directory\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String outdir;
 
-  @Option(name = "-n",
-      description = "number of certificates in one zip file")
-  private Integer numCertsInBundle = 10000;
+    @Option(name = "-n",
+            description = "number of certificates in one zip file")
+    private Integer numCertsInBundle = 10000;
 
-  @Option(name = "-k",
-      description = "number of certificates per SELECT")
-  private Integer numCertsPerCommit = 100;
+    @Option(name = "-k",
+            description = "number of certificates per SELECT")
+    private Integer numCertsPerCommit = 100;
 
-  @Option(name = "--resume")
-  private Boolean resume = Boolean.FALSE;
+    @Option(name = "--resume")
+    private Boolean resume = Boolean.FALSE;
 
-  @Option(name = "--test",
-      description = "just test the export, no real export")
-  private Boolean onlyTest = Boolean.FALSE;
+    @Option(name = "--test",
+            description = "just test the export, no real export")
+    private Boolean onlyTest = Boolean.FALSE;
 
-  @Override
-  protected DbPortWorker getDbPortWorker()
-  throws Exception {
-    return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
-        numCertsInBundle, numCertsPerCommit, onlyTest);
-  }
+    @Override
+    protected DbPortWorker getDbPortWorker()
+    throws Exception {
+        return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
+                numCertsInBundle, numCertsPerCommit, onlyTest);
+    }
 
 }

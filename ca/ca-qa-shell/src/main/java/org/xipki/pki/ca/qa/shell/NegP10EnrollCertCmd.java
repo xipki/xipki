@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -56,57 +56,57 @@ import org.xipki.pki.ca.client.shell.ClientCommandSupport;
  */
 
 @Command(scope = "xipki-qa", name = "neg-p10-enroll",
-    description = "enroll certificate via PKCS#10 request (negative, for QA)")
+        description = "enroll certificate via PKCS#10 request (negative, for QA)")
 @Service
 public class NegP10EnrollCertCmd extends ClientCommandSupport {
 
-  @Option(name = "--p10",
-      required = true,
-      description = "PKCS#10 request file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p10File;
+    @Option(name = "--p10",
+            required = true,
+            description = "PKCS#10 request file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p10File;
 
-  @Option(name = "--profile", aliases = "-p",
-      required = true,
-      description = "certificate profile\n"
-          + "(required)")
-  private String profile;
+    @Option(name = "--profile", aliases = "-p",
+            required = true,
+            description = "certificate profile\n"
+                    + "(required)")
+    private String profile;
 
-  @Option(name = "--user",
-      description = "username")
-  private String user;
+    @Option(name = "--user",
+            description = "username")
+    private String user;
 
-  @Option(name = "--ca",
-      description = "CA name\n"
-          + "(required if the profile is supported by more than one CA)")
-  private String caName;
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "(required if the profile is supported by more than one CA)")
+    private String caName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
 
-    EnrollCertResult result;
-    RequestResponseDebug debug = getRequestResponseDebug();
-    try {
-      result = caClient.requestCert(p10Req, profile, caName, user, debug);
-    } finally {
-      saveRequestResponse(debug);
+        EnrollCertResult result;
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try {
+            result = caClient.requestCert(p10Req, profile, caName, user, debug);
+        } finally {
+            saveRequestResponse(debug);
+        }
+
+        X509Certificate cert = null;
+        if (result != null) {
+            String id = result.getAllIds().iterator().next();
+            CertOrError certOrError = result.getCertificateOrError(id);
+            cert = (X509Certificate) certOrError.getCertificate();
+        }
+
+        if (cert != null) {
+            throw new CmdFailure("no certificate is excepted, but received one");
+        }
+
+        return null;
     }
-
-    X509Certificate cert = null;
-    if (result != null) {
-      String id = result.getAllIds().iterator().next();
-      CertOrError certOrError = result.getCertificateOrError(id);
-      cert = (X509Certificate) certOrError.getCertificate();
-    }
-
-    if (cert != null) {
-      throw new CmdFailure("no certificate is excepted, but received one");
-    }
-
-    return null;
-  }
 
 }

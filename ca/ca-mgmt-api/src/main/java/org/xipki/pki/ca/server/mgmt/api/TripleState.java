@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,26 +42,26 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 public enum TripleState {
 
-  REQUIRED("required"),
-  OPTIONAL("optional"),
-  FORBIDDEN("forbidden");
-  private final String value;
+    REQUIRED("required"),
+    OPTIONAL("optional"),
+    FORBIDDEN("forbidden");
+    private final String value;
 
-  TripleState(String v) {
-    value = v;
-  }
-
-  public String value() {
-    return value;
-  }
-
-  public static TripleState fromValue(String v) {
-    for (TripleState c: TripleState.values()) {
-      if (c.value.equalsIgnoreCase(v)) {
-        return c;
-      }
+    TripleState(String v) {
+        value = v;
     }
-    throw new IllegalArgumentException(v);
-  }
+
+    public String value() {
+        return value;
+    }
+
+    public static TripleState fromValue(String v) {
+        for (TripleState c: TripleState.values()) {
+            if (c.value.equalsIgnoreCase(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
+    }
 
 }

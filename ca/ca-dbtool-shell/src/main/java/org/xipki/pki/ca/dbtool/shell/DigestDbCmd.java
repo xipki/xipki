@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,41 +50,41 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
  */
 
 @Command(scope = "xipki-db", name = "digest-db",
-    description = "digest XiPKI/EJBCA database")
+        description = "digest XiPKI/EJBCA database")
 @Service
 public class DigestDbCmd extends DbPortCommandSupport {
 
-  @Option(name = "--db-conf",
-      required = true,
-      description = "database configuration file")
-  @Completion(FilePathCompleter.class)
-  private String dbconfFile;
+    @Option(name = "--db-conf",
+            required = true,
+            description = "database configuration file")
+    @Completion(FilePathCompleter.class)
+    private String dbconfFile;
 
-  @Option(name = "--out-dir",
-      required = true,
-      description = "output directory\n"
-          + "(required)")
-  @Completion(DirPathCompleter.class)
-  private String outdir;
+    @Option(name = "--out-dir",
+            required = true,
+            description = "output directory\n"
+                    + "(required)")
+    @Completion(DirPathCompleter.class)
+    private String outdir;
 
-  @Option(name = "-k",
-      description = "number of certificates per SELECT")
-  private Integer numCertsPerSelect = 1000;
+    @Option(name = "-k",
+            description = "number of certificates per SELECT")
+    private Integer numCertsPerSelect = 1000;
 
-  @Option(name = "--threads",
-      description = "number of threads to query the database")
-  private Integer numThreads = 10;
+    @Option(name = "--threads",
+            description = "number of threads to query the database")
+    private Integer numThreads = 10;
 
-  @Override
-  protected DbPortWorker getDbPortWorker()
-  throws Exception {
-    return new DbDigestExportWorker(
-        dataSourceFactory,
-        passwordResolver,
-        dbconfFile,
-        outdir,
-        numCertsPerSelect,
-        numThreads);
-  }
+    @Override
+    protected DbPortWorker getDbPortWorker()
+    throws Exception {
+        return new DbDigestExportWorker(
+                dataSourceFactory,
+                passwordResolver,
+                dbconfFile,
+                outdir,
+                numCertsPerSelect,
+                numThreads);
+    }
 
 }

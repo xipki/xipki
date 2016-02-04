@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,47 +42,47 @@ package org.xipki.pki.ca.server.impl;
 
 public class SubjectKeyProfileBundle {
 
-  private final int certId;
+    private final int certId;
 
-  private final long subjectFp;
+    private final long subjectFp;
 
-  private final long keyFp;
+    private final long keyFp;
 
-  private final String profile;
+    private final String profile;
 
-  private final boolean revoked;
+    private final boolean revoked;
 
-  public SubjectKeyProfileBundle(
-      final int certId,
-      final long subjectFp,
-      final long keyFp,
-      final String profile,
-      final boolean revoked) {
-    super();
-    this.certId = certId;
-    this.subjectFp = subjectFp;
-    this.keyFp = keyFp;
-    this.profile = profile;
-    this.revoked = revoked;
-  }
+    public SubjectKeyProfileBundle(
+            final int certId,
+            final long subjectFp,
+            final long keyFp,
+            final String profile,
+            final boolean revoked) {
+        super();
+        this.certId = certId;
+        this.subjectFp = subjectFp;
+        this.keyFp = keyFp;
+        this.profile = profile;
+        this.revoked = revoked;
+    }
 
-  public int getCertId() {
-    return certId;
-  }
+    public int getCertId() {
+        return certId;
+    }
 
-  public long getSubjectFp() {
-    return subjectFp;
-  }
+    public long getSubjectFp() {
+        return subjectFp;
+    }
 
-  public long getKeyFp() {
-    return keyFp;
-  }
+    public long getKeyFp() {
+        return keyFp;
+    }
 
-  public String getProfile() {
-    return profile;
-  }
+    public String getProfile() {
+        return profile;
+    }
 
-  public boolean isRevoked() {
-    return revoked;
-  }
+    public boolean isRevoked() {
+        return revoked;
+    }
 }

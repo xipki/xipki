@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,26 +45,26 @@ import org.xipki.commons.common.LoadExecutor;
 
 public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
 
-  @Option(name = "--duration",
-      description = "duration in seconds")
-  private Integer durationInSecond = 30;
+    @Option(name = "--duration",
+            description = "duration in seconds")
+    private Integer durationInSecond = 30;
 
-  @Option(name = "--thread",
-      description = "number of threads")
-  private Integer numThreads = 5;
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
 
-  protected abstract LoadExecutor getTester()
-  throws Exception;
+    protected abstract LoadExecutor getTester()
+    throws Exception;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    LoadExecutor tester = getTester();
-    tester.setDuration(durationInSecond);
-    tester.setThreads(Math.max(20, numThreads));
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        LoadExecutor tester = getTester();
+        tester.setDuration(durationInSecond);
+        tester.setThreads(Math.max(20, numThreads));
 
-    tester.test();
-    return null;
-  }
+        tester.test();
+        return null;
+    }
 
 }

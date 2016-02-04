@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,29 +45,29 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "env-up",
-    description = "update CA environment parameter")
+        description = "update CA environment parameter")
 @Service
 public class EnvUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-        description = "parameter name\n"
-          + "(required)")
-  protected String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+                description = "parameter name\n"
+                    + "(required)")
+    protected String name;
 
-  @Option(name = "--value",
-      required = true,
-      description = "environment paremter value\n"
-          + "(required)")
-  protected String value;
+    @Option(name = "--value",
+            required = true,
+            description = "environment paremter value\n"
+                    + "(required)")
+    protected String value;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.changeEnvParam(name, value);
-    output(b, "updated", "could not update",
-        "the environment " + name + "=" + getRealString(value));
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.changeEnvParam(name, value);
+        output(b, "updated", "could not update",
+                "the environment " + name + "=" + getRealString(value));
+        return null;
+    }
 
 }

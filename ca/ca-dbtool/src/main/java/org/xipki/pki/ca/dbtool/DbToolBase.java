@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -67,333 +67,333 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 public class DbToolBase {
 
-  private static final int STREAM_BUFFER_SIZE = 1048576; // 1M
+    private static final int STREAM_BUFFER_SIZE = 1048576; // 1M
 
-  protected final AtomicBoolean stopMe;
+    protected final AtomicBoolean stopMe;
 
-  protected final DataSourceWrapper dataSource;
+    protected final DataSourceWrapper dataSource;
 
-  protected Connection connection;
+    protected Connection connection;
 
-  private boolean connectionAutoCommit;
+    private boolean connectionAutoCommit;
 
-  protected final String baseDir;
+    protected final String baseDir;
 
-  public DbToolBase(
-      final DataSourceWrapper dataSource,
-      final String baseDir,
-      final AtomicBoolean stopMe)
-  throws DataAccessException {
-    super();
-    ParamUtil.assertNotNull("dataSource", dataSource);
-    ParamUtil.assertNotBlank("baseDir", baseDir);
-    ParamUtil.assertNotNull("stopMe", stopMe);
+    public DbToolBase(
+            final DataSourceWrapper dataSource,
+            final String baseDir,
+            final AtomicBoolean stopMe)
+    throws DataAccessException {
+        super();
+        ParamUtil.assertNotNull("dataSource", dataSource);
+        ParamUtil.assertNotBlank("baseDir", baseDir);
+        ParamUtil.assertNotNull("stopMe", stopMe);
 
-    this.stopMe = stopMe;
-    this.dataSource = dataSource;
-    this.connection = this.dataSource.getConnection();
-    try {
-      this.connectionAutoCommit = connection.getAutoCommit();
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-    this.baseDir = IoUtil.expandFilepath(baseDir);
-  }
-
-  protected Statement createStatement()
-  throws DataAccessException {
-    try {
-      return connection.createStatement();
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-  }
-
-  protected PreparedStatement prepareStatement(
-      final String sql)
-  throws DataAccessException {
-    try {
-      return connection.prepareStatement(sql);
-    } catch (SQLException e) {
-      throw dataSource.translate(sql, e);
-    }
-  }
-
-  public boolean deleteFromTableWithLargerId(
-      final String tableName,
-      final String idColumn,
-      final int id,
-      final Logger log) {
-    StringBuilder sb = new StringBuilder(50);
-    sb.append("DELETE FROM ")
-      .append(tableName)
-      .append(" WHERE ")
-      .append(idColumn)
-      .append(" > ")
-      .append(id);
-
-    Statement stmt;
-    try {
-      stmt = createStatement();
-    } catch (DataAccessException e) {
-      log.error("could not create statement", e);
-      return false;
-    }
-    try {
-      stmt.execute(sb.toString());
-    } catch (Throwable t) {
-      log.error("could not delete columns from table " + tableName + " with "
-          + idColumn + " > " + id, t);
-      return false;
-    } finally {
-      releaseResources(stmt, null);
-    }
-
-    return true;
-  } // method deleteFromTableWithLargerId
-
-  public void shutdown() {
-    dataSource.returnConnection(connection);
-    connection = null;
-  }
-
-  public long getMin(
-      final String table,
-      final String column)
-  throws DataAccessException {
-    return dataSource.getMin(connection, table, column);
-  }
-
-  public long getMin(
-      final String table,
-      final String column,
-      final String condition)
-  throws DataAccessException {
-    return dataSource.getMin(connection, table, column, condition);
-  }
-
-  public long getMax(
-      final String table,
-      final String column)
-  throws DataAccessException {
-    return dataSource.getMax(connection, table, column);
-  }
-
-  public long getMax(
-      final String table,
-      final String column,
-      final String condition)
-  throws DataAccessException {
-    return dataSource.getMax(connection, table, column, condition);
-  }
-
-  public int getCount(
-      final String table)
-  throws DataAccessException {
-    return dataSource.getCount(connection, table);
-  }
-
-  public boolean tableHasColumn(
-      final String table,
-      final String column)
-  throws DataAccessException {
-    return dataSource.tableHasColumn(connection, table, column);
-  }
-
-  public boolean tableExists(
-      final String table)
-  throws DataAccessException {
-    return dataSource.tableExists(connection, table);
-  }
-
-  protected Savepoint setSavepoint()
-  throws DataAccessException {
-    try {
-      return connection.setSavepoint();
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-  }
-
-  protected void rollback()
-  throws DataAccessException {
-    try {
-      connection.rollback();
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-  }
-
-  protected DataAccessException translate(
-      final String sql,
-      final SQLException e) {
-    return dataSource.translate(sql, e);
-  }
-
-  protected void disableAutoCommit()
-  throws DataAccessException {
-    try {
-      connection.setAutoCommit(false);
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-  }
-
-  protected void recoverAutoCommit()
-  throws DataAccessException {
-    try {
-      connection.setAutoCommit(connectionAutoCommit);
-    } catch (SQLException e) {
-      throw dataSource.translate(null, e);
-    }
-  }
-
-  protected void commit(
-      final String task)
-  throws DataAccessException {
-    try {
-      connection.commit();
-    } catch (SQLException e) {
-      throw dataSource.translate(task, e);
-    }
-  }
-
-  protected static void setLong(
-      final PreparedStatement ps,
-      final int index,
-      final Long i)
-  throws SQLException {
-    if (i != null) {
-      ps.setLong(index, i.longValue());
-    } else {
-      ps.setNull(index, Types.BIGINT);
-    }
-  }
-
-  protected static void setInt(
-      final PreparedStatement ps,
-      final int index,
-      final Integer i)
-  throws SQLException {
-    if (i != null) {
-      ps.setInt(index, i.intValue());
-    } else {
-      ps.setNull(index, Types.INTEGER);
-    }
-  }
-
-  protected static void setBoolean(
-      final PreparedStatement ps,
-      final int index,
-      final boolean b)
-  throws SQLException {
-    int i =  b
-        ? 1
-        : 0;
-    ps.setInt(index, i);
-  }
-
-  public static Properties getDbConfProperties(
-      final InputStream is)
-  throws IOException {
-    Properties props = new Properties();
-    try {
-      props.load(is);
-    } finally {
-      try {
-        is.close();
-      } catch (IOException e) {
-      }
-    }
-
-    // adapt the configuration
-    if (props.getProperty("minimumIdle") != null) {
-      props.setProperty("minimumIdle", "1");
-    }
-
-    if (props.getProperty("db.minIdle") != null) {
-      props.setProperty("db.minIdle", "1");
-    }
-
-    return props;
-  }
-
-  public static void deleteTmpFiles(
-      final String dirName,
-      final String prefix) {
-    // delete the temporary files
-    File dir = new File(dirName);
-    File[] children = dir.listFiles();
-    if (children != null && children.length > 0) {
-      for (File child : children) {
-        if (child.getName().startsWith(prefix)) {
-          child.delete();
+        this.stopMe = stopMe;
+        this.dataSource = dataSource;
+        this.connection = this.dataSource.getConnection();
+        try {
+            this.connectionAutoCommit = connection.getAutoCommit();
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
         }
-      }
-    }
-  }
-
-  protected static void writeLine(
-      final OutputStream os,
-      final String text)
-  throws IOException {
-    os.write(text.getBytes());
-    os.write('\n');
-  }
-
-  public static String buildFilename(
-      final String prefix,
-      final String suffix,
-      final int minIdOfCurrentFile,
-      final int maxIdOfCurrentFile,
-      final int maxId) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(prefix);
-
-    int len = Integer.toString(maxId).length();
-    String a = Integer.toString(minIdOfCurrentFile);
-    for (int i = 0; i < len - a.length(); i++) {
-      sb.append('0');
-    }
-    sb.append(a);
-    sb.append("-");
-
-    String b = Integer.toString(maxIdOfCurrentFile);
-    for (int i = 0; i < len - b.length(); i++) {
-      sb.append('0');
-    }
-    sb.append(b);
-
-    sb.append(suffix);
-    return sb.toString();
-  } // method writeLine
-
-  public static ZipOutputStream getZipOutputStream(
-      final File zipFile)
-  throws FileNotFoundException {
-    BufferedOutputStream out = new BufferedOutputStream(
-        new FileOutputStream(zipFile), STREAM_BUFFER_SIZE);
-    ZipOutputStream zipOutStream = new ZipOutputStream(out);
-    zipOutStream.setLevel(Deflater.BEST_SPEED);
-    return zipOutStream;
-  }
-
-  public static void releaseResources(
-      final Statement ps,
-      final ResultSet rs) {
-    if (ps != null) {
-      try {
-        ps.close();
-      } catch (SQLException e) {
-      }
+        this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
-    if (rs != null) {
-      try {
-        rs.close();
-      } catch (SQLException e) {
-      }
+    protected Statement createStatement()
+    throws DataAccessException {
+        try {
+            return connection.createStatement();
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
+        }
     }
-  }
+
+    protected PreparedStatement prepareStatement(
+            final String sql)
+    throws DataAccessException {
+        try {
+            return connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            throw dataSource.translate(sql, e);
+        }
+    }
+
+    public boolean deleteFromTableWithLargerId(
+            final String tableName,
+            final String idColumn,
+            final int id,
+            final Logger log) {
+        StringBuilder sb = new StringBuilder(50);
+        sb.append("DELETE FROM ")
+            .append(tableName)
+            .append(" WHERE ")
+            .append(idColumn)
+            .append(" > ")
+            .append(id);
+
+        Statement stmt;
+        try {
+            stmt = createStatement();
+        } catch (DataAccessException e) {
+            log.error("could not create statement", e);
+            return false;
+        }
+        try {
+            stmt.execute(sb.toString());
+        } catch (Throwable t) {
+            log.error("could not delete columns from table " + tableName + " with "
+                    + idColumn + " > " + id, t);
+            return false;
+        } finally {
+            releaseResources(stmt, null);
+        }
+
+        return true;
+    } // method deleteFromTableWithLargerId
+
+    public void shutdown() {
+        dataSource.returnConnection(connection);
+        connection = null;
+    }
+
+    public long getMin(
+            final String table,
+            final String column)
+    throws DataAccessException {
+        return dataSource.getMin(connection, table, column);
+    }
+
+    public long getMin(
+            final String table,
+            final String column,
+            final String condition)
+    throws DataAccessException {
+        return dataSource.getMin(connection, table, column, condition);
+    }
+
+    public long getMax(
+            final String table,
+            final String column)
+    throws DataAccessException {
+        return dataSource.getMax(connection, table, column);
+    }
+
+    public long getMax(
+            final String table,
+            final String column,
+            final String condition)
+    throws DataAccessException {
+        return dataSource.getMax(connection, table, column, condition);
+    }
+
+    public int getCount(
+            final String table)
+    throws DataAccessException {
+        return dataSource.getCount(connection, table);
+    }
+
+    public boolean tableHasColumn(
+            final String table,
+            final String column)
+    throws DataAccessException {
+        return dataSource.tableHasColumn(connection, table, column);
+    }
+
+    public boolean tableExists(
+            final String table)
+    throws DataAccessException {
+        return dataSource.tableExists(connection, table);
+    }
+
+    protected Savepoint setSavepoint()
+    throws DataAccessException {
+        try {
+            return connection.setSavepoint();
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
+        }
+    }
+
+    protected void rollback()
+    throws DataAccessException {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
+        }
+    }
+
+    protected DataAccessException translate(
+            final String sql,
+            final SQLException e) {
+        return dataSource.translate(sql, e);
+    }
+
+    protected void disableAutoCommit()
+    throws DataAccessException {
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
+        }
+    }
+
+    protected void recoverAutoCommit()
+    throws DataAccessException {
+        try {
+            connection.setAutoCommit(connectionAutoCommit);
+        } catch (SQLException e) {
+            throw dataSource.translate(null, e);
+        }
+    }
+
+    protected void commit(
+            final String task)
+    throws DataAccessException {
+        try {
+            connection.commit();
+        } catch (SQLException e) {
+            throw dataSource.translate(task, e);
+        }
+    }
+
+    protected static void setLong(
+            final PreparedStatement ps,
+            final int index,
+            final Long i)
+    throws SQLException {
+        if (i != null) {
+            ps.setLong(index, i.longValue());
+        } else {
+            ps.setNull(index, Types.BIGINT);
+        }
+    }
+
+    protected static void setInt(
+            final PreparedStatement ps,
+            final int index,
+            final Integer i)
+    throws SQLException {
+        if (i != null) {
+            ps.setInt(index, i.intValue());
+        } else {
+            ps.setNull(index, Types.INTEGER);
+        }
+    }
+
+    protected static void setBoolean(
+            final PreparedStatement ps,
+            final int index,
+            final boolean b)
+    throws SQLException {
+        int i =    b
+                ? 1
+                : 0;
+        ps.setInt(index, i);
+    }
+
+    public static Properties getDbConfProperties(
+            final InputStream is)
+    throws IOException {
+        Properties props = new Properties();
+        try {
+            props.load(is);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        }
+
+        // adapt the configuration
+        if (props.getProperty("minimumIdle") != null) {
+            props.setProperty("minimumIdle", "1");
+        }
+
+        if (props.getProperty("db.minIdle") != null) {
+            props.setProperty("db.minIdle", "1");
+        }
+
+        return props;
+    }
+
+    public static void deleteTmpFiles(
+            final String dirName,
+            final String prefix) {
+        // delete the temporary files
+        File dir = new File(dirName);
+        File[] children = dir.listFiles();
+        if (children != null && children.length > 0) {
+            for (File child : children) {
+                if (child.getName().startsWith(prefix)) {
+                    child.delete();
+                }
+            }
+        }
+    }
+
+    protected static void writeLine(
+            final OutputStream os,
+            final String text)
+    throws IOException {
+        os.write(text.getBytes());
+        os.write('\n');
+    }
+
+    public static String buildFilename(
+            final String prefix,
+            final String suffix,
+            final int minIdOfCurrentFile,
+            final int maxIdOfCurrentFile,
+            final int maxId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix);
+
+        int len = Integer.toString(maxId).length();
+        String a = Integer.toString(minIdOfCurrentFile);
+        for (int i = 0; i < len - a.length(); i++) {
+            sb.append('0');
+        }
+        sb.append(a);
+        sb.append("-");
+
+        String b = Integer.toString(maxIdOfCurrentFile);
+        for (int i = 0; i < len - b.length(); i++) {
+            sb.append('0');
+        }
+        sb.append(b);
+
+        sb.append(suffix);
+        return sb.toString();
+    } // method writeLine
+
+    public static ZipOutputStream getZipOutputStream(
+            final File zipFile)
+    throws FileNotFoundException {
+        BufferedOutputStream out = new BufferedOutputStream(
+                new FileOutputStream(zipFile), STREAM_BUFFER_SIZE);
+        ZipOutputStream zipOutStream = new ZipOutputStream(out);
+        zipOutStream.setLevel(Deflater.BEST_SPEED);
+        return zipOutStream;
+    }
+
+    public static void releaseResources(
+            final Statement ps,
+            final ResultSet rs) {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException e) {
+            }
+        }
+
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+            }
+        }
+    }
 
 }

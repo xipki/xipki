@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -93,256 +93,256 @@ import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 
 class X509SelfSignedCertBuilder {
 
-  static class GenerateSelfSignedResult {
+    static class GenerateSelfSignedResult {
 
-    private final String signerConf;
+        private final String signerConf;
 
-    private final X509Certificate cert;
+        private final X509Certificate cert;
 
-    GenerateSelfSignedResult(
-        final String signerConf,
-        final X509Certificate cert) {
-      this.signerConf = signerConf;
-      this.cert = cert;
-    }
-
-    String getSignerConf() {
-      return signerConf;
-    }
-
-    X509Certificate getCert() {
-      return cert;
-    }
-
-  } // class GenerateSelfSignedResult
-
-  private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
-
-  private X509SelfSignedCertBuilder() {
-  }
-
-  public static GenerateSelfSignedResult generateSelfSigned(
-      final SecurityFactory securityFactory,
-      final String signerType,
-      final String signerConf,
-      final IdentifiedX509Certprofile certprofile,
-      final CertificationRequest p10Request,
-      final long serialNumber,
-      final List<String> cacertUris,
-      final List<String> ocspUris,
-      final List<String> crlUris,
-      final List<String> deltaCrlUris)
-  throws OperationException, InvalidConfException {
-    if (!securityFactory.verifyPOPO(p10Request)) {
-      throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
-    }
-
-    if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType)) {
-      ConfPairs keyValues = new ConfPairs(signerConf);
-      String keystoreConf = keyValues.getValue("keystore");
-      if (keystoreConf == null) {
-        throw new InvalidConfException(
-          "required parameter 'keystore' for types PKCS12 and JKS, is not specified");
-      }
-    }
-
-    ConcurrentContentSigner signer;
-    try {
-      List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(signerConf);
-      List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
-
-      String thisSignerConf = null;
-      if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
-        thisSignerConf = signerConfs.get(0)[1];
-      } else {
-        for (String algo : restrictedSigAlgos) {
-          for (String[] m : signerConfs) {
-            if (m[0].equals(algo)) {
-              thisSignerConf = m[1];
-              break;
-            }
-          }
-
-          if (thisSignerConf != null) {
-            break;
-          }
+        GenerateSelfSignedResult(
+                final String signerConf,
+                final X509Certificate cert) {
+            this.signerConf = signerConf;
+            this.cert = cert;
         }
-      }
 
-      if (thisSignerConf == null) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "CA does not support any signature algorithm restricted by the cert profile");
-      }
+        String getSignerConf() {
+            return signerConf;
+        }
 
-      signer = securityFactory.createSigner(signerType, thisSignerConf,
-          (X509Certificate[]) null);
-    } catch (SignerException e) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          e.getClass().getName() + ": " + e.getMessage());
+        X509Certificate getCert() {
+            return cert;
+        }
+
+    } // class GenerateSelfSignedResult
+
+    private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
+
+    private X509SelfSignedCertBuilder() {
     }
 
-    // this certificate is the dummy one which can be considered only as public key container
-    Certificate bcCert;
-    try {
-      bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-    } catch (Exception e) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "could not reparse certificate: " + e.getMessage());
-    }
-    SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
+    public static GenerateSelfSignedResult generateSelfSigned(
+            final SecurityFactory securityFactory,
+            final String signerType,
+            final String signerConf,
+            final IdentifiedX509Certprofile certprofile,
+            final CertificationRequest p10Request,
+            final long serialNumber,
+            final List<String> cacertUris,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
+    throws OperationException, InvalidConfException {
+        if (!securityFactory.verifyPOPO(p10Request)) {
+            throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
+        }
 
-    X509Certificate newCert = generateCertificate(
-        signer, certprofile, p10Request, serialNumber, publicKeyInfo,
-        cacertUris, ocspUris, crlUris, deltaCrlUris);
+        if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType)) {
+            ConfPairs keyValues = new ConfPairs(signerConf);
+            String keystoreConf = keyValues.getValue("keystore");
+            if (keystoreConf == null) {
+                throw new InvalidConfException(
+                    "required parameter 'keystore' for types PKCS12 and JKS, is not specified");
+            }
+        }
 
-    return new GenerateSelfSignedResult(signerConf, newCert);
-  } // method generateSelfSigned
+        ConcurrentContentSigner signer;
+        try {
+            List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(signerConf);
+            List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
-  private static X509Certificate generateCertificate(
-      final ConcurrentContentSigner signer,
-      final IdentifiedX509Certprofile certprofile,
-      final CertificationRequest p10Request,
-      final long serialNumber,
-      SubjectPublicKeyInfo publicKeyInfo,
-      final List<String> cacertUris,
-      final List<String> ocspUris,
-      final List<String> crlUris,
-      final List<String> deltaCrlUris)
-  throws OperationException {
-    try {
-      publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
-    } catch (InvalidKeySpecException e) {
-      LOG.warn("SecurityUtil.toRfc3279Style", e);
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-    }
+            String thisSignerConf = null;
+            if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
+                thisSignerConf = signerConfs.get(0)[1];
+            } else {
+                for (String algo : restrictedSigAlgos) {
+                    for (String[] m : signerConfs) {
+                        if (m[0].equals(algo)) {
+                            thisSignerConf = m[1];
+                            break;
+                        }
+                    }
 
-    try {
-      certprofile.checkPublicKey(publicKeyInfo);
-    } catch (BadCertTemplateException e) {
-      LOG.warn("certprofile.checkPublicKey", e);
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-    }
+                    if (thisSignerConf != null) {
+                        break;
+                    }
+                }
+            }
 
-    X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
+            if (thisSignerConf == null) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "CA does not support any signature algorithm restricted by the cert profile");
+            }
 
-    SubjectInfo subjectInfo;
-    // subject
-    try {
-      subjectInfo = certprofile.getSubject(requestedSubject);
-    } catch (CertprofileException e) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.getName());
-    } catch (BadCertTemplateException e) {
-      LOG.warn("certprofile.getSubject", e);
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-    }
+            signer = securityFactory.createSigner(signerType, thisSignerConf,
+                    (X509Certificate[]) null);
+        } catch (SignerException e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    e.getClass().getName() + ": " + e.getMessage());
+        }
 
-    Date notBefore = certprofile.getNotBefore(null);
-    if (notBefore == null) {
-      notBefore = new Date();
-    }
+        // this certificate is the dummy one which can be considered only as public key container
+        Certificate bcCert;
+        try {
+            bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
+        } catch (Exception e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "could not reparse certificate: " + e.getMessage());
+        }
+        SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
-    CertValidity validity = certprofile.getValidity();
-    if (validity == null) {
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-          "no validity specified in the profile " + certprofile.getName());
-    }
+        X509Certificate newCert = generateCertificate(
+                signer, certprofile, p10Request, serialNumber, publicKeyInfo,
+                cacertUris, ocspUris, crlUris, deltaCrlUris);
 
-    Date notAfter = validity.add(notBefore);
+        return new GenerateSelfSignedResult(signerConf, newCert);
+    } // method generateSelfSigned
 
-    X500Name grantedSubject = subjectInfo.getGrantedSubject();
+    private static X509Certificate generateCertificate(
+            final ConcurrentContentSigner signer,
+            final IdentifiedX509Certprofile certprofile,
+            final CertificationRequest p10Request,
+            final long serialNumber,
+            SubjectPublicKeyInfo publicKeyInfo,
+            final List<String> cacertUris,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris)
+    throws OperationException {
+        try {
+            publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+        } catch (InvalidKeySpecException e) {
+            LOG.warn("SecurityUtil.toRfc3279Style", e);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        }
 
-    BigInteger _serialNumber = BigInteger.valueOf(serialNumber);
-    X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-        grantedSubject,
-        _serialNumber,
-        notBefore,
-        notAfter,
-        grantedSubject,
-        publicKeyInfo);
+        try {
+            certprofile.checkPublicKey(publicKeyInfo);
+        } catch (BadCertTemplateException e) {
+            LOG.warn("certprofile.checkPublicKey", e);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        }
 
-    PublicCAInfo publicCaInfo = new PublicCAInfo(
-        grantedSubject, _serialNumber, null, null,
-        cacertUris, ocspUris, crlUris, deltaCrlUris);
+        X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
 
-    Extensions extensions = null;
-    ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
-        extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
-      }
-    }
+        SubjectInfo subjectInfo;
+        // subject
+        try {
+            subjectInfo = certprofile.getSubject(requestedSubject);
+        } catch (CertprofileException e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "exception in cert profile " + certprofile.getName());
+        } catch (BadCertTemplateException e) {
+            LOG.warn("certprofile.getSubject", e);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        }
 
-    try {
-      addExtensions(
-          certBuilder,
-          certprofile,
-          requestedSubject,
-          extensions,
-          publicKeyInfo,
-          publicCaInfo,
-          notBefore,
-          notAfter);
+        Date notBefore = certprofile.getNotBefore(null);
+        if (notBefore == null) {
+            notBefore = new Date();
+        }
 
-      ContentSigner contentSigner = signer.borrowContentSigner();
+        CertValidity validity = certprofile.getValidity();
+        if (validity == null) {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                    "no validity specified in the profile " + certprofile.getName());
+        }
 
-      Certificate bcCert;
-      try {
-        bcCert = certBuilder.build(contentSigner).toASN1Structure();
-      } finally {
-        signer.returnContentSigner(contentSigner);
-      }
+        Date notAfter = validity.add(notBefore);
 
-      byte[] encodedCert = bcCert.getEncoded();
+        X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-      CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-      return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
-    } catch (BadCertTemplateException e) {
-      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-    } catch (NoIdleSignerException | CertificateException | IOException
-        | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException e) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          e.getClass().getName() + ": " + e.getMessage());
-    }
-  } // method generateCertificate
+        BigInteger _serialNumber = BigInteger.valueOf(serialNumber);
+        X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
+                grantedSubject,
+                _serialNumber,
+                notBefore,
+                notAfter,
+                grantedSubject,
+                publicKeyInfo);
 
-  private static void addExtensions(
-      final X509v3CertificateBuilder certBuilder,
-      final IdentifiedX509Certprofile profile,
-      final X500Name requestedSubject,
-      final Extensions extensions,
-      final SubjectPublicKeyInfo requestedPublicKeyInfo,
-      final PublicCAInfo publicCaInfo,
-      final Date notBefore,
-      final Date notAfter)
-  throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
-    ExtensionValues extensionTuples = profile.getExtensions(
-        requestedSubject, extensions, requestedPublicKeyInfo,
-        publicCaInfo, null, notBefore, notAfter);
-    if (extensionTuples == null) {
-      return;
-    }
+        PublicCAInfo publicCaInfo = new PublicCAInfo(
+                grantedSubject, _serialNumber, null, null,
+                cacertUris, ocspUris, crlUris, deltaCrlUris);
 
-    for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
-      ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
-      certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
-    }
-  } // method addExtensions
+        Extensions extensions = null;
+        ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
+        for (int i = 0; i < attrs.size(); i++) {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+                extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+            }
+        }
 
-  public static AsymmetricKeyParameter generatePublicKeyParameter(
-      final PublicKey key)
-  throws InvalidKeyException {
-    if (key instanceof RSAPublicKey) {
-      RSAPublicKey k = (RSAPublicKey) key;
-      return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
-    } else if (key instanceof ECPublicKey) {
-      return ECUtil.generatePublicKeyParameter(key);
-    } else if (key instanceof DSAPublicKey) {
-      return DSAUtil.generatePublicKeyParameter(key);
-    } else {
-      throw new InvalidKeyException("unknown key " + key.getClass().getName());
-    }
-  } // method generatePublicKeyParameter
+        try {
+            addExtensions(
+                    certBuilder,
+                    certprofile,
+                    requestedSubject,
+                    extensions,
+                    publicKeyInfo,
+                    publicCaInfo,
+                    notBefore,
+                    notAfter);
+
+            ContentSigner contentSigner = signer.borrowContentSigner();
+
+            Certificate bcCert;
+            try {
+                bcCert = certBuilder.build(contentSigner).toASN1Structure();
+            } finally {
+                signer.returnContentSigner(contentSigner);
+            }
+
+            byte[] encodedCert = bcCert.getEncoded();
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+            return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
+        } catch (BadCertTemplateException e) {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        } catch (NoIdleSignerException | CertificateException | IOException
+                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    e.getClass().getName() + ": " + e.getMessage());
+        }
+    } // method generateCertificate
+
+    private static void addExtensions(
+            final X509v3CertificateBuilder certBuilder,
+            final IdentifiedX509Certprofile profile,
+            final X500Name requestedSubject,
+            final Extensions extensions,
+            final SubjectPublicKeyInfo requestedPublicKeyInfo,
+            final PublicCAInfo publicCaInfo,
+            final Date notBefore,
+            final Date notAfter)
+    throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
+        ExtensionValues extensionTuples = profile.getExtensions(
+                requestedSubject, extensions, requestedPublicKeyInfo,
+                publicCaInfo, null, notBefore, notAfter);
+        if (extensionTuples == null) {
+            return;
+        }
+
+        for (ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes()) {
+            ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
+            certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
+        }
+    } // method addExtensions
+
+    public static AsymmetricKeyParameter generatePublicKeyParameter(
+            final PublicKey key)
+    throws InvalidKeyException {
+        if (key instanceof RSAPublicKey) {
+            RSAPublicKey k = (RSAPublicKey) key;
+            return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
+        } else if (key instanceof ECPublicKey) {
+            return ECUtil.generatePublicKeyParameter(key);
+        } else if (key instanceof DSAPublicKey) {
+            return DSAUtil.generatePublicKeyParameter(key);
+        } else {
+            throw new InvalidKeyException("unknown key " + key.getClass().getName());
+        }
+    } // method generatePublicKeyParameter
 
 }

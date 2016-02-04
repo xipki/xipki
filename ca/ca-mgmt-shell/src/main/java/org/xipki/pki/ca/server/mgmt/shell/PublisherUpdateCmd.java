@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,44 +50,44 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "publisher-up",
-    description = "update publisher")
+        description = "update publisher")
 @Service
 public class PublisherUpdateCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "publisher name\n"
-          + "(required)")
-  @Completion(PublisherNameCompleter.class)
-  protected String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "publisher name\n"
+                    + "(required)")
+    @Completion(PublisherNameCompleter.class)
+    protected String name;
 
-  @Option(name = "--type",
-      description = "publisher type")
-  protected String type;
+    @Option(name = "--type",
+            description = "publisher type")
+    protected String type;
 
-  @Option(name = "--conf",
-      description = "publisher configuration or 'NULL'")
-  protected String conf;
+    @Option(name = "--conf",
+            description = "publisher configuration or 'NULL'")
+    protected String conf;
 
-  @Option(name = "--conf-file",
-      description = "profile configuration file")
-  @Completion(FilePathCompleter.class)
-  protected String confFile;
+    @Option(name = "--conf-file",
+            description = "profile configuration file")
+    @Completion(FilePathCompleter.class)
+    protected String confFile;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (type == null && conf == null && confFile == null) {
-      throw new IllegalCmdParamException("nothing to update");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (type == null && conf == null && confFile == null) {
+            throw new IllegalCmdParamException("nothing to update");
+        }
+
+        if (conf == null && confFile != null) {
+            conf = new String(IoUtil.read(confFile));
+        }
+
+        boolean b = caManager.changePublisher(name, type, conf);
+        output(b, "updated", "could not update", "certificate profile " + name);
+        return null;
     }
-
-    if (conf == null && confFile != null) {
-      conf = new String(IoUtil.read(confFile));
-    }
-
-    boolean b = caManager.changePublisher(name, type, conf);
-    output(b, "updated", "could not update", "certificate profile " + name);
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,82 +49,82 @@ import org.bouncycastle.util.encoders.Hex;
 
 public enum HashAlgoType {
 
-  MD5   (16, "1.2.840.113549.2.5", "MD5"),
-  SHA1  (20, "1.3.14.3.2.26", "SHA1"),
-  SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
-  SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
+    MD5     (16, "1.2.840.113549.2.5", "MD5"),
+    SHA1    (20, "1.3.14.3.2.26", "SHA1"),
+    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),
+    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512");
 
-  private final int length;
+    private final int length;
 
-  private final String oid;
+    private final String oid;
 
-  private final String name;
+    private final String name;
 
-  private HashAlgoType(
-      final int length,
-      final String oid,
-      final String name) {
-    this.length = length;
-    this.oid = oid;
-    this.name = name;
-  }
-
-  public int getLength() {
-    return length;
-  }
-
-  public String getOid() {
-    return oid;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String hexDigest(
-      final byte[] content) {
-    byte[] dgst = digest(content);
-    return (dgst == null)
-        ? null
-        : Hex.toHexString(dgst).toUpperCase();
-  }
-
-  public byte[] digest(
-      final byte[] content) {
-    Digest digest;
-    if (this == SHA1) {
-      digest = new SHA1Digest();
-    } else if (this == SHA256) {
-      digest = new SHA256Digest();
-    } else if (this == SHA512) {
-      digest = new SHA512Digest();
-    } else if (this == MD5) {
-      digest = new MD5Digest();
-    } else {
-      throw new RuntimeException("should not reach here");
-    }
-    byte[] ret = new byte[length];
-    digest.doFinal(ret, 0);
-    return ret;
-  }
-
-  public static HashAlgoType getHashAlgoType(
-      String nameOrOid) {
-    for (HashAlgoType hashAlgo : values()) {
-      if (hashAlgo.oid.equals(nameOrOid)) {
-        return hashAlgo;
-      }
-
-      if (nameOrOid.indexOf('-') != -1) {
-        nameOrOid = nameOrOid.replace("-", "");
-      }
-
-      if (hashAlgo.name.equalsIgnoreCase(nameOrOid)) {
-        return hashAlgo;
-      }
+    private HashAlgoType(
+            final int length,
+            final String oid,
+            final String name) {
+        this.length = length;
+        this.oid = oid;
+        this.name = name;
     }
 
-    return null;
-  }
+    public int getLength() {
+        return length;
+    }
+
+    public String getOid() {
+        return oid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String hexDigest(
+            final byte[] content) {
+        byte[] dgst = digest(content);
+        return (dgst == null)
+                ? null
+                : Hex.toHexString(dgst).toUpperCase();
+    }
+
+    public byte[] digest(
+            final byte[] content) {
+        Digest digest;
+        if (this == SHA1) {
+            digest = new SHA1Digest();
+        } else if (this == SHA256) {
+            digest = new SHA256Digest();
+        } else if (this == SHA512) {
+            digest = new SHA512Digest();
+        } else if (this == MD5) {
+            digest = new MD5Digest();
+        } else {
+            throw new RuntimeException("should not reach here");
+        }
+        byte[] ret = new byte[length];
+        digest.doFinal(ret, 0);
+        return ret;
+    }
+
+    public static HashAlgoType getHashAlgoType(
+            String nameOrOid) {
+        for (HashAlgoType hashAlgo : values()) {
+            if (hashAlgo.oid.equals(nameOrOid)) {
+                return hashAlgo;
+            }
+
+            if (nameOrOid.indexOf('-') != -1) {
+                nameOrOid = nameOrOid.replace("-", "");
+            }
+
+            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)) {
+                return hashAlgo;
+            }
+        }
+
+        return null;
+    }
 
 }

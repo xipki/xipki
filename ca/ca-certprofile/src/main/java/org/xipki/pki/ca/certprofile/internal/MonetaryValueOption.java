@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,45 +46,45 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 
 public class MonetaryValueOption {
 
-  private final Iso4217CurrencyCode currency;
+    private final Iso4217CurrencyCode currency;
 
-  private final String currencyString;
+    private final String currencyString;
 
-  private final Range2Type amountRange;
+    private final Range2Type amountRange;
 
-  private final Range2Type exponentRange;
+    private final Range2Type exponentRange;
 
-  public MonetaryValueOption(
-      final Iso4217CurrencyCode currency,
-      final Range2Type amountRange,
-      final Range2Type exponentRange) {
-    ParamUtil.assertNotNull("currency", currency);
-    ParamUtil.assertNotNull("amountRange", amountRange);
-    ParamUtil.assertNotNull("exponentRange", exponentRange);
-    this.currency = currency;
+    public MonetaryValueOption(
+            final Iso4217CurrencyCode currency,
+            final Range2Type amountRange,
+            final Range2Type exponentRange) {
+        ParamUtil.assertNotNull("currency", currency);
+        ParamUtil.assertNotNull("amountRange", amountRange);
+        ParamUtil.assertNotNull("exponentRange", exponentRange);
+        this.currency = currency;
 
-    this.currencyString = currency.isAlphabetic()
-        ? currency.getAlphabetic().toUpperCase()
-        : Integer.toString(currency.getNumeric());
+        this.currencyString = currency.isAlphabetic()
+                ? currency.getAlphabetic().toUpperCase()
+                : Integer.toString(currency.getNumeric());
 
-    this.amountRange = amountRange;
-    this.exponentRange = exponentRange;
-  }
+        this.amountRange = amountRange;
+        this.exponentRange = exponentRange;
+    }
 
-  public Iso4217CurrencyCode getCurrency() {
-    return currency;
-  }
+    public Iso4217CurrencyCode getCurrency() {
+        return currency;
+    }
 
-  public Range2Type getAmountRange() {
-    return amountRange;
-  }
+    public Range2Type getAmountRange() {
+        return amountRange;
+    }
 
-  public Range2Type getExponentRange() {
-    return exponentRange;
-  }
+    public Range2Type getExponentRange() {
+        return exponentRange;
+    }
 
-  public String getCurrencyString() {
-    return currencyString;
-  }
+    public String getCurrencyString() {
+        return currencyString;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,56 +51,56 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
  */
 
 @Command(scope = "xipki-cli", name = "health",
-    description = "check healty status of CA")
+        description = "check healty status of CA")
 @Service
 public class HealthCmd extends ClientCommandSupport {
 
-  @Option(name = "--ca",
-      description = "CA name\n"
-          + "(required if multiple CAs are configured)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "(required if multiple CAs are configured)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show status verbosely")
-  private Boolean verbose = Boolean.FALSE;
+    @Option(name = "--verbose", aliases = "-v",
+            description = "show status verbosely")
+    private Boolean verbose = Boolean.FALSE;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    Set<String> caNames = caClient.getCaNames();
-    if (isEmpty(caNames)) {
-      throw new IllegalCmdParamException("no CA is configured");
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Set<String> caNames = caClient.getCaNames();
+        if (isEmpty(caNames)) {
+            throw new IllegalCmdParamException("no CA is configured");
+        }
 
-    if (caName != null && !caNames.contains(caName)) {
-      throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
-          + caNames);
-    }
+        if (caName != null && !caNames.contains(caName)) {
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs "
+                    + caNames);
+        }
 
-    if (caName == null) {
-      if (caNames.size() == 1) {
-        caName = caNames.iterator().next();
-      } else {
-        throw new IllegalCmdParamException("no caname is specified, one of " + caNames
-            + " is required");
-      }
-    }
+        if (caName == null) {
+            if (caNames.size() == 1) {
+                caName = caNames.iterator().next();
+            } else {
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+                        + " is required");
+            }
+        }
 
-    HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
-    StringBuilder sb = new StringBuilder();
-    sb.append("healthy status for CA ");
-    sb.append(caName);
-    sb.append(": ");
-    String healthyText = healthResult.isHealthy()
-        ? "healthy"
-        : "not healthy";
-    sb.append(healthyText);
-    if (verbose.booleanValue()) {
-      sb.append("\n").append(healthResult.toJsonMessage(true));
-    }
-    System.out.println(sb.toString());
-    return null;
-  } // method doExecute
+        HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
+        StringBuilder sb = new StringBuilder();
+        sb.append("healthy status for CA ");
+        sb.append(caName);
+        sb.append(": ");
+        String healthyText = healthResult.isHealthy()
+                ? "healthy"
+                : "not healthy";
+        sb.append(healthyText);
+        if (verbose.booleanValue()) {
+            sb.append("\n").append(healthResult.toJsonMessage(true));
+        }
+        System.out.println(sb.toString());
+        return null;
+    } // method doExecute
 
 }

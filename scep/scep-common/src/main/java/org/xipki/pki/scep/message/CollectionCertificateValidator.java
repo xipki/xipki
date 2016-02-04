@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,53 +50,53 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class CollectionCertificateValidator implements CertificateValidator {
 
-  private final Collection<String> certHashes;
+    private final Collection<String> certHashes;
 
-  public CollectionCertificateValidator(
-      final Collection<X509Certificate> certs) {
-    ParamUtil.assertNotEmpty("certs", certs);
-    certHashes = new HashSet<String>(certs.size());
-    for (X509Certificate cert : certs) {
-      String hash;
-      try {
-        hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-      } catch (CertificateEncodingException e) {
-        throw new IllegalArgumentException(
-            "could not encode certificate: " + e.getMessage(), e);
-      }
-      certHashes.add(hash);
+    public CollectionCertificateValidator(
+            final Collection<X509Certificate> certs) {
+        ParamUtil.assertNotEmpty("certs", certs);
+        certHashes = new HashSet<String>(certs.size());
+        for (X509Certificate cert : certs) {
+            String hash;
+            try {
+                hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+            } catch (CertificateEncodingException e) {
+                throw new IllegalArgumentException(
+                        "could not encode certificate: " + e.getMessage(), e);
+            }
+            certHashes.add(hash);
+        }
     }
-  }
 
-  public CollectionCertificateValidator(
-      final X509Certificate cert) {
-    ParamUtil.assertNotNull("cert", cert);
+    public CollectionCertificateValidator(
+            final X509Certificate cert) {
+        ParamUtil.assertNotNull("cert", cert);
 
-    certHashes = new HashSet<String>(1);
-    String hash;
-    try {
-      hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-    } catch (CertificateEncodingException e) {
-      throw new IllegalArgumentException(
-          "could not encode certificate: " + e.getMessage(), e);
+        certHashes = new HashSet<String>(1);
+        String hash;
+        try {
+            hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new IllegalArgumentException(
+                    "could not encode certificate: " + e.getMessage(), e);
+        }
+        certHashes.add(hash);
     }
-    certHashes.add(hash);
-  }
 
-  @Override
-  public boolean trustCertificate(
-      final X509Certificate signerCert,
-      final X509Certificate[] signerCaCerts) {
-    ParamUtil.assertNotNull("signerCert", signerCert);
+    @Override
+    public boolean trustCertificate(
+            final X509Certificate signerCert,
+            final X509Certificate[] signerCaCerts) {
+        ParamUtil.assertNotNull("signerCert", signerCert);
 
-    String hash;
-    try {
-      hash = HashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
-    } catch (CertificateEncodingException e) {
-      throw new IllegalArgumentException(
-          "could not encode certificate: " + e.getMessage(), e);
+        String hash;
+        try {
+            hash = HashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
+        } catch (CertificateEncodingException e) {
+            throw new IllegalArgumentException(
+                    "could not encode certificate: " + e.getMessage(), e);
+        }
+        return certHashes.contains(hash);
     }
-    return certHashes.contains(hash);
-  }
 
 }

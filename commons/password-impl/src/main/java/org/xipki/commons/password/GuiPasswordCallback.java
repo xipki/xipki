@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,24 +47,24 @@ import org.xipki.commons.password.api.SecurePasswordInputPanel;
 
 public class GuiPasswordCallback implements PasswordCallback {
 
-  @Override
-  public char[] getPassword(
-      String prompt)
-  throws PasswordResolverException {
-    if (StringUtil.isBlank(prompt)) {
-      prompt = "Password required";
+    @Override
+    public char[] getPassword(
+            String prompt)
+    throws PasswordResolverException {
+        if (StringUtil.isBlank(prompt)) {
+            prompt = "Password required";
+        }
+        char[] password = SecurePasswordInputPanel.readPassword(prompt);
+        if (password == null) {
+            throw new PasswordResolverException("user has cancelled");
+        }
+        return password;
     }
-    char[] password = SecurePasswordInputPanel.readPassword(prompt);
-    if (password == null) {
-      throw new PasswordResolverException("user has cancelled");
-    }
-    return password;
-  }
 
-  @Override
-  public void init(
-      final String conf)
-  throws PasswordResolverException {
-  }
+    @Override
+    public void init(
+            final String conf)
+    throws PasswordResolverException {
+    }
 
 }

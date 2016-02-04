@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -42,22 +42,22 @@ package org.xipki.commons.audit.api;
 
 public enum AuditStatus {
 
-  SUCCESSFUL,
-  FAILED,
-  UNDEFINED;
+    SUCCESSFUL,
+    FAILED,
+    UNDEFINED;
 
-  public static final AuditStatus getAuditStatus(
-      final String name) {
-    if (name == null) {
-      return null;
-    }
+    public static final AuditStatus getAuditStatus(
+            final String name) {
+        if (name == null) {
+            return null;
+        }
 
-    for (AuditStatus v : values()) {
-      if (v.name().equals(name)) {
-        return v;
-      }
+        for (AuditStatus v : values()) {
+            if (v.name().equals(name)) {
+                return v;
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
 }

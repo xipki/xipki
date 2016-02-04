@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,17 +44,17 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Command(scope = "xipki-ca", name = "unrevoke-cert",
-    description = "unrevoke certificate")
+        description = "unrevoke certificate")
 @Service
 public class UnrevokeCertCmd extends UnRevRmCertCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
-    output(successful, "unrevoked", "could not unrevoke", "certificate");
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
+        output(successful, "unrevoked", "could not unrevoke", "certificate");
 
-    return null;
-  }
+        return null;
+    }
 
 }

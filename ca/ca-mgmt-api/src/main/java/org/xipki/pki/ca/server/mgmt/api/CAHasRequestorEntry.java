@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,65 +49,65 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CAHasRequestorEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final String requestorName;
+    private final String requestorName;
 
-  private boolean ra;
+    private boolean ra;
 
-  private Set<Permission> permissions;
+    private Set<Permission> permissions;
 
-  private Set<String> profiles;
+    private Set<String> profiles;
 
-  public CAHasRequestorEntry(
-      final String requestorName) {
-    ParamUtil.assertNotBlank("requestorName", requestorName);
-    this.requestorName = requestorName;
-  }
-
-  public boolean isRa() {
-    return ra;
-  }
-
-  public void setRa(
-      final boolean ra) {
-    this.ra = ra;
-  }
-
-  public Set<Permission> getPermissions() {
-    return permissions;
-  }
-
-  public void setPermissions(
-      final Set<Permission> permissions) {
-    this.permissions = Collections.unmodifiableSet(permissions);
-  }
-
-  public String getRequestorName() {
-    return requestorName;
-  }
-
-  public void setProfiles(
-      final Set<String> profiles) {
-    if (profiles == null) {
-      this.profiles = Collections.emptySet();
-    } else {
-      this.profiles = CollectionUtil.unmodifiableSet(profiles);
+    public CAHasRequestorEntry(
+            final String requestorName) {
+        ParamUtil.assertNotBlank("requestorName", requestorName);
+        this.requestorName = requestorName;
     }
-  }
 
-  public Set<String> getProfiles() {
-    return profiles;
-  }
+    public boolean isRa() {
+        return ra;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(200);
-    sb.append("requestor: ").append(requestorName).append(", ");
-    sb.append("ra: ").append(ra).append(", ");
-    sb.append("profiles: ").append(profiles).append(", ");
-    sb.append("permissions: ").append(Permission.toString(permissions));
-    return sb.toString();
-  }
+    public void setRa(
+            final boolean ra) {
+        this.ra = ra;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(
+            final Set<Permission> permissions) {
+        this.permissions = Collections.unmodifiableSet(permissions);
+    }
+
+    public String getRequestorName() {
+        return requestorName;
+    }
+
+    public void setProfiles(
+            final Set<String> profiles) {
+        if (profiles == null) {
+            this.profiles = Collections.emptySet();
+        } else {
+            this.profiles = CollectionUtil.unmodifiableSet(profiles);
+        }
+    }
+
+    public Set<String> getProfiles() {
+        return profiles;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("requestor: ").append(requestorName).append(", ");
+        sb.append("ra: ").append(ra).append(", ");
+        sb.append("profiles: ").append(profiles).append(", ");
+        sb.append("permissions: ").append(Permission.toString(permissions));
+        return sb.toString();
+    }
 
 }

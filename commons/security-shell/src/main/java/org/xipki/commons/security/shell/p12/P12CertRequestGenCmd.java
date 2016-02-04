@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,58 +55,58 @@ import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
  */
 
 @Command(scope = "xipki-tk", name = "req-p12",
-    description = "generate PKCS#10 request with PKCS#12 keystore")
+        description = "generate PKCS#10 request with PKCS#12 keystore")
 @Service
 public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
 
-  @Option(name = "--p12",
-      required = true,
-      description = "PKCS#12 keystore file\n"
-          + "(required)")
-  @Completion(FilePathCompleter.class)
-  private String p12File;
+    @Option(name = "--p12",
+            required = true,
+            description = "PKCS#12 keystore file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String p12File;
 
-  @Option(name = "--password",
-      description = "password of the PKCS#12 file")
-  private String password;
+    @Option(name = "--password",
+            description = "password of the PKCS#12 file")
+    private String password;
 
-  private char[] getPassword() {
-    char[] pwdInChar = readPasswordIfNotSet(password);
-    if (pwdInChar != null) {
-      password = new String(pwdInChar);
-    }
-    return pwdInChar;
-  }
-
-  public KeyStore getKeyStore()
-  throws Exception {
-    KeyStore ks;
-
-    FileInputStream fIn = null;
-    try {
-      fIn = new FileInputStream(expandFilepath(p12File));
-      ks = KeyStore.getInstance("PKCS12", "BC");
-      ks.load(fIn, getPassword());
-    } finally {
-      if (fIn != null) {
-        fIn.close();
-      }
+    private char[] getPassword() {
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if (pwdInChar != null) {
+            password = new String(pwdInChar);
+        }
+        return pwdInChar;
     }
 
-    return ks;
-  }
+    public KeyStore getKeyStore()
+    throws Exception {
+        KeyStore ks;
 
-  @Override
-  protected ConcurrentContentSigner getSigner(
-      final String hashAlgo,
-      final SignatureAlgoControl signatureAlgoControl)
-  throws Exception {
-    char[] pwd = getPassword();
+        FileInputStream fIn = null;
+        try {
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        } finally {
+            if (fIn != null) {
+                fIn.close();
+            }
+        }
 
-    String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-        p12File, new String(pwd), 1);
-    return securityFactory.createSigner(
-        "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
-  }
+        return ks;
+    }
+
+    @Override
+    protected ConcurrentContentSigner getSigner(
+            final String hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl)
+    throws Exception {
+        char[] pwd = getPassword();
+
+        String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
+                p12File, new String(pwd), 1);
+        return securityFactory.createSigner(
+                "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
+    }
 
 }

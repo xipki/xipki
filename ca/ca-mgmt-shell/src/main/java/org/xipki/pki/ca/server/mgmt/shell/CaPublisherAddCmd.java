@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,32 +50,32 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "capub-add",
-    description = "add publisher to CA")
+        description = "add publisher to CA")
 @Service
 public class CaPublisherAddCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--publisher",
-    required = true, multiValued = true,
-    description = "publisher name\n"
-        + "(required, multi-valued)")
-  @Completion(PublisherNameCompleter.class)
-  private List<String> publisherNames;
+    @Option(name = "--publisher",
+        required = true, multiValued = true,
+        description = "publisher name\n"
+                + "(required, multi-valued)")
+    @Completion(PublisherNameCompleter.class)
+    private List<String> publisherNames;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    for (String publisherName : publisherNames) {
-      boolean b = caManager.addPublisherToCA(publisherName, caName);
-      output(b, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        for (String publisherName : publisherNames) {
+            boolean b = caManager.addPublisherToCA(publisherName, caName);
+            output(b, "added", "could not add", "publisher " + publisherName + " to CA " + caName);
+        }
+        return null;
     }
-    return null;
-  }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,43 +48,43 @@ import org.xipki.commons.console.karaf.CmdFailure;
  */
 
 @Command(scope = "xipki-ca", name = "restart",
-    description = "restart CA system")
+        description = "restart CA system")
 @Service
 public class CaSystemRestartCmd extends CaCommandSupport {
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean successful = caManager.restartCaSystem();
-    if (!successful) {
-      throw new CmdFailure("could not restart CA system");
-    }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean successful = caManager.restartCaSystem();
+        if (!successful) {
+            throw new CmdFailure("could not restart CA system");
+        }
 
-    StringBuilder sb = new StringBuilder("restarted CA system");
-    Set<String> names = new HashSet<>(caManager.getCaNames());
+        StringBuilder sb = new StringBuilder("restarted CA system");
+        Set<String> names = new HashSet<>(caManager.getCaNames());
 
-    if (names.size() > 0) {
-      sb.append(" with following CAs: ");
-      Set<String> caAliasNames = caManager.getCaAliasNames();
-      for (String aliasName : caAliasNames) {
-        String name = caManager.getCaNameForAlias(aliasName);
-        names.remove(name);
+        if (names.size() > 0) {
+            sb.append(" with following CAs: ");
+            Set<String> caAliasNames = caManager.getCaAliasNames();
+            for (String aliasName : caAliasNames) {
+                String name = caManager.getCaNameForAlias(aliasName);
+                names.remove(name);
 
-        sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
-      }
+                sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
+            }
 
-      for (String name : names) {
-        sb.append(name).append(", ");
-      }
+            for (String name : names) {
+                sb.append(name).append(", ");
+            }
 
-      int len = sb.length();
-      sb.delete(len - 2, len);
-    } else {
-      sb.append(": no CA is configured");
-    }
+            int len = sb.length();
+            sb.delete(len - 2, len);
+        } else {
+            sb.append(": no CA is configured");
+        }
 
-    out(sb.toString());
-    return null;
-  } // method doExecute
+        out(sb.toString());
+        return null;
+    } // method doExecute
 
 }

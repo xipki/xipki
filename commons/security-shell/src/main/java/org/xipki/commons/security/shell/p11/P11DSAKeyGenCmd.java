@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,47 +49,47 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  */
 
 @Command(scope = "xipki-tk", name = "dsa",
-    description = "generate DSA keypair in PKCS#11 device")
+        description = "generate DSA keypair in PKCS#11 device")
 @Service
 public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
 
-  @Option(name = "--plen",
-      description = "bit length of the prime")
-  private Integer pLen = 2048;
+    @Option(name = "--plen",
+            description = "bit length of the prime")
+    private Integer pLen = 2048;
 
-  @Option(name = "--qlen",
-      description = "bit length of the sub-prime")
-  private Integer qLen;
+    @Option(name = "--qlen",
+            description = "bit length of the sub-prime")
+    private Integer qLen;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    if (pLen % 1024 != 0) {
-      throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        if (pLen % 1024 != 0) {
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+        }
+
+        if (qLen == null) {
+            if (pLen >= 2048) {
+                qLen = 256;
+            } else {
+                qLen = 160;
+            }
+        }
+
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        if (noCert) {
+            P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
+            finalize(keyId);
+        } else {
+            P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
+                    pLen, qLen,
+                    label, getSubject(),
+                    getKeyUsage(),
+                    getExtendedKeyUsage());
+            finalize(keyAndCert);
+        }
+
+        return null;
     }
-
-    if (qLen == null) {
-      if (pLen >= 2048) {
-        qLen = 256;
-      } else {
-        qLen = 160;
-      }
-    }
-
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
-    if (noCert) {
-      P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-      finalize(keyId);
-    } else {
-      P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
-          pLen, qLen,
-          label, getSubject(),
-          getKeyUsage(),
-          getExtendedKeyUsage());
-      finalize(keyAndCert);
-    }
-
-    return null;
-  }
 
 }

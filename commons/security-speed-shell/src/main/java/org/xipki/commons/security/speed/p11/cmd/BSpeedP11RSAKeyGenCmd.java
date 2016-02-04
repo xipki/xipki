@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -50,22 +50,22 @@ import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
  */
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
-    description = "performance test of PKCS#11 RSA key generation (batch)")
+        description = "performance test of PKCS#11 RSA key generation (batch)")
 public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
 
-  @Override
-  protected List<LoadExecutor> getTesters()
-  throws Exception {
-    List<LoadExecutor> ret = new LinkedList<>();
-    int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    @Override
+    protected List<LoadExecutor> getTesters()
+    throws Exception {
+        List<LoadExecutor> ret = new LinkedList<>();
+        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
 
-    P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 
-    for (int keysize : keysizes) {
-      ret.add(
-          new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
+        for (int keysize : keysizes) {
+            ret.add(
+                    new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
+        }
+        return ret;
     }
-    return ret;
-  }
 
 }

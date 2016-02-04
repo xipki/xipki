@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,30 +44,30 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 
 public class PKIResponse {
 
-  private final GeneralPKIMessage pkiMessage;
+    private final GeneralPKIMessage pkiMessage;
 
-  private ProtectionVerificationResult protectionVerificationResult;
+    private ProtectionVerificationResult protectionVerificationResult;
 
-  public PKIResponse(
-      final GeneralPKIMessage pkiMessage) {
-    this.pkiMessage = pkiMessage;
-  }
+    public PKIResponse(
+            final GeneralPKIMessage pkiMessage) {
+        this.pkiMessage = pkiMessage;
+    }
 
-  public boolean hasProtection() {
-    return pkiMessage.hasProtection();
-  }
+    public boolean hasProtection() {
+        return pkiMessage.hasProtection();
+    }
 
-  public GeneralPKIMessage getPkiMessage() {
-    return pkiMessage;
-  }
+    public GeneralPKIMessage getPkiMessage() {
+        return pkiMessage;
+    }
 
-  public ProtectionVerificationResult getProtectionVerificationResult() {
-    return protectionVerificationResult;
-  }
+    public ProtectionVerificationResult getProtectionVerificationResult() {
+        return protectionVerificationResult;
+    }
 
-  public void setProtectionVerificationResult(
-      final ProtectionVerificationResult protectionVerificationResult) {
-    this.protectionVerificationResult = protectionVerificationResult;
-  }
+    public void setProtectionVerificationResult(
+            final ProtectionVerificationResult protectionVerificationResult) {
+        this.protectionVerificationResult = protectionVerificationResult;
+    }
 
 }

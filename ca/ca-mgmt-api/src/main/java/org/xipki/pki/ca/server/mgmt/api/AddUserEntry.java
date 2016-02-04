@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,47 +46,47 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class AddUserEntry implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final String name;
+    private final String name;
 
-  private final String password;
+    private final String password;
 
-  private final String cnRegex;
+    private final String cnRegex;
 
-  public AddUserEntry(
-      final String name,
-      final String password,
-      final String cnRegex)
-  throws CAMgmtException {
-    ParamUtil.assertNotBlank("name", name);
-    ParamUtil.assertNotBlank("password", password);
-    ParamUtil.assertNotBlank("cnRegex", cnRegex);
+    public AddUserEntry(
+            final String name,
+            final String password,
+            final String cnRegex)
+    throws CAMgmtException {
+        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.assertNotBlank("cnRegex", cnRegex);
 
-    this.name = name;
-    this.password = password;
-    this.cnRegex = cnRegex;
-  }
+        this.name = name;
+        this.password = password;
+        this.cnRegex = cnRegex;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public String getCnRegex() {
-    return cnRegex;
-  }
+    public String getCnRegex() {
+        return cnRegex;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder(200);
-    sb.append("name: ").append(name).append('\n');
-    sb.append("password: ").append(password).append("\n");
-    sb.append("cnRegex: ").append(cnRegex);
-    return sb.toString();
-  }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("name: ").append(name).append('\n');
+        sb.append("password: ").append(password).append("\n");
+        sb.append("cnRegex: ").append(cnRegex);
+        return sb.toString();
+    }
 
 }

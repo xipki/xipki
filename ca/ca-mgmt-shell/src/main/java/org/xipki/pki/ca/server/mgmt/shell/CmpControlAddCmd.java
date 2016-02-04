@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -46,29 +46,29 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
  */
 
 @Command(scope = "xipki-ca", name = "cmpcontrol-add",
-    description = "add CMP control")
+        description = "add CMP control")
 @Service
 public class CmpControlAddCmd extends CaCommandSupport {
 
-  @Option(name = "--name", aliases = "-n",
-      required = true,
-      description = "CMP control name\n"
-          + "(required)")
-  private String name;
+    @Option(name = "--name", aliases = "-n",
+            required = true,
+            description = "CMP control name\n"
+                    + "(required)")
+    private String name;
 
-  @Option(name = "--conf",
-      required = true,
-      description = "CMP control configuration\n"
-          + "(required)")
-  private String conf;
+    @Option(name = "--conf",
+            required = true,
+            description = "CMP control configuration\n"
+                    + "(required)")
+    private String conf;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    CmpControlEntry entry = new CmpControlEntry(name, conf);
-    boolean b = caManager.addCmpControl(entry);
-    output(b, "added", "could not add", "CMP control " + name);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        CmpControlEntry entry = new CmpControlEntry(name, conf);
+        boolean b = caManager.addCmpControl(entry);
+        output(b, "added", "could not add", "CMP control " + name);
+        return null;
+    }
 
 }

@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -48,31 +48,31 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "careq-rm",
-    description = "remove requestor from CA")
+        description = "remove requestor from CA")
 @Service
 public class CaRequestorRemoveCmd extends CaCommandSupport {
 
-  @Option(name = "--ca",
-      required = true,
-      description = "CA name\n"
-          + "(required)")
-  @Completion(CaNameCompleter.class)
-  private String caName;
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    private String caName;
 
-  @Option(name = "--requestor",
-      required = true,
-      description = "requestor name\n"
-          + "(required)")
-  @Completion(RequestorNameCompleter.class)
-  private String requestorName;
+    @Option(name = "--requestor",
+            required = true,
+            description = "requestor name\n"
+                    + "(required)")
+    @Completion(RequestorNameCompleter.class)
+    private String requestorName;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
-    output(b, "removed", "could not remove",
-        "requestor " + requestorName + " from CA " + caName);
-    return null;
-  }
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        boolean b = caManager.removeCmpRequestorFromCA(requestorName, caName);
+        output(b, "removed", "could not remove",
+                "requestor " + requestorName + " from CA " + caName);
+        return null;
+    }
 
 }

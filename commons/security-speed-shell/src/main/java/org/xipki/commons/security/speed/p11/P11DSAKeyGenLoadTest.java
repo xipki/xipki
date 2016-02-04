@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,28 +45,28 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
-  private final int pLength;
+    private final int pLength;
 
-  private final int qLength;
+    private final int qLength;
 
-  public P11DSAKeyGenLoadTest(
-      final P11WritableSlot slot,
-      final int pLength,
-      final int qLength)
-  throws Exception {
-    super(slot,
-        "PKCS#11 DSA key generation\n"
-            + "pLength: " + pLength + "\n"
-            + "qLength: " + qLength);
-    this.pLength = pLength;
-    this.qLength = qLength;
-  }
+    public P11DSAKeyGenLoadTest(
+            final P11WritableSlot slot,
+            final int pLength,
+            final int qLength)
+    throws Exception {
+        super(slot,
+                "PKCS#11 DSA key generation\n"
+                        + "pLength: " + pLength + "\n"
+                        + "qLength: " + qLength);
+        this.pLength = pLength;
+        this.qLength = qLength;
+    }
 
-  @Override
-  protected void genKeypair()
-  throws Exception {
-    P11KeyIdentifier keyId = slot.generateDSAKeypair(pLength, qLength, getDummyLabel());
-    slot.removeKey(keyId);
-  }
+    @Override
+    protected void genKeypair()
+    throws Exception {
+        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLength, qLength, getDummyLabel());
+        slot.removeKey(keyId);
+    }
 
 }

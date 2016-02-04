@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -44,82 +44,82 @@ import javax.xml.stream.XMLStreamException;
 
 public class CaCrlType extends DbDataObject {
 
-  public static final String TAG_ROOT = "crl";
+    public static final String TAG_ROOT = "crl";
 
-  public static final String TAG_id = "id";
+    public static final String TAG_id = "id";
 
-  private Integer id;
+    private Integer id;
 
-  public static final String TAG_caId = "caId";
+    public static final String TAG_caId = "caId";
 
-  private Integer caId;
+    private Integer caId;
 
-  public static final String TAG_crlNo = "crlNo";
+    public static final String TAG_crlNo = "crlNo";
 
-  private String crlNo;
+    private String crlNo;
 
-  public static final String TAG_file = "file";
+    public static final String TAG_file = "file";
 
-  private String file;
+    private String file;
 
-  public Integer getId() {
-    return id;
-  }
+    public Integer getId() {
+        return id;
+    }
 
-  public void setId(
-      final Integer id) {
-    this.id = id;
-  }
+    public void setId(
+            final Integer id) {
+        this.id = id;
+    }
 
-  public Integer getCaId() {
-    return caId;
-  }
+    public Integer getCaId() {
+        return caId;
+    }
 
-  public void setCaId(
-      final Integer caId) {
-    this.caId = caId;
-  }
+    public void setCaId(
+            final Integer caId) {
+        this.caId = caId;
+    }
 
-  public String getCrlNo() {
-    return crlNo;
-  }
+    public String getCrlNo() {
+        return crlNo;
+    }
 
-  public void setCrlNo(
-      final String crlNo) {
-    this.crlNo = crlNo;
-  }
+    public void setCrlNo(
+            final String crlNo) {
+        this.crlNo = crlNo;
+    }
 
-  public String getFile() {
-    return file;
-  }
+    public String getFile() {
+        return file;
+    }
 
-  public void setFile(
-      final String file) {
-    this.file = file;
-  }
+    public void setFile(
+            final String file) {
+        this.file = file;
+    }
 
-  @Override
-  public void validate()
-  throws InvalidDataObjectException {
-    assertNotNull("id", id);
-    assertNotNull("caId", caId);
-    assertNotBlank("crlNo", crlNo);
-    assertNotBlank("file", file);
-  }
+    @Override
+    public void validate()
+    throws InvalidDataObjectException {
+        assertNotNull("id", id);
+        assertNotNull("caId", caId);
+        assertNotBlank("crlNo", crlNo);
+        assertNotBlank("file", file);
+    }
 
-  @Override
-  public void writeTo(
-      final DbiXmlWriter writer)
-  throws InvalidDataObjectException, XMLStreamException {
-    validate();
+    @Override
+    public void writeTo(
+            final DbiXmlWriter writer)
+    throws InvalidDataObjectException, XMLStreamException {
+        validate();
 
-    writer.writeStartElement(TAG_ROOT);
-    writeIfNotNull(writer, TAG_id, id);
-    writeIfNotNull(writer, TAG_caId, caId);
-    writeIfNotNull(writer, TAG_crlNo, crlNo);
-    writeIfNotNull(writer, TAG_file, file);
-    writer.writeEndElement();
-    writer.writeNewline();
-  }
+        writer.writeStartElement(TAG_ROOT);
+        writeIfNotNull(writer, TAG_id, id);
+        writeIfNotNull(writer, TAG_caId, caId);
+        writeIfNotNull(writer, TAG_crlNo, crlNo);
+        writeIfNotNull(writer, TAG_file, file);
+        writer.writeEndElement();
+        writer.writeNewline();
+    }
 
 }

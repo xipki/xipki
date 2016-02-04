@@ -23,30 +23,30 @@ import org.xipki.commons.security.SignerUtil;
 
 public class BcRSAContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
 
-  private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
+    private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-  public BcRSAContentVerifierProviderBuilder(
-      final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
-    this.digestAlgorithmFinder = digestAlgorithmFinder;
-  }
-
-  protected Signer createSigner(
-      final AlgorithmIdentifier sigAlgId)
-  throws OperatorCreationException {
-    AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
-    Digest dig = digestProvider.get(digAlgId);
-
-    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-      return SignerUtil.createPSSRSASigner(sigAlgId);
-    } else {
-      return new RSADigestSigner(dig);
+    public BcRSAContentVerifierProviderBuilder(
+            final DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+        this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
-  }
 
-  protected AsymmetricKeyParameter extractKeyParameters(
-      final SubjectPublicKeyInfo publicKeyInfo)
-  throws IOException {
-    return PublicKeyFactory.createKey(publicKeyInfo);
-  }
+    protected Signer createSigner(
+            final AlgorithmIdentifier sigAlgId)
+    throws OperatorCreationException {
+        AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
+        Digest dig = digestProvider.get(digAlgId);
+
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+            return SignerUtil.createPSSRSASigner(sigAlgId);
+        } else {
+            return new RSADigestSigner(dig);
+        }
+    }
+
+    protected AsymmetricKeyParameter extractKeyParameters(
+            final SubjectPublicKeyInfo publicKeyInfo)
+    throws IOException {
+        return PublicKeyFactory.createKey(publicKeyInfo);
+    }
 
 }

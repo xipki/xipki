@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -45,50 +45,50 @@ import org.xipki.commons.common.util.CollectionUtil;
  */
 
 public enum Permission {
-  ENROLL_CERT ("enroll"),
-  REVOKE_CERT ("revoke"),
-  UNREVOKE_CERT ("unrevoke"),
-  REMOVE_CERT ("remove"),
-  KEY_UPDATE ("key-update"),
-  GEN_CRL ("gen-crl"),
-  GET_CRL ("get-crl"),
-  CROSS_CERT_ENROLL ("enroll-cross"),
-  ALL("all");
+    ENROLL_CERT ("enroll"),
+    REVOKE_CERT ("revoke"),
+    UNREVOKE_CERT ("unrevoke"),
+    REMOVE_CERT ("remove"),
+    KEY_UPDATE ("key-update"),
+    GEN_CRL ("gen-crl"),
+    GET_CRL ("get-crl"),
+    CROSS_CERT_ENROLL ("enroll-cross"),
+    ALL("all");
 
-  private String permission;
+    private String permission;
 
-  private Permission(
-      final String permission) {
-    this.permission = permission;
-  }
-
-  public String getPermission() {
-    return permission;
-  }
-
-  public static Permission getPermission(
-      final String permission) {
-    for (Permission p : values()) {
-      if (p.permission.equalsIgnoreCase(permission)) {
-        return p;
-      }
+    private Permission(
+            final String permission) {
+        this.permission = permission;
     }
 
-    return null;
-  }
-
-  public static String toString(
-      final Set<Permission> permissions) {
-    if (CollectionUtil.isEmpty(permissions)) {
-      return null;
+    public String getPermission() {
+        return permission;
     }
 
-    StringBuilder sb = new StringBuilder();
-    for (Permission p : permissions) {
-      sb.append(",");
-      sb.append(p.getPermission());
+    public static Permission getPermission(
+            final String permission) {
+        for (Permission p : values()) {
+            if (p.permission.equalsIgnoreCase(permission)) {
+                return p;
+            }
+        }
+
+        return null;
     }
-    return sb.substring(1); // remove the leading ",".
-  }
+
+    public static String toString(
+            final Set<Permission> permissions) {
+        if (CollectionUtil.isEmpty(permissions)) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Permission p : permissions) {
+            sb.append(",");
+            sb.append(p.getPermission());
+        }
+        return sb.substring(1); // remove the leading ",".
+    }
 
 }

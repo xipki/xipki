@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -55,53 +55,53 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "crlsigner-info",
-    description = "show information of CRL signer")
+        description = "show information of CRL signer")
 @Service
 public class CrlSignerInfoCmd extends CaCommandSupport {
 
-  @Argument(index = 0, name = "name", description = "CRL signer name")
-  @Completion(CrlSignerNameCompleter.class)
-  private String name;
+    @Argument(index = 0, name = "name", description = "CRL signer name")
+    @Completion(CrlSignerNameCompleter.class)
+    private String name;
 
-  @Option(name = "--verbose", aliases = "-v",
-      description = "show CRL signer information verbosely")
-  private Boolean verbose = Boolean.FALSE;
+    @Option(name = "--verbose", aliases = "-v",
+            description = "show CRL signer information verbosely")
+    private Boolean verbose = Boolean.FALSE;
 
-  @Override
-  protected Object doExecute()
-  throws Exception {
-    StringBuilder sb = new StringBuilder();
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        StringBuilder sb = new StringBuilder();
 
-    if (name == null) {
-      Set<String> names = caManager.getCrlSignerNames();
-      int n = names.size();
+        if (name == null) {
+            Set<String> names = caManager.getCrlSignerNames();
+            int n = names.size();
 
-      if (n == 0 || n == 1) {
-        sb.append((n == 0)
-            ? "no"
-            : "1");
-        sb.append(" CRL signer is configured\n");
-      } else {
-        sb.append(n).append(" CRL signers are configured:\n");
-      }
+            if (n == 0 || n == 1) {
+                sb.append((n == 0)
+                        ? "no"
+                        : "1");
+                sb.append(" CRL signer is configured\n");
+            } else {
+                sb.append(n).append(" CRL signers are configured:\n");
+            }
 
-      List<String> sorted = new ArrayList<>(names);
-      Collections.sort(sorted);
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
 
-      for (String name : sorted) {
-        sb.append("\t").append(name).append("\n");
-      }
-    } else {
-      X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-      if (entry == null) {
-        throw new UnexpectedException("\tno CRL signer named '" + name + " is configured");
-      } else {
-        sb.append(entry.toString(verbose.booleanValue()));
-      }
+            for (String name : sorted) {
+                sb.append("\t").append(name).append("\n");
+            }
+        } else {
+            X509CrlSignerEntry entry = caManager.getCrlSigner(name);
+            if (entry == null) {
+                throw new UnexpectedException("\tno CRL signer named '" + name + " is configured");
+            } else {
+                sb.append(entry.toString(verbose.booleanValue()));
+            }
+        }
+
+        out(sb.toString());
+        return null;
     }
-
-    out(sb.toString());
-    return null;
-  }
 
 }

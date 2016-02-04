@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,24 +47,24 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertificatePolicyInformation {
 
-  private final String certPolicyId;
+    private final String certPolicyId;
 
-  private final List<CertificatePolicyQualifier> qualifiers;
+    private final List<CertificatePolicyQualifier> qualifiers;
 
-  public CertificatePolicyInformation(
-      final String certPolicyId,
-      final List<CertificatePolicyQualifier> qualifiers) {
-    ParamUtil.assertNotBlank("certPolicyId", certPolicyId);
-    this.certPolicyId = certPolicyId;
-    this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
-  }
+    public CertificatePolicyInformation(
+            final String certPolicyId,
+            final List<CertificatePolicyQualifier> qualifiers) {
+        ParamUtil.assertNotBlank("certPolicyId", certPolicyId);
+        this.certPolicyId = certPolicyId;
+        this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
+    }
 
-  public String getCertPolicyId() {
-    return certPolicyId;
-  }
+    public String getCertPolicyId() {
+        return certPolicyId;
+    }
 
-  public List<CertificatePolicyQualifier> getQualifiers() {
-    return qualifiers;
-  }
+    public List<CertificatePolicyQualifier> getQualifiers() {
+        return qualifiers;
+    }
 
 }

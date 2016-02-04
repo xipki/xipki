@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -51,52 +51,52 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 
 public class QaAdmission extends QaExtension {
 
-  private final String registrationNumber;
+    private final String registrationNumber;
 
-  private final byte[] addProfessionInfo;
+    private final byte[] addProfessionInfo;
 
-  private final List<String> professionOIDs;
+    private final List<String> professionOIDs;
 
-  private final List<String> professionItems;
+    private final List<String> professionItems;
 
-  public QaAdmission(
-      final Admission jaxb) {
-    this.registrationNumber = jaxb.getRegistrationNumber();
-    this.addProfessionInfo = jaxb.getAddProfessionInfo();
+    public QaAdmission(
+            final Admission jaxb) {
+        this.registrationNumber = jaxb.getRegistrationNumber();
+        this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
-    List<String> items = jaxb.getProfessionItem();
-    if (CollectionUtil.isEmpty(items)) {
-      professionItems = null;
-    } else {
-      professionItems = Collections.unmodifiableList(items);
+        List<String> items = jaxb.getProfessionItem();
+        if (CollectionUtil.isEmpty(items)) {
+            professionItems = null;
+        } else {
+            professionItems = Collections.unmodifiableList(items);
+        }
+
+        List<OidWithDescType> oids = jaxb.getProfessionOid();
+        if (oids == null) {
+            this.professionOIDs = null;
+        } else {
+            List<String> list = new LinkedList<>();
+            for (OidWithDescType oid : oids) {
+                list.add(oid.getValue());
+            }
+            this.professionOIDs = Collections.unmodifiableList(list);
+        }
     }
 
-    List<OidWithDescType> oids = jaxb.getProfessionOid();
-    if (oids == null) {
-      this.professionOIDs = null;
-    } else {
-      List<String> list = new LinkedList<>();
-      for (OidWithDescType oid : oids) {
-        list.add(oid.getValue());
-      }
-      this.professionOIDs = Collections.unmodifiableList(list);
+    public String getRegistrationNumber() {
+        return registrationNumber;
     }
-  }
 
-  public String getRegistrationNumber() {
-    return registrationNumber;
-  }
+    public byte[] getAddProfessionInfo() {
+        return Arrays.clone(addProfessionInfo);
+    }
 
-  public byte[] getAddProfessionInfo() {
-    return Arrays.clone(addProfessionInfo);
-  }
+    public List<String> getProfessionOIDs() {
+        return professionOIDs;
+    }
 
-  public List<String> getProfessionOIDs() {
-    return professionOIDs;
-  }
-
-  public List<String> getProfessionItems() {
-    return professionItems;
-  }
+    public List<String> getProfessionItems() {
+        return professionItems;
+    }
 
 }

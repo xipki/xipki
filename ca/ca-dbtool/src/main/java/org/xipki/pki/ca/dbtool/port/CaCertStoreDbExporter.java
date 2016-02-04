@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -100,970 +100,970 @@ import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 
 class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
 
-  private final Marshaller marshaller;
+    private final Marshaller marshaller;
 
-  private final Unmarshaller unmarshaller;
+    private final Unmarshaller unmarshaller;
 
-  private final int numCertsInBundle;
+    private final int numCertsInBundle;
 
-  private final int numUsersInBundle;
+    private final int numUsersInBundle;
 
-  private final int numCrlsInBundle;
+    private final int numCrlsInBundle;
 
-  private final int numCertsPerSelect;
+    private final int numCertsPerSelect;
 
-  private final int numUsersPerSelect;
+    private final int numUsersPerSelect;
 
-  private final int numCrlsPerSelect;
+    private final int numCrlsPerSelect;
 
-  private final boolean resume;
+    private final boolean resume;
 
-  CaCertStoreDbExporter(
-      final DataSourceWrapper dataSource,
-      final Marshaller marshaller,
-      final Unmarshaller unmarshaller,
-      final String baseDir,
-      final int numCertsInBundle,
-      final int numCertsPerSelect,
-      final boolean resume,
-      final AtomicBoolean stopMe,
-      final boolean evaluateOnly)
-  throws DataAccessException {
-    super(dataSource, baseDir, stopMe, evaluateOnly);
-    ParamUtil.assertNotNull("marshaller", marshaller);
-    ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-    if (numCertsInBundle < 1) {
-      throw new IllegalArgumentException(
-          "numCertsInBundle could not be less than 1: " + numCertsInBundle);
-    }
-    if (numCertsPerSelect < 1) {
-      throw new IllegalArgumentException(
-          "numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
-    }
-
-    this.numCertsInBundle = numCertsInBundle;
-    this.numUsersInBundle = numCertsInBundle * 10;
-    this.numCrlsInBundle = Math.max(1, numCertsInBundle / 10);
-    this.numCertsPerSelect = numCertsPerSelect;
-    this.numUsersPerSelect = numCertsInBundle * 10;
-    this.numCrlsPerSelect = Math.max(1, numCertsPerSelect / 10);
-
-    this.marshaller = marshaller;
-    this.unmarshaller = unmarshaller;
-    this.resume = resume;
-  }
-
-  @SuppressWarnings("unchecked")
-  public void export()
-  throws Exception {
-    CertStoreType certstore;
-    if (resume) {
-      JAXBElement<CertStoreType> root;
-      try {
-        root = (JAXBElement<CertStoreType>)
-          unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
-      } catch (JAXBException e) {
-        throw XMLUtil.convert(e);
-      }
-
-      certstore = root.getValue();
-      if (certstore.getVersion() > VERSION) {
-        throw new InvalidInputException("could not continue with CertStore greater than "
-            + VERSION + ": " + certstore.getVersion());
-      }
-    } else {
-      certstore = new CertStoreType();
-      certstore.setVersion(VERSION);
-    }
-
-    Exception exception = null;
-    System.out.println("exporting CA certstore from database");
-    try {
-      if (!resume) {
-        export_ca(certstore);
-        export_requestor(certstore);
-        export_publisherinfo(certstore);
-        export_certprofileinfo(certstore);
-        export_user(certstore);
-        export_crl(certstore);
-        export_publishQueue(certstore);
-        export_deltaCRLCache(certstore);
-      }
-      File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
-      exception = export_cert(certstore, processLogFile);
-
-      JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-      try {
-        marshaller.marshal(root,
-            new File(baseDir + File.separator + FILENAME_CA_CertStore));
-      } catch (JAXBException e) {
-        throw XMLUtil.convert(e);
-      }
-    } catch (Exception e) {
-      System.err.println("error while exporting CA certstore from database");
-      exception = e;
-    }
-
-    if (exception == null) {
-      System.out.println(" exported CA certstore from database");
-    } else {
-      throw exception;
-    }
-  } // method export
-
-  private Exception export_crl(
-      final CertStoreType certstore) {
-    File fCrlsDir = new File(crlsDir);
-    fCrlsDir.mkdirs();
-
-    FileOutputStream crlsFileOs = null;
-    try {
-      certstore.setCountCrls(0);
-      crlsFileOs = new FileOutputStream(crlsListFile, true);
-      do_export_crl(certstore, crlsFileOs);
-      return null;
-    } catch (Exception e) {
-      // delete the temporary files
-      deleteTmpFiles(baseDir, "tmp-crls-");
-      System.err.println("\nexporting table CRL has been cancelled due to error");
-      LOG.error("Exception", e);
-      return e;
-    } finally {
-      IoUtil.closeStream(crlsFileOs);
-    }
-  } // method export_crl
-
-  private void do_export_crl(
-      final CertStoreType certstore,
-      final FileOutputStream filenameListOs)
-  throws Exception {
-    System.out.println(getExportingText() + "table CRL");
-
-    final int numEntriesPerSelect = numCrlsPerSelect;
-    final int numEntriesPerZip = numCrlsInBundle;
-    final String entriesDir = crlsDir;
-
-    final int minId = (int) getMin("CRL", "ID");
-    final int maxId = (int) getMax("CRL", "ID");
-
-    System.out.println(getExportingText() + "table CRL from ID " + minId);
-
-    long total = getCount("CRL");
-    if (total < 1) {
-      total = 1; // to avoid exception
-    }
-    ProcessLog processLog = new ProcessLog(total);
-
-    final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
-        + " ORDER BY ID ASC";
-    PreparedStatement ps = prepareStatement(sql);
-
-    int numCrlsInCurrentFile = 0;
-    CaCrlsWriter crlsInCurrentFile = new CaCrlsWriter();
-
-    int sum = 0;
-
-    File currentCrlsZipFile = new File(baseDir,
-        "tmp-crls-" + System.currentTimeMillis() + ".zip");
-    ZipOutputStream currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
-
-    int minIdOfCurrentFile = -1;
-    int maxIdOfCurrentFile = -1;
-
-    processLog.printHeader();
-
-    try {
-      Integer id = null;
-      boolean interrupted = false;
-      for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
-        if (stopMe.get()) {
-          interrupted = true;
-          break;
+    CaCertStoreDbExporter(
+            final DataSourceWrapper dataSource,
+            final Marshaller marshaller,
+            final Unmarshaller unmarshaller,
+            final String baseDir,
+            final int numCertsInBundle,
+            final int numCertsPerSelect,
+            final boolean resume,
+            final AtomicBoolean stopMe,
+            final boolean evaluateOnly)
+    throws DataAccessException {
+        super(dataSource, baseDir, stopMe, evaluateOnly);
+        ParamUtil.assertNotNull("marshaller", marshaller);
+        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
+        if (numCertsInBundle < 1) {
+            throw new IllegalArgumentException(
+                    "numCertsInBundle could not be less than 1: " + numCertsInBundle);
+        }
+        if (numCertsPerSelect < 1) {
+            throw new IllegalArgumentException(
+                    "numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
         }
 
-        ps.setInt(1, i);
-        ps.setInt(2, i + numEntriesPerSelect);
+        this.numCertsInBundle = numCertsInBundle;
+        this.numUsersInBundle = numCertsInBundle * 10;
+        this.numCrlsInBundle = Math.max(1, numCertsInBundle / 10);
+        this.numCertsPerSelect = numCertsPerSelect;
+        this.numUsersPerSelect = numCertsInBundle * 10;
+        this.numCrlsPerSelect = Math.max(1, numCertsPerSelect / 10);
 
-        ResultSet rs = ps.executeQuery();
+        this.marshaller = marshaller;
+        this.unmarshaller = unmarshaller;
+        this.resume = resume;
+    }
 
-        while (rs.next()) {
-          id = rs.getInt("ID");
-
-          if (minIdOfCurrentFile == -1) {
-            minIdOfCurrentFile = id;
-          } else if (minIdOfCurrentFile > id) {
-            minIdOfCurrentFile = id;
-          }
-
-          if (maxIdOfCurrentFile == -1) {
-            maxIdOfCurrentFile = id;
-          } else if (maxIdOfCurrentFile < id) {
-            maxIdOfCurrentFile = id;
-          }
-
-          int caId = rs.getInt("CA_ID");
-
-          String b64Crl = rs.getString("CRL");
-          byte[] crlBytes = Base64.decode(b64Crl);
-
-          X509CRL x509Crl = null;
-          try {
-            x509Crl = X509Util.parseCRL(new ByteArrayInputStream(crlBytes));
-          } catch (Exception e) {
-            LOG.error("could not parse CRL with id {}", id);
-            LOG.debug("could not parse CRL with id " + id, e);
-            if (e instanceof CRLException) {
-              throw (CRLException) e;
-            } else {
-              throw new CRLException(e.getMessage(), e);
-            }
-          }
-
-          byte[] octetString = x509Crl.getExtensionValue(Extension.cRLNumber.getId());
-          if (octetString == null) {
-            LOG.warn("CRL without CRL number, ignore it");
-            continue;
-          }
-          byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-          BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
-          String sha1_cert = HashCalculator.hexSha1(crlBytes);
-
-          final String crlFilename = sha1_cert + ".crl";
-          if (!evaulateOnly) {
-            ZipEntry certZipEntry = new ZipEntry(crlFilename);
-            currentCrlsZip.putNextEntry(certZipEntry);
+    @SuppressWarnings("unchecked")
+    public void export()
+    throws Exception {
+        CertStoreType certstore;
+        if (resume) {
+            JAXBElement<CertStoreType> root;
             try {
-              currentCrlsZip.write(crlBytes);
-            } finally {
-              currentCrlsZip.closeEntry();
+                root = (JAXBElement<CertStoreType>)
+                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
+            } catch (JAXBException e) {
+                throw XMLUtil.convert(e);
             }
-          }
 
-          CaCrlType crl = new CaCrlType();
-          crl.setId(id);
-          crl.setCaId(caId);
-          crl.setCrlNo(crlNumber.toString());
-          crl.setFile(crlFilename);
+            certstore = root.getValue();
+            if (certstore.getVersion() > VERSION) {
+                throw new InvalidInputException("could not continue with CertStore greater than "
+                        + VERSION + ": " + certstore.getVersion());
+            }
+        } else {
+            certstore = new CertStoreType();
+            certstore.setVersion(VERSION);
+        }
 
-          crlsInCurrentFile.add(crl);
-          numCrlsInCurrentFile++;
-          sum++;
+        Exception exception = null;
+        System.out.println("exporting CA certstore from database");
+        try {
+            if (!resume) {
+                export_ca(certstore);
+                export_requestor(certstore);
+                export_publisherinfo(certstore);
+                export_certprofileinfo(certstore);
+                export_user(certstore);
+                export_crl(certstore);
+                export_publishQueue(certstore);
+                export_deltaCRLCache(certstore);
+            }
+            File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
+            exception = export_cert(certstore, processLogFile);
 
-          if (numCrlsInCurrentFile == numEntriesPerZip) {
-            String currentCrlsFilename = buildFilename("crls_", ".zip",
-                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-            finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
-            currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
+            JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+            try {
+                marshaller.marshal(root,
+                        new File(baseDir + File.separator + FILENAME_CA_CertStore));
+            } catch (JAXBException e) {
+                throw XMLUtil.convert(e);
+            }
+        } catch (Exception e) {
+            System.err.println("error while exporting CA certstore from database");
+            exception = e;
+        }
 
-            writeLine(filenameListOs, currentCrlsFilename);
-            certstore.setCountCrls(sum);
-            processLog.addNumProcessed(numCrlsInCurrentFile);
-            processLog.printStatus();
+        if (exception == null) {
+            System.out.println(" exported CA certstore from database");
+        } else {
+            throw exception;
+        }
+    } // method export
 
-            // reset
-            crlsInCurrentFile = new CaCrlsWriter();
-            numCrlsInCurrentFile = 0;
-            minIdOfCurrentFile = -1;
-            maxIdOfCurrentFile = -1;
-            currentCrlsZipFile = new File(baseDir,
+    private Exception export_crl(
+            final CertStoreType certstore) {
+        File fCrlsDir = new File(crlsDir);
+        fCrlsDir.mkdirs();
+
+        FileOutputStream crlsFileOs = null;
+        try {
+            certstore.setCountCrls(0);
+            crlsFileOs = new FileOutputStream(crlsListFile, true);
+            do_export_crl(certstore, crlsFileOs);
+            return null;
+        } catch (Exception e) {
+            // delete the temporary files
+            deleteTmpFiles(baseDir, "tmp-crls-");
+            System.err.println("\nexporting table CRL has been cancelled due to error");
+            LOG.error("Exception", e);
+            return e;
+        } finally {
+            IoUtil.closeStream(crlsFileOs);
+        }
+    } // method export_crl
+
+    private void do_export_crl(
+            final CertStoreType certstore,
+            final FileOutputStream filenameListOs)
+    throws Exception {
+        System.out.println(getExportingText() + "table CRL");
+
+        final int numEntriesPerSelect = numCrlsPerSelect;
+        final int numEntriesPerZip = numCrlsInBundle;
+        final String entriesDir = crlsDir;
+
+        final int minId = (int) getMin("CRL", "ID");
+        final int maxId = (int) getMax("CRL", "ID");
+
+        System.out.println(getExportingText() + "table CRL from ID " + minId);
+
+        long total = getCount("CRL");
+        if (total < 1) {
+            total = 1; // to avoid exception
+        }
+        ProcessLog processLog = new ProcessLog(total);
+
+        final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
+                + " ORDER BY ID ASC";
+        PreparedStatement ps = prepareStatement(sql);
+
+        int numCrlsInCurrentFile = 0;
+        CaCrlsWriter crlsInCurrentFile = new CaCrlsWriter();
+
+        int sum = 0;
+
+        File currentCrlsZipFile = new File(baseDir,
                 "tmp-crls-" + System.currentTimeMillis() + ".zip");
-            currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
-          }
-        }  // end while (rs.next)
-        rs.close();
-      } // end for
+        ZipOutputStream currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
 
-      if (interrupted) {
-        currentCrlsZip.close();
-        throw new InterruptedException("interrupted by the user");
-      }
+        int minIdOfCurrentFile = -1;
+        int maxIdOfCurrentFile = -1;
 
-      if (numCrlsInCurrentFile > 0) {
-        finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
+        processLog.printHeader();
 
-        String currentCrlsFilename = buildFilename("crls_", ".zip",
-            minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-        currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
+        try {
+            Integer id = null;
+            boolean interrupted = false;
+            for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
+                if (stopMe.get()) {
+                    interrupted = true;
+                    break;
+                }
 
-        writeLine(filenameListOs, currentCrlsFilename);
-        processLog.addNumProcessed(numCrlsInCurrentFile);
+                ps.setInt(1, i);
+                ps.setInt(2, i + numEntriesPerSelect);
 
-        certstore.setCountCrls(sum);
-      } else {
-        currentCrlsZip.close();
-        currentCrlsZipFile.delete();
-      }
+                ResultSet rs = ps.executeQuery();
 
-    } catch (SQLException e) {
-      throw translate(null, e);
-    } finally {
-      releaseResources(ps, null);
-    } // end try
+                while (rs.next()) {
+                    id = rs.getInt("ID");
 
-    processLog.printTrailer();
-    System.out.println(getExportedText() + sum + " CRLs from table CRL");
-  } // method do_export_crl
+                    if (minIdOfCurrentFile == -1) {
+                        minIdOfCurrentFile = id;
+                    } else if (minIdOfCurrentFile > id) {
+                        minIdOfCurrentFile = id;
+                    }
 
-  private void export_ca(
-      final CertStoreType certstore)
-  throws DataAccessException, IOException {
-    System.out.println("exporting table CS_CA");
-    Cas cas = new Cas();
-    final String sql = "SELECT ID, CERT FROM CS_CA";
+                    if (maxIdOfCurrentFile == -1) {
+                        maxIdOfCurrentFile = id;
+                    } else if (maxIdOfCurrentFile < id) {
+                        maxIdOfCurrentFile = id;
+                    }
 
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+                    int caId = rs.getInt("CA_ID");
 
-      while (rs.next()) {
-        int id = rs.getInt("ID");
-        String cert = rs.getString("CERT");
+                    String b64Crl = rs.getString("CRL");
+                    byte[] crlBytes = Base64.decode(b64Crl);
 
-        CertstoreCaType ca = new CertstoreCaType();
-        ca.setId(id);
-        ca.setCert(buildFileOrValue(cert, "ca-certstore/cert-ca-" + id));
+                    X509CRL x509Crl = null;
+                    try {
+                        x509Crl = X509Util.parseCRL(new ByteArrayInputStream(crlBytes));
+                    } catch (Exception e) {
+                        LOG.error("could not parse CRL with id {}", id);
+                        LOG.debug("could not parse CRL with id " + id, e);
+                        if (e instanceof CRLException) {
+                            throw (CRLException) e;
+                        } else {
+                            throw new CRLException(e.getMessage(), e);
+                        }
+                    }
 
-        cas.getCa().add(ca);
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(stmt, rs);
-    }
+                    byte[] octetString = x509Crl.getExtensionValue(Extension.cRLNumber.getId());
+                    if (octetString == null) {
+                        LOG.warn("CRL without CRL number, ignore it");
+                        continue;
+                    }
+                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
-    certstore.setCas(cas);
-    System.out.println(" exported table CS_CA");
-  } // method export_ca
+                    String sha1_cert = HashCalculator.hexSha1(crlBytes);
 
-  private void export_requestor(
-      final CertStoreType certstore)
-  throws DataAccessException {
-    System.out.println("exporting table CS_REQUESTOR");
-    Requestors infos = new Requestors();
-    final String sql = "SELECT ID, NAME FROM CS_REQUESTOR";
+                    final String crlFilename = sha1_cert + ".crl";
+                    if (!evaulateOnly) {
+                        ZipEntry certZipEntry = new ZipEntry(crlFilename);
+                        currentCrlsZip.putNextEntry(certZipEntry);
+                        try {
+                            currentCrlsZip.write(crlBytes);
+                        } finally {
+                            currentCrlsZip.closeEntry();
+                        }
+                    }
 
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+                    CaCrlType crl = new CaCrlType();
+                    crl.setId(id);
+                    crl.setCaId(caId);
+                    crl.setCrlNo(crlNumber.toString());
+                    crl.setFile(crlFilename);
 
-      while (rs.next()) {
-        int id = rs.getInt("ID");
-        String name = rs.getString("NAME");
+                    crlsInCurrentFile.add(crl);
+                    numCrlsInCurrentFile++;
+                    sum++;
 
-        NameIdType info = createNameId(name, id);
-        infos.getRequestor().add(info);
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(stmt, rs);
-    }
+                    if (numCrlsInCurrentFile == numEntriesPerZip) {
+                        String currentCrlsFilename = buildFilename("crls_", ".zip",
+                                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                        finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
+                        currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
-    certstore.setRequestors(infos);
-    System.out.println(" exported table CS_REQUESTOR");
-  } // method export_requestor
+                        writeLine(filenameListOs, currentCrlsFilename);
+                        certstore.setCountCrls(sum);
+                        processLog.addNumProcessed(numCrlsInCurrentFile);
+                        processLog.printStatus();
 
-  private void export_publisherinfo(
-      final CertStoreType certstore)
-  throws DataAccessException {
-    System.out.println("exporting table CS_PUBLISHER");
-    Publishers infos = new Publishers();
-    final String sql = "SELECT ID, NAME FROM CS_PUBLISHER";
+                        // reset
+                        crlsInCurrentFile = new CaCrlsWriter();
+                        numCrlsInCurrentFile = 0;
+                        minIdOfCurrentFile = -1;
+                        maxIdOfCurrentFile = -1;
+                        currentCrlsZipFile = new File(baseDir,
+                                "tmp-crls-" + System.currentTimeMillis() + ".zip");
+                        currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
+                    }
+                }    // end while (rs.next)
+                rs.close();
+            } // end for
 
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
+            if (interrupted) {
+                currentCrlsZip.close();
+                throw new InterruptedException("interrupted by the user");
+            }
 
-      while (rs.next()) {
-        int id = rs.getInt("ID");
-        String name = rs.getString("NAME");
+            if (numCrlsInCurrentFile > 0) {
+                finalizeZip(currentCrlsZip, "crls.xml", crlsInCurrentFile);
 
-        NameIdType info = createNameId(name, id);
-        infos.getPublisher().add(info);
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(stmt, rs);
-    }
+                String currentCrlsFilename = buildFilename("crls_", ".zip",
+                        minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                currentCrlsZipFile.renameTo(new File(entriesDir, currentCrlsFilename));
 
-    certstore.setPublishers(infos);
-    System.out.println(" exported table CS_PUBLISHER");
-  } // method export_publisherinfo
+                writeLine(filenameListOs, currentCrlsFilename);
+                processLog.addNumProcessed(numCrlsInCurrentFile);
 
-  private Exception export_user(
-      final CertStoreType certstore) {
-    File fUsersDir = new File(usersDir);
-    fUsersDir.mkdirs();
+                certstore.setCountCrls(sum);
+            } else {
+                currentCrlsZip.close();
+                currentCrlsZipFile.delete();
+            }
 
-    FileOutputStream usersFileOs = null;
-    try {
-      certstore.setCountUsers(0);
-      usersFileOs = new FileOutputStream(usersListFile, true);
-      do_export_user(certstore, usersFileOs);
-      return null;
-    } catch (Exception e) {
-      // delete the temporary files
-      deleteTmpFiles(baseDir, "tmp-users-");
-      System.err.println("\nexporting table USERNAME has been cancelled due to error");
-      LOG.error("Exception", e);
-      return e;
-    } finally {
-      IoUtil.closeStream(usersFileOs);
-    }
-  } // method export_user
+        } catch (SQLException e) {
+            throw translate(null, e);
+        } finally {
+            releaseResources(ps, null);
+        } // end try
 
-  private void do_export_user(
-      final CertStoreType certstore,
-      final FileOutputStream filenameListOs)
-  throws Exception {
-    System.out.println(getExportingText() + "table USERNAME");
+        processLog.printTrailer();
+        System.out.println(getExportedText() + sum + " CRLs from table CRL");
+    } // method do_export_crl
 
-    final int numEntriesPerSelect = numUsersPerSelect;
-    final int numEntriesPerZip = numUsersInBundle;
-    final String entriesDir = usersDir;
+    private void export_ca(
+            final CertStoreType certstore)
+    throws DataAccessException, IOException {
+        System.out.println("exporting table CS_CA");
+        Cas cas = new Cas();
+        final String sql = "SELECT ID, CERT FROM CS_CA";
 
-    final String sql = "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME"
-        + " WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = createStatement();
+            rs = stmt.executeQuery(sql);
 
-    final int minId = (int) getMin("USERNAME", "ID");
-    final int maxId = (int) getMax("USERNAME", "ID");
-    System.out.println(getExportingText() + "table USERNAME from ID " + minId);
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String cert = rs.getString("CERT");
 
-    long total = getCount("USERNAME");
-    if (total < 1) {
-      total = 1; // to avoid exception
-    }
-    ProcessLog processLog = new ProcessLog(total);
+                CertstoreCaType ca = new CertstoreCaType();
+                ca.setId(id);
+                ca.setCert(buildFileOrValue(cert, "ca-certstore/cert-ca-" + id));
 
-    PreparedStatement ps = prepareStatement(sql);
-
-    int numUsersInCurrentFile = 0;
-    CaUsersWriter usersInCurrentFile = new CaUsersWriter();
-
-    int sum = 0;
-
-    int minIdOfCurrentFile = -1;
-    int maxIdOfCurrentFile = -1;
-
-    processLog.printHeader();
-
-    try {
-      Integer id = null;
-      boolean interrupted = false;
-      for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
-        if (stopMe.get()) {
-          interrupted = true;
-          break;
+                cas.getCa().add(ca);
+            }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(stmt, rs);
         }
 
-        ps.setInt(1, i);
-        ps.setInt(2, i + numEntriesPerSelect);
+        certstore.setCas(cas);
+        System.out.println(" exported table CS_CA");
+    } // method export_ca
 
-        ResultSet rs = ps.executeQuery();
+    private void export_requestor(
+            final CertStoreType certstore)
+    throws DataAccessException {
+        System.out.println("exporting table CS_REQUESTOR");
+        Requestors infos = new Requestors();
+        final String sql = "SELECT ID, NAME FROM CS_REQUESTOR";
 
-        while (rs.next()) {
-          id = rs.getInt("ID");
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = createStatement();
+            rs = stmt.executeQuery(sql);
 
-          if (minIdOfCurrentFile == -1) {
-            minIdOfCurrentFile = id;
-          } else if (minIdOfCurrentFile > id) {
-            minIdOfCurrentFile = id;
-          }
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
 
-          if (maxIdOfCurrentFile == -1) {
-            maxIdOfCurrentFile = id;
-          } else if (maxIdOfCurrentFile < id) {
-            maxIdOfCurrentFile = id;
-          }
-
-          String name = rs.getString("NAME");
-          CaUserType user = new CaUserType();
-          user.setId(id);
-          user.setName(name);
-          String password = rs.getString("PASSWORD");
-          user.setPassword(password);
-
-          String cnRegex = rs.getString("CN_REGEX");
-          user.setCnRegex(cnRegex);
-          usersInCurrentFile.add(user);
-
-          numUsersInCurrentFile++;
-          sum++;
-
-          if (numUsersInCurrentFile == numEntriesPerZip) {
-            String currentUsersFilename =
-                "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
-            finalizeZip(entriesDir + File.separator + currentUsersFilename,
-                usersInCurrentFile);
-            certstore.setCountUsers(sum);
-            writeLine(filenameListOs, currentUsersFilename);
-
-            processLog.addNumProcessed(numUsersInCurrentFile);
-            processLog.printStatus();
-
-            // reset
-            usersInCurrentFile = new CaUsersWriter();
-            numUsersInCurrentFile = 0;
-            minIdOfCurrentFile = -1;
-            maxIdOfCurrentFile = -1;
-          }
-        }  // end while (rs.next)
-
-        rs.close();
-      } // end for
-
-      if (interrupted) {
-        throw new InterruptedException("interrupted by the user");
-      }
-
-      if (numUsersInCurrentFile > 0) {
-        String currentUsersFilename =
-            "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
-        finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
-        certstore.setCountUsers(sum);
-        writeLine(filenameListOs, currentUsersFilename);
-
-        processLog.addNumProcessed(numUsersInCurrentFile);
-      }
-    } catch (SQLException e) {
-      throw translate(null, e);
-    } finally {
-      releaseResources(ps, null);
-    } // end try
-
-    processLog.printTrailer();
-    System.out.println(getExportedText() + sum + " users from table USERNAME");
-  } // method do_export_user
-
-  private void export_certprofileinfo(
-      final CertStoreType certstore)
-  throws DataAccessException {
-    System.out.println("exporting table CS_PROFILE");
-    Profiles infos = new Profiles();
-    final String sql = "SELECT ID, NAME FROM CS_PROFILE";
-
-    Statement stmt = null;
-    ResultSet rs = null;
-    try {
-      stmt = createStatement();
-      rs = stmt.executeQuery(sql);
-
-      while (rs.next()) {
-        int id = rs.getInt("ID");
-        String name = rs.getString("NAME");
-
-        NameIdType info = createNameId(name, id);
-        infos.getProfile().add(info);
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(stmt, rs);
-    }
-
-    certstore.setProfiles(infos);
-    System.out.println(" exported table CS_PROFILE");
-  } // method export_certprofileinfo
-
-  /**
-   *
-   * @return exception instanceof {{@link DataAccessException}, {@link IOException} or
-   * {@link JAXBException}.
-   */
-  private Exception export_cert(
-      final CertStoreType certstore,
-      final File processLogFile) {
-    File fCertsDir = new File(certsDir);
-    fCertsDir.mkdirs();
-
-    FileOutputStream certsFileOs = null;
-    try {
-      certsFileOs = new FileOutputStream(certsListFile, true);
-      do_export_cert(certstore, processLogFile, certsFileOs);
-      return null;
-    } catch (Exception e) {
-      // delete the temporary files
-      deleteTmpFiles(baseDir, "tmp-certs-");
-      System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
-          + "please continue with the option '--resume'");
-      LOG.error("Exception", e);
-      return e;
-    } finally {
-      IoUtil.closeStream(certsFileOs);
-    }
-  } // method export_cert
-
-  private void do_export_cert(
-      final CertStoreType certstore,
-      final File processLogFile,
-      final FileOutputStream filenameListOs)
-  throws Exception {
-    final int numEntriesPerSelect = numCertsPerSelect;
-    final int numEntriesPerZip = numCertsInBundle;
-    final String entriesDir = certsDir;
-
-    int numProcessedBefore = certstore.getCountCerts();
-
-    Integer minId = null;
-    if (processLogFile.exists()) {
-      byte[] content = IoUtil.read(processLogFile);
-      if (content != null && content.length > 0) {
-        minId = Integer.parseInt(new String(content).trim());
-        minId++;
-      }
-    }
-
-    if (minId == null) {
-      minId = (int) getMin("CERT", "ID");
-    }
-
-    System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
-
-    final int maxId = (int) getMax("CERT", "ID");
-    long total = getCount("CERT") - numProcessedBefore;
-    if (total < 1) {
-      total = 1; // to avoid exception
-    }
-    ProcessLog processLog = new ProcessLog(total);
-
-    StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
-    certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
-    certSql.append("REQ_SUBJECT, CERT ");
-    certSql.append("FROM CERT INNER JOIN CRAW ");
-    certSql.append("ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC");
-
-    PreparedStatement ps = prepareStatement(certSql.toString());
-
-    int numCertsInCurrentFile = 0;
-    CaCertsWriter certsInCurrentFile = new CaCertsWriter();
-
-    int sum = 0;
-    File currentCertsZipFile = new File(baseDir,
-        "tmp-certs-" + System.currentTimeMillis() + ".zip");
-    ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
-
-    int minIdOfCurrentFile = -1;
-    int maxIdOfCurrentFile = -1;
-
-    processLog.printHeader();
-
-    try {
-      Integer id = null;
-      boolean interrupted = false;
-      for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
-        if (stopMe.get()) {
-          interrupted = true;
-          break;
+                NameIdType info = createNameId(name, id);
+                infos.getRequestor().add(info);
+            }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(stmt, rs);
         }
 
-        ps.setInt(1, i);
-        ps.setInt(2, i + numEntriesPerSelect);
+        certstore.setRequestors(infos);
+        System.out.println(" exported table CS_REQUESTOR");
+    } // method export_requestor
 
-        ResultSet rs = ps.executeQuery();
+    private void export_publisherinfo(
+            final CertStoreType certstore)
+    throws DataAccessException {
+        System.out.println("exporting table CS_PUBLISHER");
+        Publishers infos = new Publishers();
+        final String sql = "SELECT ID, NAME FROM CS_PUBLISHER";
 
-        while (rs.next()) {
-          id = rs.getInt("ID");
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = createStatement();
+            rs = stmt.executeQuery(sql);
 
-          if (minIdOfCurrentFile == -1) {
-            minIdOfCurrentFile = id;
-          } else if (minIdOfCurrentFile > id) {
-            minIdOfCurrentFile = id;
-          }
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
 
-          if (maxIdOfCurrentFile == -1) {
-            maxIdOfCurrentFile = id;
-          } else if (maxIdOfCurrentFile < id) {
-            maxIdOfCurrentFile = id;
-          }
-
-          String b64Cert = rs.getString("CERT");
-          byte[] certBytes = Base64.decode(b64Cert);
-
-          String sha1_cert = HashCalculator.hexSha1(certBytes);
-
-          if (!evaulateOnly) {
-            ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
-            currentCertsZip.putNextEntry(certZipEntry);
-            try {
-              currentCertsZip.write(certBytes);
-            } finally {
-              currentCertsZip.closeEntry();
+                NameIdType info = createNameId(name, id);
+                infos.getPublisher().add(info);
             }
-          }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(stmt, rs);
+        }
 
-          CaCertType cert = new CaCertType();
-          cert.setId(id);
+        certstore.setPublishers(infos);
+        System.out.println(" exported table CS_PUBLISHER");
+    } // method export_publisherinfo
 
-          byte[] tid = null;
-          int art = rs.getInt("ART");
-          int reqType = rs.getInt("RTYPE");
-          String s = rs.getString("TID");
-          if (StringUtil.isNotBlank(s)) {
-            tid = Base64.decode(s);
-          }
+    private Exception export_user(
+            final CertStoreType certstore) {
+        File fUsersDir = new File(usersDir);
+        fUsersDir.mkdirs();
 
-          cert.setArt(art);
-          cert.setReqType(reqType);
-          if (tid != null) {
-            cert.setTid(Base64.toBase64String(tid));
-          }
+        FileOutputStream usersFileOs = null;
+        try {
+            certstore.setCountUsers(0);
+            usersFileOs = new FileOutputStream(usersListFile, true);
+            do_export_user(certstore, usersFileOs);
+            return null;
+        } catch (Exception e) {
+            // delete the temporary files
+            deleteTmpFiles(baseDir, "tmp-users-");
+            System.err.println("\nexporting table USERNAME has been cancelled due to error");
+            LOG.error("Exception", e);
+            return e;
+        } finally {
+            IoUtil.closeStream(usersFileOs);
+        }
+    } // method export_user
 
-          int cainfo_id = rs.getInt("CA_ID");
-          cert.setCaId(cainfo_id);
+    private void do_export_user(
+            final CertStoreType certstore,
+            final FileOutputStream filenameListOs)
+    throws Exception {
+        System.out.println(getExportingText() + "table USERNAME");
 
-          long serial = rs.getLong("SN");
-          cert.setSn(Long.toHexString(serial));
+        final int numEntriesPerSelect = numUsersPerSelect;
+        final int numEntriesPerZip = numUsersInBundle;
+        final String entriesDir = usersDir;
 
-          int certprofile_id = rs.getInt("PID");
-          cert.setPid(certprofile_id);
+        final String sql = "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME"
+                + " WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
 
-          int requestorinfo_id = rs.getInt("RID");
-          if (requestorinfo_id != 0) {
-            cert.setRid(requestorinfo_id);
-          }
+        final int minId = (int) getMin("USERNAME", "ID");
+        final int maxId = (int) getMax("USERNAME", "ID");
+        System.out.println(getExportingText() + "table USERNAME from ID " + minId);
 
-          long last_update = rs.getLong("LUPDATE");
-          cert.setUpdate(last_update);
+        long total = getCount("USERNAME");
+        if (total < 1) {
+            total = 1; // to avoid exception
+        }
+        ProcessLog processLog = new ProcessLog(total);
 
-          boolean revoked = rs.getBoolean("REV");
-          cert.setRev(revoked);
+        PreparedStatement ps = prepareStatement(sql);
 
-          if (revoked) {
-            int rev_reason = rs.getInt("RR");
-            long rev_time = rs.getLong("RT");
-            long rev_inv_time = rs.getLong("RIT");
-            cert.setRr(rev_reason);
-            cert.setRt(rev_time);
-            if (rev_inv_time != 0) {
-              cert.setRit(rev_inv_time);
+        int numUsersInCurrentFile = 0;
+        CaUsersWriter usersInCurrentFile = new CaUsersWriter();
+
+        int sum = 0;
+
+        int minIdOfCurrentFile = -1;
+        int maxIdOfCurrentFile = -1;
+
+        processLog.printHeader();
+
+        try {
+            Integer id = null;
+            boolean interrupted = false;
+            for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
+                if (stopMe.get()) {
+                    interrupted = true;
+                    break;
+                }
+
+                ps.setInt(1, i);
+                ps.setInt(2, i + numEntriesPerSelect);
+
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    id = rs.getInt("ID");
+
+                    if (minIdOfCurrentFile == -1) {
+                        minIdOfCurrentFile = id;
+                    } else if (minIdOfCurrentFile > id) {
+                        minIdOfCurrentFile = id;
+                    }
+
+                    if (maxIdOfCurrentFile == -1) {
+                        maxIdOfCurrentFile = id;
+                    } else if (maxIdOfCurrentFile < id) {
+                        maxIdOfCurrentFile = id;
+                    }
+
+                    String name = rs.getString("NAME");
+                    CaUserType user = new CaUserType();
+                    user.setId(id);
+                    user.setName(name);
+                    String password = rs.getString("PASSWORD");
+                    user.setPassword(password);
+
+                    String cnRegex = rs.getString("CN_REGEX");
+                    user.setCnRegex(cnRegex);
+                    usersInCurrentFile.add(user);
+
+                    numUsersInCurrentFile++;
+                    sum++;
+
+                    if (numUsersInCurrentFile == numEntriesPerZip) {
+                        String currentUsersFilename =
+                                "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
+                        finalizeZip(entriesDir + File.separator + currentUsersFilename,
+                                usersInCurrentFile);
+                        certstore.setCountUsers(sum);
+                        writeLine(filenameListOs, currentUsersFilename);
+
+                        processLog.addNumProcessed(numUsersInCurrentFile);
+                        processLog.printStatus();
+
+                        // reset
+                        usersInCurrentFile = new CaUsersWriter();
+                        numUsersInCurrentFile = 0;
+                        minIdOfCurrentFile = -1;
+                        maxIdOfCurrentFile = -1;
+                    }
+                }    // end while (rs.next)
+
+                rs.close();
+            } // end for
+
+            if (interrupted) {
+                throw new InterruptedException("interrupted by the user");
             }
-          }
 
-          String user = rs.getString("UNAME");
-          if (user != null) {
-            cert.setUser(user);
-          }
-          cert.setFile(sha1_cert + ".der");
+            if (numUsersInCurrentFile > 0) {
+                String currentUsersFilename =
+                        "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".zip";
+                finalizeZip(entriesDir + File.separator + currentUsersFilename, usersInCurrentFile);
+                certstore.setCountUsers(sum);
+                writeLine(filenameListOs, currentUsersFilename);
 
-          long fpReqSubject = rs.getLong("FP_RS");
-          if (fpReqSubject != 0) {
-            cert.setFpRs(fpReqSubject);
-            String reqSubject = rs.getString("REQ_SUBJECT");
-            cert.setRs(reqSubject);
-          }
+                processLog.addNumProcessed(numUsersInCurrentFile);
+            }
+        } catch (SQLException e) {
+            throw translate(null, e);
+        } finally {
+            releaseResources(ps, null);
+        } // end try
 
-          certsInCurrentFile.add(cert);
-          numCertsInCurrentFile++;
-          sum++;
+        processLog.printTrailer();
+        System.out.println(getExportedText() + sum + " users from table USERNAME");
+    } // method do_export_user
 
-          if (numCertsInCurrentFile == numEntriesPerZip) {
-            String currentCertsFilename = buildFilename("certs_", ".zip",
-                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-            finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
-            currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
+    private void export_certprofileinfo(
+            final CertStoreType certstore)
+    throws DataAccessException {
+        System.out.println("exporting table CS_PROFILE");
+        Profiles infos = new Profiles();
+        final String sql = "SELECT ID, NAME FROM CS_PROFILE";
 
-            writeLine(filenameListOs, currentCertsFilename);
-            certstore.setCountCerts(numProcessedBefore + sum);
-            echoToFile(Integer.toString(id), processLogFile);
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = createStatement();
+            rs = stmt.executeQuery(sql);
 
-            processLog.addNumProcessed(numCertsInCurrentFile);
-            processLog.printStatus();
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
 
-            // reset
-            certsInCurrentFile = new CaCertsWriter();
-            numCertsInCurrentFile = 0;
-            minIdOfCurrentFile = -1;
-            maxIdOfCurrentFile = -1;
-            currentCertsZipFile = new File(baseDir,
+                NameIdType info = createNameId(name, id);
+                infos.getProfile().add(info);
+            }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(stmt, rs);
+        }
+
+        certstore.setProfiles(infos);
+        System.out.println(" exported table CS_PROFILE");
+    } // method export_certprofileinfo
+
+    /**
+     *
+     * @return exception instanceof {{@link DataAccessException}, {@link IOException} or
+     * {@link JAXBException}.
+     */
+    private Exception export_cert(
+            final CertStoreType certstore,
+            final File processLogFile) {
+        File fCertsDir = new File(certsDir);
+        fCertsDir.mkdirs();
+
+        FileOutputStream certsFileOs = null;
+        try {
+            certsFileOs = new FileOutputStream(certsListFile, true);
+            do_export_cert(certstore, processLogFile, certsFileOs);
+            return null;
+        } catch (Exception e) {
+            // delete the temporary files
+            deleteTmpFiles(baseDir, "tmp-certs-");
+            System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
+                    + "please continue with the option '--resume'");
+            LOG.error("Exception", e);
+            return e;
+        } finally {
+            IoUtil.closeStream(certsFileOs);
+        }
+    } // method export_cert
+
+    private void do_export_cert(
+            final CertStoreType certstore,
+            final File processLogFile,
+            final FileOutputStream filenameListOs)
+    throws Exception {
+        final int numEntriesPerSelect = numCertsPerSelect;
+        final int numEntriesPerZip = numCertsInBundle;
+        final String entriesDir = certsDir;
+
+        int numProcessedBefore = certstore.getCountCerts();
+
+        Integer minId = null;
+        if (processLogFile.exists()) {
+            byte[] content = IoUtil.read(processLogFile);
+            if (content != null && content.length > 0) {
+                minId = Integer.parseInt(new String(content).trim());
+                minId++;
+            }
+        }
+
+        if (minId == null) {
+            minId = (int) getMin("CERT", "ID");
+        }
+
+        System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
+
+        final int maxId = (int) getMax("CERT", "ID");
+        long total = getCount("CERT") - numProcessedBefore;
+        if (total < 1) {
+            total = 1; // to avoid exception
+        }
+        ProcessLog processLog = new ProcessLog(total);
+
+        StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
+        certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
+        certSql.append("REQ_SUBJECT, CERT ");
+        certSql.append("FROM CERT INNER JOIN CRAW ");
+        certSql.append("ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC");
+
+        PreparedStatement ps = prepareStatement(certSql.toString());
+
+        int numCertsInCurrentFile = 0;
+        CaCertsWriter certsInCurrentFile = new CaCertsWriter();
+
+        int sum = 0;
+        File currentCertsZipFile = new File(baseDir,
                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
-            currentCertsZip = getZipOutputStream(currentCertsZipFile);
-          }
-        }  // end while (rs.next)
+        ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
-        rs.close();
-      } // end for
+        int minIdOfCurrentFile = -1;
+        int maxIdOfCurrentFile = -1;
 
-      if (interrupted) {
-        currentCertsZip.close();
-        throw new InterruptedException("interrupted by the user");
-      }
+        processLog.printHeader();
 
-      if (numCertsInCurrentFile > 0) {
-        finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
+        try {
+            Integer id = null;
+            boolean interrupted = false;
+            for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
+                if (stopMe.get()) {
+                    interrupted = true;
+                    break;
+                }
 
-        String currentCertsFilename = buildFilename("certs_", ".zip",
-            minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-        currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
+                ps.setInt(1, i);
+                ps.setInt(2, i + numEntriesPerSelect);
 
-        writeLine(filenameListOs, currentCertsFilename);
-        certstore.setCountCerts(numProcessedBefore + sum);
-        if (id != null) {
-          echoToFile(Integer.toString(id), processLogFile);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    id = rs.getInt("ID");
+
+                    if (minIdOfCurrentFile == -1) {
+                        minIdOfCurrentFile = id;
+                    } else if (minIdOfCurrentFile > id) {
+                        minIdOfCurrentFile = id;
+                    }
+
+                    if (maxIdOfCurrentFile == -1) {
+                        maxIdOfCurrentFile = id;
+                    } else if (maxIdOfCurrentFile < id) {
+                        maxIdOfCurrentFile = id;
+                    }
+
+                    String b64Cert = rs.getString("CERT");
+                    byte[] certBytes = Base64.decode(b64Cert);
+
+                    String sha1_cert = HashCalculator.hexSha1(certBytes);
+
+                    if (!evaulateOnly) {
+                        ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
+                        currentCertsZip.putNextEntry(certZipEntry);
+                        try {
+                            currentCertsZip.write(certBytes);
+                        } finally {
+                            currentCertsZip.closeEntry();
+                        }
+                    }
+
+                    CaCertType cert = new CaCertType();
+                    cert.setId(id);
+
+                    byte[] tid = null;
+                    int art = rs.getInt("ART");
+                    int reqType = rs.getInt("RTYPE");
+                    String s = rs.getString("TID");
+                    if (StringUtil.isNotBlank(s)) {
+                        tid = Base64.decode(s);
+                    }
+
+                    cert.setArt(art);
+                    cert.setReqType(reqType);
+                    if (tid != null) {
+                        cert.setTid(Base64.toBase64String(tid));
+                    }
+
+                    int cainfo_id = rs.getInt("CA_ID");
+                    cert.setCaId(cainfo_id);
+
+                    long serial = rs.getLong("SN");
+                    cert.setSn(Long.toHexString(serial));
+
+                    int certprofile_id = rs.getInt("PID");
+                    cert.setPid(certprofile_id);
+
+                    int requestorinfo_id = rs.getInt("RID");
+                    if (requestorinfo_id != 0) {
+                        cert.setRid(requestorinfo_id);
+                    }
+
+                    long last_update = rs.getLong("LUPDATE");
+                    cert.setUpdate(last_update);
+
+                    boolean revoked = rs.getBoolean("REV");
+                    cert.setRev(revoked);
+
+                    if (revoked) {
+                        int rev_reason = rs.getInt("RR");
+                        long rev_time = rs.getLong("RT");
+                        long rev_inv_time = rs.getLong("RIT");
+                        cert.setRr(rev_reason);
+                        cert.setRt(rev_time);
+                        if (rev_inv_time != 0) {
+                            cert.setRit(rev_inv_time);
+                        }
+                    }
+
+                    String user = rs.getString("UNAME");
+                    if (user != null) {
+                        cert.setUser(user);
+                    }
+                    cert.setFile(sha1_cert + ".der");
+
+                    long fpReqSubject = rs.getLong("FP_RS");
+                    if (fpReqSubject != 0) {
+                        cert.setFpRs(fpReqSubject);
+                        String reqSubject = rs.getString("REQ_SUBJECT");
+                        cert.setRs(reqSubject);
+                    }
+
+                    certsInCurrentFile.add(cert);
+                    numCertsInCurrentFile++;
+                    sum++;
+
+                    if (numCertsInCurrentFile == numEntriesPerZip) {
+                        String currentCertsFilename = buildFilename("certs_", ".zip",
+                                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                        finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
+                        currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
+
+                        writeLine(filenameListOs, currentCertsFilename);
+                        certstore.setCountCerts(numProcessedBefore + sum);
+                        echoToFile(Integer.toString(id), processLogFile);
+
+                        processLog.addNumProcessed(numCertsInCurrentFile);
+                        processLog.printStatus();
+
+                        // reset
+                        certsInCurrentFile = new CaCertsWriter();
+                        numCertsInCurrentFile = 0;
+                        minIdOfCurrentFile = -1;
+                        maxIdOfCurrentFile = -1;
+                        currentCertsZipFile = new File(baseDir,
+                                "tmp-certs-" + System.currentTimeMillis() + ".zip");
+                        currentCertsZip = getZipOutputStream(currentCertsZipFile);
+                    }
+                }    // end while (rs.next)
+
+                rs.close();
+            } // end for
+
+            if (interrupted) {
+                currentCertsZip.close();
+                throw new InterruptedException("interrupted by the user");
+            }
+
+            if (numCertsInCurrentFile > 0) {
+                finalizeZip(currentCertsZip, "certs.xml", certsInCurrentFile);
+
+                String currentCertsFilename = buildFilename("certs_", ".zip",
+                        minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                currentCertsZipFile.renameTo(new File(entriesDir, currentCertsFilename));
+
+                writeLine(filenameListOs, currentCertsFilename);
+                certstore.setCountCerts(numProcessedBefore + sum);
+                if (id != null) {
+                    echoToFile(Integer.toString(id), processLogFile);
+                }
+
+                processLog.addNumProcessed(numCertsInCurrentFile);
+            } else {
+                currentCertsZip.close();
+                currentCertsZipFile.delete();
+            }
+
+        } catch (SQLException e) {
+            throw translate(null, e);
+        } finally {
+            releaseResources(ps, null);
+        } // end try
+
+        processLog.printTrailer();
+        // all successful, delete the processLogFile
+        processLogFile.delete();
+        System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");
+    } // method do_export_cert
+
+    private void export_publishQueue(
+            final CertStoreType certstore)
+    throws DataAccessException, IOException, JAXBException {
+        System.out.println("exporting table PUBLISHQUEUE");
+
+        StringBuilder sqlBuilder = new StringBuilder("SELECT");
+        sqlBuilder.append(" CID, PID, ");
+        sqlBuilder.append("CA_ID");
+        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID >= ? AND CID < ? ORDER BY CID ASC");
+        final String sql = sqlBuilder.toString();
+        final int minId = (int) getMin("PUBLISHQUEUE", "CID");
+        final int maxId = (int) getMax("PUBLISHQUEUE", "CID");
+
+        PublishQueue queue = new PublishQueue();
+        certstore.setPublishQueue(queue);
+        if (maxId == 0) {
+            System.out.println(" exported table PUBLISHQUEUE");
+            return;
         }
 
-        processLog.addNumProcessed(numCertsInCurrentFile);
-      } else {
-        currentCertsZip.close();
-        currentCertsZipFile.delete();
-      }
+        PreparedStatement ps = prepareStatement(sql);
+        ResultSet rs = null;
 
-    } catch (SQLException e) {
-      throw translate(null, e);
-    } finally {
-      releaseResources(ps, null);
-    } // end try
+        List<ToPublishType> list = queue.getTop();
+        final int n = 500;
 
-    processLog.printTrailer();
-    // all successful, delete the processLogFile
-    processLogFile.delete();
-    System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");
-  } // method do_export_cert
+        try {
+            for (int i = minId; i <= maxId; i += n) {
+                ps.setInt(1, i);
+                ps.setInt(2, i + n);
 
-  private void export_publishQueue(
-      final CertStoreType certstore)
-  throws DataAccessException, IOException, JAXBException {
-    System.out.println("exporting table PUBLISHQUEUE");
+                rs = ps.executeQuery();
 
-    StringBuilder sqlBuilder = new StringBuilder("SELECT");
-    sqlBuilder.append(" CID, PID, ");
-    sqlBuilder.append("CA_ID");
-    sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID >= ? AND CID < ? ORDER BY CID ASC");
-    final String sql = sqlBuilder.toString();
-    final int minId = (int) getMin("PUBLISHQUEUE", "CID");
-    final int maxId = (int) getMax("PUBLISHQUEUE", "CID");
+                while (rs.next()) {
+                    int cert_id = rs.getInt("CID");
+                    int pub_id = rs.getInt("PID");
+                    int ca_id = rs.getInt("CA_ID");
 
-    PublishQueue queue = new PublishQueue();
-    certstore.setPublishQueue(queue);
-    if (maxId == 0) {
-      System.out.println(" exported table PUBLISHQUEUE");
-      return;
-    }
-
-    PreparedStatement ps = prepareStatement(sql);
-    ResultSet rs = null;
-
-    List<ToPublishType> list = queue.getTop();
-    final int n = 500;
-
-    try {
-      for (int i = minId; i <= maxId; i += n) {
-        ps.setInt(1, i);
-        ps.setInt(2, i + n);
-
-        rs = ps.executeQuery();
-
-        while (rs.next()) {
-          int cert_id = rs.getInt("CID");
-          int pub_id = rs.getInt("PID");
-          int ca_id = rs.getInt("CA_ID");
-
-          ToPublishType toPub = new ToPublishType();
-          toPub.setPubId(pub_id);
-          toPub.setCertId(cert_id);
-          toPub.setCaId(ca_id);
-          list.add(toPub);
+                    ToPublishType toPub = new ToPublishType();
+                    toPub.setPubId(pub_id);
+                    toPub.setCertId(cert_id);
+                    toPub.setCaId(ca_id);
+                    list.add(toPub);
+                }
+            }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(ps, rs);
         }
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(ps, rs);
-    }
-    System.out.println(" exported table PUBLISHQUEUE");
-  } // method export_publishQueue
+        System.out.println(" exported table PUBLISHQUEUE");
+    } // method export_publishQueue
 
-  private void export_deltaCRLCache(
-      final CertStoreType certstore)
-  throws DataAccessException, IOException, JAXBException {
-    System.out.println("exporting table DELTACRL_CACHE");
+    private void export_deltaCRLCache(
+            final CertStoreType certstore)
+    throws DataAccessException, IOException, JAXBException {
+        System.out.println("exporting table DELTACRL_CACHE");
 
-    StringBuilder sqlBuilder = new StringBuilder("SELECT");
-    sqlBuilder.append(" SN, ");
-    sqlBuilder.append("CA_ID");
-    sqlBuilder.append(" FROM DELTACRL_CACHE");
-    final String sql = sqlBuilder.toString();
+        StringBuilder sqlBuilder = new StringBuilder("SELECT");
+        sqlBuilder.append(" SN, ");
+        sqlBuilder.append("CA_ID");
+        sqlBuilder.append(" FROM DELTACRL_CACHE");
+        final String sql = sqlBuilder.toString();
 
-    DeltaCRLCache deltaCache = new DeltaCRLCache();
-    certstore.setDeltaCRLCache(deltaCache);
+        DeltaCRLCache deltaCache = new DeltaCRLCache();
+        certstore.setDeltaCRLCache(deltaCache);
 
-    PreparedStatement ps = prepareStatement(sql);
-    ResultSet rs = null;
+        PreparedStatement ps = prepareStatement(sql);
+        ResultSet rs = null;
 
-    List<DeltaCRLCacheEntryType> list = deltaCache.getEntry();
+        List<DeltaCRLCacheEntryType> list = deltaCache.getEntry();
 
-    try {
-      rs = ps.executeQuery();
+        try {
+            rs = ps.executeQuery();
 
-      while (rs.next()) {
-        long serial = rs.getLong("SN");
-        int ca_id = rs.getInt("CA_ID");
+            while (rs.next()) {
+                long serial = rs.getLong("SN");
+                int ca_id = rs.getInt("CA_ID");
 
-        DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
-        entry.setCaId(ca_id);
-        entry.setSerial(serial);
-        list.add(entry);
-      }
-    } catch (SQLException e) {
-      throw translate(sql, e);
-    } finally {
-      releaseResources(ps, rs);
-    }
+                DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
+                entry.setCaId(ca_id);
+                entry.setSerial(serial);
+                list.add(entry);
+            }
+        } catch (SQLException e) {
+            throw translate(sql, e);
+        } finally {
+            releaseResources(ps, rs);
+        }
 
-    System.out.println(" exported table DELTACRL_CACHE");
-  } // method export_deltaCRLCache
+        System.out.println(" exported table DELTACRL_CACHE");
+    } // method export_deltaCRLCache
 
-  private void finalizeZip(
-      final ZipOutputStream zipOutStream,
-      final String filename,
-      final DbiXmlWriter os)
-  throws JAXBException, IOException, XMLStreamException {
-    ZipEntry certZipEntry = new ZipEntry(filename);
-    zipOutStream.putNextEntry(certZipEntry);
-    try {
-      os.rewriteToZipStream(zipOutStream);
-    } finally {
-      zipOutStream.closeEntry();
+    private void finalizeZip(
+            final ZipOutputStream zipOutStream,
+            final String filename,
+            final DbiXmlWriter os)
+    throws JAXBException, IOException, XMLStreamException {
+        ZipEntry certZipEntry = new ZipEntry(filename);
+        zipOutStream.putNextEntry(certZipEntry);
+        try {
+            os.rewriteToZipStream(zipOutStream);
+        } finally {
+            zipOutStream.closeEntry();
+        }
+
+        zipOutStream.close();
     }
 
-    zipOutStream.close();
-  }
+    private void finalizeZip(
+            final String zipFilename,
+            final CaUsersWriter os)
+    throws JAXBException, IOException, XMLStreamException {
+        File zipFile = new File(baseDir, "tmp-users-" + System.currentTimeMillis() + ".zip");
+        ZipOutputStream zipOutStream = getZipOutputStream(zipFile);
+        ZipEntry certZipEntry = new ZipEntry("users.xml");
+        zipOutStream.putNextEntry(certZipEntry);
+        try {
+            os.rewriteToZipStream(zipOutStream);
+        } finally {
+            zipOutStream.closeEntry();
+        }
 
-  private void finalizeZip(
-      final String zipFilename,
-      final CaUsersWriter os)
-  throws JAXBException, IOException, XMLStreamException {
-    File zipFile = new File(baseDir, "tmp-users-" + System.currentTimeMillis() + ".zip");
-    ZipOutputStream zipOutStream = getZipOutputStream(zipFile);
-    ZipEntry certZipEntry = new ZipEntry("users.xml");
-    zipOutStream.putNextEntry(certZipEntry);
-    try {
-      os.rewriteToZipStream(zipOutStream);
-    } finally {
-      zipOutStream.closeEntry();
+        zipOutStream.close();
+
+        zipFile.renameTo(new File(zipFilename));
     }
 
-    zipOutStream.close();
-
-    zipFile.renameTo(new File(zipFilename));
-  }
-
-  private static NameIdType createNameId(
-      final String name,
-      final int id) {
-    NameIdType info = new NameIdType();
-    info.setId(id);
-    info.setName(name);
-    return info;
-  }
+    private static NameIdType createNameId(
+            final String name,
+            final int id) {
+        NameIdType info = new NameIdType();
+        info.setId(id);
+        info.setName(name);
+        return info;
+    }
 
 }
