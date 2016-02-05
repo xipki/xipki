@@ -80,7 +80,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
 
 public class CAManagerClient implements CAManager {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(CAManagerClient.class);
 
     private HessianCAManager client;
 

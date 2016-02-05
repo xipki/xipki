@@ -77,7 +77,7 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class DecodedNextCAMessage {
 
-    private final static Logger LOG = LoggerFactory.getLogger(DecodedNextCAMessage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DecodedNextCAMessage.class);
 
     private AuthorityCertStore authorityCertStore;
 
@@ -203,9 +203,9 @@ public class DecodedNextCAMessage {
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
         if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
-            ASN1ObjectIdentifier _digestAlgOID;
+            ASN1ObjectIdentifier localDigestAlgOID;
             try {
-                _digestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
+                localDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception e) {
                 final String msg =
@@ -216,18 +216,18 @@ public class DecodedNextCAMessage {
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(_digestAlgOID)) {
+            if (!digestAlgOID.equals(localDigestAlgOID)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
                         + " the same digestAlgorithm");
                 return ret;
             }
         } // end if
 
-        X509CertificateHolder _signerCert =
+        X509CertificateHolder localSignerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try {
-            signerCert = new X509CertificateObject(_signerCert.toASN1Structure());
+            signerCert = new X509CertificateObject(localSignerCert.toASN1Structure());
         } catch (CertificateParsingException e) {
             final String msg = "could not construct X509CertificateObject: " + e.getMessage();
             LOG.error(msg);
@@ -320,14 +320,14 @@ public class DecodedNextCAMessage {
             return ret;
         }
 
-        X509Certificate[] _raCerts;
+        X509Certificate[] locaRaCerts;
         if (rACerts.isEmpty()) {
-            _raCerts = null;
+            locaRaCerts = null;
         } else {
-            _raCerts = rACerts.toArray(new X509Certificate[0]);
+            locaRaCerts = rACerts.toArray(new X509Certificate[0]);
         }
 
-        AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(cACert, _raCerts);
+        AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(cACert, locaRaCerts);
         ret.setAuthorityCertStore(authorityCertStore);
 
         return ret;

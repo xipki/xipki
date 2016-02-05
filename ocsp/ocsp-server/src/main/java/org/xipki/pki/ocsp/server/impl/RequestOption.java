@@ -70,14 +70,14 @@ import org.xipki.pki.ocsp.server.impl.jaxb.VersionsType;
 
 class RequestOption {
 
-    static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<>();
+    static final Set<HashAlgoType> SUPPORTED_HASH_ALGORITHMS = new HashSet<>();
 
     static {
-        supportedHashAlgorithms.add(HashAlgoType.SHA1);
-        supportedHashAlgorithms.add(HashAlgoType.SHA224);
-        supportedHashAlgorithms.add(HashAlgoType.SHA256);
-        supportedHashAlgorithms.add(HashAlgoType.SHA384);
-        supportedHashAlgorithms.add(HashAlgoType.SHA512);
+        SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA1);
+        SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA224);
+        SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA256);
+        SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA384);
+        SUPPORTED_HASH_ALGORITHMS.add(HashAlgoType.SHA512);
     }
 
     private final boolean supportsHttpGet;
@@ -104,7 +104,7 @@ class RequestOption {
 
     private final CertpathValidationModel certpathValidationModel;
 
-    public RequestOption(
+    RequestOption(
             final RequestOptionType conf)
     throws InvalidConfException {
         NonceType nonceConf = conf.getNonce();
@@ -129,15 +129,15 @@ class RequestOption {
             nonceRequired = false;
         }
 
-        int _maxSize = 0;
+        int localMaxSize = 0;
         if (conf.getMaxRequestSize() != null) {
-            _maxSize = conf.getMaxRequestSize().intValue();
+            localMaxSize = conf.getMaxRequestSize().intValue();
         }
 
-        if (_maxSize < 255) {
-            _maxSize = 4 * 1024; // 4 KB
+        if (localMaxSize < 255) {
+            localMaxSize = 4 * 1024; // 4 KB
         }
-        this.maxRequestSize = _maxSize;
+        this.maxRequestSize = localMaxSize;
 
         this.nonceMinLen = minLen;
         this.nonceMaxLen = maxLen;
@@ -159,14 +159,14 @@ class RequestOption {
         if (reqHashAlgosConf != null) {
             for (String token : reqHashAlgosConf.getAlgorithm()) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && supportedHashAlgorithms.contains(algo)) {
+                if (algo != null && SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
                     hashAlgos.add(algo);
                 } else {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
         } else {
-            hashAlgos.addAll(supportedHashAlgorithms);
+            hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
         }
 
         // certpath validation
@@ -274,7 +274,7 @@ class RequestOption {
     private Set<X509Certificate> getCerts(
             final CertCollectionType conf)
     throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-        Set<X509Certificate> certs = new HashSet<>();
+        Set<X509Certificate> localCerts = new HashSet<>();
 
         if (conf.getKeystore() != null) {
             Keystore ksConf = conf.getKeystore();
@@ -297,7 +297,7 @@ class RequestOption {
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
                 if (trustStore.isCertificateEntry(alias)) {
-                    certs.add((X509Certificate) trustStore.getCertificate(alias));
+                    localCerts.add((X509Certificate) trustStore.getCertificate(alias));
                 }
             }
         } else if (conf.getDir() != null) {
@@ -305,14 +305,14 @@ class RequestOption {
             File[] files = dir.listFiles();
             for (File file : files) {
                 if (file.exists() && file.isFile()) {
-                    certs.add(X509Util.parseCert(file));
+                    localCerts.add(X509Util.parseCert(file));
                 }
             }
         } else {
             throw new RuntimeException("should not happen, neither keystore nor dir is defined");
         }
 
-        return certs;
+        return localCerts;
     } // method getCerts
 
 }

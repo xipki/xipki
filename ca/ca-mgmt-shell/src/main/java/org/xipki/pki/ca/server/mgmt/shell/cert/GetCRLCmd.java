@@ -72,8 +72,7 @@ public class GetCRLCmd extends CRLCommandSupport {
     private String baseCRLOut;
 
     @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
+    protected X509CRL retrieveCRL()
     throws Exception {
         return caManager.getCurrentCRL(caName);
     }
@@ -88,7 +87,7 @@ public class GetCRLCmd extends CRLCommandSupport {
 
         X509CRL crl = null;
         try {
-            crl = retrieveCRL(caName);
+            crl = retrieveCRL();
         } catch (Exception e) {
             throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }

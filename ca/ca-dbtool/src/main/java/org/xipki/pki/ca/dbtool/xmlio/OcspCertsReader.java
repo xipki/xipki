@@ -39,7 +39,6 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Lijun Liao
@@ -55,8 +54,7 @@ public class OcspCertsReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext(
-            final XMLStreamReader reader)
+    protected DbDataObject retrieveNext()
     throws InvalidDataObjectException, XMLStreamException {
         OcspCertType ret = null;
         StringBuilder buffer = new StringBuilder();
@@ -94,39 +92,40 @@ public class OcspCertsReader extends DbiXmlReader {
                 case OcspCertType.TAG_ROOT:
                     ret.validate();
                     return ret;
-                case OcspCertType.TAG_file:
+                case OcspCertType.TAG_FILE:
                     ret.setFile(tagContent);
                     break;
-                case OcspCertType.TAG_id:
+                case OcspCertType.TAG_ID:
                     ret.setId(Integer.parseInt(tagContent));
                     break;
-                case OcspCertType.TAG_iid:
+                case OcspCertType.TAG_IID:
                     ret.setIid(Integer.parseInt(tagContent));
                     break;
-                case OcspCertType.TAG_profile:
+                case OcspCertType.TAG_PROFILE:
                     ret.setProfile(tagContent);
                     break;
-                case OcspCertType.TAG_rev:
+                case OcspCertType.TAG_REV:
                     ret.setRev(Boolean.parseBoolean(tagContent));
                     break;
-                case OcspCertType.TAG_rit:
+                case OcspCertType.TAG_RIT:
                     ret.setRit(Long.parseLong(tagContent));
                     break;
-                case OcspCertType.TAG_rr:
+                case OcspCertType.TAG_RR:
                     ret.setRr(Integer.parseInt(tagContent));
                     break;
-                case OcspCertType.TAG_rt:
+                case OcspCertType.TAG_RT:
                     ret.setRt(Long.parseLong(tagContent));
                     break;
-                case OcspCertType.TAG_sn:
+                case OcspCertType.TAG_SN:
                     ret.setSn(tagContent);
                     break;
-                case OcspCertType.TAG_update:
+                case OcspCertType.TAG_UPDATE:
                     ret.setUpdate(Long.parseLong(tagContent));
                     break;
                 default:
                     break;
                 } // end switch (reader.getLocalName())
+                break;
             default:
                 break;
             } // end switch (event)

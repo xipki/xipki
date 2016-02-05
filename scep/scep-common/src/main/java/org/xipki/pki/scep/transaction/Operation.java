@@ -49,7 +49,7 @@ public enum Operation {
 
     private final String code;
 
-    private Operation(
+    Operation(
             final String code) {
         this.code = code;
     }

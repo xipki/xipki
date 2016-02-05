@@ -54,7 +54,7 @@ public enum CACapability {
 
     private String text;
 
-    private CACapability(
+    CACapability(
             final String text) {
         this.text = text;
     }

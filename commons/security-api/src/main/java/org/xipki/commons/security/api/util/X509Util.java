@@ -103,6 +103,9 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 public class X509Util {
 
+    private static CertificateFactory certFact;
+    private static final Object CERTFACT_LOCK = new Object();
+
     private X509Util() {
     }
 
@@ -138,11 +141,11 @@ public class X509Util {
             final X500Name name) {
         RDN[] orig = name.getRDNs();
         int n = orig.length;
-        RDN[] _new = new RDN[n];
+        RDN[] newRDN = new RDN[n];
         for (int i = 0; i < n; i++) {
-            _new[i] = orig[n - 1 - i];
+            newRDN[i] = orig[n - 1 - i];
         }
-        return new X500Name(_new);
+        return new X500Name(newRDN);
     }
 
     public static X500Name sortX509Name(
@@ -202,9 +205,6 @@ public class X509Util {
         }
     }
 
-    private static CertificateFactory certFact;
-    private static Object certFactLock = new Object();
-
     public static X509Certificate parseCert(
             final String fileName)
     throws IOException, CertificateException {
@@ -237,7 +237,7 @@ public class X509Util {
     public static X509Certificate parseCert(
             final InputStream certStream)
     throws IOException, CertificateException {
-        synchronized (certFactLock) {
+        synchronized (CERTFACT_LOCK) {
             if (certFact == null) {
                 try {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
@@ -283,13 +283,13 @@ public class X509Util {
      * First canonicalized the name, and then compute the SHA-1 finger-print over the
      * canonicalized subject string.
      */
-    public static long fp_canonicalized_name(
+    public static long fpCanonicalizedName(
             final X500Principal prin) {
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-        return fp_canonicalized_name(x500Name);
+        return fpCanonicalizedName(x500Name);
     }
 
-    public static long fp_canonicalized_name(
+    public static long fpCanonicalizedName(
             final X500Name name) {
         String canonicalizedName = canonicalizName(name);
         byte[] encoded;
@@ -309,10 +309,10 @@ public class X509Util {
 
     public static String canonicalizName(
             final X500Name name) {
-        ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
-        int n = _types.length;
+        ASN1ObjectIdentifier[] localTypes = name.getAttributeTypes();
+        int n = localTypes.length;
         List<String> types = new ArrayList<>(n);
-        for (ASN1ObjectIdentifier type : _types) {
+        for (ASN1ObjectIdentifier type : localTypes) {
             types.add(type.getId());
         }
 
@@ -427,16 +427,16 @@ public class X509Util {
         }
 
         int n = iOCSPAccessDescriptions.size();
-        List<String> OCSPUris = new ArrayList<>(n);
+        List<String> ocspUris = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
             if (iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
                 String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                OCSPUris.add(iOCSPUri);
+                ocspUris.add(iOCSPUri);
             }
         }
 
-        return OCSPUris;
+        return ocspUris;
     }
 
     public static byte[] extractAKI(

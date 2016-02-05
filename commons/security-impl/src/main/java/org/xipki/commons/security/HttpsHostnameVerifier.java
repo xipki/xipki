@@ -60,15 +60,15 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpsHostnameVerifier.class);
 
-    private boolean enabled = false;
+    private boolean enabled;
 
-    private boolean trustAll = false;
+    private boolean trustAll;
 
     private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
 
-    private HostnameVerifier oldHostnameVerifier = null;
+    private HostnameVerifier oldHostnameVerifier;
 
-    private boolean meAsDefaultHostnameVerifier = false;
+    private boolean meAsDefaultHostnameVerifier;
 
     public void init() {
         LOG.info("enabled: {}", enabled);

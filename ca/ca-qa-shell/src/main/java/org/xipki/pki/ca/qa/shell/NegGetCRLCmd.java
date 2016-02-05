@@ -54,8 +54,7 @@ import org.xipki.pki.ca.client.api.PKIErrorException;
 public class NegGetCRLCmd extends NegCRLCommandSupport {
 
     @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
+    protected X509CRL retrieveCRL()
     throws CAClientException, PKIErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {

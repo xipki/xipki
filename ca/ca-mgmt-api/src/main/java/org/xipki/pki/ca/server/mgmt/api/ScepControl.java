@@ -59,11 +59,11 @@ import org.xipki.commons.common.util.StringUtil;
 
 public class ScepControl implements Serializable {
 
+    public static final String KEY_CACERT_INCLUDED = "caCert.included";
+
+    public static final String KEY_SIGNERCERT_INCLUDED = "signerCert.included";
+
     private static final long serialVersionUID = 1L;
-
-    public static final String KEY_caCertIncluded = "caCert.included";
-
-    public static final String KEY_signerCertIncluded = "signerCert.included";
 
     private boolean includeCACert = true;
 
@@ -83,14 +83,14 @@ public class ScepControl implements Serializable {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
-        this.includeCACert = getBoolean(props, KEY_caCertIncluded, true);
-        this.includeSignerCert = getBoolean(props, KEY_signerCertIncluded, true);
+        this.includeCACert = getBoolean(props, KEY_CACERT_INCLUDED, true);
+        this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
     }
 
     public String getConf() {
         ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_caCertIncluded, Boolean.toString(includeCACert));
-        pairs.putPair(KEY_signerCertIncluded, Boolean.toString(includeSignerCert));
+        pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCACert));
+        pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
 
         return pairs.getEncoded();
     }

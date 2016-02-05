@@ -46,19 +46,19 @@ public class CaCrlType extends DbDataObject {
 
     public static final String TAG_ROOT = "crl";
 
-    public static final String TAG_id = "id";
+    public static final String TAG_ID = "id";
+
+    public static final String TAG_CAID = "caId";
+
+    public static final String TAG_CRLNO = "crlNo";
+
+    public static final String TAG_FILE = "file";
 
     private Integer id;
 
-    public static final String TAG_caId = "caId";
-
     private Integer caId;
 
-    public static final String TAG_crlNo = "crlNo";
-
     private String crlNo;
-
-    public static final String TAG_file = "file";
 
     private String file;
 
@@ -114,10 +114,10 @@ public class CaCrlType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_caId, caId);
-        writeIfNotNull(writer, TAG_crlNo, crlNo);
-        writeIfNotNull(writer, TAG_file, file);
+        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_CAID, caId);
+        writeIfNotNull(writer, TAG_CRLNO, crlNo);
+        writeIfNotNull(writer, TAG_FILE, file);
         writer.writeEndElement();
         writer.writeNewline();
     }

@@ -54,27 +54,28 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
 
     @Override
     public void init(
-            final P11Control p11Control) {
-        ParamUtil.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
+            final P11Control pP11Control) {
+        ParamUtil.assertNotNull("pP11Control", pP11Control);
+        this.p11Control = pP11Control;
     }
 
     @Override
     public P11CryptService createP11CryptService(
-            String moduleName)
+            final String moduleName)
     throws SignerException {
         ParamUtil.assertNotNull("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            moduleName = p11Control.getDefaultModuleName();
+        String localModuleName = moduleName;
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(localModuleName)) {
+            localModuleName = p11Control.getDefaultModuleName();
         }
 
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+        P11ModuleConf conf = p11Control.getModuleConf(localModuleName);
         if (conf == null) {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
+            throw new SignerException("PKCS#11 module " + localModuleName + " is not defined");
         }
 
         return SunP11CryptService.getInstance(conf);

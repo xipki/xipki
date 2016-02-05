@@ -52,7 +52,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class DbiXmlWriter {
 
-    private final static XMLOutputFactory factory = XMLOutputFactory.newFactory();
+    private static final XMLOutputFactory FACTORY = XMLOutputFactory.newFactory();
 
     private final String rootElementName;
 
@@ -60,7 +60,7 @@ public class DbiXmlWriter {
 
     private final XMLStreamWriter writer;
 
-    private boolean flushed = false;
+    private boolean flushed;
 
     public DbiXmlWriter(
             final String rootElementName,
@@ -71,8 +71,8 @@ public class DbiXmlWriter {
         this.rootElementName = rootElementName;
         stream = new ByteArrayOutputStream();
 
-        synchronized (factory) {
-            writer = factory.createXMLStreamWriter(stream);
+        synchronized (FACTORY) {
+            writer = FACTORY.createXMLStreamWriter(stream);
         }
         writer.writeStartDocument("UTF-8", "1.0");
         writeNewline();

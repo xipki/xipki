@@ -49,9 +49,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class PasswordHash {
 
-    private PasswordHash() {
-    }
-
     // see 'http://stackoverflow.com/questions/22580853/\
     //     reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
     //public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
@@ -65,10 +62,13 @@ public class PasswordHash {
     public static final int SALT_INDEX = 1;
     public static final int PBKDF2_INDEX = 2;
 
-    private final static PKCS5S2ParametersGenerator gen;
+    private static final PKCS5S2ParametersGenerator GEN;
 
     static {
-        gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
+        GEN = new PKCS5S2ParametersGenerator(new SHA256Digest());
+    }
+
+    private PasswordHash() {
     }
 
     /**
@@ -196,9 +196,9 @@ public class PasswordHash {
         } catch (UnsupportedEncodingException e) {
             throw new NoSuchAlgorithmException("no charset UTF-8");
         }
-        synchronized (gen) {
-            gen.init(pwdBytes, salt, iterations);
-            byte[] dk = ((KeyParameter) gen.generateDerivedParameters(bytes * 8)).getKey();
+        synchronized (GEN) {
+            GEN.init(pwdBytes, salt, iterations);
+            byte[] dk = ((KeyParameter) GEN.generateDerivedParameters(bytes * 8)).getKey();
             return dk;
         }
     }

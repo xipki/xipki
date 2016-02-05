@@ -136,11 +136,11 @@ public class X509CrlSignerEntry implements Serializable {
     }
 
     public void setCertificate(
-            final X509Certificate cert) {
+            final X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
-        this.cert = cert;
+        this.cert = certificate;
     }
 
     public String getCrlControl() {

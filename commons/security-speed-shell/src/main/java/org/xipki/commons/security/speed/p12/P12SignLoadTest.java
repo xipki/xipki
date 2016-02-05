@@ -86,9 +86,9 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     } // class Testor
 
-    private final ConcurrentContentSigner signer;
+    protected static final String PASSWORD = "1234";
 
-    protected final static String password = "1234";
+    private final ConcurrentContentSigner signer;
 
     public P12SignLoadTest(
             final SecurityFactory securityFactory,
@@ -103,7 +103,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         ParamUtil.assertNotNull("keystore", keystore);
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
-                new ByteArrayInputStream(keystore), password, signatureAlgorithm, 20);
+                new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
     }
 

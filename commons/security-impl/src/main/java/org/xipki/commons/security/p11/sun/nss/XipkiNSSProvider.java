@@ -47,6 +47,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.xipki.commons.security.api.ObjectIdentifiers;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -67,6 +69,8 @@ public class XipkiNSSProvider extends Provider {
 
         private final String[] aliases;
 
+        private List<String> aliasesWithOid;
+
         private Descriptor(
                 final Service service,
                 final String algorithm,
@@ -80,7 +84,6 @@ public class XipkiNSSProvider extends Provider {
             this.aliases = aliases;
         }
 
-        private List<String> aliasesWithOid;
         List<String> getAliases() {
             if (aliasesWithOid == null) {
                 aliasesWithOid = new ArrayList<>();
@@ -114,7 +117,7 @@ public class XipkiNSSProvider extends Provider {
 
     } // class Descriptor
 
-    private static enum Service {
+    private enum Service {
 
         Signature("Signature", NSSSignatureSpi.class.getName() + "$");
 
@@ -122,7 +125,7 @@ public class XipkiNSSProvider extends Provider {
 
         private String classPrefix;
 
-        private Service(
+        Service(
                 final String type,
                 final String classPrefix) {
             this.type = type;
@@ -131,45 +134,17 @@ public class XipkiNSSProvider extends Provider {
 
     } // enum Service
 
-    // Signature
-    public static final String OID_SHA1withRSA = "1.2.840.113549.1.1.5";
-
-    public static final String OID_SHA224withRSA = "1.2.840.113549.1.1.14";
-
-    public static final String OID_SHA256withRSA = "1.2.840.113549.1.1.11";
-
-    public static final String OID_SHA384withRSA = "1.2.840.113549.1.1.12";
-
-    public static final String OID_SHA512withRSA = "1.2.840.113549.1.1.13";
-
-    public static final String OID_SHA1withDSA = "1.2.840.10040.4.3";
-
-    public static final String OID_SHA1withECDSA     = "1.2.840.10045.4.1";
-
-    public static final String OID_SHA224withECDSA = "1.2.840.10045.4.3.1";
-
-    public static final String OID_SHA256withECDSA = "1.2.840.10045.4.3.2";
-
-    public static final String OID_SHA384withECDSA = "1.2.840.10045.4.3.3";
-
-    public static final String OID_SHA512withECDSA = "1.2.840.10045.4.3.4";
-
-    // Asymmetric Encryption
-    public static final String OID_RSAENC = "1.2.840.113549.1.1.1";
-
-    public static final String OID_DSAENC = "1.2.840.10040.4.1";
-
-    private static final long serialVersionUID = 1L;
-
     public static final String PROVIDER_NAME = "XipkiNSS";
 
     public static final double PROVIDER_VERSION = 1.0;
 
     static Provider nssProvider;
 
+    private static final long serialVersionUID = 1L;
+
     // Map from mechanism to List of Descriptors that should be registered if the mechanism
     // is supported
-    private final static Map<String, Descriptor> descriptors = new HashMap<>();
+    private static final Map<String, Descriptor> DESCRIPTORS = new HashMap<>();
 
     public XipkiNSSProvider() {
         super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_NAME + " v" + PROVIDER_VERSION);
@@ -179,7 +154,7 @@ public class XipkiNSSProvider extends Provider {
         AccessController.doPrivileged(
         new PrivilegedAction<Object>() {
             public Object run() {
-                Iterator<Descriptor> it = descriptors.values().iterator();
+                Iterator<Descriptor> it = DESCRIPTORS.values().iterator();
                 while (it.hasNext()) {
                     Descriptor d = it.next();
                     put(d.service.type + "." + d.algorithm, d.getClassName());
@@ -205,7 +180,7 @@ public class XipkiNSSProvider extends Provider {
         }
     }
 
-    private synchronized static void init() {
+    private static synchronized void init() {
         if (nssProvider != null) {
             return;
         }
@@ -218,9 +193,9 @@ public class XipkiNSSProvider extends Provider {
                 sb.append("name=").append(PROVIDER_NAME).append("\n");
                 sb.append("nssDbMode=noDb\n");
                 sb.append("attributes=compatibility\n");
-                String NSSLIB = System.getProperty("NSSLIB");
-                if (NSSLIB != null) {
-                    sb.append("\nnssLibraryDirectory=").append(NSSLIB);
+                String nssLib = System.getProperty("NSSLIB");
+                if (nssLib != null) {
+                    sb.append("\nnssLibraryDirectory=").append(nssLib);
                 }
 
                 nssProvider = new sun.security.pkcs11.SunPKCS11(
@@ -232,19 +207,30 @@ public class XipkiNSSProvider extends Provider {
         }
 
         // Signature RSA
-        regist(Service.Signature, "SHA1withRSA",     "SHA1withRSA",     OID_SHA1withRSA);
-        regist(Service.Signature, "SHA224withRSA", "SHA224withRSA", OID_SHA224withRSA);
-        regist(Service.Signature, "SHA256withRSA", "SHA256withRSA", OID_SHA256withRSA);
-        regist(Service.Signature, "SHA384withRSA", "SHA384withRSA", OID_SHA384withRSA);
-        regist(Service.Signature, "SHA512withRSA", "SHA512withRSA", OID_SHA512withRSA);
+        regist(Service.Signature, "SHA1withRSA",     "SHA1withRSA",
+                ObjectIdentifiers.id_alg_SHA1withRSA);
+        regist(Service.Signature, "SHA224withRSA", "SHA224withRSA",
+                ObjectIdentifiers.id_alg_SHA224withRSA);
+        regist(Service.Signature, "SHA256withRSA", "SHA256withRSA",
+                ObjectIdentifiers.id_alg_SHA256withRSA);
+        regist(Service.Signature, "SHA384withRSA", "SHA384withRSA",
+                ObjectIdentifiers.id_alg_SHA384withRSA);
+        regist(Service.Signature, "SHA512withRSA", "SHA512withRSA",
+                ObjectIdentifiers.id_alg_SHA512withRSA);
 
         // Signature ECDSA
-        regist(Service.Signature, "SHA1withECDSA",     "SHA1withECDSA",     OID_SHA1withECDSA);
-        regist(Service.Signature, "SHA224withECDSA", "SHA224withECDSA", OID_SHA224withECDSA);
-        regist(Service.Signature, "SHA256withECDSA", "SHA256withECDSA", OID_SHA256withECDSA);
-        regist(Service.Signature, "SHA384withECDSA", "SHA384withECDSA", OID_SHA384withECDSA);
-        regist(Service.Signature, "SHA512withECDSA", "SHA512withECDSA", OID_SHA512withECDSA);
-        regist(Service.Signature, "RawECDSA", "RawECDSA", OID_DSAENC, "NONEWithECDSA");
+        regist(Service.Signature, "SHA1withECDSA",     "SHA1withECDSA",
+                ObjectIdentifiers.id_alg_SHA1withECDSA);
+        regist(Service.Signature, "SHA224withECDSA", "SHA224withECDSA",
+                ObjectIdentifiers.id_alg_SHA224withECDSA);
+        regist(Service.Signature, "SHA256withECDSA", "SHA256withECDSA",
+                ObjectIdentifiers.id_alg_SHA256withECDSA);
+        regist(Service.Signature, "SHA384withECDSA", "SHA384withECDSA",
+                ObjectIdentifiers.id_alg_SHA384withECDSA);
+        regist(Service.Signature, "SHA512withECDSA", "SHA512withECDSA",
+                ObjectIdentifiers.id_alg_SHA512withECDSA);
+        regist(Service.Signature, "RawECDSA", "RawECDSA",
+                ObjectIdentifiers.id_alg_DSAENC, "NONEWithECDSA");
     } // method init
 
     private static void regist(
@@ -255,7 +241,7 @@ public class XipkiNSSProvider extends Provider {
             final String... aliases) {
         Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
         if (support(d)) {
-            descriptors.put(d.toString(), d);
+            DESCRIPTORS.put(d.toString(), d);
         }
     }
 

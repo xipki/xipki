@@ -104,6 +104,17 @@ import org.xipki.pki.ca.server.mgmt.api.CertArt;
 
 class CertStoreQueryExecutor {
 
+    private static final String SQL_ADD_CERT =
+            "INSERT INTO CERT (ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_RS, "
+            + "NBEFORE, NAFTER, REV, PID, CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)"
+            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SQL_ADD_CRAW =
+            "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
+
+    private static final String SQL_REVOKE_CERT =
+            "UPDATE CERT SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=? WHERE ID=?";
+
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private final DataSourceWrapper dataSource;
@@ -204,14 +215,6 @@ class CertStoreQueryExecutor {
             final byte[] transactionId,
             final X500Name reqSubject)
     throws DataAccessException, OperationException {
-        final String SQL_ADD_CERT =
-                "INSERT INTO CERT (ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_RS, "
-                + "NBEFORE, NAFTER, REV, PID, CA_ID, RID, UNAME, FP_K, EE, RTYPE, TID)"
-                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        final String SQL_ADD_CRAW =
-                "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
-
         int certId = nextCertId();
         int caId = getCaId(issuer);
         X509Certificate cert = certificate.getCert();
@@ -227,12 +230,12 @@ class CertStoreQueryExecutor {
 
         long fpPK = FpIdCalculator.hash(encodedSubjectPublicKey);
         String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
-        long fpSubject = X509Util.fp_canonicalized_name(cert.getSubjectX500Principal());
+        long fpSubject = X509Util.fpCanonicalizedName(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
         Long fpReqSubject = null;
         if (reqSubject != null) {
-            fpReqSubject = X509Util.fp_canonicalized_name(reqSubject);
+            fpReqSubject = X509Util.fpCanonicalizedName(reqSubject);
             if (fpSubject == fpReqSubject) {
                 fpReqSubject = null;
             } else {
@@ -251,53 +254,53 @@ class CertStoreQueryExecutor {
         PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_CRAW);
 
         try {
-            PreparedStatement ps_addcert = pss[0];
-            PreparedStatement ps_addRawcert = pss[1];
+            PreparedStatement psAddcert = pss[0];
+            PreparedStatement psAddRawcert = pss[1];
             // all statements have the same connection
-            conn = ps_addcert.getConnection();
+            conn = psAddcert.getConnection();
 
             // cert
             int idx = 2;
-            ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
-            ps_addcert.setLong(idx++, System.currentTimeMillis() / 1000);
-            ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
-            ps_addcert.setString(idx++, subjectText);
-            ps_addcert.setLong(idx++, fpSubject);
+            psAddcert.setInt(idx++, CertArt.X509PKC.getCode());
+            psAddcert.setLong(idx++, System.currentTimeMillis() / 1000);
+            psAddcert.setLong(idx++, cert.getSerialNumber().longValue());
+            psAddcert.setString(idx++, subjectText);
+            psAddcert.setLong(idx++, fpSubject);
             if (fpReqSubject != null) {
-                ps_addcert.setLong(idx++, fpReqSubject);
+                psAddcert.setLong(idx++, fpReqSubject);
             } else {
-                ps_addcert.setNull(idx++, Types.BIGINT);
+                psAddcert.setNull(idx++, Types.BIGINT);
             }
 
-            ps_addcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
-            ps_addcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
-            setBoolean(ps_addcert, idx++, false);
-            ps_addcert.setInt(idx++, certprofileId);
-            ps_addcert.setInt(idx++, caId);
+            psAddcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
+            psAddcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
+            setBoolean(psAddcert, idx++, false);
+            psAddcert.setInt(idx++, certprofileId);
+            psAddcert.setInt(idx++, caId);
 
             if (requestorId != null) {
-                ps_addcert.setInt(idx++, requestorId.intValue());
+                psAddcert.setInt(idx++, requestorId.intValue());
             } else {
-                ps_addcert.setNull(idx++, Types.INTEGER);
+                psAddcert.setNull(idx++, Types.INTEGER);
             }
 
-            ps_addcert.setString(idx++, user);
-            ps_addcert.setLong(idx++, fpPK);
+            psAddcert.setString(idx++, user);
+            psAddcert.setLong(idx++, fpPK);
 
             boolean isEECert = cert.getBasicConstraints() == -1;
-            ps_addcert.setInt(idx++,
+            psAddcert.setInt(idx++,
                     isEECert
                             ? 1
                             : 0);
 
-            ps_addcert.setInt(idx++, reqType.getCode());
-            ps_addcert.setString(idx++, tid);
+            psAddcert.setInt(idx++, reqType.getCode());
+            psAddcert.setString(idx++, tid);
 
             // rawcert
             idx = 2;
-            ps_addRawcert.setString(idx++, b64FpCert);
-            ps_addRawcert.setString(idx++, reqSubjectText);
-            ps_addRawcert.setString(idx++, b64Cert);
+            psAddRawcert.setString(idx++, b64FpCert);
+            psAddRawcert.setString(idx++, reqSubjectText);
+            psAddRawcert.setString(idx++, b64Cert);
 
             final int tries = 3;
             for (int i = 0; i < tries; i++) {
@@ -306,8 +309,8 @@ class CertStoreQueryExecutor {
                 }
                 certificate.setCertId(certId);
 
-                ps_addcert.setInt(1, certId);
-                ps_addRawcert.setInt(1, certId);
+                psAddcert.setInt(1, certId);
+                psAddRawcert.setInt(1, certId);
 
                 final boolean origAutoCommit = conn.getAutoCommit();
                 conn.setAutoCommit(false);
@@ -315,10 +318,10 @@ class CertStoreQueryExecutor {
                 String sql = null;
                 try {
                     sql = SQL_ADD_CERT;
-                    ps_addcert.executeUpdate();
+                    psAddcert.executeUpdate();
 
                     sql = SQL_ADD_CRAW;
-                    ps_addRawcert.executeUpdate();
+                    psAddRawcert.executeUpdate();
 
                     sql = "(commit add cert to CA certstore)";
                     conn.commit();
@@ -671,8 +674,6 @@ class CertStoreQueryExecutor {
             }
         }
 
-        final String SQL_REVOKE_CERT
-            = "UPDATE CERT SET LUPDATE=?, REV=?, RT=?, RIT=?, RR=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         int certId = certWithRevInfo.getCert().getCertId().intValue();
@@ -933,10 +934,10 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setInt(idx++, caId);
-            int i_ee = ee
+            int iEe = ee
                     ? 1
                     : 0;
-            ps.setInt(2, i_ee);
+            ps.setInt(2, iEe);
             rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -1081,14 +1082,14 @@ class CertStoreQueryExecutor {
 
             byte[] encodedCrl = null;
 
-            long current_thisUpdate = 0;
+            long currentThisUpdate = 0;
             // iterate all entries to make sure that the latest CRL will be returned
             while (rs.next()) {
                 long thisUpdate = rs.getLong("THISUPDATE");
-                if (thisUpdate >= current_thisUpdate) {
+                if (thisUpdate >= currentThisUpdate) {
                     String b64Crl = rs.getString("CRL");
                     encodedCrl = Base64.decode(b64Crl);
-                    current_thisUpdate = thisUpdate;
+                    currentThisUpdate = thisUpdate;
                 }
             }
 
@@ -1185,8 +1186,8 @@ class CertStoreQueryExecutor {
             byte[] encodedCert = Base64.decode(b64Cert);
             X509Certificate cert = X509Util.parseCert(encodedCert);
 
-            int certprofile_id = rs.getInt("PID");
-            String certprofileName = certprofileStore.getName(certprofile_id);
+            int certprofileId = rs.getInt("PID");
+            String certprofileName = certprofileStore.getName(certprofileId);
 
             X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
 
@@ -1198,16 +1199,16 @@ class CertStoreQueryExecutor {
                 return certInfo;
             }
 
-            int rev_reasonCode = rs.getInt("RR");
-            CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
-            long rev_time = rs.getLong("RT");
-            long invalidity_time = rs.getLong("RIT");
+            int revReasonCode = rs.getInt("RR");
+            CRLReason revReason = CRLReason.forReasonCode(revReasonCode);
+            long revTime = rs.getLong("RT");
+            long localInvalidityTime = rs.getLong("RIT");
 
-            Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time)
+            Date invalidityTime = (localInvalidityTime == 0 || localInvalidityTime == revTime)
                     ? null
-                    : new Date(invalidity_time * 1000);
-            CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                    new Date(rev_time * 1000), invalidityTime);
+                    : new Date(localInvalidityTime * 1000);
+            CertRevocationInfo revInfo = new CertRevocationInfo(revReason,
+                    new Date(revTime * 1000), invalidityTime);
             certInfo.setRevocationInfo(revInfo);
             return certInfo;
         } catch (IOException e) {
@@ -1302,14 +1303,14 @@ class CertStoreQueryExecutor {
             CertRevocationInfo revInfo = null;
             boolean revoked = rs.getBoolean("REV");
             if (revoked) {
-                int rev_reason = rs.getInt("RR");
-                long rev_time = rs.getLong("RT");
-                long rev_invalidity_time = rs.getLong("RIT");
-                Date invalidityTime = (rev_invalidity_time == 0)
+                int revReason = rs.getInt("RR");
+                long revTime = rs.getLong("RT");
+                long revInvalidityTime = rs.getLong("RIT");
+                Date invalidityTime = (revInvalidityTime == 0)
                         ? null
-                        : new Date(1000 * rev_invalidity_time);
-                revInfo = new CertRevocationInfo(CRLReason.forReasonCode(rev_reason),
-                        new Date(1000 * rev_time),
+                        : new Date(1000 * revInvalidityTime);
+                revInfo = new CertRevocationInfo(CRLReason.forReasonCode(revReason),
+                        new Date(1000 * revTime),
                         invalidityTime);
             }
 
@@ -1360,8 +1361,8 @@ class CertStoreQueryExecutor {
             byte[] encodedCert = Base64.decode(b64Cert);
             X509Certificate cert = X509Util.parseCert(encodedCert);
 
-            int certprofile_id = rs.getInt("PID");
-            String certprofileName = certprofileStore.getName(certprofile_id);
+            int certprofileId = rs.getInt("PID");
+            String certprofileName = certprofileStore.getName(certprofileId);
 
             X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
 
@@ -1375,16 +1376,16 @@ class CertStoreQueryExecutor {
                 return certInfo;
             }
 
-            int rev_reasonCode = rs.getInt("RR");
-            CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
-            long rev_time = rs.getLong("RT");
-            long invalidity_time = rs.getLong("RIT");
+            int revReasonCode = rs.getInt("RR");
+            CRLReason revReason = CRLReason.forReasonCode(revReasonCode);
+            long revTime = rs.getLong("RT");
+            long localInvalidityTime = rs.getLong("RIT");
 
-            Date invalidityTime = (invalidity_time == 0)
+            Date invalidityTime = (localInvalidityTime == 0)
                     ? null
-                    : new Date(invalidity_time * 1000);
-            CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                    new Date(rev_time * 1000), invalidityTime);
+                    : new Date(localInvalidityTime * 1000);
+            CertRevocationInfo revInfo = new CertRevocationInfo(revReason,
+                    new Date(revTime * 1000), invalidityTime);
             certInfo.setRevocationInfo(revInfo);
             return certInfo;
         } catch (IOException e) {
@@ -1450,7 +1451,7 @@ class CertStoreQueryExecutor {
             sql = "SELECT ID FROM CERT WHERE FP_S=? OR FP_RS=?";
         }
 
-        long fp_subject = X509Util.fp_canonicalized_name(subjectName);
+        long fpSubject = X509Util.fpCanonicalizedName(subjectName);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1459,8 +1460,8 @@ class CertStoreQueryExecutor {
             if (transactionId != null) {
                 ps.setString(idx++, Base64.toBase64String(transactionId));
             }
-            ps.setLong(idx++, fp_subject);
-            ps.setLong(idx++, fp_subject);
+            ps.setLong(idx++, fpSubject);
+            ps.setLong(idx++, fpSubject);
             rs = ps.executeQuery();
 
             List<Integer> certIds =    new LinkedList<Integer>();
@@ -1618,16 +1619,16 @@ class CertStoreQueryExecutor {
             List<CertRevInfoWithSerial> ret = new ArrayList<>();
             while (rs.next()) {
                 long serial = rs.getLong("SN");
-                int rev_reason = rs.getInt("RR");
-                long rev_time = rs.getLong("RT");
-                long rev_invalidity_time = rs.getLong("RIT");
+                int revReason = rs.getInt("RR");
+                long revTime = rs.getLong("RT");
+                long revInvalidityTime = rs.getLong("RIT");
 
-                Date invalidityTime = (rev_invalidity_time == 0)
+                Date invalidityTime = (revInvalidityTime == 0)
                         ? null
-                        :    new Date(1000 * rev_invalidity_time);
+                        :    new Date(1000 * revInvalidityTime);
                 CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(
                         BigInteger.valueOf(serial),
-                        rev_reason, new Date(1000 * rev_time), invalidityTime);
+                        revReason, new Date(1000 * revTime), invalidityTime);
                 ret.add(revInfo);
             }
 
@@ -1703,16 +1704,16 @@ class CertStoreQueryExecutor {
 
                 boolean revoked = rs.getBoolean("REVOEKD");
                 if (revoked) {
-                    int rev_reason = rs.getInt("RR");
-                    long rev_time = rs.getLong("RT");
-                    long rev_invalidity_time = rs.getLong("RIT");
+                    int revReason = rs.getInt("RR");
+                    long localRevTime = rs.getLong("RT");
+                    long revInvalidityTime = rs.getLong("RIT");
 
-                    Date invalidityTime = (rev_invalidity_time == 0)
+                    Date invalidityTime = (revInvalidityTime == 0)
                             ? null
-                            : new Date(1000 * rev_invalidity_time);
+                            : new Date(1000 * revInvalidityTime);
                     revInfo = new CertRevInfoWithSerial(
                             BigInteger.valueOf(serial),
-                            rev_reason, new Date(1000 * rev_time), invalidityTime);
+                            revReason, new Date(1000 * localRevTime), invalidityTime);
                 } else {
                     long lastUpdate = rs.getLong("LUPDATE");
                     revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
@@ -1733,7 +1734,7 @@ class CertStoreQueryExecutor {
             final X509Cert caCert,
             final X500Principal subject)
     throws DataAccessException {
-        long subjectFp = X509Util.fp_canonicalized_name(subject);
+        long subjectFp = X509Util.fpCanonicalizedName(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
@@ -1741,7 +1742,7 @@ class CertStoreQueryExecutor {
             final X509Cert caCert,
             final X500Name subject)
     throws DataAccessException {
-        long subjectFp = X509Util.fp_canonicalized_name(subject);
+        long subjectFp = X509Util.fpCanonicalizedName(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 

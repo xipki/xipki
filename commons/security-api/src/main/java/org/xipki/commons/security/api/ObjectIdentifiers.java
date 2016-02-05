@@ -68,16 +68,44 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_xipki_ext_crlCertset
             = id_xipki_ext.branch("1");
 
-    public static final ASN1ObjectIdentifier id_xipki_ext_cmRequestExtensions
+    public static final ASN1ObjectIdentifier id_xipki_ext_cmpRequestExtensions
             = id_xipki_ext.branch("2");
 
     public static final ASN1ObjectIdentifier id_xipki_ext_authorizationTemplate
             = id_xipki_ext.branch("3");
 
-    private static final ASN1ObjectIdentifier id_xipki_cm = id_xipki.branch("2");
+    private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
 
-    public static final ASN1ObjectIdentifier id_xipki_cm_cmpGenmsg
-            = id_xipki_cm.branch("1");
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg
+            = id_xipki_cmp.branch("1");
+
+    // Signature
+    public static final String id_alg_SHA1withRSA = "1.2.840.113549.1.1.5";
+
+    public static final String id_alg_SHA224withRSA = "1.2.840.113549.1.1.14";
+
+    public static final String id_alg_SHA256withRSA = "1.2.840.113549.1.1.11";
+
+    public static final String id_alg_SHA384withRSA = "1.2.840.113549.1.1.12";
+
+    public static final String id_alg_SHA512withRSA = "1.2.840.113549.1.1.13";
+
+    public static final String id_alg_SHA1withDSA = "1.2.840.10040.4.3";
+
+    public static final String id_alg_SHA1withECDSA     = "1.2.840.10045.4.1";
+
+    public static final String id_alg_SHA224withECDSA = "1.2.840.10045.4.3.1";
+
+    public static final String id_alg_SHA256withECDSA = "1.2.840.10045.4.3.2";
+
+    public static final String id_alg_SHA384withECDSA = "1.2.840.10045.4.3.3";
+
+    public static final String id_alg_SHA512withECDSA = "1.2.840.10045.4.3.4";
+
+    // Asymmetric Encryption
+    public static final String id_alg_RSAENC = "1.2.840.113549.1.1.1";
+
+    public static final String id_alg_DSAENC = "1.2.840.10040.4.1";
 
     /**
      * country code - StringType(SIZE(2))
@@ -266,7 +294,7 @@ public class ObjectIdentifiers {
     private static final ASN1ObjectIdentifier id_kp
         = id_pkix.branch("3");
 
-    public static final ASN1ObjectIdentifier anyExtendedKeyUsage
+    public static final ASN1ObjectIdentifier id_anyExtendedKeyUsage
         = Extension.extendedKeyUsage.branch("0");
 
     /**
@@ -381,42 +409,42 @@ public class ObjectIdentifiers {
             "1.2.840.113549.1.9.15");
 
     static {
-        List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
+        List<ASN1ObjectIdentifier> localForwardDNs = new ArrayList<>(25);
 
-        _forwardDNs.add(DN_C);
-        _forwardDNs.add(DN_DC);
-        _forwardDNs.add(DN_ST);
-        _forwardDNs.add(DN_L);
-        _forwardDNs.add(DN_O);
-        _forwardDNs.add(DN_OU);
-        _forwardDNs.add(DN_T);
-        _forwardDNs.add(DN_SURNAME);
-        _forwardDNs.add(DN_INITIALS);
-        _forwardDNs.add(DN_GIVENNAME);
-        _forwardDNs.add(DN_SERIALNUMBER);
-        _forwardDNs.add(DN_NAME);
-        _forwardDNs.add(DN_CN);
-        _forwardDNs.add(DN_LDAP_UID);
-        _forwardDNs.add(DN_DMD_NAME);
-        _forwardDNs.add(DN_EmailAddress);
-        _forwardDNs.add(DN_UnstructuredName);
-        _forwardDNs.add(DN_UnstructuredAddress);
-        _forwardDNs.add(DN_POSTAL_CODE);
-        _forwardDNs.add(DN_BUSINESS_CATEGORY);
-        _forwardDNs.add(DN_POSTAL_ADDRESS);
-        _forwardDNs.add(DN_TELEPHONE_NUMBER);
-        _forwardDNs.add(DN_PSEUDONYM);
-        _forwardDNs.add(DN_STREET);
+        localForwardDNs.add(DN_C);
+        localForwardDNs.add(DN_DC);
+        localForwardDNs.add(DN_ST);
+        localForwardDNs.add(DN_L);
+        localForwardDNs.add(DN_O);
+        localForwardDNs.add(DN_OU);
+        localForwardDNs.add(DN_T);
+        localForwardDNs.add(DN_SURNAME);
+        localForwardDNs.add(DN_INITIALS);
+        localForwardDNs.add(DN_GIVENNAME);
+        localForwardDNs.add(DN_SERIALNUMBER);
+        localForwardDNs.add(DN_NAME);
+        localForwardDNs.add(DN_CN);
+        localForwardDNs.add(DN_LDAP_UID);
+        localForwardDNs.add(DN_DMD_NAME);
+        localForwardDNs.add(DN_EmailAddress);
+        localForwardDNs.add(DN_UnstructuredName);
+        localForwardDNs.add(DN_UnstructuredAddress);
+        localForwardDNs.add(DN_POSTAL_CODE);
+        localForwardDNs.add(DN_BUSINESS_CATEGORY);
+        localForwardDNs.add(DN_POSTAL_ADDRESS);
+        localForwardDNs.add(DN_TELEPHONE_NUMBER);
+        localForwardDNs.add(DN_PSEUDONYM);
+        localForwardDNs.add(DN_STREET);
 
-        forwardDNs = Collections.unmodifiableList(_forwardDNs);
+        forwardDNs = Collections.unmodifiableList(localForwardDNs);
 
-        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
-        int size = _forwardDNs.size();
+        List<ASN1ObjectIdentifier> localBackwardDNs = new ArrayList<>(25);
+        int size = localForwardDNs.size();
         for (int i = size - 1; i >= 0; i--) {
-            _backwardDNs.add(_forwardDNs.get(i));
+            localBackwardDNs.add(localForwardDNs.get(i));
         }
 
-        backwardDNs = Collections.unmodifiableList(_backwardDNs);
+        backwardDNs = Collections.unmodifiableList(localBackwardDNs);
 
         oidNameMap = new HashMap<>();
 
@@ -428,7 +456,7 @@ public class ObjectIdentifiers {
         oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
 
         oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
-        oidNameMap.put(id_xipki_ext_cmRequestExtensions, "xipki-cmpRequestExtensions");
+        oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");
         oidNameMap.put(id_xipki_ext_authorizationTemplate, "xipki-authorizationTemplate");
 
         oidNameMap.put(id_kp_clientAuth, "kp-clientAuth");
@@ -450,7 +478,7 @@ public class ObjectIdentifiers {
         oidNameMap.put(id_extension_admission, "admission");
         oidNameMap.put(id_extension_validityModel, "validityModel");
 
-        oidNameMap.put(anyExtendedKeyUsage, "anyExtendedKeyUsage");
+        oidNameMap.put(id_anyExtendedKeyUsage, "anyExtendedKeyUsage");
         oidNameMap.put(id_ad_caRepository, "ad-caRepository");
         oidNameMap.put(id_ad_timeStamping, "ad-timeStamping");
         oidNameMap.put(Extension.auditIdentity, "auditIdentity");

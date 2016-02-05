@@ -46,11 +46,11 @@ import java.security.Provider;
 
 public class XipkiSunECProvider extends Provider {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String NAME = "XiPKI-SunEC";
 
     public static final double VERSION = 1.0;
+
+    private static final long serialVersionUID = 1L;
 
     public XipkiSunECProvider() {
         super(NAME, VERSION, NAME + " (version " + VERSION + ")");

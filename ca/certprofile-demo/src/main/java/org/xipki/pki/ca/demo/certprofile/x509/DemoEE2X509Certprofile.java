@@ -78,10 +78,10 @@ public class DemoEE2X509Certprofile extends AbstractEeX509Certprofile {
     public DemoEE2X509Certprofile() {
         validity = new CertValidity(10, Unit.YEAR);
 
-        Set<KeyUsageControl> _keyUsage = new HashSet<>();
-        _keyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
-        _keyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
-        keyUsage = Collections.unmodifiableSet(_keyUsage);
+        Set<KeyUsageControl> localKeyUsage = new HashSet<>();
+        localKeyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
+        localKeyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
+        keyUsage = Collections.unmodifiableSet(localKeyUsage);
 
         extensionControls = new HashMap<>();
         extensionControls.put(Extension.authorityKeyIdentifier,
@@ -142,7 +142,7 @@ public class DemoEE2X509Certprofile extends AbstractEeX509Certprofile {
 
     @Override
     public ExtensionValues getExtensions(
-            final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+            final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControlMap,
             final X500Name requestedSubject,
             final Extensions requestedExtensions,
             final Date notBefore,

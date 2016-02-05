@@ -60,7 +60,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
 
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
-    private URL _serverUrl;
+    private URL objServerUrl;
 
     private final String serverUrl;
 
@@ -77,7 +77,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
         }
 
         try {
-            _serverUrl = new URL(serverUrl);
+            objServerUrl = new URL(serverUrl);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
@@ -87,7 +87,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
     public byte[] send(
             final byte[] request)
     throws IOException {
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) objServerUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
 

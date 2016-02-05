@@ -284,7 +284,7 @@ public abstract class CmpRequestor {
             final int action)
     throws CmpRequestorException, PKIErrorException {
         ASN1Encodable itvValue = extractGeneralRepContent(response,
-                ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId(), true);
+                ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
         return extractXipkiActionContent(itvValue, action);
     }
 
@@ -513,7 +513,7 @@ public abstract class CmpRequestor {
         if (value != null) {
             v.add(value);
         }
-        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+        InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                 new DERSequence(v));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);

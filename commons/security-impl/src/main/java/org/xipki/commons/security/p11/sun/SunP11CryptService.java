@@ -79,29 +79,12 @@ public final class SunP11CryptService implements P11CryptService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SunP11CryptService.class);
 
+    private static final Map<String, SunP11CryptService> INSTANCES = new HashMap<>();
+
     private final ConcurrentSkipListSet<SunP11Identity> identities =
             new ConcurrentSkipListSet<>();
 
     private final P11ModuleConf moduleConf;
-
-    private static final Map<String, SunP11CryptService> instances = new HashMap<>();
-
-    public static SunP11CryptService getInstance(
-            final P11ModuleConf moduleConf)
-    throws SignerException {
-        SunNamedCurveExtender.addNamedCurves();
-
-        synchronized (instances) {
-            final String name = moduleConf.getName();
-            SunP11CryptService instance = instances.get(name);
-            if (instance == null) {
-                instance = new SunP11CryptService(moduleConf);
-                instances.put(name, instance);
-            }
-
-            return instance;
-        }
-    }
 
     private SunP11CryptService(
             final P11ModuleConf moduleConf)
@@ -109,8 +92,8 @@ public final class SunP11CryptService implements P11CryptService {
         ParamUtil.assertNotNull("moduleConf", moduleConf);
         this.moduleConf = moduleConf;
 
-        int idx_sunec = -1;
-        int idx_xipki = -1;
+        int idxSunec = -1;
+        int idxXipki = -1;
 
         Provider xipkiProv = null;
         Provider[] providers = Security.getProviders();
@@ -118,23 +101,23 @@ public final class SunP11CryptService implements P11CryptService {
         for (int i = 0; i < n; i++) {
             String name = providers[i].getName();
             if ("SunEC".equals(name)) {
-                idx_sunec = i;
+                idxSunec = i;
             } else if (XipkiSunECProvider.NAME.equals(name)) {
                 xipkiProv = providers[i];
-                idx_xipki = i;
+                idxXipki = i;
             }
         }
 
-        if (idx_sunec != -1) {
+        if (idxSunec != -1) {
             if (xipkiProv == null) {
                 xipkiProv = new XipkiSunECProvider();
-                idx_xipki = providers.length;
-            } else if (idx_sunec < idx_xipki) {
+                idxXipki = providers.length;
+            } else if (idxSunec < idxXipki) {
                 Security.removeProvider(XipkiSunECProvider.NAME);
             }
 
-            if (idx_sunec < idx_xipki) {
-                Security.insertProviderAt(xipkiProv, idx_sunec + 1);
+            if (idxSunec < idxXipki) {
+                Security.insertProviderAt(xipkiProv, idxSunec + 1);
             }
 
             providers = Security.getProviders();
@@ -513,6 +496,23 @@ public final class SunP11CryptService implements P11CryptService {
             throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
         }
         return slotList;
+    }
+
+    public static SunP11CryptService getInstance(
+            final P11ModuleConf moduleConf)
+    throws SignerException {
+        SunNamedCurveExtender.addNamedCurves();
+
+        synchronized (INSTANCES) {
+            final String name = moduleConf.getName();
+            SunP11CryptService instance = INSTANCES.get(name);
+            if (instance == null) {
+                instance = new SunP11CryptService(moduleConf);
+                INSTANCES.put(name, instance);
+            }
+
+            return instance;
+        }
     }
 
 }

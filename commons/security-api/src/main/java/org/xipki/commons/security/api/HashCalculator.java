@@ -58,17 +58,17 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class HashCalculator {
 
-    private final static int parallelism = 50;
+    private static final int PARALLELISM = 50;
 
-    private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> mdsMap =
+    private static final ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> MDS_MAP =
             new ConcurrentHashMap<>();
 
     static {
-        mdsMap.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
-        mdsMap.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
-        mdsMap.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
-        mdsMap.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
-        mdsMap.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
+        MDS_MAP.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
+        MDS_MAP.put(HashAlgoType.SHA224, getMessageDigests(HashAlgoType.SHA224));
+        MDS_MAP.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
+        MDS_MAP.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
+        MDS_MAP.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
     }
 
     private HashCalculator() {
@@ -77,7 +77,7 @@ public class HashCalculator {
     private static BlockingDeque<Digest> getMessageDigests(
             final HashAlgoType hashAlgo) {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for (int i = 0; i < parallelism; i++) {
+        for (int i = 0; i < PARALLELISM; i++) {
             Digest md;
             switch (hashAlgo) {
                 case SHA1:
@@ -158,11 +158,11 @@ public class HashCalculator {
             final byte[] data) {
         ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
         ParamUtil.assertNotNull("data", data);
-        if (!mdsMap.containsKey(hashAlgoType)) {
+        if (!MDS_MAP.containsKey(hashAlgoType)) {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }
 
-        BlockingDeque<Digest> mds = mdsMap.get(hashAlgoType);
+        BlockingDeque<Digest> mds = MDS_MAP.get(hashAlgoType);
 
         Digest md = null;
         for (int i = 0; i < 3; i++) {

@@ -68,7 +68,7 @@ class X509CrlSignerEntryWrapper {
 
     private byte[] subjectKeyIdentifier;
 
-    public X509CrlSignerEntryWrapper() {
+    X509CrlSignerEntryWrapper() {
     }
 
     public void setDbEntry(

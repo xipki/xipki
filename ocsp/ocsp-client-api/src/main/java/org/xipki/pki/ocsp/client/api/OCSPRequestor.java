@@ -39,8 +39,6 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
 
@@ -50,12 +48,6 @@ import org.xipki.commons.common.RequestResponseDebug;
  */
 
 public interface OCSPRequestor {
-
-    ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
-            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-
-    ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
-            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
     OCSPResp ask(
             X509Certificate issuerCert,

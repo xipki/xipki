@@ -54,7 +54,7 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  */
 public class RSAUtil {
 
-    public static final ASN1ObjectIdentifier[] rsaOids = {
+    private static final ASN1ObjectIdentifier[] RSA_OIDS = {
         PKCSObjectIdentifiers.rsaEncryption,
         X509ObjectIdentifiers.id_ea_rsa,
         PKCSObjectIdentifiers.id_RSAES_OAEP,
@@ -66,8 +66,8 @@ public class RSAUtil {
 
     public static boolean isRsaOid(
             final ASN1ObjectIdentifier algOid) {
-        for (int i = 0; i != rsaOids.length; i++) {
-            if (algOid.equals(rsaOids[i])) {
+        for (int i = 0; i != RSA_OIDS.length; i++) {
+            if (algOid.equals(RSA_OIDS[i])) {
                 return true;
             }
         }

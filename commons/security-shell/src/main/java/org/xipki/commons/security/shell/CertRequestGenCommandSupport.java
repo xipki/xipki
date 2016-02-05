@@ -95,15 +95,15 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public abstract class CertRequestGenCommandSupport extends SecurityCommandSupport {
 
+    @Option(name = "--hash",
+            description = "hash algorithm name")
+    @Completion(HashAlgCompleter.class)
+    protected String hashAlgo = "SHA256";
+
     @Option(name = "--subject", aliases = "-s",
             description = "subject in the PKCS#10 request\n"
                     + "default is the subject of self-signed certifite")
     private String subject;
-
-    @Option(name = "--hash",
-            description = "hash algorithm name")
-    @Completion(HashAlgCompleter.class)
-    private String hashAlgo = "SHA256";
 
     @Option(name = "--rsa-mgf1",
             description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
@@ -192,7 +192,6 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-            String hashAlgo,
             SignatureAlgoControl signatureAlgoControl)
     throws Exception;
 
@@ -285,27 +284,29 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         // biometricInfo
         if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
-            TypeOfBiometricData _biometricType;
+            TypeOfBiometricData localBiometricType;
             if (StringUtil.isNumber(biometricType)) {
-                _biometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
+                localBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
             } else {
-                _biometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
+                localBiometricType = new TypeOfBiometricData(
+                        new ASN1ObjectIdentifier(biometricType));
             }
 
-            ASN1ObjectIdentifier _biometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+            ASN1ObjectIdentifier localBiometricHashAlgo
+                    = AlgorithmUtil.getHashAlg(biometricHashAlgo);
             byte[] biometricBytes = IoUtil.read(biometricFile);
-            MessageDigest md = MessageDigest.getInstance(_biometricHashAlgo.getId());
+            MessageDigest md = MessageDigest.getInstance(localBiometricHashAlgo.getId());
             md.reset();
-            byte[] _biometricDataHash = md.digest(biometricBytes);
+            byte[] localBiometricDataHash = md.digest(biometricBytes);
 
-            DERIA5String _sourceDataUri = null;
+            DERIA5String localSourceDataUri = null;
             if (biometricUri != null) {
-                _sourceDataUri = new DERIA5String(biometricUri);
+                localSourceDataUri = new DERIA5String(biometricUri);
             }
-            BiometricData biometricData = new BiometricData(_biometricType,
-                    new AlgorithmIdentifier(_biometricHashAlgo),
-                    new DEROctetString(_biometricDataHash),
-                    _sourceDataUri);
+            BiometricData biometricData = new BiometricData(localBiometricType,
+                    new AlgorithmIdentifier(localBiometricHashAlgo),
+                    new DEROctetString(localBiometricDataHash),
+                    localSourceDataUri);
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(biometricData);
@@ -326,11 +327,11 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions, false,
+                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo,
+        ConcurrentContentSigner identifiedSigner = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
@@ -368,8 +369,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     } // method doExecute
 
     protected X500Name getSubject(
-            final String subject) {
-        return new X500Name(subject);
+            final String subjectText) {
+        return new X500Name(subjectText);
     }
 
 }

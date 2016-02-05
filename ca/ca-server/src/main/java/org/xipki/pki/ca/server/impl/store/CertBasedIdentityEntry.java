@@ -75,8 +75,8 @@ class CertBasedIdentityEntry {
     }
 
     boolean matchSha1Fp(
-            final byte[] sha1Fp) {
-        return Arrays.equals(this.sha1Fp, sha1Fp);
+            final byte[] sha1HashValue) {
+        return Arrays.equals(this.sha1Fp, sha1HashValue);
     }
 
     boolean matchCert(

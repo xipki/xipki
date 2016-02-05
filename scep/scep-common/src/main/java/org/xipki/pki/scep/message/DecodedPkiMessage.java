@@ -87,9 +87,9 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class DecodedPkiMessage extends PkiMessage {
 
-    private final static Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
-    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+    private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES
             = new HashSet<ASN1ObjectIdentifier>();
 
     private X509Certificate signatureCert;
@@ -107,13 +107,13 @@ public class DecodedPkiMessage extends PkiMessage {
     private String failureMessage;
 
     static {
-        scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_messageType);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_pkiStatus);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_recipientNonce);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_senderNonce);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_transactionID);
-        scepAttrTypes.add(CMSAttributes.signingTime);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_FAILINFO);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_MESSAGE_TYPE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_PKI_STATUS);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SENDER_NONCE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_TRANSACTION_ID);
+        SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
     }
 
     public DecodedPkiMessage(
@@ -246,7 +246,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
         // transactionId
         String s = getPrintableStringAttrValue(signedAttrs,
-                ScepObjectIdentifiers.id_transactionID);
+                ScepObjectIdentifiers.ID_TRANSACTION_ID);
         if (s == null || s.isEmpty()) {
             throw new MessageDecodingException("missing required SCEP attribute transactionId");
         }
@@ -254,7 +254,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
         // messageType
         Integer i = getIntegerPrintStringAttrValue(signedAttrs,
-                ScepObjectIdentifiers.id_messageType);
+                ScepObjectIdentifiers.ID_MESSAGE_TYPE);
         if (i == null) {
             throw new MessageDecodingException("tid " + transactionId.getId()
                     + ": missing required SCEP attribute messageType");
@@ -266,7 +266,7 @@ public class DecodedPkiMessage extends PkiMessage {
         }
 
         // senderNonce
-        Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.id_senderNonce);
+        Nonce senderNonce = getNonceAttrValue(signedAttrs, ScepObjectIdentifiers.ID_SENDER_NONCE);
         if (senderNonce == null) {
             throw new MessageDecodingException("tid " + transactionId.getId()
                     + ": missing required SCEP attribute senderNonce");
@@ -280,7 +280,7 @@ public class DecodedPkiMessage extends PkiMessage {
         Nonce recipientNonce = null;
         try {
             recipientNonce = getNonceAttrValue(signedAttrs,
-                    ScepObjectIdentifiers.id_recipientNonce);
+                    ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
         } catch (MessageDecodingException e) {
             ret.setFailureMessage("could not parse recipientNonce: " + e.getMessage());
         }
@@ -294,7 +294,8 @@ public class DecodedPkiMessage extends PkiMessage {
         if (MessageType.CertRep == messageType) {
             // pkiStatus
             try {
-                i = getIntegerPrintStringAttrValue(signedAttrs, ScepObjectIdentifiers.id_pkiStatus);
+                i = getIntegerPrintStringAttrValue(signedAttrs,
+                        ScepObjectIdentifiers.ID_PKI_STATUS);
             } catch (MessageDecodingException e) {
                 ret.setFailureMessage("could not parse pkiStatus: " + e.getMessage());
                 return ret;
@@ -316,7 +317,7 @@ public class DecodedPkiMessage extends PkiMessage {
             if (pkiStatus == PkiStatus.FAILURE) {
                 try {
                     i = getIntegerPrintStringAttrValue(signedAttrs,
-                            ScepObjectIdentifiers.id_failInfo);
+                            ScepObjectIdentifiers.ID_FAILINFO);
                 } catch (MessageDecodingException e) {
                     ret.setFailureMessage("could not parse failInfo: " + e.getMessage());
                     return ret;
@@ -340,7 +341,7 @@ public class DecodedPkiMessage extends PkiMessage {
         Attribute[] attrs = signedAttrs.toASN1Structure().getAttributes();
         for (Attribute attr : attrs) {
             ASN1ObjectIdentifier type = attr.getAttrType();
-            if (!scepAttrTypes.contains(type)) {
+            if (!SCEP_ATTR_TYPES.contains(type)) {
                 ret.addSignendAttribute(type, attr.getAttrValues().getObjectAt(0));
             }
         }
@@ -362,9 +363,9 @@ public class DecodedPkiMessage extends PkiMessage {
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
         if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
-            ASN1ObjectIdentifier _digestAlgOID;
+            ASN1ObjectIdentifier tmpDigestAlgOID;
             try {
-                _digestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
+                tmpDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception e) {
                 final String msg =
@@ -375,18 +376,18 @@ public class DecodedPkiMessage extends PkiMessage {
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(_digestAlgOID)) {
+            if (!digestAlgOID.equals(tmpDigestAlgOID)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
                         + " same digestAlgorithm");
                 return ret;
             } // end if
         } // end if
 
-        X509CertificateHolder _signerCert =
+        X509CertificateHolder tmpSignerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try {
-            signerCert = new X509CertificateObject(_signerCert.toASN1Structure());
+            signerCert = new X509CertificateObject(tmpSignerCert.toASN1Structure());
         } catch (CertificateParsingException e) {
             final String msg = "could not construct X509CertificateObject: " + e.getMessage();
             LOG.error(msg);

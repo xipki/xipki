@@ -85,7 +85,7 @@ class CmpResponder {
 
     private final SecureRandom random = new SecureRandom();
 
-    private final GeneralName sender = XipkiCmpConstants.remoteP11_cmp_server;
+    private final GeneralName sender = XipkiCmpConstants.REMOTE_P11_CMP_SERVER;
 
     CmpResponder() {
     }
@@ -134,7 +134,7 @@ class CmpResponder {
         if (itvs != null && itvs.length > 0) {
             for (InfoTypeAndValue m : itvs) {
                 ASN1ObjectIdentifier itvType = m.getInfoType();
-                if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(itvType)) {
+                if (ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.equals(itvType)) {
                     itv = m;
                     break;
                 }
@@ -144,7 +144,7 @@ class CmpResponder {
         if (itv == null) {
             final String statusMessage = String.format(
                     "PKIBody type %s is only supported with the sub-knownTypes",
-                    ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId());
+                    ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
         }
 
@@ -161,7 +161,7 @@ class CmpResponder {
                 }
             } catch (IllegalArgumentException e) {
                 final String statusMessage = "invalid value of the InfoTypeAndValue for "
-                        + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
+                        + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
                 return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
                         statusMessage);
             }
@@ -277,7 +277,7 @@ class CmpResponder {
                 v.add(respItvInfoValue);
             }
             InfoTypeAndValue respItv = new InfoTypeAndValue(
-                    ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+                    ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                     new DERSequence(v));
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);

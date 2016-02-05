@@ -174,7 +174,7 @@ public class OcspServer {
 
         private final String responderName;
 
-        public ServletPathResponderName(
+        ServletPathResponderName(
                 final String path,
                 final String responderName) {
             ParamUtil.assertNotNull("path", path);
@@ -207,9 +207,9 @@ public class OcspServer {
 
     } // class ServletPathResponderName
 
-    private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
+    public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
-    public static final long defaultCacheMaxAge = 60; // 1 minute
+    private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
     private DataSourceFactory dataSourceFactory;
 
@@ -300,7 +300,7 @@ public class OcspServer {
     throws InvalidConfException, PasswordResolverException, DataAccessException {
         boolean successful = false;
         try {
-            do_init();
+            doInit();
             successful = true;
         } finally {
             if (successful) {
@@ -312,7 +312,7 @@ public class OcspServer {
         }
     }
 
-    private void do_init()
+    private void doInit()
     throws InvalidConfException, DataAccessException, PasswordResolverException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
@@ -552,13 +552,13 @@ public class OcspServer {
                     throw new InvalidConfException("no store named '" + name + "' is defined");
                 }
 
-                Set<HashAlgoType> _set = storeCertHashAlgoSet.get(name);
-                if (_set == null) {
-                    _set = new HashSet<>(5);
-                    storeCertHashAlgoSet.put(name, _set);
+                Set<HashAlgoType> hashAlgoSet = storeCertHashAlgoSet.get(name);
+                if (hashAlgoSet == null) {
+                    hashAlgoSet = new HashSet<>(5);
+                    storeCertHashAlgoSet.put(name, hashAlgoSet);
                 }
 
-                _set.addAll(certHashAlgos);
+                hashAlgoSet.addAll(certHashAlgos);
             }
 
             responderOptions.put(m.getName(), option);
@@ -600,9 +600,9 @@ public class OcspServer {
             String aoName = option.getAuditOptionName();
             String cfoName = option.getCertprofileOptionName();
 
-            List<CertStatusStore> _stores = new ArrayList<>(option.getStoreNames().size());
+            List<CertStatusStore> statusStores = new ArrayList<>(option.getStoreNames().size());
             for (String storeName : option.getStoreNames()) {
-                _stores.add(stores.get(storeName));
+                statusStores.add(stores.get(storeName));
             }
 
             AuditOption auditOption = (aoName == null)
@@ -620,7 +620,7 @@ public class OcspServer {
                     auditOption,
                     certprofileOption,
                     signers.get(option.getSignerName()),
-                    _stores);
+                    statusStores);
             responders.put(name, responder);
         } // end for
     } // method do_init
@@ -882,13 +882,13 @@ public class OcspServer {
                         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
                         ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
                                 revInfo.getRevocationTime());
-                        org.bouncycastle.asn1.x509.CRLReason _reason = null;
+                        org.bouncycastle.asn1.x509.CRLReason localReason = null;
                         if (responseOption.isIncludeRevReason()) {
-                            _reason = org.bouncycastle.asn1.x509.CRLReason.lookup(
+                            localReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
                                     revInfo.getReason().getCode());
                         }
-                        RevokedInfo _revInfo = new RevokedInfo(revTime, _reason);
-                        bcCertStatus = new RevokedStatus(_revInfo);
+                        RevokedInfo localRevInfo = new RevokedInfo(revTime, localReason);
+                        bcCertStatus = new RevokedStatus(localRevInfo);
 
                         Date invalidityDate = revInfo.getInvalidityTime();
                         if (responseOption.isIncludeInvalidityDate()

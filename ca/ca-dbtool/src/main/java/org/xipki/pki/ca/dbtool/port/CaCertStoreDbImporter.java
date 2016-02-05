@@ -870,7 +870,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psCert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
 
                     psCert.setString(idx++, subjectText);
-                    long fpSubject = X509Util.fp_canonicalized_name(c.getSubject());
+                    long fpSubject = X509Util.fpCanonicalizedName(c.getSubject());
                     psCert.setLong(idx++, fpSubject);
 
                     if (cert.getFpRs() != null) {

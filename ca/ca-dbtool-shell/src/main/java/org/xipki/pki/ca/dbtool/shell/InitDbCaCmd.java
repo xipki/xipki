@@ -51,7 +51,7 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 @Service
 public class InitDbCaCmd extends LiquibaseCommandSupport {
 
-    private static final String schemaFile = "xipki/sql/ca-init.xml";
+    private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
 
     @Override
     protected Object doExecute()
@@ -59,7 +59,7 @@ public class InitDbCaCmd extends LiquibaseCommandSupport {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        resetAndInit(dbConf, schemaFile);
+        resetAndInit(dbConf, SCHEMA_FILE);
         return null;
     }
 

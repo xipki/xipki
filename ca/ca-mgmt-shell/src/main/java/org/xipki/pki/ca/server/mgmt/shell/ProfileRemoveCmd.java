@@ -37,7 +37,9 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -50,6 +52,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class ProfileRemoveCmd extends CaCommandSupport {
 
     @Argument(index = 0, name = "name", description = "certificate profile name", required = true)
+    @Completion(ProfileNameCompleter.class)
     private String name;
 
     @Override

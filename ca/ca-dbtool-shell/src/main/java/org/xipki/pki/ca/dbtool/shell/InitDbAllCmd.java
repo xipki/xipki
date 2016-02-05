@@ -51,9 +51,9 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 @Service
 public class InitDbAllCmd extends LiquibaseCommandSupport {
 
-    private static final String ca_schemaFile = "xipki/sql/ca-init.xml";
+    private static final String CA_SCHMEA_FILE = "xipki/sql/ca-init.xml";
 
-    private static final String ocsp_schemaFile = "xipki/sql/ocsp-init.xml";
+    private static final String OCSP_SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
 
     @Override
     protected Object doExecute()
@@ -61,7 +61,7 @@ public class InitDbAllCmd extends LiquibaseCommandSupport {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
-        resetAndInit(dbConf, ca_schemaFile);
+        resetAndInit(dbConf, CA_SCHMEA_FILE);
 
         for (String dbName : dbConfs.keySet()) {
             if (!dbName.toLowerCase().contains("ocsp")) {
@@ -69,7 +69,7 @@ public class InitDbAllCmd extends LiquibaseCommandSupport {
             }
 
             dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, ocsp_schemaFile);
+            resetAndInit(dbConf, OCSP_SCHEMA_FILE);
         }
         return null;
     }

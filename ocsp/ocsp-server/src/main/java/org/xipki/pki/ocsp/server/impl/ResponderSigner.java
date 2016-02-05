@@ -74,22 +74,22 @@ class ResponderSigner {
 
     private final X500Name responderId;
 
-    public ResponderSigner(
+    ResponderSigner(
             final List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException {
         ParamUtil.assertNotEmpty("signers", signers);
 
         this.signers = signers;
-        X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();
-        int n = _certificateChain.length;
+        X509Certificate[] localCertificateChain = signers.get(0).getCertificateChain();
+        int n = localCertificateChain.length;
         if (n > 1) {
-            X509Certificate c = _certificateChain[n - 1];
+            X509Certificate c = localCertificateChain[n - 1];
             if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal())) {
                 n--;
             }
         }
         this.certificateChain = new X509Certificate[n];
-        System.arraycopy(_certificateChain, 0, this.certificateChain, 0, n);
+        System.arraycopy(localCertificateChain, 0, this.certificateChain, 0, n);
 
         this.certificate = certificateChain[0];
 

@@ -183,11 +183,11 @@ import org.xipki.pki.ca.qa.impl.internal.QaTlsFeature;
 
 public class ExtensionsChecker {
 
-    private static final byte[] DERNull = new byte[]{5, 0};
+    private static final byte[] DER_NULL = new byte[]{5, 0};
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionsChecker.class);
 
-    private static final List<String> allUsages = Arrays.asList(
+    private static final List<String> ALL_USAGES = Arrays.asList(
             KeyUsage.digitalSignature.getName(), // 0
             KeyUsage.contentCommitment.getName(), // 1
             KeyUsage.keyEncipherment.getName(), // 2
@@ -796,7 +796,7 @@ public class ExtensionsChecker {
 
         if (requestedExtensions != null) {
             Extension reqExtension = requestedExtensions.getExtension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions);
+                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
             if (reqExtension != null) {
                 ExtensionExistence ee = ExtensionExistence.getInstance(
                         reqExtension.getParsedValue());
@@ -1009,21 +1009,21 @@ public class ExtensionsChecker {
         }
 
         if (bc.isCA()) {
-            BigInteger _pathLen = bc.getPathLenConstraint();
+            BigInteger localPathLen = bc.getPathLenConstraint();
             if (pathLen == null) {
-                if (_pathLen != null) {
-                    failureMsg.append("pathLen is '").append(_pathLen);
+                if (localPathLen != null) {
+                    failureMsg.append("pathLen is '").append(localPathLen);
                     failureMsg.append("' but expected 'absent'");
                     failureMsg.append("; ");
                 }
             } else {
-                if (_pathLen == null) {
+                if (localPathLen == null) {
                     failureMsg.append("pathLen is 'null' but expected '")
                         .append(pathLen)
                         .append("'");
                     failureMsg.append("; ");
-                } else if (!BigInteger.valueOf(pathLen).equals(_pathLen)) {
-                    failureMsg.append("pathLen is '").append(_pathLen);
+                } else if (!BigInteger.valueOf(pathLen).equals(localPathLen)) {
+                    failureMsg.append("pathLen is '").append(localPathLen);
                     failureMsg.append("' but expected '").append(pathLen).append("'");
                     failureMsg.append("; ");
                 }
@@ -1200,10 +1200,10 @@ public class ExtensionsChecker {
             int iMinimum = (bigInt == null)
                     ? 0
                     : bigInt.intValue();
-            Integer _int = eSubtree.getMinimum();
-            int eMinimum = (_int == null)
+            Integer minimum = eSubtree.getMinimum();
+            int eMinimum = (minimum == null)
                     ? 0
-                    : _int.intValue();
+                    : minimum.intValue();
             String desc = description + " [" + i + "]";
             if (iMinimum != eMinimum) {
                 failureMsg.append("minimum of ")
@@ -1351,7 +1351,7 @@ public class ExtensionsChecker {
         Set<String> isUsages = new HashSet<>();
         for (int i = 0; i < n; i++) {
             if (usages[i]) {
-                isUsages.add(allUsages.get(i));
+                isUsages.add(ALL_USAGES.get(i));
             }
         }
 
@@ -1383,7 +1383,7 @@ public class ExtensionsChecker {
             }
         }
 
-        Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
+        Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
@@ -1391,7 +1391,7 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(isUsages, expectedUsages);
+        diffs = strInBnotInA(isUsages, expectedUsages);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
@@ -1446,7 +1446,7 @@ public class ExtensionsChecker {
             }
         }
 
-        Set<String> diffs = str_in_b_not_in_a(expectedUsages, isUsages);
+        Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
@@ -1454,7 +1454,7 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(isUsages, expectedUsages);
+        diffs = strInBnotInA(isUsages, expectedUsages);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
@@ -1499,7 +1499,7 @@ public class ExtensionsChecker {
             expFeatures.add(m.toString());
         }
 
-        Set<String> diffs = str_in_b_not_in_a(expFeatures, isFeatures);
+        Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("features ")
                 .append(diffs.toString())
@@ -1507,7 +1507,7 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(isFeatures, expFeatures);
+        diffs = strInBnotInA(isFeatures, expFeatures);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("features ")
                 .append(diffs.toString())
@@ -1953,7 +1953,7 @@ public class ExtensionsChecker {
             }
 
             Set<String> eCRLUrls = issuerInfo.getCrlURLs();
-            Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+            Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
@@ -1961,7 +1961,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
 
-            diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+            diffs = strInBnotInA(iCrlURLs, eCRLUrls);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
@@ -2022,7 +2022,7 @@ public class ExtensionsChecker {
             }
 
             Set<String> eCRLUrls = issuerInfo.getCrlURLs();
-            Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+            Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
@@ -2030,7 +2030,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
 
-            diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+            diffs = strInBnotInA(iCrlURLs, eCRLUrls);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
@@ -2128,22 +2128,22 @@ public class ExtensionsChecker {
         }
 
         List<String> eProfessionOids = conf.getProfessionOIDs();
-        ASN1ObjectIdentifier[] _iProfessionOids = iProfessionInfo.getProfessionOIDs();
+        ASN1ObjectIdentifier[] localIProfessionOids = iProfessionInfo.getProfessionOIDs();
         List<String> iProfessionOids = new LinkedList<>();
-        if (_iProfessionOids != null) {
-            for (ASN1ObjectIdentifier entry : _iProfessionOids) {
+        if (localIProfessionOids != null) {
+            for (ASN1ObjectIdentifier entry : localIProfessionOids) {
                 iProfessionOids.add(entry.getId());
             }
         }
 
-        Set<String> diffs = str_in_b_not_in_a(eProfessionOids, iProfessionOids);
+        Set<String> diffs = strInBnotInA(eProfessionOids, iProfessionOids);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(iProfessionOids, eProfessionOids);
+        diffs = strInBnotInA(iProfessionOids, eProfessionOids);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are absent but are required");
@@ -2159,14 +2159,14 @@ public class ExtensionsChecker {
             }
         }
 
-        diffs = str_in_b_not_in_a(eProfessionItems, iProfessionItems);
+        diffs = strInBnotInA(eProfessionItems, iProfessionItems);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(iProfessionItems, eProfessionItems);
+        diffs = strInBnotInA(iProfessionItems, eProfessionItems);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are absent but are required");
@@ -2206,7 +2206,7 @@ public class ExtensionsChecker {
     private void checkExtensionOcspNocheck(
             final StringBuilder failureMsg,
             final byte[] extensionValue) {
-        if (!Arrays.equals(DERNull, extensionValue)) {
+        if (!Arrays.equals(DER_NULL, extensionValue)) {
             failureMsg.append("value is not DER NULL");
             failureMsg.append("; ");
         }
@@ -2332,16 +2332,16 @@ public class ExtensionsChecker {
             final Date certNotBefore,
             final Date certNotAfter) {
         ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
-        Date _notAfter;
+        Date dateNotAfter;
         if (privateKeyUsagePeriod == null) {
-            _notAfter = certNotAfter;
+            dateNotAfter = certNotAfter;
         } else {
-            _notAfter = privateKeyUsagePeriod.add(certNotBefore);
-            if (_notAfter.after(certNotAfter)) {
-                _notAfter = certNotAfter;
+            dateNotAfter = privateKeyUsagePeriod.add(certNotBefore);
+            if (dateNotAfter.after(certNotAfter)) {
+                dateNotAfter = certNotAfter;
             }
         }
-        ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(_notAfter);
+        ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(dateNotAfter);
 
         org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod extValue =
                 org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod.getInstance(extensionValue);
@@ -2644,13 +2644,13 @@ public class ExtensionsChecker {
             } else {
                 try {
                     byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
-                    if (!Arrays.equals(isBytes, DERNull)) {
+                    if (!Arrays.equals(isBytes, DER_NULL)) {
                         failureMsg.append("biometricData[")
                             .append(i)
                             .append("].biometricDataHash.parameters is '")
                             .append(hex(isBytes));
                         failureMsg.append("' but expected '")
-                            .append(hex(DERNull))
+                            .append(hex(DER_NULL))
                             .append("'");
                         failureMsg.append("; ");
                     }
@@ -2880,7 +2880,7 @@ public class ExtensionsChecker {
         return Hex.toHexString(bytes);
     }
 
-    private static Set<String> str_in_b_not_in_a(
+    private static Set<String> strInBnotInA(
             final Collection<String> a,
             final Collection<String> b) {
         if (b == null) {
@@ -3057,7 +3057,7 @@ public class ExtensionsChecker {
             }
         }
 
-        Set<String> diffs = str_in_b_not_in_a(expectedUris, iUris);
+        Set<String> diffs = strInBnotInA(expectedUris, iUris);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")
@@ -3066,7 +3066,7 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(iUris, expectedUris);
+        diffs = strInBnotInA(iUris, expectedUris);
         if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")

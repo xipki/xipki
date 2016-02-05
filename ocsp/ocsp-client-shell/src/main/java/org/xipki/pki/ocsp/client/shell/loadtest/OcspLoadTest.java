@@ -156,12 +156,6 @@ public class OcspLoadTest extends LoadExecutor {
 
     private RequestOptions options;
 
-    @Override
-    protected Runnable getTestor()
-    throws Exception {
-        return new Testor();
-    }
-
     public OcspLoadTest(
             final OCSPRequestor requestor,
             final List<Long> serials,
@@ -184,6 +178,12 @@ public class OcspLoadTest extends LoadExecutor {
         this.options = options;
 
         this.serialIndex = 0;
+    }
+
+    @Override
+    protected Runnable getTestor()
+    throws Exception {
+        return new Testor();
     }
 
     private synchronized long nextSerialNumber() {

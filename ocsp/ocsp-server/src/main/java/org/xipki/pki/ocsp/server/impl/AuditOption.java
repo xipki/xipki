@@ -51,7 +51,7 @@ class AuditOption {
 
     private final Map<String, String> certprofileMapping;
 
-    public AuditOption(
+    AuditOption(
             final AuditOptionType conf) {
         Map<String, String> map = new ConcurrentHashMap<>();
         if (conf.getCertprofileMappings() != null) {

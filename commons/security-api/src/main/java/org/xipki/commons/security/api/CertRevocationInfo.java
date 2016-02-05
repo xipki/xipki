@@ -50,6 +50,20 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertRevocationInfo implements Serializable {
 
+    //------------------------------------------------
+    // Customized serialization
+    //------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    private static final String SR_SERIAL_VERSION = "serialVersion";
+    private static final double SERIAL_VERSION = 1.0;
+
+    private static final String SR_REASON = "reason";
+    private static final String SR_REVOCATION_TIME = "revocationTime";
+    private static final String SR_INVALIDITY_TIME = "invalidityTime";
+
+    private double serialVersion;
+
     private CRLReason reason;
 
     private Date revocationTime;
@@ -132,29 +146,15 @@ public class CertRevocationInfo implements Serializable {
         this.invalidityTime = invalidityTime;
     }
 
-    //------------------------------------------------
-    // Customized serialization
-    //------------------------------------------------
-    private static final long serialVersionUID = 1L;
-
-    private static final String SR_serialVersion = "serialVersion";
-    private static final double SERIAL_VERSION = 1.0;
-
-    private static final String SR_reason = "reason";
-    private static final String SR_revocationTime = "revocationTime";
-    private static final String SR_invalidityTime = "invalidityTime";
-
-    private double serialVersion;
-
     private void writeObject(
             final java.io.ObjectOutputStream out)
     throws IOException {
         final Map<String, Object> serialMap = new HashMap<String, Object>();
 
-        serialMap.put(SR_serialVersion, serialVersion);
-        serialMap.put(SR_reason, reason);
-        serialMap.put(SR_revocationTime, revocationTime);
-        serialMap.put(SR_invalidityTime, invalidityTime);
+        serialMap.put(SR_SERIAL_VERSION, serialVersion);
+        serialMap.put(SR_REASON, reason);
+        serialMap.put(SR_REVOCATION_TIME, revocationTime);
+        serialMap.put(SR_INVALIDITY_TIME, invalidityTime);
 
         out.writeObject(serialMap);
     }
@@ -164,10 +164,10 @@ public class CertRevocationInfo implements Serializable {
             final java.io.ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
-        serialVersion = (double) serialMap.get(SR_serialVersion);
-        reason = (CRLReason) serialMap.get(SR_reason);
-        revocationTime = (Date) serialMap.get(SR_revocationTime);
-        invalidityTime = (Date) serialMap.get(SR_invalidityTime);
+        serialVersion = (double) serialMap.get(SR_SERIAL_VERSION);
+        reason = (CRLReason) serialMap.get(SR_REASON);
+        revocationTime = (Date) serialMap.get(SR_REVOCATION_TIME);
+        invalidityTime = (Date) serialMap.get(SR_INVALIDITY_TIME);
     }
 
 }

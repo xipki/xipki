@@ -75,8 +75,8 @@ class IssuerEntry {
     }
 
     boolean matchSha1Fp(
-            final byte[] sha1Fp) {
-        return Arrays.equals(this.sha1Fp, sha1Fp);
+            final byte[] anotherSha1Fp) {
+        return Arrays.equals(this.sha1Fp, anotherSha1Fp);
     }
 
     boolean matchCert(

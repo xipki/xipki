@@ -53,15 +53,17 @@ import org.xipki.commons.security.api.p11.P11CryptService;
 
 public class LocalP11CryptServicePool {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
+    public static final int VERSION = 2;
 
-    public static final int version = 2;
+    private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
     private SecurityFactory securityFactory;
 
     private String defaultPkcs11ModuleName;
 
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
+
+    private boolean initialized;
 
     public LocalP11CryptServicePool() {
     }
@@ -71,7 +73,6 @@ public class LocalP11CryptServicePool {
         this.securityFactory = securityFactory;
     }
 
-    private boolean initialized = false;
     public void init()
     throws Exception {
         if (initialized) {
@@ -105,17 +106,17 @@ public class LocalP11CryptServicePool {
     }
 
     public P11CryptService getP11CryptService(
-            String moduleName) {
-        if (moduleName == null
-                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(moduleName)) {
-            moduleName = defaultPkcs11ModuleName;
+            final String moduleName) {
+        String localModuleName = moduleName;
+        if (localModuleName == null
+                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(localModuleName)) {
+            localModuleName = defaultPkcs11ModuleName;
         }
-        P11CryptService p11Service = p11CryptServices.get(moduleName);
-        return p11Service;
+        return p11CryptServices.get(localModuleName);
     }
 
     public int getVersion() {
-        return version;
+        return VERSION;
     }
 
 }

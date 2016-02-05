@@ -71,9 +71,9 @@ public class CmpControl {
 
     public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
-    private static final int DFLT_messageTimeBias = 300; // 300 seconds
+    private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
 
-    private static final int DFLT_confirmWaitTime = 300; // 300 seconds
+    private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
 
     private final CmpControlEntry dbEntry;
 
@@ -91,10 +91,6 @@ public class CmpControl {
 
     private final Set<String> sigAlgos;
 
-    public boolean isMessageTimeRequired() {
-        return messageTimeRequired;
-    }
-
     public CmpControl(
             final CmpControlEntry dbEntry)
     throws InvalidConfException {
@@ -105,8 +101,8 @@ public class CmpControl {
         this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
         this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
-        this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_messageTimeBias);
-        this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_confirmWaitTime);
+        this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
+        this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
         String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
 
         if (s == null) {
@@ -157,12 +153,12 @@ public class CmpControl {
         pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
 
         this.messageTimeBias = (messageTimeBias == null)
-                ? DFLT_messageTimeBias
+                ? DFLT_MESSAGE_TIME_BIAS
                 : messageTimeBias;
         pairs.putPair(KEY_MESSAGETIME_BIAS, Integer.toString(this.messageTimeBias));
 
         this.confirmWaitTime = (confirmWaitTime == null)
-                ? DFLT_confirmWaitTime
+                ? DFLT_CONFIRM_WAIT_TIME
                 : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
@@ -176,6 +172,10 @@ public class CmpControl {
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     } // constructor
+
+    public boolean isMessageTimeRequired() {
+        return messageTimeRequired;
+    }
 
     public boolean isConfirmCert() {
         return confirmCert;

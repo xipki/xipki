@@ -59,7 +59,7 @@ public abstract class LoadExecutor {
 
     private static final int DEFAULT_THREADS = 25;
 
-    private boolean interrupted = false;
+    private boolean interrupted;
 
     private String description;
 

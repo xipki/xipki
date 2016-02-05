@@ -73,7 +73,7 @@ import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 public class HttpOcspServlet extends HttpServlet {
 
-    private final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -280,7 +280,7 @@ public class HttpOcspServlet extends HttpServlet {
                     if (responder.getResponseOption().getCacheMaxAge() != null) {
                         maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
                     } else {
-                        maxAge = OcspServer.defaultCacheMaxAge;
+                        maxAge = OcspServer.DFLT_CACHE_MAX_AGE;
                     }
 
                     if (cacheInfo.getNextUpdate() != null) {

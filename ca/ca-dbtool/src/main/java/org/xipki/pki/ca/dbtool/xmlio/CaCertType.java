@@ -46,106 +46,106 @@ public class CaCertType extends DbDataObject {
 
     public static final String TAG_ROOT = "cert";
 
-    public static final String TAG_id = "id";
+    public static final String TAG_ID = "id";
 
-    private Integer id;
+    public static final String TAG_ART = "art";
 
-    public static final String TAG_art = "art";
-
-    private Integer art;
-
-    public static final String TAG_caId = "caId";
-
-    private Integer caId;
+    public static final String TAG_CAID = "caId";
 
     /**
      * certificate serial number
      */
-    public static final String TAG_sn = "sn";
-
-    private String sn;
+    public static final String TAG_SN = "sn";
 
     /**
      * certificate profile id
      */
-    public static final String TAG_pid = "pid";
-
-    private Integer pid;
+    public static final String TAG_PID = "pid";
 
     /**
      * requestor id
      */
-    public static final String TAG_rid = "rid";
+    public static final String TAG_RID = "rid";
 
-    private Integer rid;
-
-    public static final String TAG_update = "update";
-
-    private Long update;
+    public static final String TAG_UPDATE = "update";
 
     /**
      * whether revoked
      */
-    public static final String TAG_rev = "rev";
-
-    private Boolean rev;
+    public static final String TAG_REV = "rev";
 
     /**
      * revocation reason
      */
-    public static final String TAG_rr = "rr";
-
-    private Integer rr;
+    public static final String TAG_RR = "rr";
 
     /**
      * revocation time
      */
-    public static final String TAG_rt = "rt";
-
-    private Long rt;
+    public static final String TAG_RT = "rt";
 
     /**
      * revocation invalidity time
      */
-    public static final String TAG_rit = "rit";
+    public static final String TAG_RIT = "rit";
 
-    private Long rit;
-
-    public static final String TAG_user = "user";
-
-    private String user;
+    public static final String TAG_USER = "user";
 
     /**
      * base64 encoded transaction id
      */
-    public static final String TAG_tid = "tid";
+    public static final String TAG_TID = "tid";
 
-    private String tid;
-
-    public static final String TAG_reqType = "reqType";
-
-    private Integer reqType;
+    public static final String TAG_REQ_TYPE = "reqType";
 
     /**
      * first 8 bytes of the SHA1 sum of the requested subject
      */
-    public static final String TAG_fpRs = "fpRs";
-
-    private Long fpRs;
+    public static final String TAG_FP_RS = "fpRs";
 
     /**
      * requested subject, if differs from the one in certificate
      */
-    public static final String TAG_rs = "rs";
-
-    private String rs;
+    public static final String TAG_RS = "rs";
 
     /**
      * file name of the certificate
      */
-    public static final String TAG_file = "file";
+    public static final String TAG_FILE = "file";
 
     private String file;
+
+    private Integer id;
+
+    private Integer art;
+
+    private Integer caId;
+
+    private String sn;
+
+    private Integer pid;
+
+    private Integer rid;
+
+    private Long update;
+
+    private Boolean rev;
+
+    private Integer rr;
+
+    private Long rt;
+
+    private Long rit;
+
+    private String user;
+
+    private String tid;
+
+    private Integer reqType;
+
+    private Long fpRs;
+
+    private String rs;
 
     public Integer getId() {
         return id;
@@ -330,23 +330,23 @@ public class CaCertType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_art, art);
-        writeIfNotNull(writer, TAG_caId, caId);
-        writeIfNotNull(writer, TAG_sn, sn);
-        writeIfNotNull(writer, TAG_pid, pid);
-        writeIfNotNull(writer, TAG_rid, rid);
-        writeIfNotNull(writer, TAG_update, update);
-        writeIfNotNull(writer, TAG_rev, rev);
-        writeIfNotNull(writer, TAG_rr, rr);
-        writeIfNotNull(writer, TAG_rt, rt);
-        writeIfNotNull(writer, TAG_rit, rit);
-        writeIfNotNull(writer, TAG_user, user);
-        writeIfNotNull(writer, TAG_tid, tid);
-        writeIfNotNull(writer, TAG_reqType, reqType);
-        writeIfNotNull(writer, TAG_fpRs, fpRs);
-        writeIfNotNull(writer, TAG_rs, rs);
-        writeIfNotNull(writer, TAG_file, file);
+        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_ART, art);
+        writeIfNotNull(writer, TAG_CAID, caId);
+        writeIfNotNull(writer, TAG_SN, sn);
+        writeIfNotNull(writer, TAG_PID, pid);
+        writeIfNotNull(writer, TAG_RID, rid);
+        writeIfNotNull(writer, TAG_UPDATE, update);
+        writeIfNotNull(writer, TAG_REV, rev);
+        writeIfNotNull(writer, TAG_RR, rr);
+        writeIfNotNull(writer, TAG_RT, rt);
+        writeIfNotNull(writer, TAG_RIT, rit);
+        writeIfNotNull(writer, TAG_USER, user);
+        writeIfNotNull(writer, TAG_TID, tid);
+        writeIfNotNull(writer, TAG_REQ_TYPE, reqType);
+        writeIfNotNull(writer, TAG_FP_RS, fpRs);
+        writeIfNotNull(writer, TAG_RS, rs);
+        writeIfNotNull(writer, TAG_FILE, file);
         writer.writeEndElement();
         writer.writeNewline();
     }

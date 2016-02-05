@@ -52,7 +52,7 @@ import org.xipki.commons.common.util.IoUtil;
 
 public class CanonicalizeCode {
 
-    private final static String licenseText =
+    private static final String LICENSE_TEXT =
             "/*\n"
             + " *\n"
             + " * This file is part of the XiPKI project.\n"
@@ -88,11 +88,18 @@ public class CanonicalizeCode {
             + " * address: lijun.liao@gmail.com\n"
             + " */\n\n";
 
-    private final static String THROWS_PREFIX = "    ";
+    private static final String THROWS_PREFIX = "    ";
 
     private final String baseDir;
 
     private final int baseDirLen;
+
+    private CanonicalizeCode(String baseDir) {
+        this.baseDir = baseDir.endsWith(File.separator)
+                ? baseDir
+                : baseDir + File.separator;
+        this.baseDirLen = this.baseDir.length();
+    }
 
     public static void main(
             final String[] args) {
@@ -104,13 +111,6 @@ public class CanonicalizeCode {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private CanonicalizeCode(String baseDir) {
-        this.baseDir = baseDir.endsWith(File.separator)
-                ? baseDir
-                : baseDir + File.separator;
-        this.baseDirLen = this.baseDir.length();
     }
 
     private void canonicalize()
@@ -169,7 +169,7 @@ public class CanonicalizeCode {
                 if (line.trim().startsWith("package ") || line.trim().startsWith("import ")) {
                     if (!licenseTextAdded) {
                         if (!thirdparty) {
-                            writer.write(licenseText.getBytes());
+                            writer.write(LICENSE_TEXT.getBytes());
                         }
                         licenseTextAdded = true;
                     }

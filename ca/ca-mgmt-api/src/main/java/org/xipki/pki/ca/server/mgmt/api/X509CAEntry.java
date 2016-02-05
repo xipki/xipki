@@ -99,51 +99,51 @@ public class X509CAEntry extends CAEntry implements Serializable {
     }
 
     private void init(
-            final long nextSerial,
-            final int nextCRLNumber,
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
-            final List<String> deltaCrlUris,
-            final int numCrls)
+            final long pNextSerial,
+            final int pNextCRLNumber,
+            final List<String> pCacertUris,
+            final List<String> pOcspUris,
+            final List<String> pCrlUris,
+            final List<String> pDeltaCrlUris,
+            final int pNumCrls)
     throws CAMgmtException {
-        if (nextSerial < 0) {
-            throw new IllegalArgumentException("nextSerial is negative (" + nextSerial + " < 0)");
+        if (pNextSerial < 0) {
+            throw new IllegalArgumentException("pNextSerial is negative (" + pNextSerial + " < 0)");
         }
 
-        if (nextCRLNumber <= 0) {
+        if (pNextCRLNumber < 0) {
             throw new IllegalArgumentException(
 
-                    "nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
+                    "pNextCRLNumber is not positive (" + pNextCRLNumber + " < 1)");
         }
 
-        if (numCrls < 0) {
-            throw new IllegalArgumentException("numCrls could not be negative");
+        if (pNumCrls < 0) {
+            throw new IllegalArgumentException("pNumCrls could not be negative: " + pNumCrls);
         }
-        this.numCrls = numCrls;
+        this.numCrls = pNumCrls;
 
         this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
-        this.nextSerial = nextSerial;
-        this.nextCRLNumber = nextCRLNumber;
+        this.nextSerial = pNextSerial;
+        this.nextCRLNumber = pNextCRLNumber;
 
-        this.cacertUris = CollectionUtil.unmodifiableList(cacertUris, true, true);
-        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
-        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
-        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+        this.cacertUris = CollectionUtil.unmodifiableList(pCacertUris, true, true);
+        this.ocspUris = CollectionUtil.unmodifiableList(pOcspUris, true, true);
+        this.crlUris = CollectionUtil.unmodifiableList(pCrlUris, true, true);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(pDeltaCrlUris, true, true);
     }
 
     public void setCertificate(
-            final X509Certificate cert)
+            final X509Certificate certificate)
     throws CAMgmtException {
-        if (cert == null) {
+        if (certificate == null) {
             this.cert = null;
             this.subject = null;
         } else {
-            if (!X509Util.hasKeyusage(cert, KeyUsage.keyCertSign)) {
+            if (!X509Util.hasKeyusage(certificate, KeyUsage.keyCertSign)) {
                 throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
             }
-            this.cert = cert;
-            this.subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
+            this.cert = certificate;
+            this.subject = X509Util.getRFC4519Name(certificate.getSubjectX500Principal());
         }
     }
 

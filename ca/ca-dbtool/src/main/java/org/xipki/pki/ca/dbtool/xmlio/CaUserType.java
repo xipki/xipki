@@ -46,19 +46,19 @@ public class CaUserType extends DbDataObject {
 
     public static final String TAG_ROOT = "user";
 
-    public static final String TAG_id = "id";
+    public static final String TAG_ID = "id";
+
+    public static final String TAG_NAME = "name";
+
+    public static final String TAG_PASSWORD = "password";
+
+    public static final String TAG_CN_REGEX = "cnRegex";
 
     private Integer id;
 
-    public static final String TAG_name = "name";
-
     private String name;
 
-    public static final String TAG_password = "password";
-
     private String password;
-
-    public static final String TAG_cnRegex = "cnRegex";
 
     private String cnRegex;
 
@@ -114,10 +114,10 @@ public class CaUserType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_name, name);
-        writeIfNotNull(writer, TAG_password, password);
-        writeIfNotNull(writer, TAG_cnRegex, cnRegex);
+        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_NAME, name);
+        writeIfNotNull(writer, TAG_PASSWORD, password);
+        writeIfNotNull(writer, TAG_CN_REGEX, cnRegex);
         writer.writeEndElement();
         writer.writeNewline();
     }

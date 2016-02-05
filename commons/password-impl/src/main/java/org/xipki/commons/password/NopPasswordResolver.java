@@ -45,7 +45,7 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 public class NopPasswordResolver implements PasswordResolver {
 
-    public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
+    public static final NopPasswordResolver INSTANCE = new NopPasswordResolver();
 
     private NopPasswordResolver() {
     }

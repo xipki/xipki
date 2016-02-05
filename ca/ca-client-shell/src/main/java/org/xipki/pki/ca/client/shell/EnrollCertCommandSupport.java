@@ -355,7 +355,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                     SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions,
+                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions,
                     false,
                     ee.toASN1Primitive().getEncoded()));
         }

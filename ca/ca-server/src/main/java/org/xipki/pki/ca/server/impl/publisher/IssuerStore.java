@@ -84,9 +84,9 @@ class IssuerStore {
     }
 
     Integer getIdForSha1Fp(
-            final byte[] sha1Fp_cert) {
+            final byte[] sha1FpCert) {
         for (IssuerEntry entry : entries) {
-            if (entry.matchSha1Fp(sha1Fp_cert)) {
+            if (entry.matchSha1Fp(sha1FpCert)) {
                 return entry.getId();
             }
         }

@@ -75,9 +75,10 @@ public class PublicKeyChecker {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyChecker.class);
 
-    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
+    private static final LruCache<ASN1ObjectIdentifier, Integer> EC_CURVEFIELD_SIZES
+            = new LruCache<>(100);
 
-    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
+    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     public PublicKeyChecker(
             final X509ProfileType conf)
@@ -247,12 +248,12 @@ public class PublicKeyChecker {
             final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)
     throws BadCertTemplateException {
-        Integer expectedLength = ecCurveFieldSizes.get(curveOid);
+        Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);
         if (expectedLength == null) {
             X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
             ECCurve curve = ecP.getCurve();
             expectedLength = (curve.getFieldSize() + 7) / 8;
-            ecCurveFieldSizes.put(curveOid, expectedLength);
+            EC_CURVEFIELD_SIZES.put(curveOid, expectedLength);
         }
 
         switch (encoded[0]) {

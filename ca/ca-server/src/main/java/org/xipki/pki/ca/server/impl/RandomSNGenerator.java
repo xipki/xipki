@@ -45,9 +45,9 @@ import java.security.SecureRandom;
 
 class RandomSNGenerator {
 
-    private final SecureRandom random;
+    private static RandomSNGenerator instance;
 
-    private static RandomSNGenerator instance = null;
+    private final SecureRandom random;
 
     private RandomSNGenerator() {
         this.random = new SecureRandom();

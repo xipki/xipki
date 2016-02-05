@@ -87,7 +87,7 @@ public class ScepServlet extends HttpServlet {
 
     private static final int CGI_PROGRAM_LEN = CGI_PROGRAM.length();
 
-    private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
+    private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
     private AuditServiceRegister auditServiceRegister;
 
@@ -257,14 +257,14 @@ public class ScepServlet extends HttpServlet {
                 asn1Out.flush();
             } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                response.setContentType(ScepConstants.CT_text_palin);
+                response.setContentType(ScepConstants.CT_TEXT_PLAIN);
                 byte[] caCapsBytes = responder.getCaCaps().getBytes();
 
                 response.getOutputStream().write(caCapsBytes);
             } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 byte[] respBytes = responder.getCACertResp().getBytes();
-                response.setContentType(ScepConstants.CT_x_x509_ca_ra_cert);
+                response.setContentType(ScepConstants.CT_X509_CA_RA_CERT);
                 response.setContentLength(respBytes.length);
                 response.getOutputStream().write(respBytes);
             } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {

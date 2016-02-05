@@ -62,7 +62,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaRevokeCmd extends CaCommandSupport {
 
-    public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
+    public static final List<CRLReason> PERMITTED_REASONS = Collections.unmodifiableList(
             Arrays.asList(new CRLReason[] {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
@@ -97,7 +97,7 @@ public class CaRevokeCmd extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if (!permitted_reasons.contains(crlReason)) {
+        if (!PERMITTED_REASONS.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 

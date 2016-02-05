@@ -102,15 +102,15 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
         entry.setRa(ra);
         entry.setProfiles(profiles);
-        Set<Permission> _permissions = new HashSet<>();
+        Set<Permission> localPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission _permission = Permission.getPermission(permission);
-            if (_permission == null) {
+            Permission localPermission = Permission.getPermission(permission);
+            if (localPermission == null) {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
-            _permissions.add(_permission);
+            localPermissions.add(localPermission);
         }
-        entry.setPermissions(_permissions);
+        entry.setPermissions(localPermissions);
 
         boolean b = caManager.addCmpRequestorToCA(entry, caName);
         output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);

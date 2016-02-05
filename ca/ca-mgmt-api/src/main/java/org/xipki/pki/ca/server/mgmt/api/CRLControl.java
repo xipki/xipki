@@ -121,7 +121,7 @@ import org.xipki.commons.common.util.StringUtil;
 
 public class CRLControl implements Serializable {
 
-    public static enum UpdateMode implements Serializable {
+    public enum UpdateMode implements Serializable {
 
         interval,
         onDemand;
@@ -201,67 +201,67 @@ public class CRLControl implements Serializable {
 
     } // class HourMinute
 
+    public static final String KEY_UPDATE_MODE = "updateMode";
+
+    public static final String KEY_EYTENSIONS = "extensions";
+
+    public static final String KEY_EXPIRED_CERTS_INCLUDED = "expiredCerts.included";
+
+    public static final String KEY_XIPKI_CERTSET = "xipki.certset";
+
+    public static final String KEY_XIPKI_CERTSET_CERTS = "xipki.certset.certs";
+
+    public static final String KEY_XIPKI_CERTSET_PROFILENAME = "xipki.certset.profilename";
+
+    public static final String KEY_FULLCRL_INTERVALS = "fullCRL.intervals";
+
+    public static final String KEY_DELTACRL_INTERVALS = "deltaCRL.intervals";
+
+    public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
+
+    public static final String KEY_INTERVAL_MINUTES = "interval.minutes";
+
+    public static final String KEY_INTERVAL_TIME = "interval.time";
+
+    public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullCRL.extendedNextUpdate";
+
+    public static final String KEY_ONLY_CONTAINS_USERCERTS = "onlyContainsUserCerts";
+
+    public static final String KEY_ONLY_CONTAINS_CACERTS = "onlyContainsCACerts";
+
+    public static final String KEY_EXCLUDE_REASON = "excludeReason";
+
+    public static final String KEY_INVALIDITY_DATE = "invalidityDate";
+
     private static final long serialVersionUID = 1L;
-
-    public static final String KEY_updateMode = "updateMode";
-
-    public static final String KEY_extensions = "extensions";
-
-    public static final String KEY_expiredCerts_included = "expiredCerts.included";
-
-    public static final String KEY_xipki_certset = "xipki.certset";
-
-    public static final String KEY_xipki_certset_certs = "xipki.certset.certs";
-
-    public static final String KEY_xipki_certset_profilename = "xipki.certset.profilename";
-
-    public static final String KEY_fullCRL_intervals = "fullCRL.intervals";
-
-    public static final String KEY_deltaCRL_intervals = "deltaCRL.intervals";
-
-    public static final String KEY_overlap_minutes = "overlap.minutes";
-
-    public static final String KEY_interval_minutes = "interval.minutes";
-
-    public static final String KEY_interval_time = "interval.time";
-
-    public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
-
-    public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
-
-    public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
-
-    public static final String KEY_excludeReason = "excludeReason";
-
-    public static final String KEY_invalidityDate = "invalidityDate";
 
     private UpdateMode updateMode = UpdateMode.interval;
 
-    private boolean xipkiCertsetIncluded = false;
+    private boolean xipkiCertsetIncluded;
 
     private boolean xipkiCertsetCertIncluded = true;
 
     private boolean xipkiCertsetProfilenameIncluded = true;
 
-    private boolean includeExpiredCerts = false;
+    private boolean includeExpiredCerts;
 
     private int fullCRLIntervals = 1;
 
-    private int deltaCRLIntervals = 0;
+    private int deltaCRLIntervals;
 
     private int overlapMinutes = 10;
 
-    private boolean extendedNextUpdate = false;
+    private boolean extendedNextUpdate;
 
     private Integer intervalMinutes;
 
     private HourMinute intervalDayTime;
 
-    private boolean onlyContainsUserCerts = false;
+    private boolean onlyContainsUserCerts;
 
-    private boolean onlyContainsCACerts = false;
+    private boolean onlyContainsCACerts;
 
-    private boolean excludeReason = false;
+    private boolean excludeReason;
 
     private TripleState invalidityDateMode = TripleState.OPTIONAL;
 
@@ -278,61 +278,61 @@ public class CRLControl implements Serializable {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
-        String s = props.getValue(KEY_updateMode);
+        String s = props.getValue(KEY_UPDATE_MODE);
         if (s == null) {
             this.updateMode = UpdateMode.interval;
         } else {
             this.updateMode = UpdateMode.getUpdateMode(s);
             if (this.updateMode == null) {
-                throw new InvalidConfException("invalid " + KEY_updateMode + ": " + s);
+                throw new InvalidConfException("invalid " + KEY_UPDATE_MODE + ": " + s);
             }
         }
 
-        s = props.getValue(KEY_invalidityDate);
+        s = props.getValue(KEY_INVALIDITY_DATE);
         if (s != null) {
             this.invalidityDateMode = TripleState.fromValue(s);
         }
 
-        this.includeExpiredCerts = getBoolean(props, KEY_expiredCerts_included, false);
+        this.includeExpiredCerts = getBoolean(props, KEY_EXPIRED_CERTS_INCLUDED, false);
 
-        this.xipkiCertsetIncluded = getBoolean(props, KEY_xipki_certset, false);
+        this.xipkiCertsetIncluded = getBoolean(props, KEY_XIPKI_CERTSET, false);
 
-        this.xipkiCertsetCertIncluded = getBoolean(props, KEY_xipki_certset_certs, true);
+        this.xipkiCertsetCertIncluded = getBoolean(props, KEY_XIPKI_CERTSET_CERTS, true);
 
         this.xipkiCertsetProfilenameIncluded = getBoolean(props,
-                KEY_xipki_certset_profilename, true);
+                KEY_XIPKI_CERTSET_PROFILENAME, true);
 
-        s = props.getValue(KEY_extensions);
+        s = props.getValue(KEY_EYTENSIONS);
         if (s == null) {
             this.extensionOIDs = Collections.emptySet();
         } else {
-            Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
+            Set<String> oids = StringUtil.splitAsSet(s, ", ");
             // check the OID
-            for (String extensionOID : extensionOIDs) {
+            for (String oid : oids) {
                 try {
-                    new ASN1ObjectIdentifier(extensionOID);
+                    new ASN1ObjectIdentifier(oid);
                 } catch (IllegalArgumentException e) {
-                    throw new InvalidConfException(extensionOID + " is not a valid OID");
+                    throw new InvalidConfException(oid + " is not a valid OID");
                 }
             }
-            this.extensionOIDs = extensionOIDs;
+            this.extensionOIDs = oids;
         }
 
-        this.onlyContainsCACerts = getBoolean(props, KEY_onlyContainsCACerts, false);
-        this.onlyContainsUserCerts = getBoolean(props, KEY_onlyContainsUserCerts, false);
-        this.excludeReason = getBoolean(props, KEY_excludeReason, false);
+        this.onlyContainsCACerts = getBoolean(props, KEY_ONLY_CONTAINS_CACERTS, false);
+        this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
+        this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
         if (this.updateMode != UpdateMode.onDemand) {
-            this.fullCRLIntervals = getInteger(props, KEY_fullCRL_intervals, 1);
-            this.deltaCRLIntervals = getInteger(props, KEY_deltaCRL_intervals, 0);
-            this.extendedNextUpdate = getBoolean(props, KEY_fullCRL_extendedNextUpdate, false);
-            this.overlapMinutes = getInteger(props, KEY_overlap_minutes, 60);
-            s = props.getValue(KEY_interval_time);
+            this.fullCRLIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
+            this.deltaCRLIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
+            this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
+            this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
+            s = props.getValue(KEY_INTERVAL_TIME);
             if (s != null) {
                 List<String> tokens = StringUtil.split(s.trim(), ":");
                 if (tokens.size() != 2) {
                     throw new InvalidConfException(
-                            "invalid " + KEY_interval_time + ": '" + s + "'");
+                            "invalid " + KEY_INTERVAL_TIME + ": '" + s + "'");
                 }
 
                 try {
@@ -340,13 +340,13 @@ public class CRLControl implements Serializable {
                     int minute = Integer.parseInt(tokens.get(1));
                     this.intervalDayTime = new HourMinute(hour, minute);
                 } catch (IllegalArgumentException e) {
-                    throw new InvalidConfException("invalid " + KEY_interval_time + ": '"
+                    throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '"
                             + s + "'");
                 }
             } else {
-                int minutes = getInteger(props, KEY_interval_minutes, 0);
+                int minutes = getInteger(props, KEY_INTERVAL_MINUTES, 0);
                 if (minutes < this.overlapMinutes + 30) {
-                    throw new InvalidConfException("invalid " + KEY_interval_minutes + ": '"
+                    throw new InvalidConfException("invalid " + KEY_INTERVAL_MINUTES + ": '"
                             + minutes + " is less than than 30 + " + this.overlapMinutes);
                 }
                 this.intervalMinutes = minutes;
@@ -358,26 +358,26 @@ public class CRLControl implements Serializable {
 
     public String getConf() {
         ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_updateMode, updateMode.name());
-        pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
-        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
-        pairs.putPair(KEY_xipki_certset_certs, Boolean.toString(xipkiCertsetCertIncluded));
-        pairs.putPair(KEY_xipki_certset, Boolean.toString(xipkiCertsetIncluded));
-        pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
-        pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
-        pairs.putPair(KEY_excludeReason, Boolean.toString(excludeReason));
-        pairs.putPair(KEY_invalidityDate, invalidityDateMode.name());
+        pairs.putPair(KEY_UPDATE_MODE, updateMode.name());
+        pairs.putPair(KEY_EXPIRED_CERTS_INCLUDED, Boolean.toString(includeExpiredCerts));
+        pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
+        pairs.putPair(KEY_XIPKI_CERTSET_CERTS, Boolean.toString(xipkiCertsetCertIncluded));
+        pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
+        pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCACerts));
+        pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
+        pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
+        pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
         if (updateMode != UpdateMode.onDemand) {
-            pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
-            pairs.putPair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
-            pairs.putPair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
+            pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCRLIntervals));
+            pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
+            pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCRLIntervals));
 
             if (intervalDayTime != null) {
-                pairs.putPair(KEY_interval_time, intervalDayTime.toString());
+                pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
             }
 
             if (intervalMinutes != null) {
-                pairs.putPair(KEY_interval_minutes, intervalMinutes.toString());
+                pairs.putPair(KEY_INTERVAL_MINUTES, intervalMinutes.toString());
             }
         }
 
@@ -387,7 +387,7 @@ public class CRLControl implements Serializable {
                 extensionsSb.append(oid).append(",");
             }
             extensionsSb.deleteCharAt(extensionsSb.length() - 1);
-            pairs.putPair(KEY_extensions, extensionsSb.toString());
+            pairs.putPair(KEY_EYTENSIONS, extensionsSb.toString());
         }
 
         return pairs.getEncoded();

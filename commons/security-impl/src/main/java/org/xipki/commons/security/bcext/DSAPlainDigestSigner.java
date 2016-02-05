@@ -39,9 +39,9 @@ public class DSAPlainDigestSigner implements Signer {
     }
 
     public void init(
-            final boolean forSigning,
+            final boolean pForSigning,
             final CipherParameters parameters) {
-        this.forSigning = forSigning;
+        this.forSigning = pForSigning;
 
         AsymmetricKeyParameter k;
 
@@ -64,17 +64,17 @@ public class DSAPlainDigestSigner implements Signer {
             throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
         }
 
-        if (forSigning && !k.isPrivate()) {
+        if (pForSigning && !k.isPrivate()) {
             throw new IllegalArgumentException("Signing Requires Private Key.");
         }
 
-        if (!forSigning && k.isPrivate()) {
+        if (!pForSigning && k.isPrivate()) {
             throw new IllegalArgumentException("Verification Requires Public Key.");
         }
 
         reset();
 
-        dsaSigner.init(forSigning, parameters);
+        dsaSigner.init(pForSigning, parameters);
     }
 
     /**

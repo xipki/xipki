@@ -434,11 +434,11 @@ class CAManagerQueryExecutor {
                 return null;
             }
 
-            String signer_type = rs.getString("SIGNER_TYPE");
-            String signer_conf = rs.getString("SIGNER_CONF");
-            String signer_cert = rs.getString("SIGNER_CERT");
+            String signerType = rs.getString("SIGNER_TYPE");
+            String signerConf = rs.getString("SIGNER_CONF");
+            String signerCert = rs.getString("SIGNER_CERT");
             String crlControlConf = rs.getString("CRL_CONTROL");
-            return new X509CrlSignerEntry(name, signer_type, signer_conf, signer_cert,
+            return new X509CrlSignerEntry(name, signerType, signerConf, signerCert,
                     crlControlConf);
         } catch (SQLException e) {
             DataAccessException tEx = dataSource.translate(sql, e);
@@ -532,38 +532,38 @@ class CAManagerQueryExecutor {
                         "CA " + name + " is not X509CA, and is not supported");
             }
 
-            long next_serial = rs.getLong("NEXT_SN");
-            int next_crlNo = rs.getInt("NEXT_CRLNO");
+            long nextSerial = rs.getLong("NEXT_SN");
+            int nextCrlNo = rs.getInt("NEXT_CRLNO");
             String status = rs.getString("STATUS");
-            String crl_uris = rs.getString("CRL_URIS");
-            String delta_crl_uris = rs.getString("DELTACRL_URIS");
-            String ocsp_uris = rs.getString("OCSP_URIS");
-            String cacert_uris = rs.getString("CACERT_URIS");
-            String max_validityS = rs.getString("MAX_VALIDITY");
-            CertValidity max_validity = CertValidity.getInstance(max_validityS);
+            String crlUris = rs.getString("CRL_URIS");
+            String deltaCrlUris = rs.getString("DELTACRL_URIS");
+            String ocspUris = rs.getString("OCSP_URIS");
+            String cacertUris = rs.getString("CACERT_URIS");
+            String maxValidityS = rs.getString("MAX_VALIDITY");
+            CertValidity maxValidity = CertValidity.getInstance(maxValidityS);
             String b64cert = rs.getString("CERT");
-            String signer_type = rs.getString("SIGNER_TYPE");
-            String signer_conf = rs.getString("SIGNER_CONF");
-            String crlsigner_name = rs.getString("CRLSIGNER_NAME");
-            String responder_name = rs.getString("RESPONDER_NAME");
-            String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
+            String signerType = rs.getString("SIGNER_TYPE");
+            String signerConf = rs.getString("SIGNER_CONF");
+            String crlsignerName = rs.getString("CRLSIGNER_NAME");
+            String responderName = rs.getString("RESPONDER_NAME");
+            String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
             int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
             int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
             int numCrls = rs.getInt("NUM_CRLS");
             int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
             int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
-            String extra_control = rs.getString("EXTRA_CONTROL");
+            String extraControl = rs.getString("EXTRA_CONTROL");
 
             CertRevocationInfo revocationInfo = null;
             boolean revoked = rs.getBoolean("REV");
             if (revoked) {
-                int rev_reason = rs.getInt("RR");
-                long rev_time = rs.getInt("RT");
-                long rev_invalidity_time = rs.getInt("RIT");
-                Date revInvTime = (rev_invalidity_time == 0)
+                int revReason = rs.getInt("RR");
+                long revTime = rs.getInt("RT");
+                long revInvalidityTime = rs.getInt("RIT");
+                Date revInvTime = (revInvalidityTime == 0)
                         ? null
-                        : new Date(rev_invalidity_time * 1000);
-                revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
+                        : new Date(revInvalidityTime * 1000);
+                revocationInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
                         revInvTime);
             }
 
@@ -571,27 +571,27 @@ class CAManagerQueryExecutor {
             Set<Permission> permissions = getPermissions(s);
 
             List<String> lCrlUris = null;
-            if (StringUtil.isNotBlank(crl_uris)) {
-                lCrlUris = StringUtil.split(crl_uris, " \t");
+            if (StringUtil.isNotBlank(crlUris)) {
+                lCrlUris = StringUtil.split(crlUris, " \t");
             }
 
             List<String> lDeltaCrlUris = null;
-            if (StringUtil.isNotBlank(delta_crl_uris)) {
-                lDeltaCrlUris = StringUtil.split(delta_crl_uris, " \t");
+            if (StringUtil.isNotBlank(deltaCrlUris)) {
+                lDeltaCrlUris = StringUtil.split(deltaCrlUris, " \t");
             }
 
             List<String> lOcspUris = null;
-            if (StringUtil.isNotBlank(ocsp_uris)) {
-                lOcspUris = StringUtil.split(ocsp_uris, " \t");
+            if (StringUtil.isNotBlank(ocspUris)) {
+                lOcspUris = StringUtil.split(ocspUris, " \t");
             }
 
             List<String> lCacertUris = null;
-            if (StringUtil.isNotBlank(cacert_uris)) {
-                lCacertUris = StringUtil.split(cacert_uris, " \t");
+            if (StringUtil.isNotBlank(cacertUris)) {
+                lCacertUris = StringUtil.split(cacertUris, " \t");
             }
 
-            X509CAEntry entry = new X509CAEntry(name, next_serial, next_crlNo,
-                    signer_type, signer_conf,
+            X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNo,
+                    signerType, signerConf,
                     lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris,
                     numCrls, expirationPeriod);
             X509Certificate cert = generateCert(b64cert);
@@ -603,23 +603,23 @@ class CAManagerQueryExecutor {
             }
             entry.setStatus(caStatus);
 
-            entry.setMaxValidity(max_validity);
+            entry.setMaxValidity(maxValidity);
             entry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
-            if (crlsigner_name != null) {
-                entry.setCrlSignerName(crlsigner_name);
+            if (crlsignerName != null) {
+                entry.setCrlSignerName(crlsignerName);
             }
 
-            if (responder_name != null) {
-                entry.setResponderName(responder_name);
+            if (responderName != null) {
+                entry.setResponderName(responderName);
             }
 
-            if (extra_control != null) {
-                entry.setExtraControl(extra_control);
+            if (extraControl != null) {
+                entry.setExtraControl(extraControl);
             }
 
-            if (cmpcontrol_name != null) {
-                entry.setCmpControlName(cmpcontrol_name);
+            if (cmpcontrolName != null) {
+                entry.setCmpControlName(cmpcontrolName);
             }
 
             entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
@@ -1157,18 +1157,18 @@ class CAManagerQueryExecutor {
         String name = entry.getName();
         CAStatus status = entry.getStatus();
         X509Certificate cert = entry.getCert();
-        List<String> crl_uris = entry.getCrlUris();
-        List<String> delta_crl_uris = entry.getDeltaCrlUris();
-        List<String> ocsp_uris = entry.getOcspUris();
-        List<String> cacert_uris = entry.getCaCertUris();
-        CertValidity max_validity = entry.getMaxValidity();
-        String signer_type = entry.getSignerType();
-        String signer_conf = entry.getSignerConf();
-        String crlsigner_name = entry.getCrlSignerName();
-        String responder_name = entry.getResponderName();
-        String cmpcontrol_name = entry.getCmpControlName();
-        DuplicationMode duplicate_key = entry.getDuplicateKeyMode();
-        DuplicationMode duplicate_subject = entry.getDuplicateSubjectMode();
+        List<String> crlUris = entry.getCrlUris();
+        List<String> deltaCrlUris = entry.getDeltaCrlUris();
+        List<String> ocspUris = entry.getOcspUris();
+        List<String> cacertUris = entry.getCaCertUris();
+        CertValidity maxValidity = entry.getMaxValidity();
+        String signerType = entry.getSignerType();
+        String lSignerConf = entry.getSignerConf();
+        String crlsignerName = entry.getCrlSignerName();
+        String responderName = entry.getResponderName();
+        String cmpcontrolName = entry.getCmpControlName();
+        DuplicationMode duplicateKey = entry.getDuplicateKeyMode();
+        DuplicationMode duplicateSubject = entry.getDuplicateSubjectMode();
         Set<Permission> permissions = entry.getPermissions();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
@@ -1176,7 +1176,7 @@ class CAManagerQueryExecutor {
         ValidityMode validityMode = entry.getValidityMode();
         String extraControl = entry.getExtraControl();
 
-        if (signer_type != null || signer_conf != null || cert != null) {
+        if (signerType != null || lSignerConf != null || cert != null) {
             final String sql = "SELECT SIGNER_TYPE, CERT, SIGNER_CONF FROM CA WHERE NAME=?";
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -1189,23 +1189,23 @@ class CAManagerQueryExecutor {
                     throw new CAMgmtException("no CA '" + name + "' is defined");
                 }
 
-                String _signerType = rs.getString("SIGNER_TYPE");
+                String lSignerType = rs.getString("SIGNER_TYPE");
                 String _signerConf = rs.getString("SIGNER_CONF");
-                String _b64Cert = rs.getString("CERT");
-                if (signer_type != null) {
-                    _signerType = signer_type;
+                String lB64Cert = rs.getString("CERT");
+                if (signerType != null) {
+                    lSignerType = signerType;
                 }
 
-                if (signer_conf != null) {
-                    _signerConf = getRealString(signer_conf);
+                if (lSignerConf != null) {
+                    _signerConf = getRealString(lSignerConf);
                 }
 
-                X509Certificate _cert;
+                X509Certificate localCert;
                 if (cert != null) {
-                    _cert = cert;
+                    localCert = cert;
                 } else {
                     try {
-                        _cert = X509Util.parseBase64EncodedCert(_b64Cert);
+                        localCert = X509Util.parseBase64EncodedCert(lB64Cert);
                     } catch (CertificateException | IOException e) {
                         throw new CAMgmtException(
                                 "could not parse the stored certificate for CA '" + name + "'"
@@ -1217,7 +1217,7 @@ class CAManagerQueryExecutor {
                     List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(_signerConf);
                     for (String[] m : signerConfs) {
                         String signerConf = m[1];
-                        securityFactory.createSigner(_signerType, signerConf, _cert);
+                        securityFactory.createSigner(lSignerType, signerConf, localCert);
                     }
                 } catch (SignerException e) {
                     throw new CAMgmtException(
@@ -1239,36 +1239,36 @@ class CAManagerQueryExecutor {
         Integer iStatus = addToSqlIfNotNull(sqlBuilder, index, status, "STATUS");
         Integer iSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
-        Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
-        Integer iDelta_crl_uris =
-                addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTACRL_URIS");
-        Integer iOcsp_uris = addToSqlIfNotNull(sqlBuilder, index, ocsp_uris, "OCSP_URIS");
-        Integer iCacert_uris = addToSqlIfNotNull(sqlBuilder, index, cacert_uris, "CACERT_URIS");
-        Integer iMax_validity =
-                addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iCrlsigner_name =
-                addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
-        Integer iResponder_name =
-                addToSqlIfNotNull(sqlBuilder, index, responder_name, "RESPONDER_NAME");
-        Integer iCmpcontrol_name =
-                addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
-        Integer iDuplicate_key =
-                addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY");
-        Integer iDuplicate_subject =
-                addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT");
+        Integer iCrlUris = addToSqlIfNotNull(sqlBuilder, index, crlUris, "CRL_URIS");
+        Integer iDeltaCrlUris =
+                addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris, "DELTACRL_URIS");
+        Integer iOcspUris = addToSqlIfNotNull(sqlBuilder, index, ocspUris, "OCSP_URIS");
+        Integer iCacertUris = addToSqlIfNotNull(sqlBuilder, index, cacertUris, "CACERT_URIS");
+        Integer iMaxValidity =
+                addToSqlIfNotNull(sqlBuilder, index, maxValidity, "MAX_VALIDITY");
+        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
+        Integer iCrlsignerName =
+                addToSqlIfNotNull(sqlBuilder, index, crlsignerName, "CRLSIGNER_NAME");
+        Integer iResponderName =
+                addToSqlIfNotNull(sqlBuilder, index, responderName, "RESPONDER_NAME");
+        Integer iCmpcontrolName =
+                addToSqlIfNotNull(sqlBuilder, index, cmpcontrolName, "CMPCONTROL_NAME");
+        Integer iDuplicateKey =
+                addToSqlIfNotNull(sqlBuilder, index, duplicateKey, "DUPLICATE_KEY");
+        Integer iDuplicateSubject =
+                addToSqlIfNotNull(sqlBuilder, index, duplicateSubject, "DUPLICATE_SUBJECT");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
-        Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
-        Integer iExpiration_period =
+        Integer iNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
+        Integer iExpirationPeriod =
                 addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
         Integer iExpiredCerts =
                 addToSqlIfNotNull(sqlBuilder, index, keepExpiredCertInDays,
                         "KEEP_EXPIRED_CERT_DAYS");
-        Integer iValidity_mode =
+        Integer iValidityMode =
                 addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
-        Integer iExtra_control =
+        Integer iExtraControl =
                 addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
+        Integer iSignerConf = addToSqlIfNotNull(sqlBuilder, index, lSignerConf, "SIGNER_CONF");
 
         // delete the last ','
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
@@ -1299,76 +1299,76 @@ class CAManagerQueryExecutor {
                 ps.setString(iCert, base64Cert);
             }
 
-            if (iCrl_uris != null) {
-                String txt = toString(crl_uris, ", ");
+            if (iCrlUris != null) {
+                String txt = toString(crlUris, ", ");
                 m.append("crlUri: '").append(txt).append("'; ");
-                ps.setString(iCrl_uris, txt);
+                ps.setString(iCrlUris, txt);
             }
 
-            if (iDelta_crl_uris != null) {
-                String txt = toString(delta_crl_uris, ", ");
+            if (iDeltaCrlUris != null) {
+                String txt = toString(deltaCrlUris, ", ");
                 m.append("deltaCrlUri: '").append(txt).append("'; ");
-                ps.setString(iDelta_crl_uris, txt);
+                ps.setString(iDeltaCrlUris, txt);
             }
 
-            if (iOcsp_uris != null) {
-                String txt = toString(ocsp_uris, ", ");
+            if (iOcspUris != null) {
+                String txt = toString(ocspUris, ", ");
                 m.append("ocspUri: '").append(txt).append("'; ");
-                ps.setString(iOcsp_uris, txt);
+                ps.setString(iOcspUris, txt);
             }
 
-            if (iCacert_uris != null) {
-                String txt = toString(cacert_uris, ", ");
+            if (iCacertUris != null) {
+                String txt = toString(cacertUris, ", ");
                 m.append("caCertUri: '").append(txt).append("'; ");
-                ps.setString(iCacert_uris, txt);
+                ps.setString(iCacertUris, txt);
             }
 
-            if (iMax_validity != null) {
-                String txt = max_validity.toString();
+            if (iMaxValidity != null) {
+                String txt = maxValidity.toString();
                 m.append("maxValidity: '").append(txt).append("'; ");
-                ps.setString(iMax_validity, txt);
+                ps.setString(iMaxValidity, txt);
             }
 
-            if (iSigner_type != null) {
-                m.append("signerType: '").append(signer_type).append("'; ");
-                ps.setString(iSigner_type, signer_type);
+            if (iSignerType != null) {
+                m.append("signerType: '").append(signerType).append("'; ");
+                ps.setString(iSignerType, signerType);
             }
 
-            if (iSigner_conf != null) {
+            if (iSignerConf != null) {
                 m.append("signerConf: '");
-                m.append(SecurityUtil.signerConfToString(signer_conf, false, true));
+                m.append(SecurityUtil.signerConfToString(lSignerConf, false, true));
                 m.append("'; ");
-                ps.setString(iSigner_conf, signer_conf);
+                ps.setString(iSignerConf, lSignerConf);
             }
 
-            if (iCrlsigner_name != null) {
-                String txt = getRealString(crlsigner_name);
+            if (iCrlsignerName != null) {
+                String txt = getRealString(crlsignerName);
                 m.append("crlSigner: '").append(txt).append("'; ");
-                ps.setString(iCrlsigner_name, txt);
+                ps.setString(iCrlsignerName, txt);
             }
 
-            if (iResponder_name != null) {
-                String txt = getRealString(responder_name);
+            if (iResponderName != null) {
+                String txt = getRealString(responderName);
                 m.append("responder: '").append(txt).append("'; ");
-                ps.setString(iResponder_name, txt);
+                ps.setString(iResponderName, txt);
             }
 
-            if (iCmpcontrol_name != null) {
-                String txt = getRealString(cmpcontrol_name);
+            if (iCmpcontrolName != null) {
+                String txt = getRealString(cmpcontrolName);
                 m.append("cmpControl: '").append(txt).append("'; ");
-                ps.setString(iCmpcontrol_name, txt);
+                ps.setString(iCmpcontrolName, txt);
             }
 
-            if (iDuplicate_key != null) {
-                int mode = duplicate_key.getMode();
+            if (iDuplicateKey != null) {
+                int mode = duplicateKey.getMode();
                 m.append("duplicateKey: '").append(mode).append("'; ");
-                ps.setInt(iDuplicate_key, mode);
+                ps.setInt(iDuplicateKey, mode);
             }
 
-            if (iDuplicate_subject != null) {
-                int mode = duplicate_subject.getMode();
+            if (iDuplicateSubject != null) {
+                int mode = duplicateSubject.getMode();
                 m.append("duplicateSubject: '").append(mode).append("'; ");
-                ps.setInt(iDuplicate_subject, mode);
+                ps.setInt(iDuplicateSubject, mode);
             }
 
             if (iPermissions != null) {
@@ -1377,14 +1377,14 @@ class CAManagerQueryExecutor {
                 ps.setString(iPermissions, txt);
             }
 
-            if (iNum_crls != null) {
+            if (iNumCrls != null) {
                 m.append("numCrls: '").append(numCrls).append("'; ");
-                ps.setInt(iNum_crls, numCrls);
+                ps.setInt(iNumCrls, numCrls);
             }
 
-            if (iExpiration_period != null) {
+            if (iExpirationPeriod != null) {
                 m.append("expirationPeriod: '").append(expirationPeriod).append("'; ");
-                ps.setInt(iExpiration_period, expirationPeriod);
+                ps.setInt(iExpirationPeriod, expirationPeriod);
             }
 
             if (iExpiredCerts != null) {
@@ -1392,15 +1392,15 @@ class CAManagerQueryExecutor {
                 ps.setInt(iExpiredCerts, keepExpiredCertInDays);
             }
 
-            if (iValidity_mode != null) {
+            if (iValidityMode != null) {
                 String txt = validityMode.name();
                 m.append("validityMode: '").append(txt).append("'; ");
-                ps.setString(iValidity_mode, txt);
+                ps.setString(iValidityMode, txt);
             }
 
-            if (iExtra_control != null) {
+            if (iExtraControl != null) {
                 m.append("extraControl: '").append(extraControl).append("'; ");
-                ps.setString(iExtra_control, extraControl);
+                ps.setString(iExtraControl, extraControl);
             }
 
             ps.setString(iName, name);
@@ -1676,8 +1676,8 @@ class CAManagerQueryExecutor {
 
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
-        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
+        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
+        Integer iSignerCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
         Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
 
@@ -1734,9 +1734,9 @@ class CAManagerQueryExecutor {
 
             ps = prepareStatement(sql);
 
-            if (iSigner_type != null) {
+            if (iSignerType != null) {
                 m.append("signerType: '").append(signerType).append("'; ");
-                ps.setString(iSigner_type, signerType);
+                ps.setString(iSignerType, signerType);
             }
 
             if (iSigner_conf != null) {
@@ -1747,7 +1747,7 @@ class CAManagerQueryExecutor {
                 ps.setString(iSigner_conf, txt);
             }
 
-            if (iSigner_cert != null) {
+            if (iSignerCert != null) {
                 String txt = getRealString(base64Cert);
                 String subject = null;
                 if (txt != null) {
@@ -1759,7 +1759,7 @@ class CAManagerQueryExecutor {
                     }
                 }
                 m.append("signerCert: '").append(subject).append("'; ");
-                ps.setString(iSigner_cert, txt);
+                ps.setString(iSignerCert, txt);
             }
 
             if (iCrlControl != null) {
@@ -2214,11 +2214,11 @@ class CAManagerQueryExecutor {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CAMgmtException(e);
         }
-        UserEntry _userEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
+        UserEntry localUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
 
         try {
             int maxId = (int) dataSource.getMax(null, "USERNAME", "ID");
-            executeAddUserSql(maxId + 1, _userEntry);
+            executeAddUserSql(maxId + 1, localUserEntry);
         } catch (DataAccessException e) {
             throw new CAMgmtException(e);
         }

@@ -61,7 +61,7 @@ class ResponseOption {
 
     private final Long cacheMaxAge;
 
-    public ResponseOption(
+    ResponseOption(
             final ResponseOptionType conf)
     throws InvalidConfException {
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
@@ -75,20 +75,20 @@ class ResponseOption {
             this.cacheMaxAge = null;
         }
 
-        HashAlgoType _certHashAlgo = null;
+        HashAlgoType localCertHashAlgo = null;
         String s = conf.getCerthashAlgorithm();
         if (s != null) {
             String token = s.trim();
             if (StringUtil.isNotBlank(token)) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
-                if (algo != null && RequestOption.supportedHashAlgorithms.contains(algo)) {
-                    _certHashAlgo = algo;
+                if (algo != null && RequestOption.SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
+                    localCertHashAlgo = algo;
                 } else {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
         }
-        this.certHashAlgo = _certHashAlgo;
+        this.certHashAlgo = localCertHashAlgo;
     }
 
     public boolean isIncludeInvalidityDate() {

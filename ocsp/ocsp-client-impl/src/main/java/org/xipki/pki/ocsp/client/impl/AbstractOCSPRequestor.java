@@ -73,6 +73,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
+import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.client.api.InvalidOCSPResponseException;
@@ -105,14 +106,14 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
 
     private SecureRandom random = new SecureRandom();
 
+    protected AbstractOCSPRequestor() {
+    }
+
     protected abstract byte[] send(
             byte[] request,
             URL responderUrl,
             RequestOptions requestOptions)
     throws IOException;
-
-    protected AbstractOCSPRequestor() {
-    }
 
     @Override
     public OCSPResp ask(
@@ -357,7 +358,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
             ASN1Sequence extnValue = new DERSequence(v);
             Extension extn;
             try {
-                extn = new Extension(id_pkix_ocsp_prefSigAlgs, false,
+                extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
                         new DEROctetString(extnValue));
             } catch (IOException e) {
                 throw new OCSPRequestorException(e.getMessage(), e);

@@ -68,7 +68,7 @@ public class ScepEntry implements Serializable {
 
     private final String base64Cert;
 
-    private X509Certificate cert;
+    private X509Certificate certificate;
 
     private boolean certFaulty;
 
@@ -94,7 +94,7 @@ public class ScepEntry implements Serializable {
 
         if (this.base64Cert != null) {
             try {
-                this.cert = X509Util.parseBase64EncodedCert(base64Cert);
+                this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
             } catch (Throwable t) {
                 LOG.debug("could not parse the certificate of SCEP responder for CA '"
                         + caName + "'");
@@ -104,7 +104,7 @@ public class ScepEntry implements Serializable {
     }
 
     public X509Certificate getCertificate() {
-        return cert;
+        return certificate;
     }
 
     public String getBase64Cert() {
@@ -137,11 +137,11 @@ public class ScepEntry implements Serializable {
     }
 
     public void setCertificate(
-            final X509Certificate cert) {
+            final X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
-        this.cert = cert;
+        this.certificate = certificate;
     }
 
     @Override
@@ -169,18 +169,18 @@ public class ScepEntry implements Serializable {
         }
         sb.append('\n');
         sb.append("control: ").append(control).append("\n");
-        if (cert != null) {
+        if (certificate != null) {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
-                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
+                    X509Util.getRFC4519Name(certificate.getIssuerX500Principal())).append('\n');
+            sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
             sb.append("\tsubject: ").append(
-                    X509Util.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
+                    X509Util.getRFC4519Name(certificate.getSubjectX500Principal())).append('\n');
 
             if (verbose) {
                 sb.append("\tencoded: ");
                 try {
-                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                    sb.append(Base64.toBase64String(certificate.getEncoded()));
                 } catch (CertificateEncodingException e) {
                     sb.append("ERROR");
                 }

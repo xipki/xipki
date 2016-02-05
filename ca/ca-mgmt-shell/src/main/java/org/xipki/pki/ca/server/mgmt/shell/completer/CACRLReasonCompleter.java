@@ -51,7 +51,7 @@ public class CACRLReasonCompleter extends AbstractEnumCompleter {
     public CACRLReasonCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (CRLReason reason : CaRevokeCmd.permitted_reasons) {
+        for (CRLReason reason : CaRevokeCmd.PERMITTED_REASONS) {
             enums.append(reason.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

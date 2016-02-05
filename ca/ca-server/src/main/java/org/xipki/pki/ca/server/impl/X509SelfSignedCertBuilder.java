@@ -203,21 +203,23 @@ class X509SelfSignedCertBuilder {
             final IdentifiedX509Certprofile certprofile,
             final CertificationRequest p10Request,
             final long serialNumber,
-            SubjectPublicKeyInfo publicKeyInfo,
+            final SubjectPublicKeyInfo publicKeyInfo,
             final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
+
+        SubjectPublicKeyInfo localPublicKeyInfo;
         try {
-            publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+            localPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         } catch (InvalidKeySpecException e) {
             LOG.warn("SecurityUtil.toRfc3279Style", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
         try {
-            certprofile.checkPublicKey(publicKeyInfo);
+            certprofile.checkPublicKey(localPublicKeyInfo);
         } catch (BadCertTemplateException e) {
             LOG.warn("certprofile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
@@ -252,17 +254,17 @@ class X509SelfSignedCertBuilder {
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-        BigInteger _serialNumber = BigInteger.valueOf(serialNumber);
+        BigInteger localSerialNumber = BigInteger.valueOf(serialNumber);
         X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                 grantedSubject,
-                _serialNumber,
+                localSerialNumber,
                 notBefore,
                 notAfter,
                 grantedSubject,
-                publicKeyInfo);
+                localPublicKeyInfo);
 
         PublicCAInfo publicCaInfo = new PublicCAInfo(
-                grantedSubject, _serialNumber, null, null,
+                grantedSubject, localSerialNumber, null, null,
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
@@ -280,7 +282,7 @@ class X509SelfSignedCertBuilder {
                     certprofile,
                     requestedSubject,
                     extensions,
-                    publicKeyInfo,
+                    localPublicKeyInfo,
                     publicCaInfo,
                     notBefore,
                     notAfter);

@@ -108,55 +108,55 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
 class IdentifiedX509Certprofile {
 
-    private static final Set<ASN1ObjectIdentifier> criticalOnlyExtensionTypes;
+    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSION_TYPES;
 
-    private static final Set<ASN1ObjectIdentifier> noncriticalOnlyExtensionTypes;
+    private static final Set<ASN1ObjectIdentifier> NONCRITICAL_ONLY_EXTENSION_TYPES;
 
-    private static final Set<ASN1ObjectIdentifier> caOnlyExtensionTypes;
+    private static final Set<ASN1ObjectIdentifier> CA_ONLY_EXTENSION_TYPES;
 
-    private static final Set<ASN1ObjectIdentifier> noneRequestExtensionTypes;
+    private static final Set<ASN1ObjectIdentifier> NONE_REQUEST_EXTENSION_TYPES;
 
     static {
-        criticalOnlyExtensionTypes = new HashSet<>();
-        criticalOnlyExtensionTypes.add(Extension.basicConstraints);
-        criticalOnlyExtensionTypes.add(Extension.keyUsage);
-        criticalOnlyExtensionTypes.add(Extension.policyMappings);
-        criticalOnlyExtensionTypes.add(Extension.nameConstraints);
-        criticalOnlyExtensionTypes.add(Extension.policyConstraints);
-        criticalOnlyExtensionTypes.add(Extension.inhibitAnyPolicy);
-        criticalOnlyExtensionTypes.add(ObjectIdentifiers.id_pe_tlsfeature);
+        CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.basicConstraints);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.keyUsage);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyMappings);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
+        CRITICAL_ONLY_EXTENSION_TYPES.add(ObjectIdentifiers.id_pe_tlsfeature);
 
-        noncriticalOnlyExtensionTypes = new HashSet<>();
-        noncriticalOnlyExtensionTypes.add(Extension.authorityKeyIdentifier);
-        noncriticalOnlyExtensionTypes.add(Extension.subjectKeyIdentifier);
-        noncriticalOnlyExtensionTypes.add(Extension.issuerAlternativeName);
-        noncriticalOnlyExtensionTypes.add(Extension.subjectDirectoryAttributes);
-        noncriticalOnlyExtensionTypes.add(Extension.freshestCRL);
-        noncriticalOnlyExtensionTypes.add(Extension.authorityInfoAccess);
-        noncriticalOnlyExtensionTypes.add(Extension.subjectInfoAccess);
+        NONCRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.issuerAlternativeName);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectDirectoryAttributes);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.freshestCRL);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.authorityInfoAccess);
+        NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.subjectInfoAccess);
 
-        caOnlyExtensionTypes = new HashSet<>();
-        caOnlyExtensionTypes.add(Extension.policyMappings);
-        caOnlyExtensionTypes.add(Extension.nameConstraints);
-        caOnlyExtensionTypes.add(Extension.policyConstraints);
-        caOnlyExtensionTypes.add(Extension.inhibitAnyPolicy);
+        CA_ONLY_EXTENSION_TYPES = new HashSet<>();
+        CA_ONLY_EXTENSION_TYPES.add(Extension.policyMappings);
+        CA_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
+        CA_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
+        CA_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
 
-        noneRequestExtensionTypes = new HashSet<ASN1ObjectIdentifier>();
-        noneRequestExtensionTypes.add(Extension.subjectKeyIdentifier);
-        noneRequestExtensionTypes.add(Extension.authorityKeyIdentifier);
-        noneRequestExtensionTypes.add(Extension.issuerAlternativeName);
-        noneRequestExtensionTypes.add(Extension.cRLDistributionPoints);
-        noneRequestExtensionTypes.add(Extension.freshestCRL);
-        noneRequestExtensionTypes.add(Extension.basicConstraints);
-        noneRequestExtensionTypes.add(Extension.inhibitAnyPolicy);
+        NONE_REQUEST_EXTENSION_TYPES = new HashSet<ASN1ObjectIdentifier>();
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.issuerAlternativeName);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.cRLDistributionPoints);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.freshestCRL);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.basicConstraints);
+        NONE_REQUEST_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
     } // end static
 
     private final String name;
     private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
-    private EnvParameterResolver parameterResolver;
+    private EnvParameterResolver envParameterResolver;
 
-    public IdentifiedX509Certprofile(
+    IdentifiedX509Certprofile(
             final CertprofileEntry dbEntry,
             final String realType)
     throws CertprofileException {
@@ -187,8 +187,8 @@ class IdentifiedX509Certprofile {
 
         tmpCertprofile.initialize(dbEntry.getConf());
 
-        if (parameterResolver != null) {
-            tmpCertprofile.setEnvParameterResolver(parameterResolver);
+        if (envParameterResolver != null) {
+            tmpCertprofile.setEnvParameterResolver(envParameterResolver);
         }
 
         if (tmpCertprofile.getSpecialCertprofileBehavior()
@@ -235,10 +235,10 @@ class IdentifiedX509Certprofile {
     }
 
     public void setEnvParameterResolver(
-            final EnvParameterResolver parameterResolver) {
-        this.parameterResolver = parameterResolver;
+            final EnvParameterResolver envParameterResolver) {
+        this.envParameterResolver = envParameterResolver;
         if (certprofile != null) {
-            certprofile.setEnvParameterResolver(parameterResolver);
+            certprofile.setEnvParameterResolver(envParameterResolver);
         }
     }
 
@@ -283,7 +283,7 @@ class IdentifiedX509Certprofile {
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
         if (requestExtensions != null) {
             Extension reqExtension = requestExtensions.getExtension(
-                    ObjectIdentifiers.id_xipki_ext_cmRequestExtensions);
+                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
             if (reqExtension != null) {
                 ExtensionExistence ee = ExtensionExistence.getInstance(
                         reqExtension.getParsedValue());
@@ -474,7 +474,7 @@ class IdentifiedX509Certprofile {
             }
 
             if (extControl.isCritical()
-                    && usages.contains(ObjectIdentifiers.anyExtendedKeyUsage)) {
+                    && usages.contains(ObjectIdentifiers.id_anyExtendedKeyUsage)) {
                 extControl = new ExtensionControl(false, extControl.isRequired(),
                         extControl.isRequest());
             }
@@ -646,7 +646,7 @@ class IdentifiedX509Certprofile {
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();
         Set<ASN1ObjectIdentifier> set = new HashSet<>();
-        for (ASN1ObjectIdentifier type : noneRequestExtensionTypes) {
+        for (ASN1ObjectIdentifier type : NONE_REQUEST_EXTENSION_TYPES) {
             ExtensionControl control = controls.get(type);
             if (control != null && control.isRequest()) {
                 set.add(type);
@@ -664,7 +664,7 @@ class IdentifiedX509Certprofile {
         set.clear();
         if (!ca) {
             set.clear();
-            for (ASN1ObjectIdentifier type : caOnlyExtensionTypes) {
+            for (ASN1ObjectIdentifier type : CA_ONLY_EXTENSION_TYPES) {
                 if (controls.containsKey(type)) {
                     set.add(type);
                 }
@@ -680,7 +680,7 @@ class IdentifiedX509Certprofile {
         set.clear();
         for (ASN1ObjectIdentifier type : controls.keySet()) {
             ExtensionControl control = controls.get(type);
-            if (criticalOnlyExtensionTypes.contains(type)) {
+            if (CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
                 if (!control.isCritical()) {
                     set.add(type);
                 }
@@ -695,7 +695,7 @@ class IdentifiedX509Certprofile {
         set.clear();
         for (ASN1ObjectIdentifier type : controls.keySet()) {
             ExtensionControl control = controls.get(type);
-            if (noncriticalOnlyExtensionTypes.contains(type)) {
+            if (NONCRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
                 if (control.isCritical()) {
                     set.add(type);
                 }

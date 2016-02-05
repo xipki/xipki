@@ -76,7 +76,7 @@ public class OCSPCertPublisher extends X509CertPublisher {
 
     private OCSPStoreQueryExecutor queryExecutor;
 
-    private boolean asyn = false;
+    private boolean asyn;
 
     private boolean publishsGoodCert = true;
 

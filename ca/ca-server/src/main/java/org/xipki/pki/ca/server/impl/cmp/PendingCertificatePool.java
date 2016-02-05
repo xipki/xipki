@@ -61,7 +61,7 @@ class PendingCertificatePool {
 
         private final X509CertificateInfo certInfo;
 
-        public MyEntry(
+        MyEntry(
                 final BigInteger certReqId,
                 final long waitForConfirmTill,
                 final X509CertificateInfo certInfo) {

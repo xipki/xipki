@@ -48,7 +48,7 @@ public enum CertArt {
 
     private final int code;
 
-    private CertArt(
+    CertArt(
             final int code) {
         this.code = code;
     }

@@ -52,13 +52,16 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 public class PBEPasswordResolver implements SinglePasswordResolver {
 
-    private static final int iterationCount = 2000;
+    private static final int ITERATION_COUNT = 2000;
 
     private char[] masterPassword;
 
     private final Object masterPasswordLock = new Object();
 
     private PasswordCallback masterPwdCallback;
+
+    public PBEPasswordResolver() {
+    }
 
     protected char[] getMasterPassword()
     throws PasswordResolverException {
@@ -79,9 +82,6 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         masterPassword = null;
     }
 
-    public PBEPasswordResolver() {
-    }
-
     @Override
     public boolean canResolveProtocol(
             final String protocol) {
@@ -96,25 +96,25 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
     }
 
     public void setMasterPasswordCallback(
-            String masterPasswordCallback) {
+            final String masterPasswordCallback) {
         if (masterPasswordCallback == null) {
             return;
         }
 
-        masterPasswordCallback = masterPasswordCallback.trim();
-        if (StringUtil.isBlank(masterPasswordCallback)) {
+        String localMasterPasswordCallback = masterPasswordCallback.trim();
+        if (StringUtil.isBlank(localMasterPasswordCallback)) {
             return;
         }
 
         String className;
         String conf = null;
 
-        int delimIndex = masterPasswordCallback.indexOf(' ');
+        int delimIndex = localMasterPasswordCallback.indexOf(' ');
         if (delimIndex == -1) {
-            className = masterPasswordCallback;
+            className = localMasterPasswordCallback;
         } else {
-            className = masterPasswordCallback.substring(0, delimIndex);
-            conf = masterPasswordCallback.substring(delimIndex + 1);
+            className = localMasterPasswordCallback.substring(0, delimIndex);
+            conf = localMasterPasswordCallback.substring(delimIndex + 1);
         }
 
         try {
@@ -126,12 +126,12 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
             } else {
                 throw new IllegalArgumentException(
                         "invalid masterPasswordCallback configuration "
-                        + masterPasswordCallback);
+                        + localMasterPasswordCallback);
             }
 
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-                    + masterPasswordCallback
+                    + localMasterPasswordCallback
                     + ", " + e.getClass().getName() + ": " + e.getMessage());
         }
     } // method setMasterPasswordCallback
@@ -151,7 +151,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
 
         byte[] pwd;
         try {
-            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
+            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, ITERATION_COUNT,
                     salt);
         } catch (GeneralSecurityException e) {
             throw new PasswordResolverException("could not decrypt the password: "
@@ -176,7 +176,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         byte[] encrypted;
         try {
             encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
-                    masterPassword, iterationCount, salt);
+                    masterPassword, ITERATION_COUNT, salt);
         } catch (GeneralSecurityException e) {
             throw new PasswordResolverException("could not encrypt the password: "
                     + e.getMessage());
