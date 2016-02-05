@@ -51,7 +51,7 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class TransactionId {
 
-    private static final SecureRandom random = new SecureRandom();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final String id;
 
@@ -76,7 +76,7 @@ public class TransactionId {
 
     public static TransactionId randomTransactionId() {
         byte[] bytes = new byte[20];
-        random.nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         return new TransactionId(bytes);
     }
 

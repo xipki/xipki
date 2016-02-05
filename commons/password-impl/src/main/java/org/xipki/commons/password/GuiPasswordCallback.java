@@ -49,12 +49,13 @@ public class GuiPasswordCallback implements PasswordCallback {
 
     @Override
     public char[] getPassword(
-            String prompt)
+            final String prompt)
     throws PasswordResolverException {
-        if (StringUtil.isBlank(prompt)) {
-            prompt = "Password required";
+        String localPrompt = prompt;
+        if (StringUtil.isBlank(localPrompt)) {
+            localPrompt = "Password required";
         }
-        char[] password = SecurePasswordInputPanel.readPassword(prompt);
+        char[] password = SecurePasswordInputPanel.readPassword(localPrompt);
         if (password == null) {
             throw new PasswordResolverException("user has cancelled");
         }

@@ -82,13 +82,13 @@ public class SignerUtil {
     private SignerUtil() {
     }
 
-    static public RSAKeyParameters generateRSAPublicKeyParameter(
+    public static RSAKeyParameters generateRSAPublicKeyParameter(
             final RSAPublicKey key) {
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
-    static public RSAKeyParameters generateRSAPrivateKeyParameter(
+    public static RSAKeyParameters generateRSAPrivateKeyParameter(
             final RSAPrivateKey key) {
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
@@ -103,13 +103,13 @@ public class SignerUtil {
         }
     }
 
-    static public PSSSigner createPSSRSASigner(
+    public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId)
     throws OperatorCreationException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
-    static public PSSSigner createPSSRSASigner(
+    public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId,
             final    AsymmetricBlockCipher cipher)
     throws OperatorCreationException {
@@ -136,14 +136,14 @@ public class SignerUtil {
         int saltSize = param.getSaltLength().intValue();
         int trailerField = param.getTrailerField().intValue();
 
-        AsymmetricBlockCipher _cipher = (cipher == null)
+        AsymmetricBlockCipher localCipher = (cipher == null)
                 ? new RSABlindedEngine()
                 : cipher;
 
-        return new PSSSigner(_cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
+        return new PSSSigner(localCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
 
-    static private byte getTrailer(
+    private static byte getTrailer(
             final int trailerField) {
         if (trailerField == 1) {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;

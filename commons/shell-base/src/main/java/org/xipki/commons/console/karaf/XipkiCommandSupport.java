@@ -85,7 +85,7 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected void saveVerbose(
-            String promptPrefix,
+            final String promptPrefix,
             final File file,
             final byte[] encoded)
     throws IOException {
@@ -144,24 +144,25 @@ public abstract class XipkiCommandSupport implements Action {
             }
         }
 
-        if (promptPrefix == null || promptPrefix.isEmpty()) {
-            promptPrefix = "saved to file";
+        String localPromptPrefix = promptPrefix;
+        if (localPromptPrefix == null || localPromptPrefix.isEmpty()) {
+            localPromptPrefix = "saved to file";
         }
 
-        out(promptPrefix + " " + saveTo.getPath());
+        out(localPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
     protected void save(
-            File file,
+            final File file,
             final byte[] encoded)
     throws IOException {
-        file = expandFilepath(file);
-        File parent = file.getParentFile();
+        File localFile = expandFilepath(file);
+        File parent = localFile.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
-        FileOutputStream out = new FileOutputStream(file);
+        FileOutputStream out = new FileOutputStream(localFile);
         try {
             out.write(encoded);
         } finally {
@@ -183,7 +184,7 @@ public abstract class XipkiCommandSupport implements Action {
         if (enabledS == null) {
             return null;
         }
-        return intern_isEnabled(enabledS, optionName);
+        return internIsEnabled(enabledS, optionName);
     }
 
     protected static boolean isEnabled(
@@ -194,10 +195,10 @@ public abstract class XipkiCommandSupport implements Action {
             return defaultEnabled;
         }
 
-        return intern_isEnabled(enabledS, optionName);
+        return internIsEnabled(enabledS, optionName);
     }
 
-    private static boolean intern_isEnabled(
+    private static boolean internIsEnabled(
             final String enabledS,
             final String optionName) {
         if ("yes".equalsIgnoreCase(enabledS)
@@ -287,16 +288,16 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected static BigInteger toBigInt(
-            String s) {
-        s = s.trim();
-        if (s.startsWith("0x") || s.startsWith("0X")) {
-            if (s.length() > 2) {
-                return new BigInteger(s.substring(2), 16);
+            final String s) {
+        String localS = s.trim();
+        if (localS.startsWith("0x") || localS.startsWith("0X")) {
+            if (localS.length() > 2) {
+                return new BigInteger(localS.substring(2), 16);
             } else {
-                throw new NumberFormatException("invalid integer '" + s + "'");
+                throw new NumberFormatException("invalid integer '" + localS + "'");
             }
         }
-        return new BigInteger(s);
+        return new BigInteger(localS);
     }
 
     protected boolean confirm(

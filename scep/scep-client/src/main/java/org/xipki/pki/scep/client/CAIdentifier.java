@@ -59,15 +59,15 @@ public class CAIdentifier {
             final String serverUrl,
             final String profile)
     throws MalformedURLException {
-        URL url = new URL(serverUrl);
-        final String protocol = url.getProtocol();
+        URL localUrl = new URL(serverUrl);
+        final String protocol = localUrl.getProtocol();
         if (!protocol.equalsIgnoreCase("http")
                 && !protocol.equalsIgnoreCase("https")) {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }
 
-        if (url.getQuery() != null) {
+        if (localUrl.getQuery() != null) {
             throw new IllegalArgumentException("URL should contain no query string");
         }
 
@@ -96,13 +96,13 @@ public class CAIdentifier {
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
         if (!ScepUtil.isBlank(message)) {
-            String _urlMessage;
+            String urlMessage;
             try {
-                _urlMessage = URLEncoder.encode(message, "UTF-8");
+                urlMessage = URLEncoder.encode(message, "UTF-8");
             } catch (UnsupportedEncodingException e) {
-                _urlMessage = URLEncoder.encode(message);
+                urlMessage = URLEncoder.encode(message);
             }
-            ub.append("&message=").append(_urlMessage);
+            ub.append("&message=").append(urlMessage);
         }
         return ub.toString();
     }

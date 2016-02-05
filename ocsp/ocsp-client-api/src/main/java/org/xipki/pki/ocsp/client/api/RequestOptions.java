@@ -59,54 +59,54 @@ import org.xipki.commons.common.util.CollectionUtil;
 
 public class RequestOptions {
 
-    private static final Map<String, AlgorithmIdentifier> sigAlgsMap = new HashMap<>();
+    private static final Map<String, AlgorithmIdentifier> SIGALGS_MAP = new HashMap<>();
 
     static {
         String algoName = "SHA1withRSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA256withRSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA384withRSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA512withRSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA1withECDSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA256withECDSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA384withECDSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA512withECDSA";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA1withRSAandMGF1";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA256withRSAandMGF1";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA384withRSAandMGF1";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
         algoName = "SHA512withRSAandMGF1";
-        sigAlgsMap.put(algoName.toUpperCase(), createAlgId(algoName));
+        SIGALGS_MAP.put(algoName.toUpperCase(), createAlgId(algoName));
 
     }
 
-    private boolean signRequest = false;
+    private boolean signRequest;
 
     private boolean useNonce = true;
 
     private int nonceLen = 8;
 
-    private boolean useHttpGetForRequest = false;
+    private boolean useHttpGetForRequest;
 
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
 
@@ -161,7 +161,7 @@ public class RequestOptions {
         }
 
         for (String algoName : preferredSignatureAlgorithmNames) {
-            AlgorithmIdentifier sigAlgId = sigAlgsMap.get(algoName.toUpperCase());
+            AlgorithmIdentifier sigAlgId = SIGALGS_MAP.get(algoName.toUpperCase());
             if (sigAlgId == null) {
                 // ignore it
                 continue;
@@ -241,7 +241,7 @@ public class RequestOptions {
         return new AlgorithmIdentifier(algOid, params);
     } // method createAlgId
 
-    static public RSASSAPSSparams createPSSRSAParams(
+    public static RSASSAPSSparams createPSSRSAParams(
             final ASN1ObjectIdentifier digestAlgOID) {
         int saltSize;
         if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID)) {

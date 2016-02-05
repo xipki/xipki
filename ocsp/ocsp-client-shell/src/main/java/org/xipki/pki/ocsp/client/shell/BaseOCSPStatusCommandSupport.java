@@ -53,8 +53,8 @@ import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
@@ -63,6 +63,13 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
  */
 
 public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupport {
+
+    protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP
+            = new HashMap<>();
+
+    @Option(name = "--verbose", aliases = "-v",
+            description = "show status verbosely")
+    protected Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
@@ -87,7 +94,7 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
             multiValued = true,
             description = "serial number\n"
                     + "(multi-valued)")
-    private List<String> serialNumbers;
+    private List<String> serialNumberList;
 
     @Option(name = "--cert", aliases = "-c",
             multiValued = true,
@@ -96,17 +103,13 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
     @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
-    @Option(name = "--verbose", aliases = "-v",
-            description = "show status verbosely")
-    protected Boolean verbose = Boolean.FALSE;
-
-    protected static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
-
     static {
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
-        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-        extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
+        EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
+                "ArchiveCutoff");
+        EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
+        EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
+        EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke,
+                "ExtendedRevoke");
     }
 
     protected abstract void checkParameters(
@@ -126,7 +129,7 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
     @Override
     protected final Object doExecute()
     throws Exception {
-        if (isEmpty(serialNumbers) && isEmpty(certFiles)) {
+        if (isEmpty(serialNumberList) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
 
@@ -169,7 +172,7 @@ public abstract class BaseOCSPStatusCommandSupport extends OCSPStatusCommandSupp
                 serverURL = ocspUrl;
             }
         } else {
-            for (String serialNumber : serialNumbers) {
+            for (String serialNumber : serialNumberList) {
                 BigInteger sn = toBigInt(serialNumber);
                 sns.add(sn);
             }

@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
  */
 public class MyFilenameFilter implements FilenameFilter {
 
-    private static final Pattern ignorePattern;
+    private static final Pattern IGNORE_PATTERN;
 
     static {
         String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
@@ -56,9 +56,9 @@ public class MyFilenameFilter implements FilenameFilter {
         }
 
         if (ignoreRegex == null || ignoreRegex.isEmpty()) {
-            ignorePattern = null;
+            IGNORE_PATTERN = null;
         } else {
-            ignorePattern = Pattern.compile(ignoreRegex);
+            IGNORE_PATTERN = Pattern.compile(ignoreRegex);
         }
     }
 
@@ -66,11 +66,11 @@ public class MyFilenameFilter implements FilenameFilter {
     public boolean accept(
             final File dir,
             final String name) {
-        if (ignorePattern == null) {
+        if (IGNORE_PATTERN == null) {
             return true;
         }
 
-        return !ignorePattern.matcher(name).matches();
+        return !IGNORE_PATTERN.matcher(name).matches();
     }
 
 }

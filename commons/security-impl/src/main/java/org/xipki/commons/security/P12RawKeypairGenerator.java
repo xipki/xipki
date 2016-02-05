@@ -141,15 +141,15 @@ public abstract class P12RawKeypairGenerator {
 
     } // class DSAKeypairGenerator
 
-    public abstract KeyPair genKeypair(
-            SecureRandom random)
-    throws Exception;
-
     public P12RawKeypairGenerator()
     throws Exception {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
     }
+
+    public abstract KeyPair genKeypair(
+            SecureRandom random)
+    throws Exception;
 
 }

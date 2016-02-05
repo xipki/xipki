@@ -53,11 +53,11 @@ import org.xipki.commons.console.karaf.intern.MyFilenameFilter;
 
 abstract class AbstractPathCompleter implements Completer {
 
-    protected abstract boolean isDirOnly();
-
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
 
-    private static final FilenameFilter filenameFilter = new MyFilenameFilter();
+    private static final FilenameFilter FILENAME_FILTER = new MyFilenameFilter();
+
+    protected abstract boolean isDirOnly();
 
     @Override
     public int complete(
@@ -103,7 +103,7 @@ abstract class AbstractPathCompleter implements Completer {
 
         File[] entries = (dir == null)
                 ? new File[0]
-                : dir.listFiles(filenameFilter);
+                : dir.listFiles(FILENAME_FILTER);
         if (isDirOnly()
                 && entries != null
                 && entries.length > 0) {

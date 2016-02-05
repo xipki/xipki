@@ -678,8 +678,8 @@ public class ProfileConfCreatorDemo {
 
         // Extensions - tlsFeature
         extensionValue = createTlsFeature(
-                new TLSExtensionType[]{TLSExtensionType.status_request,
-                        TLSExtensionType.client_certificate_url});
+                new TLSExtensionType[]{TLSExtensionType.STATUS_REQUEST,
+                        TLSExtensionType.CLIENT_CERTIFICATE_URL});
         list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
         // Extensions - SMIMECapabilities

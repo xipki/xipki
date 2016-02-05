@@ -69,6 +69,8 @@ public final class IaikP11CryptService implements P11CryptService {
 
     private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
 
+    private static final Map<String, IaikP11CryptService> INSTANCES = new HashMap<>();
+
     private final ConcurrentSkipListSet<IaikP11Identity> identities =
             new ConcurrentSkipListSet<>();
 
@@ -76,7 +78,9 @@ public final class IaikP11CryptService implements P11CryptService {
 
     private final P11ModuleConf moduleConf;
 
-    private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
+    private boolean lastRefreshSuccessful;
+
+    private long lastRefresh;
 
     private IaikP11CryptService(
             final P11ModuleConf moduleConf)
@@ -84,9 +88,6 @@ public final class IaikP11CryptService implements P11CryptService {
         this.moduleConf = moduleConf;
         refresh();
     }
-
-    private boolean lastRefreshSuccessful;
-    private long lastRefresh;
 
     private synchronized boolean reconnect()
     throws SignerException {
@@ -431,15 +432,15 @@ public final class IaikP11CryptService implements P11CryptService {
         return keyLabels.toArray(new String[0]);
     }
 
-    public synchronized static IaikP11CryptService getInstance(
+    public static synchronized IaikP11CryptService getInstance(
             final P11ModuleConf moduleConf)
     throws SignerException {
-        synchronized (instances) {
+        synchronized (INSTANCES) {
             final String name = moduleConf.getName();
-            IaikP11CryptService instance = instances.get(name);
+            IaikP11CryptService instance = INSTANCES.get(name);
             if (instance == null) {
                 instance = new IaikP11CryptService(moduleConf);
-                instances.put(name, instance);
+                INSTANCES.put(name, instance);
             }
 
             return instance;

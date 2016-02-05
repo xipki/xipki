@@ -113,7 +113,7 @@ public enum CRLReason {
      */
     AA_COMPROMISE(10, "aACompromise");
 
-    public static List<CRLReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
+    public static final List<CRLReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
         Arrays.asList(
             new CRLReason[] {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
@@ -121,10 +121,12 @@ public enum CRLReason {
                 CRLReason.CESSATION_OF_OPERATION,
                 CRLReason.CERTIFICATE_HOLD, CRLReason.PRIVILEGE_WITHDRAWN}));
 
+    private static final Map<Integer, CRLReason> REASONS = new HashMap<>();
+
     private final int code;
     private final String desription;
 
-    private CRLReason(
+    CRLReason(
             final int code,
             final String description) {
         this.code = code;
@@ -139,16 +141,15 @@ public enum CRLReason {
         return desription;
     }
 
-    private static Map<Integer, CRLReason> reasons = new HashMap<>();
     static {
         for (CRLReason value : CRLReason.values()) {
-            reasons.put(value.code, value);
+            REASONS.put(value.code, value);
         }
     }
 
     public static CRLReason forReasonCode(
             final int reasonCode) {
-        return reasons.get(reasonCode);
+        return REASONS.get(reasonCode);
     }
 
     public static CRLReason getInstance(

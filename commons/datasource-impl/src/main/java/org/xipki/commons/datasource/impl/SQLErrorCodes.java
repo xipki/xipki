@@ -141,7 +141,7 @@ public class SQLErrorCodes {
 
     } // class PostgreSQL
 
-    protected boolean useSqlStateForTranslation = false;
+    protected boolean useSqlStateForTranslation;
 
     protected Set<String> badSqlGrammarCodes;
 

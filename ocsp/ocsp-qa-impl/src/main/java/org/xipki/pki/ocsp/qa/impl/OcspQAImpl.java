@@ -63,12 +63,11 @@ import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
 import org.xipki.commons.security.KeyUtil;
 import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.qa.api.Occurrence;
@@ -83,15 +82,6 @@ import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
  */
 
 public class OcspQAImpl implements OcspQA {
-
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
-            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
-            = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
-
-    @SuppressWarnings("unused")
-    private static final Logger LOG = LoggerFactory.getLogger(OcspQAImpl.class);
 
     public OcspQAImpl() {
     }
@@ -262,7 +252,8 @@ public class OcspQAImpl implements OcspQA {
         resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn,
                 responseOption.getNonceOccurrence()));
 
-        boolean extendedRevoke = basicResp.getExtension(id_pkix_ocsp_extendedRevoke) != null;
+        boolean extendedRevoke = basicResp.getExtension(
+                ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
 
         for (int i = 0; i < singleResponses.length; i++) {
             SingleResp singleResp = singleResponses[i];

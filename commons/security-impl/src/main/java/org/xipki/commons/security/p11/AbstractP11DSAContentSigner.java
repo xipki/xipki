@@ -63,19 +63,15 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);
 
-    private final AlgorithmIdentifier algorithmIdentifier;
-
-    private final DigestOutputStream outputStream;
-
     protected final P11CryptService cryptService;
 
     protected final P11SlotIdentifier slot;
 
     protected final P11KeyIdentifier keyId;
 
-    protected abstract byte[] CKM_SIGN(
-            final byte[] hashValue)
-    throws SignerException;
+    private final AlgorithmIdentifier algorithmIdentifier;
+
+    private final DigestOutputStream outputStream;
 
     protected AbstractP11DSAContentSigner(
             final P11CryptService cryptService,
@@ -100,6 +96,10 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
 
         this.outputStream = new DigestOutputStream(digest);
     }
+
+    protected abstract byte[] CKM_SIGN(
+            final byte[] hashValue)
+    throws SignerException;
 
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {

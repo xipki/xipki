@@ -67,7 +67,7 @@ public enum KeyUsage {
 
     private String[] names;
 
-    private KeyUsage(
+    KeyUsage(
             final int bit,
             final int bcUsage,
             final String... names) {

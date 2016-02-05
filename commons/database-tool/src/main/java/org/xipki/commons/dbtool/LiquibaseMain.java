@@ -69,11 +69,6 @@ public class LiquibaseMain {
 
     private Liquibase liquibase;
 
-    public static boolean loglevelIsSevereOrOff(
-            final String logLevel) {
-        return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
-    }
-
     public LiquibaseMain(
             final LiquibaseDatabaseConf dbConf,
             final String changeLogFile) {
@@ -175,13 +170,13 @@ public class LiquibaseMain {
     public void dropAll()
     throws Exception {
         liquibase.dropAll();
-        System.out.println("successfully    dropped the database");
+        System.out.println("successfully  dropped the database");
     }
 
     public void update()
     throws Exception {
         liquibase.update((String) null);
-        System.out.println("successfully    updated the database");
+        System.out.println("successfully  updated the database");
     }
 
     public void shutdown() {
@@ -196,6 +191,11 @@ public class LiquibaseMain {
             database = null;
             liquibase = null;
         }
+    }
+
+    public static boolean loglevelIsSevereOrOff(
+            final String logLevel) {
+        return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
     }
 
 }

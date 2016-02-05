@@ -87,7 +87,7 @@ public class ScepServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String CT_RESPONSE = ScepConstants.CT_x_pki_message;
+    private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
     private AuditService auditService;
 
@@ -230,7 +230,7 @@ public class ScepServlet extends HttpServlet {
                 respStream.write(respBytes);
             } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                response.setContentType(ScepConstants.CT_text_palin);
+                response.setContentType(ScepConstants.CT_TEXT_PLAIN);
                 byte[] caCapsBytes = responder.getCACaps().getBytes();
                 respStream.write(caCapsBytes);
                 response.setContentLength(caCapsBytes.length);
@@ -239,15 +239,15 @@ public class ScepServlet extends HttpServlet {
                 byte[] respBytes;
                 String ct;
                 if (responder.getRAEmulator() == null) {
-                    ct = ScepConstants.CT_x_x509_ca_cert;
+                    ct = ScepConstants.CT_X509_CA_CERT;
                     respBytes = responder.getCAEmulator().getCACertBytes();
                 } else {
-                    ct = ScepConstants.CT_x_x509_ca_ra_cert;
+                    ct = ScepConstants.CT_X509_CA_RA_CERT;
                     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
                     try {
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
                                 responder.getCAEmulator().getCACert()));
-                        ct = ScepConstants.CT_x_x509_ca_ra_cert;
+                        ct = ScepConstants.CT_X509_CA_RA_CERT;
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
                                 responder.getRAEmulator().getRACert()));
                         CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
@@ -294,7 +294,7 @@ public class ScepServlet extends HttpServlet {
 
                     ContentInfo signedData = responder.encode(nextCAMsg);
                     byte[] respBytes = signedData.getEncoded();
-                    response.setContentType(ScepConstants.CT_x_x509_next_ca_cert);
+                    response.setContentType(ScepConstants.CT_X509_NEXT_CA_CERT);
                     response.setContentLength(respBytes.length);
                     response.getOutputStream().write(respBytes);
                 } catch (Exception e) {

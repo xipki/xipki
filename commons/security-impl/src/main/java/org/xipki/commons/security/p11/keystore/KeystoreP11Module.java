@@ -150,31 +150,31 @@ public class KeystoreP11Module implements P11Module {
             return extSlot;
         }
 
-        P11SlotIdentifier _slotId = null;
+        P11SlotIdentifier localSlotId = null;
         for (P11SlotIdentifier s : slotIds) {
             if (s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId()) {
-                _slotId = s;
+                localSlotId = s;
                 break;
             }
         }
 
-        if (_slotId == null) {
+        if (localSlotId == null) {
             throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;
         try {
-            pwd = moduleConf.getPasswordRetriever().getPassword(_slotId);
+            pwd = moduleConf.getPasswordRetriever().getPassword(localSlotId);
         } catch (PasswordResolverException e) {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
 
-        File slotDir = new File(moduleConf.getNativeLibrary(), _slotId.getSlotIndex() + "-"
-                + _slotId.getSlotId());
+        File slotDir = new File(moduleConf.getNativeLibrary(), localSlotId.getSlotIndex() + "-"
+                + localSlotId.getSlotId());
 
-        extSlot = new KeystoreP11Slot(slotDir, _slotId, pwd, moduleConf.getSecurityFactory());
+        extSlot = new KeystoreP11Slot(slotDir, localSlotId, pwd, moduleConf.getSecurityFactory());
 
-        slots.put(_slotId, extSlot);
+        slots.put(localSlotId, extSlot);
         return extSlot;
     } // method getSlot
 

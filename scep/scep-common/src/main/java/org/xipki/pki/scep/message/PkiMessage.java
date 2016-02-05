@@ -91,7 +91,7 @@ import org.xipki.pki.scep.util.ScepUtil;
 
 public class PkiMessage {
 
-    private static final Set<ASN1ObjectIdentifier> scepAttrTypes
+    private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES
             = new HashSet<ASN1ObjectIdentifier>();
 
     private final MessageType messageType;
@@ -115,13 +115,13 @@ public class PkiMessage {
             new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
 
     static {
-        scepAttrTypes.add(ScepObjectIdentifiers.id_failInfo);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_messageType);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_pkiStatus);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_recipientNonce);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_senderNonce);
-        scepAttrTypes.add(ScepObjectIdentifiers.id_transactionID);
-        scepAttrTypes.add(CMSAttributes.signingTime);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_FAILINFO);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_MESSAGE_TYPE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_PKI_STATUS);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_SENDER_NONCE);
+        SCEP_ATTR_TYPES.add(ScepObjectIdentifiers.ID_TRANSACTION_ID);
+        SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
     }
 
     public PkiMessage(
@@ -199,7 +199,7 @@ public class PkiMessage {
     public ASN1Encodable addSignendAttribute(
             final ASN1ObjectIdentifier type,
             final ASN1Encodable value) {
-        if (scepAttrTypes.contains(type)) {
+        if (SCEP_ATTR_TYPES.contains(type)) {
             throw new IllegalArgumentException(
                     "Adding SCEP attribute via addSignedAttribute() method is not permitted");
         }
@@ -235,35 +235,35 @@ public class PkiMessage {
     private AttributeTable getSignedAttributes() {
         ASN1EncodableVector v = new ASN1EncodableVector();
         // messageType
-        addAttribute(v, ScepObjectIdentifiers.id_messageType,
+        addAttribute(v, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
                 new DERPrintableString(
                         Integer.toString(messageType.getCode())));
 
         // senderNonce
-        addAttribute(v, ScepObjectIdentifiers.id_senderNonce,
+        addAttribute(v, ScepObjectIdentifiers.ID_SENDER_NONCE,
                 new DEROctetString(senderNonce.getBytes()));
 
         // transactionID
-        addAttribute(v, ScepObjectIdentifiers.id_transactionID,
+        addAttribute(v, ScepObjectIdentifiers.ID_TRANSACTION_ID,
                 new DERPrintableString(transactionId.getId()));
 
         // failInfo
         if (failInfo != null) {
-            addAttribute(v, ScepObjectIdentifiers.id_failInfo,
+            addAttribute(v, ScepObjectIdentifiers.ID_FAILINFO,
                     new DERPrintableString(
                             Integer.toString(failInfo.getCode())));
         }
 
         // pkiStatus
         if (pkiStatus != null) {
-            addAttribute(v, ScepObjectIdentifiers.id_pkiStatus,
+            addAttribute(v, ScepObjectIdentifiers.ID_PKI_STATUS,
                     new DERPrintableString(
                             Integer.toString(pkiStatus.getCode())));
         }
 
         // recipientNonce
         if (recipientNonce != null) {
-            addAttribute(v, ScepObjectIdentifiers.id_recipientNonce,
+            addAttribute(v, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
                     new DEROctetString(recipientNonce.getBytes()));
         }
 

@@ -54,11 +54,11 @@ public class KeystoreP11ModulePool {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11ModulePool.class);
 
+    private static final KeystoreP11ModulePool INSTANCE = new KeystoreP11ModulePool();
+
     private final Map<String, KeystoreP11Module> modules = new HashMap<>();
 
     private String defaultModuleName;
-
-    private static KeystoreP11ModulePool INSTANCE = new KeystoreP11ModulePool();
 
     public synchronized void removeModule(
             final String moduleName) {
@@ -112,8 +112,11 @@ public class KeystoreP11ModulePool {
     @Override
     protected void finalize()
     throws Throwable {
-        super.finalize();
-        shutdown();
+        try {
+            super.finalize();
+        } finally {
+            shutdown();
+        }
     }
 
     public synchronized void shutdown() {

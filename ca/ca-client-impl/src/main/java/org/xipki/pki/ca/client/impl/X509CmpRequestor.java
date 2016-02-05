@@ -224,7 +224,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         ASN1ObjectIdentifier expectedType = (xipkiAction == null)
                 ? CMPObjectIdentifiers.it_currentCRL
-                : ObjectIdentifiers.id_xipki_cm_cmpGenmsg;
+                : ObjectIdentifiers.id_xipki_cmp_cmpGenmsg;
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
 

@@ -48,7 +48,7 @@ import org.xipki.commons.common.util.LogUtil;
 
 public class XipkiNSSProviderRegister {
 
-    private static Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
 
     public void regist() {
         if (Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null) {

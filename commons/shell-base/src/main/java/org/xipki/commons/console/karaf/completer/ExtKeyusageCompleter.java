@@ -51,7 +51,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 @Service
 public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
 
-    private static final Set<String> usages;
+    private static final Set<String> USAGES;
 
     static {
         Set<String> set = new HashSet<>();
@@ -64,12 +64,12 @@ public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
         set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
         set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
 
-        usages = Collections.unmodifiableSet(set);
+        USAGES = Collections.unmodifiableSet(set);
     }
 
     @Override
     protected Set<String> getEnums() {
-        return usages;
+        return USAGES;
     }
 
 }

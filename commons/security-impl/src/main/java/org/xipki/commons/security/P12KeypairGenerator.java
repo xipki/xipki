@@ -94,7 +94,7 @@ public abstract class P12KeypairGenerator {
 
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
-        public KeyPairWithSubjectPublicKeyInfo(
+        KeyPairWithSubjectPublicKeyInfo(
                 final KeyPair keypair,
                 final SubjectPublicKeyInfo subjectPublicKeyInfo)
         throws InvalidKeySpecException {
@@ -284,6 +284,8 @@ public abstract class P12KeypairGenerator {
 
     private static final long DAY = 24L * 60 * 60 * 1000;
 
+    protected final SecureRandom random;
+
     private final char[] password;
 
     private final String subject;
@@ -295,13 +297,6 @@ public abstract class P12KeypairGenerator {
     private final Integer keyUsage;
 
     private List<ASN1ObjectIdentifier> extendedKeyUsage;
-
-    protected final SecureRandom random;
-
-    protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
-    throws Exception;
-
-    protected abstract String getKeyAlgorithm();
 
     public P12KeypairGenerator(
             final char[] password,
@@ -320,6 +315,11 @@ public abstract class P12KeypairGenerator {
         this.extendedKeyUsage = extendedKeyUsage;
         this.random = random;
     }
+
+    protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
+    throws Exception;
+
+    protected abstract String getKeyAlgorithm();
 
     public P12KeypairGenerationResult generateIdentity()
     throws Exception {

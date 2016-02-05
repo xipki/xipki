@@ -59,7 +59,7 @@ public enum PkiStatus {
 
     private final int code;
 
-    private PkiStatus(
+    PkiStatus(
             final int code) {
         this.code = code;
     }

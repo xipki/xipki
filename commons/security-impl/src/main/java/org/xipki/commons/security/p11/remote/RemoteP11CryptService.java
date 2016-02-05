@@ -103,9 +103,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     private final    Random random = new Random();
 
-    private final GeneralName sender = XipkiCmpConstants.remotep11_cmp_client;
+    private final GeneralName sender = XipkiCmpConstants.REMOTE_P11_CMP_CLIENT;
 
-    private final GeneralName recipient = XipkiCmpConstants.remoteP11_cmp_server;
+    private final GeneralName recipient = XipkiCmpConstants.REMOTE_P11_CMP_SERVER;
 
     private final P11ModuleConf moduleConf;
 
@@ -315,7 +315,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         if (content != null) {
             v.add(content);
         }
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cm_cmpGenmsg,
+        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                 new DERSequence(v));
 
         GenMsgContent genMsgContent = new GenMsgContent(itvReq);
@@ -349,9 +349,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
         PKIHeader respHeader = response.getHeader();
         ASN1OctetString tid = respHeader.getTransactionID();
-        GeneralName recipient = respHeader.getRecipient();
-        if (!sender.equals(recipient)) {
-            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, recipient);
+        GeneralName rec = respHeader.getRecipient();
+        if (!sender.equals(rec)) {
+            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
         }
 
         return extractItvInfoValue(action, response);
@@ -381,7 +381,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         InfoTypeAndValue itv = null;
         if (itvs != null && itvs.length > 0) {
             for (InfoTypeAndValue m : itvs) {
-                if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(m.getInfoType())) {
+                if (ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.equals(m.getInfoType())) {
                     itv = m;
                     break;
                 }
@@ -389,13 +389,13 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
         if (itv == null) {
             throw new SignerException("the response does not contain InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'");
+                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'");
         }
 
         ASN1Encodable itvValue = itv.getInfoValue();
         if (itvValue == null) {
             throw new SignerException("value of InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'    is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'    is incorrect");
         }
         try {
             ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
@@ -410,22 +410,25 @@ public abstract class RemoteP11CryptService implements P11CryptService {
                     : null;
         } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
-                    + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId() + "'    is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'    is incorrect");
         }
     } // method extractItvInfoValue
 
     private PKIHeader buildPKIHeader(
-            ASN1OctetString tid) {
+            final ASN1OctetString tid) {
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
                 recipient);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
+        ASN1OctetString localTid;
         if (tid == null) {
-            tid = new DEROctetString(randomTransactionId());
+            localTid = new DEROctetString(randomTransactionId());
+        } else {
+            localTid = tid;
         }
-        hBuilder.setTransactionID(tid);
+        hBuilder.setTransactionID(localTid);
 
         return hBuilder.build();
     }
@@ -473,10 +476,10 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId)
     throws SignerException {
         checkSlotId(slotId);
-        SlotIdentifier _slotId = new SlotIdentifier(slotId);
+        SlotIdentifier localSlotId = new SlotIdentifier(slotId);
 
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
-                _slotId);
+                localSlotId);
         if (!(resp instanceof ASN1Sequence)) {
             throw new SignerException("response is not ASN1Sequence, but "
                     + resp.getClass().getName());

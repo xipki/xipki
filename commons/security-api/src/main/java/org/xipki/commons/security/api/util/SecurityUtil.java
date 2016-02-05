@@ -68,9 +68,9 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 
 public class SecurityUtil {
 
-    public static final Map<Integer, String> statusTextMap = new HashMap<>();
+    private static final Map<Integer, String> STATUS_TEXT_MAP = new HashMap<>();
 
-    public static final String[] failureInfoTexts = new String[] {
+    private static final String[] FAILUREINFO_TEXTS = new String[] {
         // 0 - 3
         "incorrectData", "wrongAuthority", "badDataFormat", "badCertId",
         // 4 - 7
@@ -89,15 +89,15 @@ public class SecurityUtil {
         "-", "duplicateCertReq", "systemFailure", "systemUnavail"};
 
     static {
-        statusTextMap.put(-2, "xipki_noAnswer");
-        statusTextMap.put(-1, "xipki_responseError");
-        statusTextMap.put(PKIStatus.GRANTED, "accepted");
-        statusTextMap.put(PKIStatus.GRANTED_WITH_MODS, "grantedWithMods");
-        statusTextMap.put(PKIStatus.REJECTION, "rejection");
-        statusTextMap.put(PKIStatus.WAITING, "waiting");
-        statusTextMap.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
-        statusTextMap.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
-        statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
+        STATUS_TEXT_MAP.put(-2, "xipki_noAnswer");
+        STATUS_TEXT_MAP.put(-1, "xipki_responseError");
+        STATUS_TEXT_MAP.put(PKIStatus.GRANTED, "accepted");
+        STATUS_TEXT_MAP.put(PKIStatus.GRANTED_WITH_MODS, "grantedWithMods");
+        STATUS_TEXT_MAP.put(PKIStatus.REJECTION, "rejection");
+        STATUS_TEXT_MAP.put(PKIStatus.WAITING, "waiting");
+        STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
+        STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
+        STATUS_TEXT_MAP.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
     }
 
     private SecurityUtil() {
@@ -115,7 +115,7 @@ public class SecurityUtil {
     public static byte[] extractMinimalKeyStore(
             final String keystoreType,
             final byte[] keystoreBytes,
-            String keyname,
+            final String keyname,
             final char[] password,
             final X509Certificate[] newCertChain)
     throws Exception {
@@ -127,18 +127,19 @@ public class SecurityUtil {
         }
         ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
-        if (keyname == null) {
+        String localKeyname = keyname;
+        if (localKeyname == null) {
             Enumeration<String> aliases = ks.aliases();
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
                 if (ks.isKeyEntry(alias)) {
-                    keyname = alias;
+                    localKeyname = alias;
                     break;
                 }
             }
         } else {
-            if (!ks.isKeyEntry(keyname)) {
-                throw new KeyStoreException("unknown key named " + keyname);
+            if (!ks.isKeyEntry(localKeyname)) {
+                throw new KeyStoreException("unknown key named " + localKeyname);
             }
         }
 
@@ -154,12 +155,12 @@ public class SecurityUtil {
             if (numAliases == 1) {
                 return keystoreBytes;
             }
-            certs = ks.getCertificateChain(keyname);
+            certs = ks.getCertificateChain(localKeyname);
         } else {
             certs = newCertChain;
         }
 
-        PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
+        PrivateKey key = (PrivateKey) ks.getKey(localKeyname, password);
         ks = null;
 
         if ("JKS".equalsIgnoreCase(keystoreType)) {
@@ -168,7 +169,7 @@ public class SecurityUtil {
             ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(null, password);
-        ks.setKeyEntry(keyname, key, password, certs);
+        ks.setKeyEntry(localKeyname, key, password, certs);
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ks.store(bout, password);
         byte[] bytes = bout.toByteArray();
@@ -195,7 +196,7 @@ public class SecurityUtil {
         StringBuilder sb = new StringBuilder("PKIStatusInfo {");
         sb.append("status = ");
         sb.append(status);
-        sb.append(" (").append(statusTextMap.get(status)).append("), ");
+        sb.append(" (").append(STATUS_TEXT_MAP.get(status)).append("), ");
         sb.append("failureInfo = ");
         sb.append(failureInfo).append(" (").append(getFailureInfoText(failureInfo)).append("), ");
         sb.append("statusMessage = ").append(statusMessage);
@@ -206,12 +207,12 @@ public class SecurityUtil {
     public static String getFailureInfoText(
             final int failureInfo) {
         BigInteger b = BigInteger.valueOf(failureInfo);
-        final int n = Math.min(b.bitLength(), failureInfoTexts.length);
+        final int n = Math.min(b.bitLength(), FAILUREINFO_TEXTS.length);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
             if (b.testBit(i)) {
-                sb.append(", ").append(failureInfoTexts[i]);
+                sb.append(", ").append(FAILUREINFO_TEXTS[i]);
             }
         }
 
@@ -321,17 +322,19 @@ public class SecurityUtil {
     }
 
     public static String signerConfToString(
-            String signerConf,
+            final String signerConf,
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
+        String localSignerConf = signerConf;
         if (ignoreSensitiveInfo) {
-            signerConf = SecurityUtil.eraseSensitiveData(signerConf);
+            localSignerConf = SecurityUtil.eraseSensitiveData(localSignerConf);
         }
 
-        if (verbose || signerConf.length() < 101) {
-            return signerConf;
+        if (verbose || localSignerConf.length() < 101) {
+            return localSignerConf;
         } else {
-            return new StringBuilder().append(signerConf.substring(0, 97)).append("...").toString();
+            return new StringBuilder().append(localSignerConf.substring(0, 97))
+                    .append("...").toString();
         }
     }
 

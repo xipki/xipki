@@ -104,6 +104,8 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
 
     private static final long MAX_CERT_TIME_MS = 253402300799982L; //9999-12-31-23-59-59
 
+    private static final long EPOCHTIME_2050010100 = 2524608000L;
+
     private final SubjectChecker subjectChecker;
 
     private final PublicKeyChecker publicKeyChecker;
@@ -119,8 +121,6 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
     private final boolean notBeforeMidnight;
 
     private final int maxSize;
-
-    private static final long _2050010100_EPOCHTIME = 2524608000L;
 
     public X509CertprofileQAImpl(
             final String data)
@@ -426,7 +426,7 @@ public class X509CertprofileQAImpl implements X509CertprofileQA {
 
     private static void checkTime(Time time, ValidationIssue issue) {
         ASN1Primitive asn1Time = time.toASN1Primitive();
-        if (time.getDate().getTime() / 1000 < _2050010100_EPOCHTIME) {
+        if (time.getDate().getTime() / 1000 < EPOCHTIME_2050010100) {
             if (!(asn1Time instanceof ASN1UTCTime)) {
                 issue.setFailureMessage("not encoded as UTCTime");
             }

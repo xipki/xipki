@@ -50,7 +50,7 @@ public enum OcspError {
 
     private final int status;
 
-    private OcspError(
+    OcspError(
             final int status) {
         this.status = status;
     }

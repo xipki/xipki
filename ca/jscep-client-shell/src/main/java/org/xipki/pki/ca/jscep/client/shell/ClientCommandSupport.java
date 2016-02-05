@@ -98,8 +98,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     throws CertificateException, IOException {
         if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
-            URL _url = new URL(url);
-            scepClient = new Client(_url, new PreProvisionedCertificateVerifier(caCert));
+            URL localUrl = new URL(url);
+            scepClient = new Client(localUrl, new PreProvisionedCertificateVerifier(caCert));
         }
         return scepClient;
     }

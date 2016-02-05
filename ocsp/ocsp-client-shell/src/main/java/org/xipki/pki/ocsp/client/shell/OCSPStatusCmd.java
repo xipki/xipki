@@ -68,9 +68,9 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.security.KeyUtil;
 import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ocsp.client.api.OCSPRequestor;
 
 /**
  * @author Lijun Liao
@@ -100,8 +100,8 @@ public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
     throws Exception {
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
-        boolean extendedRevoke =
-                basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
+        boolean extendedRevoke = basicResp.getExtension(
+                ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
@@ -288,7 +288,7 @@ public class OCSPStatusCmd extends BaseOCSPStatusCommandSupport {
                     for (int j = 0; j < size; j++) {
                         ASN1ObjectIdentifier extensionOID =
                                 (ASN1ObjectIdentifier) extensionOIDs.get(j);
-                        String name = extensionOidNameMap.get(extensionOID);
+                        String name = EXTENSION_OIDNAME_MAP.get(extensionOID);
                         if (name == null) {
                             msg.append(extensionOID.getId());
                         } else {

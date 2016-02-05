@@ -110,7 +110,6 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
         char[] pwd = getPassword();
