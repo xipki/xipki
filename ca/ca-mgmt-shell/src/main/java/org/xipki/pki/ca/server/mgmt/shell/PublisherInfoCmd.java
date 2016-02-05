@@ -83,8 +83,8 @@ public class PublisherInfoCmd extends CaCommandSupport {
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String name : sorted) {
-                sb.append("\t").append(name).append("\n");
+            for (String entry : sorted) {
+                sb.append("\t").append(entry).append("\n");
             }
         } else {
             PublisherEntry entry = caManager.getPublisher(name);

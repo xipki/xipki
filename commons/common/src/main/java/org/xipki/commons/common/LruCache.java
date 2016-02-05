@@ -85,18 +85,18 @@ public class LruCache<K, V> {
     /**
      * Sets the size of the cache.
      *
-     * @param maxSize The new maximum size.
+     * @param pMaxSize The new maximum size.
      */
     public void resize(
-            final int maxSize) {
-        if (maxSize <= 0) {
+            final int pMaxSize) {
+        if (pMaxSize <= 0) {
             throw new IllegalArgumentException("maxSize <= 0");
         }
 
         synchronized (this) {
-            this.maxSize = maxSize;
+            this.maxSize = pMaxSize;
         }
-        trimToSize(maxSize);
+        trimToSize(pMaxSize);
     }
 
     /**
@@ -189,11 +189,11 @@ public class LruCache<K, V> {
      * Remove the eldest entries until the total of remaining entries is at or
      * below the requested size.
      *
-     * @param maxSize the maximum size of the cache before returning. May be -1
+     * @param pMaxSize the maximum size of the cache before returning. May be -1
      *            to evict even 0-sized elements.
      */
     public void trimToSize(
-            final int maxSize) {
+            final int pMaxSize) {
         while (true) {
             K key;
             V value;
@@ -203,7 +203,7 @@ public class LruCache<K, V> {
                             + ".sizeOf() is reporting inconsistent results!");
                 }
 
-                if (size <= maxSize || map.isEmpty()) {
+                if (size <= pMaxSize || map.isEmpty()) {
                     break;
                 }
 
@@ -322,7 +322,7 @@ public class LruCache<K, V> {
      * of entries in the cache. For all other caches, this returns the sum of
      * the sizes of the entries in this cache.
      */
-    public synchronized final int size() {
+    public final synchronized int size() {
         return size;
     }
 
@@ -331,7 +331,7 @@ public class LruCache<K, V> {
      * number of entries in the cache. For all other caches, this returns the
      * maximum sum of the sizes of the entries in this cache.
      */
-    public synchronized final int maxSize() {
+    public final synchronized int maxSize() {
         return maxSize;
     }
 
@@ -339,7 +339,7 @@ public class LruCache<K, V> {
      * Returns the number of times {@link #get} returned a value that was
      * already present in the cache.
      */
-    public synchronized final int hitCount() {
+    public final synchronized int hitCount() {
         return hitCount;
     }
 
@@ -347,28 +347,28 @@ public class LruCache<K, V> {
      * Returns the number of times {@link #get} returned null or required a new
      * value to be created.
      */
-    public synchronized final int missCount() {
+    public final synchronized int missCount() {
         return missCount;
     }
 
     /**
      * Returns the number of times {@link #create(Object)} returned a value.
      */
-    public synchronized final int createCount() {
+    public final synchronized int createCount() {
         return createCount;
     }
 
     /**
      * Returns the number of times {@link #put} was called.
      */
-    public synchronized final int putCount() {
+    public final synchronized int putCount() {
         return putCount;
     }
 
     /**
      * Returns the number of values that have been evicted.
      */
-    public synchronized final int evictionCount() {
+    public final synchronized int evictionCount() {
         return evictionCount;
     }
 
@@ -376,11 +376,11 @@ public class LruCache<K, V> {
      * Returns a copy of the current contents of the cache, ordered from least
      * recently accessed to most recently accessed.
      */
-    public synchronized final Map<K, V> snapshot() {
+    public final synchronized Map<K, V> snapshot() {
         return new LinkedHashMap<>(map);
     }
 
-    @Override public synchronized final String toString() {
+    @Override public final synchronized String toString() {
         int accesses = hitCount + missCount;
         int hitPercent = (accesses != 0)
                 ? (100 * hitCount / accesses)

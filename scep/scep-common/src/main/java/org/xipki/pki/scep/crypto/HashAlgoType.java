@@ -60,7 +60,7 @@ public enum HashAlgoType {
 
     private final String name;
 
-    private HashAlgoType(
+    HashAlgoType(
             final int length,
             final String oid,
             final String name) {
@@ -109,17 +109,20 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getHashAlgoType(
-            String nameOrOid) {
+            final String nameOrOid) {
+
+        String localNameOrOid = nameOrOid;
+
         for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(nameOrOid)) {
+            if (hashAlgo.oid.equals(localNameOrOid)) {
                 return hashAlgo;
             }
 
-            if (nameOrOid.indexOf('-') != -1) {
-                nameOrOid = nameOrOid.replace("-", "");
+            if (localNameOrOid.indexOf('-') != -1) {
+                localNameOrOid = localNameOrOid.replace("-", "");
             }
 
-            if (hashAlgo.name.equalsIgnoreCase(nameOrOid)) {
+            if (hashAlgo.name.equalsIgnoreCase(localNameOrOid)) {
                 return hashAlgo;
             }
         }

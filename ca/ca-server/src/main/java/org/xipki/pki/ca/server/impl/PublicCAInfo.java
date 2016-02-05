@@ -86,7 +86,7 @@ class PublicCAInfo {
 
     private final List<String> deltaCrlUris;
 
-    public PublicCAInfo(
+    PublicCAInfo(
             final X509Certificate caCertificate,
             final List<String> caCertUris,
             final List<String> ocspUris,
@@ -124,7 +124,7 @@ class PublicCAInfo {
         }
     } // constructor
 
-    public PublicCAInfo(
+    PublicCAInfo(
             final X500Name subject,
             final BigInteger serialNumber,
             final GeneralNames subjectAltName,

@@ -62,11 +62,11 @@ public class ScepServerContainer {
             final int port,
             final List<ScepServer> scepServers)
     throws Exception {
-        Server server = new Server(port);
+        Server localServer = new Server(port);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        server.setHandler(context);
+        localServer.setHandler(context);
 
         for (ScepServer m : scepServers) {
             String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
@@ -74,7 +74,7 @@ public class ScepServerContainer {
             context.addServlet(new ServletHolder(servlet), servletPattern);
         }
 
-        this.server = server;
+        this.server = localServer;
     }
 
     public void start()

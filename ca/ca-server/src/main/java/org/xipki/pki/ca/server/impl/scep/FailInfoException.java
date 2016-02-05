@@ -45,18 +45,18 @@ import org.xipki.pki.scep.transaction.FailInfo;
 
 public class FailInfoException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+    public static final FailInfoException BAD_ALG = new FailInfoException(FailInfo.badAlg);
 
-    public static final FailInfoException badAlg = new FailInfoException(FailInfo.badAlg);
+    public static final FailInfoException BAD_CERTID = new FailInfoException(FailInfo.badCertId);
 
-    public static final FailInfoException badCertId = new FailInfoException(FailInfo.badCertId);
-
-    public static final FailInfoException badMessageCheck
+    public static final FailInfoException BAD_MESSAGE_CHECK
             = new FailInfoException(FailInfo.badMessageCheck);
 
-    public static final FailInfoException badRequest = new FailInfoException(FailInfo.badRequest);
+    public static final FailInfoException BAD_REQUEST = new FailInfoException(FailInfo.badRequest);
 
-    public static final FailInfoException badTime = new FailInfoException(FailInfo.badTime);
+    public static final FailInfoException BAD_TIME = new FailInfoException(FailInfo.badTime);
+
+    private static final long serialVersionUID = 1L;
 
     private final FailInfo failInfo;
 

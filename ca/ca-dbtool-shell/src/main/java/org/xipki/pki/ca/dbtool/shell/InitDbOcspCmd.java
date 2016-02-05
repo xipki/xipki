@@ -51,7 +51,7 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 @Service
 public class InitDbOcspCmd extends LiquibaseCommandSupport {
 
-    private static final String schemaFile = "xipki/sql/ocsp-init.xml";
+    private static final String SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
 
     @Override
     protected Object doExecute()
@@ -64,7 +64,7 @@ public class InitDbOcspCmd extends LiquibaseCommandSupport {
             }
 
             LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, schemaFile);
+            resetAndInit(dbConf, SCHEMA_FILE);
         }
         return null;
     }

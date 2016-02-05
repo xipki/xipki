@@ -131,17 +131,17 @@ public class CaExportCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CAEntry _entry = caManager.getCA(name);
-        if (_entry == null) {
+        CAEntry entry = caManager.getCA(name);
+        if (entry == null) {
             throw new UnexpectedException("no CA named " + name + " is defined");
         }
 
-        if (!(_entry instanceof X509CAEntry)) {
+        if (!(entry instanceof X509CAEntry)) {
             throw new UnexpectedException(
-                    "unsupported CAEntry type " + _entry.getClass().getName());
+                    "unsupported CAEntry type " + entry.getClass().getName());
         }
 
-        X509CAEntry entry = (X509CAEntry) _entry;
+        X509CAEntry x509Entry = (X509CAEntry) entry;
 
         Properties props = new Properties();
 
@@ -149,58 +149,58 @@ public class CaExportCmd extends CaCommandSupport {
         propsput(props, KEY_ART, CertArt.X509PKC.name());
 
         // NEXT_SN
-        propsput(props, KEY_NEXT_SN, entry.getNextSerial());
+        propsput(props, KEY_NEXT_SN, x509Entry.getNextSerial());
 
         // NEXT_CRLNO
-        propsput(props, KEY_NEXT_CRLNO, entry.getNextCRLNumber());
+        propsput(props, KEY_NEXT_CRLNO, x509Entry.getNextCRLNumber());
 
         // STATUS
-        propsput(props, KEY_STATUS, entry.getStatus().name());
+        propsput(props, KEY_STATUS, x509Entry.getStatus().name());
 
         // CACERT_URIS
-        propsput(props, KEY_CACERT_URIS, entry.getCacertUris());
+        propsput(props, KEY_CACERT_URIS, x509Entry.getCacertUris());
 
         // CRL_URIS
-        propsput(props, KEY_CRL_URIS, entry.getCrlUrisAsString());
+        propsput(props, KEY_CRL_URIS, x509Entry.getCrlUrisAsString());
 
         // DELTACRL_URIS
-        propsput(props, KEY_DELTACRL_URIS, entry.getDeltaCrlUrisAsString());
+        propsput(props, KEY_DELTACRL_URIS, x509Entry.getDeltaCrlUrisAsString());
 
         // OCSP_URIS
-        propsput(props, KEY_OCSP_URIS, entry.getOcspUrisAsString());
+        propsput(props, KEY_OCSP_URIS, x509Entry.getOcspUrisAsString());
 
         // MAX_VALIDITY
-        propsput(props, KEY_MAX_VALIDITY, entry.getMaxValidity());
+        propsput(props, KEY_MAX_VALIDITY, x509Entry.getMaxValidity());
 
         // CRLSIGNER_NAME
-        propsput(props, KEY_CRLSIGNER_NAME, entry.getCrlSignerName());
+        propsput(props, KEY_CRLSIGNER_NAME, x509Entry.getCrlSignerName());
 
         // CMPCONTROL_NAME
-        propsput(props, KEY_CMPCONTROL_NAME, entry.getCmpControlName());
+        propsput(props, KEY_CMPCONTROL_NAME, x509Entry.getCmpControlName());
 
         // DUPLICATE_KEY
-        propsput(props, KEY_DUPLICATE_KEY, entry.getDuplicateKeyMode().name());
+        propsput(props, KEY_DUPLICATE_KEY, x509Entry.getDuplicateKeyMode().name());
 
         // DUPLICATE_SUBJECT
-        propsput(props, KEY_DUPLICATE_SUBJECT, entry.getDuplicateSubjectMode().name());
+        propsput(props, KEY_DUPLICATE_SUBJECT, x509Entry.getDuplicateSubjectMode().name());
 
         // VALIDITY_MODE
-        propsput(props, KEY_VALIDITY_MODE, entry.getValidityMode().name());
+        propsput(props, KEY_VALIDITY_MODE, x509Entry.getValidityMode().name());
 
         // PERMISSIONS
-        propsput(props, KEY_PERMISSIONS, entry.getPermissionsAsText());
+        propsput(props, KEY_PERMISSIONS, x509Entry.getPermissionsAsText());
 
         // NUM_CRLS
-        propsput(props, KEY_NUM_CRLS, entry.getNumCrls());
+        propsput(props, KEY_NUM_CRLS, x509Entry.getNumCrls());
 
         // EXPIRATION_PERIOD
-        propsput(props, KEY_EXPIRATION_PERIOD, entry.getExpirationPeriod());
+        propsput(props, KEY_EXPIRATION_PERIOD, x509Entry.getExpirationPeriod());
 
         // KEEP_EXPIRED_CERT_DAYS
-        propsput(props, KEY_KEEP_EXPIRED_CERT_DAYS, entry.getKeepExpiredCertInDays());
+        propsput(props, KEY_KEEP_EXPIRED_CERT_DAYS, x509Entry.getKeepExpiredCertInDays());
 
         // REVOKED
-        CertRevocationInfo revInfo = entry.getRevocationInfo();
+        CertRevocationInfo revInfo = x509Entry.getRevocationInfo();
         propsput(props, KEY_REVOKED, revInfo != null);
         if (revInfo != null) {
             if (revInfo.getReason() != null) {
@@ -217,17 +217,17 @@ public class CaExportCmd extends CaCommandSupport {
         }
 
         // SIGNER_TYPE
-        propsput(props, KEY_SIGNER_TYPE, entry.getSignerType());
+        propsput(props, KEY_SIGNER_TYPE, x509Entry.getSignerType());
 
         // SIGNER_CONF
-        propsput(props, KEY_SIGNER_CONF, entry.getSignerConf());
+        propsput(props, KEY_SIGNER_CONF, x509Entry.getSignerConf());
 
         // CERT
-        byte[] bytes = entry.getCertificate().getEncoded();
+        byte[] bytes = x509Entry.getCertificate().getEncoded();
         propsput(props, KEY_CERT, IoUtil.base64Encode(bytes, false));
 
         // EXTRA_CONTROL
-        propsput(props, KEY_EXTRA_CONTROL, entry.getExtraControl());
+        propsput(props, KEY_EXTRA_CONTROL, x509Entry.getExtraControl());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         props.store(out, "CA configuration");

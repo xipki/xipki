@@ -55,7 +55,7 @@ public class HealthCheckResult {
 
     private String name;
 
-    private boolean healthy = false;
+    private boolean healthy;
 
     private Map<String, Object> statuses = new ConcurrentHashMap<>();
 
@@ -138,9 +138,9 @@ public class HealthCheckResult {
         Set<String> names = statuses.keySet();
         int size = names.size();
         int count = 0;
-        for (String name : names) {
+        for (String entry : names) {
             count++;
-            append(sb, name, statuses.get(name), level + 1, pretty,
+            append(sb, entry, statuses.get(entry), level + 1, pretty,
                     CollectionUtil.isEmpty(childChecks) && count == size);
         }
 

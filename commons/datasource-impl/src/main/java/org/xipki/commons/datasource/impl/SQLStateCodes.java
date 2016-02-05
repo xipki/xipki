@@ -110,37 +110,37 @@ public class SQLStateCodes {
     } // class PostgreSQL
 
     // bad grammar error
-    private static final String bge_dynamic_SQL_error = "07";
+    private static final String BGE_DYNAMIC_SQL_ERROR = "07";
 
-    private static final String bge_cardinality_violation = "21";
+    private static final String BGE_CARDINALITY_VIOLATION = "21";
 
-    private static final String bge_syntax_error_directSQL = "2A";
+    private static final String BGE_SYNTAX_ERROR_DIRECT_SQL = "2A";
 
-    private static final String bge_syntax_error_dynamicSQL = "37";
+    private static final String BGE_SYNTAX_ERROR_DYNAMIC_SQL = "37";
 
-    private static final String bge_general_SQL_syntax_error = "42";
+    private static final String BGE_GENERAL_SQL_SYNTAX_ERROR = "42";
 
     // data integrity violation
-    private static final String div_data_truncation = "01";
+    private static final String DIV_DATA_TRUNCATION = "01";
 
-    private static final String div_no_data_found = "02";
+    private static final String DIV_NO_DATA_FOUND = "02";
 
-    private static final String div_value_outof_range = "22";
+    private static final String DIV_VALUE_OUTOF_RANGE = "22";
 
-    private static final String div_integrity_constraint_violation = "23";
+    private static final String DIV_INTEGRITY_CONSTRAINT_VIOLATION = "23";
 
-    private static final String div_triggered_data_change_violation = "27";
+    private static final String DIV_TRIGGERED_DATA_CHANGE_VIOLATION = "27";
 
-    private static final String div_with_check_violation = "44";
+    private static final String DIV_WITH_CHECK_VIOLATION = "44";
 
     // data access resource failure
-    private static final String drf_connection_exception = "08";
+    private static final String DRF_CONNECTION_EXCEPTION = "08";
 
     // transient data access resource
-    private static final String tdr_communication_failure = "S1";
+    private static final String TDR_COMMUNICATION_FAILURE = "S1";
 
     // concurrency failure
-    private static final String cf_transaction_rollback = "40";
+    private static final String CF_TRANSACTION_ROLLBACK = "40";
 
     protected Set<String> badSQLGrammarCodes;
 
@@ -153,15 +153,15 @@ public class SQLStateCodes {
     protected Set<String> concurrencyFailureCodes;
 
     private SQLStateCodes() {
-        badSQLGrammarCodes = toSet(bge_dynamic_SQL_error, bge_cardinality_violation,
-                bge_syntax_error_directSQL, bge_syntax_error_dynamicSQL,
-                bge_general_SQL_syntax_error);
-        dataIntegrityViolationCodes = toSet(div_data_truncation, div_integrity_constraint_violation,
-                div_no_data_found, div_triggered_data_change_violation,
-                div_value_outof_range, div_with_check_violation);
-        dataAccessResourceFailureCodes = toSet(drf_connection_exception);
-        transientDataAccessResourceCodes = toSet(tdr_communication_failure);
-        concurrencyFailureCodes = toSet(cf_transaction_rollback);
+        badSQLGrammarCodes = toSet(BGE_DYNAMIC_SQL_ERROR, BGE_CARDINALITY_VIOLATION,
+                BGE_SYNTAX_ERROR_DIRECT_SQL, BGE_SYNTAX_ERROR_DYNAMIC_SQL,
+                BGE_GENERAL_SQL_SYNTAX_ERROR);
+        dataIntegrityViolationCodes = toSet(DIV_DATA_TRUNCATION, DIV_INTEGRITY_CONSTRAINT_VIOLATION,
+                DIV_NO_DATA_FOUND, DIV_TRIGGERED_DATA_CHANGE_VIOLATION,
+                DIV_VALUE_OUTOF_RANGE, DIV_WITH_CHECK_VIOLATION);
+        dataAccessResourceFailureCodes = toSet(DRF_CONNECTION_EXCEPTION);
+        transientDataAccessResourceCodes = toSet(TDR_COMMUNICATION_FAILURE);
+        concurrencyFailureCodes = toSet(CF_TRANSACTION_ROLLBACK);
     }
 
     public Set<String> getBadSQLGrammarCodes() {

@@ -48,7 +48,7 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
 
 public class OBFPasswordResolver    implements SinglePasswordResolver {
 
-    public static final String __OBFUSCATE = "OBF:";
+    public static final String OBFUSCATE = "OBF:";
 
     @Override
     public boolean canResolveProtocol(
@@ -68,7 +68,7 @@ public class OBFPasswordResolver    implements SinglePasswordResolver {
         StringBuilder buf = new StringBuilder();
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
 
-        buf.append(__OBFUSCATE);
+        buf.append(OBFUSCATE);
         for (int i = 0; i < b.length; i++) {
             byte b1 = b[i];
             byte b2 = b[b.length - (i + 1)];
@@ -90,24 +90,24 @@ public class OBFPasswordResolver    implements SinglePasswordResolver {
         return buf.toString();
     }
 
-    /*------------------------------------------------------------ */
     public static String deobfuscate(
-            String s) {
-        if (StringUtil.startsWithIgnoreCase(s, __OBFUSCATE)) {
-            s = s.substring(4);
+            final String s) {
+        String localS = s;
+        if (StringUtil.startsWithIgnoreCase(localS, OBFUSCATE)) {
+            localS = localS.substring(4);
         }
 
-        byte[] b = new byte[s.length() / 2];
+        byte[] b = new byte[localS.length() / 2];
         int l = 0;
-        for (int i = 0; i < s.length(); i += 4) {
-            if (s.charAt(i) == 'U') {
+        for (int i = 0; i < localS.length(); i += 4) {
+            if (localS.charAt(i) == 'U') {
                 i++;
-                String x = s.substring(i, i + 4);
+                String x = localS.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
             } else {
-                String x = s.substring(i, i + 4);
+                String x = localS.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 int i1 = (i0 / 256);
                 int i2 = (i0 % 256);

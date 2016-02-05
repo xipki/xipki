@@ -78,7 +78,16 @@ public class QASystemManagerImpl implements QASystemManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(QASystemManagerImpl.class);
 
+    private static Unmarshaller jaxbUnmarshaller;
+
     private String confFile;
+
+    private Map<String, X509CertprofileQAImpl> x509ProfileMap = new HashMap<>();
+
+    private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+
+    public QASystemManagerImpl() {
+    }
 
     public String getConfFile() {
         return confFile;
@@ -87,15 +96,6 @@ public class QASystemManagerImpl implements QASystemManager {
     public void setConfFile(
             final String confFile) {
         this.confFile = confFile;
-    }
-
-    private Map<String, X509CertprofileQAImpl> x509ProfileMap = new HashMap<>();
-
-    private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
-
-    private static Unmarshaller jaxbUnmarshaller;
-
-    public QASystemManagerImpl() {
     }
 
     public void init() {

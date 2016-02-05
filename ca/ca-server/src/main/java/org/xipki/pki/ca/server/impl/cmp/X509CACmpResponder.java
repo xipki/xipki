@@ -167,7 +167,7 @@ public class X509CACmpResponder extends CmpResponder {
 
     } // class PendingPoolCleaner
 
-    private static final Set<String> knownGenMsgIds = new HashSet<>();
+    private static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
 
@@ -180,8 +180,8 @@ public class X509CACmpResponder extends CmpResponder {
     private final CAManagerImpl caManager;
 
     static {
-        knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId());
+        KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
+        KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
     }
 
     public X509CACmpResponder(
@@ -251,7 +251,7 @@ public class X509CACmpResponder extends CmpResponder {
     }
 
     @Override
-    protected PKIMessage intern_processPKIMessage(
+    protected PKIMessage doProcessPKIMessage(
             final RequestorInfo requestor,
             final String user,
             final ASN1OctetString tid,
@@ -263,10 +263,10 @@ public class X509CACmpResponder extends CmpResponder {
                     "unknown requestor type " + requestor.getClass().getName());
         }
 
-        CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
-        if (_requestor != null && auditEvent != null) {
+        CmpRequestorInfo localRequestor = (CmpRequestorInfo) requestor;
+        if (localRequestor != null && auditEvent != null) {
             auditEvent.addEventData(new AuditEventData("requestor",
-                    _requestor.getCert().getSubject()));
+                    localRequestor.getCert().getSubject()));
         }
 
         PKIHeader reqHeader = message.getHeader();
@@ -289,7 +289,7 @@ public class X509CACmpResponder extends CmpResponder {
             case PKIBody.TYPE_P10_CERT_REQ:
             case PKIBody.TYPE_CROSS_CERT_REQ:
                 respBody = cmpEnrollCert(respHeader, cmpControl, reqHeader, reqBody,
-                        _requestor, user, tid, auditEvent);
+                        localRequestor, user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CERT_CONFIRM:
                 addAutitEventType(auditEvent, "CERT_CONFIRM");
@@ -299,18 +299,19 @@ public class X509CACmpResponder extends CmpResponder {
             case PKIBody.TYPE_REVOCATION_REQ:
                 respBody = cmpRevokeOrUnrevokeOrRemoveCertificates(respHeader, cmpControl,
                         reqHeader, reqBody,
-                        _requestor, user, tid, auditEvent);
+                        localRequestor, user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CONFIRM:
                 addAutitEventType(auditEvent, "CONFIRM");
                 respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
+                break;
             case PKIBody.TYPE_ERROR:
                 addAutitEventType(auditEvent, "ERROR");
                 revokePendingCertificates(tid);
                 respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
                 break;
             case PKIBody.TYPE_GEN_MSG:
-                respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, _requestor,
+                respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, localRequestor,
                         user, tid, auditEvent);
                 break;
             default:
@@ -418,7 +419,7 @@ public class X509CACmpResponder extends CmpResponder {
             final boolean sendCaCert,
             final AuditEvent auditEvent)
     throws InsuffientPermissionException {
-        CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
+        CmpRequestorInfo localRequestor = (CmpRequestorInfo) requestor;
 
         CertReqMsg[] certReqMsgs = kur.toCertReqMsgArray();
         CertResponse[] certResponses = new CertResponse[certReqMsgs.length];
@@ -449,7 +450,7 @@ public class X509CACmpResponder extends CmpResponder {
                 continue;
             }
 
-            if (!verifyPOP(req, _requestor.isRa())) {
+            if (!verifyPOP(req, localRequestor.isRa())) {
                 LOG.warn("could not validate POP for requst {}", certReqId.getValue());
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses[i] = new CertResponse(certReqId, status);
@@ -480,8 +481,8 @@ public class X509CACmpResponder extends CmpResponder {
                             new AuditEventData("certprofile", certprofileName));
                 }
 
-                checkPermission(_requestor, certprofileName);
-                certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
+                checkPermission(localRequestor, certprofileName);
+                certResponses[i] = generateCertificate(localRequestor, user, tid, certReqId,
                         subject, publicKeyInfo, validity, extensions,
                         certprofileName, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException e) {
@@ -685,6 +686,7 @@ public class X509CACmpResponder extends CmpResponder {
                 break;
             case BAD_REQUEST:
                 failureInfo = PKIFailureInfo.badRequest;
+                break;
             case CERT_REVOKED:
                 failureInfo = PKIFailureInfo.certRevoked;
                 break;
@@ -1386,10 +1388,10 @@ public class X509CACmpResponder extends CmpResponder {
 
         InfoTypeAndValue itv = null;
         if (itvs != null && itvs.length > 0) {
-            for (InfoTypeAndValue _itv : itvs) {
-                String itvType = _itv.getInfoType().getId();
-                if (knownGenMsgIds.contains(itvType)) {
-                    itv = _itv;
+            for (InfoTypeAndValue entry : itvs) {
+                String itvType = entry.getInfoType().getId();
+                if (KNOWN_GENMSG_IDS.contains(itvType)) {
+                    itv = entry;
                     break;
                 }
             }
@@ -1398,7 +1400,7 @@ public class X509CACmpResponder extends CmpResponder {
         if (itv == null) {
             String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
                     + " is only supported with the sub-types "
-                    + knownGenMsgIds.toString();
+                    + KNOWN_GENMSG_IDS.toString();
             return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                     statusMessage);
         }
@@ -1429,7 +1431,7 @@ public class X509CACmpResponder extends CmpResponder {
                 }
 
                 itvResp = new InfoTypeAndValue(infoType, crl);
-            } else if (ObjectIdentifiers.id_xipki_cm_cmpGenmsg.equals(infoType)) {
+            } else if (ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.equals(infoType)) {
                 ASN1Encodable asn1 = itv.getInfoValue();
                 ASN1Integer asn1Code = null;
                 ASN1Encodable reqValue = null;
@@ -1442,7 +1444,7 @@ public class X509CACmpResponder extends CmpResponder {
                     }
                 } catch (IllegalArgumentException e) {
                     String statusMessage = "invalid value of the InfoTypeAndValue for "
-                            + ObjectIdentifiers.id_xipki_cm_cmpGenmsg.getId();
+                            + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
@@ -1454,13 +1456,13 @@ public class X509CACmpResponder extends CmpResponder {
                 case XipkiCmpConstants.ACTION_GEN_CRL:
                     addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
                     checkPermission(requestor, Permission.GEN_CRL);
-                    X509CRL _crl = ca.generateCRLonDemand(auditEvent);
-                    if (_crl == null) {
+                    X509CRL localCrl = ca.generateCRLonDemand(auditEvent);
+                    if (localCrl == null) {
                         String statusMessage = "CRL generation is not activated";
                         return createErrorMsgPKIBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     } else {
-                        respValue = CertificateList.getInstance(_crl.getEncoded());
+                        respValue = CertificateList.getInstance(localCrl.getEncoded());
                     }
                     break;
                 case XipkiCmpConstants.ACTION_GET_CRL_WITH_SN:

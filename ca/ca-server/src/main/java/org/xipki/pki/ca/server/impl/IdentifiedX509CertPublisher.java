@@ -64,7 +64,7 @@ class IdentifiedX509CertPublisher {
 
     private final X509CertPublisher certPublisher;
 
-    public IdentifiedX509CertPublisher(
+    IdentifiedX509CertPublisher(
             final PublisherEntry entry,
             final String realType)
     throws CertPublisherException {

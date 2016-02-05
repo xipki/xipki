@@ -50,7 +50,7 @@ public class ValidationIssue {
 
     private boolean failed;
 
-    private String message;
+    private String failureMessage;
 
     public ValidationIssue(
             final String code,
@@ -66,14 +66,14 @@ public class ValidationIssue {
         return failed;
     }
 
-    public String getMessage() {
-        return message;
+    public String getFailureMessage() {
+        return failureMessage;
     }
 
     public void setFailureMessage(
-            final String message) {
+            final String failureMessage) {
         this.failed = true;
-        this.message = message;
+        this.failureMessage = failureMessage;
     }
 
     public String getCode() {

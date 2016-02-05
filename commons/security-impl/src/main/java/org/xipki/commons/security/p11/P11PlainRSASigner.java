@@ -56,15 +56,16 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
     @Override
     public void init(
             final boolean forEncryption,
-            final CipherParameters param) {
+            final CipherParameters cipherParam) {
         if (!forEncryption) {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
 
-        if (!(param instanceof P11RSAKeyParameter)) {
-            throw new IllegalArgumentException("invalid param type " + param.getClass().getName());
+        if (!(cipherParam instanceof P11RSAKeyParameter)) {
+            throw new IllegalArgumentException(
+                    "invalid param type " + cipherParam.getClass().getName());
         }
-        this.param = (P11RSAKeyParameter) param;
+        this.param = (P11RSAKeyParameter) cipherParam;
     }
 
     @Override

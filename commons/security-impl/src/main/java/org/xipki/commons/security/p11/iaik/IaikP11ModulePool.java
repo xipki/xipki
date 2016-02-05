@@ -167,8 +167,11 @@ public class IaikP11ModulePool {
     @Override
     protected void finalize()
     throws Throwable {
-        super.finalize();
-        shutdown();
+        try {
+            super.finalize();
+        } finally {
+            shutdown();
+        }
     }
 
     public synchronized void shutdown() {

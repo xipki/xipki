@@ -52,22 +52,24 @@ public class MgmtQAShellUtil {
 
     public static void assertEquals(
             final String desc,
-            String ex,
+            final String ex,
             final String is)
     throws CmdFailure {
-        if (CAManager.NULL.equals(ex)) {
-            ex = null;
+
+        String localEx = ex;
+        if (CAManager.NULL.equals(localEx)) {
+            localEx = null;
         }
 
         boolean b;
-        if (ex == null) {
+        if (localEx == null) {
             b = (is == null);
         } else {
-            b = ex.equals(is);
+            b = localEx.equals(is);
         }
 
         if (!b) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
+            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + localEx + "'");
         }
     }
 

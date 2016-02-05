@@ -68,7 +68,7 @@ class ResponderOption {
 
     private final List<String> servletPaths;
 
-    public ResponderOption(
+    ResponderOption(
             final ResponderType conf)
     throws InvalidConfException {
         String s = conf.getMode();

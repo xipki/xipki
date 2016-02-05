@@ -47,7 +47,7 @@ public enum CAStatus {
 
     private String status;
 
-    private CAStatus(
+    CAStatus(
             final String status) {
         this.status = status;
     }

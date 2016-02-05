@@ -215,7 +215,7 @@ class OCSPStoreQueryExecutor {
             return;
         } // end if
 
-        final String sql_addCert = revoked
+        final String sqlAddCert = revoked
                 ? SQL_ADD_REVOKED_CERT
                 : SQL_ADD_CERT;
 
@@ -229,35 +229,35 @@ class OCSPStoreQueryExecutor {
         String sha512Fp = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert);
 
         PreparedStatement[] pss = borrowPreparedStatements(
-                sql_addCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
+                sqlAddCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
         // all statements have the same connection
         Connection conn = null;
 
         try {
-            PreparedStatement ps_addcert = pss[0];
-            PreparedStatement ps_addRawcert = pss[1];
-            PreparedStatement ps_addCerthash = pss[2];
-            conn = ps_addcert.getConnection();
+            PreparedStatement psAddcert = pss[0];
+            PreparedStatement psAddRawcert = pss[1];
+            PreparedStatement psAddCerthash = pss[2];
+            conn = psAddcert.getConnection();
 
             // CERT
             X509Certificate cert = certificate.getCert();
             int idx = 2;
-            ps_addcert.setLong(idx++, System.currentTimeMillis() / 1000);
-            ps_addcert.setLong(idx++, serialNumber.longValue());
-            ps_addcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
-            ps_addcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
-            setBoolean(ps_addcert, idx++, revoked);
-            ps_addcert.setInt(idx++, issuerId);
-            ps_addcert.setString(idx++, certprofile);
+            psAddcert.setLong(idx++, System.currentTimeMillis() / 1000);
+            psAddcert.setLong(idx++, serialNumber.longValue());
+            psAddcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
+            psAddcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
+            setBoolean(psAddcert, idx++, revoked);
+            psAddcert.setInt(idx++, issuerId);
+            psAddcert.setString(idx++, certprofile);
 
             if (revoked) {
-                ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
+                psAddcert.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
                 if (revInfo.getInvalidityTime() != null) {
-                    ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+                    psAddcert.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
                 } else {
-                    ps_addcert.setNull(idx++, Types.BIGINT);
+                    psAddcert.setNull(idx++, Types.BIGINT);
                 }
-                ps_addcert.setInt(idx++,
+                psAddcert.setInt(idx++,
                         (revInfo.getReason() == null)
                             ? 0
                             : revInfo.getReason().getCode());
@@ -265,17 +265,17 @@ class OCSPStoreQueryExecutor {
 
             // CRAW
             idx = 2;
-            ps_addRawcert.setString(idx++,
+            psAddRawcert.setString(idx++,
                     X509Util.cutText(certificate.getSubject(), maxX500nameLen));
-            ps_addRawcert.setString(idx++, b64Cert);
+            psAddRawcert.setString(idx++, b64Cert);
 
             // CHASH
             idx = 2;
-            ps_addCerthash.setString(idx++, sha1Fp);
-            ps_addCerthash.setString(idx++, sha224Fp);
-            ps_addCerthash.setString(idx++, sha256Fp);
-            ps_addCerthash.setString(idx++, sha384Fp);
-            ps_addCerthash.setString(idx++, sha512Fp);
+            psAddCerthash.setString(idx++, sha1Fp);
+            psAddCerthash.setString(idx++, sha224Fp);
+            psAddCerthash.setString(idx++, sha256Fp);
+            psAddCerthash.setString(idx++, sha384Fp);
+            psAddCerthash.setString(idx++, sha512Fp);
 
             final int tries = 3;
             for (int i = 0; i < tries; i++) {
@@ -283,22 +283,22 @@ class OCSPStoreQueryExecutor {
                     certId = nextCertId();
                 }
 
-                ps_addcert.setInt(1, certId);
-                ps_addCerthash.setInt(1, certId);
-                ps_addRawcert.setInt(1, certId);
+                psAddcert.setInt(1, certId);
+                psAddCerthash.setInt(1, certId);
+                psAddRawcert.setInt(1, certId);
 
                 final boolean origAutoCommit = conn.getAutoCommit();
                 conn.setAutoCommit(false);
                 String sql = null;
                 try {
-                    sql = sql_addCert;
-                    ps_addcert.executeUpdate();
+                    sql = sqlAddCert;
+                    psAddcert.executeUpdate();
 
                     sql = SQL_ADD_CHASH;
-                    ps_addRawcert.executeUpdate();
+                    psAddRawcert.executeUpdate();
 
                     sql = SQL_ADD_CHASH;
-                    ps_addCerthash.executeUpdate();
+                    psAddCerthash.executeUpdate();
 
                     sql = "(commit add cert to OCSP)";
                     conn.commit();

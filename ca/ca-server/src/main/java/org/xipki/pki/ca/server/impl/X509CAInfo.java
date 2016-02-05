@@ -73,9 +73,9 @@ import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
 
 public class X509CAInfo {
 
-    private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 
-    private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
+    private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
     private final X509CAEntry caEntry;
 

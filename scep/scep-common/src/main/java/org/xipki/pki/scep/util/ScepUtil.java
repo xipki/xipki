@@ -104,6 +104,8 @@ import org.xipki.pki.scep.crypto.KeyUsage;
  */
 
 public class ScepUtil {
+    private static final long MIN_IN_MS = 60L * 1000;
+    private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
     private ScepUtil() {
     }
@@ -194,9 +196,6 @@ public class ScepUtil {
             final SubjectPublicKeyInfo pubKeyInfo,
             final PrivateKey identityKey)
     throws CertificateException {
-        final long MIN_IN_MS = 60L * 1000;
-        final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
-
         Date notBefore = new Date(System.currentTimeMillis() - 5 * MIN_IN_MS);
         Date notAfter = new Date(notBefore.getTime() + 30 * DAY_IN_MS);
 
@@ -238,8 +237,12 @@ public class ScepUtil {
             final SignedData signedData)
     throws CertificateException {
         ASN1Set set = signedData.getCertificates();
-        int n;
-        if (set == null || (n = set.size()) == 0) {
+        if (set == null) {
+            return Collections.emptyList();
+        }
+
+        int n = set.size();
+        if (n == 0) {
             return Collections.emptyList();
         }
 
@@ -430,7 +433,7 @@ public class ScepUtil {
                 : message + ", {}: {}";
     }
 
-    static public ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(
+    public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(
             final String sigOid,
             final byte[] sigParams)
     throws NoSuchAlgorithmException {

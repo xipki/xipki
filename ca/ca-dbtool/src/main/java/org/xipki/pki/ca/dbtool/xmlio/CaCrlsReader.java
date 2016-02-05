@@ -39,7 +39,6 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Lijun Liao
@@ -55,8 +54,7 @@ public class CaCrlsReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext(
-            final XMLStreamReader reader)
+    protected DbDataObject retrieveNext()
     throws InvalidDataObjectException, XMLStreamException {
         CaCrlType ret = null;
         StringBuilder buffer = new StringBuilder();
@@ -94,21 +92,22 @@ public class CaCrlsReader extends DbiXmlReader {
                 case CaCrlType.TAG_ROOT:
                     ret.validate();
                     return ret;
-                case CaCrlType.TAG_caId:
+                case CaCrlType.TAG_CAID:
                     ret.setCaId(Integer.parseInt(tagContent));
                     break;
-                case CaCrlType.TAG_crlNo:
+                case CaCrlType.TAG_CRLNO:
                     ret.setCrlNo(tagContent);
                     break;
-                case CaCrlType.TAG_file:
+                case CaCrlType.TAG_FILE:
                     ret.setFile(tagContent);
                     break;
-                case CaCrlType.TAG_id:
+                case CaCrlType.TAG_ID:
                     ret.setId(Integer.parseInt(tagContent));
                     break;
                 default:
                     break;
                 } // end switch (reader.getLocalName())
+                break;
             default:
                 break;
             } // end switch (event)

@@ -137,8 +137,8 @@ public class CAEntry {
     }
 
     public void setCmpControlName(
-            final String name) {
-        this.cmpControlName = name;
+            final String cmpControlName) {
+        this.cmpControlName = cmpControlName;
     }
 
     public String getCmpControlName() {

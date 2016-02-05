@@ -47,7 +47,7 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class Nonce {
 
-    private static final SecureRandom random = new SecureRandom();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final int NONCE_LEN = 16;
 
@@ -76,7 +76,7 @@ public class Nonce {
 
     public static Nonce randomNonce() {
         byte[] bytes = new byte[NONCE_LEN];
-        random.nextBytes(bytes);
+        RANDOM.nextBytes(bytes);
         return new Nonce(bytes, false);
     }
 

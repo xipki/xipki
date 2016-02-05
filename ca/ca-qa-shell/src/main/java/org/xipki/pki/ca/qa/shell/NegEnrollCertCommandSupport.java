@@ -69,6 +69,14 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
+    @Reference
+    protected SecurityFactory securityFactory;
+
+    @Option(name = "--hash",
+            description = "hash algorithm name for the POPO computation")
+    @Completion(HashAlgCompleter.class)
+    protected String hashAlgo = "SHA256";
+
     @Option(name = "--subject", aliases = "-s",
             description = "subject to be requested.\n"
                     + "default is the subject of self-signed certifite.")
@@ -83,11 +91,6 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     @Option(name = "--user",
             description = "username")
     private String user;
-
-    @Option(name = "--hash",
-            description = "hash algorithm name for the POPO computation")
-    @Completion(HashAlgCompleter.class)
-    private String hashAlgo = "SHA256";
 
     @Option(name = "--rsa-mgf1",
             description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
@@ -105,11 +108,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Reference
-    protected SecurityFactory securityFactory;
-
     protected abstract ConcurrentContentSigner getSigner(
-            String hashAlgo,
             SignatureAlgoControl signatureAlgoControl)
     throws SignerException;
 
@@ -120,7 +119,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
                 EnrollCertRequestType.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-        ConcurrentContentSigner signer = getSigner(hashAlgo,
+        ConcurrentContentSigner signer = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
 

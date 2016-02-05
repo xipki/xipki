@@ -104,13 +104,13 @@ import org.xipki.commons.security.bcext.ECDSAContentVerifierProviderBuilder;
 
 public class KeyUtil {
 
-    private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
+    private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
             new DefaultDigestAlgorithmIdentifierFinder();
 
-    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders
+    private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
         = new HashMap<>();
 
-    private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
+    private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
 
     private KeyUtil() {
     }
@@ -123,19 +123,19 @@ public class KeyUtil {
             keyAlg = "ECDSA";
         }
 
-        BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
+        BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
         if (builder == null) {
             if ("RSA".equals(keyAlg)) {
-                builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+                builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else if ("DSA".equals(keyAlg)) {
-                builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+                builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else if ("ECDSA".equals(keyAlg)) {
-                builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+                builder = new ECDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new OperatorCreationException("unknown key algorithm of the public key "
                         + keyAlg);
             }
-            verifierProviderBuilders.put(keyAlg, builder);
+            VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
         }
 
         AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
@@ -151,15 +151,16 @@ public class KeyUtil {
 
     public static KeyPair generateRSAKeypair(
             final int keysize,
-            BigInteger publicExponent,
+            final BigInteger publicExponent,
             final SecureRandom random)
     throws Exception {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
-        if (publicExponent == null) {
-            publicExponent = RSAKeyGenParameterSpec.F4;
+        BigInteger localPublicExponent = publicExponent;
+        if (localPublicExponent == null) {
+            localPublicExponent = RSAKeyGenParameterSpec.F4;
         }
-        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, publicExponent);
+        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, localPublicExponent);
         if (random == null) {
             kpGen.initialize(params);
         } else {
@@ -212,8 +213,8 @@ public class KeyUtil {
     private static KeyFactory getKeyFactory(
             final String algorithm)
     throws InvalidKeySpecException {
-        synchronized (keyFactories) {
-            KeyFactory kf = keyFactories.get(algorithm);
+        synchronized (KEY_FACTORIES) {
+            KeyFactory kf = KEY_FACTORIES.get(algorithm);
             if (kf != null) {
                 return kf;
             }
@@ -224,7 +225,7 @@ public class KeyUtil {
                 throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm
                         + ": " + e.getMessage());
             }
-            keyFactories.put(algorithm, kf);
+            KEY_FACTORIES.put(algorithm, kf);
             return kf;
         }
     }

@@ -51,8 +51,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class GenCRLCmd extends CRLCommandSupport {
 
     @Override
-    protected X509CRL retrieveCRL(
-            final String caName)
+    protected X509CRL retrieveCRL()
     throws Exception {
         return caManager.generateCRLonDemand(caName);
     }

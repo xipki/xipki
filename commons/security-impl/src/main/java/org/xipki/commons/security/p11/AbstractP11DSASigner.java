@@ -52,32 +52,33 @@ import org.xipki.commons.security.api.SignerException;
 
 abstract class AbstractP11DSASigner implements Signer {
 
-    private final Digest digest;
-
     protected P11KeyParameter param;
 
-    protected abstract byte[] sign(
-            final byte[] hashValue)
-    throws SignerException;
+    private final Digest digest;
 
-    public AbstractP11DSASigner(
+    AbstractP11DSASigner(
             final Digest digest) {
         ParamUtil.assertNotNull("digest", digest);
         this.digest = digest;
     }
 
+    protected abstract byte[] sign(
+            final byte[] hashValue)
+    throws SignerException;
+
     @Override
     public void init(
             final boolean forSigning,
-            final CipherParameters param) {
+            final CipherParameters ciperParam) {
         if (!forSigning) {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
 
-        if (!(param instanceof P11KeyParameter)) {
-            throw new IllegalArgumentException("invalid param type " + param.getClass().getName());
+        if (!(ciperParam instanceof P11KeyParameter)) {
+            throw new IllegalArgumentException(
+                    "invalid param type " + ciperParam.getClass().getName());
         }
-        this.param = (P11KeyParameter) param;
+        this.param = (P11KeyParameter) ciperParam;
         reset();
     }
 

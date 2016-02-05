@@ -396,7 +396,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
 
         private final char[] keyLabel;
 
-        public ComparableIaikPrivateKey(
+        ComparableIaikPrivateKey(
                 final byte[] keyId,
                 final char[] keyLabel) {
             this.keyId = keyId;

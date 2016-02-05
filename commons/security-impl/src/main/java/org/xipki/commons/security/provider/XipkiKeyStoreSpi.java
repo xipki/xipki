@@ -75,7 +75,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         private Iterator<E> iter;
 
-        public MyEnumeration(
+        MyEnumeration(
                 final Iterator<E> iter) {
             this.iter = iter;
         }
@@ -98,7 +98,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         private Certificate[] chain;
 
-        public KeyCertEntry(
+        KeyCertEntry(
                 final PrivateKey key,
                 final Certificate[] chain) {
             ParamUtil.assertNotNull("key", key);

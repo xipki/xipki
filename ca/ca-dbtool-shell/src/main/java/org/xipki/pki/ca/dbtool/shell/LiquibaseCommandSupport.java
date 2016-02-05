@@ -38,7 +38,7 @@ package org.xipki.pki.ca.dbtool.shell;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -66,15 +66,10 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
 
     private static final String DFLT_CACONF_FILE = "xipki/ca-config/ca.properties";
 
-    private static final List<String> yesNo = new ArrayList<>(2);
+    private static final List<String> YES_NO = Arrays.asList("yes", "no");
 
     @Reference
     private PasswordResolver passwordResolver;
-
-    static {
-        yesNo.add("yes");
-        yesNo.add("no");
-    }
 
     @Option(name = "--quiet", aliases = "-q",
             description = "quiet mode")
@@ -189,7 +184,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             final String schemaFile) {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
-        msg.append("driver        = ").append(dbParams.getDriver()).append("\n");
+        msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
         msg.append("user        = ").append(dbParams.getUsername()).append("\n");
         msg.append("url         = ").append(dbParams.getUrl()).append("\n");
         if (dbParams.getSchema() != null) {
@@ -203,47 +198,49 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     private boolean confirm(
             final String command)
     throws IOException {
-        String text = read("\nDo you wish to " + command + " the database", yesNo);
+        String text = read("\nDo you wish to " + command + " the database", YES_NO);
         return "yes".equalsIgnoreCase(text);
     }
 
     private String read(
-            String prompt,
-            List<String> validValues)
+            final String prompt,
+            final List<String> validValues)
     throws IOException {
-        if (validValues == null) {
-            validValues = Collections.emptyList();
+        String localPrompt = prompt;
+        List<String> localValidValues = validValues;
+        if (localValidValues == null) {
+            localValidValues = Collections.emptyList();
         }
 
-        if (prompt == null) {
-            prompt = "Please enter";
+        if (localPrompt == null) {
+            localPrompt = "Please enter";
         }
 
-        if (isNotEmpty(validValues)) {
-            StringBuilder promptBuilder = new StringBuilder(prompt);
+        if (isNotEmpty(localValidValues)) {
+            StringBuilder promptBuilder = new StringBuilder(localPrompt);
             promptBuilder.append(" [");
 
-            for (String validValue : validValues) {
+            for (String validValue : localValidValues) {
                 promptBuilder.append(validValue).append("/");
             }
             promptBuilder.deleteCharAt(promptBuilder.length() - 1);
             promptBuilder.append("] ?");
 
-            prompt = promptBuilder.toString();
+            localPrompt = promptBuilder.toString();
         }
 
-        out(prompt);
+        out(localPrompt);
         while (true) {
             String answer = session.readLine(null, null);
             if (answer == null) {
                 throw new IOException("interrupted");
             }
 
-            if (isEmpty(validValues) || validValues.contains(answer)) {
+            if (isEmpty(localValidValues) || localValidValues.contains(answer)) {
                 return answer;
             } else {
                 StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for (String validValue : validValues) {
+                for (String validValue : localValidValues) {
                     retryPromptBuilder.append(validValue).append("/");
                 }
                 retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);

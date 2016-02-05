@@ -69,7 +69,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
         if (keystoreBytes == null) {
             P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
-                    pLength, qLength, password.toCharArray(), "CN=dummy",
+                    pLength, qLength, PASSWORD.toCharArray(), "CN=dummy",
                     (Integer) null, (List<ASN1ObjectIdentifier>) null,
                     new SecureRandom());
             keystoreBytes = kpGen.generateIdentity().getKeystore();

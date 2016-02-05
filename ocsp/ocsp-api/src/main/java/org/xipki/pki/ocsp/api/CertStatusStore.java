@@ -66,6 +66,12 @@ public abstract class CertStatusStore {
 
     private AuditServiceRegister auditServiceRegister;
 
+    protected CertStatusStore(
+            final String name) {
+        ParamUtil.assertNotBlank("name", name);
+        this.name = name;
+    }
+
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(
@@ -97,12 +103,6 @@ public abstract class CertStatusStore {
     throws CertStatusStoreException;
 
     public abstract boolean isHealthy();
-
-    protected CertStatusStore(
-            final String name) {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
-    }
 
     public String getName() {
         return name;

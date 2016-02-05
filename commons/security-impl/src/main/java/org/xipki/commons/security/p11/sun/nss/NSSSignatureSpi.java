@@ -176,6 +176,9 @@ public class NSSSignatureSpi extends SignatureSpi {
 
     public static final String ECDSA = "ECDSA";
 
+    private static final String MSG_UNSUPPORTED_ALGO =
+            "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
+
     private final Signature service;
 
     private final ASN1ObjectIdentifier hashAlgOid;
@@ -183,9 +186,6 @@ public class NSSSignatureSpi extends SignatureSpi {
     private final MessageDigest md;
 
     private final Cipher cipher;
-
-    private static final String MSG_UNSUPPORTED_ALGO =
-            "unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
 
     private NSSSignatureSpi(
             final String algorithm) {
@@ -198,27 +198,27 @@ public class NSSSignatureSpi extends SignatureSpi {
     private NSSSignatureSpi(
             final String digestAlgorithmName,
             final String encrAlgorithmName) {
-        String HASHALGO = digestAlgorithmName.toUpperCase();
-        String ENCALGO = encrAlgorithmName.toUpperCase();
-        if (RSA.equalsIgnoreCase(ENCALGO) || ECDSA.equals(ENCALGO)) {
-            if (!(SHA1.equals(HASHALGO) || SHA224.equals(HASHALGO) || SHA256.equals(HASHALGO)
-                    || SHA384.equals(HASHALGO) || SHA512.equals(HASHALGO))) {
-                throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, HASHALGO, ENCALGO));
+        String hashAlgo = digestAlgorithmName.toUpperCase();
+        String encAlgo = encrAlgorithmName.toUpperCase();
+        if (RSA.equalsIgnoreCase(encAlgo) || ECDSA.equals(encAlgo)) {
+            if (!(SHA1.equals(hashAlgo) || SHA224.equals(hashAlgo) || SHA256.equals(hashAlgo)
+                    || SHA384.equals(hashAlgo) || SHA512.equals(hashAlgo))) {
+                throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO, hashAlgo, encAlgo));
             }
         } else {
             throw new ProviderException(String.format(MSG_UNSUPPORTED_ALGO,
-                    HASHALGO, encrAlgorithmName));
+                    hashAlgo, encrAlgorithmName));
         }
 
-        if (SHA224.equals(HASHALGO)) {
-            if (RSA.equals(ENCALGO)) {
+        if (SHA224.equals(hashAlgo)) {
+            if (RSA.equals(encAlgo)) {
                 this.service = null;
                 this.cipher = getCipherService("RSA/ECB/NoPadding");
             } else { // ECDSA
                 this.service = getSignatureService("NONEwithECDSA");
                 this.cipher = null;
             }
-            this.md = getMessageDigestService(HASHALGO);
+            this.md = getMessageDigestService(hashAlgo);
 
             hashAlgOid = new ASN1ObjectIdentifier(HashAlgoType.SHA224.getOid());
         } else {
@@ -564,9 +564,9 @@ public class NSSSignatureSpi extends SignatureSpi {
 
         start++;                     // data should start at the next byte
 
-        final int HEADER_LENGTH = 10;
+        final int headerLength = 10;
 
-        if (start > block.length || start < HEADER_LENGTH) {
+        if (start > block.length || start < headerLength) {
             throw new InvalidCipherTextException("no data in block");
         }
 

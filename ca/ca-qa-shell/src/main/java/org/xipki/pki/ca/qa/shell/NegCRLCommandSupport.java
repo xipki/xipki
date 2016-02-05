@@ -55,10 +55,9 @@ public abstract class NegCRLCommandSupport extends ClientCommandSupport {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "required if multiple CAs are configured")
-    private String caName;
+    protected String caName;
 
-    protected abstract X509CRL retrieveCRL(
-            String caName)
+    protected abstract X509CRL retrieveCRL()
     throws CAClientException, PKIErrorException;
 
     @Override
@@ -85,7 +84,7 @@ public abstract class NegCRLCommandSupport extends ClientCommandSupport {
 
         X509CRL crl = null;
         try {
-            crl = retrieveCRL(caName);
+            crl = retrieveCRL();
         } catch (PKIErrorException e) {
         }
 

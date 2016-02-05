@@ -58,7 +58,7 @@ public class IssuerStore {
     public IssuerStore(
             final List<IssuerEntry> entries) {
         this.entries = new ArrayList<>(entries.size());
-        Set<Integer> ids = new HashSet<>(entries.size());
+        Set<Integer> idSet = new HashSet<>(entries.size());
 
         for (IssuerEntry entry : entries) {
             for (IssuerEntry existingEntry : this.entries) {
@@ -68,10 +68,10 @@ public class IssuerStore {
                 }
             }
             this.entries.add(entry);
-            ids.add(entry.getId());
+            idSet.add(entry.getId());
         }
 
-        this.ids = Collections.unmodifiableSet(ids);
+        this.ids = Collections.unmodifiableSet(idSet);
     }
 
     public Set<Integer> getIds() {

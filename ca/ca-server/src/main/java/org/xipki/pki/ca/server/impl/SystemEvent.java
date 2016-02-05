@@ -48,7 +48,7 @@ class SystemEvent {
 
     private final long eventTime;
 
-    public SystemEvent(
+    SystemEvent(
             final String name,
             final String owner,
             final long eventTime) {

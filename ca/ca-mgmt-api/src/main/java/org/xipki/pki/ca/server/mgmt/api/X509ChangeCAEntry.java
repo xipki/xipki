@@ -101,7 +101,7 @@ public class X509ChangeCAEntry extends ChangeCAEntry implements Serializable {
         return caCertUris;
     }
 
-    public void setCacertUris(
+    public void setCaCertUris(
             final List<String> caCertUris) {
         this.caCertUris = caCertUris;
     }

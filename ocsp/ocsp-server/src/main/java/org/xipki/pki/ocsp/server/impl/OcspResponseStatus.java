@@ -50,7 +50,8 @@ public enum OcspResponseStatus {
     unauthorized(6);
 
     private final int status;
-    private OcspResponseStatus(
+
+    OcspResponseStatus(
             final int status) {
         this.status = status;
     }

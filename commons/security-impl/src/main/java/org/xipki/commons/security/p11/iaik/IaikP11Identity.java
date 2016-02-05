@@ -54,7 +54,7 @@ import org.xipki.commons.security.api.util.SecurityUtil;
 
 class IaikP11Identity extends P11Identity {
 
-    public IaikP11Identity(
+    IaikP11Identity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain,

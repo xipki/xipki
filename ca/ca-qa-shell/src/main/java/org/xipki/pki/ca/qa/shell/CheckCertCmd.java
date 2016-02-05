@@ -179,8 +179,8 @@ public class CheckCertCmd extends XipkiCommandSupport {
                 issue.isFailed()
                     ? "failed"
                     : "successful");
-        if (issue.getMessage() != null) {
-            sb.append(", ").append(issue.getMessage());
+        if (issue.getFailureMessage() != null) {
+            sb.append(", ").append(issue.getFailureMessage());
         }
     }
 

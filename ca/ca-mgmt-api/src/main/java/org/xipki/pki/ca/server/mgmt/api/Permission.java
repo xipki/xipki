@@ -57,7 +57,7 @@ public enum Permission {
 
     private String permission;
 
-    private Permission(
+    Permission(
             final String permission) {
         this.permission = permission;
     }

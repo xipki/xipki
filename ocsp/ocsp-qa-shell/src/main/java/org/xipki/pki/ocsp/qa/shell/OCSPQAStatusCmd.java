@@ -116,7 +116,7 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
 
     private OcspError expectedOcspError;
 
-    private Map<BigInteger, OcspCertStatus> expectedStatuses = null;
+    private Map<BigInteger, OcspCertStatus> expectedStatuses;
 
     private Occurrence expectedNextUpdateOccurrence;
 
@@ -232,8 +232,8 @@ public class OCSPQAStatusCmd extends BaseOCSPStatusCommandSupport {
                 ? "failed"
                 : "successful";
         sb.append(txt);
-        if (issue.getMessage() != null) {
-            sb.append(", ").append(issue.getMessage());
+        if (issue.getFailureMessage() != null) {
+            sb.append(", ").append(issue.getFailureMessage());
         }
     }
 

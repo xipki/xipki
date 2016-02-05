@@ -63,6 +63,9 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 @Service
 public class ResponderUpdateCmd extends CaCommandSupport {
 
+    @Reference
+    protected PasswordResolver passwordResolver;
+
     @Option(name = "--name", aliases = "-n",
             required = true,
             description = "responder name\n"
@@ -75,33 +78,30 @@ public class ResponderUpdateCmd extends CaCommandSupport {
     @Completion(SignerTypeCompleter.class)
     protected String signerType;
 
-    @Option(name = "--signer-conf",
-            description = "conf of the responder signer or 'NULL'")
-    private String signerConf;
-
     @Option(name = "--cert",
             description = "requestor certificate file or 'NULL'")
     @Completion(FilePathCompleter.class)
     protected String certFile;
 
-    @Reference
-    protected PasswordResolver passwordResolver;
+    @Option(name = "--signer-conf",
+            description = "conf of the responder signer or 'NULL'")
+    private String signerConf;
 
     protected String getSignerConf()
     throws Exception {
         if (signerConf == null) {
             return signerConf;
         }
-        String _signerType = signerType;
-        if (_signerType == null) {
+        String localSignerType = signerType;
+        if (localSignerType == null) {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
-            _signerType = entry.getType();
+            localSignerType = entry.getType();
         }
 
-        return ShellUtil.canonicalizeSignerConf(_signerType, signerConf, passwordResolver);
+        return ShellUtil.canonicalizeSignerConf(localSignerType, signerConf, passwordResolver);
     }
 
     @Override

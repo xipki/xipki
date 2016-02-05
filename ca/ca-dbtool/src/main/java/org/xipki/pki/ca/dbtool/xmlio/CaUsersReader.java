@@ -39,7 +39,6 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Lijun Liao
@@ -55,8 +54,7 @@ public class CaUsersReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext(
-            final XMLStreamReader reader)
+    protected DbDataObject retrieveNext()
     throws InvalidDataObjectException, XMLStreamException {
         CaUserType ret = null;
         StringBuilder buffer = new StringBuilder();
@@ -94,21 +92,22 @@ public class CaUsersReader extends DbiXmlReader {
                 case CaUserType.TAG_ROOT:
                     ret.validate();
                     return ret;
-                case CaUserType.TAG_cnRegex:
+                case CaUserType.TAG_CN_REGEX:
                     ret.setCnRegex(tagContent);
                     break;
-                case CaUserType.TAG_id:
+                case CaUserType.TAG_ID:
                     ret.setId(Integer.parseInt(tagContent));
                     break;
-                case CaUserType.TAG_name:
+                case CaUserType.TAG_NAME:
                     ret.setName(tagContent);
                     break;
-                case CaUserType.TAG_password:
+                case CaUserType.TAG_PASSWORD:
                     ret.setPassword(tagContent);
                     break;
                 default:
                     break;
                 } // end switch (reader.getLocalName())
+                break;
             default:
                 break;
             } // end switch (event)

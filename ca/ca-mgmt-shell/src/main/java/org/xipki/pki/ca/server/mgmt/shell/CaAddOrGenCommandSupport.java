@@ -249,8 +249,8 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             entry.setResponderName(responderName);
         }
 
-        CertValidity _maxValidity = CertValidity.getInstance(maxValidity);
-        entry.setMaxValidity(_maxValidity);
+        CertValidity localMaxValidity = CertValidity.getInstance(maxValidity);
+        entry.setMaxValidity(localMaxValidity);
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays);
 
@@ -258,16 +258,16 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             entry.setCmpControlName(cmpControlName);
         }
 
-        Set<Permission> _permissions = new HashSet<>();
+        Set<Permission> localPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission _permission = Permission.getPermission(permission);
-            if (_permission == null) {
+            Permission localPermission = Permission.getPermission(permission);
+            if (localPermission == null) {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
-            _permissions.add(_permission);
+            localPermissions.add(localPermission);
         }
 
-        entry.setPermissions(_permissions);
+        entry.setPermissions(localPermissions);
 
         if (StringUtil.isNotBlank(extraControl)) {
             entry.setExtraControl(extraControl.trim());

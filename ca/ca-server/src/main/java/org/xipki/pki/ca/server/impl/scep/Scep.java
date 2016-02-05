@@ -119,7 +119,7 @@ public class Scep {
 
     private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
 
-    private final static Set<ASN1ObjectIdentifier> aesEncAlgs = new HashSet<>();
+    private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGOS = new HashSet<>();
 
     private final String caName;
 
@@ -144,15 +144,15 @@ public class Scep {
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
     static {
-        aesEncAlgs.add(CMSAlgorithm.AES128_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES128_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES128_GCM);
-        aesEncAlgs.add(CMSAlgorithm.AES192_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES192_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES192_GCM);
-        aesEncAlgs.add(CMSAlgorithm.AES256_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES256_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES256_GCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES128_CBC);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES128_CCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES128_GCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES192_CBC);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES192_CCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES192_GCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES256_CBC);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES256_CCM);
+        AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
     }
 
     public Scep(
@@ -393,7 +393,7 @@ public class Scep {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
-        } else if (aesEncAlgs.contains(encOid)) {
+        } else if (AES_ENC_ALGOS.contains(encOid)) {
             if (!caCaps.containsCapability(CACapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -444,7 +444,7 @@ public class Scep {
 
                     if (!caManager.getSecurityFactory().verifyPOPO(p10Req)) {
                         LOG.warn("tid={}, POPO verification failed", tid);
-                        throw FailInfoException.badMessageCheck;
+                        throw FailInfoException.BAD_MESSAGE_CHECK;
                     }
 
                     CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
@@ -476,7 +476,7 @@ public class Scep {
 
                             if (!authenticatedByPwd) {
                                 LOG.warn("tid={}: could not verify the challengePassword", tid);
-                                throw FailInfoException.badRequest;
+                                throw FailInfoException.BAD_REQUEST;
                             }
                         } else {
                             LOG.warn("tid={}: ignore challengePassword since it does not has the"
@@ -489,14 +489,14 @@ public class Scep {
                         if (MessageType.PKCSReq != mt) {
                             LOG.warn("tid={}: self-signed certificate is not permitted for"
                                     + " messageType {}", tid, mt);
-                            throw FailInfoException.badRequest;
+                            throw FailInfoException.BAD_REQUEST;
                         }
                         if (user == null) {
                             LOG.warn("tid={}: could not extract user and password from"
                                     + " challengePassword, which are required for self-signed"
                                     + " signature certificate",
                                 tid);
-                            throw FailInfoException.badRequest;
+                            throw FailInfoException.BAD_REQUEST;
                         }
                         checkCN(ca, user, cn);
                     } else {
@@ -507,7 +507,7 @@ public class Scep {
                             if (!knowCertRes.isKnown()) {
                                 LOG.warn("tid={}: signature certiciate is not trusted by the CA",
                                         tid);
-                                throw FailInfoException.badRequest;
+                                throw FailInfoException.BAD_REQUEST;
                             }
                             user = knowCertRes.getUser();
                             audit(auditEvent,
@@ -528,7 +528,7 @@ public class Scep {
                             } else {
                                 LOG.warn("tid={}: signature certificate is not trusted and {}",
                                         tid, "no challengePassword is contained in the request");
-                                throw FailInfoException.badRequest;
+                                throw FailInfoException.BAD_REQUEST;
                             }
                         } // end if
                     } // end if
@@ -584,7 +584,7 @@ public class Scep {
                     break;
                 default:
                     LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
-                    throw FailInfoException.badRequest;
+                    throw FailInfoException.BAD_REQUEST;
             } // end switch
 
             ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
@@ -616,7 +616,7 @@ public class Scep {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
         if (cert == null) {
-            throw FailInfoException.badCertId;
+            throw FailInfoException.BAD_CERTID;
         }
         return buildSignedData(cert);
     } // method getCert
@@ -633,14 +633,14 @@ public class Scep {
         }
 
         if (CollectionUtil.isEmpty(certs)) {
-            throw FailInfoException.badCertId;
+            throw FailInfoException.BAD_CERTID;
         }
 
         if (certs.size() > 1) {
             LOG.warn(
                 "given certId (subject: {}) and transactionId {} match at least two certificates",
                 X509Util.getRFC4519Name(subject), tid.getId());
-            throw FailInfoException.badCertId;
+            throw FailInfoException.BAD_CERTID;
         }
 
         return buildSignedData(certs.get(0));
@@ -675,7 +675,7 @@ public class Scep {
     throws FailInfoException, OperationException {
         CertificateList crl = ca.getCurrentCRL();
         if (crl == null) {
-            throw FailInfoException.badRequest;
+            throw FailInfoException.BAD_REQUEST;
         }
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
@@ -761,7 +761,7 @@ public class Scep {
             final X500Name caX500Name)
     throws FailInfoException {
         if (!thisCAX500Name.equals(caX500Name)) {
-            throw FailInfoException.badCertId;
+            throw FailInfoException.BAD_CERTID;
         }
     }
 

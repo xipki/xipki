@@ -43,9 +43,11 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -58,6 +60,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 public class ProfileInfoCmd extends CaCommandSupport {
 
     @Argument(index = 0, name = "name", description = "certificate profile name")
+    @Completion(ProfileNameCompleter.class)
     private String name;
 
     @Option(name = "--verbose", aliases = "-v",
@@ -85,8 +88,8 @@ public class ProfileInfoCmd extends CaCommandSupport {
             List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for (String name : sorted) {
-                sb.append("\t").append(name).append("\n");
+            for (String entry : sorted) {
+                sb.append("\t").append(entry).append("\n");
             }
         } else {
             CertprofileEntry entry = caManager.getCertprofile(name);

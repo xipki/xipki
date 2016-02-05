@@ -210,16 +210,16 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (signerConf != null) {
-            String _signerType = signerType;
-            if (_signerType == null) {
+            String localSignerType = signerType;
+            if (localSignerType == null) {
                 CAEntry caEntry = caManager.getCA(caName);
                 if (caEntry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
-                _signerType = caEntry.getSignerType();
+                localSignerType = caEntry.getSignerType();
             }
 
-            signerConf = ShellUtil.canonicalizeSignerConf(_signerType, signerConf,
+            signerConf = ShellUtil.canonicalizeSignerConf(localSignerType, signerConf,
                     passwordResolver);
             entry.setSignerConf(signerConf);
         }
@@ -241,21 +241,21 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (permissions != null && permissions.size() > 0) {
-            Set<Permission> _permissions = new HashSet<>();
+            Set<Permission> localPermissions = new HashSet<>();
             for (String permission : permissions) {
-                Permission _permission = Permission.getPermission(permission);
-                if (_permission == null) {
+                Permission localPermission = Permission.getPermission(permission);
+                if (localPermission == null) {
                     throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
-                _permissions.add(_permission);
+                localPermissions.add(localPermission);
             }
-            entry.setPermissions(_permissions);
+            entry.setPermissions(localPermissions);
         }
 
         entry.setCrlUris(getUris(crlUris));
         entry.setDeltaCrlUris(getUris(deltaCrlUris));
         entry.setOcspUris(getUris(ocspUris));
-        entry.setCacertUris(getUris(caCertUris));
+        entry.setCaCertUris(getUris(caCertUris));
 
         if (validityModeS != null) {
             ValidityMode validityMode = ValidityMode.getInstance(validityModeS);

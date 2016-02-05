@@ -51,11 +51,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public abstract class DbiXmlReader {
 
+    protected final XMLStreamReader reader;
+
     private final XMLInputFactory factory = XMLInputFactory.newInstance();
 
     private final String rootElementName;
-
-    private final XMLStreamReader reader;
 
     private DbDataObject next;
 
@@ -84,7 +84,7 @@ public abstract class DbiXmlReader {
                     + rootElementName + "', but '" + thisRootElement + "'");
         }
 
-        this.next = retrieveNext(this.reader);
+        this.next = retrieveNext();
     }
 
     public String getRootElementName() {
@@ -103,13 +103,11 @@ public abstract class DbiXmlReader {
 
         DbDataObject ret = next;
         next = null;
-        next = retrieveNext(reader);
 
         return ret;
     }
 
-    protected abstract DbDataObject retrieveNext(
-            XMLStreamReader reader)
+    protected abstract DbDataObject retrieveNext()
     throws InvalidDataObjectException, XMLStreamException;
 
 }

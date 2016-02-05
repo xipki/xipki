@@ -114,9 +114,9 @@ public class ExtractCertFromCRLCmd extends SecurityCommandSupport {
             }
 
             byte[] certBytes = cert.getEncoded();
-            String sha1_fp_cert = HashCalculator.hexSha1(certBytes);
+            String sha1FpCert = HashCalculator.hexSha1(certBytes);
 
-            ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+            ZipEntry certZipEntry = new ZipEntry(sha1FpCert + ".der");
             zip.putNextEntry(certZipEntry);
             try {
                 zip.write(certBytes);

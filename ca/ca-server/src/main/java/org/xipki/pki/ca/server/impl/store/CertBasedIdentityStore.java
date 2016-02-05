@@ -89,9 +89,9 @@ class CertBasedIdentityStore {
     }
 
     Integer getCaIdForSha1Fp(
-            final byte[] sha1Fp_cert) {
+            final byte[] sha1FpCert) {
         for (CertBasedIdentityEntry entry : entries) {
-            if (entry.matchSha1Fp(sha1Fp_cert)) {
+            if (entry.matchSha1Fp(sha1FpCert)) {
                 return entry.getId();
             }
         }

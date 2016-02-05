@@ -48,7 +48,7 @@ class ResponderAndRelativeUri {
 
     private final String relativeUri;
 
-    public ResponderAndRelativeUri(
+    ResponderAndRelativeUri(
             final Responder responder,
             final String relativeUri) {
         ParamUtil.assertNotNull("responder", responder);

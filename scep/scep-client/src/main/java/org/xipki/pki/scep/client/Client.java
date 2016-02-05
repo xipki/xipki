@@ -105,9 +105,9 @@ public abstract class Client {
 
     private CollectionStore<X509CertificateHolder> responseSignerCerts;
 
-    private boolean httpGetOnly = false;
+    private boolean httpGetOnly;
 
-    private boolean useInsecureAlgorithms = false;
+    private boolean useInsecureAlgorithms;
 
     public Client(
             final CAIdentifier cAId,
@@ -528,7 +528,7 @@ public abstract class Client {
     throws ScepClientException {
         String ct = httpResp.getContentType();
 
-        if (!ScepConstants.CT_x_x509_next_ca_cert.equalsIgnoreCase(ct)) {
+        if (!ScepConstants.CT_X509_NEXT_CA_CERT.equalsIgnoreCase(ct)) {
             throw new ScepClientException("invalid Content-Type '" + ct + "'");
         }
 
@@ -674,9 +674,9 @@ public abstract class Client {
         X509Certificate cACert = null;
         List<X509Certificate> rACerts = new LinkedList<X509Certificate>();
 
-        if (ScepConstants.CT_x_x509_ca_cert.equalsIgnoreCase(ct)) {
+        if (ScepConstants.CT_X509_CA_CERT.equalsIgnoreCase(ct)) {
             cACert = parseCert(resp.getContentBytes());
-        } else if (ScepConstants.CT_x_x509_ca_ra_cert.equalsIgnoreCase(ct)) {
+        } else if (ScepConstants.CT_X509_CA_RA_CERT.equalsIgnoreCase(ct)) {
             ContentInfo contentInfo = ContentInfo.getInstance(resp.getContentBytes());
 
             SignedData signedData;

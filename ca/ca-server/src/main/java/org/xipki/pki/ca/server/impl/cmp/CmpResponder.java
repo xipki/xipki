@@ -90,7 +90,16 @@ abstract class CmpResponder {
 
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
+    protected final SecurityFactory securityFactory;
+
     private final SecureRandom random = new SecureRandom();
+
+    protected CmpResponder(
+            final SecurityFactory securityFactory) {
+        ParamUtil.assertNotNull("securityFactory", securityFactory);
+
+        this.securityFactory = securityFactory;
+    }
 
     protected abstract ConcurrentContentSigner getSigner()
     throws InvalidConfException;
@@ -101,8 +110,6 @@ abstract class CmpResponder {
     protected abstract boolean intendsMe(
             GeneralName requestRecipient)
     throws InvalidConfException;
-
-    protected final SecurityFactory securityFactory;
 
     public boolean isInService() {
         try {
@@ -127,20 +134,13 @@ abstract class CmpResponder {
     protected abstract CmpRequestorInfo getRequestor(
             X500Name requestorSender);
 
-    protected abstract PKIMessage intern_processPKIMessage(
+    protected abstract PKIMessage doProcessPKIMessage(
             RequestorInfo requestor,
             String user,
             ASN1OctetString transactionId,
             GeneralPKIMessage pkiMessage,
             AuditEvent auditEvent)
     throws InvalidConfException;
-
-    protected CmpResponder(
-            final SecurityFactory securityFactory) {
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-
-        this.securityFactory = securityFactory;
-    }
 
     public PKIMessage processPKIMessage(
             final PKIMessage pkiMessage,
@@ -307,7 +307,7 @@ abstract class CmpResponder {
                     errorStatus);
         }
 
-        PKIMessage resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
+        PKIMessage resp = doProcessPKIMessage(requestor, username, tid, message, auditEvent);
 
         if (isProtected) {
             resp = addProtection(resp, auditEvent);

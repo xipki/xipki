@@ -54,15 +54,15 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
 
     @Override
     public void init(
-            final P11Control p11Control) {
-        ParamUtil.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
-        IaikP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
+            final P11Control pP11Control) {
+        ParamUtil.assertNotNull("pP11Control", pP11Control);
+        this.p11Control = pP11Control;
+        IaikP11ModulePool.getInstance().setDefaultModuleName(pP11Control.getDefaultModuleName());
     }
 
     @Override
     public P11CryptService createP11CryptService(
-            String moduleName)
+            final String moduleName)
     throws SignerException {
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
@@ -70,13 +70,14 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
 
         ParamUtil.assertNotNull("moduleName", moduleName);
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            moduleName = p11Control.getDefaultModuleName();
+        String localModuleName = moduleName;
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(localModuleName)) {
+            localModuleName = p11Control.getDefaultModuleName();
         }
 
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+        P11ModuleConf conf = p11Control.getModuleConf(localModuleName);
         if (conf == null) {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
+            throw new SignerException("PKCS#11 module " + localModuleName + " is not defined");
         }
 
         return IaikP11CryptService.getInstance(conf);

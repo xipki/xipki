@@ -50,7 +50,7 @@ public enum DuplicationMode {
 
     private final String description;
 
-    private DuplicationMode(
+    DuplicationMode(
             final int mode,
             final String description) {
         this.mode = mode;

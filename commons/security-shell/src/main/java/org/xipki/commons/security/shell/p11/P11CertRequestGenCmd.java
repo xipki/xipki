@@ -99,7 +99,6 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(
-            final String hashAlgo,
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);

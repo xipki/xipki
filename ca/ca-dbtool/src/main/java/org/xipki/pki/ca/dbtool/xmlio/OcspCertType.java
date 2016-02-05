@@ -46,69 +46,69 @@ public class OcspCertType extends DbDataObject {
 
     public static final String TAG_ROOT = "cert";
 
-    public static final String TAG_id = "id";
-
-    private Integer id;
+    public static final String TAG_ID = "id";
 
     /**
      * issuer id
      */
-    public static final String TAG_iid = "iid";
-
-    private Integer iid;
+    public static final String TAG_IID = "iid";
 
     /**
      * certificate serial number
      */
-    public static final String TAG_sn = "sn";
+    public static final String TAG_SN = "sn";
 
-    private String sn;
-
-    public static final String TAG_update = "update";
-
-    private Long update;
+    public static final String TAG_UPDATE = "update";
 
     /**
      * whether revoked
      */
-    public static final String TAG_rev = "rev";
-
-    private Boolean rev;
+    public static final String TAG_REV = "rev";
 
     /**
      * revocation reason
      */
-    public static final String TAG_rr = "rr";
-
-    private Integer rr;
+    public static final String TAG_RR = "rr";
 
     /**
      * revocation time
      */
-    public static final String TAG_rt = "rt";
-
-    private Long rt;
+    public static final String TAG_RT = "rt";
 
     /**
      * revocation invalidity time
      */
-    public static final String TAG_rit = "rit";
-
-    private Long rit;
+    public static final String TAG_RIT = "rit";
 
     /**
      * certificate profile name
      */
-    public static final String TAG_profile = "profile";
-
-    private String profile;
+    public static final String TAG_PROFILE = "profile";
 
     /**
      * file name of the certificate
      */
-    public static final String TAG_file = "file";
+    public static final String TAG_FILE = "file";
+
+    private Integer id;
 
     private String file;
+
+    private String profile;
+
+    private Integer iid;
+
+    private String sn;
+
+    private Long update;
+
+    private Boolean rev;
+
+    private Integer rr;
+
+    private Long rt;
+
+    private Long rit;
 
     public Integer getId() {
         return id;
@@ -223,16 +223,16 @@ public class OcspCertType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_id, id);
-        writeIfNotNull(writer, TAG_iid, iid);
-        writeIfNotNull(writer, TAG_sn, sn);
-        writeIfNotNull(writer, TAG_update, update);
-        writeIfNotNull(writer, TAG_rev, rev);
-        writeIfNotNull(writer, TAG_rr, rr);
-        writeIfNotNull(writer, TAG_rt, rt);
-        writeIfNotNull(writer, TAG_rit, rit);
-        writeIfNotNull(writer, TAG_profile, profile);
-        writeIfNotNull(writer, TAG_file, file);
+        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_IID, iid);
+        writeIfNotNull(writer, TAG_SN, sn);
+        writeIfNotNull(writer, TAG_UPDATE, update);
+        writeIfNotNull(writer, TAG_REV, rev);
+        writeIfNotNull(writer, TAG_RR, rr);
+        writeIfNotNull(writer, TAG_RT, rt);
+        writeIfNotNull(writer, TAG_RIT, rit);
+        writeIfNotNull(writer, TAG_PROFILE, profile);
+        writeIfNotNull(writer, TAG_FILE, file);
         writer.writeEndElement();
         writer.writeNewline();
     }
