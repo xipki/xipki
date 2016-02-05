@@ -77,7 +77,7 @@ public abstract class FingerprintCertificateValidator implements CACertValidator
     }
 
     protected abstract boolean isCertTrusted(
-            HashAlgoType hashAlgo,
+            HashAlgoType pHashAlgo,
             byte[] hashValue);
 
 }
