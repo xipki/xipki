@@ -33,7 +33,7 @@ public class BCRSAPrivateKey implements RSAPrivateKey, PKCS12BagAttributeCarrier
 
     static final long serialVersionUID = 5110188922551353628L;
 
-    private static BigInteger ZERO = BigInteger.valueOf(0);
+    private static final BigInteger ZERO = BigInteger.valueOf(0);
 
     protected BigInteger modulus;
 

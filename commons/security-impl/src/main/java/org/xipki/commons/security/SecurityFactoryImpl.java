@@ -147,7 +147,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private boolean strongRandom4KeyEnabled = true;
 
-    private boolean strongRandom4SignEnabled = false;
+    private boolean strongRandom4SignEnabled;
 
     private final Map<String, String> signerTypeMapping = new HashMap<>();
 
@@ -206,19 +206,20 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
      *
      */
     private ConcurrentContentSigner doCreateSigner(
-            String type,
+            final String type,
             final String conf,
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
     throws SignerException {
-        if (signerTypeMapping.containsKey(type)) {
-            type = signerTypeMapping.get(type);
+        String localType = type;
+        if (signerTypeMapping.containsKey(localType)) {
+            localType = signerTypeMapping.get(localType);
         }
 
-        if ("PKCS11".equalsIgnoreCase(type)
-                || "PKCS12".equalsIgnoreCase(type)
-                || "JKS".equalsIgnoreCase(type)) {
+        if ("PKCS11".equalsIgnoreCase(localType)
+                || "PKCS12".equalsIgnoreCase(localType)
+                || "JKS".equalsIgnoreCase(localType)) {
             ConfPairs keyValues = new ConfPairs(conf);
 
             String s = keyValues.getValue("parallelism");
@@ -235,7 +236,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
             }
 
-            if ("PKCS11".equalsIgnoreCase(type)) {
+            if ("PKCS11".equalsIgnoreCase(localType)) {
                 String pkcs11Module = keyValues.getValue("module");
                 if (pkcs11Module == null) {
                     pkcs11Module = DEFAULT_P11MODULE_NAME;
@@ -340,7 +341,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
 
                 SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                        type, keystoreStream, password, keyLabel, password, certificateChain);
+                        localType, keystoreStream, password, keyLabel, password, certificateChain);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
@@ -360,10 +361,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             e.getClass().getName(), e.getMessage()));
                 }
             }
-        } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
+        } else if (StringUtil.startsWithIgnoreCase(localType, "java:")) {
             if (hashAlgo == null) {
                 ConcurrentContentSigner contentSigner;
-                String classname = type.substring("java:".length());
+                String classname = localType.substring("java:".length());
                 try {
                     Class<?> clazz = Class.forName(classname);
                     contentSigner = (ConcurrentContentSigner) clazz.newInstance();
@@ -378,10 +379,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
                 return contentSigner;
             } else {
-                throw new SignerException("unknwon type: " + type);
+                throw new SignerException("unknwon type: " + localType);
             }
         } else {
-            throw new SignerException("unknwon type: " + type);
+            throw new SignerException("unknwon type: " + localType);
         }
     } // method doCreateSigner
 
@@ -673,19 +674,19 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     public void setSignerTypeMap(
-            String signerTypeMap) {
+            final String signerTypeMap) {
         if (signerTypeMap == null) {
             LOG.debug("signerTypeMap is null");
             return;
         }
 
-        signerTypeMap = signerTypeMap.trim();
-        if (StringUtil.isBlank(signerTypeMap)) {
+        String localSignerTypeMap = signerTypeMap.trim();
+        if (StringUtil.isBlank(localSignerTypeMap)) {
             LOG.debug("signerTypeMap is empty");
             return;
         }
 
-        StringTokenizer st = new StringTokenizer(signerTypeMap, " \t");
+        StringTokenizer st = new StringTokenizer(localSignerTypeMap, " \t");
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             StringTokenizer st2 = new StringTokenizer(token, "=");

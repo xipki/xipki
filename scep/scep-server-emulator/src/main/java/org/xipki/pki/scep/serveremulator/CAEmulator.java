@@ -159,10 +159,10 @@ public class CAEmulator {
     throws Exception {
         Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
 
-        BigInteger _serialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
+        BigInteger localSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
                 cASubject,
-                _serialNumber,
+                localSerialNumber,
                 notBefore,
                 notAfter,
                 subjectDN,
@@ -181,19 +181,19 @@ public class CAEmulator {
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(cAKey);
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
 
-        serialCertMap.put(_serialNumber, asn1Cert);
+        serialCertMap.put(localSerialNumber, asn1Cert);
         reqSubjectCertMap.put(subjectDN, asn1Cert);
         return asn1Cert;
     }
 
     public Certificate getCert(
             final X500Name issuer,
-            final BigInteger serialNumber) {
+            final BigInteger pSerialNumber) {
         if (!cASubject.equals(issuer)) {
             return null;
         }
 
-        return serialCertMap.get(serialNumber);
+        return serialCertMap.get(pSerialNumber);
     }
 
     public Certificate pollCert(
@@ -208,7 +208,7 @@ public class CAEmulator {
 
     public synchronized CertificateList getCRL(
             final X500Name issuer,
-            final BigInteger serialNumber)
+            final BigInteger pSerialNumber)
     throws Exception {
         if (crl != null) {
             return crl;
@@ -229,8 +229,8 @@ public class CAEmulator {
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(cAKey, HashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(cAKey);
-        X509CRLHolder _crl = crlBuilder.build(contentSigner);
-        crl = _crl.toASN1Structure();
+        X509CRLHolder localCrl = crlBuilder.build(contentSigner);
+        crl = localCrl.toASN1Structure();
         return crl;
     }
 

@@ -98,7 +98,7 @@ public class SlotIdentifier extends ASN1Object {
                 slotIdASN1Obj = obj;
             }
 
-            Long slotId = null;
+            Long localSlotId = null;
 
             if (slotIdASN1Obj instanceof ASN1TaggedObject) {
                 ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
@@ -106,13 +106,13 @@ public class SlotIdentifier extends ASN1Object {
                 int tagNo = tagObj.getTagNo();
                 if (tagNo == 1) {
                     ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
-                    slotId = i.getPositiveValue().longValue();
+                    localSlotId = i.getPositiveValue().longValue();
                 } else {
                     throw new BadASN1ObjectException("unknown tag " + tagNo);
                 }
             }
 
-            this.slotId = new P11SlotIdentifier(slotIndex, slotId);
+            this.slotId = new P11SlotIdentifier(slotIndex, localSlotId);
         } catch (IllegalArgumentException e) {
             throw new BadASN1ObjectException(e.getMessage(), e);
         }

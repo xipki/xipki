@@ -169,7 +169,7 @@ public class KeystoreP11Identity extends P11Identity {
 
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
                 (getSignatureKeyBitLength() + 7) / 8);
-        return do_rsa_sign(padded);
+        return doRsaSign(padded);
     }
 
     public byte[] CKM_RSA_X509(
@@ -179,10 +179,10 @@ public class KeystoreP11Identity extends P11Identity {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
-        return do_rsa_sign(hash);
+        return doRsaSign(hash);
     }
 
-    private byte[] do_rsa_sign(
+    private byte[] doRsaSign(
             final byte[] paddedHash)
     throws SignerException {
         Cipher cipher;
@@ -210,7 +210,7 @@ public class KeystoreP11Identity extends P11Identity {
                     + publicKey.getAlgorithm() + " public key");
         }
 
-        return do_dsa_x962_sign(hash);
+        return doDsaX962Sign(hash);
     }
     public byte[] CKM_ECDSA(
             final byte[] hash)
@@ -226,7 +226,7 @@ public class KeystoreP11Identity extends P11Identity {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
-        return do_dsa_x962_sign(hash);
+        return doDsaX962Sign(hash);
     }
 
     public byte[] CKM_DSA(
@@ -236,7 +236,7 @@ public class KeystoreP11Identity extends P11Identity {
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
-    private byte[] do_dsa_x962_sign(
+    private byte[] doDsaX962Sign(
             final byte[] hash)
     throws SignerException {
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());

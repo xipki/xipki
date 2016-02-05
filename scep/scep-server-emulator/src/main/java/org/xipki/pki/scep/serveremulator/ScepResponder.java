@@ -93,6 +93,11 @@ public class ScepResponder {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScepResponder.class);
 
+    private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
+
+    private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGS
+            = new HashSet<ASN1ObjectIdentifier>();
+
     private final CACaps cACaps;
 
     private final CAEmulator cAEmulator;
@@ -103,22 +108,18 @@ public class ScepResponder {
 
     private final ScepControl control;
 
-    private static final long DFLT_MAX_SIGNINGTIME_BIAS = 5L * 60 * 1000; // 5 minutes
-
-    private final static Set<ASN1ObjectIdentifier> aesEncAlgs = new HashSet<ASN1ObjectIdentifier>();
-
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
     static {
-        aesEncAlgs.add(CMSAlgorithm.AES128_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES128_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES128_GCM);
-        aesEncAlgs.add(CMSAlgorithm.AES192_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES192_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES192_GCM);
-        aesEncAlgs.add(CMSAlgorithm.AES256_CBC);
-        aesEncAlgs.add(CMSAlgorithm.AES256_CCM);
-        aesEncAlgs.add(CMSAlgorithm.AES256_GCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES128_CBC);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES128_CCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES128_GCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES192_CBC);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES192_CCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES192_GCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES256_CBC);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES256_CCM);
+        AES_ENC_ALGS.add(CMSAlgorithm.AES256_GCM);
     }
 
     public ScepResponder(
@@ -322,7 +323,7 @@ public class ScepResponder {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
-        } else if (aesEncAlgs.contains(encOid)) {
+        } else if (AES_ENC_ALGS.contains(encOid)) {
             if (!cACaps.containsCapability(CACapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
                         encOid);

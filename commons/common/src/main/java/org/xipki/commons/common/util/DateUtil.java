@@ -47,11 +47,11 @@ import java.util.TimeZone;
 
 public class DateUtil {
 
-    private static final SimpleDateFormat sdf;
+    private static final SimpleDateFormat SDF;
 
     static {
-        sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SDF = new SimpleDateFormat("yyyyMMddHHmmss");
+        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     private DateUtil() {
@@ -63,7 +63,7 @@ public class DateUtil {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try {
-            return sdf.parse(utcTime);
+            return SDF.parse(utcTime);
         } catch (ParseException e) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
                     + e.getMessage());

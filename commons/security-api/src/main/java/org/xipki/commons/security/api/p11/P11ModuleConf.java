@@ -132,8 +132,8 @@ public class P11ModuleConf {
             included = true;
         } else {
             included = false;
-            for (P11SlotIdentifier _slot : includeSlots) {
-                if (_slot.equals(slot)) {
+            for (P11SlotIdentifier entry : includeSlots) {
+                if (entry.equals(slot)) {
                     included = true;
                     break;
                 }
@@ -148,8 +148,8 @@ public class P11ModuleConf {
             return included;
         }
 
-        for (P11SlotIdentifier _slot : excludeSlots) {
-            if (_slot.equals(slot)) {
+        for (P11SlotIdentifier entry : excludeSlots) {
+            if (entry.equals(slot)) {
                 return false;
             }
         }

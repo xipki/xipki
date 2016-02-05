@@ -190,8 +190,6 @@ public class XipkiProvider extends Provider {
 
     } // class MyPrivilegedAction
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Exactly the name this provider is registered under at
      * <code>java.security.Security</code>: "<code>XiPKI</code>".
@@ -209,6 +207,8 @@ public class XipkiProvider extends Provider {
      * and also telling about the provided algorithms.
      */
     private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
+
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
     public XipkiProvider() {

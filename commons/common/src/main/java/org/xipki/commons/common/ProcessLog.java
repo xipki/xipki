@@ -54,7 +54,7 @@ public class ProcessLog {
 
     private static final long DAY_IN_SEC = 24L * 60 * 60;
 
-    private static final int minLen = 12;
+    private static final int MIN_LEN = 12;
 
     private final long total;
 
@@ -88,7 +88,7 @@ public class ProcessLog {
         int n = hasTotal
                 ? 7
                 : 4;
-        for (int i = 0; i < n * minLen; i++) {
+        for (int i = 0; i < n * MIN_LEN; i++) {
             sb.append('-');
         }
         sb.append('\n');
@@ -144,7 +144,7 @@ public class ProcessLog {
         int n = hasTotal
                 ? 7
                 : 4;
-        for (int i = 0; i < n * minLen; i++) {
+        for (int i = 0; i < n * MIN_LEN; i++) {
             sb.append('-');
         }
 
@@ -173,8 +173,8 @@ public class ProcessLog {
     }
 
     public long addNumProcessed(
-            final long numProcessed) {
-        return this.numProcessed.addAndGet(numProcessed);
+            final long pNumProcessed) {
+        return this.numProcessed.addAndGet(pNumProcessed);
     }
 
     public void printStatus() {
@@ -284,7 +284,7 @@ public class ProcessLog {
     } // method printStatus
 
     private static String formatText(String text) {
-        return StringUtil.formatText(text, minLen);
+        return StringUtil.formatText(text, MIN_LEN);
     }
 
     private static String buildDateTime(long timeMs) {
@@ -324,7 +324,7 @@ public class ProcessLog {
         }
 
         int size = sb.length();
-        for (int i = 0; i < (minLen - size); i++) {
+        for (int i = 0; i < (MIN_LEN - size); i++) {
             sb.insert(0, ' ');
         }
 

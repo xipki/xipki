@@ -106,22 +106,25 @@ public class SecurePasswordInputPanel extends Panel {
 
     private static final String OK = "OK";
 
-    private final JPasswordField passwordField;
+    private static final Map<Integer, String[]> KEYS_MAP = new HashMap<Integer, String[]>();
 
-    private static final Map<Integer, String[]> keysMap = new HashMap<Integer, String[]>();
+    private final JPasswordField passwordField;
 
     private final Set<JButton> buttons = new HashSet<JButton>();
 
+    private String password = "";
+    private boolean caps;
+
     static {
         int i = 0;
-        keysMap.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
-        keysMap.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
+        KEYS_MAP.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
+        KEYS_MAP.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
                 "(", ")", "{", "}"});
-        keysMap.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
+        KEYS_MAP.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
                 ".", "-", "/"});
-        keysMap.put(i++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
-        keysMap.put(i++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
-        keysMap.put(i++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
+        KEYS_MAP.put(i++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
+        KEYS_MAP.put(i++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
+        KEYS_MAP.put(i++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
     }
 
     private SecurePasswordInputPanel() {
@@ -132,7 +135,7 @@ public class SecurePasswordInputPanel extends Panel {
 
         add(passwordField);
 
-        Set<Integer> rows = new HashSet<Integer>(keysMap.keySet());
+        Set<Integer> rows = new HashSet<Integer>(KEYS_MAP.keySet());
         int n = rows.size();
 
         SecureRandom random = new SecureRandom();
@@ -142,7 +145,7 @@ public class SecurePasswordInputPanel extends Panel {
                 continue;
             }
 
-            String[] keys = keysMap.get(row);
+            String[] keys = KEYS_MAP.get(row);
             rows.remove(row);
 
             JPanel panel = new JPanel();
@@ -172,9 +175,6 @@ public class SecurePasswordInputPanel extends Panel {
         return password.toCharArray();
     }
 
-    private String password = "";
-    private boolean caps = false;
-
     public static void main(
             final String[] args) {
         char[] password = readPassword("Enter password");
@@ -184,7 +184,7 @@ public class SecurePasswordInputPanel extends Panel {
     }
 
     public static char[] readPassword(
-            String prompt) {
+            final String prompt) {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
         try {
             UIManager.setLookAndFeel(
@@ -195,11 +195,13 @@ public class SecurePasswordInputPanel extends Panel {
         try {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
             String[] options = new String[]{OK};
-            if (prompt == null || prompt.isEmpty()) {
-                prompt = "Password required";
+
+            String localPrompt = prompt;
+            if (localPrompt == null || localPrompt.isEmpty()) {
+                localPrompt = "Password required";
             }
 
-            int option = JOptionPane.showOptionDialog(null, gui, prompt,
+            int option = JOptionPane.showOptionDialog(null, gui, localPrompt,
                     JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
 

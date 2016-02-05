@@ -53,16 +53,16 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class FpIdCalculator {
 
-    private final static int parallelism = 50;
+    private static final int PARALLELISM = 50;
 
-    private final static BlockingDeque<Digest> mds = getMD5MessageDigests();
+    private static final BlockingDeque<Digest> MDS = getMD5MessageDigests();
 
     private FpIdCalculator() {
     }
 
     private static BlockingDeque<Digest> getMD5MessageDigests() {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
-        for (int i = 0; i < parallelism; i++) {
+        for (int i = 0; i < PARALLELISM; i++) {
             Digest md = new SHA1Digest();
             mds.addLast(md);
         }
@@ -94,7 +94,7 @@ public class FpIdCalculator {
         Digest md = null;
         for (int i = 0; i < 3; i++) {
             try {
-                md = mds.poll(10, TimeUnit.SECONDS);
+                md = MDS.poll(10, TimeUnit.SECONDS);
                 break;
             } catch (InterruptedException e) {
             }
@@ -112,7 +112,7 @@ public class FpIdCalculator {
 
             return bytesToLong(b);
         } finally {
-            mds.addLast(md);
+            MDS.addLast(md);
         }
     }
 

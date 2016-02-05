@@ -81,7 +81,7 @@ class SunP11Identity implements Comparable<SunP11Identity> {
 
     private final int signatureKeyBitLength;
 
-    public SunP11Identity(
+    SunP11Identity(
             final Provider p11Provider,
             final P11SlotIdentifier slotId,
             final String keyLabel,
@@ -189,9 +189,9 @@ class SunP11Identity implements Comparable<SunP11Identity> {
     }
 
     public boolean match(
-            final P11SlotIdentifier slotId,
-            final String keyLabel) {
-        return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
+            final P11SlotIdentifier pSlotId,
+            final String pKeyLabel) {
+        return this.slotId.equals(pSlotId) && this.keyLabel.equals(pKeyLabel);
     }
 
     public byte[] CKM_RSA_PKCS(

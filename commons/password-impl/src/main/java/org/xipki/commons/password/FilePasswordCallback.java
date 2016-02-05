@@ -88,7 +88,7 @@ public class FilePasswordCallback implements PasswordCallback {
             throw new PasswordResolverException("no password is specified in file " + passwordFile);
         }
 
-        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.__OBFUSCATE)) {
+        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.OBFUSCATE)) {
             return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
         } else {
             return passwordHint.toCharArray();

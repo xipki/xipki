@@ -42,17 +42,17 @@ package org.xipki.commons.security.api;
 
 public class TLSExtensionType implements Comparable<TLSExtensionType> {
 
-    public static final TLSExtensionType server_name
+    public static final TLSExtensionType SERVER_NAME
             = new TLSExtensionType(0, "server_name");
-    public static final TLSExtensionType max_fragment_length
+    public static final TLSExtensionType MAX_FRAGMENT_LENGTH
             = new TLSExtensionType(1, "max_fragment_length");
-    public static final TLSExtensionType client_certificate_url
+    public static final TLSExtensionType CLIENT_CERTIFICATE_URL
             = new TLSExtensionType(2, "client_certificate_url");
-    public static final TLSExtensionType trusted_ca_keys
+    public static final TLSExtensionType TRUSTED_CA_KEYS
             = new TLSExtensionType(3, "trusted_ca_keys");
-    public static final TLSExtensionType truncated_hmac
+    public static final TLSExtensionType TRUCATED_HMAC
             = new TLSExtensionType(4, "truncated_hmac");
-    public static final TLSExtensionType status_request
+    public static final TLSExtensionType STATUS_REQUEST
             = new TLSExtensionType(5, "status_request");
 
     private final int code;

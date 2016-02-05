@@ -181,7 +181,8 @@ public class XMLUtil {
                     if (n.getNodeType() == Node.TEXT_NODE) {
                         return n.getNodeValue();
                     }
-                } while ((n = n.getNextSibling()) != null);
+                    n = n.getNextSibling();
+                } while (n != null);
             }
         }
 
@@ -201,7 +202,8 @@ public class XMLUtil {
             if (match(node, namespace, localname)) {
                 return (Element) node;
             }
-        } while ((node = node.getNextSibling()) != null);
+            node = node.getNextSibling();
+        } while (node != null);
         return null;
     }
 

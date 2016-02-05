@@ -65,11 +65,14 @@ public class KeystoreP11CryptService implements P11CryptService {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11CryptService.class);
 
+    private static final Map<String, KeystoreP11CryptService> INSTANCES = new HashMap<>();
+
     private final P11ModuleConf moduleConf;
 
-    private KeystoreP11Module module;
+    private final ConcurrentSkipListSet<KeystoreP11Identity> identities
+            = new ConcurrentSkipListSet<>();
 
-    private static final Map<String, KeystoreP11CryptService> instances = new HashMap<>();
+    private KeystoreP11Module module;
 
     public KeystoreP11CryptService(
             final P11ModuleConf moduleConf)
@@ -78,9 +81,6 @@ public class KeystoreP11CryptService implements P11CryptService {
         this.moduleConf = moduleConf;
         refresh();
     }
-
-    private final ConcurrentSkipListSet<KeystoreP11Identity> identities
-        = new ConcurrentSkipListSet<>();
 
     @Override
     public synchronized void refresh()
@@ -327,12 +327,12 @@ public class KeystoreP11CryptService implements P11CryptService {
     public static KeystoreP11CryptService getInstance(
             final P11ModuleConf moduleConf)
     throws SignerException {
-        synchronized (instances) {
+        synchronized (INSTANCES) {
             final String name = moduleConf.getName();
-            KeystoreP11CryptService instance = instances.get(name);
+            KeystoreP11CryptService instance = INSTANCES.get(name);
             if (instance == null) {
                 instance = new KeystoreP11CryptService(moduleConf);
-                instances.put(name, instance);
+                INSTANCES.put(name, instance);
             }
 
             return instance;

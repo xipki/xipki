@@ -216,7 +216,7 @@ public class SoftTokenContentSignerBuilder {
 
     public static class NssPlainRSASigner implements AsymmetricBlockCipher {
 
-        private static final String algorithm = "RSA/ECB/NoPadding";
+        private static final String ALGORITHM = "RSA/ECB/NoPadding";
 
         private Cipher cipher;
 
@@ -224,7 +224,7 @@ public class SoftTokenContentSignerBuilder {
 
         public NssPlainRSASigner()
         throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-            cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
+            cipher = Cipher.getInstance(ALGORITHM, "SunPKCS11-XipkiNSS");
         }
 
         @Override
@@ -284,11 +284,11 @@ public class SoftTokenContentSignerBuilder {
 
     } // class NssPlainRSASigner
 
-    private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
-
     public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
 
     public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
+
+    private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
 
     private final PrivateKey key;
 
@@ -305,7 +305,7 @@ public class SoftTokenContentSignerBuilder {
             final String keystoreType,
             final InputStream keystoreStream,
             final char[] keystorePassword,
-            String keyname,
+            final String keyname,
             final char[] keyPassword,
             final X509Certificate[] certificateChain)
     throws SignerException {
@@ -327,22 +327,23 @@ public class SoftTokenContentSignerBuilder {
             }
             ks.load(keystoreStream, keystorePassword);
 
-            if (keyname == null) {
+            String localKeyname = keyname;
+            if (localKeyname == null) {
                 Enumeration<String> aliases = ks.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
                     if (ks.isKeyEntry(alias)) {
-                        keyname = alias;
+                        localKeyname = alias;
                         break;
                     }
                 }
             } else {
-                if (!ks.isKeyEntry(keyname)) {
-                    throw new SignerException("unknown key named " + keyname);
+                if (!ks.isKeyEntry(localKeyname)) {
+                    throw new SignerException("unknown key named " + localKeyname);
                 }
             }
 
-            this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
+            this.key = (PrivateKey) ks.getKey(localKeyname, keyPassword);
 
             if (!(key instanceof RSAPrivateKey
                     || key instanceof DSAPrivateKey
@@ -364,10 +365,10 @@ public class SoftTokenContentSignerBuilder {
                     }
                 }
             } else {
-                cert = (X509Certificate) ks.getCertificate(keyname);
+                cert = (X509Certificate) ks.getCertificate(localKeyname);
             }
 
-            Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
+            Certificate[] certsInKeystore = ks.getCertificateChain(localKeyname);
             if (certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);

@@ -64,60 +64,60 @@ import org.xipki.commons.security.p11.P11RSAKeyParameter;
 
 class RSAPSSSignatureSpi extends SignatureSpi {
 
-    static public class NonePSS extends RSAPSSSignatureSpi {
+    class NonePSS extends RSAPSSSignatureSpi {
 
-        public NonePSS() {
+        NonePSS() {
             super(null, true);
         }
 
     } // class nonePSS
 
-    static public class PSSwithRSA extends RSAPSSSignatureSpi {
+    class PSSwithRSA extends RSAPSSSignatureSpi {
 
-        public PSSwithRSA() {
+        PSSwithRSA() {
             super(null);
         }
 
     } // class PSSwithRSA
 
-    static public class SHA1withRSA extends RSAPSSSignatureSpi {
+    class SHA1withRSA extends RSAPSSSignatureSpi {
 
-        public SHA1withRSA() {
+        SHA1withRSA() {
             super(PSSParameterSpec.DEFAULT);
         }
 
     } // class SHA1withRSA
 
-    static public class SHA224withRSA extends RSAPSSSignatureSpi {
+    class SHA224withRSA extends RSAPSSSignatureSpi {
 
-        public SHA224withRSA() {
+        SHA224withRSA() {
             super(new PSSParameterSpec("SHA-224", "MGF1",
                     new MGF1ParameterSpec("SHA-224"), 28, 1));
         }
 
     } // class SHA224withRSA
 
-    static public class SHA256withRSA extends RSAPSSSignatureSpi {
+    class SHA256withRSA extends RSAPSSSignatureSpi {
 
-        public SHA256withRSA() {
+        SHA256withRSA() {
             super(new PSSParameterSpec("SHA-256", "MGF1",
                     new MGF1ParameterSpec("SHA-256"), 32, 1));
         }
 
     } // class SHA256withRSA
 
-    static public class SHA384withRSA extends RSAPSSSignatureSpi {
+    class SHA384withRSA extends RSAPSSSignatureSpi {
 
-        public SHA384withRSA() {
+        SHA384withRSA() {
             super(new PSSParameterSpec("SHA-384", "MGF1",
                     new MGF1ParameterSpec("SHA-384"), 48, 1));
         }
 
     } // class SHA384withRSA
 
-    static public class SHA512withRSA extends RSAPSSSignatureSpi {
+    class SHA512withRSA extends RSAPSSSignatureSpi {
 
-        public SHA512withRSA() {
+        SHA512withRSA() {
             super(new PSSParameterSpec("SHA-512", "MGF1",
                     new MGF1ParameterSpec("SHA-512"), 64, 1));
         }
@@ -132,7 +132,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
         private boolean oddTime = true;
 
-        public NullPssDigest(
+        NullPssDigest(
                 final Digest mgfDigest) {
             this.baseDigest = mgfDigest;
         }
@@ -205,23 +205,6 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     private P11PrivateKey signingKey;
 
     private org.bouncycastle.crypto.signers.PSSSigner pss;
-
-    private byte getTrailer(
-            final int trailerField) {
-        if (trailerField == 1) {
-            return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
-        }
-
-        throw new IllegalArgumentException("unknown trailer field");
-    }
-
-    private void setupContentDigest() {
-        if (isRaw) {
-            this.contentDigest = new NullPssDigest(mgfDigest);
-        } else {
-            this.contentDigest = mgfDigest;
-        }
-    }
 
     protected RSAPSSSignatureSpi(
             final PSSParameterSpec paramSpecArg) {
@@ -396,6 +379,23 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     protected Object engineGetParameter(
             final String param) {
         throw new UnsupportedOperationException("engineGetParameter unsupported");
+    }
+
+    private byte getTrailer(
+            final int trailerField) {
+        if (trailerField == 1) {
+            return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
+        }
+
+        throw new IllegalArgumentException("unknown trailer field");
+    }
+
+    private void setupContentDigest() {
+        if (isRaw) {
+            this.contentDigest = new NullPssDigest(mgfDigest);
+        } else {
+            this.contentDigest = mgfDigest;
+        }
     }
 
 }

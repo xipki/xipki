@@ -46,11 +46,11 @@ public class XipkiCmpConstants {
 
     public static final int CRL_REASON_REMOVE = -1;
 
-    public static final GeneralName remoteP11_cmp_server =
+    public static final GeneralName REMOTE_P11_CMP_SERVER =
             new GeneralName(GeneralName.uniformResourceIdentifier,
                     "http://xipki.org/remotep11/server");
 
-    public static final GeneralName remotep11_cmp_client =
+    public static final GeneralName REMOTE_P11_CMP_CLIENT =
             new GeneralName(GeneralName.uniformResourceIdentifier,
                     "http://xipki.org/remotep11/client");
 

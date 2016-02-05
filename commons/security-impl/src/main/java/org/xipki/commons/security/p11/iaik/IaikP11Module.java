@@ -147,11 +147,11 @@ public class IaikP11Module implements P11Module {
         }
 
         Slot slot = null;
-        P11SlotIdentifier _slotId = null;
+        P11SlotIdentifier localSlotId = null;
         for (P11SlotIdentifier s : availableSlots.keySet()) {
             if (s.getSlotIndex() == slotId.getSlotIndex()
                     || s.getSlotId() == slotId.getSlotId()) {
-                _slotId = s;
+                localSlotId = s;
                 slot = availableSlots.get(s);
                 break;
             }
@@ -167,9 +167,9 @@ public class IaikP11Module implements P11Module {
         } catch (PasswordResolverException e) {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
-        extSlot = new IaikP11Slot(_slotId, slot, pwd);
+        extSlot = new IaikP11Slot(localSlotId, slot, pwd);
 
-        slots.put(_slotId, extSlot);
+        slots.put(localSlotId, extSlot);
         return extSlot;
     } // method gestSlot
 
