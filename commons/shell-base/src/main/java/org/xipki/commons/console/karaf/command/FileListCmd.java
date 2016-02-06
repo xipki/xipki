@@ -99,13 +99,14 @@ public class FileListCmd extends XipkiCommandSupport {
         List<String> l2 = new LinkedList<>();
 
         for (String s : l) {
-            int diffLen = maxLen - s.length();
+            String lS = s;
+            int diffLen = maxLen - lS.length();
             if (diffLen > 0) {
                 for (int i = 0; i < diffLen; i++) {
-                    s += " ";
+                    lS += " ";
                 }
             }
-            l2.add(s);
+            l2.add(lS);
         }
 
         int width = session.getTerminal().getWidth();
