@@ -200,10 +200,11 @@ public class SunNamedCurveExtender {
     private SunNamedCurveExtender() {
     }
 
+    /*
     public static void main(
             final String[] args) {
         addNamedCurves();
-    }
+    }*/
 
     public static void addNamedCurves() {
         synchronized (executed) {

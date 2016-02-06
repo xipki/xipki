@@ -158,7 +158,7 @@ public class HealthCheckResult {
             int n = childChecks.size();
             for (int i = 0; i < n; i++) {
                 HealthCheckResult childCheck = childChecks.get(i);
-                if (i > 0) {
+                if (i > 0 && pretty) {
                     sb.append("\n");
                 }
                 sb.append(childCheck.toJsonMessage(level + 2, pretty));
@@ -327,53 +327,5 @@ public class HealthCheckResult {
 
         throw new IllegalArgumentException("invalid text: '" + text + "'");
     } // method getBlock
-
-    public static void main(
-            final String[] args) {
-        String jm1 = "{\"healthy\":true}";
-        String jm2 = "{\"healthy\":true,\"checks\":{\"childcheck\":{\"healthy\":false,"
-                + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
-                + "\"childcheck2\":{\"healthy\":false}}}";
-        System.out.println(getBlock(jm1, 0));
-        System.out.println(getBlock(jm2, 25));
-        getInstanceFromJsonMessage("default", jm1);
-        getInstanceFromJsonMessage("default", jm2);
-
-        HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
-        checkResult.setHealthy(false);
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(true));
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(false));
-
-        checkResult = new HealthCheckResult("mycheck-positive");
-        checkResult.setHealthy(true);
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(true));
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(false));
-
-        HealthCheckResult childCheck = new HealthCheckResult("childcheck");
-        checkResult.addChildCheck(childCheck);
-        childCheck.setHealthy(false);
-
-        HealthCheckResult childCheck2 = new HealthCheckResult("childcheck2");
-        checkResult.addChildCheck(childCheck2);
-        childCheck.setHealthy(false);
-
-        HealthCheckResult childChildCheck = new HealthCheckResult("childChildCheck");
-        childCheck.addChildCheck(childChildCheck);
-        childChildCheck.setHealthy(false);
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(true));
-
-        System.out.println();
-        System.out.println(checkResult.toJsonMessage(false));
-    } // method main
 
 }
