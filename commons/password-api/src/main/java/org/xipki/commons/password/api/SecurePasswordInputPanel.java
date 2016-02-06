@@ -175,14 +175,6 @@ public class SecurePasswordInputPanel extends Panel {
         return password.toCharArray();
     }
 
-    public static void main(
-            final String[] args) {
-        char[] password = readPassword("Enter password");
-        System.out.println("'" + new String(password) + "'");
-        char[] password2 = readPassword("Enter password");
-        System.out.println("'" + new String(password2) + "'");
-    }
-
     public static char[] readPassword(
             final String prompt) {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();

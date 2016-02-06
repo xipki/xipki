@@ -690,6 +690,7 @@ public class CAManagerClient implements CAManager {
         return client.getScepEntry(name);
     }
 
+    /*
     public static void main(
             final String[] args) {
         try {
@@ -704,6 +705,6 @@ public class CAManagerClient implements CAManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } */
 
 }
