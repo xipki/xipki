@@ -214,23 +214,21 @@ public class OcspQAImpl implements OcspQA {
                     }
                 } // end for
 
-                if (!issue.isFailed()) {
-                    X509Certificate respIssuer = responseOption.getRespIssuer();
-                    if (respIssuer != null) {
-                        X509Certificate jceRespSigner;
-                        try {
-                            jceRespSigner = new X509CertificateObject(
-                                    respSigner.toASN1Structure());
-                            if (X509Util.issues(respIssuer, jceRespSigner)) {
-                                jceRespSigner.verify(respIssuer.getPublicKey());
-                            } else {
-                                issue.setFailureMessage("responder signer is not trusted");
-                            }
-                        } catch (Exception e) {
+                X509Certificate respIssuer = responseOption.getRespIssuer();
+                if (!issue.isFailed() && respIssuer != null) {
+                    X509Certificate jceRespSigner;
+                    try {
+                        jceRespSigner = new X509CertificateObject(
+                                respSigner.toASN1Structure());
+                        if (X509Util.issues(respIssuer, jceRespSigner)) {
+                            jceRespSigner.verify(respIssuer.getPublicKey());
+                        } else {
                             issue.setFailureMessage("responder signer is not trusted");
                         }
-                    } // end if (respIssuer != null)
-                } // end if (!issue.isFailed())
+                    } catch (Exception e) {
+                        issue.setFailureMessage("responder signer is not trusted");
+                    }
+                }
 
                 try {
                     PublicKey responderPubKey = KeyUtil.generatePublicKey(

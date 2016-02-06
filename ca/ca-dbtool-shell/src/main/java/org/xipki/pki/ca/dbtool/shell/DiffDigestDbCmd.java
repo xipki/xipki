@@ -47,6 +47,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
+import org.xipki.pki.ca.dbtool.diffdb.NumThreads;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**
@@ -116,6 +117,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
             }
         }
 
+        NumThreads numThreads = new NumThreads(numRefThreads, numTargetThreads);
         return new DbDigestDiffWorker(
                 dataSourceFactory,
                 passwordResolver,
@@ -125,8 +127,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
                 dbconfFile,
                 reportDir,
                 numCertsPerSelect,
-                numRefThreads,
-                numTargetThreads,
+                numThreads,
                 cACerts);
     }
 

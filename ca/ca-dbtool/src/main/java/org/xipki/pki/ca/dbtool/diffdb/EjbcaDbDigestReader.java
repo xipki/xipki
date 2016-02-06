@@ -51,7 +51,6 @@ import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IDRange;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
 import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCACertExtractor;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
@@ -79,9 +78,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             final int minId,
             final int maxId,
             final int numThreads,
-            final DbSchemaType dbSchemaType,
             final int caId,
-            final boolean dbContainsOtherCA,
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws Exception {
@@ -171,12 +168,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                             base64Rs.next();
                             String b64Cert = base64Rs.getString("base64Cert");
                             base64Rs.close();
-                            X509Certificate jceCert;
-                            try {
-                                jceCert = X509Util.parseBase64EncodedCert(b64Cert);
-                            } catch (Exception e) {
-                                throw new DataAccessException("IOException", e);
-                            }
+                            X509Certificate jceCert = readBase64Cert(b64Cert);
                             if (jceCert.getIssuerX500Principal()
                                     .equals(caCert.getSubjectX500Principal())) {
                                 ofThisCA = true;
@@ -244,7 +236,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
     public static EjbcaDbDigestReader getInstance(
             final DataSourceWrapper datasource,
-            final DbSchemaType dbSchemaType,
             final int caId,
             final boolean dbContainsOtherCA,
             final boolean revokedOnly,
@@ -322,8 +313,17 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         }
 
         return new EjbcaDbDigestReader(datasource, caCert, revokedOnly, totalAccount,
-                minId, maxId, numThreads, dbSchemaType, caId, dbContainsOtherCA,
+                minId, maxId, numThreads, caId,
                 numCertsToPredicate, stopMe);
     } // method getInstance
+
+    private static X509Certificate readBase64Cert(String b64Cert)
+    throws DataAccessException {
+        try {
+            return X509Util.parseBase64EncodedCert(b64Cert);
+        } catch (Exception e) {
+            throw new DataAccessException("IOException", e);
+        }
+    }
 
 }

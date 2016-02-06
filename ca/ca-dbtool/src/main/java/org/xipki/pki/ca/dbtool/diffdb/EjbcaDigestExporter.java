@@ -172,9 +172,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             if (tblCertHasId) {
                 EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource,
                         cas, numThreads);
-                doDigest_withTableId(certsReader, processLog, caEntryContainer, cas);
+                doDigestWithTableId(certsReader, processLog, caEntryContainer, cas);
             } else {
-                doDigest_noTableId(processLog, caEntryContainer, cas);
+                doDigestNoTableId(processLog, caEntryContainer, cas);
             }
         } catch (Exception e) {
             // delete the temporary files
@@ -196,13 +196,13 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
     private Map<String, EjbcaCaInfo> getCas()
     throws Exception {
         Map<String, EjbcaCaInfo> cas = new HashMap<>();
-        final String sql = "SELECT NAME, DATA FROM CAData";
+        final String selectSql = "SELECT NAME, DATA FROM CAData";
 
         Statement stmt = null;
         ResultSet rs = null;
         try {
             stmt = createStatement();
-            rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(selectSql);
             int caId = 0;
 
             while (rs.next()) {
@@ -233,7 +233,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 cas.put(caInfo.getHexSha1(), caInfo);
             }
         } catch (SQLException e) {
-            throw translate(sql, e);
+            throw translate(selectSql, e);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -241,7 +241,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         return cas;
     } // method getCas
 
-    private void doDigest_noTableId(
+    private void doDigestNoTableId(
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,
             final Map<String, EjbcaCaInfo> caInfos)
@@ -258,7 +258,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
         processLog.printHeader();
 
-        String sql = null;
+        String localSql = null;
         int id = 0;
 
         try {
@@ -327,9 +327,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
                     if (revoked) {
                         revReason = rs.getInt("revocationReason");
-                        long rev_timeInMs = rs.getLong("revocationDate");
+                        long revTimeInMs = rs.getLong("revocationDate");
                         // rev_time is milliseconds, convert it to seconds
-                        revTime = rev_timeInMs / 1000;
+                        revTime = revTimeInMs / 1000;
                     }
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
@@ -351,7 +351,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 throw new InterruptedException("interrupted by the user");
             }
         } catch (SQLException e) {
-            throw translate(sql, e);
+            throw translate(localSql, e);
         } finally {
             releaseResources(ps, null);
             releaseResources(rawCertPs, null);
@@ -371,7 +371,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         System.out.println(sb.toString());
     } // method doDigest_noTableId
 
-    private void doDigest_withTableId(
+    private void doDigestWithTableId(
             final EjbcaDigestExportReader certsReader,
             final ProcessLog processLog,
             final CaEntryContainer caEntryContainer,

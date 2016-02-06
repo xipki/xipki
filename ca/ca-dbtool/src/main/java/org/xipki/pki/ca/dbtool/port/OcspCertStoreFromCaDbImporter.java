@@ -90,6 +90,21 @@ import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
 
 class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
+    private static final class ImportStatements {
+        final PreparedStatement psCert;
+        final PreparedStatement psCerthash;
+        final PreparedStatement psRawCert;
+
+        ImportStatements(
+                PreparedStatement psCert,
+                PreparedStatement psCerthash,
+                PreparedStatement psRawCert) {
+            this.psCert = psCert;
+            this.psCerthash = psCerthash;
+            this.psRawCert = psRawCert;
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -279,86 +294,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         try {
             for (CertstoreCaType issuer : issuers.getCa()) {
-                try {
-                    String b64Cert = getValue(issuer.getCert());
-                    byte[] encodedCert = Base64.decode(b64Cert);
-
-                    // retrieve the revocation information of the CA, if possible
-                    CaType ca = null;
-                    for (CaType caType : cas) {
-                        if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert())))) {
-                            ca = caType;
-                            break;
-                        }
-                    }
-
-                    if (ca == null) {
-                        continue;
-                    }
-
-                    relatedCaIds.add(issuer.getId());
-
-                    Certificate c;
-                    byte[] encodedName;
-                    try {
-                        c = Certificate.getInstance(encodedCert);
-                        encodedName = c.getSubject().getEncoded("DER");
-                    } catch (Exception e) {
-                        LOG.error("could not parse certificate of issuer {}", issuer.getId());
-                        LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
-                        if (e instanceof CertificateException) {
-                            throw (CertificateException) e;
-                        } else {
-                            throw new CertificateException(e.getMessage(), e);
-                        }
-                    }
-                    byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-
-                    int idx = 1;
-                    ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++,
-                            X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
-                    ps.setLong(idx++,
-                            c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps.setLong(idx++,
-                            c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++,
-                            HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
-                    ps.setString(idx++, b64Cert);
-
-                    setBoolean(ps, idx++, ca.isRevoked());
-                    setInt(ps, idx++, ca.getRevReason());
-                    setLong(ps, idx++, ca.getRevTime());
-                    setLong(ps, idx++, ca.getRevInvTime());
-
-                    ps.execute();
-                } catch (SQLException e) {
-                    System.err.println("error while importing issuer with id=" + issuer.getId());
-                    throw translate(sql, e);
-                } catch (CertificateException e) {
-                    System.err.println("error while importing issuer with id=" + issuer.getId());
-                    throw e;
-                }
+                doImportIssuer(issuer, sql, ps, cas, relatedCaIds);
             }
         } finally {
             releaseResources(ps, null);
@@ -366,7 +302,96 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         System.out.println(" imported table ISSUER");
         return relatedCaIds;
-    } // method importIssuer
+    }
+
+    private void doImportIssuer(
+            final CertstoreCaType issuer,
+            final String sql,
+            final PreparedStatement ps,
+            final List<CaType> cas,
+            final List<Integer> relatedCaIds)
+    throws IOException, DataAccessException, CertificateException {
+        try {
+            String b64Cert = getValue(issuer.getCert());
+            byte[] encodedCert = Base64.decode(b64Cert);
+
+            // retrieve the revocation information of the CA, if possible
+            CaType ca = null;
+            for (CaType caType : cas) {
+                if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert())))) {
+                    ca = caType;
+                    break;
+                }
+            }
+
+            if (ca == null) {
+                return;
+            }
+
+            relatedCaIds.add(issuer.getId());
+
+            Certificate c;
+            byte[] encodedName;
+            try {
+                c = Certificate.getInstance(encodedCert);
+                encodedName = c.getSubject().getEncoded("DER");
+            } catch (Exception e) {
+                LOG.error("could not parse certificate of issuer {}", issuer.getId());
+                LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
+                if (e instanceof CertificateException) {
+                    throw (CertificateException) e;
+                } else {
+                    throw new CertificateException(e.getMessage(), e);
+                }
+            }
+            byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+
+            int idx = 1;
+            ps.setInt(idx++, issuer.getId());
+            ps.setString(idx++,
+                    X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+            ps.setLong(idx++,
+                    c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+            ps.setLong(idx++,
+                    c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+            ps.setString(idx++,
+                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+            ps.setString(idx++, b64Cert);
+
+            setBoolean(ps, idx++, ca.isRevoked());
+            setInt(ps, idx++, ca.getRevReason());
+            setLong(ps, idx++, ca.getRevTime());
+            setLong(ps, idx++, ca.getRevInvTime());
+
+            ps.execute();
+        } catch (SQLException e) {
+            System.err.println("error while importing issuer with id=" + issuer.getId());
+            throw translate(sql, e);
+        } catch (CertificateException e) {
+            System.err.println("error while importing issuer with id=" + issuer.getId());
+            throw e;
+        }
+    } // method doImportIssuer
 
     private void importCert(
             final CertStoreType certstore,
@@ -405,6 +430,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement psCerthash = prepareStatement(SQL_ADD_CHASH);
         PreparedStatement psRawCert = prepareStatement(SQL_ADD_CRAW);
+        ImportStatements statments = new ImportStatements(psCert, psCerthash, psRawCert);
 
         DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(certsListFile);
         try {
@@ -428,7 +454,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 try {
-                    int lastId = doImportCert(psCert, psCerthash, psRawCert,
+                    int lastId = doImportCert(statments,
                             certsFile, profileMap, revokedOnly, caIds, minId,
                             processLogFile, processLog, numProcessedBefore, importLog);
                     minId = lastId + 1;
@@ -453,9 +479,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     } // method importCert
 
     private int doImportCert(
-            final PreparedStatement psCert,
-            final PreparedStatement psCerthash,
-            final PreparedStatement psRawCert,
+            final ImportStatements statments,
             final String certsZipFile,
             final Map<Integer, String> profileMap,
             final boolean revokedOnly,
@@ -481,6 +505,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         }
 
         disableAutoCommit();
+
+        PreparedStatement psCert = statments.psCert;
+        PreparedStatement psCerthash = statments.psCerthash;
+        PreparedStatement psRawCert = statments.psRawCert;
 
         try {
             int numProcessedEntriesInBatch = 0;

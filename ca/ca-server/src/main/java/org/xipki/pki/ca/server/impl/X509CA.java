@@ -272,165 +272,170 @@ public class X509CA {
             crlGenInProcess.set(true);
 
             try {
-                final long signWindowMin = 20;
-
-                Date thisUpdate = new Date();
-                long minSinceCrlBaseTime =
-                        (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
-                                / MS_PER_SECOND / SECOND_PER_MIN;
-
-                CRLControl control = getCrlSigner().getCRLControl();
-                int interval;
-
-                if (control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0) {
-                    long intervalMin = control.getIntervalMinutes();
-                    interval = (int) (minSinceCrlBaseTime / intervalMin);
-
-                    long baseTimeInMin = interval * intervalMin;
-                    if (minSinceCrlBaseTime - baseTimeInMin > signWindowMin) {
-                        // only generate CRL within the time window
-                        return;
-                    }
-                } else if (control.getIntervalDayTime() != null) {
-                    HourMinute hm = control.getIntervalDayTime();
-                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    c.setTime(thisUpdate);
-                    int minute = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE);
-                    int scheduledMinute = hm.getHour() * 60 + hm.getMinute();
-                    if (minute < scheduledMinute || minute - scheduledMinute > signWindowMin) {
-                        return;
-                    }
-                    interval = (int) (minSinceCrlBaseTime % MIN_PER_DAY);
-                } else {
-                    throw new RuntimeException("should not reach here, neither interval minutes"
-                            + " nor dateTime is specified");
-                }
-
-                boolean deltaCrl;
-                if (interval % control.getFullCRLIntervals() == 0) {
-                    deltaCrl = false;
-                } else if (control.getDeltaCRLIntervals() > 0
-                        && interval % control.getDeltaCRLIntervals() == 0) {
-                    deltaCrl = true;
-                } else {
-                    return;
-                }
-
-                if (deltaCrl && !certstore.hasCRL(caInfo.getCertificate())) {
-                    // DeltaCRL will be generated only if fullCRL exists
-                    return;
-                }
-
-                long nowInSecond = thisUpdate.getTime() / MS_PER_SECOND;
-                long thisUpdateOfCurrentCRL = certstore.getThisUpdateOfCurrentCRL(
-                        caInfo.getCertificate());
-                if (nowInSecond - thisUpdateOfCurrentCRL
-                        <= (signWindowMin + 5) * SECOND_PER_MIN) {
-                    // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
-                    return;
-                }
-
-                // find out the next interval for fullCRL and deltaCRL
-                int nextFullCRLInterval = 0;
-                int nextDeltaCRLInterval = 0;
-
-                for (int i = interval + 1;; i++) {
-                    if (i % control.getFullCRLIntervals() == 0) {
-                        nextFullCRLInterval = i;
-                        break;
-                    }
-
-                    if (nextDeltaCRLInterval != 0
-                            && control.getDeltaCRLIntervals() != 0
-                            && i % control.getDeltaCRLIntervals() == 0) {
-                        nextDeltaCRLInterval = i;
-                    }
-                }
-
-                int intervalOfNextUpdate;
-                if (deltaCrl) {
-                    intervalOfNextUpdate = nextDeltaCRLInterval == 0
-                            ? nextFullCRLInterval
-                            : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
-                } else {
-                    if (nextDeltaCRLInterval == 0) {
-                        intervalOfNextUpdate = nextFullCRLInterval;
-                    } else {
-                        intervalOfNextUpdate = control.isExtendedNextUpdate()
-                                ? nextFullCRLInterval
-                                : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
-                    }
-                }
-
-                Date nextUpdate;
-                if (control.getIntervalMinutes() != null) {
-                    int minutesTillNextUpdate = (intervalOfNextUpdate - interval)
-                            * control.getIntervalMinutes()
-                            + control.getOverlapMinutes();
-                    nextUpdate = new Date(MS_PER_SECOND
-                            * (nowInSecond + minutesTillNextUpdate * 60));
-                } else {
-                    HourMinute hm = control.getIntervalDayTime();
-                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    c.setTime(new Date(nowInSecond * MS_PER_SECOND));
-                    c.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - interval));
-                    c.set(Calendar.HOUR_OF_DAY, hm.getHour());
-                    c.set(Calendar.MINUTE, hm.getMinute());
-                    c.add(Calendar.MINUTE, control.getOverlapMinutes());
-                    c.set(Calendar.SECOND, 0);
-                    c.set(Calendar.MILLISECOND, 0);
-                    nextUpdate = c.getTime();
-                }
-
-                Date start = new Date();
-                AuditEvent auditEvent = new AuditEvent(start);
-                auditEvent.setApplicationName("CA");
-                auditEvent.setName("PERF");
-                auditEvent.addEventData(new AuditEventData("eventType", "CRL_GEN_INTERVAL"));
-
-                try {
-                    long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(
-                            caInfo.getCertificate());
-
-                    generateCRL(deltaCrl, thisUpdate, nextUpdate, auditEvent);
-                    auditEvent.setStatus(AuditStatus.SUCCESSFUL);
-                    auditEvent.setLevel(AuditLevel.INFO);
-
-                    try {
-                        certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
-                    } catch (Throwable t) {
-                        final String message =
-                                "CRL_GEN_INTERVAL: could not clear DeltaCRLCache of CA "
-                                + caInfo.getName();
-                        if (LOG.isErrorEnabled()) {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                    t.getClass().getName(), t.getMessage());
-                        }
-                        LOG.debug(message, t);
-                    }
-                } catch (Throwable t) {
-                    auditEvent.setStatus(AuditStatus.FAILED);
-                    auditEvent.setLevel(AuditLevel.ERROR);
-                    final String message = "CRL_GEN_INTERVAL: Error";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                t.getClass().getName(), t.getMessage());
-                    }
-                    LOG.debug(message, t);
-                } finally {
-                    auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
-                }
-
-                if (auditServiceRegister != null) {
-                    auditServiceRegister.getAuditService().logEvent(auditEvent);
-                }
-                LOG.info("CRL_GEN_INTERVAL: {}", auditEvent.getStatus().name());
+                doRun();
             } catch (Throwable t) {
                 LOG.error("CRL_GEN_INTERVAL: fatal error", t);
             } finally {
                 crlGenInProcess.set(false);
             }
         } // method run
+
+        private void doRun()
+        throws OperationException {
+            final long signWindowMin = 20;
+
+            Date thisUpdate = new Date();
+            long minSinceCrlBaseTime =
+                    (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
+                            / MS_PER_SECOND / SECOND_PER_MIN;
+
+            CRLControl control = getCrlSigner().getCRLControl();
+            int interval;
+
+            if (control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0) {
+                long intervalMin = control.getIntervalMinutes();
+                interval = (int) (minSinceCrlBaseTime / intervalMin);
+
+                long baseTimeInMin = interval * intervalMin;
+                if (minSinceCrlBaseTime - baseTimeInMin > signWindowMin) {
+                    // only generate CRL within the time window
+                    return;
+                }
+            } else if (control.getIntervalDayTime() != null) {
+                HourMinute hm = control.getIntervalDayTime();
+                Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                c.setTime(thisUpdate);
+                int minute = c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE);
+                int scheduledMinute = hm.getHour() * 60 + hm.getMinute();
+                if (minute < scheduledMinute || minute - scheduledMinute > signWindowMin) {
+                    return;
+                }
+                interval = (int) (minSinceCrlBaseTime % MIN_PER_DAY);
+            } else {
+                throw new RuntimeException("should not reach here, neither interval minutes"
+                        + " nor dateTime is specified");
+            }
+
+            boolean deltaCrl;
+            if (interval % control.getFullCRLIntervals() == 0) {
+                deltaCrl = false;
+            } else if (control.getDeltaCRLIntervals() > 0
+                    && interval % control.getDeltaCRLIntervals() == 0) {
+                deltaCrl = true;
+            } else {
+                return;
+            }
+
+            if (deltaCrl && !certstore.hasCRL(caInfo.getCertificate())) {
+                // DeltaCRL will be generated only if fullCRL exists
+                return;
+            }
+
+            long nowInSecond = thisUpdate.getTime() / MS_PER_SECOND;
+            long thisUpdateOfCurrentCRL = certstore.getThisUpdateOfCurrentCRL(
+                    caInfo.getCertificate());
+            if (nowInSecond - thisUpdateOfCurrentCRL
+                    <= (signWindowMin + 5) * SECOND_PER_MIN) {
+                // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
+                return;
+            }
+
+            // find out the next interval for fullCRL and deltaCRL
+            int nextFullCRLInterval = 0;
+            int nextDeltaCRLInterval = 0;
+
+            for (int i = interval + 1;; i++) {
+                if (i % control.getFullCRLIntervals() == 0) {
+                    nextFullCRLInterval = i;
+                    break;
+                }
+
+                if (nextDeltaCRLInterval != 0
+                        && control.getDeltaCRLIntervals() != 0
+                        && i % control.getDeltaCRLIntervals() == 0) {
+                    nextDeltaCRLInterval = i;
+                }
+            }
+
+            int intervalOfNextUpdate;
+            if (deltaCrl) {
+                intervalOfNextUpdate = nextDeltaCRLInterval == 0
+                        ? nextFullCRLInterval
+                        : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+            } else {
+                if (nextDeltaCRLInterval == 0) {
+                    intervalOfNextUpdate = nextFullCRLInterval;
+                } else {
+                    intervalOfNextUpdate = control.isExtendedNextUpdate()
+                            ? nextFullCRLInterval
+                            : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+                }
+            }
+
+            Date nextUpdate;
+            if (control.getIntervalMinutes() != null) {
+                int minutesTillNextUpdate = (intervalOfNextUpdate - interval)
+                        * control.getIntervalMinutes()
+                        + control.getOverlapMinutes();
+                nextUpdate = new Date(MS_PER_SECOND
+                        * (nowInSecond + minutesTillNextUpdate * 60));
+            } else {
+                HourMinute hm = control.getIntervalDayTime();
+                Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                c.setTime(new Date(nowInSecond * MS_PER_SECOND));
+                c.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - interval));
+                c.set(Calendar.HOUR_OF_DAY, hm.getHour());
+                c.set(Calendar.MINUTE, hm.getMinute());
+                c.add(Calendar.MINUTE, control.getOverlapMinutes());
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MILLISECOND, 0);
+                nextUpdate = c.getTime();
+            }
+
+            Date start = new Date();
+            AuditEvent auditEvent = new AuditEvent(start);
+            auditEvent.setApplicationName("CA");
+            auditEvent.setName("PERF");
+            auditEvent.addEventData(new AuditEventData("eventType", "CRL_GEN_INTERVAL"));
+
+            try {
+                long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(
+                        caInfo.getCertificate());
+
+                generateCRL(deltaCrl, thisUpdate, nextUpdate, auditEvent);
+                auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+                auditEvent.setLevel(AuditLevel.INFO);
+
+                try {
+                    certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
+                } catch (Throwable t) {
+                    final String message =
+                            "CRL_GEN_INTERVAL: could not clear DeltaCRLCache of CA "
+                            + caInfo.getName();
+                    if (LOG.isErrorEnabled()) {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message),
+                                t.getClass().getName(), t.getMessage());
+                    }
+                    LOG.debug(message, t);
+                }
+            } catch (Throwable t) {
+                auditEvent.setStatus(AuditStatus.FAILED);
+                auditEvent.setLevel(AuditLevel.ERROR);
+                final String message = "CRL_GEN_INTERVAL: Error";
+                if (LOG.isErrorEnabled()) {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message),
+                            t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+            } finally {
+                auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
+            }
+
+            if (auditServiceRegister != null) {
+                auditServiceRegister.getAuditService().logEvent(auditEvent);
+            }
+            LOG.info("CRL_GEN_INTERVAL: {}", auditEvent.getStatus().name());
+        } // method doRun
 
     } // class ScheduledCRLGenerationService
 
@@ -635,6 +640,16 @@ public class X509CA {
             }
         }
     } // method getCRL
+
+    private void cleanupCRLsWithoutException()
+    throws OperationException {
+        try {
+            cleanupCRLs();
+        } catch (Throwable t) {
+            LOG.warn("could not cleanup CRLs.{}: {}", t.getClass().getName(),
+                    t.getMessage());
+        }
+    }
 
     private void cleanupCRLs()
     throws OperationException {
@@ -1016,12 +1031,7 @@ public class X509CA {
                 }
 
                 // clean up the CRL
-                try {
-                    cleanupCRLs();
-                } catch (Throwable t) {
-                    LOG.warn("could not cleanup CRLs.{}: {}", t.getClass().getName(),
-                            t.getMessage());
-                }
+                cleanupCRLsWithoutException();
                 return crl;
             } catch (CRLException e) {
                 throw new OperationException(ErrorCode.CRL_FAILURE, "CRLException: "
@@ -1126,8 +1136,7 @@ public class X509CA {
         try {
             X509CertificateInfo ret = doGenerateCertificate(
                     requestedByRA, requestor, certprofileName, user,
-                    subject, publicKeyInfo,
-                    notBefore, notAfter, extensions, false,
+                    subject, publicKeyInfo, notBefore, notAfter, extensions, false,
                     reqType, transactionId);
             successful = true;
             LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={},"

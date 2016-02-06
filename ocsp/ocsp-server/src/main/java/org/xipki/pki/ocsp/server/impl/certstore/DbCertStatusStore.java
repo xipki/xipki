@@ -81,7 +81,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
         private final Long revocationTimeMs;
 
-        public SimpleIssuerEntry(
+        SimpleIssuerEntry(
                 final int id,
                 final Long revocationTimeMs) {
             this.id = id;
@@ -118,9 +118,9 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String sqlCs = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+    private static final String SQL_CS = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
 
-    private static final Map<HashAlgoType, String> sqlCsHashMap = new HashMap<>();
+    private static final Map<HashAlgoType, String> SQL_CS_HASHMAP = new HashMap<>();
 
     static {
         for (HashAlgoType h : HashAlgoType.values()) {
@@ -129,7 +129,7 @@ public class DbCertStatusStore extends CertStatusStore {
             sb.append(h.getShortName()).append(" ");
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
             sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
-            sqlCsHashMap.put(h, sb.toString());
+            SQL_CS_HASHMAP.put(h, sb.toString());
         }
     }
 
@@ -139,9 +139,9 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private IssuerStore issuerStore;
 
-    private boolean initialized = false;
+    private boolean initialized;
 
-    private boolean initializationFailed = false;
+    private boolean initializationFailed;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -237,10 +237,10 @@ public class DbCertStatusStore extends CertStatusStore {
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
                     for (HashAlgoType h : hashAlgoTypes) {
-                        String hash_name = rs.getString(h.getShortName() + "S");
-                        String hash_key = rs.getString(h.getShortName() + "K");
-                        byte[] hashNameBytes = Base64.decode(hash_name);
-                        byte[] hashKeyBytes = Base64.decode(hash_key);
+                        String hashName = rs.getString(h.getShortName() + "S");
+                        String hashKey = rs.getString(h.getShortName() + "K");
+                        byte[] hashNameBytes = Base64.decode(hashName);
+                        byte[] hashKeyBytes = Base64.decode(hashKey);
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
                                 h, hashNameBytes, hashKeyBytes);
 
@@ -319,9 +319,9 @@ public class DbCertStatusStore extends CertStatusStore {
             certHashAlgo = (certHashAlg == null)
                     ? hashAlgo
                     : certHashAlg;
-            coreSql = sqlCsHashMap.get(certHashAlgo);
+            coreSql = SQL_CS_HASHMAP.get(certHashAlgo);
         } else {
-            coreSql = sqlCs;
+            coreSql = SQL_CS;
         }
 
         try {

@@ -147,11 +147,11 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private byte[] fpOfCrlFile;
 
-    private long lastmodifiedOfCrlFile = 0;
+    private long lastmodifiedOfCrlFile;
 
     private byte[] fpOfDeltaCrlFile;
 
-    private long lastModifiedOfDeltaCrlFile = 0;
+    private long lastModifiedOfDeltaCrlFile;
 
     private Date thisUpdate;
 
@@ -166,9 +166,9 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    private boolean initialized = false;
+    private boolean initialized;
 
-    private boolean initializationFailed = false;
+    private boolean initializationFailed;
 
     public CrlCertStatusStore(
             final String name,
@@ -706,26 +706,26 @@ public class CrlCertStatusStore extends CertStatusStore {
                     : certHashAlg;
         }
 
-        Date thisUpdate;
-        Date nextUpdate = null;
+        Date localThisUpdate;
+        Date localNextUpdate = null;
 
         if (useUpdateDatesFromCRL) {
-            thisUpdate = this.thisUpdate;
+            localThisUpdate = this.thisUpdate;
 
             if (this.nextUpdate != null) {
                 // this.nextUpdate is still in the future (10 seconds buffer)
                 if (this.nextUpdate.getTime() > System.currentTimeMillis() + 10 * 1000) {
-                    nextUpdate = this.nextUpdate;
+                    localNextUpdate = this.nextUpdate;
                 }
             }
         } else {
-            thisUpdate = new Date();
+            localThisUpdate = new Date();
         }
 
         IssuerHashNameAndKey issuerHashNameAndKey = issuerHashMap.get(hashAlgo);
 
         if (!issuerHashNameAndKey.match(hashAlgo, issuerNameHash, issuerKeyHash)) {
-            return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, nextUpdate);
+            return CertStatusInfo.getIssuerUnknownCertStatusInfo(localThisUpdate, localNextUpdate);
         }
 
         CertStatusInfo certStatusInfo = null;
@@ -738,18 +738,20 @@ public class CrlCertStatusStore extends CertStatusStore {
                     && certprofileOption != null
                     && !certprofileOption.include(profileName);
             if (ignore) {
-                certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
+                certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(
+                        localThisUpdate, localNextUpdate);
             } else {
-                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate,
-                        nextUpdate);
+                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, localThisUpdate,
+                        localNextUpdate);
             }
         } else {
             // SerialNumber is unknown
             if (isUnknownSerialAsGood()) {
                 certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
-                        null, null, thisUpdate, nextUpdate, null);
+                        null, null, localThisUpdate, localNextUpdate, null);
             } else {
-                certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+                certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(
+                        localThisUpdate, localNextUpdate);
             }
         }
 
@@ -838,24 +840,24 @@ public class CrlCertStatusStore extends CertStatusStore {
     }
 
     private void readCertWithInfosFromDir(
-            final X509Certificate caCert,
-            final String certsDirname,
+            final X509Certificate pCaCert,
+            final String pCertsDirname,
             final Map<BigInteger, CertWithInfo> certsMap)
     throws CertificateEncodingException {
-        File certsDir = new File(certsDirname);
+        File certsDir = new File(pCertsDirname);
 
         if (!certsDir.exists()) {
-            LOG.warn("the folder " + certsDirname + " does not exist, ignore it");
+            LOG.warn("the folder " + pCertsDirname + " does not exist, ignore it");
             return;
         }
 
         if (!certsDir.isDirectory()) {
-            LOG.warn("the path " + certsDirname + " does not point to a folder, ignore it");
+            LOG.warn("the path " + pCertsDirname + " does not point to a folder, ignore it");
             return;
         }
 
         if (!certsDir.canRead()) {
-            LOG.warn("the folder " + certsDirname + " could not be read, ignore it");
+            LOG.warn("the folder " + pCertsDirname + " could not be read, ignore it");
             return;
         }
 
@@ -872,8 +874,8 @@ public class CrlCertStatusStore extends CertStatusStore {
             return;
         }
 
-        X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        byte[] issuerSKI = X509Util.extractSKI(caCert);
+        X500Name issuer = X500Name.getInstance(pCaCert.getSubjectX500Principal().getEncoded());
+        byte[] issuerSKI = X509Util.extractSKI(pCaCert);
 
         final String profileName = "UNKNOWN";
         final boolean needsCert = !certHashAlgos.isEmpty();

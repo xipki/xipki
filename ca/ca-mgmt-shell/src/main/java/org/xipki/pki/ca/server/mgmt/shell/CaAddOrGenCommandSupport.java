@@ -52,6 +52,7 @@ import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CAUris;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
@@ -215,10 +216,10 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
                     passwordResolver);
         }
 
+        X509CAUris caUris = new X509CAUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
         X509CAEntry entry = new X509CAEntry(
                 caName, nextSerial, nextCrlNumber, signerType, signerConf,
-                caCertUris, ocspUris, crlUris, deltaCrlUris,
-                numCrls.intValue(), expirationPeriod.intValue());
+                caUris, numCrls.intValue(), expirationPeriod.intValue());
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
 

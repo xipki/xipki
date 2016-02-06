@@ -90,13 +90,13 @@ abstract class DbDigestReader implements DigestReader {
 
     protected final StopMe stopMe;
 
+    protected final boolean revokedOnly;
+
     private final int numThreads;
 
     private ExecutorService executor;
 
     private List<Retriever> retrievers;
-
-    private final boolean revokedOnly;
 
     private final int totalAccount;
 

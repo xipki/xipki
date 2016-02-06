@@ -154,7 +154,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor {
             } catch (CertificateEncodingException e) {
                 throw new OCSPRequestorException(e.getMessage(), e);
             }
-            serialNumbers[i++] = cert.getSerialNumber();
+            serialNumbers[i] = cert.getSerialNumber();
         }
 
         return ask(issuerCert, serialNumbers, responderUrl, requestOptions, debug);
