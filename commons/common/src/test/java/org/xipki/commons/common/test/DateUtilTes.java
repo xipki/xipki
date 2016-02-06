@@ -33,41 +33,27 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.common.util;
+package org.xipki.commons.common.test;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
+
+import org.junit.Test;
+import org.xipki.commons.common.util.DateUtil;
+
+import junit.framework.Assert;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class DateUtil {
+public class DateUtilTes {
 
-    private static final SimpleDateFormat SDF;
+    @Test
+    public void test1() {
+        Date utcDate = DateUtil.parseUTCTimeyyyyMMddhhmmss("20150223134459");
+        long expTimeMs = 1424699099L;
 
-    static {
-        SDF = new SimpleDateFormat("yyyyMMddHHmmss");
-        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Assert.assertEquals("DateTime parsing", expTimeMs, utcDate.getTime() / 1000);
     }
-
-    private DateUtil() {
-    }
-
-    public static Date parseUTCTimeyyyyMMddhhmmss(
-            final String utcTime) {
-        if (utcTime == null || utcTime.length() != 14) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
-        }
-        try {
-            return SDF.parse(utcTime);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-                    + e.getMessage());
-        }
-    }
-
 }
