@@ -792,43 +792,41 @@ public class OcspServer {
                         certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(
                                 new Date(), null);
                     }
-                } else if (answeredStore != null) {
-                    if (responderOption.isInheritCaRevocation()) {
-                        CertRevocationInfo caRevInfo = answeredStore.getCARevocationInfo(
-                                reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash());
-                        if (caRevInfo != null) {
-                            CertStatus certStatus = certStatusInfo.getCertStatus();
-                            boolean replaced = false;
-                            if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
+                } else if (answeredStore != null && responderOption.isInheritCaRevocation()) {
+                    CertRevocationInfo caRevInfo = answeredStore.getCARevocationInfo(
+                            reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash());
+                    if (caRevInfo != null) {
+                        CertStatus certStatus = certStatusInfo.getCertStatus();
+                        boolean replaced = false;
+                        if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
+                            replaced = true;
+                        } else if (certStatus == CertStatus.REVOKED) {
+                            if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
+                                    caRevInfo.getRevocationTime())) {
                                 replaced = true;
-                            } else if (certStatus == CertStatus.REVOKED) {
-                                if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
-                                        caRevInfo.getRevocationTime())) {
-                                    replaced = true;
-                                }
                             }
+                        }
 
-                            if (replaced) {
-                                CertRevocationInfo newRevInfo;
-                                if (caRevInfo.getReason() == CRLReason.CA_COMPROMISE) {
-                                    newRevInfo = caRevInfo;
-                                } else {
-                                    newRevInfo = new CertRevocationInfo(
-                                            CRLReason.CA_COMPROMISE,
-                                            caRevInfo.getRevocationTime(),
-                                            caRevInfo.getInvalidityTime());
-                                }
-                                certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(
-                                        newRevInfo,
-                                        certStatusInfo.getCertHashAlgo(),
-                                        certStatusInfo.getCertHash(),
-                                        certStatusInfo.getThisUpdate(),
-                                        certStatusInfo.getNextUpdate(),
-                                        certStatusInfo.getCertprofile());
-                            } // end if(replaced)
-                        } // end if (caRevInfo != null) {
+                        if (replaced) {
+                            CertRevocationInfo newRevInfo;
+                            if (caRevInfo.getReason() == CRLReason.CA_COMPROMISE) {
+                                newRevInfo = caRevInfo;
+                            } else {
+                                newRevInfo = new CertRevocationInfo(
+                                        CRLReason.CA_COMPROMISE,
+                                        caRevInfo.getRevocationTime(),
+                                        caRevInfo.getInvalidityTime());
+                            }
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(
+                                    newRevInfo,
+                                    certStatusInfo.getCertHashAlgo(),
+                                    certStatusInfo.getCertHash(),
+                                    certStatusInfo.getThisUpdate(),
+                                    certStatusInfo.getNextUpdate(),
+                                    certStatusInfo.getCertprofile());
+                        } // end if(replaced)
                     } // end if
-                } // end for
+                } // end if
 
                 if (childAuditEvent != null) {
                     String certprofile = certStatusInfo.getCertprofile();

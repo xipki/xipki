@@ -896,10 +896,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     boolean ee = true;
                     if (extension != null) {
                         ASN1Encodable asn1 = extension.getParsedValue();
-                        try {
-                            ee = !BasicConstraints.getInstance(asn1).isCA();
-                        } catch (Exception e) {
-                        }
+                        ee = !BasicConstraints.getInstance(asn1).isCA();
                     }
 
                     int iEe = ee

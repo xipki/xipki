@@ -78,9 +78,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final int numCertsPerSelect;
 
-    private final int numRefThreads;
-
-    private final int numTargetThreads;
+    private final NumThreads numThreads;
 
     public DbDigestDiffWorker(
             final DataSourceFactory dataSourceFactory,
@@ -91,8 +89,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             final String dbConfFile,
             final String reportDirName,
             final int numCertsPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads,
+            final NumThreads numThreads,
             final Set<byte[]> includeCACerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         boolean validRef = false;
@@ -145,8 +142,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
         this.reportDir = reportDirName;
         this.numCertsPerSelect = numCertsPerSelect;
-        this.numRefThreads = numRefThreads;
-        this.numTargetThreads = numTargetThreads;
+        this.numThreads = numThreads;
     } // constructor DbDigestDiffWorker
 
     @Override
@@ -159,11 +155,11 @@ public class DbDigestDiffWorker extends DbPortWorker {
             if (refDirname != null) {
                 diff = DbDigestDiff.getInstanceForDirRef(
                     refDirname, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numRefThreads, numTargetThreads);
+                    numCertsPerSelect, numThreads);
             } else {
                 diff = DbDigestDiff.getInstanceForDbRef(
                     refDatasource, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numRefThreads, numTargetThreads);
+                    numCertsPerSelect, numThreads);
             }
             diff.setIncludeCACerts(includeCACerts);
             diff.diff();

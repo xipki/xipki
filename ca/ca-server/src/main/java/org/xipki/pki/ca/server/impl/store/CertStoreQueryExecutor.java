@@ -356,11 +356,7 @@ class CertStoreQueryExecutor {
         } finally {
             try {
                 for (PreparedStatement ps : pss) {
-                    try {
-                        ps.close();
-                    } catch (Throwable t) {
-                        LOG.warn("could not close PreparedStatement", t);
-                    }
+                    releaseStatement(ps);
                 }
             } finally {
                 dataSource.returnConnection(conn);
@@ -2283,16 +2279,10 @@ class CertStoreQueryExecutor {
             } catch (SQLException e) {
                 throw dataSource.translate(sql, e);
             } finally {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
+                releaseStatement(ps);
 
                 if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException e) {
-                    }
+                    releaseResultSet(rs);
                 }
             }
 
@@ -2332,16 +2322,9 @@ class CertStoreQueryExecutor {
             } catch (SQLException e) {
                 throw dataSource.translate(sql, e);
             } finally {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
-
+                releaseStatement(ps);
                 if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException e) {
-                    }
+                    releaseResultSet(rs);
                 }
             }
 
@@ -2497,6 +2480,24 @@ class CertStoreQueryExecutor {
             throw dataSource.translate(sql, e);
         } finally {
             dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    private static void releaseStatement(
+            Statement statment) {
+        try {
+            statment.close();
+        } catch (SQLException e) {
+            LOG.warn("could not close Statement", e);
+        }
+    }
+
+    private static void releaseResultSet(
+            ResultSet resultSet) {
+        try {
+            resultSet.close();
+        } catch (SQLException e) {
+            LOG.warn("could not close ResultSet", e);
         }
     }
 

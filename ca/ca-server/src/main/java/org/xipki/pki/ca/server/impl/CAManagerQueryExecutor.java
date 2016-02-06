@@ -100,6 +100,7 @@ import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CAUris;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 
@@ -590,10 +591,10 @@ class CAManagerQueryExecutor {
                 lCacertUris = StringUtil.split(cacertUris, " \t");
             }
 
+            X509CAUris caUris = new X509CAUris(lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris);
+
             X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNo,
-                    signerType, signerConf,
-                    lCacertUris, lOcspUris, lCrlUris, lDeltaCrlUris,
-                    numCrls, expirationPeriod);
+                    signerType, signerConf, caUris, numCrls, expirationPeriod);
             X509Certificate cert = generateCert(b64cert);
             entry.setCertificate(cert);
 
@@ -1189,15 +1190,15 @@ class CAManagerQueryExecutor {
                     throw new CAMgmtException("no CA '" + name + "' is defined");
                 }
 
-                String lSignerType = rs.getString("SIGNER_TYPE");
-                String _signerConf = rs.getString("SIGNER_CONF");
-                String lB64Cert = rs.getString("CERT");
+                String localSignerType = rs.getString("SIGNER_TYPE");
+                String localSignerConf = rs.getString("SIGNER_CONF");
+                String localB64Cert = rs.getString("CERT");
                 if (signerType != null) {
-                    lSignerType = signerType;
+                    localSignerType = signerType;
                 }
 
                 if (lSignerConf != null) {
-                    _signerConf = getRealString(lSignerConf);
+                    localSignerConf = getRealString(lSignerConf);
                 }
 
                 X509Certificate localCert;
@@ -1205,7 +1206,7 @@ class CAManagerQueryExecutor {
                     localCert = cert;
                 } else {
                     try {
-                        localCert = X509Util.parseBase64EncodedCert(lB64Cert);
+                        localCert = X509Util.parseBase64EncodedCert(localB64Cert);
                     } catch (CertificateException | IOException e) {
                         throw new CAMgmtException(
                                 "could not parse the stored certificate for CA '" + name + "'"
@@ -1214,10 +1215,10 @@ class CAManagerQueryExecutor {
                 }
 
                 try {
-                    List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(_signerConf);
+                    List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(localSignerConf);
                     for (String[] m : signerConfs) {
                         String signerConf = m[1];
-                        securityFactory.createSigner(lSignerType, signerConf, localCert);
+                        securityFactory.createSigner(localSignerType, signerConf, localCert);
                     }
                 } catch (SignerException e) {
                     throw new CAMgmtException(
@@ -1424,8 +1425,8 @@ class CAManagerQueryExecutor {
 
     IdentifiedX509Certprofile changeCertprofile(
             final String name,
-            String type,
-            String conf,
+            final String type,
+            final String conf,
             final CAManagerImpl caManager)
     throws CAMgmtException {
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1435,15 +1436,18 @@ class CAManagerQueryExecutor {
 
         StringBuilder m = new StringBuilder();
 
-        if (type != null) {
-            m.append("type: '").append(type).append("'; ");
+        String localType = type;
+        String localConf = conf;
+
+        if (localType != null) {
+            m.append("type: '").append(localType).append("'; ");
         }
-        if (conf != null) {
-            m.append("conf: '").append(conf).append("'; ");
+        if (localConf != null) {
+            m.append("conf: '").append(localConf).append("'; ");
         }
 
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
         if (index.get() == 1) {
@@ -1451,17 +1455,17 @@ class CAManagerQueryExecutor {
         }
 
         CertprofileEntry currentDbEntry = createCertprofile(name);
-        if (type == null) {
-            type = currentDbEntry.getType();
+        if (localType == null) {
+            localType = currentDbEntry.getType();
         }
-        if (conf == null) {
-            conf = currentDbEntry.getConf();
+        if (localConf == null) {
+            localConf = currentDbEntry.getConf();
         }
 
-        type = getRealString(type);
-        conf = getRealString(conf);
+        localType = getRealString(localType);
+        localConf = getRealString(localConf);
 
-        CertprofileEntry newDbEntry = new CertprofileEntry(name, type, conf);
+        CertprofileEntry newDbEntry = new CertprofileEntry(name, localType, localConf);
         IdentifiedX509Certprofile profile = caManager.createCertprofile(newDbEntry);
         if (profile == null) {
             return null;
@@ -1474,11 +1478,11 @@ class CAManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                ps.setString(iType, type);
+                ps.setString(iType, localType);
             }
 
             if (iConf != null) {
-                ps.setString(iConf, getRealString(conf));
+                ps.setString(iConf, getRealString(localConf));
             }
 
             ps.setString(index.get(), name);
@@ -1574,18 +1578,22 @@ class CAManagerQueryExecutor {
 
     CmpResponderEntryWrapper changeCmpResponder(
             final String name,
-            String type,
-            String conf,
-            String base64Cert,
+            final String type,
+            final String conf,
+            final String base64Cert,
             final CAManagerImpl caManager)
     throws CAMgmtException {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
+        String localType = type;
+        String localConf = conf;
+        String localBase64Cert = base64Cert;
+
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "CERT");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, localBase64Cert, "CERT");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -1595,19 +1603,20 @@ class CAManagerQueryExecutor {
 
         CmpResponderEntry dbEntry = createResponder(name);
 
-        if (type == null) {
-            type = dbEntry.getType();
+        if (localType == null) {
+            localType = dbEntry.getType();
         }
 
-        if (conf == null) {
-            conf = dbEntry.getConf();
+        if (localConf == null) {
+            localConf = dbEntry.getConf();
         }
 
-        if (base64Cert == null) {
-            base64Cert = dbEntry.getBase64Cert();
+        if (localBase64Cert == null) {
+            localBase64Cert = dbEntry.getBase64Cert();
         }
 
-        CmpResponderEntry newDbEntry = new CmpResponderEntry(name, type, conf, base64Cert);
+        CmpResponderEntry newDbEntry = new CmpResponderEntry(name, localType,
+                localConf, localBase64Cert);
         CmpResponderEntryWrapper responder = caManager.createCmpResponder(newDbEntry);
 
         final String sql = sqlBuilder.toString();
@@ -1618,19 +1627,19 @@ class CAManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                String txt = type;
+                String txt = localType;
                 ps.setString(iType, txt);
                 m.append("type: '").append(txt).append("'; ");
             }
 
             if (iConf != null) {
-                String txt = getRealString(conf);
+                String txt = getRealString(localConf);
                 m.append("conf: '").append(SecurityUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
             if (iCert != null) {
-                String txt = getRealString(base64Cert);
+                String txt = getRealString(localBase64Cert);
                 m.append("cert: '");
                 if (txt == null) {
                     m.append("null");
@@ -1665,21 +1674,26 @@ class CAManagerQueryExecutor {
 
     X509CrlSignerEntryWrapper changeCrlSigner(
             final String name,
-            String signerType,
-            String signerConf,
-            String base64Cert,
-            String crlControl,
+            final String signerType,
+            final String signerConf,
+            final String base64Cert,
+            final String crlControl,
             final CAManagerImpl caManager)
     throws CAMgmtException {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
+        String localSignerType = signerType;
+        String localSignerConf = signerConf;
+        String localBase64Cert = base64Cert;
+        String localCrlControl = crlControl;
+
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
-        Integer iSignerCert = addToSqlIfNotNull(sqlBuilder, index, base64Cert, "SIGNER_CERT");
-        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
+        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, localSignerType, "SIGNER_TYPE");
+        Integer iSignerCert = addToSqlIfNotNull(sqlBuilder, index, localBase64Cert, "SIGNER_CERT");
+        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, localCrlControl, "CRL_CONTROL");
+        Integer iSignerConf = addToSqlIfNotNull(sqlBuilder, index, localSignerConf, "SIGNER_CONF");
 
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
@@ -1689,38 +1703,39 @@ class CAManagerQueryExecutor {
         }
 
         X509CrlSignerEntry dbEntry = createCrlSigner(name);
-        if (signerType == null) {
-            signerType = dbEntry.getType();
+        if (localSignerType == null) {
+            localSignerType = dbEntry.getType();
         }
 
-        if ("CA".equalsIgnoreCase(signerType)) {
-            signerConf = null;
-            base64Cert = null;
+        if ("CA".equalsIgnoreCase(localSignerType)) {
+            localSignerConf = null;
+            localBase64Cert = null;
         } else {
-            if (signerConf == null) {
-                signerConf = dbEntry.getConf();
+            if (localSignerConf == null) {
+                localSignerConf = dbEntry.getConf();
             }
 
-            if (base64Cert == null) {
-                base64Cert = dbEntry.getBase64Cert();
+            if (localBase64Cert == null) {
+                localBase64Cert = dbEntry.getBase64Cert();
             }
         }
 
-        if (crlControl == null) {
-            crlControl = dbEntry.getCrlControl();
+        if (localCrlControl == null) {
+            localCrlControl = dbEntry.getCrlControl();
         } else {
             // validate crlControl
-            if (crlControl != null) {
+            if (localCrlControl != null) {
                 try {
-                    new CRLControl(crlControl);
+                    new CRLControl(localCrlControl);
                 } catch (InvalidConfException e) {
-                    throw new CAMgmtException("invalid CRL control '" + crlControl + "'");
+                    throw new CAMgmtException("invalid CRL control '" + localCrlControl + "'");
                 }
             }
         }
 
         try {
-            dbEntry = new X509CrlSignerEntry(name, signerType, signerConf, base64Cert, crlControl);
+            dbEntry = new X509CrlSignerEntry(name, localSignerType, localSignerConf,
+                    localBase64Cert, localCrlControl);
         } catch (InvalidConfException e) {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -1735,20 +1750,20 @@ class CAManagerQueryExecutor {
             ps = prepareStatement(sql);
 
             if (iSignerType != null) {
-                m.append("signerType: '").append(signerType).append("'; ");
-                ps.setString(iSignerType, signerType);
+                m.append("signerType: '").append(localSignerType).append("'; ");
+                ps.setString(iSignerType, localSignerType);
             }
 
-            if (iSigner_conf != null) {
-                String txt = getRealString(signerConf);
+            if (iSignerConf != null) {
+                String txt = getRealString(localSignerConf);
                 m.append("signerConf: '")
                     .append(SecurityUtil.signerConfToString(txt, false, true))
                     .append("'; ");
-                ps.setString(iSigner_conf, txt);
+                ps.setString(iSignerConf, txt);
             }
 
             if (iSignerCert != null) {
-                String txt = getRealString(base64Cert);
+                String txt = getRealString(localBase64Cert);
                 String subject = null;
                 if (txt != null) {
                     try {
@@ -1763,8 +1778,8 @@ class CAManagerQueryExecutor {
             }
 
             if (iCrlControl != null) {
-                m.append("crlControl: '").append(crlControl).append("'; ");
-                ps.setString(iCrlControl, crlControl);
+                m.append("crlControl: '").append(localCrlControl).append("'; ");
+                ps.setString(iCrlControl, localCrlControl);
             }
 
             ps.setString(index.get(), name);
@@ -1785,20 +1800,29 @@ class CAManagerQueryExecutor {
 
     Scep changeScep(
             final String caName,
-            String responderType,
-            String responderConf,
-            String responderBase64Cert,
-            String control,
+            final String responderType,
+            final String responderConf,
+            final String responderBase64Cert,
+            final String control,
             final CAManagerImpl caManager)
     throws CAMgmtException {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE SCEP SET ");
 
+        String localResponderType = responderType;
+        String localResponderConf = responderConf;
+        String localResponderBase64Cert = responderBase64Cert;
+        String localControl = control;
+
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert, "RESPONDER_CERT");
-        Integer iControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localResponderType,
+                "RESPONDER_TYPE");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, localResponderBase64Cert,
+                "RESPONDER_CERT");
+        Integer iControl = addToSqlIfNotNull(sqlBuilder, index, localControl,
+                "CONTROL");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localResponderConf,
+                "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE CA_NAME=?");
 
@@ -1808,28 +1832,28 @@ class CAManagerQueryExecutor {
 
         ScepEntry dbEntry = getScep(caName);
 
-        if (responderType == null) {
-            responderType = dbEntry.getResponderType();
+        if (localResponderType == null) {
+            localResponderType = dbEntry.getResponderType();
         }
 
-        if (responderConf == null) {
-            responderConf = dbEntry.getResponderConf();
+        if (localResponderConf == null) {
+            localResponderConf = dbEntry.getResponderConf();
         }
 
-        if (responderBase64Cert == null) {
-            responderBase64Cert = dbEntry.getBase64Cert();
+        if (localResponderBase64Cert == null) {
+            localResponderBase64Cert = dbEntry.getBase64Cert();
         }
 
-        if (control == null) {
-            control = dbEntry.getControl();
-        } else if (CAManager.NULL.equals(control)) {
-            control = null;
+        if (localControl == null) {
+            localControl = dbEntry.getControl();
+        } else if (CAManager.NULL.equals(localControl)) {
+            localControl = null;
         }
 
         ScepEntry newDbEntry;
         try {
-            newDbEntry = new ScepEntry(caName, responderType, responderConf,
-                    responderBase64Cert, control);
+            newDbEntry = new ScepEntry(caName, localResponderType, localResponderConf,
+                    localResponderBase64Cert, localControl);
         } catch (InvalidConfException e) {
             throw new CAMgmtException(e);
         }
@@ -1843,20 +1867,20 @@ class CAManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                String txt = responderType;
+                String txt = localResponderType;
                 ps.setString(iType, txt);
                 m.append("responder type: '").append(txt).append("'; ");
             }
 
             if (iConf != null) {
-                String txt = getRealString(responderConf);
+                String txt = getRealString(localResponderConf);
                 m.append("responder conf: '")
                     .append(SecurityUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
             if (iCert != null) {
-                String txt = getRealString(responderBase64Cert);
+                String txt = getRealString(localResponderBase64Cert);
                 m.append("responder cert: '");
                 if (txt == null) {
                     m.append("null");
@@ -1874,8 +1898,8 @@ class CAManagerQueryExecutor {
             }
 
             if (iControl != null) {
-                String txt = getRealString(control);
-                m.append("control: '").append(control);
+                String txt = getRealString(localControl);
+                m.append("control: '").append(localControl);
                 ps.setString(iControl, txt);
             }
 
@@ -1923,16 +1947,19 @@ class CAManagerQueryExecutor {
 
     IdentifiedX509CertPublisher changePublisher(
             final String name,
-            String type,
-            String conf,
+            final String type,
+            final String conf,
             final CAManagerImpl caManager)
     throws CAMgmtException {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PUBLISHER SET ");
 
+        String localType = type;
+        String localConf = conf;
+
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -1941,15 +1968,15 @@ class CAManagerQueryExecutor {
         }
 
         PublisherEntry currentDbEntry = createPublisher(name);
-        if (type == null) {
-            type = currentDbEntry.getType();
+        if (localType == null) {
+            localType = currentDbEntry.getType();
         }
 
-        if (conf == null) {
-            conf = currentDbEntry.getConf();
+        if (localConf == null) {
+            localConf = currentDbEntry.getConf();
         }
 
-        PublisherEntry dbEntry = new PublisherEntry(name, type, conf);
+        PublisherEntry dbEntry = new PublisherEntry(name, localType, localConf);
         IdentifiedX509CertPublisher publisher = caManager.createPublisher(dbEntry);
         if (publisher == null) {
             return null;
@@ -1962,14 +1989,14 @@ class CAManagerQueryExecutor {
             StringBuilder m = new StringBuilder();
             ps = prepareStatement(sql);
             if (iType != null) {
-                m.append("type: '").append(type).append("'; ");
-                ps.setString(iType, type);
+                m.append("type: '").append(localType).append("'; ");
+                ps.setString(iType, localType);
             }
 
             if (iConf != null) {
-                String txt = getRealString(conf);
+                String txt = getRealString(localConf);
                 m.append("conf: '").append(txt).append("'; ");
-                ps.setString(iConf, getRealString(conf));
+                ps.setString(iConf, getRealString(localConf));
             }
 
             ps.setString(index.get(), name);

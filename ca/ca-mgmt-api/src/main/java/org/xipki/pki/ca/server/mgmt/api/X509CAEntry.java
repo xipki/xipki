@@ -42,7 +42,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.KeyUsage;
@@ -87,24 +86,18 @@ public class X509CAEntry extends CAEntry implements Serializable {
             final int nextCRLNumber,
             final String signerType,
             final String signerConf,
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
-            final List<String> deltaCrlUris,
+            final X509CAUris caUris,
             final int numCrls,
             final int expirationPeriod)
     throws CAMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
-        init(nextSerial, nextCRLNumber, cacertUris, ocspUris, crlUris, deltaCrlUris, numCrls);
+        init(nextSerial, nextCRLNumber, caUris, numCrls);
     }
 
     private void init(
             final long pNextSerial,
             final int pNextCRLNumber,
-            final List<String> pCacertUris,
-            final List<String> pOcspUris,
-            final List<String> pCrlUris,
-            final List<String> pDeltaCrlUris,
+            final X509CAUris caUris,
             final int pNumCrls)
     throws CAMgmtException {
         if (pNextSerial < 0) {
@@ -126,10 +119,10 @@ public class X509CAEntry extends CAEntry implements Serializable {
         this.nextSerial = pNextSerial;
         this.nextCRLNumber = pNextCRLNumber;
 
-        this.cacertUris = CollectionUtil.unmodifiableList(pCacertUris, true, true);
-        this.ocspUris = CollectionUtil.unmodifiableList(pOcspUris, true, true);
-        this.crlUris = CollectionUtil.unmodifiableList(pCrlUris, true, true);
-        this.deltaCrlUris = CollectionUtil.unmodifiableList(pDeltaCrlUris, true, true);
+        this.cacertUris = caUris.getCacertUris();
+        this.ocspUris = caUris.getOcspUris();
+        this.crlUris = caUris.getCrlUris();
+        this.deltaCrlUris = caUris.getDeltaCrlUris();
     }
 
     public void setCertificate(

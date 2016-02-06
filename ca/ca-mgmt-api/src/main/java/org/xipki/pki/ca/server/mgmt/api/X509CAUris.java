@@ -33,54 +33,48 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ca.server.mgmt.api;
 
-import java.math.BigInteger;
+import java.util.List;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class CertWithInfo {
+public class X509CAUris {
+    private final List<String> cacertUris;
+    private final List<String> ocspUris;
+    private final List<String> crlUris;
+    private final List<String> deltaCrlUris;
 
-    private final BigInteger serialNumber;
-
-    private Certificate cert;
-
-    private String profileName;
-
-    CertWithInfo(
-            final BigInteger serialNumber) {
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
-        this.serialNumber = serialNumber;
+    public X509CAUris(
+            final List<String> cacertUris,
+            final List<String> ocspUris,
+            final List<String> crlUris,
+            final List<String> deltaCrlUris) {
+        this.cacertUris = cacertUris;
+        this.ocspUris = ocspUris;
+        this.crlUris = crlUris;
+        this.deltaCrlUris = deltaCrlUris;
     }
 
-    public void setProfileName(
-            final String profileName) {
-        this.profileName = StringUtil.isBlank(profileName)
-                ? null
-                : profileName;
+    public List<String> getCacertUris() {
+        return CollectionUtil.unmodifiableList(cacertUris, true, true);
     }
 
-    public void setCert(Certificate cert) {
-        this.cert = cert;
+    public List<String> getOcspUris() {
+        return CollectionUtil.unmodifiableList(ocspUris, true, true);
     }
 
-    public BigInteger getSerialNumber() {
-        return serialNumber;
+    public List<String> getCrlUris() {
+        return CollectionUtil.unmodifiableList(crlUris, true, true);
     }
 
-    public Certificate getCert() {
-        return cert;
+    public List<String> getDeltaCrlUris() {
+        return CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
     }
 
-    public String getProfileName() {
-        return profileName;
-    }
-
-} // class CertWithInfo
+}

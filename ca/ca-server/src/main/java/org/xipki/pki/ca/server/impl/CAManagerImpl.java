@@ -136,6 +136,7 @@ import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CAUris;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 
@@ -2638,10 +2639,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager, ScepManage
             }
         }
 
+        X509CAUris caUris = new X509CAUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
+
         X509CAEntry entry = new X509CAEntry(name, nextSerial, nextCrlNumber,
                 signerType, signerConf,
-                cacertUris, ocspUris, crlUris, deltaCrlUris,
-                numCrls, expirationPeriod);
+                caUris, numCrls, expirationPeriod);
         entry.setCertificate(caCert);
         entry.setCmpControlName(caEntry.getCmpControlName());
         entry.setCrlSignerName(caEntry.getCrlSignerName());

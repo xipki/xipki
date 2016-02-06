@@ -104,16 +104,8 @@ public class DbDigestDiff {
             final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads)
+            final NumThreads numThreads)
     throws IOException, DataAccessException {
-        if (numRefThreads < 1) {
-            throw new IllegalArgumentException("invalid numRefThreads: " + numRefThreads);
-        }
-        if (numTargetThreads < 1) {
-            throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
-        }
-
         this.revokedOnly = revokedOnly;
 
         this.refDirname = (refDir == null)
@@ -132,16 +124,18 @@ public class DbDigestDiff {
         // number of threads
         this.numRefThreads = (refDatasource == null)
                 ? 1
-                : Math.min(numRefThreads, refDatasource.getMaximumPoolSize() - 1);
-        if (this.numRefThreads != numRefThreads) {
+                : Math.min(numThreads.getNumRefThreads(),
+                        refDatasource.getMaximumPoolSize() - 1);
+        if (this.numRefThreads != numThreads.getNumRefThreads()) {
             LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
         }
 
         this.numTargetThreads = (targetDatasource == null)
                 ? 1
-                : Math.min(numTargetThreads, targetDatasource.getMaximumPoolSize() - 1);
+                : Math.min(numThreads.getNumTargetThreads(),
+                        targetDatasource.getMaximumPoolSize() - 1);
 
-        if (this.numTargetThreads != numRefThreads) {
+        if (this.numTargetThreads != numThreads.getNumTargetThreads()) {
             LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
                     this.numTargetThreads);
         }
@@ -218,7 +212,7 @@ public class DbDigestDiff {
             final int numCertsToPredicate = (numTargetThreads * 3 / 2) * numPerSelect;
             for (Integer refCaId : refCaIds) {
                 DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-                        ? EjbcaDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                        ? EjbcaDbDigestReader.getInstance(refDatasource,
                                 refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads,
                                 numCertsToPredicate, new StopMe(stopMe))
                         : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
@@ -311,8 +305,7 @@ public class DbDigestDiff {
             final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads)
+            final NumThreads numThreads)
     throws IOException, DataAccessException {
         ParamUtil.assertNotBlank("refDirname", refDirname);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
@@ -324,7 +317,7 @@ public class DbDigestDiff {
 
         return new DbDigestDiff(refDirname, null,
                 targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numRefThreads, numTargetThreads);
+                numPerSelect, numThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(
@@ -334,8 +327,7 @@ public class DbDigestDiff {
             final boolean revokedOnly,
             final AtomicBoolean stopMe,
             final int numPerSelect,
-            final int numRefThreads,
-            final int numTargetThreads)
+            final NumThreads numThreads)
     throws IOException, DataAccessException {
         ParamUtil.assertNotNull("refDatasource", refDatasource);
         ParamUtil.assertNotBlank("reportDirName", reportDirName);
@@ -347,7 +339,7 @@ public class DbDigestDiff {
 
         return new DbDigestDiff(null, refDatasource,
                 targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numRefThreads, numTargetThreads);
+                numPerSelect, numThreads);
     }
 
     private static Map<Integer, byte[]> getCAs(

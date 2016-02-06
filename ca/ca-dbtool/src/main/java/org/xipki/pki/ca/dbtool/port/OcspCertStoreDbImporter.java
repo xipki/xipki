@@ -156,66 +156,73 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
         try {
             for (IssuerType issuer : issuers.getIssuer()) {
-                try {
-                    String certFilename = issuer.getCertFile();
-                    String b64Cert = new String(
-                            IoUtil.read(new File(baseDir, certFilename)));
-                    byte[] encodedCert = Base64.decode(b64Cert);
-
-                    Certificate c;
-                    byte[] encodedName;
-                    try {
-                        c = Certificate.getInstance(encodedCert);
-                        encodedName = c.getSubject().getEncoded("DER");
-                    } catch (Exception e) {
-                        LOG.error("could not parse certificate of issuer {}", issuer.getId());
-                        LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
-                        if (e instanceof CertificateException) {
-                            throw (CertificateException) e;
-                        } else {
-                            throw new CertificateException(e.getMessage(), e);
-                        }
-                    }
-                    byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-
-                    int idx = 1;
-                    ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
-                    ps.setLong(idx++,
-                            c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps.setLong(idx++,
-                            c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps.setString(idx++, sha1(encodedName));
-                    ps.setString(idx++, sha1(encodedKey));
-                    ps.setString(idx++, sha224(encodedName));
-                    ps.setString(idx++, sha224(encodedKey));
-                    ps.setString(idx++, sha256(encodedName));
-                    ps.setString(idx++, sha256(encodedKey));
-                    ps.setString(idx++, sha384(encodedName));
-                    ps.setString(idx++, sha384(encodedKey));
-                    ps.setString(idx++, sha512(encodedName));
-                    ps.setString(idx++, sha512(encodedKey));
-                    ps.setString(idx++, sha1(encodedCert));
-                    ps.setString(idx++, b64Cert);
-                    setBoolean(ps, idx++, issuer.isRevoked());
-                    setInt(ps, idx++, issuer.getRevReason());
-                    setLong(ps, idx++, issuer.getRevTime());
-                    setLong(ps, idx++, issuer.getRevInvTime());
-
-                    ps.execute();
-                } catch (SQLException e) {
-                    System.err.println("error while importing issuer with id=" + issuer.getId());
-                    throw translate(SQL_ADD_ISSUER, e);
-                } catch (CertificateException e) {
-                    System.err.println("error while importing issuer with id=" + issuer.getId());
-                    throw e;
-                }
+                doImportIssuer(issuer, ps);
             }
         } finally {
             releaseResources(ps, null);
         }
         System.out.println(" imported table ISSUER");
-    } // method importIssuer
+    }
+
+    private void doImportIssuer(
+            final IssuerType issuer,
+            final PreparedStatement ps)
+    throws DataAccessException, CertificateException, IOException {
+        try {
+            String certFilename = issuer.getCertFile();
+            String b64Cert = new String(
+                    IoUtil.read(new File(baseDir, certFilename)));
+            byte[] encodedCert = Base64.decode(b64Cert);
+
+            Certificate c;
+            byte[] encodedName;
+            try {
+                c = Certificate.getInstance(encodedCert);
+                encodedName = c.getSubject().getEncoded("DER");
+            } catch (Exception e) {
+                LOG.error("could not parse certificate of issuer {}", issuer.getId());
+                LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
+                if (e instanceof CertificateException) {
+                    throw (CertificateException) e;
+                } else {
+                    throw new CertificateException(e.getMessage(), e);
+                }
+            }
+            byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+
+            int idx = 1;
+            ps.setInt(idx++, issuer.getId());
+            ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+            ps.setLong(idx++,
+                    c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+            ps.setLong(idx++,
+                    c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+            ps.setString(idx++, sha1(encodedName));
+            ps.setString(idx++, sha1(encodedKey));
+            ps.setString(idx++, sha224(encodedName));
+            ps.setString(idx++, sha224(encodedKey));
+            ps.setString(idx++, sha256(encodedName));
+            ps.setString(idx++, sha256(encodedKey));
+            ps.setString(idx++, sha384(encodedName));
+            ps.setString(idx++, sha384(encodedKey));
+            ps.setString(idx++, sha512(encodedName));
+            ps.setString(idx++, sha512(encodedKey));
+            ps.setString(idx++, sha1(encodedCert));
+            ps.setString(idx++, b64Cert);
+            setBoolean(ps, idx++, issuer.isRevoked());
+            setInt(ps, idx++, issuer.getRevReason());
+            setLong(ps, idx++, issuer.getRevTime());
+            setLong(ps, idx++, issuer.getRevInvTime());
+
+            ps.execute();
+        } catch (SQLException e) {
+            System.err.println("error while importing issuer with id=" + issuer.getId());
+            throw translate(SQL_ADD_ISSUER, e);
+        } catch (CertificateException e) {
+            System.err.println("error while importing issuer with id=" + issuer.getId());
+            throw e;
+        }
+    }  // method doImportIssuer
 
     private void importCert(
             final CertStoreType certstore,

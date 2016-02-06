@@ -33,54 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
-
-import java.math.BigInteger;
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+package org.xipki.pki.ca.dbtool.diffdb;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class CertWithInfo {
+public class NumThreads {
 
-    private final BigInteger serialNumber;
+    private final int numRefThreads;
 
-    private Certificate cert;
+    private final int numTargetThreads;
 
-    private String profileName;
-
-    CertWithInfo(
-            final BigInteger serialNumber) {
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
-        this.serialNumber = serialNumber;
+    public NumThreads(
+            final int numRefThreads,
+            final int numTargetThreads) {
+        if (numRefThreads < 1) {
+            throw new IllegalArgumentException("invalid numRefThreads: " + numRefThreads);
+        }
+        if (numTargetThreads < 1) {
+            throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
+        }
+        this.numRefThreads = numRefThreads;
+        this.numTargetThreads = numTargetThreads;
     }
 
-    public void setProfileName(
-            final String profileName) {
-        this.profileName = StringUtil.isBlank(profileName)
-                ? null
-                : profileName;
+    public int getNumRefThreads() {
+        return numRefThreads;
     }
 
-    public void setCert(Certificate cert) {
-        this.cert = cert;
+    public int getNumTargetThreads() {
+        return numTargetThreads;
     }
 
-    public BigInteger getSerialNumber() {
-        return serialNumber;
-    }
+}
 
-    public Certificate getCert() {
-        return cert;
-    }
-
-    public String getProfileName() {
-        return profileName;
-    }
-
-} // class CertWithInfo
