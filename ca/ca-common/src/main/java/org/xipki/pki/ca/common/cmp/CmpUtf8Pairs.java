@@ -196,50 +196,6 @@ public class CmpUtf8Pairs {
         return pairs.equals(b.pairs);
     }
 
-    public static void main(String[] args) {
-        try {
-            CmpUtf8Pairs pairs = new CmpUtf8Pairs("key-a", "value-a");
-            pairs.putUtf8Pair("key-b", "value-b");
-
-            String encoded = pairs.getEncoded();
-            System.out.println(encoded);
-            pairs = new CmpUtf8Pairs(encoded);
-            for (String name : pairs.getNames()) {
-                System.out.println(name + ": " + pairs.getValue(name));
-            }
-
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a");
-            System.out.println(pairs.getEncoded());
-            for (String name : pairs.getNames()) {
-                System.out.println(name + ": " + pairs.getValue(name));
-            }
-
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%");
-            System.out.println(pairs.getEncoded());
-            for (String name : pairs.getNames()) {
-                System.out.println(name + ": " + pairs.getValue(name));
-            }
-
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%3f%");
-            System.out.println(pairs.getEncoded());
-            for (String name : pairs.getNames()) {
-                System.out.println(name + ": " + pairs.getValue(name));
-            }
-
-            System.out.println("--------------");
-            pairs = new CmpUtf8Pairs("key-a?value-a%3f%3f%25%");
-            System.out.println(pairs.getEncoded());
-            for (String name : pairs.getNames()) {
-                System.out.println(name + ": " + pairs.getValue(name));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    } // method main
-
     private static String encodeNameOrValue(
             final String s) {
         String localS = s;
