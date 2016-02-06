@@ -77,25 +77,30 @@ public class ConfPairs {
 
         StringBuilder tokenBuilder = new StringBuilder();
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n;) {
             char c = string.charAt(i);
-            if ('\\' == c) {
-                if (i == n - 1) {
-                    throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
-                } else {
-                    tokenBuilder.append(c);
-                    c = string.charAt(++i);
-                }
-            } else if (TOKEN_TERM == c) {
+            if (TOKEN_TERM == c) {
                 if (tokenBuilder.length() > 0) {
                     tokens.add(tokenBuilder.toString());
                 }
                 // reset tokenBuilder
                 tokenBuilder = new StringBuilder();
+                i++;
                 continue;
             }
 
+            if ('\\' == c) {
+                if (i == n - 1) {
+                    throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                }
+
+                tokenBuilder.append(c);
+                c = string.charAt(i + 1);
+                i++;
+            }
+
             tokenBuilder.append(c);
+            i++;
         }
 
         if (tokenBuilder.length() > 0) {
@@ -105,18 +110,21 @@ public class ConfPairs {
         for (String token : tokens) {
             int termPosition = -1;
             n = token.length();
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < n;) {
                 char c = token.charAt(i);
-                if ('\\' == c) {
-                    if (i == n - 1) {
-                        throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
-                    } else {
-                        i++;
-                    }
-                }
                 if (c == NAME_TERM) {
                     termPosition = i;
                     break;
+                }
+
+                if ('\\' == c) {
+                    if (i == n - 1) {
+                        throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                    }
+
+                    i += 2;
+                } else {
+                    i++;
                 }
             }
 
@@ -125,34 +133,36 @@ public class ConfPairs {
             }
 
             tokenBuilder = new StringBuilder();
-            for (int i = 0; i < termPosition; i++) {
+            for (int i = 0; i < termPosition;) {
                 char c = token.charAt(i);
                 if ('\\' == c) {
                     if (i == termPosition - 1) {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
-                    } else {
-                        i++;
-                        continue;
                     }
-                }
 
-                tokenBuilder.append(c);
+                    i += 2;
+                } else {
+                    tokenBuilder.append(c);
+                    i++;
+                }
             }
 
             String name = tokenBuilder.toString();
 
             tokenBuilder = new StringBuilder();
-            for (int i = termPosition + 1; i < n; i++) {
+            for (int i = termPosition + 1; i < n;) {
                 char c = token.charAt(i);
                 if ('\\' == c) {
                     if (i == n - 1) {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
-                    } else {
-                        c = token.charAt(++i);
                     }
+
+                    c = token.charAt(i + 1);
+                    i++;
                 }
 
                 tokenBuilder.append(c);
+                i++;
             }
 
             String value = tokenBuilder.toString();
