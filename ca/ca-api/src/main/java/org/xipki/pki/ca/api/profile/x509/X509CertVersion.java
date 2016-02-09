@@ -42,9 +42,9 @@ package org.xipki.pki.ca.api.profile.x509;
 
 public enum X509CertVersion {
 
-    V1(1),
-    V2(2),
-    V3(3);
+    V1(0),
+    V2(1),
+    V3(2);
 
     private int version;
 

@@ -80,6 +80,7 @@ public class RdnControl {
             throw new IllegalArgumentException(
                     String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
         }
+
         this.type = type;
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;

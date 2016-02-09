@@ -39,12 +39,12 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.xipki.commons.console.karaf.intern.Configuration;
-import org.xipki.commons.console.karaf.intern.MyFilenameFilter;
 
 /**
  * @author Lijun Liao
@@ -52,6 +52,38 @@ import org.xipki.commons.console.karaf.intern.MyFilenameFilter;
  */
 
 abstract class AbstractPathCompleter implements Completer {
+
+    private static class MyFilenameFilter implements FilenameFilter {
+
+        private static final Pattern IGNORE_PATTERN;
+
+        static {
+            String ignoreRegex = System.getProperty("org.xipki.console.ignore.regex");
+            if (ignoreRegex == null) {
+                if (!Configuration.isWindows()) {
+                    ignoreRegex = "\\..*";
+                }
+            }
+
+            if (ignoreRegex == null || ignoreRegex.isEmpty()) {
+                IGNORE_PATTERN = null;
+            } else {
+                IGNORE_PATTERN = Pattern.compile(ignoreRegex);
+            }
+        }
+
+        @Override
+        public boolean accept(
+                final File dir,
+                final String name) {
+            if (IGNORE_PATTERN == null) {
+                return true;
+            }
+
+            return !IGNORE_PATTERN.matcher(name).matches();
+        }
+
+    }
 
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
 

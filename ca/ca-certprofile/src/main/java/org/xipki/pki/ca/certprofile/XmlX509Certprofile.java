@@ -159,67 +159,57 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlX509Certprofile.class);
 
-    private SpecialX509CertprofileBehavior specialBehavior;
+    private ExtensionValue additionalInformation;
 
-    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
-
-    private SubjectControl subjectControl;
-
-    private Map<String, String> parameters;
-
-    private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
-
-    private CertValidity validity;
-
-    private X509CertVersion version;
-
-    private List<String> signatureAlgorithms;
-
-    private boolean incSerialNoIfSubjectExists;
-
-    private boolean raOnly;
-
-    private boolean ca;
-
-    private boolean duplicateKeyPermitted;
-
-    private boolean duplicateSubjectPermitted;
-
-    private boolean serialNumberInReqPermitted;
-
-    private boolean notBeforeMidnight;
-
-    private boolean includeIssuerAndSerialInAKI;
-
-    private Integer pathLen;
+    private ExtensionValue admission;
 
     private AuthorityInfoAccessControl aIAControl;
-
-    private Set<KeyUsageControl> keyusages;
-
-    private Set<ExtKeyUsageControl> extendedKeyusages;
 
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
 
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
+    private ExtensionValue authorizationTemplate;
+
+    private BiometricInfoOption biometricDataOption;
+
+    private boolean ca;
+
     private ExtensionValue certificatePolicies;
 
-    private ExtensionValue policyMappings;
+    private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
-    private ExtensionValue nameConstraints;
+    private boolean duplicateKeyPermitted;
 
-    private ExtensionValue policyConstraints;
+    private boolean duplicateSubjectPermitted;
+
+    private Set<ExtKeyUsageControl> extendedKeyusages;
+
+    private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
+
+    private boolean includeIssuerAndSerialInAKI;
+
+    private boolean incSerialNoIfSubjectExists;
 
     private ExtensionValue inhibitAnyPolicy;
 
-    private ExtensionValue admission;
+    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    private ExtensionValue restriction;
+    private Set<KeyUsageControl> keyusages;
 
-    private ExtensionValue additionalInformation;
+    private Integer maxSize;
 
-    private ExtensionValue validityModel;
+    private ExtensionValue nameConstraints;
+
+    private boolean notBeforeMidnight;
+
+    private Map<String, String> parameters;
+
+    private Integer pathLen;
+
+    private ExtensionValue policyConstraints;
+
+    private ExtensionValue policyMappings;
 
     private CertValidity privateKeyUsagePeriod;
 
@@ -227,55 +217,69 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private List<QcStatementOption> qcStatementsOption;
 
-    private ExtensionValue authorizationTemplate;
+    private boolean raOnly;
 
-    private BiometricInfoOption biometricDataOption;
+    private ExtensionValue restriction;
 
-    private ExtensionValue tlsFeature;
+    private boolean serialNumberInReqPermitted;
+
+    private List<String> signatureAlgorithms;
 
     private ExtensionValue smimeCapatibilities;
 
-    private Integer maxSize;
+    private SpecialX509CertprofileBehavior specialBehavior;
 
-    private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
+    private SubjectControl subjectControl;
+
+    private ExtensionValue tlsFeature;
+
+    private CertValidity validity;
+
+    private X509CertVersion version;
+
+    private ExtensionValue validityModel;
 
     private void reset() {
-        version = null;
-        signatureAlgorithms = null;
-        incSerialNoIfSubjectExists = false;
-        keyAlgorithms = null;
-        subjectControl = null;
-        extensionControls = null;
-        validity = null;
-        notBeforeMidnight = false;
-        includeIssuerAndSerialInAKI = false;
-        raOnly = false;
-        ca = false;
-        duplicateKeyPermitted = true;
-        duplicateSubjectPermitted = true;
-        serialNumberInReqPermitted = true;
-        pathLen = null;
+        additionalInformation = null;
+        admission = null;
         aIAControl = null;
-        keyusages = null;
-        extendedKeyusages = null;
         allowedSubjectAltNameModes = null;
         allowedSubjectInfoAccessModes = null;
+        authorizationTemplate = null;
+        biometricDataOption = null;
+        ca = false;
         certificatePolicies = null;
-        nameConstraints = null;
-        policyMappings = null;
+        constantExtensions = null;
+        duplicateKeyPermitted = true;
+        duplicateSubjectPermitted = true;
+        extendedKeyusages = null;
+        extensionControls = null;
+        includeIssuerAndSerialInAKI = false;
+        incSerialNoIfSubjectExists = false;
         inhibitAnyPolicy = null;
-        admission = null;
-        restriction = null;
-        additionalInformation = null;
-        validityModel = null;
+        keyAlgorithms = null;
+        keyusages = null;
+        maxSize = null;
+        nameConstraints = null;
+        notBeforeMidnight = false;
+        parameters = null;
+        pathLen = null;
+        policyConstraints = null;
+        policyMappings = null;
         privateKeyUsagePeriod = null;
         qCStatments = null;
         qcStatementsOption = null;
-        authorizationTemplate = null;
-        biometricDataOption = null;
+        raOnly = false;
+        restriction = null;
+        serialNumberInReqPermitted = true;
+        signatureAlgorithms = null;
+        smimeCapatibilities = null;
+        specialBehavior = null;
+        subjectControl = null;
         tlsFeature = null;
-        constantExtensions = null;
-        maxSize = null;
+        validity = null;
+        validityModel = null;
+        version = null;
     } // method reset
 
     @Override
@@ -314,8 +318,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             int intVersion = conf.getVersion().intValue();
             this.version = X509CertVersion.getInstance(intVersion);
             if (this.version == null) {
-                throw new CertprofileException(
-                    String.format("invalid version %s", intVersion));
+                throw new CertprofileException(String.format(
+                        "invalid version %s", intVersion));
             }
         } else {
             this.version = X509CertVersion.V3;
@@ -409,7 +413,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             } else {
                 range = null;
             }
+
             RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
+            subjectDNControls.put(type, rdnControl);
+
             rdnControl.setStringType(stringType);
             rdnControl.setStringLengthRange(range);
             rdnControl.setPatterns(patterns);
@@ -417,8 +424,6 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             rdnControl.setSuffix(t.getSuffix());
             rdnControl.setGroup(t.getGroup());
             SubjectDnSpec.fixRDNControl(rdnControl);
-
-            subjectDNControls.put(type, rdnControl);
         }
         this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
         this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
@@ -429,426 +434,618 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // Extension controls
         this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
 
-        // BasicConstrains
-        ASN1ObjectIdentifier type = Extension.basicConstraints;
-        if (extensionControls.containsKey(type)) {
-            BasicConstraints extConf = (BasicConstraints) getExtensionValue(
-                    type, extensionsType, BasicConstraints.class);
-            if (extConf != null) {
-                this.pathLen = extConf.getPathLen();
-            }
-        }
-
-        // AuthorityInfoAccess
-        type = Extension.authorityInfoAccess;
-        if (extensionControls.containsKey(type)) {
-            AuthorityInfoAccess extConf = (AuthorityInfoAccess) getExtensionValue(
-                    type, extensionsType, AuthorityInfoAccess.class);
-            if (extConf != null) {
-                b = extConf.isIncludeCaIssuers();
-                boolean includesCaIssuers = (b == null)
-                        ? true
-                        : b.booleanValue();
-
-                b = extConf.isIncludeOcsp();
-                boolean includesOcsp = (b == null)
-                        ? true
-                        : b.booleanValue();
-
-                this.aIAControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
-            }
-        }
-
-        // Extension KeyUsage
-        type = Extension.keyUsage;
-        if (extensionControls.containsKey(type)) {
-            KeyUsage extConf = (KeyUsage) getExtensionValue(
-                    type, extensionsType, KeyUsage.class);
-            if (extConf != null) {
-                this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
-            }
-        }
-
-        // ExtendedKeyUsage
-        type = Extension.extendedKeyUsage;
-        if (extensionControls.containsKey(type)) {
-            ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
-                    type, extensionsType, ExtendedKeyUsage.class);
-            if (extConf != null) {
-                this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
-            }
-        }
-
-        // AuthorityKeyIdentifier
-        type = Extension.authorityKeyIdentifier;
-        if (extensionControls.containsKey(type)) {
-            AuthorityKeyIdentifier extConf = (AuthorityKeyIdentifier) getExtensionValue(
-                    type, extensionsType, AuthorityKeyIdentifier.class);
-            if (extConf != null) {
-                this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
-            }
-        }
-
-        // Certificate Policies
-        type = Extension.certificatePolicies;
-        if (extensionControls.containsKey(type)) {
-            CertificatePolicies extConf = (CertificatePolicies) getExtensionValue(
-                    type, extensionsType, CertificatePolicies.class);
-            if (extConf != null) {
-                List<CertificatePolicyInformation> policyInfos =
-                        XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
-                org.bouncycastle.asn1.x509.CertificatePolicies value =
-                        X509CertUtil.createCertificatePolicies(policyInfos);
-                this.certificatePolicies =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), value);
-            }
-        }
-
-        // Policy Mappings
-        type = Extension.policyMappings;
-        if (extensionControls.containsKey(type)) {
-            PolicyMappings extConf = (PolicyMappings) getExtensionValue(
-                    type, extensionsType, PolicyMappings.class);
-            if (extConf != null) {
-                org.bouncycastle.asn1.x509.PolicyMappings value =
-                        XmlX509CertprofileUtil.buildPolicyMappings(extConf);
-                this.policyMappings =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), value);
-            }
-        }
-
-        // Name Constrains
-        type = Extension.nameConstraints;
-        if (extensionControls.containsKey(type)) {
-            NameConstraints extConf = (NameConstraints) getExtensionValue(
-                    type, extensionsType, NameConstraints.class);
-            if (extConf != null) {
-                org.bouncycastle.asn1.x509.NameConstraints value =
-                        XmlX509CertprofileUtil.buildNameConstrains(extConf);
-                this.nameConstraints =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), value);
-            }
-        }
-
-        // Policy Constraints
-        type = Extension.policyConstraints;
-        if (extensionControls.containsKey(type)) {
-            PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
-                    type, extensionsType, PolicyConstraints.class);
-            if (extConf != null) {
-                ASN1Sequence value = XmlX509CertprofileUtil.buildPolicyConstrains(extConf);
-                this.policyConstraints =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), value);
-            }
-        }
-
-        // Inhibit anyPolicy
-        type = Extension.inhibitAnyPolicy;
-        if (extensionControls.containsKey(type)) {
-            InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
-                    type, extensionsType, InhibitAnyPolicy.class);
-            if (extConf != null) {
-                int skipCerts = extConf.getSkipCerts();
-                if (skipCerts < 0) {
-                    throw new CertprofileException(
-                            "negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
-                }
-                ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
-                this.inhibitAnyPolicy =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), value);
-            }
-        }
+        // additionalInformation
+        initAdditionalInformation(extensionsType);
 
         // admission
-        type = ObjectIdentifiers.id_extension_admission;
-        if (extensionControls.containsKey(type)) {
-            Admission extConf = (Admission) getExtensionValue(
-                    type, extensionsType, Admission.class);
-            if (extConf != null) {
-                List<ASN1ObjectIdentifier> professionOIDs;
-                List<String> professionItems;
+        initAdmission(extensionsType);
 
-                List<String> items = (type == null)
-                        ? null
-                        : extConf.getProfessionItem();
-                professionItems = CollectionUtil.unmodifiableList(items, true, true);
+        // AuthorityInfoAccess
+        initAuthorityInfoAccess(extensionsType);
 
-                List<OidWithDescType> oidWithDescs = (type == null)
-                        ? null
-                        : extConf.getProfessionOid();
-                professionOIDs = XmlX509CertprofileUtil.toOIDList(oidWithDescs);
-
-                this.admission = createAdmission(extensionControls.get(type).isCritical(),
-                        professionOIDs, professionItems,
-                        extConf.getRegistrationNumber(),
-                        extConf.getAddProfessionInfo());
-            }
-        }
-
-        // SubjectAltNameMode
-        type = Extension.subjectAlternativeName;
-        if (extensionControls.containsKey(type)) {
-            SubjectAltName extConf = (SubjectAltName) getExtensionValue(
-                    type, extensionsType, SubjectAltName.class);
-            if (extConf != null) {
-                this.allowedSubjectAltNameModes =
-                        XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
-            }
-        }
-
-        // SubjectInfoAccess
-        type = Extension.subjectInfoAccess;
-        if (extensionControls.containsKey(type)) {
-            SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
-                    type, extensionsType, SubjectInfoAccess.class);
-            if (extConf != null) {
-                List<Access> list = extConf.getAccess();
-                this.allowedSubjectInfoAccessModes = new HashMap<>();
-                for (Access entry : list) {
-                    this.allowedSubjectInfoAccessModes.put(
-                            new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
-                            XmlX509CertprofileUtil.buildGeneralNameMode(
-                                    entry.getAccessLocation()));
-                }
-            }
-        }
-
-        // restriction
-        type = ObjectIdentifiers.id_extension_restriction;
-        if (extensionControls.containsKey(type)) {
-            Restriction extConf = (Restriction) getExtensionValue(
-                    type, extensionsType, Restriction.class);
-            if (extConf != null) {
-                DirectoryStringType stringType =
-                        XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
-                ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
-                restriction =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-            }
-        }
-
-        // additionalInformation
-        type = ObjectIdentifiers.id_extension_additionalInformation;
-        if (extensionControls.containsKey(type)) {
-            AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
-                    type, extensionsType, AdditionalInformation.class);
-            if (extConf != null) {
-                DirectoryStringType stringType =
-                        XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
-                ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
-                additionalInformation =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-            }
-        }
-
-        // validityModel
-        type = ObjectIdentifiers.id_extension_validityModel;
-        if (extensionControls.containsKey(type)) {
-            ValidityModel extConf = (ValidityModel) getExtensionValue(
-                    type, extensionsType, ValidityModel.class);
-            if (extConf != null) {
-                ASN1ObjectIdentifier oid =
-                        new ASN1ObjectIdentifier(extConf.getModelId().getValue());
-                ASN1Encodable extValue = new DERSequence(oid);
-                validityModel =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-            }
-        }
-
-        // PrivateKeyUsagePeriod
-        type = Extension.privateKeyUsagePeriod;
-        if (extensionControls.containsKey(type)) {
-            PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
-                    type, extensionsType, PrivateKeyUsagePeriod.class);
-            if (extConf != null) {
-                privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
-            }
-        }
-
-        // QCStatements
-        type = Extension.qCStatements;
-        if (extensionControls.containsKey(type)) {
-            QCStatements extConf = (QCStatements) getExtensionValue(
-                    type, extensionsType, QCStatements.class);
-
-            if (extConf != null) {
-                List<QCStatementType> qcStatementTypes = extConf.getQCStatement();
-
-                this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
-                Set<String> currencyCodes = new HashSet<>();
-                boolean requireInfoFromReq = false;
-
-                for (QCStatementType m : qcStatementTypes) {
-                    ASN1ObjectIdentifier qcStatementId =
-                            new ASN1ObjectIdentifier(m.getStatementId().getValue());
-                    QcStatementOption qcStatementOption;
-
-                    QCStatementValueType statementValue = m.getStatementValue();
-                    if (statementValue == null) {
-                        QCStatement qcStatment = new QCStatement(qcStatementId);
-                        qcStatementOption = new QcStatementOption(qcStatment);
-                    } else if (statementValue.getQcRetentionPeriod() != null) {
-                        QCStatement qcStatment = new QCStatement(qcStatementId,
-                                new ASN1Integer(statementValue.getQcRetentionPeriod()));
-                        qcStatementOption = new QcStatementOption(qcStatment);
-                    } else if (statementValue.getConstant() != null) {
-                        ASN1Encodable constantStatementValue;
-                        try {
-                            constantStatementValue = new ASN1StreamParser(
-                                    statementValue.getConstant().getValue()).readObject();
-                        } catch (IOException e) {
-                            throw new CertprofileException(
-                                    "cannot parse the constant value of QcStatement");
-                        }
-                        QCStatement qcStatment = new QCStatement(qcStatementId,
-                                constantStatementValue);
-                        qcStatementOption = new QcStatementOption(qcStatment);
-                    } else if (statementValue.getQcEuLimitValue() != null) {
-                        QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
-                        String sCurrency = euLimitType.getCurrency().toUpperCase();
-                        if (currencyCodes.contains(sCurrency)) {
-                            throw new CertprofileException(
-                                    "Duplicated definition of qcStatments with QCEuLimitValue for "
-                                    + "the currency " + sCurrency);
-                        }
-
-                        Iso4217CurrencyCode currency;
-                        if (StringUtil.isNumber(sCurrency)) {
-                            int cCode = Integer.parseInt(sCurrency);
-                            currency = new Iso4217CurrencyCode(cCode);
-                        } else {
-                            currency = new Iso4217CurrencyCode(sCurrency);
-                        }
-
-                        Range2Type r1 = euLimitType.getAmount();
-                        Range2Type r2 = euLimitType.getExponent();
-                        if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
-                            MonetaryValue monetaryValue =
-                                    new MonetaryValue(currency, r1.getMin(), r2.getMin());
-                            QCStatement qcStatment =
-                                    new QCStatement(qcStatementId, monetaryValue);
-                            qcStatementOption = new QcStatementOption(qcStatment);
-                        } else {
-                            MonetaryValueOption monetaryValueOption =
-                                    new MonetaryValueOption(currency, r1, r2);
-                            qcStatementOption =
-                                    new QcStatementOption(qcStatementId, monetaryValueOption);
-                            requireInfoFromReq = true;
-                        }
-                        currencyCodes.add(sCurrency);
-                    } else {
-                        throw new RuntimeException("unknown value of qcStatment");
-                    }
-
-                    this.qcStatementsOption.add(qcStatementOption);
-                } // end for
-
-                if (!requireInfoFromReq) {
-                    ASN1EncodableVector v = new ASN1EncodableVector();
-                    for (QcStatementOption m : qcStatementsOption) {
-                        if (m.getStatement() == null) {
-                            throw new RuntimeException("should not reach here");
-                        }
-                        v.add(m.getStatement());
-                    }
-                    ASN1Sequence seq = new DERSequence(v);
-                    qCStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
-                    qcStatementsOption = null;
-                }
-            }
-        }
-
-        // biometricInfo
-        type = Extension.biometricInfo;
-        if (extensionControls.containsKey(type)) {
-            BiometricInfo extConf = (BiometricInfo) getExtensionValue(
-                    type, extensionsType, BiometricInfo.class);
-            if (extConf != null) {
-                try {
-                    this.biometricDataOption = new BiometricInfoOption(extConf);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new CertprofileException("NoSuchAlgorithmException: " + e.getMessage());
-                }
-            }
-        }
+        // AuthorityKeyIdentifier
+        initAuthorityKeyIdentifier(extensionsType);
 
         // authorizationTemplate
-        type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
-        if (extensionControls.containsKey(type)) {
-            AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
-                    type, extensionsType, AuthorizationTemplate.class);
-            if (extConf != null) {
-                ASN1EncodableVector v = new ASN1EncodableVector();
-                v.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
-                v.add(new DEROctetString(extConf.getAccessRights().getValue()));
-                ASN1Encodable extValue = new DERSequence(v);
-                authorizationTemplate =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-            }
-        }
+        initAuthorizationTemplate(extensionsType);
 
-        // tlsFeature
-        type = ObjectIdentifiers.id_pe_tlsfeature;
-        if (extensionControls.containsKey(type)) {
-            TlsFeature extConf = (TlsFeature) getExtensionValue(
-                    type, extensionsType, TlsFeature.class);
+        // BasicConstrains
+        initBasicConstraints(extensionsType);
 
-            List<Integer> features = new ArrayList<>(extConf.getFeature().size());
-            for (IntWithDescType m : extConf.getFeature()) {
-                int value = m.getValue();
-                if (value < 0 || value > 65535) {
-                    throw new CertprofileException(
-                            "invalid TLS feature (extensionType) " + value);
-                }
-                features.add(value);
-            }
-            Collections.sort(features);
+        // biometricInfo
+        initBiometricInfo(extensionsType);
 
-            if (extConf != null) {
-                ASN1EncodableVector v = new ASN1EncodableVector();
-                for (Integer m : features) {
-                    v.add(new ASN1Integer(m));
-                }
-                ASN1Encodable extValue = new DERSequence(v);
-                tlsFeature =
-                        new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-            }
-        }
+        // Certificate Policies
+        initCertificatePolicies(extensionsType);
+
+        // ExtendedKeyUsage
+        initExtendedKeyUsage(extensionsType);
+
+        // Inhibit anyPolicy
+        initInhibitAnyPolicy(extensionsType);
+
+        // KeyUsage
+        initKeyUsage(extensionsType);
+
+        // Name Constrains
+        initNameConstraints(extensionsType);
+
+        // Policy Constraints
+        initPolicyConstraints(extensionsType);
+
+        // Policy Mappings
+        initPolicyMappings(extensionsType);
+
+        // PrivateKeyUsagePeriod
+        initPrivateKeyUsagePeriod(extensionsType);
+
+        // QCStatements
+        initQcStatements(extensionsType);
+
+        // restriction
+        initRestriction(extensionsType);
 
         // SMIMECapatibilities
-        type = ObjectIdentifiers.id_smimeCapabilities;
-        if (extensionControls.containsKey(type)) {
-            SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
-                    type, extensionsType, SMIMECapabilities.class);
-            List<SMIMECapability> list = extConf.getSMIMECapability();
+        initSmimeCapabilities(extensionsType);
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            for (SMIMECapability m : list) {
-                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
-                        m.getCapabilityID().getValue());
-                ASN1Encodable params = null;
-                org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
-                        m.getParameters();
-                if (capParams != null) {
-                    if (capParams.getInteger() != null) {
-                        params = new ASN1Integer(capParams.getInteger());
-                    } else if (capParams.getBase64Binary() != null) {
-                        params = readASN1Encodable(capParams.getBase64Binary().getValue());
-                    }
-                }
-                org.bouncycastle.asn1.smime.SMIMECapability cap =
-                        new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
-                v.add(cap);
-            }
+        // SubjectAltNameMode
+        initSubjectAlternativeName(extensionsType);
 
-            ASN1Encodable extValue = new DERSequence(v);
-            smimeCapatibilities =
-                    new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
-        }
+        // SubjectInfoAccess
+        initSubjectInfoAccess(extensionsType);
+
+        // tlsFeature
+        initTlsFeature(extensionsType);
+
+        // validityModel
+        initValidityModel(extensionsType);
 
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     } // method doInitialize
+
+    private void initAdditionalInformation(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_additionalInformation;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
+                type, extensionsType, AdditionalInformation.class);
+        if (extConf == null) {
+            return;
+        }
+
+        DirectoryStringType stringType =
+                XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
+        ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
+        additionalInformation =
+                new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
+
+    private void initAdmission(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        Admission extConf = (Admission) getExtensionValue(
+                type, extensionsType, Admission.class);
+        if (extConf == null) {
+            return;
+        }
+
+        List<ASN1ObjectIdentifier> professionOIDs;
+        List<String> professionItems;
+
+        List<String> items = (type == null)
+                ? null
+                : extConf.getProfessionItem();
+        professionItems = CollectionUtil.unmodifiableList(items, true, true);
+
+        List<OidWithDescType> oidWithDescs = (type == null)
+                ? null
+                : extConf.getProfessionOid();
+        professionOIDs = XmlX509CertprofileUtil.toOIDList(oidWithDescs);
+
+        this.admission = createAdmission(extensionControls.get(type).isCritical(),
+                professionOIDs, professionItems,
+                extConf.getRegistrationNumber(),
+                extConf.getAddProfessionInfo());
+    }
+
+    private void initAuthorityInfoAccess(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        AuthorityInfoAccess extConf = (AuthorityInfoAccess) getExtensionValue(
+                type, extensionsType, AuthorityInfoAccess.class);
+        if (extConf == null) {
+            return;
+        }
+
+        Boolean b = extConf.isIncludeCaIssuers();
+        boolean includesCaIssuers = (b == null)
+                ? true
+                : b.booleanValue();
+
+        b = extConf.isIncludeOcsp();
+        boolean includesOcsp = (b == null)
+                ? true
+                : b.booleanValue();
+
+        this.aIAControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
+    }
+
+    private void initAuthorityKeyIdentifier(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        AuthorityKeyIdentifier extConf = (AuthorityKeyIdentifier) getExtensionValue(
+                type, extensionsType, AuthorityKeyIdentifier.class);
+        if (extConf == null) {
+            return;
+        }
+
+        this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
+    }
+
+    private void initAuthorizationTemplate(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
+                type, extensionsType, AuthorizationTemplate.class);
+        if (extConf == null) {
+            return;
+        }
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
+        v.add(new DEROctetString(extConf.getAccessRights().getValue()));
+        ASN1Encodable extValue = new DERSequence(v);
+        authorizationTemplate =
+                new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
+
+    private void initBasicConstraints(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.basicConstraints;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        BasicConstraints extConf = (BasicConstraints) getExtensionValue(
+                type, extensionsType, BasicConstraints.class);
+        if (extConf == null) {
+            return;
+        }
+        this.pathLen = extConf.getPathLen();
+    }
+
+    private void initBiometricInfo(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.biometricInfo;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        BiometricInfo extConf = (BiometricInfo) getExtensionValue(
+                type, extensionsType, BiometricInfo.class);
+        if (extConf == null) {
+            return;
+        }
+
+        try {
+            this.biometricDataOption = new BiometricInfoOption(extConf);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CertprofileException("NoSuchAlgorithmException: " + e.getMessage());
+        }
+    }
+
+    private void initCertificatePolicies(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.certificatePolicies;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        CertificatePolicies extConf = (CertificatePolicies) getExtensionValue(
+                type, extensionsType, CertificatePolicies.class);
+        if (extConf == null) {
+            return;
+        }
+
+        List<CertificatePolicyInformation> policyInfos =
+                XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
+        org.bouncycastle.asn1.x509.CertificatePolicies value =
+                X509CertUtil.createCertificatePolicies(policyInfos);
+        this.certificatePolicies =
+                new ExtensionValue(extensionControls.get(type).isCritical(), value);
+    }
+
+    private void initExtendedKeyUsage(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
+                type, extensionsType, ExtendedKeyUsage.class);
+        if (extConf == null) {
+            return;
+        }
+
+        this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
+    }
+
+    private void initInhibitAnyPolicy(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
+                type, extensionsType, InhibitAnyPolicy.class);
+        if (extConf == null) {
+            return;
+        }
+
+        int skipCerts = extConf.getSkipCerts();
+        if (skipCerts < 0) {
+            throw new CertprofileException(
+                    "negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
+        }
+        ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
+        this.inhibitAnyPolicy =
+                new ExtensionValue(extensionControls.get(type).isCritical(), value);
+    }
+
+    private void initKeyUsage(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.keyUsage;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        KeyUsage extConf = (KeyUsage) getExtensionValue(
+                type, extensionsType, KeyUsage.class);
+        if (extConf == null) {
+            return;
+        }
+
+        this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
+    }
+
+    private void initNameConstraints(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.nameConstraints;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        NameConstraints extConf = (NameConstraints) getExtensionValue(
+                type, extensionsType, NameConstraints.class);
+        if (extConf == null) {
+            return;
+        }
+
+        org.bouncycastle.asn1.x509.NameConstraints value =
+                XmlX509CertprofileUtil.buildNameConstrains(extConf);
+        this.nameConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+    }
+
+    private void initPrivateKeyUsagePeriod(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.privateKeyUsagePeriod;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
+                type, extensionsType, PrivateKeyUsagePeriod.class);
+        if (extConf == null) {
+            return;
+        }
+        privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
+    }
+
+    private void initPolicyConstraints(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.policyConstraints;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
+                type, extensionsType, PolicyConstraints.class);
+        if (extConf == null) {
+            return;
+        }
+
+        ASN1Sequence value = XmlX509CertprofileUtil.buildPolicyConstrains(extConf);
+        this.policyConstraints =
+                new ExtensionValue(extensionControls.get(type).isCritical(), value);
+    }
+
+    private void initPolicyMappings(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.policyMappings;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        PolicyMappings extConf = (PolicyMappings) getExtensionValue(
+                type, extensionsType, PolicyMappings.class);
+        if (extConf == null) {
+            return;
+        }
+
+        org.bouncycastle.asn1.x509.PolicyMappings value =
+                XmlX509CertprofileUtil.buildPolicyMappings(extConf);
+        this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
+    }
+
+    private void initQcStatements(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.qCStatements;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        QCStatements extConf = (QCStatements) getExtensionValue(
+                type, extensionsType, QCStatements.class);
+
+        if (extConf == null) {
+            return;
+        }
+
+        List<QCStatementType> qcStatementTypes = extConf.getQCStatement();
+
+        this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
+        Set<String> currencyCodes = new HashSet<>();
+        boolean requireInfoFromReq = false;
+
+        for (QCStatementType m : qcStatementTypes) {
+            ASN1ObjectIdentifier qcStatementId =
+                    new ASN1ObjectIdentifier(m.getStatementId().getValue());
+            QcStatementOption qcStatementOption;
+
+            QCStatementValueType statementValue = m.getStatementValue();
+            if (statementValue == null) {
+                QCStatement qcStatment = new QCStatement(qcStatementId);
+                qcStatementOption = new QcStatementOption(qcStatment);
+            } else if (statementValue.getQcRetentionPeriod() != null) {
+                QCStatement qcStatment = new QCStatement(qcStatementId,
+                        new ASN1Integer(statementValue.getQcRetentionPeriod()));
+                qcStatementOption = new QcStatementOption(qcStatment);
+            } else if (statementValue.getConstant() != null) {
+                ASN1Encodable constantStatementValue;
+                try {
+                    constantStatementValue = new ASN1StreamParser(
+                            statementValue.getConstant().getValue()).readObject();
+                } catch (IOException e) {
+                    throw new CertprofileException(
+                            "cannot parse the constant value of QcStatement");
+                }
+                QCStatement qcStatment = new QCStatement(qcStatementId,
+                        constantStatementValue);
+                qcStatementOption = new QcStatementOption(qcStatment);
+            } else if (statementValue.getQcEuLimitValue() != null) {
+                QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
+                String sCurrency = euLimitType.getCurrency().toUpperCase();
+                if (currencyCodes.contains(sCurrency)) {
+                    throw new CertprofileException(
+                            "Duplicated definition of qcStatments with QCEuLimitValue for "
+                            + "the currency " + sCurrency);
+                }
+
+                Iso4217CurrencyCode currency;
+                if (StringUtil.isNumber(sCurrency)) {
+                    int cCode = Integer.parseInt(sCurrency);
+                    currency = new Iso4217CurrencyCode(cCode);
+                } else {
+                    currency = new Iso4217CurrencyCode(sCurrency);
+                }
+
+                Range2Type r1 = euLimitType.getAmount();
+                Range2Type r2 = euLimitType.getExponent();
+                if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
+                    MonetaryValue monetaryValue =
+                            new MonetaryValue(currency, r1.getMin(), r2.getMin());
+                    QCStatement qcStatment =
+                            new QCStatement(qcStatementId, monetaryValue);
+                    qcStatementOption = new QcStatementOption(qcStatment);
+                } else {
+                    MonetaryValueOption monetaryValueOption =
+                            new MonetaryValueOption(currency, r1, r2);
+                    qcStatementOption =
+                            new QcStatementOption(qcStatementId, monetaryValueOption);
+                    requireInfoFromReq = true;
+                }
+                currencyCodes.add(sCurrency);
+            } else {
+                throw new RuntimeException("unknown value of qcStatment");
+            }
+
+            this.qcStatementsOption.add(qcStatementOption);
+        } // end for
+
+        if (requireInfoFromReq) {
+            return;
+        }
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        for (QcStatementOption m : qcStatementsOption) {
+            if (m.getStatement() == null) {
+                throw new RuntimeException("should not reach here");
+            }
+            v.add(m.getStatement());
+        }
+        ASN1Sequence seq = new DERSequence(v);
+        qCStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
+        qcStatementsOption = null;
+    }
+
+    private void initRestriction(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_restriction;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        Restriction extConf = (Restriction) getExtensionValue(
+                type, extensionsType, Restriction.class);
+        if (extConf == null) {
+            return;
+        }
+
+        DirectoryStringType stringType =
+                XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType());
+        ASN1Encodable extValue = stringType.createDirectoryString(extConf.getText());
+        restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
+
+    private void initSmimeCapabilities(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_smimeCapabilities;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
+                type, extensionsType, SMIMECapabilities.class);
+        if(extConf == null) {
+            return;
+        }
+
+        List<SMIMECapability> list = extConf.getSMIMECapability();
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        for (SMIMECapability m : list) {
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityID().getValue());
+            ASN1Encodable params = null;
+            org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
+                    m.getParameters();
+            if (capParams != null) {
+                if (capParams.getInteger() != null) {
+                    params = new ASN1Integer(capParams.getInteger());
+                } else if (capParams.getBase64Binary() != null) {
+                    params = readASN1Encodable(capParams.getBase64Binary().getValue());
+                }
+            }
+            org.bouncycastle.asn1.smime.SMIMECapability cap =
+                    new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+            v.add(cap);
+        }
+
+        ASN1Encodable extValue = new DERSequence(v);
+        smimeCapatibilities =
+                new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
+
+    private void initSubjectAlternativeName(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        SubjectAltName extConf = (SubjectAltName) getExtensionValue(
+                type, extensionsType, SubjectAltName.class);
+        if (extConf == null) {
+            return;
+        }
+
+        this.allowedSubjectAltNameModes =
+                XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
+    }
+
+    private void initSubjectInfoAccess(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
+                type, extensionsType, SubjectInfoAccess.class);
+        if (extConf == null) {
+            return;
+        }
+
+        List<Access> list = extConf.getAccess();
+        this.allowedSubjectInfoAccessModes = new HashMap<>();
+        for (Access entry : list) {
+            this.allowedSubjectInfoAccessModes.put(
+                    new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
+                    XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
+        }
+    }
+
+    private void initTlsFeature(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_pe_tlsfeature;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        TlsFeature extConf = (TlsFeature) getExtensionValue(
+                type, extensionsType, TlsFeature.class);
+
+        if (extConf == null) {
+            return;
+        }
+
+        List<Integer> features = new ArrayList<>(extConf.getFeature().size());
+        for (IntWithDescType m : extConf.getFeature()) {
+            int value = m.getValue();
+            if (value < 0 || value > 65535) {
+                throw new CertprofileException("invalid TLS feature (extensionType) " + value);
+            }
+            features.add(value);
+        }
+        Collections.sort(features);
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        for (Integer m : features) {
+            v.add(new ASN1Integer(m));
+        }
+        ASN1Encodable extValue = new DERSequence(v);
+        tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
+
+    private void initValidityModel(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_validityModel;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        ValidityModel extConf = (ValidityModel) getExtensionValue(
+                type, extensionsType, ValidityModel.class);
+        if (extConf == null) {
+            return;
+        }
+
+        ASN1ObjectIdentifier oid =
+                new ASN1ObjectIdentifier(extConf.getModelId().getValue());
+        ASN1Encodable extValue = new DERSequence(oid);
+        validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
+    }
 
     @Override
     public CertValidity getValidity() {

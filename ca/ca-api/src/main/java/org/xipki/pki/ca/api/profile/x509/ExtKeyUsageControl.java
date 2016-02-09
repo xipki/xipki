@@ -53,6 +53,7 @@ public class ExtKeyUsageControl {
             final ASN1ObjectIdentifier extKeyUsage,
             final boolean required) {
         ParamUtil.assertNotNull("extKeyUsage", extKeyUsage);
+
         this.extKeyUsage = extKeyUsage;
         this.required = required;
     }

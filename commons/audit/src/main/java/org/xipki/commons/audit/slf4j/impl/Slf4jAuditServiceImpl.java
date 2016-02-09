@@ -67,14 +67,14 @@ public class Slf4jAuditServiceImpl implements AuditService {
         }
 
         switch (event.getLevel()) {
-            case DEBUG:
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{}", createMessage(event));
-                }
-                break;
-            default:
-                LOG.info("{}", createMessage(event));
-                break;
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{}", createMessage(event));
+            }
+            break;
+        default:
+            LOG.info("{}", createMessage(event));
+            break;
         } // end switch
     }
 
@@ -88,14 +88,14 @@ public class Slf4jAuditServiceImpl implements AuditService {
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.getLevel();
         switch (al) {
-            case DEBUG:
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("{} | {}", al.getAlignedText(), msg);
-                }
-                break;
-            default:
-                LOG.info("{} | {}", al.getAlignedText(), msg);
-                break;
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{} | {}", al.getAlignedText(), msg);
+            }
+            break;
+        default:
+            LOG.info("{} | {}", al.getAlignedText(), msg);
+            break;
         } // end switch
     }
 

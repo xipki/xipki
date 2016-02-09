@@ -79,19 +79,20 @@ public class X509Cert {
         try {
             this.subjectKeyIdentifer = X509Util.extractSKI(cert);
         } catch (CertificateEncodingException ex) {
-            throw new RuntimeException(
-                String.format("CertificateEncodingException: %s", ex.getMessage()));
+            throw new RuntimeException(String.format(
+                    "CertificateEncodingException: %s", ex.getMessage()));
         }
 
-        if (encodedCert == null) {
-            try {
-                this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException ex) {
-                throw new RuntimeException(
-                    String.format("CertificateEncodingException: %s", ex.getMessage()));
-            }
-        } else {
+        if (encodedCert != null) {
             this.encodedCert = encodedCert;
+            return;
+        }
+
+        try {
+            this.encodedCert = cert.getEncoded();
+        } catch (CertificateEncodingException ex) {
+            throw new RuntimeException(String.format(
+                    "CertificateEncodingException: %s", ex.getMessage()));
         }
     }
 

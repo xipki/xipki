@@ -364,17 +364,17 @@ public class SyslogAuditServiceImpl implements AuditService {
         }
 
         switch (auditLevel) {
-            case DEBUG:
-                return Severity.DEBUG;
-            case INFO:
-                return Severity.INFORMATIONAL;
-            case WARN:
-                return Severity.WARNING;
-            case ERROR:
-                return Severity.ERROR;
-            default:
-                throw new RuntimeException(
-                    String.format("unknown auditLevel '%s'", auditLevel));
+        case DEBUG:
+            return Severity.DEBUG;
+        case INFO:
+            return Severity.INFORMATIONAL;
+        case WARN:
+            return Severity.WARNING;
+        case ERROR:
+            return Severity.ERROR;
+        default:
+            throw new RuntimeException(
+                String.format("unknown auditLevel '%s'", auditLevel));
         }
     }
 

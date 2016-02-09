@@ -41,7 +41,9 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -61,9 +63,13 @@ public class PciAuditEvent {
 
     private static final String DEFAULT_REPLACE_DELIMITER = "_";
 
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy/MM/dd");
+    private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
-    private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("HH:mm:ss");
+    private static final DateTimeFormatter DATE_FORMATTER
+            = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+    private static final DateTimeFormatter TIME_FORMATTER
+            = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * 10.3.1 "User Identification"
@@ -107,14 +113,9 @@ public class PciAuditEvent {
 
     public PciAuditEvent(
             final Date date) {
-        synchronized (DATE_FORMATTER) {
-            this.date = DATE_FORMATTER.format(date);
-        }
-
-        synchronized (TIME_FORMATTER) {
-            this.time = TIME_FORMATTER.format(date);
-        }
-
+        LocalDateTime lDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
+        this.date = DATE_FORMATTER.format(lDate);
+        this.time = TIME_FORMATTER.format(lDate);
         this.level = AuditLevel.INFO;
     }
 

@@ -171,8 +171,7 @@ public class XmlX509CertprofileUtil {
 
     public static List<CertificatePolicyInformation> buildCertificatePolicies(
             final CertificatePolicies type) {
-        List<CertificatePolicyInformationType> policyPairs =
-                type.getCertificatePolicyInformation();
+        List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
         if (CollectionUtil.isEmpty(policyPairs)) {
             return null;
         }
@@ -457,36 +456,36 @@ public class XmlX509CertprofileUtil {
         for (UsageType m : usages) {
             boolean required = m.isRequired();
             switch (m.getValue()) {
-                case C_RL_SIGN:
-                    controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
-                    break;
-                case DATA_ENCIPHERMENT:
-                    controls.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
-                    break;
-                case CONTENT_COMMITMENT:
-                    controls.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
-                    break;
-                case DECIPHER_ONLY:
-                    controls.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
-                    break;
-                case ENCIPHER_ONLY:
-                    controls.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
-                    break;
-                case DIGITAL_SIGNATURE:
-                    controls.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
-                    break;
-                case KEY_AGREEMENT:
-                    controls.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
-                    break;
-                case KEY_CERT_SIGN:
-                    controls.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
-                    break;
-                case KEY_ENCIPHERMENT:
-                    controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
-                    break;
-                default:
-                    throw new RuntimeException(
-                        "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
+            case C_RL_SIGN:
+                controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
+                break;
+            case DATA_ENCIPHERMENT:
+                controls.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
+                break;
+            case CONTENT_COMMITMENT:
+                controls.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
+                break;
+            case DECIPHER_ONLY:
+                controls.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
+                break;
+            case ENCIPHER_ONLY:
+                controls.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
+                break;
+            case DIGITAL_SIGNATURE:
+                controls.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
+                break;
+            case KEY_AGREEMENT:
+                controls.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
+                break;
+            case KEY_CERT_SIGN:
+                controls.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
+                break;
+            case KEY_ENCIPHERMENT:
+                controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
+                break;
+            default:
+                throw new RuntimeException(
+                    "should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
             }
         }
 
@@ -656,18 +655,19 @@ public class XmlX509CertprofileUtil {
         if (jaxbType == null) {
             return null;
         }
+
         switch (jaxbType) {
-            case BMP_STRING:
-                return DirectoryStringType.bmpString;
-            case PRINTABLE_STRING:
-                return DirectoryStringType.printableString;
-            case TELETEX_STRING:
-                return DirectoryStringType.teletexString;
-            case UTF_8_STRING:
-                return DirectoryStringType.utf8String;
-            default:
-                throw new RuntimeException(
-                    "should not reach here, undefined DirectoryStringType " + jaxbType);
+        case BMP_STRING:
+            return DirectoryStringType.bmpString;
+        case PRINTABLE_STRING:
+            return DirectoryStringType.printableString;
+        case TELETEX_STRING:
+            return DirectoryStringType.teletexString;
+        case UTF_8_STRING:
+            return DirectoryStringType.utf8String;
+        default:
+            throw new RuntimeException(
+                "should not reach here, undefined DirectoryStringType " + jaxbType);
         }
     }
 
@@ -676,20 +676,20 @@ public class XmlX509CertprofileUtil {
         if (jaxbType == null) {
             return null;
         }
+
         switch (jaxbType) {
-            case BMP_STRING:
-                return StringType.bmpString;
-            case PRINTABLE_STRING:
-                return StringType.printableString;
-            case TELETEX_STRING:
-                return StringType.teletexString;
-            case UTF_8_STRING:
-                return StringType.utf8String;
-            case IA_5_STRING:
-                return StringType.ia5String;
-            default:
-                throw new RuntimeException(
-                    "should not reach here, undefined StringType " + jaxbType);
+        case BMP_STRING:
+            return StringType.bmpString;
+        case PRINTABLE_STRING:
+            return StringType.printableString;
+        case TELETEX_STRING:
+            return StringType.teletexString;
+        case UTF_8_STRING:
+            return StringType.utf8String;
+        case IA_5_STRING:
+            return StringType.ia5String;
+        default:
+            throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
         }
     }
 

@@ -403,37 +403,38 @@ public class SubjectDnSpec {
         }
 
         Range specRange = RANGES.get(type);
-        if (specRange != null) {
-            Range isRange = control.getStringLengthRange();
-            if (isRange == null) {
-                control.setStringLengthRange(specRange);
-            } else {
-                boolean changed = false;
-                Integer specMin = specRange.getMin();
-                Integer min = isRange.getMin();
-                if (min == null) {
-                    changed = true;
-                    min = specMin;
-                } else if (specMin != null && specMin > min) {
-                    changed = true;
-                    min = specMin;
-                }
+        Range isRange = (specRange == null)
+                ? null
+                : control.getStringLengthRange();
+        if (isRange == null) {
+            control.setStringLengthRange(specRange);
+            return;
+        }
 
-                Integer specMax = specRange.getMax();
-                Integer max = isRange.getMax();
-                if (max == null) {
-                    changed = true;
-                    max = specMax;
-                } else if (specMax != null && specMax < max) {
-                    changed = true;
-                    max = specMax;
-                }
+        boolean changed = false;
+        Integer specMin = specRange.getMin();
+        Integer min = isRange.getMin();
+        if (min == null) {
+            changed = true;
+            min = specMin;
+        } else if (specMin != null && specMin > min) {
+            changed = true;
+            min = specMin;
+        }
 
-                if (changed) {
-                    isRange.setRange(min, max);
-                }
-            } // isRange
-        } // specRange
+        Integer specMax = specRange.getMax();
+        Integer max = isRange.getMax();
+        if (max == null) {
+            changed = true;
+            max = specMax;
+        } else if (specMax != null && specMax < max) {
+            changed = true;
+            max = specMax;
+        }
+
+        if (changed) {
+            isRange.setRange(min, max);
+        } // isRange
     } // method fixRDNControl
 
 }

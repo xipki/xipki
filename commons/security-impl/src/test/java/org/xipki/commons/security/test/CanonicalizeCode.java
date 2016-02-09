@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl;
+package org.xipki.commons.security.test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -277,7 +277,7 @@ public class CanonicalizeCode {
                 if (idx == -1) {
                     lastLine = line;
 
-                    if (line.length() > 100 || line.endsWith("+") || line.endsWith("|")
+                    if (line.length() > 120 || line.endsWith("+") || line.endsWith("|")
                             || line.endsWith("&")) {
                         lineNumbers.add(lineNumber);
                         continue;
