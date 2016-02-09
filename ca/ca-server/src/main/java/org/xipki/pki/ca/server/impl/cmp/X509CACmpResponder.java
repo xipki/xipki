@@ -450,7 +450,7 @@ public class X509CACmpResponder extends CmpResponder {
                 continue;
             }
 
-            if (!verifyPOP(req, localRequestor.isRa())) {
+            if (!verifyPOP(req, localRequestor.isRA())) {
                 LOG.warn("could not validate POP for requst {}", certReqId.getValue());
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses[i] = new CertResponse(certReqId, status);
@@ -627,12 +627,12 @@ public class X509CACmpResponder extends CmpResponder {
             X509CA ca = getCA();
             X509CertificateInfo certInfo;
             if (keyUpdate) {
-                certInfo = ca.regenerateCertificate(requestor.isRa(), requestor,
+                certInfo = ca.regenerateCertificate(requestor.isRA(), requestor,
                         certprofileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
             } else {
-                certInfo = ca.generateCertificate(requestor.isRa(), requestor, certprofileName,
+                certInfo = ca.generateCertificate(requestor.isRA(), requestor, certprofileName,
                         user, subject, publicKeyInfo,
                         notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
             }

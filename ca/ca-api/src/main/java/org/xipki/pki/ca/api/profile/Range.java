@@ -67,8 +67,8 @@ public class Range {
             throw new IllegalArgumentException("pMin and pMax cannot be both null");
         }
         if (pMin != null && pMax != null && pMin > pMax) {
-            throw new IllegalArgumentException(
-                String.format("pMin cannot be greater than pMax: %d > %d", pMin, pMax));
+            throw new IllegalArgumentException(String.format(
+                    "pMin cannot be greater than pMax: %d > %d", pMin, pMax));
         }
         this.min = pMin;
         this.max = pMax;
@@ -88,7 +88,7 @@ public class Range {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(16);
         sb.append("[");
         if (min != null) {
             sb.append(min);

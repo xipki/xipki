@@ -246,7 +246,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             } // for
 
             rdns = newRdns;
-        } // END for ()
+        } // if
 
         X500Name grantedSubject = new X500Name(rdns.toArray(new RDN[0]));
         return new SubjectInfo(grantedSubject, null);
@@ -289,9 +289,9 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (algParam instanceof ASN1ObjectIdentifier) {
                 curveOid = (ASN1ObjectIdentifier) algParam;
                 if (!ecOption.allowsCurve(curveOid)) {
-                    throw new BadCertTemplateException("EC curve "
-                            + SecurityUtil.getCurveName(curveOid)
-                            + " (OID: " + curveOid.getId() + ") is not allowed");
+                    throw new BadCertTemplateException(String.format(
+                            "EC curve %s (OID: %s) is not allowed",
+                            SecurityUtil.getCurveName(curveOid), curveOid.getId()));
                 }
             } else {
                 throw new BadCertTemplateException(
@@ -306,8 +306,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 }
                 byte pointEncoding = keyData[0];
                 if (!ecOption.getPointEncodings().contains(pointEncoding)) {
-                    throw new BadCertTemplateException(
-                            String.format("unaccepted EC point encoding '%s'", pointEncoding));
+                    throw new BadCertTemplateException(String.format(
+                            "unaccepted EC point encoding '%s'", pointEncoding));
                 }
             }
 
@@ -318,8 +318,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 throw ex;
             } catch (Exception ex) {
                 LOG.debug("populateFromPubKeyInfo", ex);
-                throw new BadCertTemplateException(
-                        String.format("invalid public key: %s", ex.getMessage()));
+                throw new BadCertTemplateException(String.format(
+                        "invalid public key: %s", ex.getMessage()));
             }
             return publicKey;
         } else if (keyParamsOption instanceof RSAParametersOption) {
@@ -367,8 +367,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 return publicKey;
             }
         } else {
-            throw new RuntimeException(
-                    String.format("should not reach here, unknown KeyParametersOption %s",
+            throw new RuntimeException(String.format(
+                    "should not reach here, unknown KeyParametersOption %s",
                     keyParamsOption));
         }
 
@@ -393,14 +393,13 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         for (ASN1ObjectIdentifier type : types) {
             RdnControl occu = occurences.getControl(type);
             if (occu == null) {
-                throw new BadCertTemplateException(
-                    String.format("subject DN of type %s is not allowed", oidToDisplayName(type)));
+                throw new BadCertTemplateException(String.format(
+                        "subject DN of type %s is not allowed", oidToDisplayName(type)));
             }
 
             RDN[] rdns = requestedSubject.getRDNs(type);
             if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
-                throw new BadCertTemplateException(
-                    String.format(
+                throw new BadCertTemplateException(String.format(
                         "occurrence of subject DN of type %s not within the allowed range. "
                         + "%d is not within [%d, %d]",
                         oidToDisplayName(type),
@@ -425,8 +424,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             if (!present) {
-                throw new BadCertTemplateException(
-                        String.format("requied subject DN of type %s is not present",
+                throw new BadCertTemplateException(String.format(
+                        "requied subject DN of type %s is not present",
                         oidToDisplayName(occurence.getType())));
             }
         }

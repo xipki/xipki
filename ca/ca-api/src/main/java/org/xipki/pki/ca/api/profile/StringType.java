@@ -68,8 +68,8 @@ public enum StringType {
         } else if (ia5String == this) {
             return new DERIA5String(text, true);
         } else {
-            throw new RuntimeException(
-                    String.format("should not reach here, unkown StringType '%s'", text));
+            throw new RuntimeException(String.format(
+                    "should not reach here, unkown StringType '%s'", text));
         }
     }
 

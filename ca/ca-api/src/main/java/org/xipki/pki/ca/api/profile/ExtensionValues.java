@@ -59,6 +59,7 @@ public class ExtensionValues {
             final ASN1Encodable value) {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
+
         if (extensions.containsKey(type)) {
             return false;
         }
@@ -71,6 +72,7 @@ public class ExtensionValues {
             final ExtensionValue value) {
         ParamUtil.assertNotNull("type", type);
         ParamUtil.assertNotNull("value", value);
+
         if (extensions.containsKey(type)) {
             return false;
         }

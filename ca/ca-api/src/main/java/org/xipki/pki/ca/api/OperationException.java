@@ -69,8 +69,7 @@ public class OperationException extends Exception {
 
     public OperationException(
             final ErrorCode errorCode) {
-        super(
-            String.format("error code: %s", errorCode));
+        super(String.format("error code: %s", errorCode));
         this.errorCode = errorCode;
         this.errorMessage = null;
     }
@@ -78,8 +77,7 @@ public class OperationException extends Exception {
     public OperationException(
             final ErrorCode errorCode,
             final String errorMessage) {
-        super(
-            String.format("error code: %s, error message: %s", errorCode, errorMessage));
+        super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }

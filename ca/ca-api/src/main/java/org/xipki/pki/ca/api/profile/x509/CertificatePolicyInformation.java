@@ -55,6 +55,7 @@ public class CertificatePolicyInformation {
             final String certPolicyId,
             final List<CertificatePolicyQualifier> qualifiers) {
         ParamUtil.assertNotBlank("certPolicyId", certPolicyId);
+
         this.certPolicyId = certPolicyId;
         this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
     }

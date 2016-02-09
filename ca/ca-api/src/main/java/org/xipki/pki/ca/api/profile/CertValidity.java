@@ -72,6 +72,10 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
     private static final long SECOND = 1000L;
 
+    private static final long HOUR = 60L * 60 * SECOND;
+
+    private static final long DAY = 24L* HOUR;
+
     private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
     private final int validity;
@@ -108,16 +112,16 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             unit = Unit.DAY;
             numValdityS = validityS;
         } else {
-            throw new IllegalArgumentException(
-                String.format("invalid validityS: %s", validityS));
+            throw new IllegalArgumentException(String.format(
+                    "invalid validityS: %s", validityS));
         }
 
         int validity;
         try {
             validity = Integer.parseInt(numValdityS);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(
-                    String.format("invalid validityS: ", validityS));
+            throw new IllegalArgumentException(String.format(
+                    "invalid validityS: %s", validityS));
         }
         return new CertValidity(validity, unit);
     } // method getInstance
@@ -133,34 +137,34 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     public Date add(
             final Date referenceDate) {
         switch (unit) {
-            case HOUR:
-                return new Date(referenceDate.getTime() + 60L * 60 * SECOND - SECOND);
-            case DAY:
-                return new Date(referenceDate.getTime() + 24L * 60 * 60 * SECOND - SECOND);
-            case YEAR:
-                Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
-                cal.setTime(referenceDate);
-                cal.add(Calendar.YEAR, validity);
-                cal.add(Calendar.SECOND, -1);
+        case HOUR:
+            return new Date(referenceDate.getTime() + HOUR - SECOND);
+        case DAY:
+            return new Date(referenceDate.getTime() + DAY - SECOND);
+        case YEAR:
+            Calendar cal = Calendar.getInstance(TIMEZONE_UTC);
+            cal.setTime(referenceDate);
+            cal.add(Calendar.YEAR, validity);
+            cal.add(Calendar.SECOND, -1);
 
-                int month = cal.get(Calendar.MONTH);
-                // february
-                if (month == 1) {
-                    int day = cal.get(Calendar.DAY_OF_MONTH);
-                    if (day > 28) {
-                        int year = cal.get(Calendar.YEAR);
-                        if (isLeapYear(year)) {
-                            day = 29;
-                        } else {
-                            day = 28;
-                        }
+            int month = cal.get(Calendar.MONTH);
+            // February
+            if (month == 1) {
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+                if (day > 28) {
+                    int year = cal.get(Calendar.YEAR);
+                    if (isLeapYear(year)) {
+                        day = 29;
+                    } else {
+                        day = 28;
                     }
                 }
+            }
 
-                return cal.getTime();
-            default:
-                throw new RuntimeException(
-                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+            return cal.getTime();
+        default:
+            throw new RuntimeException(String.format(
+                    "should not reach here, unknown CertValidity.Unit %s", unit));
         }
     } // method add
 
@@ -173,8 +177,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             case YEAR:
                 return (365 * validity + validity / 4) * 24;
             default:
-                throw new RuntimeException(
-                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+                throw new RuntimeException(String.format(
+                        "should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 
@@ -228,8 +232,8 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             case YEAR:
                 return validity + "y";
             default:
-                throw new RuntimeException(
-                    String.format("should not reach here, unknown CertValidity.Unit %s", unit));
+                throw new RuntimeException(String.format(
+                        "should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 

@@ -1,103 +1,103 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2" maxSize="5000">
-  <appInfo>
-    <my:myDescription xmlns:my="http://example.org">
-      <my:category>cat A</my:category>
-      <my:details>Certprofile SCEP</my:details>
+    <appInfo>
+        <my:myDescription xmlns:my="http://example.org">
+        <my:category>cat A</my:category>
+        <my:details>Certprofile SCEP</my:details>
     </my:myDescription>
-  </appInfo>
-  <version>3</version>
-  <signatureAlgorithms>
-    <algorithm>SHA256withRSA</algorithm>
-    <algorithm>SHA256withDSA</algorithm>
-    <algorithm>SHA256withECDSA</algorithm>
-    <algorithm>SHA256withPlainECDSA</algorithm>
-    <algorithm>SHA256withRSAandMGF1</algorithm>
-  </signatureAlgorithms>
-  <ca>false</ca>
-  <validity>5y</validity>
-  <notBeforeTime>current</notBeforeTime>
-  <duplicateKey>false</duplicateKey>
-  <serialNumberInReq>false</serialNumberInReq>
-  <keyAlgorithms>
-    <algorithm>
-      <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
-      <parameters>
-        <RSAParameters>
-          <modulusLength>
-            <range min="2048" max="2048"/>
-            <range min="3072" max="3072"/>
-            <range min="4096" max="4096"/>
-          </modulusLength>
-        </RSAParameters>
-      </parameters>
-    </algorithm>
-  </keyAlgorithms>
-  <subject duplicateSubjectPermitted="false">
-    <dnBackwards>false</dnBackwards>
-    <incSerialNumber>false</incSerialNumber>
-    <rdn minOccurs="1" maxOccurs="1">
-      <type description="c">2.5.4.6</type>
-    </rdn>
-    <rdn minOccurs="1" maxOccurs="1">
-      <type description="o">2.5.4.10</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="ou">2.5.4.11</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="serialNumber">2.5.4.5</type>
-      <regex>[\d]{1,}</regex>
-    </rdn>
-    <rdn minOccurs="1" maxOccurs="1">
-      <type description="cn">2.5.4.3</type>
-    </rdn>
-  </subject>
-  <extensions>
-    <extension required="true" permittedInRequest="false">
-      <type description="subjectKeyIdentifier">2.5.29.14</type>
-      <critical>false</critical>
-    </extension>
-    <extension required="false" permittedInRequest="false">
-      <type description="cRLDistributionPoints">2.5.29.31</type>
-      <critical>false</critical>
-    </extension>
-    <extension required="false" permittedInRequest="false">
-      <type description="freshestCRL">2.5.29.46</type>
-      <critical>false</critical>
-    </extension>
-    <extension required="true" permittedInRequest="false">
-      <type description="basicConstraints">2.5.29.19</type>
-      <critical>true</critical>
-    </extension>
-    <extension required="true" permittedInRequest="false">
-      <type description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</type>
-      <critical>false</critical>
-      <value>
-        <authorityInfoAccess>
-          <includeCaIssuers>true</includeCaIssuers>
-          <includeOcsp>true</includeOcsp>
-        </authorityInfoAccess>
-      </value>
-    </extension>
-    <extension required="true" permittedInRequest="false">
-      <type description="authorityKeyIdentifier">2.5.29.35</type>
-      <critical>false</critical>
-      <value>
-        <authorityKeyIdentifier>
-          <includeIssuerAndSerial>true</includeIssuerAndSerial>
-        </authorityKeyIdentifier>
-      </value>
-    </extension>
-    <extension required="true" permittedInRequest="true">
-      <type description="keyUsage">2.5.29.15</type>
-      <critical>true</critical>
-      <value>
-        <keyUsage>
-          <usage required="true">digitalSignature</usage>
-          <usage required="true">keyEncipherment</usage>
-        </keyUsage>
-      </value>
-    </extension>
-  </extensions>
+    </appInfo>
+    <version>3</version>
+    <signatureAlgorithms>
+        <algorithm>SHA256withRSA</algorithm>
+        <algorithm>SHA256withDSA</algorithm>
+        <algorithm>SHA256withECDSA</algorithm>
+        <algorithm>SHA256withPlainECDSA</algorithm>
+        <algorithm>SHA256withRSAandMGF1</algorithm>
+    </signatureAlgorithms>
+    <ca>false</ca>
+    <validity>5y</validity>
+    <notBeforeTime>current</notBeforeTime>
+    <duplicateKey>false</duplicateKey>
+    <serialNumberInReq>false</serialNumberInReq>
+    <keyAlgorithms>
+        <algorithm>
+            <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
+            <parameters>
+                <RSAParameters>
+                    <modulusLength>
+                        <range min="2048" max="2048"/>
+                        <range min="3072" max="3072"/>
+                        <range min="4096" max="4096"/>
+                    </modulusLength>
+                </RSAParameters>
+            </parameters>
+        </algorithm>
+    </keyAlgorithms>
+    <subject duplicateSubjectPermitted="false">
+        <dnBackwards>false</dnBackwards>
+        <incSerialNumber>false</incSerialNumber>
+        <rdn minOccurs="1" maxOccurs="1">
+            <type description="c">2.5.4.6</type>
+        </rdn>
+        <rdn minOccurs="1" maxOccurs="1">
+            <type description="o">2.5.4.10</type>
+        </rdn>
+        <rdn minOccurs="0" maxOccurs="1">
+            <type description="ou">2.5.4.11</type>
+        </rdn>
+        <rdn minOccurs="0" maxOccurs="1">
+            <type description="serialNumber">2.5.4.5</type>
+            <regex>[\d]{1,}</regex>
+        </rdn>
+        <rdn minOccurs="1" maxOccurs="1">
+            <type description="cn">2.5.4.3</type>
+        </rdn>
+    </subject>
+    <extensions>
+        <extension required="true" permittedInRequest="false">
+            <type description="subjectKeyIdentifier">2.5.29.14</type>
+            <critical>false</critical>
+        </extension>
+        <extension required="false" permittedInRequest="false">
+            <type description="cRLDistributionPoints">2.5.29.31</type>
+            <critical>false</critical>
+        </extension>
+        <extension required="false" permittedInRequest="false">
+            <type description="freshestCRL">2.5.29.46</type>
+            <critical>false</critical>
+        </extension>
+        <extension required="true" permittedInRequest="false">
+            <type description="basicConstraints">2.5.29.19</type>
+            <critical>true</critical>
+        </extension>
+        <extension required="true" permittedInRequest="false">
+            <type description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</type>
+            <critical>false</critical>
+            <value>
+                <authorityInfoAccess>
+                    <includeCaIssuers>true</includeCaIssuers>
+                    <includeOcsp>true</includeOcsp>
+                </authorityInfoAccess>
+            </value>
+        </extension>
+        <extension required="true" permittedInRequest="false">
+            <type description="authorityKeyIdentifier">2.5.29.35</type>
+            <critical>false</critical>
+            <value>
+                <authorityKeyIdentifier>
+                    <includeIssuerAndSerial>true</includeIssuerAndSerial>
+                </authorityKeyIdentifier>
+            </value>
+        </extension>
+        <extension required="true" permittedInRequest="true">
+            <type description="keyUsage">2.5.29.15</type>
+            <critical>true</critical>
+            <value>
+                <keyUsage>
+                    <usage required="true">digitalSignature</usage>
+                    <usage required="true">keyEncipherment</usage>
+                </keyUsage>
+            </value>
+        </extension>
+    </extensions>
 </X509Profile>

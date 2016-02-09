@@ -76,7 +76,7 @@ public class LiquibaseMain {
             throw new IllegalArgumentException("dbConf could not be null");
         }
 
-        if (MyStringUtil.isBlank(changeLogFile)) {
+        if (changeLogFile == null | changeLogFile.isEmpty()) {
             throw new IllegalArgumentException("changeLogFile could not be empty");
         }
 

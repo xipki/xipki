@@ -55,11 +55,6 @@ public class AuditEvent {
     private String applicationName;
 
     /**
-     * The data array belonging to the event.
-     */
-    private final List<AuditEventData> eventDatas = new LinkedList<>();
-
-    /**
      * The name of the event type.
      */
     private String name;
@@ -77,6 +72,11 @@ public class AuditEvent {
     private AuditStatus status;
 
     private long duration = -1;
+
+    /**
+     * The data array belonging to the event.
+     */
+    private final List<AuditEventData> eventDatas = new LinkedList<>();
 
     private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
