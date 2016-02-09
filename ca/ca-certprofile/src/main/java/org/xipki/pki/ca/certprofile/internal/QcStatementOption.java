@@ -55,6 +55,7 @@ public class QcStatementOption {
     public QcStatementOption(
             final QCStatement statement) {
         ParamUtil.assertNotNull("statement", statement);
+
         this.statement = statement;
         this.statementId = null;
         this.monetaryValueOption = null;
@@ -65,6 +66,7 @@ public class QcStatementOption {
             final MonetaryValueOption monetaryValueOption) {
         ParamUtil.assertNotNull("statementId", statementId);
         ParamUtil.assertNotNull("monetaryValueOption", monetaryValueOption);
+
         this.statement = null;
         this.statementId = statementId;
         this.monetaryValueOption = monetaryValueOption;

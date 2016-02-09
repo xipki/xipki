@@ -122,7 +122,7 @@ public class LiquibaseDatabaseConf {
             } else if (dataSourceClassName.contains("oracle.")) {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
                 String s = dbProps.getProperty("dataSource.URL");
-                if (MyStringUtil.isNotBlank(s)) {
+                if (s != null && !s.isEmpty()) {
                     urlBuilder.append(s);
                 } else {
                     urlBuilder.append("jdbc:oracle:thin:@");
@@ -186,7 +186,7 @@ public class LiquibaseDatabaseConf {
                 url = dbProps.getProperty("db.url");
             }
 
-            if (MyStringUtil.startsWithIgnoreCase(url, "jdbc:db2:")) {
+            if (startsWithIgnoreCase(url, "jdbc:db2:")) {
                 String sep = ":currentSchema=";
                 int idx = url.indexOf(sep);
                 if (idx != 1) {
@@ -202,11 +202,25 @@ public class LiquibaseDatabaseConf {
             throw new IllegalArgumentException("unsupported configuration");
         }
 
-        if (passwordResolver != null && MyStringUtil.isNotBlank(password)) {
+        if (passwordResolver != null && (password != null && !password.isEmpty())) {
             password = new String(passwordResolver.resolvePassword(password));
         }
 
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     } // method getInstance
 
+    public static boolean isNotBlank(
+            final String s) {
+        return s != null && !s.isEmpty();
+    }
+
+    private static boolean startsWithIgnoreCase(
+            final String s,
+            final String prefix) {
+        if (s.length() < prefix.length()) {
+            return false;
+        }
+
+        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+    }
 }
