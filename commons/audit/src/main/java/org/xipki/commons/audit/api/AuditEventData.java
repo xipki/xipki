@@ -49,8 +49,16 @@ public class AuditEventData {
     public AuditEventData(
             final String name,
             final String value) {
-        assertNotEmpty("name", name);
-        assertNotNull("value", value);
+        if(name == null) {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("name could not be empty");
+        }
+        if(value == null) {
+            throw new IllegalArgumentException("value could not be null");
+        }
+
         this.name = name;
         this.value = value;
     }
@@ -69,28 +77,4 @@ public class AuditEventData {
         sb.append(name).append(": ").append(value);
         return sb.toString();
     }
-
-    private static void assertNotNull(
-            final String parameterName,
-            final Object parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(
-                String.format("%s could not be null", parameterName));
-        }
-    }
-
-    private static void assertNotEmpty(
-            final String parameterName,
-            final String parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(
-                    String.format("%s could not be null", parameterName));
-        }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(
-                    String.format("%s could not be empty", parameterName));
-        }
-    }
-
 }
