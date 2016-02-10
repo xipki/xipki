@@ -39,6 +39,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -50,6 +52,8 @@ public class RevokeCertRequestType {
 
     public boolean addRequestEntry(
             final RevokeCertRequestEntryType requestEntry) {
+        ParamUtil.assertNotNull("requestEntry", requestEntry);
+
         for (RevokeCertRequestEntryType re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {
                 return false;

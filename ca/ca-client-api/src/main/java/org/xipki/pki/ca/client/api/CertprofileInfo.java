@@ -56,6 +56,7 @@ public class CertprofileInfo {
             final String type,
             final String conf) {
         ParamUtil.assertNotBlank("name", name);
+
         this.name = name;
         if (StringUtil.isBlank(type)) {
             this.type = null;

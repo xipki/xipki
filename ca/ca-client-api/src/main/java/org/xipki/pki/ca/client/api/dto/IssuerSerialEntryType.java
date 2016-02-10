@@ -63,7 +63,6 @@ public class IssuerSerialEntryType extends ResultEntryType {
             final X500Name issuer,
             final BigInteger serialNumber) {
         super(id);
-
         this.serialNumber = serialNumber;
         this.issuer = issuer;
     }

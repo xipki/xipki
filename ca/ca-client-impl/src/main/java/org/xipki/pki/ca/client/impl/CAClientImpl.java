@@ -493,10 +493,10 @@ public final class CAClientImpl implements CAClient {
         String localCaName = caName;
         if (localCaName == null) {
             localCaName = getCANameForProfile(profile);
-            if (localCaName == null) {
-                throw new CAClientException("cert profile " + profile
-                        + " is not supported by any CA");
-            }
+        }
+
+        if (localCaName == null) {
+            throw new CAClientException("cert profile " + profile + " is not supported by any CA");
         }
 
         CAConf ca = casMap.get(localCaName.trim());
@@ -587,13 +587,15 @@ public final class CAClientImpl implements CAClient {
             if (!ca.isCAInfoConfigured()) {
                 continue;
             }
-            if (ca.supportsProfile(certprofile)) {
-                if (localCaName == null) {
-                    localCaName = ca.getName();
-                } else {
-                    throw new CAClientException("cert profile " + certprofile
-                            + " supported by more than one CA, please specify the CA name.");
-                }
+            if (!ca.supportsProfile(certprofile)) {
+                continue;
+            }
+
+            if (localCaName == null) {
+                localCaName = ca.getName();
+            } else {
+                throw new CAClientException("cert profile " + certprofile
+                        + " supported by more than one CA, please specify the CA name.");
             }
         }
 
@@ -776,13 +778,15 @@ public final class CAClientImpl implements CAClient {
                 continue;
             }
 
-            if (ca.supportsProfile(certprofile)) {
-                if (caName == null) {
-                    caName = ca.getName();
-                } else {
-                    throw new CAClientException("cert profile " + certprofile
-                            + " supported by more than one CA, please specify the CA name.");
-                }
+            if (!ca.supportsProfile(certprofile)) {
+                continue;
+            }
+
+            if (caName == null) {
+                caName = ca.getName();
+            } else {
+                throw new CAClientException("cert profile " + certprofile
+                        + " supported by more than one CA, please specify the CA name.");
             }
         }
 
@@ -1019,8 +1023,7 @@ public final class CAClientImpl implements CAClient {
             final RequestResponseDebug debug)
     throws CAClientException, PKIErrorException {
         final String id = "cert-1";
-        IssuerSerialEntryType entry =
-                new IssuerSerialEntryType(id, issuer, serial);
+        IssuerSerialEntryType entry = new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = removeCerts(request, debug);
@@ -1121,9 +1124,10 @@ public final class CAClientImpl implements CAClient {
             if (responseCode != HttpURLConnection.HTTP_OK
                     && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR) {
                 inputStream.close();
-                throw new IOException("bad response: "
-                        + httpUrlConnection.getResponseCode() + "    "
-                        + httpUrlConnection.getResponseMessage());
+                throw new IOException(String.format(
+                        "bad response: %s    %s",
+                        httpUrlConnection.getResponseCode(),
+                        httpUrlConnection.getResponseMessage()));
             }
 
             String responseContentType = httpUrlConnection.getContentType();
@@ -1186,13 +1190,12 @@ public final class CAClientImpl implements CAClient {
                     java.security.cert.Certificate cert = getCertificate(entry.getCert());
                     certOrError = new CertOrError(cert);
                 } catch (CertificateException e) {
-                    throw new CAClientException(
-                            "CertificateParsingException for request (id=" + entry.getId() + "): "
-                            + e.getMessage());
+                    throw new CAClientException(String.format(
+                            "CertificateParsingException for request (id=%s): %s",
+                            entry.getId(), e.getMessage()));
                 }
             } else if (resultEntry instanceof ErrorResultEntryType) {
-                certOrError = new CertOrError(
-                        ((ErrorResultEntryType) resultEntry).getStatusInfo());
+                certOrError = new CertOrError(((ErrorResultEntryType) resultEntry).getStatusInfo());
             } else {
                 certOrError = null;
             }

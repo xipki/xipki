@@ -217,9 +217,9 @@ abstract class X509CmpRequestor extends CmpRequestor {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP    + ", "
-                    + PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException(String.format(
+                    "unknown PKI body type %s instead the exceptected [%s, %s]",
+                    bodyType, PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
         ASN1ObjectIdentifier expectedType = (xipkiAction == null)
@@ -238,6 +238,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
                 }
             }
         }
+
         if (itv == null) {
             throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
                     + expectedType);
@@ -306,16 +307,17 @@ abstract class X509CmpRequestor extends CmpRequestor {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_REVOCATION_REP != bodyType) {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + PKIBody.TYPE_REVOCATION_REP    + ", "
-                    + PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException(String.format(
+                    "unknown PKI body type %s instead the exceptected [%s, %s]",
+                    bodyType, PKIBody.TYPE_REVOCATION_REP, PKIBody.TYPE_ERROR));
         }
 
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
         if (statuses == null || statuses.length != reqEntries.size()) {
-            throw new CmpRequestorException("incorrect number of status entries in response '"
-                    + statuses.length + "' instead the exceptected '" + reqEntries.size() + "'");
+            throw new CmpRequestorException(String.format(
+                "incorrect number of status entries in response '%s' instead the exceptected '%s'",
+                statuses.length, reqEntries.size()));
         }
 
         CertId[] revCerts = content.getRevCerts();
@@ -391,14 +393,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         int exptectedBodyType;
         switch (req.getType()) {
-            case CERT_REQ:
-                exptectedBodyType = PKIBody.TYPE_CERT_REP;
-                break;
-            case KEY_UPDATE:
-                exptectedBodyType = PKIBody.TYPE_KEY_UPDATE_REP;
-                break;
-            default:
-                exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
+        case CERT_REQ:
+            exptectedBodyType = PKIBody.TYPE_CERT_REP;
+            break;
+        case KEY_UPDATE:
+            exptectedBodyType = PKIBody.TYPE_KEY_UPDATE_REP;
+            break;
+        default:
+            exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
         }
 
         return internRequestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
@@ -420,9 +422,9 @@ abstract class X509CmpRequestor extends CmpRequestor {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             throw new PKIErrorException(content.getPKIStatusInfo());
         } else if (expectedBodyType != bodyType) {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + expectedBodyType    + ", "
-                    + PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException(String.format(
+                    "unknown PKI body type %s instead the exceptected [%s, %s]",
+                    bodyType, expectedBodyType, PKIBody.TYPE_ERROR));
         }
 
         CertRepMessage certRep = (CertRepMessage) respBody.getContent();
@@ -531,7 +533,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         }
 
         return result;
-    } // method intern_requestCertificate
+    } // method internRequestCertificate
 
     private PKIMessage buildCertConfirmRequest(
             final ASN1OctetString tid,
@@ -655,27 +657,23 @@ abstract class X509CmpRequestor extends CmpRequestor {
             AttributeTypeAndValue[] atvs = (certprofileInfo == null)
                     ? null
                     : new AttributeTypeAndValue[]{certprofileInfo};
-            certReqMsgs[i] = new CertReqMsg(
-                    reqEntry.getCertReq(), reqEntry.getPopo(),
-                    atvs);
+            certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(), reqEntry.getPopo(), atvs);
         }
 
         int bodyType;
         switch (req.getType()) {
-            case CERT_REQ:
-                bodyType = PKIBody.TYPE_CERT_REQ;
-                break;
-            case KEY_UPDATE:
-                bodyType = PKIBody.TYPE_KEY_UPDATE_REQ;
-                break;
-            default:
-                bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
+        case CERT_REQ:
+            bodyType = PKIBody.TYPE_CERT_REQ;
+            break;
+        case KEY_UPDATE:
+            bodyType = PKIBody.TYPE_KEY_UPDATE_REQ;
+            break;
+        default:
+            bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
         }
 
         PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));
-
-        PKIMessage pkiMessage = new PKIMessage(header, body);
-        return pkiMessage;
+        return new PKIMessage(header, body);
     } // method buildPKIMessage
 
     private PKIMessage buildPKIMessage(
@@ -689,8 +687,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
         AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
         CertReqMsg[] certReqMsgs = new CertReqMsg[1];
         certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certprofileInfo});
-        PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
 
+        PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
         return new PKIMessage(header, body);
     }
 

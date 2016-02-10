@@ -88,8 +88,8 @@ public abstract class CRLCommandSupport extends ClientCommandSupport {
             if (caNames.size() == 1) {
                 caName = caNames.iterator().next();
             } else {
-                throw new IllegalCmdParamException("no caname is specified, one of "
-                        + caNames + " is required");
+                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+                        + " is required");
             }
         }
 
