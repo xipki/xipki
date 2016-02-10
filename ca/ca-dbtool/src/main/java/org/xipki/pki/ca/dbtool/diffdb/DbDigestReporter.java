@@ -80,6 +80,7 @@ public class DbDigestReporter {
             final byte[] caCertBytes)
     throws IOException {
         ParamUtil.assertNotBlank("reportDirname", reportDirname);
+
         this.reportDirname = reportDirname;
         File dir = new File(reportDirname);
         dir.mkdirs();
@@ -169,7 +170,7 @@ public class DbDigestReporter {
         Date now = new Date();
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(200);
         sb.append("sum :         ")
             .append(StringUtil.formatAccount(sum, false)).append("\n");
         sb.append("good:         ")

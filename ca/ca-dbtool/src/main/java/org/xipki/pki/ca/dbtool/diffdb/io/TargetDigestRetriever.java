@@ -235,50 +235,54 @@ public class TargetDigestRetriever {
         this.reporter = reporter;
         this.stopMe = stopMe;
 
-        String coreSql =
-                dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=" + caId
-                + " AND CERT." + dbControl.getColSerialNumber() + "=?"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
-                + dbControl.getColCertId();
-        singleCertSql = datasource.createFetchFirstSelectSQL(coreSql, 1);
+        StringBuilder buffer = new StringBuilder(200);
+        buffer.append(dbControl.getColRevoked()).append(',');
+        buffer.append(dbControl.getColRevReason()).append(',');
+        buffer.append(dbControl.getColRevTime()).append(',');
+        buffer.append(dbControl.getColRevInvTime()).append(',');
+        buffer.append(dbControl.getColCerthash());
+        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
+        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
+        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append("=?");
+        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append('.');
+        buffer.append(dbControl.getColCertId());
 
-        StringBuilder sb = new StringBuilder("?");
+        singleCertSql = datasource.createFetchFirstSelectSQL(buffer.toString(), 1);
+
+        buffer = new StringBuilder(200);
+        buffer.append(dbControl.getColSerialNumber()).append(',');
+        buffer.append(dbControl.getColRevoked()).append(',');
+        buffer.append(dbControl.getColRevReason()).append(',');
+        buffer.append(dbControl.getColRevTime()).append(',');
+        buffer.append(dbControl.getColRevInvTime()).append(',');
+        buffer.append(dbControl.getColCerthash());
+        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
+        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
+        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append(" IN (?");
         for (int i = 1; i < numPerSelect; i++) {
-            sb.append(",?");
+            buffer.append(",?");
         }
+        buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
+        buffer.append(".").append(dbControl.getColCertId());
 
-        coreSql =
-                dbControl.getColSerialNumber() + ","
-                + dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=" + caId
-                + " AND CERT." + dbControl.getColSerialNumber() + " IN (" + sb.toString() + ")"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "." + dbControl.getColCertId();
-        inArrayCertsSql = datasource.createFetchFirstSelectSQL(coreSql, numPerSelect);
+        inArrayCertsSql = datasource.createFetchFirstSelectSQL(buffer.toString(), numPerSelect);
 
-        rangeCertsSql = "SELECT "
-                + dbControl.getColSerialNumber() + ","
-                + dbControl.getColRevoked() + ","
-                + dbControl.getColRevReason() + ","
-                + dbControl.getColRevTime() + ","
-                + dbControl.getColRevInvTime() + ","
-                + dbControl.getColCerthash()
-                + " FROM CERT INNER JOIN " + dbControl.getTblCerthash()
-                + " ON CERT." + dbControl.getColCaId() + "=" + caId
-                + " AND CERT." + dbControl.getColSerialNumber() + ">=?"
-                + " AND CERT." + dbControl.getColSerialNumber() + "<=?"
-                + " AND CERT.ID=" + dbControl.getTblCerthash() + "."
-                + dbControl.getColCertId();
+        buffer = new StringBuilder(200);
+        buffer.append("SELECT ");
+        buffer.append(dbControl.getColSerialNumber()).append(',');
+        buffer.append(dbControl.getColRevoked()).append(',');
+        buffer.append(dbControl.getColRevReason()).append(',');
+        buffer.append(dbControl.getColRevTime()).append(',');
+        buffer.append(dbControl.getColRevInvTime()).append(',');
+        buffer.append(dbControl.getColCerthash());
+        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
+        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
+        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append(">=?");
+        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append("<=?");
+        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append(".");
+        buffer.append(dbControl.getColCertId());
+
+        rangeCertsSql = buffer.toString();
 
         retrievers = new ArrayList<>(numThreads);
 

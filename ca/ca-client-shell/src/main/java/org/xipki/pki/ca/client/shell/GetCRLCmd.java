@@ -120,33 +120,36 @@ public class GetCRLCmd extends CRLCommandSupport {
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
 
-        if (withBaseCRL.booleanValue()) {
-            byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-            if (octetString != null) {
-                if (baseCRLOut == null) {
-                    baseCRLOut = outFile + "-baseCRL";
-                }
-
-                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
-                RequestResponseDebug debug = getRequestResponseDebug();
-                try {
-                    crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
-                } catch (PKIErrorException ex) {
-                    throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
-                } finally {
-                    saveRequestResponse(debug);
-                }
-
-                if (crl == null) {
-                    throw new CmdFailure("received no baseCRL from server");
-                } else {
-                    saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
-                }
-            }
+        if (!withBaseCRL.booleanValue()) {
+            return null;
         }
 
+        byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+        if (octetString == null) {
+            return null;
+        }
+
+        if (baseCRLOut == null) {
+            baseCRLOut = outFile + "-baseCRL";
+        }
+
+        byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+        BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try {
+            crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
+        } catch (PKIErrorException ex) {
+            throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
+        } finally {
+            saveRequestResponse(debug);
+        }
+
+        if (crl == null) {
+            throw new CmdFailure("received no baseCRL from server");
+        }
+
+        saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
         return null;
     } // method doExecute
 

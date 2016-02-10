@@ -86,7 +86,7 @@ public class CALoadTestTemplateEnrollCmd extends CALoadTestCommandSupport {
                 new FileInputStream(templateFile));
         int n = template.getEnrollCert().size();
 
-        StringBuilder description = new StringBuilder();
+        StringBuilder description = new StringBuilder(200);
         description.append("template: ").append(templateFile).append("\n");
         description.append("#certs/req: ").append(n).append("\n");
         description.append("unit: ").append(n).append(" certificate");

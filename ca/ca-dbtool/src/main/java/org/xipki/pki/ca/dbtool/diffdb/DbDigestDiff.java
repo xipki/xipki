@@ -251,8 +251,7 @@ public class DbDigestDiff {
             caReportDir = new File(reportDirName, "ca-" + commonName + "-" + (idx++));
         }
 
-        DbDigestReporter reporter = new DbDigestReporter(
-                caReportDir.getPath(), caCertBytes);
+        DbDigestReporter reporter = new DbDigestReporter(caReportDir.getPath(), caCertBytes);
 
         Integer caId = null;
         for (Integer i : caIdCertBytesMap.keySet()) {

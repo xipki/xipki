@@ -77,7 +77,7 @@ public class CALoadTestRevoke extends LoadExecutor {
 
     private static final CRLReason[] REASONS = {CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
             CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
-            CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN};
+            CRLReason.CERTIFICATE_HOLD, CRLReason.PRIVILEGE_WITHDRAWN};
 
     private final CAClient caClient;
 
@@ -120,8 +120,8 @@ public class CALoadTestRevoke extends LoadExecutor {
         if (n < 1) {
             throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
         }
-        this.n = n;
 
+        this.n = n;
         this.caClient = caClient;
         this.caDataSource = caDataSource;
         this.caSubject = caCert.getSubject();
@@ -255,42 +255,43 @@ public class CALoadTestRevoke extends LoadExecutor {
                 return firstSerial;
             }
 
-            if (!noUnrevokedCerts) {
-                String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
-                        + " AND SN > " + (nextStartSerial - 1)
-                        + " AND SN < " + (maxSerial + 1);
-                sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
+            if (noUnrevokedCerts) {
+                return serials.pollFirst();
+            }
 
-                int i = 0;
-                try {
-                    stmt = caDataSource.getConnection().prepareStatement(sql);
-                    rs = stmt.executeQuery();
-                    while (rs.next()) {
-                        i++;
-                        long serial = rs.getLong("SN");
-                        if (serial + 1 > nextStartSerial) {
-                            nextStartSerial = serial + 1;
-                        }
-                        if (!excludeSerials.contains(serial)) {
-                            serials.addLast(serial);
-                        }
+            String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
+                    + " AND SN > " + (nextStartSerial - 1) + " AND SN < " + (maxSerial + 1);
+            sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+
+            int i = 0;
+            try {
+                stmt = caDataSource.getConnection().prepareStatement(sql);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    i++;
+                    long serial = rs.getLong("SN");
+                    if (serial + 1 > nextStartSerial) {
+                        nextStartSerial = serial + 1;
                     }
-                } catch (SQLException e) {
-                    throw caDataSource.translate(sql, e);
-                } finally {
-                    caDataSource.releaseResources(stmt, rs);
+                    if (!excludeSerials.contains(serial)) {
+                        serials.addLast(serial);
+                    }
                 }
+            } catch (SQLException e) {
+                throw caDataSource.translate(sql, e);
+            } finally {
+                caDataSource.releaseResources(stmt, rs);
+            }
 
-                if (i == 0) {
-                    System.out.println("no unrevoked certificate");
-                    System.out.flush();
-                }
+            if (i == 0) {
+                System.out.println("no unrevoked certificate");
+                System.out.flush();
+            }
 
-                if (i < 1000) {
-                    noUnrevokedCerts = true;
-                }
+            if (i < 1000) {
+                noUnrevokedCerts = true;
             }
 
             return serials.pollFirst();

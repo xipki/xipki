@@ -118,7 +118,7 @@ public class CALoadTestEnrollCmd extends CALoadTestCommandSupport {
             throw new IllegalCmdParamException("curveName is not specified");
         }
 
-        StringBuilder description = new StringBuilder();
+        StringBuilder description = new StringBuilder(200);
         description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
         description.append("profile: ").append(certprofile).append("\n");
         description.append("keyType: ").append(keyType).append("\n");

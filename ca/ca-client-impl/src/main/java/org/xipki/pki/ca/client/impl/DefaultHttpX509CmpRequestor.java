@@ -126,8 +126,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
         if (!isValidContentType) {
             inputStream.close();
             throw new IOException("bad response: mime type "
-                    + responseContentType
-                    + " not supported!");
+                    + responseContentType + " not supported!");
         }
 
         return IoUtil.read(inputStream);

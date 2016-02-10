@@ -103,7 +103,7 @@ public abstract class CmpRequestor {
 
     protected boolean signRequest;
 
-    private final    Random random = new Random();
+    private final Random random = new Random();
 
     private final ConcurrentContentSigner requestor;
 
@@ -196,15 +196,15 @@ public abstract class CmpRequestor {
             final PKIMessage request,
             final RequestResponseDebug debug)
     throws CmpRequestorException {
+        if (responderCert == null) {
+            throw new CmpRequestorException("CMP responder is not configured");
+        }
+
         PKIMessage localRequest;
         if (signRequest) {
             localRequest = sign(request);
         } else {
             localRequest = request;
-        }
-
-        if (responderCert == null) {
-            throw new CmpRequestorException("CMP responder is not configured");
         }
 
         byte[] encodedRequest;
@@ -337,9 +337,9 @@ public abstract class CmpRequestor {
             throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
-            throw new CmpRequestorException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP    + ", "
-                    + PKIBody.TYPE_ERROR + "]");
+            throw new CmpRequestorException(String.format(
+                        "unknown PKI body type %s instead the exceptected [%s, %s]",
+                    bodyType, PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
@@ -543,16 +543,17 @@ public abstract class CmpRequestor {
     protected void checkProtection(
             final PKIResponse response)
     throws PKIErrorException {
+        if (!response.hasProtection()) {
+            return;
+        }
+
         ProtectionVerificationResult protectionVerificationResult =
                 response.getProtectionVerificationResult();
-        if (response.hasProtection()) {
-            if (protectionVerificationResult == null
-                    || protectionVerificationResult.getProtectionResult()
-                            != ProtectionResult.VALID) {
-                throw new PKIErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
-                        PKIFailureInfo.badMessageCheck,
-                        "message check of the response failed");
-            }
+
+        if (protectionVerificationResult == null
+            || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
+            throw new PKIErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+                        PKIFailureInfo.badMessageCheck, "message check of the response failed");
         }
     }
 

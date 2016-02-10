@@ -64,6 +64,7 @@ public class EnrollCertRequestType {
     public EnrollCertRequestType(
             final Type type) {
         ParamUtil.assertNotNull("type", type);
+
         this.type = type;
     }
 
@@ -73,6 +74,8 @@ public class EnrollCertRequestType {
 
     public boolean addRequestEntry(
             final EnrollCertRequestEntryType requestEntry) {
+        ParamUtil.assertNotNull("requestEntry", requestEntry);
+
         String id = requestEntry.getId();
         ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
         for (EnrollCertRequestEntryType re : requestEntries) {

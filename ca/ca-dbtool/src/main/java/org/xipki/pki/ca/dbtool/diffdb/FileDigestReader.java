@@ -84,11 +84,11 @@ public class FileDigestReader implements DigestReader {
             final boolean revokedOnly)
     throws IOException, CertificateException {
         ParamUtil.assertNotBlank("caDirname", caDirname);
+
         this.caDirname = caDirname;
         this.revokedOnly = revokedOnly;
 
-        this.caCert = X509Util.parseCert(
-                new File(caDirname, "ca.der"));
+        this.caCert = X509Util.parseCert(new File(caDirname, "ca.der"));
         Properties props = new Properties();
         props.load(new FileInputStream(new File(caDirname, CaEntry.FILENAME_OVERVIEW)));
         String accoutPropKey = revokedOnly
@@ -98,8 +98,7 @@ public class FileDigestReader implements DigestReader {
         this.totalAccount = Integer.parseInt(accoutS);
 
         this.certsFilesReader = new BufferedReader(
-                new FileReader(
-                        new File(caDirname, "certs-manifest")));
+                new FileReader(new File(caDirname, "certs-manifest")));
         this.caSubjectName = X509Util.getRFC4519Name(this.caCert.getSubjectX500Principal());
         this.next = retrieveNext(true);
     }

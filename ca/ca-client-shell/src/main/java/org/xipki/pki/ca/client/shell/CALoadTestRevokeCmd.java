@@ -114,7 +114,7 @@ public class CALoadTestRevokeCmd extends CALoadTestCommandSupport {
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
-        StringBuilder description = new StringBuilder();
+        StringBuilder description = new StringBuilder(200);
         description.append("issuer: ").append(issuerCertFile).append("\n");
         description.append("cadb: ").append(caDbConfFile).append("\n");
         description.append("maxCerts: ").append(maxCerts).append("\n");

@@ -125,12 +125,8 @@ public class DbToolBase {
             final int id,
             final Logger log) {
         StringBuilder sb = new StringBuilder(50);
-        sb.append("DELETE FROM ")
-            .append(tableName)
-            .append(" WHERE ")
-            .append(idColumn)
-            .append(" > ")
-            .append(id);
+        sb.append("DELETE FROM ").append(tableName).append(" WHERE ")
+            .append(idColumn).append(" > ").append(id);
 
         Statement stmt;
         try {
@@ -142,8 +138,9 @@ public class DbToolBase {
         try {
             stmt.execute(sb.toString());
         } catch (Throwable t) {
-            log.error("could not delete columns from table " + tableName + " with "
-                    + idColumn + " > " + id, t);
+            String msg = String.format(
+                    "could not delete columns from table %s with %s > %s", tableName, idColumn, id);
+            log.error(msg, t);
             return false;
         } finally {
             releaseResources(stmt, null);
@@ -287,7 +284,7 @@ public class DbToolBase {
             final int index,
             final boolean b)
     throws SQLException {
-        int i =    b
+        int i = b
                 ? 1
                 : 0;
         ps.setInt(index, i);

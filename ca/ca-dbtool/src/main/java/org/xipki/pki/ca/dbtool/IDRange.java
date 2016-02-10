@@ -53,6 +53,7 @@ public class IDRange {
             throw new IllegalArgumentException(
                     "from could not be greater than to: " + from + " > " + to);
         }
+
         this.from = from;
         this.to = to;
     }

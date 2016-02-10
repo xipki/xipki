@@ -94,8 +94,7 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CertificationRequest p10Req = CertificationRequest.getInstance(
-                IoUtil.read(p10File));
+        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
 
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
@@ -118,7 +117,6 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
 
         File certFile = new File(outputFile);
         saveVerbose("certificate saved to file", certFile, cert.getEncoded());
-
         return null;
     }
 
