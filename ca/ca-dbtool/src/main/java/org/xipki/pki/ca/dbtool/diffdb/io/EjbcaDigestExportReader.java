@@ -229,9 +229,8 @@ public class EjbcaDigestExportReader {
         this.numThreads = numThreads;
         this.fpCaInfoMap = fpCaInfoMap;
 
-        selectCertSql =
-                "SELECT id, fingerprint, serialNumber, cAFingerprint, status, revocationReason,"
-                + " revocationDate"
+        selectCertSql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status,"
+                + " revocationReason, revocationDate"
                 + " FROM CertificateData WHERE id >= ? AND id < ? ORDER BY id ASC";
 
         selectRawCertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
@@ -273,14 +272,16 @@ public class EjbcaDigestExportReader {
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
         for (DigestDBEntrySet result : results) {
-            if (result.getException() != null) {
-                throw new DataAccessException(
-                        "error while reading from ID " + result.getStartId()
-                            + ": " + result.getException().getMessage(),
-                        result.getException());
+            if (result.getException() == null) {
+                ret.addAll(result.getEntries());
+                continue;
             }
 
-            ret.addAll(result.getEntries());
+            throw new DataAccessException(
+                    String.format(
+                            "error while reading from ID %s: %s",
+                            result.getStartId(), result.getException().getMessage()),
+                    result.getException());
         }
 
         return ret;

@@ -52,6 +52,7 @@ public class ErrorResultEntryType extends ResultEntryType {
             final PKIStatusInfo statusInfo) {
         super(id);
         ParamUtil.assertNotNull("statusInfo", statusInfo);
+
         this.statusInfo = statusInfo;
     }
 

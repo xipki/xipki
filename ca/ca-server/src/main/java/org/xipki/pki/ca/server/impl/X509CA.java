@@ -566,7 +566,6 @@ public class X509CA {
      *
      * @param subjectName
      * @param transactionId <code>null</code> for all transactionIds
-     * @return
      */
     public List<X509Certificate> getCertificate(
             final X500Name subjectName,
@@ -684,13 +683,11 @@ public class X509CA {
     throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
-            throw new OperationException(ErrorCode.NOT_PERMITTED,
-                    "CA could not generate CRL");
+            throw new OperationException(ErrorCode.NOT_PERMITTED, "CA could not generate CRL");
         }
 
         if (crlGenInProcess.get()) {
-            throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE,
-                    "TRY_LATER");
+            throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE, "TRY_LATER");
         }
 
         crlGenInProcess.set(true);
@@ -708,13 +705,12 @@ public class X509CA {
                 try {
                     certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
                 } catch (Throwable t) {
-                    final String message =
-                            "could not clear DeltaCRLCache of CA " + caInfo.getName();
+                    final String msg = "could not clear DeltaCRLCache of CA " + caInfo.getName();
                     if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                        LOG.error(LogUtil.buildExceptionLogFormat(msg), t.getClass().getName(),
                                 t.getMessage());
                     }
-                    LOG.debug(message, t);
+                    LOG.debug(msg, t);
                 }
             }
 
@@ -774,10 +770,13 @@ public class X509CA {
             CRLControl control = crlSigner.getCRLControl();
 
             boolean directCRL = localCrlSigner == null;
-            X500Name crlIssuer = directCRL
-                    ? caInfo.getPublicCAInfo().getX500Subject()
-                    : X500Name.getInstance(
-                            localCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
+            X500Name crlIssuer;
+            if (directCRL) {
+                crlIssuer = caInfo.getPublicCAInfo().getX500Subject();
+            } else {
+                crlIssuer = X500Name.getInstance(
+                        localCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
+            }
 
             X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
             if (nextUpdate != null) {

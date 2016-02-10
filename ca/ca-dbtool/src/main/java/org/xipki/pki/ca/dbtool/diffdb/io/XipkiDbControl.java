@@ -119,12 +119,12 @@ public class XipkiDbControl {
         // CERT SQL
         sb.delete(0, sb.length());
         sb.append("SELECT ID,");
-        sb.append(colCaId).append(",");
-        sb.append(colSerialNumber).append(",");
-        sb.append(colRevoked).append(",");
-        sb.append(colRevReason).append(",");
-        sb.append(colRevTime).append(",");
-        sb.append(colRevInvTime).append(",");
+        sb.append(colCaId).append(',');
+        sb.append(colSerialNumber).append(',');
+        sb.append(colRevoked).append(',');
+        sb.append(colRevReason).append(',');
+        sb.append(colRevTime).append(',');
+        sb.append(colRevInvTime).append(',');
         sb.append(colCerthash);
         sb.append(" FROM CERT INNER JOIN ").append(tblCerthash);
         sb.append(" ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=");

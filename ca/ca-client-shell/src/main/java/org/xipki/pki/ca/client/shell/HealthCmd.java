@@ -88,7 +88,7 @@ public class HealthCmd extends ClientCommandSupport {
         }
 
         HealthCheckResult healthResult = caClient.getHealthCheckResult(caName);
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(40);
         sb.append("healthy status for CA ");
         sb.append(caName);
         sb.append(": ");

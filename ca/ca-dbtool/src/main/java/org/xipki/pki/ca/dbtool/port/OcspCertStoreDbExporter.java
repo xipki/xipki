@@ -116,7 +116,6 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         this.numCertsInBundle = numCertsInBundle;
         this.numCertsPerSelect = numCertsInBundle;
-
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
         if (resume) {

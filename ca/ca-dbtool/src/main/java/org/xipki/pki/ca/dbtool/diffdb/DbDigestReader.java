@@ -124,6 +124,7 @@ abstract class DbDigestReader implements DigestReader {
             final StopMe stopMe)
     throws DataAccessException, CertificateException, IOException {
         ParamUtil.assertNotNull("datasource", datasource);
+
         this.datasource = datasource;
         this.totalAccount = totalAccount;
         this.revokedOnly = revokedOnly;

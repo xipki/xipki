@@ -60,7 +60,6 @@ public class CertsBundle {
         if (numSkipped < 0) {
             throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
         }
-
         ParamUtil.assertNotEmpty("certs", certs);
         ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
 

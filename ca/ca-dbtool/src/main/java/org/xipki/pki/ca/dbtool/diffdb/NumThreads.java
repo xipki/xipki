@@ -55,6 +55,7 @@ public class NumThreads {
         if (numTargetThreads < 1) {
             throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
         }
+
         this.numRefThreads = numRefThreads;
         this.numTargetThreads = numTargetThreads;
     }

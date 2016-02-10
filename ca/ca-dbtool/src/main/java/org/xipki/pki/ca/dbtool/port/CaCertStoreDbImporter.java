@@ -245,7 +245,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_CA");
-    } // method import_ca
+    } // method importCa
 
     private void importRequestor(
             final Requestors requestors)
@@ -276,7 +276,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_REQUESTOR");
-    } // method import_requestor
+    } // method importRequestor
 
     private void importPublisher(
             final Publishers publishers)
@@ -308,7 +308,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_PUBLISHER");
-    } // method import_publisher
+    } // method importPublisher
 
     private void importProfile(
             final Profiles profiles)
@@ -337,7 +337,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table CS_PROFILE");
-    } // method import_profile
+    } // method importProfile
 
     private void importUser(
             final CertStoreType certstore)
@@ -375,7 +375,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         System.out.println(getImportedText() + sum + " users");
         System.out.println(getImportedText() + "table USERNAME");
-    } // method import_user
+    } // method importUser
 
     private int doImportUser(
             final PreparedStatement psAdduser,
@@ -462,7 +462,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             zipFile.close();
         }
-    } // method do_import_user
+    } // method doImportUser
 
     private void importPublishQueue(
             final PublishQueue publishQueue)
@@ -491,7 +491,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" imported table PUBLISHQUEUE");
-    } // method import_publishQueue
+    } // method importPublishQueue
 
     private void importDeltaCRLCache(
             final DeltaCRLCache deltaCRLCache)
@@ -524,7 +524,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         dataSource.dropAndCreateSequence("DCC_ID", maxId + 1);
 
         System.out.println(" imported table DELTACRL_CACHE");
-    } // method import_deltaCRLCache
+    } // method importDeltaCRLCache
 
     private void importCrl(
             final CertStoreType certstore)
@@ -562,7 +562,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         System.out.println(getImportedText() + sum + " CRLs");
         System.out.println(getImportedText() + "table CRL");
-    } // method import_crl
+    } // method importCrl
 
     @SuppressWarnings("resource")
     private int doImportCrl(
@@ -703,7 +703,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             } catch (DataAccessException e) {
             }
         }
-    } // method do_import_crl
+    } // method doImportCrl
 
     private void importCert(
             final CertStoreType certstore,
@@ -782,7 +782,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
-    } // method import_cert
+    } // method importCert
 
     private int doImportCert(
             final PreparedStatement psCert,
@@ -974,7 +974,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             zipFile.close();
         }
-    } // method do_import_cert
+    } // method doImportCert
 
     private void deleteCertGreatherThan(
             final int id) {

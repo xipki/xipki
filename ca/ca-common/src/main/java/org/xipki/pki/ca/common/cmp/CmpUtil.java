@@ -149,11 +149,13 @@ public class CmpUtil {
     public static boolean isImplictConfirm(
             final PKIHeader header) {
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
-        if (regInfos != null) {
-            for (InfoTypeAndValue regInfo : regInfos) {
-                if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
-                    return true;
-                }
+        if (regInfos == null) {
+            return false;
+        }
+
+        for (InfoTypeAndValue regInfo : regInfos) {
+            if (CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType())) {
+                return true;
             }
         }
         return false;
@@ -165,12 +167,14 @@ public class CmpUtil {
 
     public static CmpUtf8Pairs extract(
             final InfoTypeAndValue[] regInfos) {
-        if (regInfos != null) {
-            for (InfoTypeAndValue regInfo : regInfos) {
-                if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
-                    String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
-                    return new CmpUtf8Pairs(regInfoValue);
-                }
+        if (regInfos == null) {
+            return null;
+        }
+
+        for (InfoTypeAndValue regInfo : regInfos) {
+            if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType())) {
+                String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
+                return new CmpUtf8Pairs(regInfoValue);
             }
         }
 

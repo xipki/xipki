@@ -69,6 +69,10 @@ public class DbDigestEntry {
             final Long revInvTime,
             final String sha1Fp) {
         ParamUtil.assertNotBlank("sha1Fp", sha1Fp);
+        if (revoked) {
+            ParamUtil.assertNotNull("revReason", revReason);
+            ParamUtil.assertNotNull("revTime", revTime);
+        }
 
         if (sha1Fp.length() == 28) {
             this.base64Sha1 = sha1Fp;
@@ -76,10 +80,6 @@ public class DbDigestEntry {
             this.base64Sha1 = Base64.toBase64String(Hex.decode(sha1Fp));
         } else {
             throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
-        }
-        if (revoked) {
-            ParamUtil.assertNotNull("revReason", revReason);
-            ParamUtil.assertNotNull("revTime", revTime);
         }
 
         this.serialNumber = serialNumber;
