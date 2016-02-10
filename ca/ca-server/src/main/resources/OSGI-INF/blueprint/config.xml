@@ -21,13 +21,13 @@
   <reference id="dataSourceFactory" interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
-  <bean id="caManager" class="org.xipki.pki.ca.server.impl.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.pki.ca.server.impl.CaManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
+  <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CaManager"/>
   <!-- CMP servlet -->
   <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.HttpCmpServlet">
     <property name="responderManager" ref="caManager"/>

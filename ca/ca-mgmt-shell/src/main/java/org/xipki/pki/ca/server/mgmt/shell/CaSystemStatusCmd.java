@@ -39,7 +39,7 @@ import java.rmi.UnexpectedException;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.pki.ca.server.mgmt.api.CaSystemStatus;
 
 /**
  * @author Lijun Liao
@@ -54,7 +54,7 @@ public class CaSystemStatusCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CASystemStatus status = caManager.getCASystemStatus();
+        CaSystemStatus status = caManager.getCASystemStatus();
         if (status != null) {
             out(status.toString());
         } else {

@@ -18,7 +18,7 @@
 
   <reference id="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
 
-  <bean id="XipkiProviderNssRegister" class="org.xipki.commons.security.p11.sun.nss.XipkiNSSProviderRegister"
+  <bean id="XipkiProviderNssRegister" class="org.xipki.commons.security.p11.sun.nss.XipkiNssProviderRegister"
       init-method="regist" destroy-method="unregist"/>
 
   <bean id="securityFactoryImpl" class="org.xipki.commons.security.SecurityFactoryImpl">

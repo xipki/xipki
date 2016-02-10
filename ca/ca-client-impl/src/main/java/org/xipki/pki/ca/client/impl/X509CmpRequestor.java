@@ -108,16 +108,16 @@ import org.w3c.dom.Element;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XMLUtil;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.common.util.XmlUtil;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.XipkiCmpConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
-import org.xipki.pki.ca.client.api.PKIErrorException;
-import org.xipki.pki.ca.client.api.dto.CRLResultType;
+import org.xipki.pki.ca.client.api.PkiErrorException;
+import org.xipki.pki.ca.client.api.dto.CrlResultType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntryType;
@@ -133,7 +133,7 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
-import org.xipki.pki.ca.common.cmp.PKIResponse;
+import org.xipki.pki.ca.common.cmp.PkiResponse;
 import org.xml.sax.SAXException;
 
 /**
@@ -171,25 +171,25 @@ abstract class X509CmpRequestor extends CmpRequestor {
         xmlDocBuilder = newDocumentBuilder();
     }
 
-    public CRLResultType generateCRL(
+    public CrlResultType generateCRL(
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         int action = XipkiCmpConstants.ACTION_GEN_CRL;
         PKIMessage request = buildMessageWithXipkAction(action, null);
-        PKIResponse response = signAndSend(request, debug);
+        PkiResponse response = signAndSend(request, debug);
         return evaluateCRLResponse(response, action);
     }
 
-    public CRLResultType downloadCurrentCRL(
+    public CrlResultType downloadCurrentCRL(
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         return downloadCRL((BigInteger) null, debug);
     }
 
-    public CRLResultType downloadCRL(
+    public CrlResultType downloadCRL(
             final BigInteger crlNumber,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         Integer action = null;
         PKIMessage request;
         if (crlNumber == null) {
@@ -200,14 +200,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
             request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
         }
 
-        PKIResponse response = signAndSend(request, debug);
+        PkiResponse response = signAndSend(request, debug);
         return evaluateCRLResponse(response, action);
     }
 
-    private CRLResultType evaluateCRLResponse(
-            final PKIResponse response,
+    private CrlResultType evaluateCRLResponse(
+            final PkiResponse response,
             final Integer xipkiAction)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         checkProtection(response);
 
         PKIBody respBody = response.getPkiMessage().getBody();
@@ -215,7 +215,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new PKIErrorException(content.getPKIStatusInfo());
+            throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
                     "unknown PKI body type %s instead the exceptected [%s, %s]",
@@ -260,7 +260,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             throw new CmpRequestorException("returned CRL is invalid: " + ex.getMessage());
         }
 
-        CRLResultType result = new CRLResultType();
+        CrlResultType result = new CrlResultType();
         result.setCrl(crl);
         return result;
     } // method evaluateCRLResponse
@@ -268,36 +268,36 @@ abstract class X509CmpRequestor extends CmpRequestor {
     public RevokeCertResultType revokeCertificate(
             final RevokeCertRequestType request,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         PKIMessage reqMessage = buildRevokeCertRequest(request);
-        PKIResponse response = signAndSend(reqMessage, debug);
+        PkiResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
     public RevokeCertResultType unrevokeCertificate(
             final UnrevokeOrRemoveCertRequestType request,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
-                CRLReason.REMOVE_FROM_CRL.getCode());
-        PKIResponse response = signAndSend(reqMessage, debug);
+                CrlReason.REMOVE_FROM_CRL.getCode());
+        PkiResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
     public RevokeCertResultType removeCertificate(
             final UnrevokeOrRemoveCertRequestType request,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
                 XipkiCmpConstants.CRL_REASON_REMOVE);
-        PKIResponse response = signAndSend(reqMessage, debug);
+        PkiResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
     private RevokeCertResultType parse(
-            final PKIResponse response,
+            final PkiResponse response,
             final List<? extends IssuerSerialEntryType> reqEntries)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         checkProtection(response);
 
         PKIBody respBody = response.getPkiMessage().getBody();
@@ -305,7 +305,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new PKIErrorException(content.getPKIStatusInfo());
+            throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_REVOCATION_REP != bodyType) {
             throw new CmpRequestorException(String.format(
                     "unknown PKI body type %s instead the exceptected [%s, %s]",
@@ -371,7 +371,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final P10EnrollCertRequestType p10Req,
             final String username,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         PKIMessage request = buildPKIMessage(p10Req, username);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
@@ -382,7 +382,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final EnrollCertRequestType req,
             final String username,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         PKIMessage request = buildPKIMessage(req, username);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
@@ -411,8 +411,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final Map<BigInteger, String> reqIdIdMap,
             final int expectedBodyType,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
-        PKIResponse response = signAndSend(reqMessage, debug);
+    throws CmpRequestorException, PkiErrorException {
+        PkiResponse response = signAndSend(reqMessage, debug);
         checkProtection(response);
 
         PKIBody respBody = response.getPkiMessage().getBody();
@@ -420,7 +420,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new PKIErrorException(content.getPKIStatusInfo());
+            throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (expectedBodyType != bodyType) {
             throw new CmpRequestorException(String.format(
                     "unknown PKI body type %s instead the exceptected [%s, %s]",
@@ -529,7 +529,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new PKIErrorException(content.getPKIStatusInfo());
+            throw new PkiErrorException(content.getPKIStatusInfo());
         }
 
         return result;
@@ -710,17 +710,17 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return reqMessage;
     }
 
-    public CAInfo retrieveCAInfo(
+    public CaInfo retrieveCAInfo(
             final String caName,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(2));
         ASN1Sequence acceptVersions = new DERSequence(v);
 
         int action = XipkiCmpConstants.ACTION_GET_CAINFO;
         PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
-        PKIResponse response = signAndSend(request, debug);
+        PkiResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String systemInfoStr = utf8Str.getString();
@@ -748,24 +748,24 @@ abstract class X509CmpRequestor extends CmpRequestor {
         if (version == 2) {
             X509Certificate caCert;
 
-            String b64CACert = XMLUtil.getValueOfFirstElementChild(root, namespace, "CACert");
+            String b64CACert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try {
                 caCert = X509Util.parseBase64EncodedCert(b64CACert);
             } catch (CertificateException | IOException ex) {
                 throw new CmpRequestorException("could no parse the CA certificate", ex);
             }
 
-            Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certprofiles");
+            Element profilesElement = XmlUtil.getFirstElementChild(root, namespace, "certprofiles");
             Set<CertprofileInfo> profiles = new HashSet<>();
             Set<String> profileNames = new HashSet<>();
             if (profilesElement != null) {
-                List<Element> profileElements = XMLUtil.getElementChilden(
+                List<Element> profileElements = XmlUtil.getElementChilden(
                         profilesElement, namespace, "certprofile");
 
                 for (Element element : profileElements) {
-                    String name = XMLUtil.getValueOfFirstElementChild(element, namespace, "name");
-                    String type = XMLUtil.getValueOfFirstElementChild(element, namespace, "type");
-                    String conf = XMLUtil.getValueOfFirstElementChild(element, namespace, "conf");
+                    String name = XmlUtil.getValueOfFirstElementChild(element, namespace, "name");
+                    String type = XmlUtil.getValueOfFirstElementChild(element, namespace, "type");
+                    String conf = XmlUtil.getValueOfFirstElementChild(element, namespace, "conf");
                     CertprofileInfo profile = new CertprofileInfo(name, type, conf);
                     profiles.add(profile);
                     profileNames.add(name);
@@ -781,7 +781,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             }
 
             LOG.info("CA {} supports profiles {}", caName, profileNames);
-            return new CAInfo(caCert, profiles);
+            return new CaInfo(caCert, profiles);
         } else {
             throw new CmpRequestorException("unknown CAInfo version " + version);
         }

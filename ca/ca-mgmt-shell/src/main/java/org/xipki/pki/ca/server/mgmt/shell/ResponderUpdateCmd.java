@@ -49,7 +49,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNameCompleter;
 
@@ -108,8 +108,8 @@ public class ResponderUpdateCmd extends CaCommandSupport {
     protected Object doExecute()
     throws Exception {
         String cert = null;
-        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-            cert = CAManager.NULL;
+        if (CaManager.NULL.equalsIgnoreCase(certFile)) {
+            cert = CaManager.NULL;
         } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

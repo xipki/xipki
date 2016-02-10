@@ -40,8 +40,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.api.CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
 
 /**
  * @author Lijun Liao
@@ -55,12 +55,12 @@ public class RcaNameCompleter extends MgmtNameCompleter {
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
         for (String name : caManager.getCaNames()) {
-            CAEntry caEntry = caManager.getCA(name);
-            if (!(caEntry instanceof X509CAEntry)) {
+            CaEntry caEntry = caManager.getCA(name);
+            if (!(caEntry instanceof X509CaEntry)) {
                 continue;
             }
 
-            X509Certificate cert = ((X509CAEntry) caEntry).getCertificate();
+            X509Certificate cert = ((X509CaEntry) caEntry).getCertificate();
             if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
                 ret.add(name);
             }

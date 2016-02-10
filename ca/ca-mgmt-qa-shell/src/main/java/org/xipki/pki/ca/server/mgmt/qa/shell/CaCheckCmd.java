@@ -45,13 +45,13 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
-import org.xipki.pki.ca.server.mgmt.api.CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 
 /**
@@ -67,26 +67,26 @@ public class CaCheckCmd extends CaUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509ChangeCAEntry ey = getChangeCAEntry();
+        X509ChangeCaEntry ey = getChangeCAEntry();
         String caName = ey.getName();
         out("checking CA" + caName);
 
-        CAEntry entry = caManager.getCA(caName);
+        CaEntry entry = caManager.getCA(caName);
         if (entry == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        if (!(entry instanceof X509CAEntry)) {
+        if (!(entry instanceof X509CaEntry)) {
             throw new UnexpectedException("CA '" + caName + "' is not an X509-CA");
         }
 
-        X509CAEntry ca = (X509CAEntry) entry;
+        X509CaEntry ca = (X509CaEntry) entry;
 
         // CA cert uris
         if (ey.getCaCertUris() != null) {
             List<String> ex = ey.getCaCertUris();
             List<String> is = ca.getCacertUris();
-            MgmtQAShellUtil.assertEquals("CA cert uris", ex, is);
+            MgmtQaShellUtil.assertEquals("CA cert uris", ex, is);
         }
 
         // CA certificate
@@ -102,28 +102,28 @@ public class CaCheckCmd extends CaUpdateCmd {
         if (ey.getCmpControlName() != null) {
             String ex = ey.getCmpControlName();
             String is = ca.getCmpControlName();
-            MgmtQAShellUtil.assertEquals("CMP control name", ex, is);
+            MgmtQaShellUtil.assertEquals("CMP control name", ex, is);
         }
 
         // CRL signer name
         if (ey.getCrlSignerName() != null) {
             String ex = ey.getCrlSignerName();
             String is = ca.getCrlSignerName();
-            MgmtQAShellUtil.assertEquals("CRL signer name", ex, is);
+            MgmtQaShellUtil.assertEquals("CRL signer name", ex, is);
         }
 
         // CRL uris
         if (ey.getCrlUris() != null) {
             List<String> ex = ey.getCrlUris();
             List<String> is = ca.getCrlUris();
-            MgmtQAShellUtil.assertEquals("CRL uris", ex, is);
+            MgmtQaShellUtil.assertEquals("CRL uris", ex, is);
         }
 
         // DeltaCRL uris
         if (ey.getDeltaCrlUris() != null) {
             List<String> ex = ey.getDeltaCrlUris();
             List<String> is = ca.getDeltaCrlUris();
-            MgmtQAShellUtil.assertEquals("Delta CRL uris", ex, is);
+            MgmtQaShellUtil.assertEquals("Delta CRL uris", ex, is);
         }
 
         // Duplicate key mode
@@ -197,28 +197,28 @@ public class CaCheckCmd extends CaUpdateCmd {
         if (ey.getOcspUris() != null) {
             List<String> ex = ey.getOcspUris();
             List<String> is = ca.getOcspUris();
-            MgmtQAShellUtil.assertEquals("OCSP uris", ex, is);
+            MgmtQaShellUtil.assertEquals("OCSP uris", ex, is);
         }
 
         // Permissions
         if (ey.getPermissions() != null) {
             Set<Permission> ex = ey.getPermissions();
             Set<Permission> is = ca.getPermissions();
-            MgmtQAShellUtil.assertEquals("permissions", ex, is);
+            MgmtQaShellUtil.assertEquals("permissions", ex, is);
         }
 
         // Responder name
         if (ey.getResponderName() != null) {
             String ex = ey.getResponderName();
             String is = ca.getResponderName();
-            MgmtQAShellUtil.assertEquals("responder name", ex, is);
+            MgmtQaShellUtil.assertEquals("responder name", ex, is);
         }
 
         // Signer Type
         if (ey.getSignerType() != null) {
             String ex = ey.getSignerType();
             String is = ca.getSignerType();
-            MgmtQAShellUtil.assertEquals("signer type", ex, is);
+            MgmtQaShellUtil.assertEquals("signer type", ex, is);
         }
 
         if (ey.getSignerConf() != null) {
@@ -233,8 +233,8 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         // Status
         if (ey.getStatus() != null) {
-            CAStatus ex = ey.getStatus();
-            CAStatus is = ca.getStatus();
+            CaStatus ex = ey.getStatus();
+            CaStatus is = ca.getStatus();
             if (!ex.equals(is)) {
                 throw new CmdFailure("status: is '" + is + "', but expected '" + ex + "'");
             }

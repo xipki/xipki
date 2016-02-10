@@ -61,12 +61,12 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.EndOfQueue;
-import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.QueueEntry;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
+import org.xipki.pki.ca.dbtool.diffdb.io.DigestDbEntrySet;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 /**
@@ -78,9 +78,9 @@ abstract class DbDigestReader implements DigestReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestReader.class);
 
-    protected final BlockingQueue<IDRange> inQueue;
+    protected final BlockingQueue<IdRange> inQueue;
 
-    protected final BlockingQueue<DigestDBEntrySet> outQueue;
+    protected final BlockingQueue<DigestDbEntrySet> outQueue;
 
     protected final DataSourceWrapper datasource;
 
@@ -153,14 +153,14 @@ abstract class DbDigestReader implements DigestReader {
                 for (int i = 0; i < numThreads; i++) {
                     if (nextId <= maxId) {
                         n++;
-                        inQueue.add(new IDRange(nextId, nextId + 999));
+                        inQueue.add(new IdRange(nextId, nextId + 999));
                         nextId += 1000;
                     } else {
                         break;
                     }
                 }
 
-                List<DigestDBEntrySet> results = new ArrayList<>(n);
+                List<DigestDbEntrySet> results = new ArrayList<>(n);
                 for (int i = 0; i < n; i++) {
                     try {
                         results.add(outQueue.take());
@@ -170,7 +170,7 @@ abstract class DbDigestReader implements DigestReader {
                     }
                 }
 
-                for (DigestDBEntrySet result : results) {
+                for (DigestDbEntrySet result : results) {
                     if (result.getException() != null) {
                         exception = new DataAccessException(
                                 "error while reading from ID " + result.getStartId()
@@ -181,7 +181,7 @@ abstract class DbDigestReader implements DigestReader {
                 }
 
                 Collections.sort(results);
-                for (DigestDBEntrySet result : results) {
+                for (DigestDbEntrySet result : results) {
                     for (IdentifiedDbDigestEntry entry : result.getEntries()) {
                         try {
                             fixedSizedCerts.offer(entry, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);

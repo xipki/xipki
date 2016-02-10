@@ -75,7 +75,7 @@ public class CaAliasCheckCmd extends CaCommandSupport {
             throw new CmdFailure("alias '" + aliasName + "' is not configured");
         }
 
-        MgmtQAShellUtil.assertEquals("CA name", caName, localCaName);
+        MgmtQaShellUtil.assertEquals("CA name", caName, localCaName);
         out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
         return null;
     }

@@ -66,9 +66,9 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.pki.scep.exception.MessageDecodingException;
-import org.xipki.pki.scep.message.CACaps;
-import org.xipki.pki.scep.message.NextCAMessage;
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.message.CaCaps;
+import org.xipki.pki.scep.message.NextCaMessage;
+import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepConstants;
@@ -147,8 +147,8 @@ public class ScepServlet extends HttpServlet {
         OutputStream respStream = response.getOutputStream();
 
         try {
-            CACaps cACaps = responder.getCACaps();
-            if (post && !cACaps.containsCapability(CACapability.POSTPKIOperation)) {
+            CaCaps cACaps = responder.getCACaps();
+            if (post && !cACaps.containsCapability(CaCapability.POSTPKIOperation)) {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
 
@@ -209,7 +209,7 @@ public class ScepServlet extends HttpServlet {
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
                     return;
-                } catch (CAException e) {
+                } catch (CaException e) {
                     final String message = "system internal error";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(ScepUtil.buildExceptionLogFormat(message),
@@ -283,7 +283,7 @@ public class ScepServlet extends HttpServlet {
                 }
 
                 try {
-                    NextCAMessage nextCAMsg = new NextCAMessage();
+                    NextCaMessage nextCAMsg = new NextCaMessage();
                     nextCAMsg.setCaCert(
                             new X509CertificateObject(responder.getNextCAandRA().getCACert()));
                     if (responder.getNextCAandRA().getRACert() != null) {

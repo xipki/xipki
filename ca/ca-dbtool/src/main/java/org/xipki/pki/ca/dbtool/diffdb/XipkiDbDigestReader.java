@@ -46,11 +46,11 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
-import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
+import org.xipki.pki.ca.dbtool.diffdb.io.DigestDbEntrySet;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDbControl;
 
@@ -108,7 +108,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         public void run() {
             while (!stopMe.stopMe()) {
                 try {
-                    IDRange idRange = inQueue.take();
+                    IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException e) {
                 }
@@ -120,8 +120,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
         }
 
         private void query(
-                final IDRange idRange) {
-            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
+                final IdRange idRange) {
+            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
             try {

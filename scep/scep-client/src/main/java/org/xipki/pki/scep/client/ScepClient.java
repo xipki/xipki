@@ -52,8 +52,8 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 public class ScepClient extends Client {
 
     public ScepClient(
-            final CAIdentifier cAId,
-            final CACertValidator cACertValidator)
+            final CaIdentifier cAId,
+            final CaCertValidator cACertValidator)
     throws MalformedURLException {
         super(cAId, cACertValidator);
     }

@@ -37,7 +37,7 @@ package org.xipki.pki.ca.client.api;
 
 import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
@@ -48,7 +48,7 @@ public class CertIdOrError {
 
     private final CertId certId;
 
-    private final PKIStatusInfo error;
+    private final PkiStatusInfo error;
 
     public CertIdOrError(
             final CertId certId) {
@@ -59,7 +59,7 @@ public class CertIdOrError {
     }
 
     public CertIdOrError(
-            final PKIStatusInfo error) {
+            final PkiStatusInfo error) {
         ParamUtil.assertNotNull("error", error);
 
         this.certId = null;
@@ -70,7 +70,7 @@ public class CertIdOrError {
         return certId;
     }
 
-    public PKIStatusInfo getError() {
+    public PkiStatusInfo getError() {
         return error;
     }
 

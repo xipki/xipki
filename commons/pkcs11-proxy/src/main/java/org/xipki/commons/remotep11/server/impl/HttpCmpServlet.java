@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.SecurityFactory;
 
 /**
@@ -166,13 +166,13 @@ public class HttpCmpServlet extends HttpServlet {
 
     protected PKIMessage generatePKIMessage(
             final InputStream is)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
         try {
             return PKIMessage.getInstance(asn1Stream.readObject());
         } catch (IOException | IllegalArgumentException e) {
-            throw new BadASN1ObjectException("could not parse PKIMessage: " + e.getMessage(), e);
+            throw new BadAsn1ObjectException("could not parse PKIMessage: " + e.getMessage(), e);
         } finally {
             try {
                 asn1Stream.close();

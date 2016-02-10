@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.util.X509Util;
@@ -123,7 +123,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                             new File(baseDir + File.separator + FILENAME_OCSP_CERTSTORE));
             certstore = root.getValue();
         } catch (JAXBException e) {
-            throw XMLUtil.convert(e);
+            throw XmlUtil.convert(e);
         }
 
         if (certstore.getVersion() > VERSION) {

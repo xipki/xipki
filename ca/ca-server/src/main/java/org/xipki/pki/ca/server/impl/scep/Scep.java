@@ -84,23 +84,23 @@ import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.pki.ca.server.impl.CAManagerImpl;
+import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
-import org.xipki.pki.ca.server.impl.X509CA;
-import org.xipki.pki.ca.server.mgmt.api.CAMgmtException;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.impl.X509Ca;
+import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.exception.MessageEncodingException;
-import org.xipki.pki.scep.message.CACaps;
+import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.DecodedPkiMessage;
 import org.xipki.pki.scep.message.EnvelopedDataDecryptor;
 import org.xipki.pki.scep.message.EnvelopedDataDecryptorInstance;
 import org.xipki.pki.scep.message.IssuerAndSubject;
 import org.xipki.pki.scep.message.PkiMessage;
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.FailInfo;
 import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Nonce;
@@ -127,17 +127,17 @@ public class Scep {
 
     private final ScepControl control;
 
-    private final CAManagerImpl caManager;
+    private final CaManagerImpl caManager;
 
     private PrivateKey responderKey;
 
     private X509Certificate responderCert;
 
-    private CACertRespBytes cACertRespBytes;
+    private CaCertRespBytes cACertRespBytes;
 
     private X509CertificateHolder cACert;
 
-    private CACaps caCaps;
+    private CaCaps caCaps;
 
     private EnvelopedDataDecryptor envelopedDataDecryptor;
 
@@ -157,8 +157,8 @@ public class Scep {
 
     public Scep(
             final ScepEntry dbEntry,
-            final CAManagerImpl caManager)
-    throws CAMgmtException {
+            final CaManagerImpl caManager)
+    throws CaMgmtException {
         ParamUtil.assertNotNull("caManager", caManager);
         ParamUtil.assertNotNull("dbEntry", dbEntry);
 
@@ -168,7 +168,7 @@ public class Scep {
         try {
             this.control = new ScepControl(dbEntry.getControl());
         } catch (InvalidConfException e) {
-            throw new CAMgmtException(e);
+            throw new CaMgmtException(e);
         }
         LOG.info("SCEP {}: caCert.included={}, signerCert.included={}",
                 this.caName, this.control.isIncludeCACert(), this.control.isIncludeSignerCert());
@@ -185,10 +185,10 @@ public class Scep {
     }
 
     public void refreshCA()
-    throws CAMgmtException {
+    throws CaMgmtException {
         String type = dbEntry.getResponderType();
         if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
-            throw new CAMgmtException("unsupported SCEP responder type '" + type + "'");
+            throw new CaMgmtException("unsupported SCEP responder type '" + type + "'");
         }
 
         KeyCertPair privKeyAndCert;
@@ -197,7 +197,7 @@ public class Scep {
                     dbEntry.getResponderType(), dbEntry.getResponderConf(),
                     dbEntry.getCertificate());
         } catch (SignerException e) {
-            throw new CAMgmtException(e);
+            throw new CaMgmtException(e);
         }
 
         this.responderKey = privKeyAndCert.getPrivateKey();
@@ -209,28 +209,28 @@ public class Scep {
         }
 
         // CACaps
-        CACaps caps = new CACaps();
-        caps.addCapability(CACapability.AES);
-        caps.addCapability(CACapability.DES3);
-        caps.addCapability(CACapability.POSTPKIOperation);
-        caps.addCapability(CACapability.Renewal);
-        caps.addCapability(CACapability.SHA1);
-        caps.addCapability(CACapability.SHA256);
-        caps.addCapability(CACapability.SHA512);
+        CaCaps caps = new CaCaps();
+        caps.addCapability(CaCapability.AES);
+        caps.addCapability(CaCapability.DES3);
+        caps.addCapability(CaCapability.POSTPKIOperation);
+        caps.addCapability(CaCapability.Renewal);
+        caps.addCapability(CaCapability.SHA1);
+        caps.addCapability(CaCapability.SHA256);
+        caps.addCapability(CaCapability.SHA512);
         this.caCaps = caps;
 
-        X509CA ca = caManager.getX509CA(caName);
+        X509Ca ca = caManager.getX509CA(caName);
         try {
             this.cACert = new X509CertificateHolder(
                     ca.getCAInfo().getCertificate().getEncodedCert());
-            this.cACertRespBytes = new CACertRespBytes(
+            this.cACertRespBytes = new CaCertRespBytes(
                     ca.getCAInfo().getCertificate().getCert(), responderCert);
         } catch (CertificateException e) {
-            throw new CAMgmtException(e);
+            throw new CaMgmtException(e);
         } catch (CMSException e) {
-            throw new CAMgmtException(e);
+            throw new CaMgmtException(e);
         } catch (IOException e) {
-            throw new CAMgmtException(e);
+            throw new CaMgmtException(e);
         }
 
         EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
@@ -246,28 +246,28 @@ public class Scep {
         return dbEntry;
     }
 
-    public CACaps getCaCaps() {
+    public CaCaps getCaCaps() {
         return caCaps;
     }
 
     public void setCaCaps(
-            final CACaps caCaps) {
+            final CaCaps caCaps) {
         ParamUtil.assertNotNull("caCaps", caCaps);
         this.caCaps = caCaps;
     }
 
-    public CACertRespBytes getCACertResp() {
+    public CaCertRespBytes getCACertResp() {
         return cACertRespBytes;
     }
 
     public boolean supportsCertProfile(
             final String profileName)
-    throws CAMgmtException {
+    throws CaMgmtException {
         return caManager.getX509CA(caName).supportsCertProfile(profileName);
     }
 
-    public CAStatus getStatus()
-    throws CAMgmtException {
+    public CaStatus getStatus()
+    throws CaMgmtException {
         return caManager.getX509CA(caName).getCAInfo().getStatus();
     }
 
@@ -365,15 +365,15 @@ public class Scep {
         } else {
             boolean supported = false;
             if (hashAlgoType == HashAlgoType.SHA1) {
-                if (caCaps.containsCapability(CACapability.SHA1)) {
+                if (caCaps.containsCapability(CaCapability.SHA1)) {
                     supported = true;
                 }
             } else if (hashAlgoType == HashAlgoType.SHA256) {
-                if (caCaps.containsCapability(CACapability.SHA256)) {
+                if (caCaps.containsCapability(CaCapability.SHA256)) {
                     supported = true;
                 }
             } else if (hashAlgoType == HashAlgoType.SHA512) {
-                if (caCaps.containsCapability(CACapability.SHA512)) {
+                if (caCaps.containsCapability(CaCapability.SHA512)) {
                     supported = true;
                 }
             }
@@ -388,13 +388,13 @@ public class Scep {
         // check the content encryption algorithm
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
-            if (!caCaps.containsCapability(CACapability.DES3)) {
+            if (!caCaps.containsCapability(CaCapability.DES3)) {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
         } else if (AES_ENC_ALGOS.contains(encOid)) {
-            if (!caCaps.containsCapability(CACapability.AES)) {
+            if (!caCaps.containsCapability(CaCapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
@@ -409,10 +409,10 @@ public class Scep {
             return rep;
         }
 
-        X509CA ca;
+        X509Ca ca;
         try {
             ca = caManager.getX509CA(caName);
-        } catch (CAMgmtException e) {
+        } catch (CaMgmtException e) {
             final String message = tid + "=" + tid + ",could not get X509CA";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
@@ -599,7 +599,7 @@ public class Scep {
     } // method doServicePkiOperation
 
     private SignedData getCert(
-            final X509CA ca,
+            final X509Ca ca,
             final BigInteger serialNumber)
     throws FailInfoException, OperationException {
         X509Certificate cert;
@@ -622,7 +622,7 @@ public class Scep {
     } // method getCert
 
     private SignedData pollCert(
-            final X509CA ca,
+            final X509Ca ca,
             final X500Name subject,
             final TransactionId tid)
     throws FailInfoException, OperationException {
@@ -670,7 +670,7 @@ public class Scep {
     } // method buildSignedData
 
     private SignedData getCRL(
-            final X509CA ca,
+            final X509Ca ca,
             final BigInteger serialNumber)
     throws FailInfoException, OperationException {
         CertificateList crl = ca.getCurrentCRL();
@@ -726,7 +726,7 @@ public class Scep {
     } // method encodeResponse
 
     private static void checkCN(
-            final X509CA ca,
+            final X509Ca ca,
             final String user,
             final String cn)
     throws OperationException {

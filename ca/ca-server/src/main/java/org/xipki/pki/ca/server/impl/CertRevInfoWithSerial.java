@@ -38,7 +38,7 @@ package org.xipki.pki.ca.server.impl;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
 
 /**
@@ -54,7 +54,7 @@ public class CertRevInfoWithSerial extends CertRevocationInfo {
 
     public CertRevInfoWithSerial(
             final BigInteger serial,
-            final CRLReason reason,
+            final CrlReason reason,
             final Date revocationTime,
             final Date invalidityTime) {
         super(reason, revocationTime, invalidityTime);

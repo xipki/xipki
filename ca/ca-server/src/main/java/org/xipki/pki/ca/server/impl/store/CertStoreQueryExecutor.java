@@ -76,7 +76,7 @@ import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.datasource.api.springframework.dao.DataIntegrityViolationException;
 import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyException;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.FpIdCalculator;
 import org.xipki.commons.security.api.HashCalculator;
@@ -654,9 +654,9 @@ class CertStoreQueryExecutor {
 
         CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
         if (currentRevInfo != null) {
-            CRLReason currentReason = currentRevInfo.getReason();
-            if (currentReason == CRLReason.CERTIFICATE_HOLD) {
-                if (revInfo.getReason() == CRLReason.CERTIFICATE_HOLD) {
+            CrlReason currentReason = currentRevInfo.getReason();
+            if (currentReason == CrlReason.CERTIFICATE_HOLD) {
+                if (revInfo.getReason() == CrlReason.CERTIFICATE_HOLD) {
                     throw new OperationException(ErrorCode.CERT_REVOKED,
                             "certificate already issued with the requested reason "
                             + currentReason.getDescription());
@@ -732,9 +732,9 @@ class CertStoreQueryExecutor {
                     "certificate is not revoked");
         }
 
-        CRLReason currentReason = currentRevInfo.getReason();
+        CrlReason currentReason = currentRevInfo.getReason();
         if (!force) {
-            if (currentReason != CRLReason.CERTIFICATE_HOLD) {
+            if (currentReason != CrlReason.CERTIFICATE_HOLD) {
                 throw new OperationException(ErrorCode.NOT_PERMITTED,
                         "could not unrevoke certificate revoked with reason "
                         + currentReason.getDescription());
@@ -1196,7 +1196,7 @@ class CertStoreQueryExecutor {
             }
 
             int revReasonCode = rs.getInt("RR");
-            CRLReason revReason = CRLReason.forReasonCode(revReasonCode);
+            CrlReason revReason = CrlReason.forReasonCode(revReasonCode);
             long revTime = rs.getLong("RT");
             long localInvalidityTime = rs.getLong("RIT");
 
@@ -1305,7 +1305,7 @@ class CertStoreQueryExecutor {
                 Date invalidityTime = (revInvalidityTime == 0)
                         ? null
                         : new Date(1000 * revInvalidityTime);
-                revInfo = new CertRevocationInfo(CRLReason.forReasonCode(revReason),
+                revInfo = new CertRevocationInfo(CrlReason.forReasonCode(revReason),
                         new Date(1000 * revTime),
                         invalidityTime);
             }
@@ -1373,7 +1373,7 @@ class CertStoreQueryExecutor {
             }
 
             int revReasonCode = rs.getInt("RR");
-            CRLReason revReason = CRLReason.forReasonCode(revReasonCode);
+            CrlReason revReason = CrlReason.forReasonCode(revReasonCode);
             long revTime = rs.getLong("RT");
             long localInvalidityTime = rs.getLong("RIT");
 
@@ -1713,7 +1713,7 @@ class CertStoreQueryExecutor {
                 } else {
                     long lastUpdate = rs.getLong("LUPDATE");
                     revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
-                            CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+                            CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);
             } catch (SQLException e) {

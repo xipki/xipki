@@ -48,11 +48,11 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
-import org.xipki.pki.ca.dbtool.diffdb.io.DigestDBEntrySet;
-import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCACertExtractor;
+import org.xipki.pki.ca.dbtool.diffdb.io.DigestDbEntrySet;
+import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCaCertExtractor;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
 
 /**
@@ -129,7 +129,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         public void run() {
             while (!stopMe.stopMe()) {
                 try {
-                    IDRange idRange = inQueue.take();
+                    IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException e) {
                 }
@@ -144,8 +144,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
         @SuppressWarnings("resource")
         private void query(
-                final IDRange idRange) {
-            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
+                final IdRange idRange) {
+            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
             try {
@@ -268,7 +268,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             String caData = rs.getString("data");
             rs.close();
 
-            caCert = EjbcaCACertExtractor.extractCACert(caData);
+            caCert = EjbcaCaCertExtractor.extractCACert(caData);
             // account
             if (dbContainsOtherCA) {
                 // ignore it due to performance

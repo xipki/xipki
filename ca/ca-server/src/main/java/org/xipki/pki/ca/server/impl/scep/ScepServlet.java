@@ -64,8 +64,8 @@ import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.pki.ca.api.OperationException;
-import org.xipki.pki.ca.server.impl.CAManagerImpl;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.impl.CaManagerImpl;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.util.ScepConstants;
@@ -91,7 +91,7 @@ public class ScepServlet extends HttpServlet {
 
     private AuditServiceRegister auditServiceRegister;
 
-    private CAManagerImpl responderManager;
+    private CaManagerImpl responderManager;
 
     public ScepServlet() {
     }
@@ -174,7 +174,7 @@ public class ScepServlet extends HttpServlet {
                 scepName = realScepName;
             }
             Scep responder = responderManager.getScep(scepName);
-            if (responder == null || responder.getStatus() != CAStatus.ACTIVE
+            if (responder == null || responder.getStatus() != CaStatus.ACTIVE
                     || !responder.supportsCertProfile(certProfileName)) {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -328,7 +328,7 @@ public class ScepServlet extends HttpServlet {
     } // method generatePKIMessage
 
     public void setResponderManager(
-            final CAManagerImpl responderManager) {
+            final CaManagerImpl responderManager) {
         this.responderManager = responderManager;
     }
 

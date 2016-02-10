@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
 
 /**
  * @author Lijun Liao
@@ -63,7 +63,7 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509CAEntry caEntry = getCAEntry();
+        X509CaEntry caEntry = getCAEntry();
         if (certFile != null) {
             X509Certificate caCert = X509Util.parseCert(certFile);
             caEntry.setCertificate(caCert);

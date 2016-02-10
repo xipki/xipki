@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
@@ -71,10 +71,10 @@ public class CaRequestorInfoCmd extends CaCommandSupport {
 
         StringBuilder sb = new StringBuilder();
 
-        Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
         if (isNotEmpty(entries)) {
             sb.append("requestors trusted by CA " + caName).append("\n");
-            for (CAHasRequestorEntry entry    : entries) {
+            for (CaHasRequestorEntry entry    : entries) {
                 sb.append("\t").append(entry).append("\n");
             }
         } else {

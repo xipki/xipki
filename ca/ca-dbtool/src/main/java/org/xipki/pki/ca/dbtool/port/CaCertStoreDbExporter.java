@@ -67,7 +67,7 @@ import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.dbtool.InvalidInputException;
@@ -165,7 +165,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 root = (JAXBElement<CertStoreType>)
                     unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CERTSTORE));
             } catch (JAXBException e) {
-                throw XMLUtil.convert(e);
+                throw XmlUtil.convert(e);
             }
 
             certstore = root.getValue();
@@ -199,7 +199,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 marshaller.marshal(root,
                         new File(baseDir + File.separator + FILENAME_CA_CERTSTORE));
             } catch (JAXBException e) {
-                throw XMLUtil.convert(e);
+                throw XmlUtil.convert(e);
             }
         } catch (Exception e) {
             System.err.println("error while exporting CA certstore from database");

@@ -63,14 +63,14 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.XipkiCmpConstants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.remote.KeyIdentifier;
-import org.xipki.commons.security.api.p11.remote.PSOTemplate;
+import org.xipki.commons.security.api.p11.remote.PsoTemplate;
 import org.xipki.commons.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
 
@@ -186,7 +186,7 @@ class CmpResponder {
                 P11SlotIdentifier slot = null;
                 P11KeyIdentifier keyId = null;
                 try {
-                    PSOTemplate psoTemplate = PSOTemplate.getInstance(reqValue);
+                    PsoTemplate psoTemplate = PsoTemplate.getInstance(reqValue);
                     psoMessage = psoTemplate.getMessage();
                     SlotAndKeyIdentifer slotAndKeyIdentifier =
                             psoTemplate.getSlotAndKeyIdentifer();
@@ -282,7 +282,7 @@ class CmpResponder {
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);
-        } catch (BadASN1ObjectException e) {
+        } catch (BadAsn1ObjectException e) {
             return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
                     e.getMessage());
         } catch (Throwable t) {

@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xipki.commons.common.InvalidConfException;
-import org.xipki.pki.ocsp.api.OCSPMode;
+import org.xipki.pki.ocsp.api.OcspMode;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 
 /**
@@ -50,7 +50,7 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 
 class ResponderOption {
 
-    private final OCSPMode mode;
+    private final OcspMode mode;
 
     private final boolean inheritCaRevocation;
 
@@ -73,9 +73,9 @@ class ResponderOption {
     throws InvalidConfException {
         String s = conf.getMode();
         if (s == null || "RFC6960".equalsIgnoreCase(s)) {
-            this.mode = OCSPMode.RFC6960;
+            this.mode = OcspMode.RFC6960;
         } else if ("RFC2560".equalsIgnoreCase(s)) {
-            this.mode = OCSPMode.RFC2560;
+            this.mode = OcspMode.RFC2560;
         } else {
             throw new InvalidConfException("invalid OCSP mode '" + s + "'");
         }
@@ -110,7 +110,7 @@ class ResponderOption {
         }
     } // constructor
 
-    public OCSPMode getMode() {
+    public OcspMode getMode() {
         return mode;
     }
 

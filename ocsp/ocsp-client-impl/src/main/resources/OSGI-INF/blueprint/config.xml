@@ -10,11 +10,11 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
-  <bean id="ocspRequestor" class="org.xipki.pki.ocsp.client.impl.DefaultHttpOCSPRequestor">
+  <bean id="ocspRequestor" class="org.xipki.pki.ocsp.client.impl.DefaultHttpOcspRequestor">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="signerType" value="${signer.type}"/>
     <property name="signerConf" value="${signer.conf}"/>
     <property name="signerCertFile" value="${signer.cert}"/>
   </bean>
-  <service ref="ocspRequestor" interface="org.xipki.pki.ocsp.client.api.OCSPRequestor"/>
+  <service ref="ocspRequestor" interface="org.xipki.pki.ocsp.client.api.OcspRequestor"/>
 </blueprint>

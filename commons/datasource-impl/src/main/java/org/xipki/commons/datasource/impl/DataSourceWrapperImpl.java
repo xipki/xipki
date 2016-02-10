@@ -64,7 +64,7 @@ import org.xipki.commons.datasource.api.springframework.dao.TransientDataAccessR
 import org.xipki.commons.datasource.api.springframework.jdbc.BadSqlGrammarException;
 import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyException;
 import org.xipki.commons.datasource.api.springframework.jdbc.InvalidResultSetAccessException;
-import org.xipki.commons.datasource.api.springframework.jdbc.UncategorizedSQLException;
+import org.xipki.commons.datasource.api.springframework.jdbc.UncategorizedSqlException;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -666,9 +666,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     private final ConcurrentHashMap<String, Long> lastUsedSeqValues
             = new ConcurrentHashMap<String, Long>();
 
-    private final SQLErrorCodes sqlErrorCodes;
+    private final SqlErrorCodes sqlErrorCodes;
 
-    private final SQLStateCodes sqlStateCodes;
+    private final SqlStateCodes sqlStateCodes;
 
     private DataSourceWrapperImpl(
             final String name,
@@ -677,8 +677,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         ParamUtil.assertNotNull("service", service);
         this.name = name;
         this.service = service;
-        this.sqlErrorCodes = SQLErrorCodes.newInstance(dbType);
-        this.sqlStateCodes = SQLStateCodes.newInstance(dbType);
+        this.sqlErrorCodes = SqlErrorCodes.newInstance(dbType);
+        this.sqlStateCodes = SqlStateCodes.newInstance(dbType);
     }
 
     @Override
@@ -1539,7 +1539,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             LOG.debug("Unable to translate SQLException with " + codes);
         }
 
-        return new UncategorizedSQLException(buildMessage(localSql, sqlEx), sqlEx);
+        return new UncategorizedSqlException(buildMessage(localSql, sqlEx), sqlEx);
     } // method translate
 
     private void logTranslation(

@@ -45,7 +45,7 @@ import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.client.api.CAClient;
+import org.xipki.pki.ca.client.api.CaClient;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ import org.xipki.pki.ca.client.api.CAClient;
 public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
     @Reference
-    protected CAClient caClient;
+    protected CaClient caClient;
 
     @Option(name = "--req-out",
             description = "where to save the request")

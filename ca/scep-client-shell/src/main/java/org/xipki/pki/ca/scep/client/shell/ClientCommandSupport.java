@@ -48,9 +48,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.scep.client.CACertValidator;
-import org.xipki.pki.scep.client.CAIdentifier;
-import org.xipki.pki.scep.client.PreprovisionedCACertValidator;
+import org.xipki.pki.scep.client.CaCertValidator;
+import org.xipki.pki.scep.client.CaIdentifier;
+import org.xipki.pki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.pki.scep.client.ScepClient;
 
 /**
@@ -96,8 +96,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     throws CertificateException, IOException {
         if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
-            CAIdentifier localCaId = new CAIdentifier(url, caId);
-            CACertValidator cACertValidator = new PreprovisionedCACertValidator(caCert);
+            CaIdentifier localCaId = new CaIdentifier(url, caId);
+            CaCertValidator cACertValidator = new PreprovisionedCaCertValidator(caCert);
             scepClient = new ScepClient(localCaId, cACertValidator);
         }
         return scepClient;

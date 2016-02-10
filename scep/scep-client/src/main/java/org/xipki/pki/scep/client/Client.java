@@ -68,12 +68,12 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.message.AuthorityCertStore;
-import org.xipki.pki.scep.message.CACaps;
-import org.xipki.pki.scep.message.DecodedNextCAMessage;
+import org.xipki.pki.scep.message.CaCaps;
+import org.xipki.pki.scep.message.DecodedNextCaMessage;
 import org.xipki.pki.scep.message.DecodedPkiMessage;
 import org.xipki.pki.scep.message.IssuerAndSubject;
 import org.xipki.pki.scep.message.PkiMessage;
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.transaction.TransactionId;
@@ -93,11 +93,11 @@ public abstract class Client {
     // 5 minutes
     public static final long DEFAULT_SIGNINGTIME_BIAS = 5L * 60 * 1000;
 
-    protected final CAIdentifier cAId;
+    protected final CaIdentifier cAId;
 
-    protected CACaps cACaps;
+    protected CaCaps cACaps;
 
-    private final CACertValidator cACertValidator;
+    private final CaCertValidator cACertValidator;
 
     private long maxSigningTimeBiasInMs = DEFAULT_SIGNINGTIME_BIAS;
 
@@ -110,8 +110,8 @@ public abstract class Client {
     private boolean useInsecureAlgorithms;
 
     public Client(
-            final CAIdentifier cAId,
-            final CACertValidator cACertValidator)
+            final CaIdentifier cAId,
+            final CaCertValidator cACertValidator)
     throws MalformedURLException {
         ParamUtil.assertNotNull("cAId", cAId);
         ParamUtil.assertNotNull("cACertValidator", cACertValidator);
@@ -179,7 +179,7 @@ public abstract class Client {
             String url = cAId.buildGetUrl(operation, cAId.getProfile());
             return httpGET(url);
         } else {
-            if (!httpGetOnly && cACaps.containsCapability(CACapability.POSTPKIOperation)) {
+            if (!httpGetOnly && cACaps.containsCapability(CaCapability.POSTPKIOperation)) {
                 String url = cAId.buildPostUrl(operation);
                 return httpPOST(url, REQ_CONTENT_TYPE, request);
             } else {
@@ -207,7 +207,7 @@ public abstract class Client {
     throws ScepClientException {
         // getCACaps
         ScepHttpResponse getCACapsResp = httpSend(Operation.GetCACaps);
-        this.cACaps = CACaps.getInstance(new String(getCACapsResp.getContentBytes()));
+        this.cACaps = CaCaps.getInstance(new String(getCACapsResp.getContentBytes()));
 
         // getCACert
         ScepHttpResponse getCACertResp = httpSend(Operation.GetCACert);
@@ -226,19 +226,19 @@ public abstract class Client {
                 Arrays.asList(certHolder));
     }
 
-    public CACaps getCACaps()
+    public CaCaps getCACaps()
     throws ScepClientException {
         initIfNotInited();
         return cACaps;
     }
 
-    public CAIdentifier getCAId()
+    public CaIdentifier getCAId()
     throws ScepClientException {
         initIfNotInited();
         return cAId;
     }
 
-    public CACertValidator getCACertValidator()
+    public CaCertValidator getCACertValidator()
     throws ScepClientException {
         initIfNotInited();
         return cACertValidator;
@@ -377,11 +377,11 @@ public abstract class Client {
         if (!ScepUtil.isSelfSigned(identityCert)) {
             X509Certificate cACert = authorityCertStore.getCACert();
             if (identityCert.getIssuerX500Principal().equals(cACert.getSubjectX500Principal())) {
-                if (cACaps.containsCapability(CACapability.Renewal)) {
+                if (cACaps.containsCapability(CaCapability.Renewal)) {
                     return scepRenewalReq(csr, identityKey, identityCert);
                 }
             } else {
-                if (cACaps.containsCapability(CACapability.Update)) {
+                if (cACaps.containsCapability(CaCapability.Update)) {
                     return scepUpdateReq(csr, identityKey, identityCert);
                 }
             }
@@ -416,7 +416,7 @@ public abstract class Client {
     throws ScepClientException {
         initIfNotInited();
 
-        if (!cACaps.containsCapability(CACapability.Renewal)) {
+        if (!cACaps.containsCapability(CaCapability.Renewal)) {
             throw new OperationNotSupportedException(
                     "unsupported messageType '" + MessageType.RenewalReq + "'");
         }
@@ -435,7 +435,7 @@ public abstract class Client {
     throws ScepClientException {
         initIfNotInited();
 
-        if (!cACaps.containsCapability(CACapability.Update)) {
+        if (!cACaps.containsCapability(CaCapability.Update)) {
             throw new OperationNotSupportedException(
                     "unsupported messageType '" + MessageType.UpdateReq + "'");
         }
@@ -476,7 +476,7 @@ public abstract class Client {
     throws ScepClientException {
         initIfNotInited();
 
-        if (!this.cACaps.containsCapability(CACapability.GetNextCACert)) {
+        if (!this.cACaps.containsCapability(CaCapability.GetNextCACert)) {
             throw new OperationNotSupportedException(
                     "unsupported operation '" + Operation.GetNextCACert.getCode() + "'");
         }
@@ -497,9 +497,9 @@ public abstract class Client {
         }
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, hashAlgo);
         ASN1ObjectIdentifier encAlgId;
-        if (cACaps.containsCapability(CACapability.AES)) {
+        if (cACaps.containsCapability(CaCapability.AES)) {
             encAlgId = CMSAlgorithm.AES128_CBC;
-        } else if (cACaps.containsCapability(CACapability.DES3)) {
+        } else if (cACaps.containsCapability(CaCapability.DES3)) {
             encAlgId = CMSAlgorithm.DES_EDE3_CBC;
         } else if (useInsecureAlgorithms) {
             encAlgId = CMSAlgorithm.DES_CBC;
@@ -541,9 +541,9 @@ public abstract class Client {
             throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
         }
 
-        DecodedNextCAMessage resp;
+        DecodedNextCaMessage resp;
         try {
-            resp = DecodedNextCAMessage.decode(cmsSignedData, responseSignerCerts);
+            resp = DecodedNextCaMessage.decode(cmsSignedData, responseSignerCerts);
         } catch (MessageDecodingException e) {
             throw new ScepClientException("could not decode response: " + e.getMessage(), e);
         }
@@ -639,8 +639,8 @@ public abstract class Client {
     } // method decode
 
     private boolean isGutmannScep() {
-        return cACaps.containsCapability(CACapability.AES)
-                || cACaps.containsCapability(CACapability.Update);
+        return cACaps.containsCapability(CaCapability.AES)
+                || cACaps.containsCapability(CaCapability.Update);
     }
 
     private static X509Certificate parseCert(
@@ -667,7 +667,7 @@ public abstract class Client {
 
     private static AuthorityCertStore retrieveCACertStore(
             final ScepHttpResponse resp,
-            final CACertValidator cAValidator)
+            final CaCertValidator cAValidator)
     throws ScepClientException {
         String ct = resp.getContentType();
 
