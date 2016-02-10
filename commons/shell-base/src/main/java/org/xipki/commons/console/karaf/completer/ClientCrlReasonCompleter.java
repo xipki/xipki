@@ -33,48 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
+package org.xipki.commons.console.karaf.completer;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
+import org.xipki.commons.security.api.CrlReason;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+@Service
+public class ClientCrlReasonCompleter extends AbstractEnumCompleter {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+    public ClientCrlReasonCompleter() {
+        StringBuilder enums = new StringBuilder();
 
-    private final CaCertValidator delegate;
-
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
-    }
-
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
+        for (CrlReason reason : CrlReason.PERMITTED_CLIENT_CRLREASONS) {
+            enums.append(reason.getDescription()).append(",");
         }
-
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
-        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
 
 }

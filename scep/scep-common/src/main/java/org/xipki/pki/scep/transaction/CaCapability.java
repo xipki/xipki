@@ -33,48 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
-
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.xipki.pki.scep.crypto.HashAlgoType;
+package org.xipki.pki.scep.transaction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+public enum CaCapability {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+    AES ("AES"),
+    DES3 ("DES3"),
+    GetNextCACert ("GetNextCACert"),
+    POSTPKIOperation ("POSTPKIOperation"),
+    Renewal ("Renewal"),
+    SHA1 ("SHA-1"),
+    SHA256 ("SHA-256"),
+    SHA512 ("SHA-512"),
+    Update ("Update");
 
-    private final CaCertValidator delegate;
+    private String text;
 
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+    CaCapability(
+            final String text) {
+        this.text = text;
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
+    public String getText() {
+        return text;
+    }
 
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
+    public static CaCapability valueForText(
+            final String text) {
+        for (CaCapability m : values()) {
+            if (m.text.equalsIgnoreCase(text)) {
+                return m;
+            }
         }
+        return null;
     }
 
 }

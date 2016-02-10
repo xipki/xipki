@@ -33,48 +33,24 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
+package org.xipki.pki.scep.client.test;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+public class DESOnlyCaTest extends AbstractCaTest {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
-
-    private final CaCertValidator delegate;
-
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+    protected boolean useInsecureAlgorithms() {
+        return true;
     }
 
     @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
-
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
-        }
+    protected CaCapability[] getExcludedCACaps() {
+        return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
     }
 
 }

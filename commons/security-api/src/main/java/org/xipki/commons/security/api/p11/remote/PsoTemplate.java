@@ -41,15 +41,16 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 /**
  *
  * <pre>
- * SlotAndKeyIdentifer ::= SEQUENCE {
- *     slotIdentifier     SlotIdentifier,
- *     keyIdentifier    KeyIdentifier
+ * PSOTemplate ::= SEQUENCE {
+ *     slotAndKeyIdentifier     SlotAndKeyIdentifer
+ *     message                OCTET STRING,
  *     }
  * </pre>
  *
@@ -57,81 +58,81 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
  * @since 2.0.0
  */
 
-public class SlotAndKeyIdentifer extends ASN1Object {
+public class PsoTemplate extends ASN1Object {
 
-    private SlotIdentifier slotIdentifier;
+    private SlotAndKeyIdentifer slotAndKeyIdentifier;
 
-    private KeyIdentifier keyIdentifier;
+    private byte[] message;
 
-    public SlotAndKeyIdentifer(
-            final SlotIdentifier slotIdentifier,
-            final KeyIdentifier keyIdentifier) {
-        if (slotIdentifier == null) {
-            throw new IllegalArgumentException("slotIdentifier could not be null");
-        }
-
-        if (keyIdentifier == null) {
-            throw new IllegalArgumentException("keyIdentifier could not be null");
-        }
-
-        this.slotIdentifier = slotIdentifier;
-        this.keyIdentifier = keyIdentifier;
-    }
-
-    private SlotAndKeyIdentifer(
+    private PsoTemplate(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         final int n = seq.size();
         if (n != 2) {
             StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence 'SlotAndKeyIdentifier'");
+            sb.append("wrong number of elements in sequence 'PSOTemplate'");
             sb.append(", is '").append(n).append("'");
             sb.append(", but expected '").append(2).append("'");
             throw new BadAsn1ObjectException(sb.toString());
         }
 
-        this.slotIdentifier = SlotIdentifier.getInstance(seq.getObjectAt(0));
-        this.keyIdentifier = KeyIdentifier.getInstance(seq.getObjectAt(1));
+        this.slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(seq.getObjectAt(0));
+        DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(
+                seq.getObjectAt(1));
+        this.message = octetString.getOctets();
     }
 
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotIdentifier.toASN1Primitive());
-        vector.add(keyIdentifier.toASN1Primitive());
-        return new DERSequence(vector);
+    public PsoTemplate(
+            final SlotAndKeyIdentifer slotAndKeyIdentifier,
+            final byte[] message) {
+        if (slotAndKeyIdentifier == null) {
+            throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
+        }
+        if (message == null) {
+            throw new IllegalArgumentException("message could not be null");
+        }
+
+        this.slotAndKeyIdentifier = slotAndKeyIdentifier;
+        this.message = message;
     }
 
-    public SlotIdentifier getSlotIdentifier() {
-        return slotIdentifier;
-    }
-
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
-    }
-
-    public static SlotAndKeyIdentifer getInstance(
+    public static PsoTemplate getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof SlotAndKeyIdentifer) {
-            return (SlotAndKeyIdentifer) obj;
+        if (obj == null || obj instanceof PsoTemplate) {
+            return (PsoTemplate) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new SlotAndKeyIdentifer((ASN1Sequence) obj);
+                return new PsoTemplate((ASN1Sequence) obj);
             }
 
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException e) {
-            throw new BadAsn1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
+            throw new BadAsn1ObjectException("unable to parse encoded PSOTemplate");
         }
 
-        throw new BadAsn1ObjectException(
-                "unknown object in SlotAndKeyIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in PSOTemplate.getInstance(): "
                 + obj.getClass().getName());
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(slotAndKeyIdentifier.toASN1Primitive());
+        vector.add(new DEROctetString(message));
+        return new DERSequence(vector);
+    }
+
+    public byte[] getMessage() {
+        return message;
+    }
+
+    public SlotAndKeyIdentifer getSlotAndKeyIdentifer() {
+        return slotAndKeyIdentifier;
     }
 
 }

@@ -45,7 +45,7 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
  * @since 2.0.0
  */
 
-public abstract class FingerprintCertificateValidator implements CACertValidator {
+public abstract class FingerprintCertificateValidator implements CaCertValidator {
 
     private static final HashAlgoType DEFAULT_HASHALGO = HashAlgoType.SHA256;
 

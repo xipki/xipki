@@ -33,48 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
-
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.xipki.pki.scep.crypto.HashAlgoType;
+package org.xipki.pki.scep.serveremulator;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+public class CaException extends Exception {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+    private static final long serialVersionUID = 1L;
 
-    private final CaCertValidator delegate;
-
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+    public CaException() {
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
+    public CaException(
+            final String message) {
+        super(message);
+    }
 
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
-        }
+    public CaException(
+            final Throwable cause) {
+        super(cause);
+    }
+
+    public CaException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
     }
 
 }

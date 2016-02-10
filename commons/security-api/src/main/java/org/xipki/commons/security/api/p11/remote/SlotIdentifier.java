@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
@@ -78,10 +78,10 @@ public class SlotIdentifier extends ASN1Object {
 
     private SlotIdentifier(
             final ASN1Sequence seq)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         int size = seq.size();
         if (size < 1) {
-            throw new BadASN1ObjectException("wrong number of elements in sequence");
+            throw new BadAsn1ObjectException("wrong number of elements in sequence");
         }
 
         try {
@@ -108,13 +108,13 @@ public class SlotIdentifier extends ASN1Object {
                     ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
                     localSlotId = i.getPositiveValue().longValue();
                 } else {
-                    throw new BadASN1ObjectException("unknown tag " + tagNo);
+                    throw new BadAsn1ObjectException("unknown tag " + tagNo);
                 }
             }
 
             this.slotId = new P11SlotIdentifier(slotIndex, localSlotId);
         } catch (IllegalArgumentException e) {
-            throw new BadASN1ObjectException(e.getMessage(), e);
+            throw new BadAsn1ObjectException(e.getMessage(), e);
         }
     } // constructor
 
@@ -140,7 +140,7 @@ public class SlotIdentifier extends ASN1Object {
 
     public static SlotIdentifier getInstance(
             final Object obj)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (obj == null || obj instanceof SlotIdentifier) {
             return (SlotIdentifier) obj;
         }
@@ -154,10 +154,10 @@ public class SlotIdentifier extends ASN1Object {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException e) {
-            throw new BadASN1ObjectException("unable to parse encoded SlotIdentifier");
+            throw new BadAsn1ObjectException("unable to parse encoded SlotIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in SlotIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in SlotIdentifier.getInstance(): "
                 + obj.getClass().getName());
     }
 

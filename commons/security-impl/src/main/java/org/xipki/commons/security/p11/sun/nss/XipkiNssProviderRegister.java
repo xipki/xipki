@@ -33,47 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
+package org.xipki.commons.security.p11.sun.nss;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
+import java.security.Security;
 
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+public class XipkiNssProviderRegister {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiNssProviderRegister.class);
 
-    private final CaCertValidator delegate;
-
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+    public void regist() {
+        if (Security.getProvider(XipkiNssProvider.PROVIDER_NAME) == null) {
+            try {
+                XipkiNssProvider provider = new XipkiNssProvider();
+                Security.addProvider(provider);
+            } catch (Throwable t) {
+                final String message = "could not add provider " + XipkiNssProvider.PROVIDER_NAME;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
+                }
+                LOG.debug(message, t);
+            }
+        }
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
-
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
+    public void unregist() {
+        if (Security.getProperty(XipkiNssProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(XipkiNssProvider.PROVIDER_NAME);
         }
     }
 

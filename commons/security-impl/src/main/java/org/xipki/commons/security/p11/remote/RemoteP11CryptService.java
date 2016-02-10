@@ -77,7 +77,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.XipkiCmpConstants;
@@ -86,7 +86,7 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.remote.KeyIdentifier;
-import org.xipki.commons.security.api.p11.remote.PSOTemplate;
+import org.xipki.commons.security.api.p11.remote.PsoTemplate;
 import org.xipki.commons.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
 import org.xipki.commons.security.api.util.SecurityUtil;
@@ -248,11 +248,11 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        PSOTemplate psoTemplate;
+        PsoTemplate psoTemplate;
         try {
             SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-            psoTemplate = new PSOTemplate(slotAndKeyIdentifier, message);
-        } catch (BadASN1ObjectException e) {
+            psoTemplate = new PsoTemplate(slotAndKeyIdentifier, message);
+        } catch (BadAsn1ObjectException e) {
             throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
         }
 
@@ -278,7 +278,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         SlotAndKeyIdentifer slotAndKeyIdentifier;
         try {
             slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-        } catch (BadASN1ObjectException e) {
+        } catch (BadAsn1ObjectException e) {
             throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
         }
 
@@ -299,7 +299,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         SlotIdentifier slotIdentifier = new SlotIdentifier(slotId);
         KeyIdentifier keyIdentifier = new KeyIdentifier(keyId);
         return new SlotAndKeyIdentifer(slotIdentifier, keyIdentifier);

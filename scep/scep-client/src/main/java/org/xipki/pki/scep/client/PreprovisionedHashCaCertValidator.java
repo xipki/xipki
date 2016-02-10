@@ -37,44 +37,62 @@ package org.xipki.pki.scep.client;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CaCertValidator {
+public final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
-    private final ConcurrentHashMap<String, Boolean> cachedAnswers;
+    private final HashAlgoType hashAlgo;
 
-    private final CaCertValidator delegate;
+    private final Set<byte[]> hashValues;
 
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
-        this.delegate = delegate;
-        this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
+    public PreprovisionedHashCaCertValidator(
+        final HashAlgoType hashAlgo,
+        final Set<byte[]> hashValues) {
+        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
+        ParamUtil.assertNotEmpty("hashValues", hashValues);
+
+        final int hLen = hashAlgo.getLength();
+        for (byte[] m : hashValues) {
+            if (m.length != hLen) {
+                throw new IllegalArgumentException("invalid the length of hashValue: "
+                        + m.length + " != " + hLen);
+            }
+        }
+
+        this.hashAlgo = hashAlgo;
+        this.hashValues = new HashSet<byte[]>(hashValues.size());
+        for (byte[] m : hashValues) {
+            this.hashValues.add(Arrays.copyOf(m, m.length));
+        }
     }
 
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
-        String hexFp;
+        byte[] actual;
         try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+            actual = hashAlgo.digest(cert.getEncoded());
         } catch (CertificateEncodingException e) {
             return false;
         }
 
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
-        } else {
-            boolean answer = delegate.isTrusted(cert);
-            cachedAnswers.put(hexFp, answer);
-            return answer;
+        for (byte[] m : hashValues) {
+            if (Arrays.equals(actual, m)) {
+                return true;
+            }
         }
+
+        return false;
     }
 
 }
