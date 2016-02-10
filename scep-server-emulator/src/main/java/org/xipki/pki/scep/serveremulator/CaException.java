@@ -33,66 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client;
-
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.util.ParamUtil;
+package org.xipki.pki.scep.serveremulator;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public final class PreprovisionedHashCACertValidator implements CACertValidator {
+public class CaException extends Exception {
 
-    private final HashAlgoType hashAlgo;
+    private static final long serialVersionUID = 1L;
 
-    private final Set<byte[]> hashValues;
-
-    public PreprovisionedHashCACertValidator(
-        final HashAlgoType hashAlgo,
-        final Set<byte[]> hashValues) {
-        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
-        ParamUtil.assertNotEmpty("hashValues", hashValues);
-
-        final int hLen = hashAlgo.getLength();
-        for (byte[] m : hashValues) {
-            if (m.length != hLen) {
-                throw new IllegalArgumentException("invalid the length of hashValue: "
-                        + m.length + " != " + hLen);
-            }
-        }
-
-        this.hashAlgo = hashAlgo;
-        this.hashValues = new HashSet<byte[]>(hashValues.size());
-        for (byte[] m : hashValues) {
-            this.hashValues.add(Arrays.copyOf(m, m.length));
-        }
+    public CaException() {
     }
 
-    @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
-        byte[] actual;
-        try {
-            actual = hashAlgo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            return false;
-        }
+    public CaException(
+            final String message) {
+        super(message);
+    }
 
-        for (byte[] m : hashValues) {
-            if (Arrays.equals(actual, m)) {
-                return true;
-            }
-        }
+    public CaException(
+            final Throwable cause) {
+        super(cause);
+    }
 
-        return false;
+    public CaException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
     }
 
 }

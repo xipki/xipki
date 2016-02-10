@@ -33,36 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.serveremulator;
+package org.xipki.pki.scep.client.test;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.pki.scep.util.ParamUtil;
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class NextCAandRA {
+public class NoCmsSignerCertCaTest extends AbstractCaTest {
 
-    private final Certificate cACert;
-
-    private final Certificate rACert;
-
-    public NextCAandRA(
-            final Certificate cACert,
-            final Certificate rACert) {
-        ParamUtil.assertNotNull("cACert", cACert);
-        this.cACert = cACert;
-        this.rACert = rACert;
+    @Override
+    protected boolean sendSignerCert() {
+        return false;
     }
 
-    public Certificate getCACert() {
-        return cACert;
-    }
-
-    public Certificate getRACert() {
-        return rACert;
+    @Override
+    protected CaCapability[] getExcludedCACaps() {
+        return null;
     }
 
 }

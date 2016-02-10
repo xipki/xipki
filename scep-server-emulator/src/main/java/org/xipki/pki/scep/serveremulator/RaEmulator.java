@@ -33,24 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.client.test;
+package org.xipki.pki.scep.serveremulator;
 
-import org.xipki.pki.scep.transaction.CACapability;
+import java.security.PrivateKey;
+
+import org.bouncycastle.asn1.x509.Certificate;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class MD5OnlyCATest extends AbstractCATest {
+public class RaEmulator {
 
-    protected boolean useInsecureAlgorithms() {
-        return true;
+    private final PrivateKey rAKey;
+
+    private final Certificate rACert;
+
+    public RaEmulator(
+            final PrivateKey rAKey,
+            final Certificate rACert) {
+        this.rAKey = rAKey;
+        this.rACert = rACert;
     }
 
-    @Override
-    protected CACapability[] getExcludedCACaps() {
-        return new CACapability[]{CACapability.SHA1, CACapability.SHA256, CACapability.SHA512};
+    public PrivateKey getRAKey() {
+        return rAKey;
+    }
+
+    public Certificate getRACert() {
+        return rACert;
     }
 
 }

@@ -49,13 +49,13 @@ import org.xipki.pki.scep.util.ScepUtil;
  * @since 2.0.0
  */
 
-public class CAIdentifier {
+public class CaIdentifier {
 
     private final String url;
 
     private final String profile;
 
-    public CAIdentifier(
+    public CaIdentifier(
             final String serverUrl,
             final String profile)
     throws MalformedURLException {
@@ -127,8 +127,8 @@ public class CAIdentifier {
     @Override
     public boolean equals(
             final Object object) {
-        if (object instanceof CAIdentifier) {
-            CAIdentifier b = (CAIdentifier) object;
+        if (object instanceof CaIdentifier) {
+            CaIdentifier b = (CaIdentifier) object;
             return url == b.url && profile == b.profile;
         }
         return false;

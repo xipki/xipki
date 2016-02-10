@@ -75,9 +75,9 @@ import org.xipki.pki.scep.util.ScepUtil;
  * @since 2.0.0
  */
 
-public class DecodedNextCAMessage {
+public class DecodedNextCaMessage {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DecodedNextCAMessage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DecodedNextCaMessage.class);
 
     private AuthorityCertStore authorityCertStore;
 
@@ -91,7 +91,7 @@ public class DecodedNextCAMessage {
 
     private String failureMessage;
 
-    public DecodedNextCAMessage() {
+    public DecodedNextCaMessage() {
     }
 
     public AuthorityCertStore getAuthorityCertStore() {
@@ -149,7 +149,7 @@ public class DecodedNextCAMessage {
     }
 
     @SuppressWarnings("unchecked")
-    public static DecodedNextCAMessage decode(
+    public static DecodedNextCaMessage decode(
             final CMSSignedData pkiMessage,
             final CollectionStore<X509CertificateHolder> certStore)
     throws MessageDecodingException {
@@ -193,7 +193,7 @@ public class DecodedNextCAMessage {
             signingTime = Time.getInstance(attrValue).getDate();
         }
 
-        DecodedNextCAMessage ret = new DecodedNextCAMessage();
+        DecodedNextCaMessage ret = new DecodedNextCaMessage();
         if (signingTime != null) {
             ret.setSigningTime(signingTime);
         }

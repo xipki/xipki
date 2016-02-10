@@ -67,13 +67,13 @@ import org.xipki.pki.scep.util.ScepUtil;
  * @since 2.0.0
  */
 
-public class NextCAMessage {
+public class NextCaMessage {
 
     private X509Certificate caCert;
 
     private List<X509Certificate> raCerts;
 
-    public NextCAMessage() {
+    public NextCaMessage() {
     }
 
     public X509Certificate getCaCert() {

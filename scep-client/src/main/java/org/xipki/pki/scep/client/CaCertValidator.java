@@ -42,7 +42,7 @@ import java.security.cert.X509Certificate;
  * @since 2.0.0
  */
 
-public interface CACertValidator {
+public interface CaCertValidator {
 
     boolean isTrusted(
             X509Certificate cert);

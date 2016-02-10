@@ -33,34 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.serveremulator;
+package org.xipki.pki.scep.transaction;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CAException extends Exception {
+public enum CaCapability {
 
-    private static final long serialVersionUID = 1L;
+    AES ("AES"),
+    DES3 ("DES3"),
+    GetNextCACert ("GetNextCACert"),
+    POSTPKIOperation ("POSTPKIOperation"),
+    Renewal ("Renewal"),
+    SHA1 ("SHA-1"),
+    SHA256 ("SHA-256"),
+    SHA512 ("SHA-512"),
+    Update ("Update");
 
-    public CAException() {
+    private String text;
+
+    CaCapability(
+            final String text) {
+        this.text = text;
     }
 
-    public CAException(
-            final String message) {
-        super(message);
+    public String getText() {
+        return text;
     }
 
-    public CAException(
-            final Throwable cause) {
-        super(cause);
-    }
-
-    public CAException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
+    public static CaCapability valueForText(
+            final String text) {
+        for (CaCapability m : values()) {
+            if (m.text.equalsIgnoreCase(text)) {
+                return m;
+            }
+        }
+        return null;
     }
 
 }

@@ -44,47 +44,47 @@ import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CACaps {
+public class CaCaps {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CACaps.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaCaps.class);
 
     private byte[] bytes;
 
-    private final Set<CACapability> capabilities;
+    private final Set<CaCapability> capabilities;
 
-    public CACaps() {
-        this.capabilities = new HashSet<CACapability>();
+    public CaCaps() {
+        this.capabilities = new HashSet<CaCapability>();
     }
 
-    public CACaps(
-            final Set<CACapability> capabilities) {
+    public CaCaps(
+            final Set<CaCapability> capabilities) {
         if (capabilities == null) {
-            this.capabilities = new HashSet<CACapability>();
+            this.capabilities = new HashSet<CaCapability>();
         } else {
-            this.capabilities = new HashSet<CACapability>(capabilities);
+            this.capabilities = new HashSet<CaCapability>(capabilities);
         }
         refresh();
     }
 
-    public Set<CACapability> getCapabilities() {
+    public Set<CaCapability> getCapabilities() {
         return Collections.unmodifiableSet(capabilities);
     }
 
     public void removeCapabilities(
-            final CACaps caCaps) {
+            final CaCaps caCaps) {
         this.capabilities.retainAll(caCaps.capabilities);
         refresh();
     }
 
     public void addCapability(
-            final CACapability cap) {
+            final CaCapability cap) {
         if (cap != null) {
             capabilities.add(cap);
             refresh();
@@ -92,7 +92,7 @@ public class CACaps {
     }
 
     public void removeCapability(
-            final CACapability cap) {
+            final CaCapability cap) {
         if (cap != null) {
             capabilities.remove(cap);
             refresh();
@@ -100,7 +100,7 @@ public class CACaps {
     }
 
     public boolean containsCapability(
-            final CACapability cap) {
+            final CaCapability cap) {
         return capabilities.contains(cap);
     }
 
@@ -120,7 +120,7 @@ public class CACaps {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (CACapability cap : capabilities) {
+        for (CaCapability cap : capabilities) {
             sb.append(cap.getText()).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -128,15 +128,15 @@ public class CACaps {
     }
 
     public boolean supportsPost() {
-        return capabilities.contains(CACapability.POSTPKIOperation);
+        return capabilities.contains(CaCapability.POSTPKIOperation);
     }
 
     public HashAlgoType getMostSecureHashAlgo() {
-        if (capabilities.contains(CACapability.SHA512)) {
+        if (capabilities.contains(CaCapability.SHA512)) {
             return HashAlgoType.SHA512;
-        } else if (capabilities.contains(CACapability.SHA256)) {
+        } else if (capabilities.contains(CaCapability.SHA256)) {
             return HashAlgoType.SHA256;
-        } else if (capabilities.contains(CACapability.SHA1)) {
+        } else if (capabilities.contains(CaCapability.SHA1)) {
             return HashAlgoType.SHA1;
         } else {
             return HashAlgoType.MD5;
@@ -152,11 +152,11 @@ public class CACaps {
     @Override
     public boolean equals(
             final Object other) {
-        if (!(other instanceof CACaps)) {
+        if (!(other instanceof CaCaps)) {
             return false;
         }
 
-        CACaps b = (CACaps) other;
+        CaCaps b = (CaCaps) other;
         return capabilities.equals(b.capabilities);
     }
 
@@ -164,9 +164,9 @@ public class CACaps {
         return Arrays.clone(bytes);
     }
 
-    public static CACaps getInstance(
+    public static CaCaps getInstance(
             final String scepMessage) {
-        CACaps ret = new CACaps();
+        CaCaps ret = new CaCaps();
         if (scepMessage == null || scepMessage.isEmpty()) {
             return ret;
         }
@@ -175,7 +175,7 @@ public class CACaps {
 
         while (st.hasMoreTokens()) {
             String m = st.nextToken();
-            CACapability cap = CACapability.valueForText(m);
+            CaCapability cap = CaCapability.valueForText(m);
             if (cap == null) {
                 LOG.warn("ignore unknown CACap '{}'", m);
             } else {

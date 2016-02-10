@@ -71,7 +71,7 @@ import org.xipki.pki.scep.util.ScepUtil;
  * @since 2.0.0
  */
 
-public class CAEmulator {
+public class CaEmulator {
 
     public static final long MIN_IN_MS = 60L * 1000;
 
@@ -99,7 +99,7 @@ public class CAEmulator {
 
     private CertificateList crl;
 
-    public CAEmulator(
+    public CaEmulator(
             final PrivateKey cAKey,
             final Certificate cACert,
             final boolean generateCRL)
@@ -149,7 +149,7 @@ public class CAEmulator {
             final X500Name subjectDN)
     throws Exception {
         return generateCert(pubKeyInfo, subjectDN,
-                new Date(System.currentTimeMillis() - 10 * CAEmulator.MIN_IN_MS));
+                new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     }
 
     public Certificate generateCert(

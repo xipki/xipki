@@ -35,22 +35,22 @@
 
 package org.xipki.pki.scep.client.test;
 
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class DESOnlyCATest extends AbstractCATest {
+public class MD5OnlyCaTest extends AbstractCaTest {
 
     protected boolean useInsecureAlgorithms() {
         return true;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps() {
-        return new CACapability[]{CACapability.AES, CACapability.DES3};
+    protected CaCapability[] getExcludedCACaps() {
+        return new CaCapability[]{CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512};
     }
 
 }

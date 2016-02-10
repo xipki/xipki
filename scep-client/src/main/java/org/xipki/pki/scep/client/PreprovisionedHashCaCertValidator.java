@@ -37,6 +37,7 @@ package org.xipki.pki.scep.client;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,50 +49,50 @@ import org.xipki.pki.scep.util.ParamUtil;
  * @since 2.0.0
  */
 
-public final class PreprovisionedCACertValidator implements CACertValidator {
+public final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
-    private final Set<String> fpOfCerts;
+    private final HashAlgoType hashAlgo;
 
-    public PreprovisionedCACertValidator(
-            final X509Certificate cert) {
-        ParamUtil.assertNotNull("cert", cert);
-        fpOfCerts = new HashSet<String>(1);
-        String hexFp;
-        try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
-            throw new IllegalArgumentException(
-                    "at least one of the certificate could not be encoded");
-        }
-        fpOfCerts.add(hexFp);
-    }
+    private final Set<byte[]> hashValues;
 
-    public PreprovisionedCACertValidator(
-            final Set<X509Certificate> certs) {
-        ParamUtil.assertNotEmpty("certs", certs);
-        fpOfCerts = new HashSet<String>(certs.size());
-        for (X509Certificate m : certs) {
-            String hexFp;
-            try {
-                hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
-            } catch (CertificateEncodingException e) {
-                throw new IllegalArgumentException(
-                        "at least one of the certificate could not be encoded");
+    public PreprovisionedHashCaCertValidator(
+        final HashAlgoType hashAlgo,
+        final Set<byte[]> hashValues) {
+        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
+        ParamUtil.assertNotEmpty("hashValues", hashValues);
+
+        final int hLen = hashAlgo.getLength();
+        for (byte[] m : hashValues) {
+            if (m.length != hLen) {
+                throw new IllegalArgumentException("invalid the length of hashValue: "
+                        + m.length + " != " + hLen);
             }
-            fpOfCerts.add(hexFp);
+        }
+
+        this.hashAlgo = hashAlgo;
+        this.hashValues = new HashSet<byte[]>(hashValues.size());
+        for (byte[] m : hashValues) {
+            this.hashValues.add(Arrays.copyOf(m, m.length));
         }
     }
 
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
-        String hextFp;
+        byte[] actual;
         try {
-            hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+            actual = hashAlgo.digest(cert.getEncoded());
         } catch (CertificateEncodingException e) {
             return false;
         }
-        return fpOfCerts.contains(hextFp);
+
+        for (byte[] m : hashValues) {
+            if (Arrays.equals(actual, m)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

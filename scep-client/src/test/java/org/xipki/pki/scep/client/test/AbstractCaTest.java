@@ -56,17 +56,17 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xipki.pki.scep.client.CACertValidator;
-import org.xipki.pki.scep.client.CAIdentifier;
+import org.xipki.pki.scep.client.CaCertValidator;
+import org.xipki.pki.scep.client.CaIdentifier;
 import org.xipki.pki.scep.client.EnrolmentResponse;
-import org.xipki.pki.scep.client.PreprovisionedCACertValidator;
+import org.xipki.pki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.pki.scep.client.ScepClient;
 import org.xipki.pki.scep.message.AuthorityCertStore;
-import org.xipki.pki.scep.message.CACaps;
+import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.serveremulator.ScepControl;
 import org.xipki.pki.scep.serveremulator.ScepServer;
 import org.xipki.pki.scep.serveremulator.ScepServerContainer;
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.util.ScepUtil;
 
@@ -77,7 +77,7 @@ import junit.framework.Assert;
  * @since 2.0.0
  */
 
-public abstract class AbstractCATest {
+public abstract class AbstractCaTest {
 
     private final String secret = "preshared-secret";
 
@@ -85,7 +85,7 @@ public abstract class AbstractCATest {
 
     private ScepServer scepServer;
 
-    protected abstract CACapability[] getExcludedCACaps();
+    protected abstract CaCapability[] getExcludedCACaps();
 
     protected boolean isWithRA() {
         return true;
@@ -122,13 +122,13 @@ public abstract class AbstractCATest {
         }
     }
 
-    protected CACaps getDefaultCACaps() {
-        final CACaps caCaps = new CACaps();
-        caCaps.addCapability(CACapability.DES3);
-        caCaps.addCapability(CACapability.AES);
-        caCaps.addCapability(CACapability.SHA1);
-        caCaps.addCapability(CACapability.SHA256);
-        caCaps.addCapability(CACapability.POSTPKIOperation);
+    protected CaCaps getDefaultCACaps() {
+        final CaCaps caCaps = new CaCaps();
+        caCaps.addCapability(CaCapability.DES3);
+        caCaps.addCapability(CaCapability.AES);
+        caCaps.addCapability(CaCapability.SHA1);
+        caCaps.addCapability(CaCapability.SHA256);
+        caCaps.addCapability(CaCapability.POSTPKIOperation);
         return caCaps;
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractCATest {
     public synchronized void startScepServer()
     throws Exception {
         if (scepServerContainer == null) {
-            CACaps caCaps = getExpectedCACaps();
+            CaCaps caCaps = getExpectedCACaps();
 
             ScepControl control = new ScepControl(isSendCACert(), isPendingCert(),
                     sendSignerCert(), useInsecureAlgorithms(), secret);
@@ -165,18 +165,18 @@ public abstract class AbstractCATest {
     @Test
     public void test()
     throws Exception {
-        CAIdentifier cAId = new CAIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
-        CACertValidator cACertValidator = new PreprovisionedCACertValidator(
+        CaIdentifier cAId = new CaIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
+        CaCertValidator cACertValidator = new PreprovisionedCaCertValidator(
                 new X509CertificateObject(scepServer.getCACert()));
         ScepClient client = new ScepClient(cAId, cACertValidator);
         client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 
         client.refresh();
 
-        CACaps expCACaps = getExpectedCACaps();
+        CaCaps expCACaps = getExpectedCACaps();
 
         // CACaps
-        CACaps cACaps = client.getCACaps();
+        CaCaps cACaps = client.getCACaps();
         Assert.assertEquals("CACaps", expCACaps, cACaps);
 
         // CA certificate
@@ -299,20 +299,20 @@ public abstract class AbstractCATest {
         Assert.assertNotNull("nextCA", nextCA);
     }
 
-    private CACaps getExpectedCACaps() {
-        CACaps caCaps = getDefaultCACaps();
-        CACapability[] excludedCACaps = getExcludedCACaps();
+    private CaCaps getExpectedCACaps() {
+        CaCaps caCaps = getDefaultCACaps();
+        CaCapability[] excludedCACaps = getExcludedCACaps();
         if (excludedCACaps != null) {
-            for (CACapability m : excludedCACaps) {
+            for (CaCapability m : excludedCACaps) {
                 caCaps.removeCapability(m);
             }
         }
         if (isWithNextCA()) {
-            if (!caCaps.containsCapability(CACapability.GetNextCACert)) {
-                caCaps.addCapability(CACapability.GetNextCACert);
+            if (!caCaps.containsCapability(CaCapability.GetNextCACert)) {
+                caCaps.addCapability(CaCapability.GetNextCACert);
             }
         } else {
-            caCaps.removeCapability(CACapability.GetNextCACert);
+            caCaps.removeCapability(CaCapability.GetNextCACert);
         }
         return caCaps;
     }

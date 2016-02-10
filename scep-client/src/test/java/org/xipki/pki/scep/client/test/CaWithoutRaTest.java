@@ -35,22 +35,22 @@
 
 package org.xipki.pki.scep.client.test;
 
-import org.xipki.pki.scep.transaction.CACapability;
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CATest extends AbstractCATest {
+public class CaWithoutRaTest extends AbstractCaTest {
 
     @Override
     protected boolean isWithRA() {
-        return true;
+        return false;
     }
 
     @Override
-    protected CACapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCACaps() {
         return null;
     }
 

@@ -33,44 +33,24 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.scep.transaction;
+package org.xipki.pki.scep.client.test;
+
+import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public enum CACapability {
+public class DESOnlyCaTest extends AbstractCaTest {
 
-    AES ("AES"),
-    DES3 ("DES3"),
-    GetNextCACert ("GetNextCACert"),
-    POSTPKIOperation ("POSTPKIOperation"),
-    Renewal ("Renewal"),
-    SHA1 ("SHA-1"),
-    SHA256 ("SHA-256"),
-    SHA512 ("SHA-512"),
-    Update ("Update");
-
-    private String text;
-
-    CACapability(
-            final String text) {
-        this.text = text;
+    protected boolean useInsecureAlgorithms() {
+        return true;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public static CACapability valueForText(
-            final String text) {
-        for (CACapability m : values()) {
-            if (m.text.equalsIgnoreCase(text)) {
-                return m;
-            }
-        }
-        return null;
+    @Override
+    protected CaCapability[] getExcludedCACaps() {
+        return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
     }
 
 }
