@@ -91,7 +91,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
@@ -563,7 +563,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                                 removeTagAndLenFromExtensionValue(encodedExtnValue));
                         reasonCode = enumerated.getValue().intValue();
                     } else {
-                        reasonCode = CRLReason.UNSPECIFIED.getCode();
+                        reasonCode = CrlReason.UNSPECIFIED.getCode();
                     }
 
                     Date revTime = revokedCert.getRevocationDate();
@@ -979,7 +979,7 @@ public class CrlCertStatusStore extends CertStatusStore {
     public void setCARevocationInfo(
             final Date revocationTime) {
         ParamUtil.assertNotNull("revocationTime", revocationTime);
-        this.caRevInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
+        this.caRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
     }
 
     @Override

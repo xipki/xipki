@@ -54,8 +54,8 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.qa.api.QASystemManager;
-import org.xipki.pki.ca.qa.api.X509CertprofileQA;
+import org.xipki.pki.ca.qa.api.QaSystemManager;
+import org.xipki.pki.ca.qa.api.X509CertprofileQa;
 import org.xipki.pki.ca.qa.api.X509IssuerInfo;
 import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 
@@ -101,7 +101,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Reference
-    private QASystemManager qaSystemManager;
+    private QaSystemManager qaSystemManager;
 
     @Override
     protected Object doExecute()
@@ -126,7 +126,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-        X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
+        X509CertprofileQa qa = qaSystemManager.getCertprofile(profileName);
         if (qa == null) {
             throw new IllegalCmdParamException("found no certificate profile named '"
                     + profileName + "'");

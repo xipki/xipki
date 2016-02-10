@@ -47,8 +47,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -108,9 +108,9 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-        CAHasRequestorEntry entry = null;
-        for (CAHasRequestorEntry m : entries) {
+        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        CaHasRequestorEntry entry = null;
+        for (CaHasRequestorEntry m : entries) {
             if (m.getRequestorName().equals(requestorName)) {
                 entry = m;
                 break;
@@ -145,7 +145,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
 
         if (profiles != null) {
             if (profiles.size() == 1) {
-                if (CAManager.NULL.equalsIgnoreCase(profiles.iterator().next())) {
+                if (CaManager.NULL.equalsIgnoreCase(profiles.iterator().next())) {
                     profiles = Collections.emptySet();
                 }
             }

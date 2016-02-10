@@ -57,13 +57,13 @@ import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CAUris;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaUris;
 
 /**
  * @author Lijun Liao
@@ -94,14 +94,14 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509CAEntry caEntry = getCAEntry(false);
+        X509CaEntry caEntry = getCAEntry(false);
 
         boolean b = caManager.addCA(caEntry);
         output(b, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }
 
-    protected X509CAEntry getCAEntry(
+    protected X509CaEntry getCAEntry(
             final boolean ignoreCert)
     throws Exception {
         Properties props = new Properties();
@@ -196,15 +196,15 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             ocspUris = StringUtil.split(s, ", ");
         }
 
-        X509CAUris caUris = new X509CAUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-        X509CAEntry entry = new X509CAEntry(
+        X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
+        X509CaEntry entry = new X509CaEntry(
                 caName, nextSerial, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls, expirationPeriod);
 
         // STATUS
         key = CaExportCmd.KEY_STATUS;
         s = getStrProp(props, key, true);
-        CAStatus status = CAStatus.getCAStatus(s);
+        CaStatus status = CaStatus.getCAStatus(s);
         assertNotNull(status, key, s);
         entry.setStatus(status);
 

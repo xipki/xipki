@@ -40,7 +40,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.pki.ca.client.api.CAClient;
+import org.xipki.pki.ca.client.api.CaClient;
 
 /**
  * @author Lijun Liao
@@ -51,7 +51,7 @@ import org.xipki.pki.ca.client.api.CAClient;
 public class CaNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Reference
-    protected CAClient caClient;
+    protected CaClient caClient;
 
     @Override
     protected Set<String> getEnums() {

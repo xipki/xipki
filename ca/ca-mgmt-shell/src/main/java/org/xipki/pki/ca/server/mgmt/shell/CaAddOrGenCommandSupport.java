@@ -47,12 +47,12 @@ import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.pki.ca.api.profile.CertValidity;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CAUris;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaUris;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
@@ -188,7 +188,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509CAEntry getCAEntry()
+    protected X509CaEntry getCAEntry()
     throws Exception {
         if (nextSerial < 0) {
             throw new IllegalCmdParamException("invalid serial number: " + nextSerial);
@@ -206,7 +206,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
-        CAStatus status = CAStatus.getCAStatus(caStatus);
+        CaStatus status = CaStatus.getCAStatus(caStatus);
         if (status == null) {
             throw new IllegalCmdParamException("invalid status: " + caStatus);
         }
@@ -216,8 +216,8 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
                     passwordResolver);
         }
 
-        X509CAUris caUris = new X509CAUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-        X509CAEntry entry = new X509CAEntry(
+        X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
+        X509CaEntry entry = new X509CaEntry(
                 caName, nextSerial, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls.intValue(), expirationPeriod.intValue());
 

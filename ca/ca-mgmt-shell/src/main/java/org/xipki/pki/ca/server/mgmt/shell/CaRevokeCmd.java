@@ -47,9 +47,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.pki.ca.server.mgmt.shell.completer.CACRLReasonCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaCrlReasonCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
@@ -62,12 +62,12 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 @Service
 public class CaRevokeCmd extends CaCommandSupport {
 
-    public static final List<CRLReason> PERMITTED_REASONS = Collections.unmodifiableList(
-            Arrays.asList(new CRLReason[] {
-                CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
-                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED,
-                CRLReason.CESSATION_OF_OPERATION,
-                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
+    public static final List<CrlReason> PERMITTED_REASONS = Collections.unmodifiableList(
+            Arrays.asList(new CrlReason[] {
+                CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
+                CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED,
+                CrlReason.CESSATION_OF_OPERATION,
+                CrlReason.CERTIFICATE_HOLD,    CrlReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)
@@ -77,7 +77,7 @@ public class CaRevokeCmd extends CaCommandSupport {
             required = true,
             description = "CRL reason\n"
                     + "(required)")
-    @Completion(CACRLReasonCompleter.class)
+    @Completion(CaCrlReasonCompleter.class)
     private String reason;
 
     @Option(name = "--rev-date",
@@ -92,7 +92,7 @@ public class CaRevokeCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CRLReason crlReason = CRLReason.getInstance(reason);
+        CrlReason crlReason = CrlReason.getInstance(reason);
         if (crlReason == null) {
             throw new IllegalCmdParamException("invalid reason " + reason);
         }

@@ -48,7 +48,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
@@ -116,8 +116,8 @@ public class ScepUpdateCmd extends CaCommandSupport {
     protected Object doExecute()
     throws Exception {
         String certConf = null;
-        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
-            certConf = CAManager.NULL;
+        if (CaManager.NULL.equalsIgnoreCase(certFile)) {
+            certConf = CaManager.NULL;
         } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

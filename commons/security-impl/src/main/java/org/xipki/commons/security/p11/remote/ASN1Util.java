@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 /**
  * @author Lijun Liao
@@ -66,9 +66,9 @@ public class ASN1Util {
     public static byte[] getBytes(
             final ASN1Encodable obj,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (!(obj instanceof ASN1OctetString)) {
-            throw new BadASN1ObjectException(desc + " is not an octet string");
+            throw new BadAsn1ObjectException(desc + " is not an octet string");
         }
 
         return ((ASN1OctetString) obj).getOctets();
@@ -77,9 +77,9 @@ public class ASN1Util {
     public static boolean getBoolean(
             final ASN1Encodable obj,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (!(obj instanceof ASN1Boolean)) {
-            throw new BadASN1ObjectException(desc + " is not a boolean");
+            throw new BadAsn1ObjectException(desc + " is not a boolean");
         }
         return ((ASN1Boolean) obj).isTrue();
     }
@@ -87,14 +87,14 @@ public class ASN1Util {
     public static byte getByte(
             final ASN1Encodable obj,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (!(obj instanceof ASN1Integer)) {
-            throw new BadASN1ObjectException(desc + " is not an integer");
+            throw new BadAsn1ObjectException(desc + " is not an integer");
         }
 
         BigInteger bi = ((ASN1Integer) obj).getValue();
         if (bi.compareTo(MAX_BYTE) > 0 || bi.compareTo(MIN_BYTE) < 0) {
-            throw new BadASN1ObjectException(desc + " is not in the range of byte");
+            throw new BadAsn1ObjectException(desc + " is not in the range of byte");
         }
         return bi.byteValue();
     }
@@ -102,14 +102,14 @@ public class ASN1Util {
     public static int getInt(
             final ASN1Encodable obj,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (!(obj instanceof ASN1Integer)) {
-            throw new BadASN1ObjectException(desc + " is not an integer");
+            throw new BadAsn1ObjectException(desc + " is not an integer");
         }
 
         BigInteger bi = ((ASN1Integer) obj).getValue();
         if (bi.compareTo(MAX_INT) > 0 || bi.compareTo(MIN_INT) < 0) {
-            throw new BadASN1ObjectException(desc + " is not in the range of integer");
+            throw new BadAsn1ObjectException(desc + " is not in the range of integer");
         }
         return bi.intValue();
     }
@@ -117,9 +117,9 @@ public class ASN1Util {
     public static String getString(
             final ASN1Encodable obj,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (!(obj instanceof ASN1String)) {
-            throw new BadASN1ObjectException(desc + " is not a string");
+            throw new BadAsn1ObjectException(desc + " is not a string");
         }
 
         return ((ASN1String) obj).getString();
@@ -129,7 +129,7 @@ public class ASN1Util {
             final ASN1Sequence seq,
             final int size,
             final String desc)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         final int n = seq.size();
         if (n != size) {
             StringBuilder sb = new StringBuilder(100);
@@ -140,7 +140,7 @@ public class ASN1Util {
             sb.append(", is '").append(n).append("'");
             sb.append(", but expected '").append(size).append("'");
 
-            throw new BadASN1ObjectException(sb.toString());
+            throw new BadAsn1ObjectException(sb.toString());
         }
     }
 

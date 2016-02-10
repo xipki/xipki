@@ -48,7 +48,7 @@ import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
@@ -95,8 +95,8 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
     protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry()
     throws Exception {
         String signerCertConf = null;
-        if (CAManager.NULL.equalsIgnoreCase(signerCert)) {
-            signerCertConf = CAManager.NULL;
+        if (CaManager.NULL.equalsIgnoreCase(signerCert)) {
+            signerCertConf = CaManager.NULL;
         } else if (signerCert != null) {
             byte[] certBytes = IoUtil.read(signerCert);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));

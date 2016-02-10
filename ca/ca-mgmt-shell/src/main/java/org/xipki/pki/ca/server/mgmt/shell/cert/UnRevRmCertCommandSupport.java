@@ -47,8 +47,8 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
@@ -79,12 +79,12 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
 
     protected BigInteger getSerialNumber()
     throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
-        CAEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCA(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
-        if (!(ca instanceof X509CAEntry)) {
+        if (!(ca instanceof X509CaEntry)) {
             throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
         }
 
@@ -92,7 +92,7 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
         if (serialNumberS != null) {
             serialNumber = toBigInt(serialNumberS);
         } else if (certFile != null) {
-            X509Certificate caCert = ((X509CAEntry) ca).getCertificate();
+            X509Certificate caCert = ((X509CaEntry) ca).getCertificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
             if (!X509Util.issues(caCert, cert)) {
                 throw new UnexpectedException(

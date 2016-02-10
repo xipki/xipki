@@ -52,13 +52,13 @@ import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
-import org.xipki.pki.ca.server.mgmt.api.CAEntry;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
-import org.xipki.pki.ca.server.mgmt.api.CAStatus;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCAEntry;
+import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;
@@ -188,11 +188,11 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509ChangeCAEntry getChangeCAEntry()
+    protected X509ChangeCaEntry getChangeCAEntry()
     throws Exception {
-        X509ChangeCAEntry entry = new X509ChangeCAEntry(caName);
+        X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
         if (caStatus != null) {
-            entry.setStatus(CAStatus.getCAStatus(caStatus));
+            entry.setStatus(CaStatus.getCAStatus(caStatus));
         }
 
         if (expirationPeriod != null && expirationPeriod < 0) {
@@ -212,7 +212,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         if (signerConf != null) {
             String localSignerType = signerType;
             if (localSignerType == null) {
-                CAEntry caEntry = caManager.getCA(caName);
+                CaEntry caEntry = caManager.getCA(caName);
                 if (caEntry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
@@ -309,7 +309,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         boolean clearUris = false;
         if (uris != null) {
             for (String uri : uris) {
-                if (CAManager.NULL.equalsIgnoreCase(uri)) {
+                if (CaManager.NULL.equalsIgnoreCase(uri)) {
                     clearUris = true;
                     break;
                 }

@@ -38,7 +38,7 @@ package org.xipki.pki.ca.server.impl.cmp;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 
 /**
  * @author Lijun Liao
@@ -47,12 +47,12 @@ import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 public class CmpRequestorInfo implements RequestorInfo {
 
-    private final CAHasRequestorEntry caHasRequestor;
+    private final CaHasRequestorEntry caHasRequestor;
 
     private final X509CertWithDbId cert;
 
     public CmpRequestorInfo(
-            final CAHasRequestorEntry caHasRequestor,
+            final CaHasRequestorEntry caHasRequestor,
             final X509CertWithDbId cert) {
         ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
         ParamUtil.assertNotNull("cert", cert);
@@ -60,7 +60,7 @@ public class CmpRequestorInfo implements RequestorInfo {
         this.cert = cert;
     }
 
-    public CAHasRequestorEntry getCaHasRequestor() {
+    public CaHasRequestorEntry getCaHasRequestor() {
         return caHasRequestor;
     }
 

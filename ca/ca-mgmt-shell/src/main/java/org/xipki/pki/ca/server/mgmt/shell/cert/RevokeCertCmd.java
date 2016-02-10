@@ -43,8 +43,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.DateUtil;
-import org.xipki.commons.console.karaf.completer.ClientCRLReasonCompleter;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.console.karaf.completer.ClientCrlReasonCompleter;
+import org.xipki.commons.security.api.CrlReason;
 
 /**
  * @author Lijun Liao
@@ -60,7 +60,7 @@ public class RevokeCertCmd extends UnRevRmCertCommandSupport {
             required = true,
             description = "CRL reason\n"
                     + "(required)")
-    @Completion(ClientCRLReasonCompleter.class)
+    @Completion(ClientCrlReasonCompleter.class)
     private String reason;
 
     @Option(name = "--inv-date",
@@ -70,12 +70,12 @@ public class RevokeCertCmd extends UnRevRmCertCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CRLReason crlReason = CRLReason.getInstance(reason);
+        CrlReason crlReason = CrlReason.getInstance(reason);
         if (crlReason == null) {
             throw new InvalidConfException("invalid reason " + reason);
         }
 
-        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+        if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new InvalidConfException("reason " + reason + " is not permitted");
         }
 

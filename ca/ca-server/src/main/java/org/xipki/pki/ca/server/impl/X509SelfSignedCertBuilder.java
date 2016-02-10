@@ -148,7 +148,7 @@ class X509SelfSignedCertBuilder {
 
         ConcurrentContentSigner signer;
         try {
-            List<String[]> signerConfs = CAManagerImpl.splitCASignerConfs(signerConf);
+            List<String[]> signerConfs = CaManagerImpl.splitCASignerConfs(signerConf);
             List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
             String thisSignerConf = null;
@@ -263,7 +263,7 @@ class X509SelfSignedCertBuilder {
                 grantedSubject,
                 localPublicKeyInfo);
 
-        PublicCAInfo publicCaInfo = new PublicCAInfo(
+        PublicCaInfo publicCaInfo = new PublicCaInfo(
                 grantedSubject, localSerialNumber, null, null,
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
@@ -315,7 +315,7 @@ class X509SelfSignedCertBuilder {
             final X500Name requestedSubject,
             final Extensions extensions,
             final SubjectPublicKeyInfo requestedPublicKeyInfo,
-            final PublicCAInfo publicCaInfo,
+            final PublicCaInfo publicCaInfo,
             final Date notBefore,
             final Date notAfter)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {

@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CAEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
@@ -95,7 +95,7 @@ public class EnrollCertCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CAEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCA(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }

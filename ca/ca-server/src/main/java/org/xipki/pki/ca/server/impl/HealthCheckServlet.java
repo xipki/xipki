@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
-import org.xipki.pki.ca.server.impl.cmp.X509CACmpResponder;
+import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
 
 /**
  * @author Lijun Liao
@@ -87,7 +87,7 @@ public class HealthCheckServlet extends HttpServlet {
             String servletPath = request.getServletPath();
 
             String caName = null;
-            X509CACmpResponder responder = null;
+            X509CaCmpResponder responder = null;
             int n = servletPath.length();
             if (requestURI.length() > n + 1) {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");

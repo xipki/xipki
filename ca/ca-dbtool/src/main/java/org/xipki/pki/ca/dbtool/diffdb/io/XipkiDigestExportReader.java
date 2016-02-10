@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.IdRange;
 
 /**
  * @author Lijun Liao
@@ -83,7 +83,7 @@ public class XipkiDigestExportReader {
         public void run() {
             while (!stop.get()) {
                 try {
-                    IDRange idRange = inQueue.take();
+                    IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException e) {
                     LOG.error("InterruptedException", e);
@@ -96,8 +96,8 @@ public class XipkiDigestExportReader {
         }
 
         private void query(
-                final IDRange idRange) {
-            DigestDBEntrySet result = new DigestDBEntrySet(idRange.getFrom());
+                final IdRange idRange) {
+            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
             try {
@@ -149,9 +149,9 @@ public class XipkiDigestExportReader {
 
     protected final AtomicBoolean stop = new AtomicBoolean(false);
 
-    protected final BlockingDeque<IDRange> inQueue = new LinkedBlockingDeque<>();
+    protected final BlockingDeque<IdRange> inQueue = new LinkedBlockingDeque<>();
 
-    protected final BlockingDeque<DigestDBEntrySet> outQueue = new LinkedBlockingDeque<>();
+    protected final BlockingDeque<DigestDbEntrySet> outQueue = new LinkedBlockingDeque<>();
 
     private final int numThreads;
 
@@ -189,18 +189,18 @@ public class XipkiDigestExportReader {
     }
 
     public List<IdentifiedDbDigestEntry> readCerts(
-            final List<IDRange> idRanges)
+            final List<IdRange> idRanges)
     throws DataAccessException {
         int n = idRanges.size();
-        for (IDRange range : idRanges) {
+        for (IdRange range : idRanges) {
             inQueue.add(range);
         }
 
-        List<DigestDBEntrySet> results = new ArrayList<>(n);
+        List<DigestDbEntrySet> results = new ArrayList<>(n);
         int numCerts = 0;
         for (int i = 0; i < n; i++) {
             try {
-                DigestDBEntrySet result = outQueue.take();
+                DigestDbEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
             } catch (InterruptedException e) {
@@ -211,7 +211,7 @@ public class XipkiDigestExportReader {
         Collections.sort(results);
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
-        for (DigestDBEntrySet result : results) {
+        for (DigestDbEntrySet result : results) {
             if (result.getException() != null) {
                 throw new DataAccessException(
                         "error while reading from ID " + result.getStartId()

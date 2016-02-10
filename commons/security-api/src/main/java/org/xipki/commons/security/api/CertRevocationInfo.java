@@ -64,14 +64,14 @@ public class CertRevocationInfo implements Serializable {
 
     private double serialVersion;
 
-    private CRLReason reason;
+    private CrlReason reason;
 
     private Date revocationTime;
 
     private Date invalidityTime;
 
     public CertRevocationInfo(
-            final CRLReason reason) {
+            final CrlReason reason) {
         this(reason, new Date(), null);
     }
 
@@ -81,7 +81,7 @@ public class CertRevocationInfo implements Serializable {
     }
 
     public CertRevocationInfo(
-            final CRLReason reason,
+            final CrlReason reason,
             final Date revocationTime,
             final Date invalidityTime) {
         ParamUtil.assertNotNull("reason", reason);
@@ -98,7 +98,7 @@ public class CertRevocationInfo implements Serializable {
             final Date invalidityTime) {
         ParamUtil.assertNotNull("revocationTime", revocationTime);
 
-        this.reason = CRLReason.forReasonCode(reasonCode);
+        this.reason = CrlReason.forReasonCode(reasonCode);
         if (this.reason == null) {
             throw new IllegalArgumentException("invalid reason " + reasonCode);
         }
@@ -108,12 +108,12 @@ public class CertRevocationInfo implements Serializable {
     }
 
     public void setReason(
-            final CRLReason reason) {
+            final CrlReason reason) {
         ParamUtil.assertNotNull("reason", reason);
         this.reason = reason;
     }
 
-    public CRLReason getReason() {
+    public CrlReason getReason() {
         return reason;
     }
 
@@ -165,7 +165,7 @@ public class CertRevocationInfo implements Serializable {
     throws IOException, ClassNotFoundException {
         final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
         serialVersion = (double) serialMap.get(SR_SERIAL_VERSION);
-        reason = (CRLReason) serialMap.get(SR_REASON);
+        reason = (CrlReason) serialMap.get(SR_REASON);
         revocationTime = (Date) serialMap.get(SR_REVOCATION_TIME);
         invalidityTime = (Date) serialMap.get(SR_INVALIDITY_TIME);
     }

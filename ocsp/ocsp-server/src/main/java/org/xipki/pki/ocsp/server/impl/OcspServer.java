@@ -115,12 +115,12 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CertpathValidationModel;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
@@ -135,7 +135,7 @@ import org.xipki.pki.ocsp.api.CertStatusInfo;
 import org.xipki.pki.ocsp.api.CertStatusStore;
 import org.xipki.pki.ocsp.api.CertStatusStoreException;
 import org.xipki.pki.ocsp.api.CertprofileOption;
-import org.xipki.pki.ocsp.api.OCSPMode;
+import org.xipki.pki.ocsp.api.OcspMode;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.pki.ocsp.server.impl.certstore.CrlCertStatusStore;
 import org.xipki.pki.ocsp.server.impl.certstore.DbCertStatusStore;
@@ -809,11 +809,11 @@ public class OcspServer {
 
                         if (replaced) {
                             CertRevocationInfo newRevInfo;
-                            if (caRevInfo.getReason() == CRLReason.CA_COMPROMISE) {
+                            if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
                                 newRevInfo = caRevInfo;
                             } else {
                                 newRevInfo = new CertRevocationInfo(
-                                        CRLReason.CA_COMPROMISE,
+                                        CrlReason.CA_COMPROMISE,
                                         caRevInfo.getRevocationTime(),
                                         caRevInfo.getInvalidityTime());
                             }
@@ -867,13 +867,13 @@ public class OcspServer {
                     case UNKNOWN:
                     case IGNORE:
                         couldCacheInfo = false;
-                        if (responderOption.getMode() == OCSPMode.RFC2560) {
+                        if (responderOption.getMode() == OcspMode.RFC2560) {
                             bcCertStatus = new UnknownStatus();
                         } else { // (ocspMode == OCSPMode.RFC6960)
                             unknownAsRevoked = true;
                             includeExtendedRevokeExtension = true;
                             bcCertStatus = new RevokedStatus(new Date(0L),
-                                    CRLReason.CERTIFICATE_HOLD.getCode());
+                                    CrlReason.CERTIFICATE_HOLD.getCode());
                         }
                         break;
                     case REVOKED:
@@ -1006,7 +1006,7 @@ public class OcspServer {
             }
 
             ConcurrentContentSigner concurrentSigner = null;
-            if (responderOption.getMode() != OCSPMode.RFC2560) {
+            if (responderOption.getMode() != OcspMode.RFC2560) {
                 extensionType = ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
                 criticalExtensionOIDs.remove(extensionType);
                 Extension ext = request.getExtension(extensionType);
@@ -1597,7 +1597,7 @@ public class OcspServer {
                     "parse profile failed, message: " + e.getMessage(), e);
         } catch (JAXBException e) {
             throw new InvalidConfException(
-                    "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                    "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) e), e);
         }
     }
 

@@ -59,12 +59,12 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IDRange;
+import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntryContainer;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
-import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCACertExtractor;
+import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCaCertExtractor;
 import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaCaInfo;
 import org.xipki.pki.ca.dbtool.diffdb.io.EjbcaDigestExportReader;
 import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
@@ -212,7 +212,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                     continue;
                 }
 
-                X509Certificate cert = EjbcaCACertExtractor.extractCACert(data);
+                X509Certificate cert = EjbcaCaCertExtractor.extractCACert(data);
                 byte[] certBytes = cert.getEncoded();
 
                 String commonName = X509Util.getCommonName(cert.getSubjectX500Principal());
@@ -383,7 +383,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
         processLog.printHeader();
 
-        List<IDRange> idRanges = new ArrayList<>(numThreads);
+        List<IdRange> idRanges = new ArrayList<>(numThreads);
 
         boolean interrupted = false;
 
@@ -397,7 +397,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             idRanges.clear();
             for (int j = 0; j < numThreads; j++) {
                 int to = i + numCertsPerSelect - 1;
-                idRanges.add(new IDRange(i, to));
+                idRanges.add(new IdRange(i, to));
                 i = to + 1;
                 if (i > maxCertId) {
                     break; // break for (int j; ...)

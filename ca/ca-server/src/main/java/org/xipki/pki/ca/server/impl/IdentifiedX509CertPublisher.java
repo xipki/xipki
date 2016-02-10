@@ -50,7 +50,7 @@ import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.pki.ca.server.impl.publisher.OCSPCertPublisher;
+import org.xipki.pki.ca.server.impl.publisher.OcspCertPublisher;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 /**
@@ -78,7 +78,7 @@ class IdentifiedX509CertPublisher {
 
         X509CertPublisher realPublisher;
         if ("ocsp".equalsIgnoreCase(type)) {
-            realPublisher = new OCSPCertPublisher();
+            realPublisher = new OcspCertPublisher();
         } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
             String className = type.substring("java:".length());
             try {

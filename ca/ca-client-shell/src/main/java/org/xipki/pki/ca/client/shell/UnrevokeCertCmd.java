@@ -45,7 +45,7 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CertIdOrError;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
@@ -95,7 +95,7 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
         }
 
         if (certIdOrError.getError() != null) {
-            PKIStatusInfo error = certIdOrError.getError();
+            PkiStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("releasing revocation failed: " + error);
         } else {
             out("unrevoked certificate");

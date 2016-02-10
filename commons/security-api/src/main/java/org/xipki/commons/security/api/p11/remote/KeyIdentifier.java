@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.commons.security.api.BadASN1ObjectException;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 
 /**
@@ -87,7 +87,7 @@ public class KeyIdentifier extends ASN1Object {
 
     public static KeyIdentifier getInstance(
             final Object obj)
-    throws BadASN1ObjectException {
+    throws BadAsn1ObjectException {
         if (obj == null || obj instanceof KeyIdentifier) {
             return (KeyIdentifier) obj;
         }
@@ -107,10 +107,10 @@ public class KeyIdentifier extends ASN1Object {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IllegalArgumentException | IOException e) {
-            throw new BadASN1ObjectException("unable to parse encoded KeyIdentifier");
+            throw new BadAsn1ObjectException("unable to parse encoded KeyIdentifier");
         }
 
-        throw new BadASN1ObjectException("unknown object in KeyIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in KeyIdentifier.getInstance(): "
                 + obj.getClass().getName());
     }
 

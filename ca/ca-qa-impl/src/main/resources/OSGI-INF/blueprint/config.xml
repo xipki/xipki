@@ -14,8 +14,8 @@
       <cm:property name="confFile" value="xipki/ca-qa/caqa-conf.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="qaSystemManager" class="org.xipki.pki.ca.qa.impl.QASystemManagerImpl" init-method="init" destroy-method="shutdown">
+  <bean id="qaSystemManager" class="org.xipki.pki.ca.qa.impl.QaSystemManagerImpl" init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
   </bean>
-  <service ref="qaSystemManager" interface="org.xipki.pki.ca.qa.api.QASystemManager"/>  
+  <service ref="qaSystemManager" interface="org.xipki.pki.ca.qa.api.QaSystemManager"/>  
 </blueprint>

@@ -58,7 +58,7 @@ public class UserEntry implements Serializable {
             final String name,
             final String hashedPassword,
             final String cnRegex)
-    throws CAMgmtException {
+    throws CaMgmtException {
         ParamUtil.assertNotBlank("name", name);
 
         this.name = name;

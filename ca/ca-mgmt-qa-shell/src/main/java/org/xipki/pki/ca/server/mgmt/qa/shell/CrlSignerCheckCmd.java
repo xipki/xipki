@@ -38,7 +38,7 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.pki.ca.server.mgmt.api.CRLControl;
+import org.xipki.pki.ca.server.mgmt.api.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
@@ -68,18 +68,18 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
         if (ey.getSignerType() != null) {
             String ex = ey.getSignerType();
             String is = cs.getType();
-            MgmtQAShellUtil.assertEquals("signer type", ex, is);
+            MgmtQaShellUtil.assertEquals("signer type", ex, is);
         }
 
         if (ey.getSignerConf() != null) {
             String ex = ey.getSignerConf();
             String is = cs.getConf();
-            MgmtQAShellUtil.assertEquals("signer conf", ex, is);
+            MgmtQaShellUtil.assertEquals("signer conf", ex, is);
         }
 
         if (ey.getCrlControl() != null) {
-            CRLControl ex = new CRLControl(ey.getCrlControl());
-            CRLControl is = new CRLControl(cs.getCrlControl());
+            CrlControl ex = new CrlControl(ey.getCrlControl());
+            CrlControl is = new CrlControl(cs.getCrlControl());
 
             if (!ex.equals(is)) {
                 throw new CmdFailure("CRL control: is '" + is.getConf()
@@ -90,7 +90,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
         if (ey.getBase64Cert() != null) {
             String ex = ey.getBase64Cert();
             String is = cs.getBase64Cert();
-            MgmtQAShellUtil.assertEquals("certificate", ex, is);
+            MgmtQaShellUtil.assertEquals("certificate", ex, is);
         }
 
         out(" checked CRL signer " + name);

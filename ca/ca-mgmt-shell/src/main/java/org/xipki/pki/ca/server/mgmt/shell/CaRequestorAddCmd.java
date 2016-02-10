@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
@@ -99,7 +99,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
     throws Exception {
         boolean ra = isEnabled(raS, false, "ra");
 
-        CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
+        CaHasRequestorEntry entry = new CaHasRequestorEntry(requestorName);
         entry.setRa(ra);
         entry.setProfiles(profiles);
         Set<Permission> localPermissions = new HashSet<>();

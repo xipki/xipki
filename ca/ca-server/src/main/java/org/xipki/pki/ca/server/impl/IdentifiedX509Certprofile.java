@@ -269,7 +269,7 @@ class IdentifiedX509Certprofile {
             final X500Name requestedSubject,
             final Extensions requestExtensions,
             final SubjectPublicKeyInfo publicKeyInfo,
-            final PublicCAInfo publicCaInfo,
+            final PublicCaInfo publicCaInfo,
             final X509Certificate crlSignerCert,
             final Date notBefore,
             final Date notAfter)

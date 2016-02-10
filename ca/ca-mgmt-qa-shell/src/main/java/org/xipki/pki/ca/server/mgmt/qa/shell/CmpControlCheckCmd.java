@@ -64,7 +64,7 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd {
 
         String is = c.getConf();
         String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
-        MgmtQAShellUtil.assertEquals("CMP control", ex, is);
+        MgmtQaShellUtil.assertEquals("CMP control", ex, is);
 
         out(" checked CMP control " + name);
         return null;

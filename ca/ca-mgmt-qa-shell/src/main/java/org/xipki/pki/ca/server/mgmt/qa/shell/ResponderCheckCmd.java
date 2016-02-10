@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
 
@@ -66,7 +66,7 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
             throw new CmdFailure("CMP responder named '" + name + "' is not configured");
         }
 
-        if (CAManager.NULL.equalsIgnoreCase(certFile)) {
+        if (CaManager.NULL.equalsIgnoreCase(certFile)) {
             if (cr.getBase64Cert() != null) {
                 throw new CmdFailure("Cert: is configured but expected is none");
             }
@@ -82,7 +82,7 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
 
         String signerConf = getSignerConf();
         if (signerConf != null) {
-            MgmtQAShellUtil.assertEquals("conf", signerConf, cr.getConf());
+            MgmtQaShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }
 
         out(" checked responder " + name);

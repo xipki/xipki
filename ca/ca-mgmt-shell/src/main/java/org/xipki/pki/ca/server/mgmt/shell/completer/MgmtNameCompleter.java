@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CAManager;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
 
 /**
  * @author Lijun Liao
@@ -47,10 +47,10 @@ import org.xipki.pki.ca.server.mgmt.api.CAManager;
 public abstract class MgmtNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Reference
-    protected CAManager caManager;
+    protected CaManager caManager;
 
     public void setCaManager(
-            final CAManager caManager) {
+            final CaManager caManager) {
         this.caManager = caManager;
     }
 

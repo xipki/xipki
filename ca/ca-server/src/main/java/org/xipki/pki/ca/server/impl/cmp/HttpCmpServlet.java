@@ -135,7 +135,7 @@ public class HttpCmpServlet extends HttpServlet {
             String servletPath = request.getServletPath();
 
             String caName = null;
-            X509CACmpResponder responder = null;
+            X509CaCmpResponder responder = null;
             int n = servletPath.length();
             if (requestURI.length() > n + 1) {
                 String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");

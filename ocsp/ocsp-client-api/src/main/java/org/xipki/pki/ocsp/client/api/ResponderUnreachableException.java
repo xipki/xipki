@@ -41,7 +41,7 @@ package org.xipki.pki.ocsp.client.api;
  */
 
 @SuppressWarnings("serial")
-public class ResponderUnreachableException extends OCSPResponseException {
+public class ResponderUnreachableException extends OcspResponseException {
 
     public ResponderUnreachableException() {
         super();

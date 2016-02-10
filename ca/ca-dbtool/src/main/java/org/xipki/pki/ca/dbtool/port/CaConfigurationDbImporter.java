@@ -50,7 +50,7 @@ import javax.xml.bind.Unmarshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.dbtool.InvalidInputException;
@@ -114,7 +114,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CONFIGURATION));
             caconf = root.getValue();
         } catch (JAXBException e) {
-            throw XMLUtil.convert(e);
+            throw XmlUtil.convert(e);
         }
 
         if (caconf.getVersion() > VERSION) {
