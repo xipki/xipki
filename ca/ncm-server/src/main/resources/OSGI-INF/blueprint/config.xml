@@ -17,10 +17,10 @@
       <cm:property name="truststore.provider" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>
+  <reference id="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CaManager"/>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="serverServlet" class="org.xipki.pki.ca.ncm.server.impl.CAManagerServlet" init-method="initialize" destroy-method="shutdown">
+  <bean id="serverServlet" class="org.xipki.pki.ca.ncm.server.impl.CaManagerServlet" init-method="initialize" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="caManager" ref="caManager"/>
     <property name="truststoreFile" value="${truststore.file}"/>

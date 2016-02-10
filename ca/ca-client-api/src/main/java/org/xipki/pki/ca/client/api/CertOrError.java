@@ -38,7 +38,7 @@ package org.xipki.pki.ca.client.api;
 import java.security.cert.Certificate;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
@@ -49,7 +49,7 @@ public class CertOrError {
 
     private final Certificate certificate;
 
-    private final PKIStatusInfo error;
+    private final PkiStatusInfo error;
 
     public CertOrError(
             final Certificate certificate) {
@@ -60,7 +60,7 @@ public class CertOrError {
     }
 
     public CertOrError(
-            final PKIStatusInfo error) {
+            final PkiStatusInfo error) {
         ParamUtil.assertNotNull("error", error);
 
         this.certificate = null;
@@ -71,7 +71,7 @@ public class CertOrError {
         return certificate;
     }
 
-    public PKIStatusInfo getError() {
+    public PkiStatusInfo getError() {
         return error;
     }
 

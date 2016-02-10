@@ -36,7 +36,7 @@
 package org.xipki.pki.ca.client.api.dto;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
@@ -45,11 +45,11 @@ import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
 
 public class ErrorResultEntryType extends ResultEntryType {
 
-    private final PKIStatusInfo statusInfo;
+    private final PkiStatusInfo statusInfo;
 
     public ErrorResultEntryType(
             final String id,
-            final PKIStatusInfo statusInfo) {
+            final PkiStatusInfo statusInfo) {
         super(id);
         ParamUtil.assertNotNull("statusInfo", statusInfo);
 
@@ -62,17 +62,17 @@ public class ErrorResultEntryType extends ResultEntryType {
             final int pkiFailureInfo,
             final String statusMessage) {
         super(id);
-        this.statusInfo = new PKIStatusInfo(status, pkiFailureInfo, statusMessage);
+        this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
     public ErrorResultEntryType(
             final String id,
             final int status) {
         super(id);
-        this.statusInfo = new PKIStatusInfo(status);
+        this.statusInfo = new PkiStatusInfo(status);
     }
 
-    public PKIStatusInfo getStatusInfo() {
+    public PkiStatusInfo getStatusInfo() {
         return statusInfo;
     }
 

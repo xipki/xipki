@@ -51,11 +51,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ocsp.client.api.OCSPRequestor;
-import org.xipki.pki.ocsp.client.api.OCSPRequestorException;
-import org.xipki.pki.ocsp.client.api.OCSPResponseException;
+import org.xipki.pki.ocsp.client.api.OcspRequestor;
+import org.xipki.pki.ocsp.client.api.OcspRequestorException;
+import org.xipki.pki.ocsp.client.api.OcspResponseException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.pki.ocsp.client.shell.OCSPUtils;
+import org.xipki.pki.ocsp.client.shell.OcspUtils;
 
 /**
  * @author Lijun Liao
@@ -84,11 +84,11 @@ public class OcspLoadTest extends LoadExecutor {
             try {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
                         options, null);
-                basicResp = OCSPUtils.extractBasicOCSPResp(response);
-            } catch (OCSPRequestorException e) {
+                basicResp = OcspUtils.extractBasicOCSPResp(response);
+            } catch (OcspRequestorException e) {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;
-            } catch (OCSPResponseException e) {
+            } catch (OcspResponseException e) {
                 LOG.warn("OCSPResponseException: {}", e.getMessage());
                 return false;
             } catch (Throwable t) {
@@ -142,7 +142,7 @@ public class OcspLoadTest extends LoadExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
-    private final OCSPRequestor requestor;
+    private final OcspRequestor requestor;
 
     private final List<Long> serials;
 
@@ -157,7 +157,7 @@ public class OcspLoadTest extends LoadExecutor {
     private RequestOptions options;
 
     public OcspLoadTest(
-            final OCSPRequestor requestor,
+            final OcspRequestor requestor,
             final List<Long> serials,
             final X509Certificate caCert,
             final URL serverUrl,

@@ -5,7 +5,7 @@
     default-activation="lazy">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <bean id="ocspQA" class="org.xipki.pki.ocsp.qa.impl.OcspQAImpl" init-method="init" destroy-method="shutdown">
+  <bean id="ocspQa" class="org.xipki.pki.ocsp.qa.impl.OcspQaImpl" init-method="init" destroy-method="shutdown">
   </bean>
-  <service ref="ocspQA" interface="org.xipki.pki.ocsp.qa.api.OcspQA"/>  
+  <service ref="ocspQa" interface="org.xipki.pki.ocsp.qa.api.OcspQa"/>  
 </blueprint>

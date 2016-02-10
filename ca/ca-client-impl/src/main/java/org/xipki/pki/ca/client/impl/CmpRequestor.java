@@ -83,10 +83,10 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.client.api.PKIErrorException;
+import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
-import org.xipki.pki.ca.common.cmp.PKIResponse;
+import org.xipki.pki.ca.common.cmp.PkiResponse;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 
@@ -192,7 +192,7 @@ public abstract class CmpRequestor {
         }
     }
 
-    protected PKIResponse signAndSend(
+    protected PkiResponse signAndSend(
             final PKIMessage request,
             final RequestResponseDebug debug)
     throws CmpRequestorException {
@@ -252,7 +252,7 @@ public abstract class CmpRequestor {
             LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
         }
 
-        PKIResponse ret = new PKIResponse(response);
+        PkiResponse ret = new PkiResponse(response);
         if (response.hasProtection()) {
             try {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
@@ -273,16 +273,16 @@ public abstract class CmpRequestor {
     } // method signAndSend
 
     protected ASN1Encodable extractGeneralRepContent(
-            final PKIResponse response,
+            final PkiResponse response,
             final String exepectedType)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         return extractGeneralRepContent(response, exepectedType, true);
     }
 
     protected ASN1Encodable extractXipkiActionRepContent(
-            final PKIResponse response,
+            final PkiResponse response,
             final int action)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         ASN1Encodable itvValue = extractGeneralRepContent(response,
                 ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
         return extractXipkiActionContent(itvValue, action);
@@ -321,10 +321,10 @@ public abstract class CmpRequestor {
     } // method extractXipkiActionContent
 
     private ASN1Encodable extractGeneralRepContent(
-            final PKIResponse response,
+            final PkiResponse response,
             final String exepectedType,
             final boolean requireProtectionCheck)
-    throws CmpRequestorException, PKIErrorException {
+    throws CmpRequestorException, PkiErrorException {
         if (requireProtectionCheck) {
             checkProtection(response);
         }
@@ -443,11 +443,11 @@ public abstract class CmpRequestor {
         return hBuilder.build();
     } // method buildPKIHeader
 
-    protected PKIErrorException buildErrorResult(
+    protected PkiErrorException buildErrorResult(
             final ErrorMsgContent bodyContent) {
-        org.xipki.pki.ca.common.cmp.PKIStatusInfo statusInfo =
-                new org.xipki.pki.ca.common.cmp.PKIStatusInfo(bodyContent.getPKIStatusInfo());
-        return new PKIErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(),
+        org.xipki.pki.ca.common.cmp.PkiStatusInfo statusInfo =
+                new org.xipki.pki.ca.common.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
+        return new PkiErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(),
                 statusInfo.getStatusMessage());
     }
 
@@ -541,8 +541,8 @@ public abstract class CmpRequestor {
     }
 
     protected void checkProtection(
-            final PKIResponse response)
-    throws PKIErrorException {
+            final PkiResponse response)
+    throws PkiErrorException {
         if (!response.hasProtection()) {
             return;
         }
@@ -552,7 +552,7 @@ public abstract class CmpRequestor {
 
         if (protectionVerificationResult == null
             || protectionVerificationResult.getProtectionResult() != ProtectionResult.VALID) {
-            throw new PKIErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
+            throw new PkiErrorException(ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
                         PKIFailureInfo.badMessageCheck, "message check of the response failed");
         }
     }

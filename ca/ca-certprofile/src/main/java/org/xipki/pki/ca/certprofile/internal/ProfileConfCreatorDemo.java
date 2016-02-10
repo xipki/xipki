@@ -63,9 +63,9 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.TLSExtensionType;
+import org.xipki.commons.security.api.TlsExtensionType;
 import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
@@ -256,7 +256,7 @@ public class ProfileConfCreatorDemo {
         try {
             m.marshal(root, out);
         } catch (JAXBException e) {
-            throw XMLUtil.convert(e);
+            throw XmlUtil.convert(e);
         } finally {
             out.close();
         }
@@ -678,8 +678,8 @@ public class ProfileConfCreatorDemo {
 
         // Extensions - tlsFeature
         extensionValue = createTlsFeature(
-                new TLSExtensionType[]{TLSExtensionType.STATUS_REQUEST,
-                        TLSExtensionType.CLIENT_CERTIFICATE_URL});
+                new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
+                        TlsExtensionType.CLIENT_CERTIFICATE_URL});
         list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
         // Extensions - SMIMECapabilities
@@ -1735,7 +1735,7 @@ public class ProfileConfCreatorDemo {
         sb.append("    </my:myDescription>\n");
         Element element;
         try {
-            element = XMLUtil.getDocumentElment(sb.toString().getBytes());
+            element = XmlUtil.getDocumentElment(sb.toString().getBytes());
         } catch (IOException | SAXException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -1756,12 +1756,12 @@ public class ProfileConfCreatorDemo {
         return ret;
     }
 
-    private static ExtensionValueType createTlsFeature(TLSExtensionType[] features) {
-        List<TLSExtensionType> l = Arrays.asList(features);
+    private static ExtensionValueType createTlsFeature(TlsExtensionType[] features) {
+        List<TlsExtensionType> l = Arrays.asList(features);
         Collections.sort(l);
 
         TlsFeature tlsFeature = new TlsFeature();
-        for (TLSExtensionType m : l) {
+        for (TlsExtensionType m : l) {
             IntWithDescType k = new IntWithDescType();
             k.setValue(m.getCode());
             k.setDescription(m.getName());

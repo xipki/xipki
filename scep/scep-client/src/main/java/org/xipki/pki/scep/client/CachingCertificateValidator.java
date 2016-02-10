@@ -46,14 +46,14 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
  * @since 2.0.0
  */
 
-public final class CachingCertificateValidator implements CACertValidator {
+public final class CachingCertificateValidator implements CaCertValidator {
 
     private final ConcurrentHashMap<String, Boolean> cachedAnswers;
 
-    private final CACertValidator delegate;
+    private final CaCertValidator delegate;
 
     public CachingCertificateValidator(
-            final CACertValidator delegate) {
+            final CaCertValidator delegate) {
         this.delegate = delegate;
         this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
     }

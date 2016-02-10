@@ -47,11 +47,11 @@ import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.ClientCRLReasonCompleter;
-import org.xipki.commons.security.api.CRLReason;
+import org.xipki.commons.console.karaf.completer.ClientCrlReasonCompleter;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CertIdOrError;
-import org.xipki.pki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
@@ -67,7 +67,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
             required = true,
             description = "CRL reason\n"
                     + "(required)")
-    @Completion(ClientCRLReasonCompleter.class)
+    @Completion(ClientCrlReasonCompleter.class)
     private String reason;
 
     @Option(name = "--inv-date",
@@ -81,12 +81,12 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
-        CRLReason crlReason = CRLReason.getInstance(reason);
+        CrlReason crlReason = CrlReason.getInstance(reason);
         if (crlReason == null) {
             throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
-        if (!CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
+        if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
@@ -128,7 +128,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
         }
 
         if (certIdOrError.getError() != null) {
-            PKIStatusInfo error = certIdOrError.getError();
+            PkiStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("revocation failed: " + error);
         } else {
             out("revoked certificate");

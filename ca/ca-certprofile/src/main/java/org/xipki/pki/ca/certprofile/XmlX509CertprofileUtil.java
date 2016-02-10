@@ -70,7 +70,7 @@ import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.XMLUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -156,7 +156,7 @@ public class XmlX509CertprofileUtil {
                         "parse profile failed, message: " + e.getMessage(), e);
             } catch (JAXBException e) {
                 throw new CertprofileException(
-                        "parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e),
+                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) e),
                         e);
             }
 
