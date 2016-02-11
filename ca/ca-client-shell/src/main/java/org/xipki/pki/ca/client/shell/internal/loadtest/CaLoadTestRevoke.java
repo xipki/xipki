@@ -261,7 +261,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
             String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
                     + " AND SN > " + (nextStartSerial - 1) + " AND SN < " + (maxSerial + 1);
-            sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SN");
+            sql = caDataSource.createFetchFirstSelectSql(sql, 1000, "SN");
             PreparedStatement stmt = null;
             ResultSet rs = null;
 

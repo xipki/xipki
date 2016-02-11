@@ -59,7 +59,7 @@ public class ScepClient extends Client {
     }
 
     @Override
-    protected ScepHttpResponse httpGET(
+    protected ScepHttpResponse httpGet(
             final String url)
     throws ScepClientException {
         try {
@@ -73,7 +73,7 @@ public class ScepClient extends Client {
     }
 
     @Override
-    protected ScepHttpResponse httpPOST(
+    protected ScepHttpResponse httpPost(
             final String url,
             final String requestContentType,
             final byte[] request)

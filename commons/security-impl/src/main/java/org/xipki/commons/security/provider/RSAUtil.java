@@ -64,7 +64,7 @@ public class RSAUtil {
     private RSAUtil() {
     }
 
-    public static boolean isRsaOid(
+    public static boolean isRSAOid(
             final ASN1ObjectIdentifier algOid) {
         for (int i = 0; i != RSA_OIDS.length; i++) {
             if (algOid.equals(RSA_OIDS[i])) {

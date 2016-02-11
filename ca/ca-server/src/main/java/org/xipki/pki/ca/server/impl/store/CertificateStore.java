@@ -106,7 +106,7 @@ public class CertificateStore {
         }
 
         return true;
-    } // method addCertificate
+    }
 
     public void addToPublishQueue(
             final String publisherName,
@@ -121,7 +121,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method addToPublishQueue
+    }
 
     public void removeFromPublishQueue(
             final String publisherName,
@@ -135,7 +135,7 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method removeFromPublishQueue
+    }
 
     public void clearPublishQueue(
             final X509Cert caCert,
@@ -149,45 +149,45 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method clearPublishQueue
+    }
 
-    public long getMaxIdOfDeltaCRLCache(
+    public long getMaxIdOfDeltaCrlCache(
             final X509Cert caCert)
     throws OperationException {
         try {
-            return queryExecutor.getMaxIdOfDeltaCRLCache(caCert);
+            return queryExecutor.getMaxIdOfDeltaCrlCache(caCert);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method getMaxIdOfDeltaCRLCache
+    }
 
-    public void clearDeltaCRLCache(
+    public void clearDeltaCrlCache(
             final X509Cert caCert,
             final long maxId)
     throws OperationException {
         try {
-            queryExecutor.clearDeltaCRLCache(caCert, maxId);
+            queryExecutor.clearDeltaCrlCache(caCert, maxId);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method clearDeltaCRLCache
+    }
 
     public X509CertWithRevocationInfo revokeCertificate(
             final X509Cert caCert,
             final BigInteger serialNumber,
             final CertRevocationInfo revInfo,
             final boolean force,
-            final boolean publishToDeltaCRLCache)
+            final boolean publishToDeltaCrlCache)
     throws OperationException {
         try {
             X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
-                    caCert, serialNumber, revInfo, force, publishToDeltaCRLCache);
+                    caCert, serialNumber, revInfo, force, publishToDeltaCrlCache);
             if (revokedCert == null) {
                 LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
@@ -203,17 +203,17 @@ public class CertificateStore {
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
-    } // method revokeCertificate
+    }
 
     public X509CertWithDbId unrevokeCertificate(
             final X509Cert caCert,
             final BigInteger serialNumber,
             final boolean force,
-            final boolean publishToDeltaCRLCache)
+            final boolean publishToDeltaCrlCache)
     throws OperationException {
         try {
             X509CertWithDbId unrevokedCert = queryExecutor.unrevokeCert(
-                    caCert, serialNumber, force, publishToDeltaCRLCache);
+                    caCert, serialNumber, force, publishToDeltaCrlCache);
             if (unrevokedCert == null) {
                 LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), serialNumber);
@@ -259,11 +259,11 @@ public class CertificateStore {
         }
     }
 
-    public boolean addCRL(
+    public boolean addCrl(
             final X509Cert caCert,
             final X509CRL crl) {
         try {
-            queryExecutor.addCRL(caCert, crl);
+            queryExecutor.addCrl(caCert, crl);
             return true;
         } catch (Exception e) {
             LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
@@ -274,11 +274,11 @@ public class CertificateStore {
         }
     }
 
-    public boolean hasCRL(
+    public boolean hasCrl(
             final X509Cert caCert)
     throws OperationException {
         try {
-            return queryExecutor.hasCRL(caCert);
+            return queryExecutor.hasCrl(caCert);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -287,7 +287,7 @@ public class CertificateStore {
         }
     }
 
-    public int getMaxCRLNumber(
+    public int getMaxCrlNumber(
             final X509Cert caCert)
     throws OperationException {
         try {
@@ -300,11 +300,11 @@ public class CertificateStore {
         }
     }
 
-    public long getThisUpdateOfCurrentCRL(
+    public long getThisUpdateOfCurrentCrl(
             final X509Cert caCert)
     throws OperationException {
         try {
-            return queryExecutor.getThisUpdateOfCurrentCRL(caCert);
+            return queryExecutor.getThisUpdateOfCurrentCrl(caCert);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -313,11 +313,11 @@ public class CertificateStore {
         }
     }
 
-    public byte[] getEncodedCRL(
+    public byte[] getEncodedCrl(
             final X509Cert caCert,
             final BigInteger crlNumber) {
         try {
-            return queryExecutor.getEncodedCRL(caCert, crlNumber);
+            return queryExecutor.getEncodedCrl(caCert, crlNumber);
         } catch (Exception e) {
             LOG.error("could not get CRL ca={}: error message: {}",
                     caCert.getSubject(),
@@ -327,11 +327,11 @@ public class CertificateStore {
         }
     }
 
-    public int cleanupCRLs(
+    public int cleanupCrls(
             final X509Cert caCert,
             final int numCRLs) {
         try {
-            return queryExecutor.cleanupCRLs(caCert, numCRLs);
+            return queryExecutor.cleanupCrls(caCert, numCRLs);
         } catch (Exception e) {
             LOG.error("could not cleanup CRLs ca={}: error message: {}",
                     caCert.getSubject(),
@@ -392,20 +392,19 @@ public class CertificateStore {
      * @param notExpiredAt
      * @param startSerial
      * @param numEntries
-     * @return
      * @throws DataAccessException
      */
-    public List<CertRevInfoWithSerial> getRevokedCertificates(
+    public List<CertRevInfoWithSerial> getRevokedCerts(
             final X509Cert caCert,
             final Date notExpiredAt,
             final BigInteger startSerial,
             final int numEntries,
-            final boolean onlyCACerts,
+            final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
             return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial,
-                    numEntries, onlyCACerts, onlyUserCerts);
+                    numEntries, onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -414,16 +413,16 @@ public class CertificateStore {
         }
     }
 
-    public List<CertRevInfoWithSerial> getCertificatesForDeltaCRL(
+    public List<CertRevInfoWithSerial> getCertsForDeltaCrl(
             final X509Cert caCert,
             final BigInteger startSerial,
             final int numEntries,
-            final boolean onlyCACerts,
+            final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
-            return queryExecutor.getCertificatesForDeltaCRL(caCert, startSerial, numEntries,
-                    onlyCACerts, onlyUserCerts);
+            return queryExecutor.getCertificatesForDeltaCrl(caCert, startSerial, numEntries,
+                    onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -438,13 +437,13 @@ public class CertificateStore {
             final BigInteger startSerial,
             final int numEntries,
             final boolean onlyRevoked,
-            final boolean onlyCACerts,
+            final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
             return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial,
                     numEntries, onlyRevoked,
-                    onlyCACerts, onlyUserCerts);
+                    onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -553,11 +552,11 @@ public class CertificateStore {
         }
     }
 
-    public String getCNRegexForUser(
+    public String getCnRegexForUser(
             final String user)
     throws OperationException {
         try {
-            return queryExecutor.getCNRegexForUser(user);
+            return queryExecutor.getCnRegexForUser(user);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -684,22 +683,23 @@ public class CertificateStore {
         }
     }
 
-    public String getLatestSN(
-            final X500Name nameWithSN)
+    public String getLatestSerialNumber(
+            final X500Name nameWithSerialNumber)
     throws OperationException {
         try {
-            return queryExecutor.getLatestSN(nameWithSN);
+            return queryExecutor.getLatestSerialNumber(nameWithSerialNumber);
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
         }
     }
 
-    public Long getNotBeforeOfFirstCertStartsWithCN(
+    public Long getNotBeforeOfFirstCertStartsWithCommonName(
             final String commonName,
             final String profileName)
     throws OperationException {
         try {
-            return queryExecutor.getNotBeforeOfFirstCertStartsWithCN(commonName, profileName);
+            return queryExecutor.getNotBeforeOfFirstCertStartsWithCommonName(commonName,
+                    profileName);
         } catch (DataAccessException e) {
             LOG.debug("DataAccessException", e);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -708,7 +708,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean containsCACertificates(
+    public boolean containsCaCertificates(
             final X509Cert caCert)
     throws OperationException {
         try {

@@ -268,7 +268,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             String caData = rs.getString("data");
             rs.close();
 
-            caCert = EjbcaCaCertExtractor.extractCACert(caData);
+            caCert = EjbcaCaCertExtractor.extractCaCert(caData);
             // account
             if (dbContainsOtherCA) {
                 // ignore it due to performance

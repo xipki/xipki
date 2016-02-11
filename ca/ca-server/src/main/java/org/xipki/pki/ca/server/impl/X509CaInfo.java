@@ -89,9 +89,9 @@ public class X509CaInfo {
 
     private boolean selfSigned;
 
-    private CMPCertificate certInCMPFormat;
+    private CMPCertificate certInCmpFormat;
 
-    private PublicCaInfo publicCAInfo;
+    private PublicCaInfo publicCaInfo;
 
     private CertificateStore certStore;
 
@@ -126,9 +126,9 @@ public class X509CaInfo {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not encode the CA certificate");
         }
-        this.certInCMPFormat = new CMPCertificate(bcCert);
+        this.certInCmpFormat = new CMPCertificate(bcCert);
 
-        this.publicCAInfo = new PublicCaInfo(cert,
+        this.publicCaInfo = new PublicCaInfo(cert,
                 caEntry.getCacertUris(),
                 caEntry.getOcspUris(),
                 caEntry.getCrlUris(),
@@ -144,7 +144,7 @@ public class X509CaInfo {
         }
 
         Long greatestSerialNumber = certStore.getGreatestSerialNumber(
-                this.publicCAInfo.getCaCertificate());
+                this.publicCaInfo.getCaCertificate());
 
         if (greatestSerialNumber == null) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
@@ -175,11 +175,11 @@ public class X509CaInfo {
 
     public void commitNextCrlNo()
     throws OperationException {
-        certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCRLNumber());
+        certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCrlNumber());
     }
 
-    public PublicCaInfo getPublicCAInfo() {
-        return publicCAInfo;
+    public PublicCaInfo getPublicCaInfo() {
+        return publicCaInfo;
     }
 
     public String getSubject() {
@@ -202,8 +202,8 @@ public class X509CaInfo {
         return selfSigned;
     }
 
-    public CMPCertificate getCertInCMPFormat() {
-        return certInCMPFormat;
+    public CMPCertificate getCertInCmpFormat() {
+        return certInCmpFormat;
     }
 
     public long getNoNewCertificateAfter() {
@@ -252,7 +252,7 @@ public class X509CaInfo {
     }
 
     public X509Cert getCertificate() {
-        return publicCAInfo.getCaCertificate();
+        return publicCaInfo.getCaCertificate();
     }
 
     public String getSignerConf() {
@@ -377,7 +377,7 @@ public class X509CaInfo {
     public BigInteger nextSerial()
     throws OperationException {
         if (useRandomSerialNumber) {
-            return randomSNGenerator.getSerialNumber();
+            return randomSNGenerator.nextSerialNumber();
         }
 
         long serial = certStore.nextSerial(getCertificate(), caEntry.getSerialSeqName());
@@ -392,14 +392,14 @@ public class X509CaInfo {
         }
     }
 
-    public BigInteger nextCRLNumber()
+    public BigInteger nextCrlNumber()
     throws OperationException {
-        int crlNo = caEntry.getNextCRLNumber();
-        int currentMaxNo = certStore.getMaxCRLNumber(getCertificate());
+        int crlNo = caEntry.getNextCrlNumber();
+        int currentMaxNo = certStore.getMaxCrlNumber(getCertificate());
         if (crlNo <= currentMaxNo) {
             crlNo = currentMaxNo + 1;
         }
-        caEntry.setNextCRLNumber(crlNo + 1);
+        caEntry.setNextCrlNumber(crlNo + 1);
         return BigInteger.valueOf(crlNo);
     }
 

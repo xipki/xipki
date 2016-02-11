@@ -48,19 +48,19 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class EnrollCertResultType {
 
-    private List<CMPCertificate> cACertificates;
+    private List<CMPCertificate> caCertificates;
 
     private List<ResultEntryType> resultEntries;
 
     public EnrollCertResultType() {
     }
 
-    public void addCACertificate(
-            final CMPCertificate cACertificate) {
-        if (cACertificates == null) {
-            cACertificates = new ArrayList<>(1);
+    public void addCaCertificate(
+            final CMPCertificate caCertificate) {
+        if (caCertificates == null) {
+            caCertificates = new ArrayList<>(1);
         }
-        cACertificates.add(cACertificate);
+        caCertificates.add(caCertificate);
     }
 
     public void addResultEntry(
@@ -80,8 +80,8 @@ public class EnrollCertResultType {
         resultEntries.add(resultEntry);
     }
 
-    public List<CMPCertificate> getCACertificates() {
-        return cACertificates;
+    public List<CMPCertificate> getCaCertificates() {
+        return caCertificates;
     }
 
     public List<ResultEntryType> getResultEntries() {

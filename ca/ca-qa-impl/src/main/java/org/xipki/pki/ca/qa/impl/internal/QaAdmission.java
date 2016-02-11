@@ -55,7 +55,7 @@ public class QaAdmission extends QaExtension {
 
     private final byte[] addProfessionInfo;
 
-    private final List<String> professionOIDs;
+    private final List<String> professionOids;
 
     private final List<String> professionItems;
 
@@ -73,13 +73,13 @@ public class QaAdmission extends QaExtension {
 
         List<OidWithDescType> oids = jaxb.getProfessionOid();
         if (oids == null) {
-            this.professionOIDs = null;
+            this.professionOids = null;
         } else {
             List<String> list = new LinkedList<>();
             for (OidWithDescType oid : oids) {
                 list.add(oid.getValue());
             }
-            this.professionOIDs = Collections.unmodifiableList(list);
+            this.professionOids = Collections.unmodifiableList(list);
         }
     }
 
@@ -91,8 +91,8 @@ public class QaAdmission extends QaExtension {
         return Arrays.clone(addProfessionInfo);
     }
 
-    public List<String> getProfessionOIDs() {
-        return professionOIDs;
+    public List<String> getProfessionOids() {
+        return professionOids;
     }
 
     public List<String> getProfessionItems() {

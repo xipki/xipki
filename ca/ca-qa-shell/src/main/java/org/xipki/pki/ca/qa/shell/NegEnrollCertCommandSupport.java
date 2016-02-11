@@ -121,7 +121,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
         ConcurrentContentSigner signer = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
-        X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
+        X509CertificateHolder ssCert = signer.getCertificateAsBcObject();
 
         X500Name x500Subject = (subject == null)
                 ? ssCert.getSubject()

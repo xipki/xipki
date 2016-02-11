@@ -505,7 +505,7 @@ class CaManagerQueryExecutor {
         }
     } // method createResponder
 
-    X509CaInfo createCAInfo(
+    X509CaInfo createCaInfo(
             final String name,
             final boolean masterMode,
             final CertificateStore certstore)
@@ -656,7 +656,7 @@ class CaManagerQueryExecutor {
         }
     } // method createCAInfo
 
-    Set<CaHasRequestorEntry> createCAhasRequestors(
+    Set<CaHasRequestorEntry> createCaHasRequestors(
             final String caName)
     throws CaMgmtException {
         final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, "
@@ -697,7 +697,7 @@ class CaManagerQueryExecutor {
         }
     } // method createCAhasRequestors
 
-    Map<String, String> createCAhasProfiles(
+    Map<String, String> createCaHasProfiles(
             final String caName)
     throws CaMgmtException {
         final String sql = new StringBuilder("SELECT PROFILE_NAME, PROFILE_LOCALNAME")
@@ -726,13 +726,13 @@ class CaManagerQueryExecutor {
         }
     } // method createCAhasProfiles
 
-    Set<String> createCAhasPublishers(
+    Set<String> createCaHasPublishers(
             final String caName)
     throws CaMgmtException {
-        return createCAhasNames(caName, "PUBLISHER_NAME", "CA_HAS_PUBLISHER");
+        return createCaHasNames(caName, "PUBLISHER_NAME", "CA_HAS_PUBLISHER");
     }
 
-    Set<String> createCAhasNames(
+    Set<String> createCaHasNames(
             final String caName,
             final String columnName,
             final String table)
@@ -798,7 +798,7 @@ class CaManagerQueryExecutor {
         }
     } // method deleteRows
 
-    void addCA(
+    void addCa(
             final CaEntry caEntry)
     throws CaMgmtException {
         if (!(caEntry instanceof X509CaEntry)) {
@@ -836,7 +836,7 @@ class CaManagerQueryExecutor {
             }
             ps.setLong(idx++, nextSerial);
 
-            ps.setInt(idx++, entry.getNextCRLNumber());
+            ps.setInt(idx++, entry.getNextCrlNumber());
             ps.setString(idx++, entry.getStatus().getStatus());
             ps.setString(idx++, entry.getCrlUrisAsString());
             ps.setString(idx++, entry.getDeltaCrlUrisAsString());
@@ -926,7 +926,7 @@ class CaManagerQueryExecutor {
         }
     } // method addCertprofile
 
-    void addCertprofileToCA(
+    void addCertprofileToCa(
             final String profileName,
             final String profileLocalName,
             final String caName)
@@ -1000,7 +1000,7 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpRequestor
 
-    void addCmpRequestorToCA(
+    void addCmpRequestorToCa(
             final CaHasRequestorEntry requestor,
             final String caName)
     throws CaMgmtException {
@@ -1125,7 +1125,7 @@ class CaManagerQueryExecutor {
         }
     } // method addPublisher
 
-    void addPublisherToCA(
+    void addPublisherToCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
@@ -1145,7 +1145,7 @@ class CaManagerQueryExecutor {
         }
     } // method addPublisherToCA
 
-    boolean changeCA(
+    boolean changeCa(
             final ChangeCaEntry changeCAEntry,
             final SecurityFactory securityFactory)
     throws CaMgmtException {
@@ -1293,7 +1293,7 @@ class CaManagerQueryExecutor {
             }
 
             if (iCert != null) {
-                String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
+                String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
                 m.append("cert: '").append(subject).append("'; ");
                 ps.setString(iSubject, subject);
                 String base64Cert = Base64.toBase64String(cert.getEncoded());
@@ -2015,7 +2015,7 @@ class CaManagerQueryExecutor {
         }
     } // method changePublisher
 
-    boolean removeCA(
+    boolean removeCa(
             final String caName)
     throws CaMgmtException {
         final String sql = "DELETE FROM CA WHERE NAME=?";
@@ -2055,7 +2055,7 @@ class CaManagerQueryExecutor {
         }
     } // method removeCaAlias
 
-    boolean removeCertprofileFromCA(
+    boolean removeCertprofileFromCa(
             final String profileLocalName,
             final String caName)
     throws CaMgmtException {
@@ -2078,7 +2078,7 @@ class CaManagerQueryExecutor {
         }
     } // method removeCertprofileFromCA
 
-    boolean removeCmpRequestorFromCA(
+    boolean removeCmpRequestorFromCa(
             final String requestorName,
             final String caName)
     throws CaMgmtException {
@@ -2101,7 +2101,7 @@ class CaManagerQueryExecutor {
         }
     } // method removeCmpRequestorFromCA
 
-    boolean removePublisherFromCA(
+    boolean removePublisherFromCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
@@ -2187,7 +2187,7 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpResponder
 
-    boolean unlockCA()
+    boolean unlockCa()
     throws DataAccessException, CaMgmtException {
         final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
         Statement stmt = null;

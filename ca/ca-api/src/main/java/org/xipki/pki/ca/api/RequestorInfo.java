@@ -44,6 +44,6 @@ public interface RequestorInfo {
 
     String getName();
 
-    boolean isRA();
+    boolean isRa();
 
 }

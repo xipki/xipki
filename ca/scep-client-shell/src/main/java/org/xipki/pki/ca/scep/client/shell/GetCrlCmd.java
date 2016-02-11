@@ -77,7 +77,7 @@ public class GetCrlCmd extends ClientCommandSupport {
     throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
         ScepClient client = getScepClient();
-        X509CRL crl = client.scepGetCRL(getIdentityKey(), getIdentityCert(),
+        X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
                 cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
         if (crl == null) {
             throw new CmdFailure("received no CRL from server");

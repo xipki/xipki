@@ -79,7 +79,7 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
 
     protected BigInteger getSerialNumber()
     throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
-        CaEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }

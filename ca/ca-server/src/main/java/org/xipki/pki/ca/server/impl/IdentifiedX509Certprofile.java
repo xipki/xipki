@@ -426,7 +426,7 @@ class IdentifiedX509Certprofile {
         extControl = controls.remove(extType);
         if (extControl != null
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
-            BasicConstraints value = X509CertUtil.createBasicConstraints(certprofile.isCA(),
+            BasicConstraints value = X509CertUtil.createBasicConstraints(certprofile.isCa(),
                     certprofile.getPathLenBasicConstraint());
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
@@ -569,12 +569,12 @@ class IdentifiedX509Certprofile {
         return values;
     } // method getExtensions
 
-    public boolean isCA() {
-        return certprofile.isCA();
+    public boolean isCa() {
+        return certprofile.isCa();
     }
 
-    public boolean isOnlyForRA() {
-        return certprofile.isOnlyForRA();
+    public boolean isOnlyForRa() {
+        return certprofile.isOnlyForRa();
     }
 
     public SubjectPublicKeyInfo checkPublicKey(
@@ -593,7 +593,7 @@ class IdentifiedX509Certprofile {
         }
     }
 
-    public boolean includeIssuerAndSerialInAKI() {
+    public boolean includeIssuerAndSerialInAki() {
         return certprofile.includeIssuerAndSerialInAki();
     }
 
@@ -659,7 +659,7 @@ class IdentifiedX509Certprofile {
                 .append(" could not be contained in request, ");
         }
 
-        boolean ca = isCA();
+        boolean ca = isCa();
 
         set.clear();
         if (!ca) {

@@ -58,7 +58,7 @@ public abstract class AbstractCaX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public boolean isCA() {
+    public boolean isCa() {
         return true;
     }
 

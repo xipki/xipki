@@ -67,7 +67,7 @@ public class PkiErrorException extends Exception {
             final int status,
             final int pkiFailureInfo,
             final String statusMessage) {
-        super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
+        super(SecurityUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;

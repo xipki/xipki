@@ -55,9 +55,9 @@ import org.w3c.dom.Node;
  */
 public class SimpleXpath {
 
-    private static class SimpleXPathStep {
+    private static class SimpleXpathStep {
 
-        private final String namespaceURI;
+        private final String namespaceUri;
 
         private final String localPart;
 
@@ -66,12 +66,12 @@ public class SimpleXpath {
         /**
          *
          * @param step
-         * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
+         * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
          *        namespace will not be evaluated.
          */
-        SimpleXPathStep(
+        SimpleXpathStep(
                 final String pStep,
-                final Map<String, String> nsPrefixURIMap)
+                final Map<String, String> nsPrefixUriMap)
         throws XPathExpressionException {
             String step = pStep;
             if (step.charAt(0) == '@') {
@@ -91,14 +91,14 @@ public class SimpleXpath {
                 this.localPart = step;
             }
 
-            if (nsPrefixURIMap != null && prefix != null) {
-                this.namespaceURI = nsPrefixURIMap.get(prefix);
-                if (this.namespaceURI == null) {
+            if (nsPrefixUriMap != null && prefix != null) {
+                this.namespaceUri = nsPrefixUriMap.get(prefix);
+                if (this.namespaceUri == null) {
                     throw new XPathExpressionException(
                             "could not find namespace for the prefix '" + prefix + "'");
                 }
             } else {
-                this.namespaceURI = null;
+                this.namespaceUri = null;
             }
         }
 
@@ -112,32 +112,32 @@ public class SimpleXpath {
             sb.append(localPart);
             sb.append("'");
             sb.append(" namespace='");
-            sb.append(namespaceURI);
+            sb.append(namespaceUri);
             sb.append("'");
             return sb.toString();
         }
 
     } // class SimpleXPathStep
 
-    private final List<SimpleXPathStep> steps;
+    private final List<SimpleXpathStep> steps;
 
     /**
      *
-     * @param relativeXPath
-     * @param nsPrefixURIMap Prefix and URI map of namespace. Set it to null if
+     * @param relativeXpath
+     * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
      *        namespace will not be evaluated.
      * @throws XPathExpressionException
      */
     public SimpleXpath(
-            final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap)
+            final String relativeXpath,
+            final Map<String, String> nsPrefixUriMap)
     throws XPathExpressionException {
-        if (relativeXPath.startsWith("/")) {
-            throw new XPathExpressionException(relativeXPath + " is no a relative xpath");
+        if (relativeXpath.startsWith("/")) {
+            throw new XPathExpressionException(relativeXpath + " is no a relative xpath");
         }
 
-        StringTokenizer st = new StringTokenizer(relativeXPath, "/");
-        steps = new ArrayList<SimpleXpath.SimpleXPathStep>(st.countTokens());
+        StringTokenizer st = new StringTokenizer(relativeXpath, "/");
+        steps = new ArrayList<SimpleXpath.SimpleXpathStep>(st.countTokens());
 
         int countTokens = st.countTokens();
 
@@ -151,12 +151,12 @@ public class SimpleXpath {
                             "attribute is only allowed in the last step");
                 } else {
                     if (idx > 0) {
-                        steps.add(new SimpleXPathStep(step.substring(0, idx), nsPrefixURIMap));
+                        steps.add(new SimpleXpathStep(step.substring(0, idx), nsPrefixUriMap));
                     }
-                    steps.add(new SimpleXPathStep(step.substring(idx), nsPrefixURIMap));
+                    steps.add(new SimpleXpathStep(step.substring(idx), nsPrefixUriMap));
                 }
             } else {
-                steps.add(new SimpleXPathStep(step, nsPrefixURIMap));
+                steps.add(new SimpleXpathStep(step, nsPrefixUriMap));
             }
 
             stepNo++;
@@ -182,17 +182,17 @@ public class SimpleXpath {
     private static void select(
             final List<Node> results,
             final Element context,
-            final List<SimpleXPathStep> steps,
+            final List<SimpleXpathStep> steps,
             final int stepIndex,
             final boolean onlyFirst) {
         if (onlyFirst && CollectionUtil.isNotEmpty(results)) {
             return;
         }
 
-        SimpleXPathStep step = steps.get(stepIndex);
+        SimpleXpathStep step = steps.get(stepIndex);
         if (step.isElement) {
             List<Element> children = XmlUtil.getElementChilden(
-                    context, step.namespaceURI, step.localPart);
+                    context, step.namespaceUri, step.localPart);
             if (steps.size() == stepIndex + 1) {
                 results.addAll(children);
             } else {
@@ -201,8 +201,8 @@ public class SimpleXpath {
                 }
             }
         } else {
-            Attr attr = context.getAttributeNodeNS(step.namespaceURI, step.localPart);
-            if (attr == null && step.namespaceURI == null) {
+            Attr attr = context.getAttributeNodeNS(step.namespaceUri, step.localPart);
+            if (attr == null && step.namespaceUri == null) {
                 attr = context.getAttributeNode(step.localPart);
             }
             if (attr != null) {

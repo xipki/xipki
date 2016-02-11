@@ -263,7 +263,7 @@ public class ScepServlet extends HttpServlet {
                 response.getOutputStream().write(caCapsBytes);
             } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                byte[] respBytes = responder.getCACertResp().getBytes();
+                byte[] respBytes = responder.getCaCertResp().getBytes();
                 response.setContentType(ScepConstants.CT_X509_CA_RA_CERT);
                 response.setContentLength(respBytes.length);
                 response.getOutputStream().write(respBytes);
@@ -312,7 +312,7 @@ public class ScepServlet extends HttpServlet {
         }
     } // method service
 
-    protected PKIMessage generatePKIMessage(
+    protected PKIMessage generatePkiMessage(
             final InputStream is)
     throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);

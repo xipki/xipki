@@ -93,7 +93,7 @@ public class OcspQaImpl implements OcspQa {
     }
 
     @Override
-    public ValidationResult checkOCSP(
+    public ValidationResult checkOcsp(
             final OCSPResp response,
             final X509Certificate issuer,
             final List<BigInteger> serialNumbers,

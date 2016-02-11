@@ -65,7 +65,7 @@ public abstract class X509Certprofile {
 
     private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
-    public boolean isOnlyForRA() {
+    public boolean isOnlyForRa() {
         return false;
     }
 
@@ -159,7 +159,7 @@ public abstract class X509Certprofile {
             String data)
     throws CertprofileException;
 
-    public abstract boolean isCA();
+    public abstract boolean isCa();
 
     public abstract Set<KeyUsageControl> getKeyUsage();
 

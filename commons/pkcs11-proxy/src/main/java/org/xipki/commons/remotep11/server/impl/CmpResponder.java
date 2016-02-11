@@ -90,7 +90,7 @@ class CmpResponder {
     CmpResponder() {
     }
 
-    PKIMessage processPKIMessage(
+    PKIMessage processPkiMessage(
             final LocalP11CryptServicePool localP11CryptServicePool,
             final String moduleName,
             final PKIMessage pkiMessage) {
@@ -145,7 +145,7 @@ class CmpResponder {
             final String statusMessage = String.format(
                     "PKIBody type %s is only supported with the sub-knownTypes",
                     ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
-            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
+            return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest, statusMessage);
         }
 
         try {
@@ -162,7 +162,7 @@ class CmpResponder {
             } catch (IllegalArgumentException e) {
                 final String statusMessage = "invalid value of the InfoTypeAndValue for "
                         + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
-                return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                         statusMessage);
             }
 
@@ -195,7 +195,7 @@ class CmpResponder {
                     keyId = keyIdentifier.getKeyId();
                 } catch (IllegalArgumentException e) {
                     final String statusMessage = "invalid PSOTemplate";
-                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                    return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
@@ -231,7 +231,7 @@ class CmpResponder {
                     keyId = keyIdentifier.getKeyId();
                 } catch (IllegalArgumentException e) {
                     final String statusMessage = "invalid SlotAndKeyIdentifier";
-                    return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+                    return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
@@ -267,7 +267,7 @@ class CmpResponder {
                 break;
             default:
                 final String statusMessage = "unsupported XiPKI action code '" + action + "'";
-                return createRejectionPKIMessage(respHeader,
+                return createRejectionPkiMessage(respHeader,
                         PKIFailureInfo.badRequest, statusMessage);
             } // end switch (code)
 
@@ -283,18 +283,18 @@ class CmpResponder {
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);
         } catch (BadAsn1ObjectException e) {
-            return createRejectionPKIMessage(respHeader, PKIFailureInfo.badRequest,
+            return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     e.getMessage());
         } catch (Throwable t) {
             LOG.error("error while processing CMP message {}, message: {}", tidStr,
                     t.getMessage());
             LOG.debug("error while processing CMP message " + tidStr, t);
-            return createRejectionPKIMessage(respHeader, PKIFailureInfo.systemFailure,
+            return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
                     t.getMessage());
         }
     } // method processPKIMessage
 
-    private PKIMessage createRejectionPKIMessage(
+    private PKIMessage createRejectionPkiMessage(
             final PKIHeader header,
             final int pkiFailureInfo,
             final String statusMessage) {

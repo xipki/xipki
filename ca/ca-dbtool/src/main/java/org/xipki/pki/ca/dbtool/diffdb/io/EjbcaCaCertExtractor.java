@@ -50,7 +50,7 @@ public class EjbcaCaCertExtractor {
     private EjbcaCaCertExtractor() {
     }
 
-    public static X509Certificate extractCACert(
+    public static X509Certificate extractCaCert(
             final String caData)
     throws Exception {
         XmlDocumentReader cadataReader = new XmlDocumentReader(

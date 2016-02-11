@@ -250,13 +250,13 @@ public class X509Util {
         return (X509Certificate) certFact.generateCertificate(certStream);
     }
 
-    public static X509CRL parseCRL(
+    public static X509CRL parseCrl(
             final String f)
     throws IOException, CertificateException, CRLException {
-        return parseCRL(new FileInputStream(IoUtil.expandFilepath(f)));
+        return parseCrl(new FileInputStream(IoUtil.expandFilepath(f)));
     }
 
-    public static X509CRL parseCRL(
+    public static X509CRL parseCrl(
             final InputStream crlStream)
     throws IOException, CertificateException, CRLException {
         try {
@@ -269,12 +269,12 @@ public class X509Util {
         }
     }
 
-    public static String getRFC4519Name(
+    public static String getRfc4519Name(
             final X500Principal name) {
-        return getRFC4519Name(X500Name.getInstance(name.getEncoded()));
+        return getRfc4519Name(X500Name.getInstance(name.getEncoded()));
     }
 
-    public static String getRFC4519Name(
+    public static String getRfc4519Name(
             final X500Name name) {
         return RFC4519Style.INSTANCE.toString(name);
     }
@@ -359,7 +359,7 @@ public class X509Util {
         return sb.toString();
     } // method canonicalizName
 
-    public static byte[] extractSKI(
+    public static byte[] extractSki(
             final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
@@ -374,7 +374,7 @@ public class X509Util {
         }
     }
 
-    public static byte[] extractSKI(
+    public static byte[] extractSki(
             final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException {
         Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
@@ -391,7 +391,7 @@ public class X509Util {
         }
     }
 
-    public static byte[] extractAKI(
+    public static byte[] extractAki(
             final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
@@ -408,7 +408,7 @@ public class X509Util {
         }
     }
 
-    public static List<String> extractOCSPUrls(
+    public static List<String> extractOcspUrls(
             final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
@@ -439,7 +439,7 @@ public class X509Util {
         return ocspUris;
     }
 
-    public static byte[] extractAKI(
+    public static byte[] extractAki(
             final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException {
         try {
@@ -500,7 +500,7 @@ public class X509Util {
         }
 
         List<ASN1ObjectIdentifier> l = new ArrayList<>(usages);
-        List<ASN1ObjectIdentifier> sortedUsages = sortOIDList(l);
+        List<ASN1ObjectIdentifier> sortedUsages = sortOidList(l);
         KeyPurposeId[] kps = new KeyPurposeId[sortedUsages.size()];
 
         int i = 0;
@@ -512,7 +512,7 @@ public class X509Util {
     }
 
     // sort the list and remove duplicated OID.
-    public static List<ASN1ObjectIdentifier> sortOIDList(
+    public static List<ASN1ObjectIdentifier> sortOidList(
             List<ASN1ObjectIdentifier> oids) {
         List<String> l = new ArrayList<>(oids.size());
         for (ASN1ObjectIdentifier m : oids) {
@@ -650,8 +650,8 @@ public class X509Util {
     throws CertificateEncodingException {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (equals) {
-            byte[] ski = X509Util.extractSKI(cert);
-            byte[] aki = X509Util.extractAKI(cert);
+            byte[] ski = X509Util.extractSki(cert);
+            byte[] aki = X509Util.extractAki(cert);
             if (ski != null && aki != null) {
                 equals = Arrays.equals(ski, aki);
             }
@@ -671,8 +671,8 @@ public class X509Util {
         boolean issues = issuerCert.getSubjectX500Principal().equals(
                 cert.getIssuerX500Principal());
         if (issues) {
-            byte[] ski = X509Util.extractSKI(issuerCert);
-            byte[] aki = X509Util.extractAKI(cert);
+            byte[] ski = X509Util.extractSki(issuerCert);
+            byte[] aki = X509Util.extractAki(cert);
             if (ski != null) {
                 issues = Arrays.equals(ski, aki);
             }
@@ -748,14 +748,14 @@ public class X509Util {
     public static String cutX500Name(
             final X500Name name,
             final int maxLen) {
-        String text = getRFC4519Name(name);
+        String text = getRfc4519Name(name);
         return cutText(text, maxLen);
     }
 
     public static String cutX500Name(
             final X500Principal name,
             final int maxLen) {
-        String text = getRFC4519Name(name);
+        String text = getRfc4519Name(name);
         return cutText(text, maxLen);
     }
 

@@ -95,7 +95,7 @@ public class EnrollCertCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CaEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }

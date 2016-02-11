@@ -60,7 +60,7 @@ public enum OcspResponseStatus {
         return status;
     }
 
-    public static OcspResponseStatus getOCSPResponseStatus(
+    public static OcspResponseStatus getOcspResponseStatus(
             final int status) {
         for (OcspResponseStatus entry : values()) {
             if (entry.status == status) {

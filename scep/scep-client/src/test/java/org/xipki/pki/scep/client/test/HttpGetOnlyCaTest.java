@@ -45,7 +45,7 @@ import org.xipki.pki.scep.transaction.CaCapability;
 public class HttpGetOnlyCaTest extends AbstractCaTest {
 
     @Override
-    protected CaCapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCaCaps() {
         return new CaCapability[]{CaCapability.POSTPKIOperation};
     }
 

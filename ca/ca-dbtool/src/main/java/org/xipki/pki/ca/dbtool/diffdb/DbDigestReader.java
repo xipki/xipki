@@ -130,7 +130,7 @@ abstract class DbDigestReader implements DigestReader {
         this.revokedOnly = revokedOnly;
         this.numThreads = numThreads;
         this.caCert = caCert;
-        this.caSubjectName = X509Util.getRFC4519Name(caCert.getSubjectX500Principal());
+        this.caSubjectName = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
         this.minId = minId;
         this.maxId = maxId;
         this.nextId = minId;

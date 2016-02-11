@@ -53,7 +53,7 @@ class RandomSerialNumberGenerator {
         this.random = new SecureRandom();
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger nextSerialNumber() {
         while (true) {
             byte[] rdnBytes = new byte[8];
             random.nextBytes(rdnBytes);

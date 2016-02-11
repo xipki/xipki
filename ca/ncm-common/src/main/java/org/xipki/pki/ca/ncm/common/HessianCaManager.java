@@ -72,11 +72,11 @@ public interface HessianCaManager {
     String getAttribute(
             String attributeKey);
 
-    CaSystemStatus getCASystemStatus();
+    CaSystemStatus getCaSystemStatus();
 
-    boolean unlockCA();
+    boolean unlockCa();
 
-    boolean publishRootCA(
+    boolean publishRootCa(
             String caName,
             String certprofile)
     throws HessianCaMgmtException;
@@ -91,12 +91,12 @@ public interface HessianCaManager {
             List<String> publisherNames)
     throws HessianCaMgmtException;
 
-    boolean removeCA(String caName)
+    boolean removeCa(String caName)
     throws HessianCaMgmtException;
 
     boolean restartCaSystem();
 
-    boolean notifyCAChange()
+    boolean notifyCaChange()
     throws HessianCaMgmtException;
 
     boolean addCaAlias(
@@ -108,7 +108,7 @@ public interface HessianCaManager {
             String aliasName)
     throws HessianCaMgmtException;
 
-    Set<String> getAliasesForCA(
+    Set<String> getAliasesForCa(
             String caName);
 
     String getCaName(
@@ -130,41 +130,41 @@ public interface HessianCaManager {
 
     Set<String> getCaNames();
 
-    boolean addCA(
+    boolean addCa(
             CaEntry newCaDbEntry)
     throws HessianCaMgmtException;
 
-    CaEntry getCA(String caName);
+    CaEntry getCa(String caName);
 
-    boolean changeCA(
-            ChangeCaEntry changeCAEntry)
+    boolean changeCa(
+            ChangeCaEntry changeCaEntry)
     throws HessianCaMgmtException;
 
-    boolean removeCertprofileFromCA(
+    boolean removeCertprofileFromCa(
             String profileName,
             String caName)
     throws HessianCaMgmtException;
 
-    boolean addCertprofileToCA(
+    boolean addCertprofileToCa(
             String profileName,
             String profileLocalname,
             String caName)
     throws HessianCaMgmtException;
 
-    boolean removePublisherFromCA(
+    boolean removePublisherFromCa(
             String publisherName,
             String caName)
     throws HessianCaMgmtException;
 
-    boolean addPublisherToCA(
+    boolean addPublisherToCa(
             String publisherName,
             String caName)
     throws HessianCaMgmtException;
 
-    Map<String, String> getCertprofilesForCA(
+    Map<String, String> getCertprofilesForCa(
             String caName);
 
-    Set<CaHasRequestorEntry> getCmpRequestorsForCA(
+    Set<CaHasRequestorEntry> getCmpRequestorsForCa(
             String caName);
 
     CmpRequestorEntry getCmpRequestor(
@@ -183,12 +183,12 @@ public interface HessianCaManager {
             String base64Cert)
     throws HessianCaMgmtException;
 
-    boolean removeCmpRequestorFromCA(
+    boolean removeCmpRequestorFromCa(
             String requestorName,
             String caName)
     throws HessianCaMgmtException;
 
-    boolean addCmpRequestorToCA(
+    boolean addCmpRequestorToCa(
             CaHasRequestorEntry requestor,
             String caName)
     throws HessianCaMgmtException;
@@ -247,7 +247,7 @@ public interface HessianCaManager {
             PublisherEntry dbEntry)
     throws HessianCaMgmtException;
 
-    List<PublisherEntry> getPublishersForCA(
+    List<PublisherEntry> getPublishersForCa(
             String caName);
 
     PublisherEntry getPublisher(
@@ -331,7 +331,7 @@ public interface HessianCaManager {
             byte[] encodedPkcs10Request)
     throws HessianCaMgmtException;
 
-    X509Certificate generateSelfSignedCA(
+    X509Certificate generateSelfSignedCa(
             X509CaEntry caEntry,
             String certprofileName,
             byte[] p10Req)
@@ -355,16 +355,16 @@ public interface HessianCaManager {
             String username)
     throws HessianCaMgmtException;
 
-    X509CRL generateCRLonDemand(
+    X509CRL generateCrlOnDemand(
             String caName)
     throws HessianCaMgmtException;
 
-    X509CRL getCRL(
+    X509CRL getCrl(
             String caName,
             BigInteger crlNumber)
     throws HessianCaMgmtException;
 
-    X509CRL getCurrentCRL(
+    X509CRL getCurrentCrl(
             String caName)
     throws HessianCaMgmtException;
 

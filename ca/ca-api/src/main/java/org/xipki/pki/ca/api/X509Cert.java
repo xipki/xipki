@@ -74,10 +74,10 @@ public class X509Cert {
 
         this.cert = cert;
         X500Principal x500Subject = cert.getSubjectX500Principal();
-        this.subject = X509Util.getRFC4519Name(x500Subject);
+        this.subject = X509Util.getRfc4519Name(x500Subject);
         this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
         try {
-            this.subjectKeyIdentifer = X509Util.extractSKI(cert);
+            this.subjectKeyIdentifer = X509Util.extractSki(cert);
         } catch (CertificateEncodingException ex) {
             throw new RuntimeException(String.format(
                     "CertificateEncodingException: %s", ex.getMessage()));

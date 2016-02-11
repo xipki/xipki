@@ -65,12 +65,12 @@ public class CaProfileInfoCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if (caManager.getCA(caName) == null) {
+        if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
-        Map<String, String> entries = caManager.getCertprofilesForCA(caName);
+        Map<String, String> entries = caManager.getCertprofilesForCa(caName);
         if (CollectionUtil.isNotEmpty(entries)) {
             sb.append("certificate Profiles supported by CA " + caName).append("\n");
 

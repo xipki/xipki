@@ -419,9 +419,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                     throw new OcspRequestorException("NoIdleSignerException: " + e.getMessage());
                 }
 
-                reqBuilder.setRequestorName(signer.getCertificateAsBCObject().getSubject());
+                reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
                 try {
-                    return reqBuilder.build(singleSigner, signer.getCertificateChainAsBCObjects());
+                    return reqBuilder.build(singleSigner, signer.getCertificateChainAsBcObjects());
                 } finally {
                     signer.returnContentSigner(singleSigner);
                 }

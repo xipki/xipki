@@ -104,11 +104,11 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
     throws Exception {
         out("checking CA requestor CA='" + caName +    "', requestor='" + requestorName + "'");
 
-        if (caManager.getCA(caName) == null) {
+        if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCa(caName);
         CaHasRequestorEntry entry = null;
         for (CaHasRequestorEntry m : entries) {
             if (m.getRequestorName().equals(requestorName)) {

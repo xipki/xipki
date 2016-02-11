@@ -107,7 +107,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         QAConfType qaConf;
         try {
             FileInputStream issuerConfStream = new FileInputStream(confFile);
-            qaConf = parseQAConf(issuerConfStream);
+            qaConf = parseQaConf(issuerConfStream);
         } catch (IOException | JAXBException | SAXException e) {
             final String message = "could not parse the QA configuration";
             String exceptionMessage;
@@ -210,7 +210,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         return x509ProfileMap.get(certprofileName);
     }
 
-    private static QAConfType parseQAConf(
+    private static QAConfType parseQaConf(
             final InputStream confStream)
     throws IOException, JAXBException, SAXException {
         JAXBElement<?> rootElement;

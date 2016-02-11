@@ -94,14 +94,14 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509CaEntry caEntry = getCAEntry(false);
+        X509CaEntry caEntry = getCaEntry(false);
 
-        boolean b = caManager.addCA(caEntry);
+        boolean b = caManager.addCa(caEntry);
         output(b, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }
 
-    protected X509CaEntry getCAEntry(
+    protected X509CaEntry getCaEntry(
             final boolean ignoreCert)
     throws Exception {
         Properties props = new Properties();

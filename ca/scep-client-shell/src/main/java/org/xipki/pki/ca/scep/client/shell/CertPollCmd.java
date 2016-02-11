@@ -81,7 +81,7 @@ public class CertPollCmd extends ClientCommandSupport {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
 
         ScepClient client = getScepClient();
-        X509Certificate caCert = client.getAuthorityCertStore().getCACert();
+        X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
         EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),

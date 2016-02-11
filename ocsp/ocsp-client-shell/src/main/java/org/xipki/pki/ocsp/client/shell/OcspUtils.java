@@ -51,18 +51,18 @@ public class OcspUtils {
     private OcspUtils() {
     }
 
-    public static BasicOCSPResp extractBasicOCSPResp(
+    public static BasicOCSPResp extractBasicOcspResp(
             final OCSPResp response)
     throws OcspResponseException {
         int status = response.getStatus();
         if (status == 0) {
-            BasicOCSPResp basicOCSPResp;
+            BasicOCSPResp basicOcspResp;
             try {
-                basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
+                basicOcspResp = (BasicOCSPResp) response.getResponseObject();
             } catch (OCSPException e) {
                 throw new InvalidOcspResponseException(e.getMessage(), e);
             }
-            return basicOCSPResp;
+            return basicOcspResp;
         } else {
             throw new OcspResponseUnsuccessfulException(status);
         }

@@ -70,7 +70,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final DataSourceWrapper refDatasource;
 
-    private final Set<byte[]> includeCACerts;
+    private final Set<byte[]> includeCaCerts;
 
     private final DataSourceWrapper dataSource;
 
@@ -90,7 +90,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             final String reportDirName,
             final int numCertsPerSelect,
             final NumThreads numThreads,
-            final Set<byte[]> includeCACerts)
+            final Set<byte[]> includeCaCerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         boolean validRef = false;
         if (refDirname == null) {
@@ -104,7 +104,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
                     "Exactly one of refDirname and refDbConffile must be not null");
         }
 
-        this.includeCACerts = includeCACerts;
+        this.includeCaCerts = includeCaCerts;
 
         File f = new File(reportDirName);
         if (!f.exists()) {
@@ -161,7 +161,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
                     refDatasource, dataSource, reportDir, revokedOnly, stopMe,
                     numCertsPerSelect, numThreads);
             }
-            diff.setIncludeCACerts(includeCACerts);
+            diff.setIncludeCaCerts(includeCaCerts);
             diff.diff();
         } finally {
             if (refDatasource != null) {

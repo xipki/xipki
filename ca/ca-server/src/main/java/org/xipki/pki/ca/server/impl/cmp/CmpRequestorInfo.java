@@ -74,7 +74,7 @@ public class CmpRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public boolean isRA() {
+    public boolean isRa() {
         return caHasRequestor.isRa();
     }
 

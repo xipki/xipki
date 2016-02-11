@@ -54,7 +54,7 @@ public class CaSystemStatusCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CaSystemStatus status = caManager.getCASystemStatus();
+        CaSystemStatus status = caManager.getCaSystemStatus();
         if (status != null) {
             out(status.toString());
         } else {

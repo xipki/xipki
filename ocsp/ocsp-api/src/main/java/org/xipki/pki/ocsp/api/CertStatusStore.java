@@ -62,7 +62,7 @@ public abstract class CertStatusStore {
 
     private boolean includeArchiveCutoff;
 
-    private boolean includeCrlID;
+    private boolean includeCrlId;
 
     private AuditServiceRegister auditServiceRegister;
 
@@ -94,7 +94,7 @@ public abstract class CertStatusStore {
             DataSourceWrapper datasource)
     throws CertStatusStoreException;
 
-    public abstract CertRevocationInfo getCARevocationInfo(
+    public abstract CertRevocationInfo getCaRevocationInfo(
             HashAlgoType hashAlgo,
             byte[] issuerNameHash,
             byte[] issuerKeyHash);
@@ -146,13 +146,13 @@ public abstract class CertStatusStore {
         this.retentionInterval = retentionInterval;
     }
 
-    public boolean isIncludeCrlID() {
-        return includeCrlID;
+    public boolean isIncludeCrlId() {
+        return includeCrlId;
     }
 
-    public void setIncludeCrlID(
-            final boolean includeCrlID) {
-        this.includeCrlID = includeCrlID;
+    public void setIncludeCrlId(
+            final boolean includeCrlId) {
+        this.includeCrlId = includeCrlId;
     }
 
 }

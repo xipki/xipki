@@ -59,7 +59,7 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
     protected List<LoadExecutor> getTesters()
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
         for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P12ECKeyGenLoadTest(curveName, securityFactory));
         }

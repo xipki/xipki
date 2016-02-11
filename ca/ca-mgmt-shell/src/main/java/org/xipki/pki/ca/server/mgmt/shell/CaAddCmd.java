@@ -63,13 +63,13 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509CaEntry caEntry = getCAEntry();
+        X509CaEntry caEntry = getCaEntry();
         if (certFile != null) {
             X509Certificate caCert = X509Util.parseCert(certFile);
             caEntry.setCertificate(caCert);
         }
 
-        boolean b = caManager.addCA(caEntry);
+        boolean b = caManager.addCa(caEntry);
         output(b, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }

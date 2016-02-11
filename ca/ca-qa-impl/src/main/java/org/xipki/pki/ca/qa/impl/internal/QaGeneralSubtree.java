@@ -67,7 +67,7 @@ public class QaGeneralSubtree {
         return jaxb.getRfc822Name();
     }
 
-    public String getDNSName() {
+    public String getDnsName() {
         return jaxb.getDNSName();
     }
 

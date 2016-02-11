@@ -89,18 +89,18 @@ public class CaInfoCmd extends CaCommandSupport {
             Collections.sort(sorted);
             for (String paramName : sorted) {
                 sb.append("\t").append(paramName);
-                Set<String> aliases = caManager.getAliasesForCA(paramName);
+                Set<String> aliases = caManager.getAliasesForCa(paramName);
                 if (CollectionUtil.isNotEmpty(aliases)) {
                     sb.append(" (aliases: ").append(toString(aliases)).append(")");
                 }
                 sb.append("\n");
             }
         } else {
-            CaEntry entry = caManager.getCA(caName);
+            CaEntry entry = caManager.getCa(caName);
             if (entry == null) {
                 throw new UnexpectedException("could not find CA '" + caName + "'");
             } else {
-                Set<String> aliases = caManager.getAliasesForCA(caName);
+                Set<String> aliases = caManager.getAliasesForCa(caName);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");
                 sb.append(entry.toString(verbose.booleanValue()));
             }

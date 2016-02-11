@@ -188,7 +188,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509CaEntry getCAEntry()
+    protected X509CaEntry getCaEntry()
     throws Exception {
         if (nextSerial < 0) {
             throw new IllegalCmdParamException("invalid serial number: " + nextSerial);

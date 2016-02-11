@@ -91,7 +91,7 @@ public class SqlStateCodes {
         Oracle() {
             super();
             // 65: unknown identifier
-            badSQLGrammarCodes = addToSet(badSQLGrammarCodes, "65");
+            badSqlGrammarCodes = addToSet(badSqlGrammarCodes, "65");
             // 61: deadlock
             concurrencyFailureCodes = addToSet(concurrencyFailureCodes, "61");
         }
@@ -142,7 +142,7 @@ public class SqlStateCodes {
     // concurrency failure
     private static final String CF_TRANSACTION_ROLLBACK = "40";
 
-    protected Set<String> badSQLGrammarCodes;
+    protected Set<String> badSqlGrammarCodes;
 
     protected Set<String> dataIntegrityViolationCodes;
 
@@ -153,7 +153,7 @@ public class SqlStateCodes {
     protected Set<String> concurrencyFailureCodes;
 
     private SqlStateCodes() {
-        badSQLGrammarCodes = toSet(BGE_DYNAMIC_SQL_ERROR, BGE_CARDINALITY_VIOLATION,
+        badSqlGrammarCodes = toSet(BGE_DYNAMIC_SQL_ERROR, BGE_CARDINALITY_VIOLATION,
                 BGE_SYNTAX_ERROR_DIRECT_SQL, BGE_SYNTAX_ERROR_DYNAMIC_SQL,
                 BGE_GENERAL_SQL_SYNTAX_ERROR);
         dataIntegrityViolationCodes = toSet(DIV_DATA_TRUNCATION, DIV_INTEGRITY_CONSTRAINT_VIOLATION,
@@ -164,8 +164,8 @@ public class SqlStateCodes {
         concurrencyFailureCodes = toSet(CF_TRANSACTION_ROLLBACK);
     }
 
-    public Set<String> getBadSQLGrammarCodes() {
-        return badSQLGrammarCodes;
+    public Set<String> getBadSqlGrammarCodes() {
+        return badSqlGrammarCodes;
     }
 
     public Set<String> getDataIntegrityViolationCodes() {

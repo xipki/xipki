@@ -62,7 +62,7 @@ public class CertStatusInfo {
 
     private final String certprofile;
 
-    private CrlID crlID;
+    private CrlID crlId;
 
     private Date archiveCutOff;
 
@@ -105,13 +105,13 @@ public class CertStatusInfo {
         return certprofile;
     }
 
-    public CrlID getCrlID() {
-        return crlID;
+    public CrlID getCrlId() {
+        return crlId;
     }
 
-    public void setCrlID(
-            final CrlID crlID) {
-        this.crlID = crlID;
+    public void setCrlId(
+            final CrlID crlId) {
+        this.crlId = crlId;
     }
 
     public Date getArchiveCutOff() {

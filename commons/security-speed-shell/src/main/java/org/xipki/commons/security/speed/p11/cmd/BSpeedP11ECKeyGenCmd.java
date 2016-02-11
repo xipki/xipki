@@ -59,7 +59,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
     protected List<LoadExecutor> getTesters()
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
 
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
 

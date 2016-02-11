@@ -118,22 +118,22 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public CaSystemStatus getCASystemStatus() {
-        return caManager.getCASystemStatus();
+    public CaSystemStatus getCaSystemStatus() {
+        return caManager.getCaSystemStatus();
     }
 
     @Override
-    public boolean unlockCA() {
-        return caManager.unlockCA();
+    public boolean unlockCa() {
+        return caManager.unlockCa();
     }
 
     @Override
-    public boolean publishRootCA(
+    public boolean publishRootCa(
             final String caName,
             final String certprofile)
     throws HessianCaMgmtException {
         try {
-            return caManager.publishRootCA(caName, certprofile);
+            return caManager.publishRootCa(caName, certprofile);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -164,11 +164,11 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public boolean removeCA(
+    public boolean removeCa(
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.removeCA(caName);
+            return caManager.removeCa(caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -180,10 +180,10 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public boolean notifyCAChange()
+    public boolean notifyCaChange()
     throws HessianCaMgmtException {
         try {
-            return caManager.notifyCAChange();
+            return caManager.notifyCaChange();
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -213,9 +213,9 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public Set<String> getAliasesForCA(
+    public Set<String> getAliasesForCa(
             final String caName) {
-        return caManager.getAliasesForCA(caName);
+        return caManager.getAliasesForCa(caName);
     }
 
     @Override
@@ -265,92 +265,92 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public boolean addCA(
+    public boolean addCa(
             final CaEntry newCaDbEntry)
     throws HessianCaMgmtException {
         try {
-            return caManager.addCA(newCaDbEntry);
+            return caManager.addCa(newCaDbEntry);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public CaEntry getCA(
+    public CaEntry getCa(
             final String caName) {
-        return caManager.getCA(caName);
+        return caManager.getCa(caName);
     }
 
     @Override
-    public boolean changeCA(
+    public boolean changeCa(
             final ChangeCaEntry changeCAentry)
     throws HessianCaMgmtException {
         try {
-            return caManager.changeCA(changeCAentry);
+            return caManager.changeCa(changeCAentry);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean removeCertprofileFromCA(
+    public boolean removeCertprofileFromCa(
             final String profileName,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.removeCertprofileFromCA(profileName, caName);
+            return caManager.removeCertprofileFromCa(profileName, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean addCertprofileToCA(
+    public boolean addCertprofileToCa(
             final String profileName,
             final String profileLocalname,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.addCertprofileToCA(profileName, profileLocalname, caName);
+            return caManager.addCertprofileToCa(profileName, profileLocalname, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean removePublisherFromCA(
+    public boolean removePublisherFromCa(
             final String publisherName,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.removePublisherFromCA(publisherName, caName);
+            return caManager.removePublisherFromCa(publisherName, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean addPublisherToCA(
+    public boolean addPublisherToCa(
             final String publisherName,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.addPublisherToCA(publisherName, caName);
+            return caManager.addPublisherToCa(publisherName, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public Map<String, String> getCertprofilesForCA(
+    public Map<String, String> getCertprofilesForCa(
             final String caName) {
-        return caManager.getCertprofilesForCA(caName);
+        return caManager.getCertprofilesForCa(caName);
     }
 
     @Override
-    public Set<CaHasRequestorEntry> getCmpRequestorsForCA(
+    public Set<CaHasRequestorEntry> getCmpRequestorsForCa(
             final String caName) {
-        return caManager.getCmpRequestorsForCA(caName);
+        return caManager.getCmpRequestorsForCa(caName);
     }
 
     @Override
@@ -394,24 +394,24 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public boolean removeCmpRequestorFromCA(
+    public boolean removeCmpRequestorFromCa(
             final String requestorName,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.removeCmpRequestorFromCA(requestorName, caName);
+            return caManager.removeCmpRequestorFromCa(requestorName, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public boolean addCmpRequestorToCA(
+    public boolean addCmpRequestorToCa(
             final CaHasRequestorEntry requestor,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.addCmpRequestorToCA(requestor, caName);
+            return caManager.addCmpRequestorToCa(requestor, caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -550,9 +550,9 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public List<PublisherEntry> getPublishersForCA(
+    public List<PublisherEntry> getPublishersForCa(
             final String caName) {
-        return caManager.getPublishersForCA(caName);
+        return caManager.getPublishersForCa(caName);
     }
 
     @Override
@@ -752,13 +752,13 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public X509Certificate generateSelfSignedCA(
+    public X509Certificate generateSelfSignedCa(
             final X509CaEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)
     throws HessianCaMgmtException {
         try {
-            return caManager.generateRootCA(caEntry, certprofileName, p10Req);
+            return caManager.generateRootCa(caEntry, certprofileName, p10Req);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -820,34 +820,34 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public X509CRL generateCRLonDemand(
+    public X509CRL generateCrlOnDemand(
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.generateCRLonDemand(caName);
+            return caManager.generateCrlOnDemand(caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public X509CRL getCRL(
+    public X509CRL getCrl(
             final String caName,
             final BigInteger crlNumber)
     throws HessianCaMgmtException {
         try {
-            return caManager.getCRL(caName, crlNumber);
+            return caManager.getCrl(caName, crlNumber);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
     }
 
     @Override
-    public X509CRL getCurrentCRL(
+    public X509CRL getCurrentCrl(
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.getCurrentCRL(caName);
+            return caManager.getCurrentCrl(caName);
         } catch (CaMgmtException e) {
             throw new HessianCaMgmtException(e.getMessage());
         }
@@ -993,27 +993,27 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
         trustedUserCerts.clear();
     }
 
-    public    void setTruststoreFile(
+    public void setTruststoreFile(
             final String truststoreFile) {
         this.truststoreFile = truststoreFile;
     }
 
-    public    void setTruststoreType(
+    public void setTruststoreType(
             final String truststoreType) {
         this.truststoreType = truststoreType;
     }
 
-    public    void setTruststoreProvider(
+    public void setTruststoreProvider(
             final String truststoreProvider) {
         this.truststoreProvider = truststoreProvider;
     }
 
-    public    void setTruststorePassword(
+    public void setTruststorePassword(
             final String truststorePassword) {
         this.truststorePassword = truststorePassword;
     }
 
-    public    void setSecurityFactory(
+    public void setSecurityFactory(
             final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }

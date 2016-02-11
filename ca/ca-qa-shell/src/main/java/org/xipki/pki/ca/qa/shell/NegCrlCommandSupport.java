@@ -57,7 +57,7 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
                     + "required if multiple CAs are configured")
     protected String caName;
 
-    protected abstract X509CRL retrieveCRL()
+    protected abstract X509CRL retrieveCrl()
     throws CaClientException, PkiErrorException;
 
     @Override
@@ -84,7 +84,7 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
 
         X509CRL crl = null;
         try {
-            crl = retrieveCRL();
+            crl = retrieveCrl();
         } catch (PkiErrorException e) {
         }
 

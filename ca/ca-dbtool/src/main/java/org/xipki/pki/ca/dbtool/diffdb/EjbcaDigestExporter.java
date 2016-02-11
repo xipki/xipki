@@ -136,7 +136,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             String coreSql =
                     "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
                     + "revocationDate FROM CertificateData WHERE fingerprint > ?";
-            sql = dataSource.createFetchFirstSelectSQL(coreSql, numCertsPerSelect,
+            sql = dataSource.createFetchFirstSelectSql(coreSql, numCertsPerSelect,
                     "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
 
@@ -212,7 +212,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                     continue;
                 }
 
-                X509Certificate cert = EjbcaCaCertExtractor.extractCACert(data);
+                X509Certificate cert = EjbcaCaCertExtractor.extractCaCert(data);
                 byte[] certBytes = cert.getEncoded();
 
                 String commonName = X509Util.getCommonName(cert.getSubjectX500Principal());

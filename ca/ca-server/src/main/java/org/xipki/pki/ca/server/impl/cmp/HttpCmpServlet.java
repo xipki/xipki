@@ -144,7 +144,7 @@ public class HttpCmpServlet extends HttpServlet {
                     caName = caAlias;
                 }
                 caName = caName.toUpperCase();
-                responder = responderManager.getX509CACmpResponder(caName);
+                responder = responderManager.getX509CaCmpResponder(caName);
             }
 
             if (caName == null || responder == null || !responder.isInService()) {
@@ -166,7 +166,7 @@ public class HttpCmpServlet extends HttpServlet {
 
             if (auditEvent != null) {
                 auditEvent.addEventData(new AuditEventData("CA",
-                        responder.getCA().getCAInfo().getName()));
+                        responder.getCa().getCaInfo().getName()));
             }
 
             PKIMessage pkiReq;
@@ -199,7 +199,7 @@ public class HttpCmpServlet extends HttpServlet {
                     reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
-            PKIMessage pkiResp = responder.processPKIMessage(pkiReq, clientCert, auditEvent);
+            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, auditEvent);
 
             response.setContentType(HttpCmpServlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);

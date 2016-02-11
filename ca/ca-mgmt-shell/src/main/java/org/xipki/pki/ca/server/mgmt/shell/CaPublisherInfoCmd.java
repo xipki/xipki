@@ -65,13 +65,13 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if (caManager.getCA(caName) == null) {
+        if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
 
-        List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
+        List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
         if (isNotEmpty(entries)) {
             sb.append("publishers for CA " + caName).append("\n");
             for (PublisherEntry entry    : entries) {
