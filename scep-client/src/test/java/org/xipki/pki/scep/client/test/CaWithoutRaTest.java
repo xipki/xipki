@@ -45,12 +45,12 @@ import org.xipki.pki.scep.transaction.CaCapability;
 public class CaWithoutRaTest extends AbstractCaTest {
 
     @Override
-    protected boolean isWithRA() {
+    protected boolean isWithRa() {
         return false;
     }
 
     @Override
-    protected CaCapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCaCaps() {
         return null;
     }
 

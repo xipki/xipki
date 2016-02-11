@@ -98,13 +98,13 @@ public class ScepResponder {
     private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGS
             = new HashSet<ASN1ObjectIdentifier>();
 
-    private final CaCaps cACaps;
+    private final CaCaps caCaps;
 
-    private final CaEmulator cAEmulator;
+    private final CaEmulator caEmulator;
 
-    private final RaEmulator rAEmulator;
+    private final RaEmulator raEmulator;
 
-    private final NextCaAndRa nextCAandRA;
+    private final NextCaAndRa nextCaAndRa;
 
     private final ScepControl control;
 
@@ -123,27 +123,27 @@ public class ScepResponder {
     }
 
     public ScepResponder(
-            final CaCaps cACaps,
-            final CaEmulator cAEmulator,
-            final RaEmulator rAEmulator,
-            final NextCaAndRa nextCAandRA,
+            final CaCaps caCaps,
+            final CaEmulator caEmulator,
+            final RaEmulator raEmulator,
+            final NextCaAndRa nextCaAndRa,
             final ScepControl control)
     throws Exception {
-        ParamUtil.assertNotNull("cACaps", cACaps);
-        ParamUtil.assertNotNull("cAEmulator", cAEmulator);
+        ParamUtil.assertNotNull("caCaps", caCaps);
+        ParamUtil.assertNotNull("caEmulator", caEmulator);
         ParamUtil.assertNotNull("control", control);
 
-        this.cAEmulator = cAEmulator;
-        this.rAEmulator = rAEmulator;
-        this.nextCAandRA = nextCAandRA;
+        this.caEmulator = caEmulator;
+        this.raEmulator = raEmulator;
+        this.nextCaAndRa = nextCaAndRa;
         this.control = control;
-        CaCaps caps = cACaps;
-        if (nextCAandRA == null) {
+        CaCaps caps = caCaps;
+        if (nextCaAndRa == null) {
             caps.removeCapability(CaCapability.GetNextCACert);
         } else {
             caps.addCapability(CaCapability.GetNextCACert);
         }
-        this.cACaps = caps;
+        this.caCaps = caps;
     }
 
     /**
@@ -160,12 +160,12 @@ public class ScepResponder {
             final CMSSignedData requestContent,
             final AuditEvent auditEvent)
     throws MessageDecodingException, CaException {
-        PrivateKey recipientKey = (rAEmulator != null)
-                ? rAEmulator.getRAKey()
-                : cAEmulator.getCAKey();
-        Certificate recipientCert = (rAEmulator != null)
-                ? rAEmulator.getRACert()
-                : cAEmulator.getCACert();
+        PrivateKey recipientKey = (raEmulator != null)
+                ? raEmulator.getRaKey()
+                : caEmulator.getCaKey();
+        Certificate recipientCert = (raEmulator != null)
+                ? raEmulator.getRaCert()
+                : caEmulator.getCaCert();
         X509CertificateObject recipientX509Obj;
         try {
             recipientX509Obj = new X509CertificateObject(recipientCert);
@@ -291,15 +291,15 @@ public class ScepResponder {
         } else {
             boolean supported = false;
             if (hashAlgoType == HashAlgoType.SHA1) {
-                if (cACaps.containsCapability(CaCapability.SHA1)) {
+                if (caCaps.containsCapability(CaCapability.SHA1)) {
                     supported = true;
                 }
             } else if (hashAlgoType == HashAlgoType.SHA256) {
-                if (cACaps.containsCapability(CaCapability.SHA256)) {
+                if (caCaps.containsCapability(CaCapability.SHA256)) {
                     supported = true;
                 }
             } else if (hashAlgoType == HashAlgoType.SHA512) {
-                if (cACaps.containsCapability(CaCapability.SHA512)) {
+                if (caCaps.containsCapability(CaCapability.SHA512)) {
                     supported = true;
                 }
             } else if (hashAlgoType == HashAlgoType.MD5) {
@@ -318,13 +318,13 @@ public class ScepResponder {
         // check the content encryption algorithm
         ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
-            if (!cACaps.containsCapability(CaCapability.DES3)) {
+            if (!caCaps.containsCapability(CaCapability.DES3)) {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
         } else if (AES_ENC_ALGS.contains(encOid)) {
-            if (!cACaps.containsCapability(CaCapability.AES)) {
+            if (!caCaps.containsCapability(CaCapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
                         encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -362,7 +362,7 @@ public class ScepResponder {
 
             Certificate cert;
             try {
-                cert = cAEmulator.generateCert(p10ReqInfo);
+                cert = caEmulator.generateCert(p10ReqInfo);
             } catch (Exception e) {
                 throw new CaException("system failure: " + e.getMessage(), e);
             }
@@ -380,7 +380,7 @@ public class ScepResponder {
             break;
         case CertPoll:
             IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
-            cert = cAEmulator.pollCert(is.getIssuer(), is.getSubject());
+            cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
             } else {
@@ -391,7 +391,7 @@ public class ScepResponder {
             break;
         case GetCert:
             IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
-            cert = cAEmulator.getCert(isn.getName(),
+            cert = caEmulator.getCert(isn.getName(),
                     isn.getSerialNumber().getValue());
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
@@ -402,13 +402,13 @@ public class ScepResponder {
 
             break;
         case RenewalReq:
-            if (!cACaps.containsCapability(CaCapability.Renewal)) {
+            if (!caCaps.containsCapability(CaCapability.Renewal)) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
                 p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
-                    cert = cAEmulator.generateCert(p10ReqInfo);
+                    cert = caEmulator.generateCert(p10ReqInfo);
                 } catch (Exception e) {
                     throw new CaException("system failure: " + e.getMessage(), e);
                 }
@@ -421,13 +421,13 @@ public class ScepResponder {
             }
             break;
         case UpdateReq:
-            if (!cACaps.containsCapability(CaCapability.Update)) {
+            if (!caCaps.containsCapability(CaCapability.Update)) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
                 p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
-                    cert = cAEmulator.generateCert(p10ReqInfo);
+                    cert = caEmulator.generateCert(p10ReqInfo);
                 } catch (Exception e) {
                     throw new CaException("system failure: " + e.getMessage(), e);
                 }
@@ -443,7 +443,7 @@ public class ScepResponder {
             isn = (IssuerAndSerialNumber) req.getMessageData();
             CertificateList crl;
             try {
-                crl = cAEmulator.getCRL(isn.getName(), isn.getSerialNumber().getValue());
+                crl = caEmulator.getCrl(isn.getName(), isn.getSerialNumber().getValue());
             } catch (Exception e) {
                 throw new CaException("system failure: " + e.getMessage(), e);
             }
@@ -487,8 +487,8 @@ public class ScepResponder {
         CMSSignedData cmsSigneddata;
         try {
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(cert));
-            if (control.isSendCACert()) {
-                cmsSignedDataGen.addCertificate(new X509CertificateHolder(cAEmulator.getCACert()));
+            if (control.isSendCaCert()) {
+                cmsSignedDataGen.addCertificate(new X509CertificateHolder(caEmulator.getCaCert()));
             }
 
             cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
@@ -500,31 +500,31 @@ public class ScepResponder {
     }
 
     public PrivateKey getSigningKey() {
-        return (rAEmulator != null)
-                ? rAEmulator.getRAKey()
-                : cAEmulator.getCAKey();
+        return (raEmulator != null)
+                ? raEmulator.getRaKey()
+                : caEmulator.getCaKey();
     }
 
     public Certificate getSigningCert() {
-        return (rAEmulator != null)
-                ? rAEmulator.getRACert()
-                : cAEmulator.getCACert();
+        return (raEmulator != null)
+                ? raEmulator.getRaCert()
+                : caEmulator.getCaCert();
     }
 
-    public CaCaps getCACaps() {
-        return cACaps;
+    public CaCaps getCaCaps() {
+        return caCaps;
     }
 
-    public CaEmulator getCAEmulator() {
-        return cAEmulator;
+    public CaEmulator getCaEmulator() {
+        return caEmulator;
     }
 
-    public RaEmulator getRAEmulator() {
-        return rAEmulator;
+    public RaEmulator getRaEmulator() {
+        return raEmulator;
     }
 
-    public NextCaAndRa getNextCAandRA() {
-        return nextCAandRA;
+    public NextCaAndRa getNextCaAndRa() {
+        return nextCaAndRa;
     }
 
     private static String getChallengePassword(
