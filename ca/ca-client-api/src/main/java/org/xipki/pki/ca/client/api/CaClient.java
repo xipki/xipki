@@ -99,18 +99,18 @@ public interface CaClient {
             RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    X509CRL downloadCRL(
+    X509CRL downloadCrl(
             String caName,
             RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    X509CRL downloadCRL(
+    X509CRL downloadCrl(
             String caName,
             BigInteger crlNumber,
             RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    X509CRL generateCRL(
+    X509CRL generateCrl(
             String caName,
             RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;

@@ -77,7 +77,7 @@ public class GetCertCmd extends ClientCommandSupport {
         Client client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
         CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
-        X509Certificate cert = extractEECerts(certs);
+        X509Certificate cert = extractEeCerts(certs);
 
         if (cert == null) {
             throw new CmdFailure("received no certficate from server");

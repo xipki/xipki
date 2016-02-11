@@ -151,7 +151,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                 }
 
                 if (isBlank(serverURL)) {
-                    List<String> ocspUrls = X509Util.extractOCSPUrls(cert);
+                    List<String> ocspUrls = X509Util.extractOcspUrls(cert);
                     if (ocspUrls.size() > 0) {
                         String url = ocspUrls.get(0);
                         if (ocspUrl != null && !ocspUrl.equals(url)) {

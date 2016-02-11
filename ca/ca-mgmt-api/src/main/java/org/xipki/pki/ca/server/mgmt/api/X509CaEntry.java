@@ -70,7 +70,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     private long nextSerial;
 
-    private int nextCRLNumber;
+    private int nextCrlNumber;
 
     private int numCrls;
 
@@ -117,7 +117,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
         this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
         this.nextSerial = pNextSerial;
-        this.nextCRLNumber = pNextCRLNumber;
+        this.nextCrlNumber = pNextCRLNumber;
 
         this.cacertUris = caUris.getCacertUris();
         this.ocspUris = caUris.getOcspUris();
@@ -136,7 +136,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
                 throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
             }
             this.cert = certificate;
-            this.subject = X509Util.getRFC4519Name(certificate.getSubjectX500Principal());
+            this.subject = X509Util.getRfc4519Name(certificate.getSubjectX500Principal());
         }
     }
 
@@ -149,13 +149,13 @@ public class X509CaEntry extends CaEntry implements Serializable {
         this.nextSerial = nextSerial;
     }
 
-    public int getNextCRLNumber() {
-        return nextCRLNumber;
+    public int getNextCrlNumber() {
+        return nextCrlNumber;
     }
 
-    public void setNextCRLNumber(
+    public void setNextCrlNumber(
             final int crlNumber) {
-        this.nextCRLNumber = crlNumber;
+        this.nextCrlNumber = crlNumber;
     }
 
     public List<String> getCrlUris() {
@@ -216,7 +216,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
             sb.append('\n');
         }
         sb.append("nextSerial: ").append(nextSerial).append('\n');
-        sb.append("nextCrlNumber: ").append(nextCRLNumber).append('\n');
+        sb.append("nextCrlNumber: ").append(nextCrlNumber).append('\n');
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
@@ -226,7 +226,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
             sb.append("\tnull").append("\n");
         } else {
             sb.append("\tissuer: ").append(
-                    X509Util.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
+                    X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(subject).append("\n");
             sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");

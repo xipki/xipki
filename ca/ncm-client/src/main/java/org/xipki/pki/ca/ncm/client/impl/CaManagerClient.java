@@ -129,21 +129,21 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public CaSystemStatus getCASystemStatus() {
-        return client.getCASystemStatus();
+    public CaSystemStatus getCaSystemStatus() {
+        return client.getCaSystemStatus();
     }
 
     @Override
-    public boolean unlockCA() {
-        return client.unlockCA();
+    public boolean unlockCa() {
+        return client.unlockCa();
     }
 
     @Override
-    public boolean publishRootCA(
+    public boolean publishRootCa(
             final String caName,
             final String certprofile)
     throws CaMgmtException {
-        return client.publishRootCA(caName, certprofile);
+        return client.publishRootCa(caName, certprofile);
     }
 
     @Override
@@ -163,10 +163,10 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public boolean removeCA(
+    public boolean removeCa(
             final String caName)
     throws CaMgmtException {
-        return client.removeCA(caName);
+        return client.removeCa(caName);
     }
 
     @Override
@@ -175,9 +175,9 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public boolean notifyCAChange()
+    public boolean notifyCaChange()
     throws HessianCaMgmtException {
-        return client.notifyCAChange();
+        return client.notifyCaChange();
     }
 
     @Override
@@ -196,9 +196,9 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public Set<String> getAliasesForCA(
+    public Set<String> getAliasesForCa(
             final String caName) {
-        return client.getAliasesForCA(caName);
+        return client.getAliasesForCa(caName);
     }
 
     @Override
@@ -248,68 +248,68 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public boolean addCA(
+    public boolean addCa(
             final CaEntry newCaDbEntry)
     throws CaMgmtException {
-        return client.addCA(newCaDbEntry);
+        return client.addCa(newCaDbEntry);
     }
 
     @Override
-    public CaEntry getCA(
+    public CaEntry getCa(
             final String caName) {
-        return client.getCA(caName);
+        return client.getCa(caName);
     }
 
     @Override
-    public boolean changeCA(
+    public boolean changeCa(
             final ChangeCaEntry changeCAentry)
     throws CaMgmtException {
-        return client.changeCA(changeCAentry);
+        return client.changeCa(changeCAentry);
     }
 
     @Override
-    public boolean removeCertprofileFromCA(
+    public boolean removeCertprofileFromCa(
             final String profileName,
             final String caName)
     throws CaMgmtException {
-        return client.removeCertprofileFromCA(profileName, caName);
+        return client.removeCertprofileFromCa(profileName, caName);
     }
 
     @Override
-    public boolean addCertprofileToCA(
+    public boolean addCertprofileToCa(
             final String profileName,
             final String profileLocalname,
             final String caName)
     throws CaMgmtException {
-        return client.addCertprofileToCA(profileName, profileLocalname, caName);
+        return client.addCertprofileToCa(profileName, profileLocalname, caName);
     }
 
     @Override
-    public boolean removePublisherFromCA(
+    public boolean removePublisherFromCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
-        return client.removePublisherFromCA(publisherName, caName);
+        return client.removePublisherFromCa(publisherName, caName);
     }
 
     @Override
-    public boolean addPublisherToCA(
+    public boolean addPublisherToCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
-        return client.addPublisherToCA(publisherName, caName);
+        return client.addPublisherToCa(publisherName, caName);
     }
 
     @Override
-    public Map<String, String> getCertprofilesForCA(
+    public Map<String, String> getCertprofilesForCa(
             final String caName) {
-        return client.getCertprofilesForCA(caName);
+        return client.getCertprofilesForCa(caName);
     }
 
     @Override
-    public Set<CaHasRequestorEntry> getCmpRequestorsForCA(
+    public Set<CaHasRequestorEntry> getCmpRequestorsForCa(
             final String caName) {
-        return client.getCmpRequestorsForCA(caName);
+        return client.getCmpRequestorsForCa(caName);
     }
 
     @Override
@@ -341,19 +341,19 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public boolean removeCmpRequestorFromCA(
+    public boolean removeCmpRequestorFromCa(
             final String requestorName,
             final String caName)
     throws CaMgmtException {
-        return client.removeCmpRequestorFromCA(requestorName, caName);
+        return client.removeCmpRequestorFromCa(requestorName, caName);
     }
 
     @Override
-    public boolean addCmpRequestorToCA(
+    public boolean addCmpRequestorToCa(
             final CaHasRequestorEntry requestor,
             final String caName)
     throws CaMgmtException {
-        return client.addCmpRequestorToCA(requestor, caName);
+        return client.addCmpRequestorToCa(requestor, caName);
     }
 
     @Override
@@ -450,9 +450,9 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public List<PublisherEntry> getPublishersForCA(
+    public List<PublisherEntry> getPublishersForCa(
             final String caName) {
-        return client.getPublishersForCA(caName);
+        return client.getPublishersForCa(caName);
     }
 
     @Override
@@ -597,12 +597,12 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public X509Certificate generateRootCA(
+    public X509Certificate generateRootCa(
             final X509CaEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)
     throws CaMgmtException {
-        return client.generateSelfSignedCA(caEntry, certprofileName, p10Req);
+        return client.generateSelfSignedCa(caEntry, certprofileName, p10Req);
     }
 
     @Override
@@ -636,25 +636,25 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public X509CRL generateCRLonDemand(
+    public X509CRL generateCrlOnDemand(
             final String caName)
     throws CaMgmtException {
-        return client.generateCRLonDemand(caName);
+        return client.generateCrlOnDemand(caName);
     }
 
     @Override
-    public X509CRL getCRL(
+    public X509CRL getCrl(
             final String caName,
             final BigInteger crlNumber)
     throws CaMgmtException {
-        return client.getCRL(caName, crlNumber);
+        return client.getCrl(caName, crlNumber);
     }
 
     @Override
-    public X509CRL getCurrentCRL(
+    public X509CRL getCurrentCrl(
             final String caName)
     throws CaMgmtException {
-        return client.getCurrentCRL(caName);
+        return client.getCurrentCrl(caName);
     }
 
     @Override
@@ -694,13 +694,13 @@ public class CaManagerClient implements CaManager {
     public static void main(
             final String[] args) {
         try {
-            CAManagerClient c = new CAManagerClient();
+            CaManagerClient c = new CaManagerClient();
             c.setServerURL("http://localhost:8080/pkiconsole/hessian");
             c.init();
             X509CrlSignerEntry crlSigner = c.getCrlSigner("CASIGN.CRLSIGNER");
             System.out.println(crlSigner);
 
-            CAEntry caEntry = c.getCA("RCA1");
+            CAEntry caEntry = c.getCa("RCA1");
             System.out.println(caEntry);
         } catch (Exception e) {
             e.printStackTrace();

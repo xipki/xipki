@@ -84,7 +84,7 @@ public class OcspLoadTest extends LoadExecutor {
             try {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
                         options, null);
-                basicResp = OcspUtils.extractBasicOCSPResp(response);
+                basicResp = OcspUtils.extractBasicOcspResp(response);
             } catch (OcspRequestorException e) {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;

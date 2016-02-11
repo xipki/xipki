@@ -67,11 +67,11 @@ public class CaCheckCmd extends CaUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509ChangeCaEntry ey = getChangeCAEntry();
+        X509ChangeCaEntry ey = getChangeCaEntry();
         String caName = ey.getName();
         out("checking CA" + caName);
 
-        CaEntry entry = caManager.getCA(caName);
+        CaEntry entry = caManager.getCa(caName);
         if (entry == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }

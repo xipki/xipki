@@ -548,7 +548,7 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableMap(map);
     } // buildConstantExtesions
 
-    public static Set<ASN1ObjectIdentifier> toOIDSet(
+    public static Set<ASN1ObjectIdentifier> toOidSet(
             final List<OidWithDescType> oidWithDescTypes) {
         if (CollectionUtil.isEmpty(oidWithDescTypes)) {
             return null;
@@ -576,7 +576,7 @@ public class XmlX509CertprofileUtil {
 
             if (params.getCurves() != null) {
                 Curves curves = params.getCurves();
-                Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
+                Set<ASN1ObjectIdentifier> curveOids = toOidSet(curves.getCurve());
                 option.setCurveOids(curveOids);
             }
 
@@ -634,13 +634,13 @@ public class XmlX509CertprofileUtil {
             KeyParametersOption.GostParametersOption option =
                     new KeyParametersOption.GostParametersOption();
 
-            Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
+            Set<ASN1ObjectIdentifier> set = toOidSet(params.getPublicKeyParamSet());
             option.setPublicKeyParamSets(set);
 
-            set = toOIDSet(params.getDigestParamSet());
+            set = toOidSet(params.getDigestParamSet());
             option.setDigestParamSets(set);
 
-            set = toOIDSet(params.getEncryptionParamSet());
+            set = toOidSet(params.getEncryptionParamSet());
             option.setEncryptionParamSets(set);
 
             return option;

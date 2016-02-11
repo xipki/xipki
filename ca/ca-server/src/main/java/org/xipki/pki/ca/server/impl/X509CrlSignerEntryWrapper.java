@@ -78,7 +78,7 @@ class X509CrlSignerEntryWrapper {
         this.crlControl = new CrlControl(dbEntry.getCrlControl());
     }
 
-    public CrlControl getCRLControl() {
+    public CrlControl getCrlControl() {
         return crlControl;
     }
 

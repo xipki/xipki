@@ -100,7 +100,7 @@ class PublicCaInfo {
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
         this.c14nSubject = X509Util.canonicalizName(x500Subject);
         try {
-            this.subjectKeyIdentifier = X509Util.extractSKI(caCertificate);
+            this.subjectKeyIdentifier = X509Util.extractSki(caCertificate);
         } catch (CertificateEncodingException e) {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }

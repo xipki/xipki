@@ -134,7 +134,7 @@ abstract class CmpResponder {
     protected abstract CmpRequestorInfo getRequestor(
             X500Name requestorSender);
 
-    protected abstract PKIMessage doProcessPKIMessage(
+    protected abstract PKIMessage doProcessPkiMessage(
             RequestorInfo requestor,
             String user,
             ASN1OctetString transactionId,
@@ -142,7 +142,7 @@ abstract class CmpResponder {
             AuditEvent auditEvent)
     throws InvalidConfException;
 
-    public PKIMessage processPKIMessage(
+    public PKIMessage processPkiMessage(
             final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert,
             final AuditEvent auditEvent)
@@ -279,7 +279,7 @@ abstract class CmpResponder {
                 errorStatus = null;
             } else {
                 LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
-                        tid, X509Util.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
+                        tid, X509Util.getRfc4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "requestor (TLS client certificate) is not authorized";
             }
         } else {
@@ -307,7 +307,7 @@ abstract class CmpResponder {
                     errorStatus);
         }
 
-        PKIMessage resp = doProcessPKIMessage(requestor, username, tid, message, auditEvent);
+        PKIMessage resp = doProcessPkiMessage(requestor, username, tid, message, auditEvent);
 
         if (isProtected) {
             resp = addProtection(resp, auditEvent);

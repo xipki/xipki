@@ -272,7 +272,7 @@ public class ScepUtil {
         return certs;
     } // method getCertsFromSignedData
 
-    public static X509CRL getCRLFromPkiMessage(
+    public static X509CRL getCrlFromPkiMessage(
             final SignedData signedData)
     throws CRLException {
         ASN1Set set = signedData.getCRLs();
@@ -319,7 +319,7 @@ public class ScepUtil {
         return (X509Certificate) certFact.generateCertificate(certStream);
     }
 
-    private static byte[] extractSKI(
+    private static byte[] extractSki(
             final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
@@ -334,7 +334,7 @@ public class ScepUtil {
         }
     }
 
-    private static byte[] extractAKI(
+    private static byte[] extractAki(
             final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
@@ -385,8 +385,8 @@ public class ScepUtil {
         }
 
         try {
-            byte[] ski = extractSKI(cert);
-            byte[] aki = extractAKI(cert);
+            byte[] ski = extractSki(cert);
+            byte[] aki = extractAki(cert);
 
             if (ski != null && aki != null) {
                 return Arrays.equals(ski, aki);
@@ -409,8 +409,8 @@ public class ScepUtil {
 
         boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (issues) {
-            byte[] ski = extractSKI(issuerCert);
-            byte[] aki = extractAKI(cert);
+            byte[] ski = extractSki(issuerCert);
+            byte[] aki = extractAki(cert);
             if (ski != null) {
                 issues = Arrays.equals(ski, aki);
             }

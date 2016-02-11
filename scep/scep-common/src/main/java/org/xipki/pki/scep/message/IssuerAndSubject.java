@@ -75,7 +75,7 @@ public class IssuerAndSubject extends ASN1Object {
     }
 
     public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector    v = new ASN1EncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(issuer);
         v.add(subject);

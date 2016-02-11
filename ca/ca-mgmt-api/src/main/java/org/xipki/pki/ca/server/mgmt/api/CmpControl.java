@@ -224,16 +224,16 @@ public class CmpControl {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(500);
-        sb.append("                 name: ").append(dbEntry.getName()).append('\n');
-        sb.append("        confirmCert: ").append(getYesNo(confirmCert)).append('\n');
-        sb.append("         sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
-        sb.append("    sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
+        sb.append("name: ").append(dbEntry.getName()).append('\n');
+        sb.append("confirmCert: ").append(getYesNo(confirmCert)).append('\n');
+        sb.append("sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
+        sb.append("sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
         sb.append("messageTimeRequired: ").append(getYesNo(messageTimeRequired)).append("\n");
-        sb.append("    messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
-        sb.append("    confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
-        sb.append("    signature algos: ")
+        sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
+        sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
+        sb.append("signature algos: ")
             .append(StringUtil.collectionAsString(sigAlgos, ALGO_DELIMITER)).append('\n');
-        sb.append("                 conf: ").append(dbEntry.getConf());
+        sb.append("conf: ").append(dbEntry.getConf());
 
         return sb.toString();
     }

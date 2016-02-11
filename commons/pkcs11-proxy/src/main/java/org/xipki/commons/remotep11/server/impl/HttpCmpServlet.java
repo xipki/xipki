@@ -139,7 +139,7 @@ public class HttpCmpServlet extends HttpServlet {
                         : constructedPath.substring(0, moduleNameEndIndex);
             }
 
-            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool,
+            PKIMessage pkiResp = responder.processPkiMessage(localP11CryptServicePool,
                     moduleName, pkiReq);
 
             response.setContentType(HttpCmpServlet.CT_RESPONSE);

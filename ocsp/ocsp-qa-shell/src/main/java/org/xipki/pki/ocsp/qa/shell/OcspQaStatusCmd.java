@@ -112,7 +112,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     @Reference
-    private OcspQa ocspQA;
+    private OcspQa ocspQa;
 
     private OcspError expectedOcspError;
 
@@ -191,7 +191,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
             responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
         }
 
-        ValidationResult result = ocspQA.checkOCSP(response,
+        ValidationResult result = ocspQa.checkOcsp(response,
                 issuer,
                 serialNumbers,
                 encodedCerts,

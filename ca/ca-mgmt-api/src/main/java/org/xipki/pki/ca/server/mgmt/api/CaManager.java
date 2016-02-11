@@ -55,14 +55,14 @@ public interface CaManager {
 
     String NULL = "NULL";
 
-    CaSystemStatus getCASystemStatus();
+    CaSystemStatus getCaSystemStatus();
 
-    boolean unlockCA();
+    boolean unlockCa();
 
-    boolean notifyCAChange()
+    boolean notifyCaChange()
     throws CaMgmtException;
 
-    boolean publishRootCA(
+    boolean publishRootCa(
             String caName,
             String certprofile)
     throws CaMgmtException;
@@ -77,7 +77,7 @@ public interface CaManager {
             List<String> publisherNames)
     throws CaMgmtException;
 
-    boolean removeCA(
+    boolean removeCa(
             String caName)
     throws CaMgmtException;
 
@@ -92,7 +92,7 @@ public interface CaManager {
             String aliasName)
     throws CaMgmtException;
 
-    Set<String> getAliasesForCA(
+    Set<String> getAliasesForCa(
             String caName);
 
     String getCaNameForAlias(
@@ -114,42 +114,42 @@ public interface CaManager {
 
     Set<String> getCaNames();
 
-    boolean addCA(
+    boolean addCa(
             CaEntry cEntry)
     throws CaMgmtException;
 
-    CaEntry getCA(
+    CaEntry getCa(
             String caName);
 
-    boolean changeCA(
+    boolean changeCa(
             ChangeCaEntry changeCAentry)
     throws CaMgmtException;
 
-    boolean removeCertprofileFromCA(
+    boolean removeCertprofileFromCa(
             String profileLocalname,
             String caName)
     throws CaMgmtException;
 
-    boolean addCertprofileToCA(
+    boolean addCertprofileToCa(
             String profileName,
             String profileLocalname,
             String caName)
     throws CaMgmtException;
 
-    boolean removePublisherFromCA(
+    boolean removePublisherFromCa(
             String publisherName,
             String caName)
     throws CaMgmtException;
 
-    boolean addPublisherToCA(
+    boolean addPublisherToCa(
             String publisherName,
             String caName)
     throws CaMgmtException;
 
-    Map<String, String> getCertprofilesForCA(
+    Map<String, String> getCertprofilesForCa(
             String caName);
 
-    Set<CaHasRequestorEntry> getCmpRequestorsForCA(
+    Set<CaHasRequestorEntry> getCmpRequestorsForCa(
             String caName);
 
     CmpRequestorEntry getCmpRequestor(
@@ -168,12 +168,12 @@ public interface CaManager {
             String base64Cert)
     throws CaMgmtException;
 
-    boolean removeCmpRequestorFromCA(
+    boolean removeCmpRequestorFromCa(
             String requestorName,
             String caName)
     throws CaMgmtException;
 
-    boolean addCmpRequestorToCA(
+    boolean addCmpRequestorToCa(
             CaHasRequestorEntry requestor,
             String caName)
     throws CaMgmtException;
@@ -232,7 +232,7 @@ public interface CaManager {
             PublisherEntry dbEntry)
     throws CaMgmtException;
 
-    List<PublisherEntry> getPublishersForCA(
+    List<PublisherEntry> getPublishersForCa(
             String caName);
 
     PublisherEntry getPublisher(
@@ -315,7 +315,7 @@ public interface CaManager {
             byte[] encodedPkcs10Request)
     throws CaMgmtException;
 
-    X509Certificate generateRootCA(
+    X509Certificate generateRootCa(
             X509CaEntry caEntry,
             String certprofileName,
             byte[] p10Req)
@@ -339,16 +339,16 @@ public interface CaManager {
             String username)
     throws CaMgmtException;
 
-    X509CRL generateCRLonDemand(
+    X509CRL generateCrlOnDemand(
             String caName)
     throws CaMgmtException;
 
-    X509CRL getCRL(
+    X509CRL getCrl(
             String caName,
             BigInteger crlNumber)
     throws CaMgmtException;
 
-    X509CRL getCurrentCRL(
+    X509CRL getCurrentCrl(
             String caName)
     throws CaMgmtException;
 

@@ -131,7 +131,7 @@ public class CaExportCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        CaEntry entry = caManager.getCA(name);
+        CaEntry entry = caManager.getCa(name);
         if (entry == null) {
             throw new UnexpectedException("no CA named " + name + " is defined");
         }
@@ -152,7 +152,7 @@ public class CaExportCmd extends CaCommandSupport {
         propsput(props, KEY_NEXT_SN, x509Entry.getNextSerial());
 
         // NEXT_CRLNO
-        propsput(props, KEY_NEXT_CRLNO, x509Entry.getNextCRLNumber());
+        propsput(props, KEY_NEXT_CRLNO, x509Entry.getNextCrlNumber());
 
         // STATUS
         propsput(props, KEY_STATUS, x509Entry.getStatus().name());

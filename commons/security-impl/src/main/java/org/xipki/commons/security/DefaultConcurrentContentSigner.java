@@ -201,7 +201,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CertificateHolder getCertificateAsBCObject() {
+    public X509CertificateHolder getCertificateAsBcObject() {
         if (certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0) {
             return certificateChainAsBCObjects[0];
         } else {
@@ -215,7 +215,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CertificateHolder[] getCertificateChainAsBCObjects() {
+    public X509CertificateHolder[] getCertificateChainAsBcObjects() {
         return certificateChainAsBCObjects;
     }
 

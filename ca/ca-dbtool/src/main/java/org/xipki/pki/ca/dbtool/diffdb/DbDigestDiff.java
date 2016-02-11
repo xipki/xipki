@@ -84,7 +84,7 @@ public class DbDigestDiff {
 
     private final XipkiDbControl targetDbControl;
 
-    private Set<byte[]> includeCACerts;
+    private Set<byte[]> includeCaCerts;
 
     private final String reportDirName;
 
@@ -141,18 +141,18 @@ public class DbDigestDiff {
         }
     } // constuctor
 
-    public Set<byte[]> getIncludeCACerts() {
-        return includeCACerts;
+    public Set<byte[]> getIncludeCaCerts() {
+        return includeCaCerts;
     }
 
-    public void setIncludeCACerts(
-            final Set<byte[]> includeCACerts) {
-        this.includeCACerts = includeCACerts;
+    public void setIncludeCaCerts(
+            final Set<byte[]> includeCaCerts) {
+        this.includeCaCerts = includeCaCerts;
     }
 
     public void diff()
     throws Exception {
-        Map<Integer, byte[]> caIdCertMap = getCAs(targetDatasource, targetDbControl);
+        Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbControl);
 
         if (refDirname != null) {
             File refDir = new File(this.refDirname);
@@ -165,7 +165,7 @@ public class DbDigestDiff {
 
                 String caDirPath = caDir.getPath();
                 DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
-                diffSingleCA(refReader, caIdCertMap);
+                diffSingleCa(refReader, caIdCertMap);
             }
         } else {
             DbSchemaType refDbSchemaType = DbDigestExportWorker
@@ -218,21 +218,21 @@ public class DbDigestDiff {
                         : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
                                 refCaId, revokedOnly, numRefThreads,
                                 numCertsToPredicate, new StopMe(stopMe));
-                diffSingleCA(refReader, caIdCertMap);
+                diffSingleCa(refReader, caIdCertMap);
             }
         }
     } // method diff
 
-    private void diffSingleCA(
+    private void diffSingleCa(
             final DigestReader refReader,
             final Map<Integer, byte[]> caIdCertBytesMap)
     throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.getCaCert();
         byte[] caCertBytes = caCert.getEncoded();
 
-        if (includeCACerts != null && !includeCACerts.isEmpty()) {
+        if (includeCaCerts != null && !includeCaCerts.isEmpty()) {
             boolean include = false;
-            for (byte[] m : includeCACerts) {
+            for (byte[] m : includeCaCerts) {
                 if (Arrays.equals(m, caCertBytes)) {
                     include = true;
                     break;
@@ -261,7 +261,7 @@ public class DbDigestDiff {
         }
 
         if (caId == null) {
-            reporter.addNoCAMatch();
+            reporter.addNoCaMatch();
             refReader.close();
             reporter.close();
             return;
@@ -341,7 +341,7 @@ public class DbDigestDiff {
                 numPerSelect, numThreads);
     }
 
-    private static Map<Integer, byte[]> getCAs(
+    private static Map<Integer, byte[]> getCas(
             final DataSourceWrapper datasource,
             final XipkiDbControl dbControl)
     throws DataAccessException {

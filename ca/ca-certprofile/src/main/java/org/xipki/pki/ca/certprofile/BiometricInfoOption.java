@@ -67,7 +67,7 @@ public class BiometricInfoOption {
     throws NoSuchAlgorithmException {
         ParamUtil.assertNotNull("jaxb", jaxb);
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
-        this.hashAlgorithms = XmlX509CertprofileUtil.toOIDSet(jaxb.getHashAlgorithm());
+        this.hashAlgorithms = XmlX509CertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
 
         for (ASN1ObjectIdentifier m : hashAlgorithms) {
             AlgorithmUtil.getHashOutputSizeInOctets(m);

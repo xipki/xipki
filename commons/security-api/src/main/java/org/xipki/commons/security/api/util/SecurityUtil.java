@@ -58,7 +58,7 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.InvalidOIDorNameException;
+import org.xipki.commons.security.api.InvalidOidOrNameException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 
 /**
@@ -177,7 +177,7 @@ public class SecurityUtil {
         return bytes;
     } // method extractMinimalKeyStore
 
-    public static String formatPKIStatusInfo(
+    public static String formatPkiStatusInfo(
             final org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo) {
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
@@ -186,10 +186,10 @@ public class SecurityUtil {
                 ? null
                 : text.getStringAt(0).getString();
 
-        return SecurityUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
+        return SecurityUtil.formatPkiStatusInfo(status, failureInfo, statusMessage);
     }
 
-    public static String formatPKIStatusInfo(
+    public static String formatPkiStatusInfo(
             final int status,
             final int failureInfo,
             final String statusMessage) {
@@ -276,7 +276,7 @@ public class SecurityUtil {
 
     public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
             final List<String> oidTexts)
-    throws InvalidOIDorNameException {
+    throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
         }
@@ -287,7 +287,7 @@ public class SecurityUtil {
                 continue;
             }
 
-            ASN1ObjectIdentifier oid = toOID(oidText);
+            ASN1ObjectIdentifier oid = toOid(oidText);
             if (!ret.contains(oid)) {
                 ret.add(oid);
             }
@@ -295,9 +295,9 @@ public class SecurityUtil {
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOID(
+    private static ASN1ObjectIdentifier toOid(
             final String s)
-    throws InvalidOIDorNameException {
+    throws InvalidOidOrNameException {
         final int n = s.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {
@@ -314,9 +314,9 @@ public class SecurityUtil {
             }
         }
 
-        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOID(s);
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(s);
         if (oid == null) {
-            throw new InvalidOIDorNameException(s);
+            throw new InvalidOidOrNameException(s);
         }
         return oid;
     }

@@ -35,10 +35,12 @@
 
 package org.xipki.commons.common.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * @author Lijun Liao
@@ -47,12 +49,9 @@ import java.util.TimeZone;
 
 public class DateUtil {
 
-    private static final SimpleDateFormat SDF;
+    private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
-    static {
-        SDF = new SimpleDateFormat("yyyyMMddHHmmss");
-        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+    private static final DateTimeFormatter SDF = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private DateUtil() {
     }
@@ -63,8 +62,10 @@ public class DateUtil {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try {
-            return SDF.parse(utcTime);
-        } catch (ParseException e) {
+            LocalDateTime localDate = LocalDateTime.parse(utcTime, SDF);
+            Instant instant = localDate.atZone(ZONE_UTC).toInstant();
+            return Date.from(instant);
+        } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
                     + e.getMessage());
         }

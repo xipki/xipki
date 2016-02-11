@@ -511,7 +511,7 @@ public class DbCertStatusStore extends CertStatusStore {
     }
 
     @Override
-    public CertRevocationInfo getCARevocationInfo(
+    public CertRevocationInfo getCaRevocationInfo(
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {

@@ -65,7 +65,7 @@ public class ScepControl implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean includeCACert = true;
+    private boolean includeCaCert = true;
 
     private boolean includeSignerCert = true;
 
@@ -83,25 +83,25 @@ public class ScepControl implements Serializable {
             throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
-        this.includeCACert = getBoolean(props, KEY_CACERT_INCLUDED, true);
+        this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
         this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
     }
 
     public String getConf() {
         ConfPairs pairs = new ConfPairs();
-        pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCACert));
+        pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
         pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
 
         return pairs.getEncoded();
     }
 
-    public boolean isIncludeCACert() {
-        return includeCACert;
+    public boolean isIncludeCaCert() {
+        return includeCaCert;
     }
 
-    public void setIncludeCACert(
-            final boolean includeCACert) {
-        this.includeCACert = includeCACert;
+    public void setIncludeCaCert(
+            final boolean includeCaCert) {
+        this.includeCaCert = includeCaCert;
     }
 
     public boolean isIncludeSignerCert() {
@@ -131,7 +131,7 @@ public class ScepControl implements Serializable {
         }
 
         ScepControl b = (ScepControl) obj;
-        if (includeCACert != b.includeCACert
+        if (includeCaCert != b.includeCaCert
                 || includeSignerCert != b.includeSignerCert) {
             return false;
         }

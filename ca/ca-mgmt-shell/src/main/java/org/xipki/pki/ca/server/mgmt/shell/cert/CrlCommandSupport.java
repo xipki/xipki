@@ -68,20 +68,20 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
     @Completion(FilePathCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRL retrieveCRL()
+    protected abstract X509CRL retrieveCrl()
     throws Exception;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        CaEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
         X509CRL crl = null;
         try {
-            crl = retrieveCRL();
+            crl = retrieveCrl();
         } catch (Exception e) {
             throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }

@@ -83,9 +83,9 @@ public class CmpControlEntry implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("    name: ").append(name).append('\n');
+        sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');
-        sb.append("    conf: ").append(conf);
+        sb.append("conf: ").append(conf);
 
         return sb.toString();
     }

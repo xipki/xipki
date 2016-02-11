@@ -293,7 +293,7 @@ public abstract class KeyEntry {
                 curveName = KeyUtil.getCurveName(curveOid);
             } else {
                 curveName = curveNameOrOid;
-                curveOid = KeyUtil.getCurveOID(curveName);
+                curveOid = KeyUtil.getCurveOid(curveName);
                 if (curveOid == null) {
                     throw new IllegalArgumentException(
                             "no OID is defined for the curve " + curveName);

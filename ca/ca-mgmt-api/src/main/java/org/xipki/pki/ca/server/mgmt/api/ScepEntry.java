@@ -172,10 +172,10 @@ public class ScepEntry implements Serializable {
         if (certificate != null) {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
-                    X509Util.getRFC4519Name(certificate.getIssuerX500Principal())).append('\n');
+                    X509Util.getRfc4519Name(certificate.getIssuerX500Principal())).append('\n');
             sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
             sb.append("\tsubject: ").append(
-                    X509Util.getRFC4519Name(certificate.getSubjectX500Principal())).append('\n');
+                    X509Util.getRfc4519Name(certificate.getSubjectX500Principal())).append('\n');
 
             if (verbose) {
                 sb.append("\tencoded: ");

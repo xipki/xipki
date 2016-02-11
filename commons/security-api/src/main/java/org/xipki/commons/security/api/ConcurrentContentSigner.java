@@ -60,14 +60,14 @@ public interface ConcurrentContentSigner {
 
     X509Certificate getCertificate();
 
-    X509CertificateHolder getCertificateAsBCObject();
+    X509CertificateHolder getCertificateAsBcObject();
 
     void setCertificateChain(
             X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
 
-    X509CertificateHolder[] getCertificateChainAsBCObjects();
+    X509CertificateHolder[] getCertificateChainAsBcObjects();
 
     void initialize(
             String conf,

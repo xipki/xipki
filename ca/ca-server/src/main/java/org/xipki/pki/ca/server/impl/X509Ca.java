@@ -255,13 +255,13 @@ public class X509Ca {
 
     } // class ScheduledExpiredCertsRemover
 
-    private class ScheduledCRLGenerationService implements Runnable {
+    private class ScheduledCrlGenerationService implements Runnable {
 
         @Override
         public void run() {
             X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
             if (crlSigner == null
-                    || crlSigner.getCRLControl().getUpdateMode() != UpdateMode.interval) {
+                    || crlSigner.getCrlControl().getUpdateMode() != UpdateMode.interval) {
                 return;
             }
 
@@ -289,7 +289,7 @@ public class X509Ca {
                     (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
                             / MS_PER_SECOND / SECOND_PER_MIN;
 
-            CrlControl control = getCrlSigner().getCRLControl();
+            CrlControl control = getCrlSigner().getCrlControl();
             int interval;
 
             if (control.getIntervalMinutes() != null && control.getIntervalMinutes() > 0) {
@@ -317,58 +317,58 @@ public class X509Ca {
             }
 
             boolean deltaCrl;
-            if (interval % control.getFullCRLIntervals() == 0) {
+            if (interval % control.getFullCrlIntervals() == 0) {
                 deltaCrl = false;
-            } else if (control.getDeltaCRLIntervals() > 0
-                    && interval % control.getDeltaCRLIntervals() == 0) {
+            } else if (control.getDeltaCrlIntervals() > 0
+                    && interval % control.getDeltaCrlIntervals() == 0) {
                 deltaCrl = true;
             } else {
                 return;
             }
 
-            if (deltaCrl && !certstore.hasCRL(caInfo.getCertificate())) {
+            if (deltaCrl && !certstore.hasCrl(caInfo.getCertificate())) {
                 // DeltaCRL will be generated only if fullCRL exists
                 return;
             }
 
             long nowInSecond = thisUpdate.getTime() / MS_PER_SECOND;
-            long thisUpdateOfCurrentCRL = certstore.getThisUpdateOfCurrentCRL(
+            long thisUpdateOfCurrentCrl = certstore.getThisUpdateOfCurrentCrl(
                     caInfo.getCertificate());
-            if (nowInSecond - thisUpdateOfCurrentCRL
+            if (nowInSecond - thisUpdateOfCurrentCrl
                     <= (signWindowMin + 5) * SECOND_PER_MIN) {
                 // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
                 return;
             }
 
             // find out the next interval for fullCRL and deltaCRL
-            int nextFullCRLInterval = 0;
-            int nextDeltaCRLInterval = 0;
+            int nextFullCrlInterval = 0;
+            int nextDeltaCrlInterval = 0;
 
             for (int i = interval + 1;; i++) {
-                if (i % control.getFullCRLIntervals() == 0) {
-                    nextFullCRLInterval = i;
+                if (i % control.getFullCrlIntervals() == 0) {
+                    nextFullCrlInterval = i;
                     break;
                 }
 
-                if (nextDeltaCRLInterval != 0
-                        && control.getDeltaCRLIntervals() != 0
-                        && i % control.getDeltaCRLIntervals() == 0) {
-                    nextDeltaCRLInterval = i;
+                if (nextDeltaCrlInterval != 0
+                        && control.getDeltaCrlIntervals() != 0
+                        && i % control.getDeltaCrlIntervals() == 0) {
+                    nextDeltaCrlInterval = i;
                 }
             }
 
             int intervalOfNextUpdate;
             if (deltaCrl) {
-                intervalOfNextUpdate = nextDeltaCRLInterval == 0
-                        ? nextFullCRLInterval
-                        : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+                intervalOfNextUpdate = nextDeltaCrlInterval == 0
+                        ? nextFullCrlInterval
+                        : Math.min(nextFullCrlInterval, nextDeltaCrlInterval);
             } else {
-                if (nextDeltaCRLInterval == 0) {
-                    intervalOfNextUpdate = nextFullCRLInterval;
+                if (nextDeltaCrlInterval == 0) {
+                    intervalOfNextUpdate = nextFullCrlInterval;
                 } else {
                     intervalOfNextUpdate = control.isExtendedNextUpdate()
-                            ? nextFullCRLInterval
-                            : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+                            ? nextFullCrlInterval
+                            : Math.min(nextFullCrlInterval, nextDeltaCrlInterval);
                 }
             }
 
@@ -399,15 +399,15 @@ public class X509Ca {
             auditEvent.addEventData(new AuditEventData("eventType", "CRL_GEN_INTERVAL"));
 
             try {
-                long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(
+                long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(
                         caInfo.getCertificate());
 
-                generateCRL(deltaCrl, thisUpdate, nextUpdate, auditEvent);
+                generateCrl(deltaCrl, thisUpdate, nextUpdate, auditEvent);
                 auditEvent.setStatus(AuditStatus.SUCCESSFUL);
                 auditEvent.setLevel(AuditLevel.INFO);
 
                 try {
-                    certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
+                    certstore.clearDeltaCrlCache(caInfo.getCertificate(), maxIdOfDeltaCrlCache);
                 } catch (Throwable t) {
                     final String message =
                             "CRL_GEN_INTERVAL: could not clear DeltaCRLCache of CA "
@@ -437,7 +437,7 @@ public class X509Ca {
             LOG.info("CRL_GEN_INTERVAL: {}", auditEvent.getStatus().name());
         } // method doRun
 
-    } // class ScheduledCRLGenerationService
+    } // class ScheduledCrlGenerationService
 
     private static final long MS_PER_SECOND = 1000L;
 
@@ -540,7 +540,7 @@ public class X509Ca {
 
         // CRL generation services
         crlGenerationService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledCRLGenerationService(),
+                new ScheduledCrlGenerationService(),
                 1, 1, TimeUnit.MINUTES);
 
         expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
@@ -548,7 +548,7 @@ public class X509Ca {
                 1, 1, TimeUnit.DAYS);
     } // constructor
 
-    public X509CaInfo getCAInfo() {
+    public X509CaInfo getCaInfo() {
         return caInfo;
     }
 
@@ -578,7 +578,7 @@ public class X509Ca {
             final X509Certificate cert)
     throws OperationException {
         if (!caInfo.getSubject().equals(
-                X509Util.getRFC4519Name(cert.getIssuerX500Principal()))) {
+                X509Util.getRfc4519Name(cert.getIssuerX500Principal()))) {
             return KnowCertResult.UNKNOWN;
         }
 
@@ -592,15 +592,15 @@ public class X509Ca {
         return certstore.authenticateUser(user, password);
     }
 
-    public String getCNRegexForUser(
+    public String getCnRegexForUser(
             final String user)
     throws OperationException {
-        return certstore.getCNRegexForUser(user);
+        return certstore.getCnRegexForUser(user);
     }
 
-    public CertificateList getCurrentCRL()
+    public CertificateList getCurrentCrl()
     throws OperationException {
-        return getCRL(null);
+        return getCrl(null);
     }
 
     /**
@@ -609,14 +609,14 @@ public class X509Ca {
      * @return
      * @throws OperationException
      */
-    public CertificateList getCRL(
+    public CertificateList getCrl(
             final BigInteger crlNumber)
     throws OperationException {
-        LOG.info("     START getCurrentCRL: ca={}, crlNumber={}", caInfo.getName(), crlNumber);
+        LOG.info("     START getCurrentCrl: ca={}, crlNumber={}", caInfo.getName(), crlNumber);
         boolean successful = false;
 
         try {
-            byte[] encodedCrl = certstore.getEncodedCRL(caInfo.getCertificate(), crlNumber);
+            byte[] encodedCrl = certstore.getEncodedCrl(caInfo.getCertificate(), crlNumber);
             if (encodedCrl == null) {
                 return null;
             }
@@ -625,7 +625,7 @@ public class X509Ca {
                 CertificateList crl = CertificateList.getInstance(encodedCrl);
                 successful = true;
 
-                LOG.info("SUCCESSFUL getCurrentCRL: ca={}, thisUpdate={}", caInfo.getName(),
+                LOG.info("SUCCESSFUL getCurrentCrl: ca={}, thisUpdate={}", caInfo.getName(),
                         crl.getThisUpdate().getTime());
 
                 return crl;
@@ -635,50 +635,50 @@ public class X509Ca {
             }
         } finally {
             if (!successful) {
-                LOG.info("    FAILED getCurrentCRL: ca={}", caInfo.getName());
+                LOG.info("    FAILED getCurrentCrl: ca={}", caInfo.getName());
             }
         }
-    } // method getCRL
+    } // method getCrl
 
-    private void cleanupCRLsWithoutException()
+    private void cleanupCrlsWithoutException()
     throws OperationException {
         try {
-            cleanupCRLs();
+            cleanupCrls();
         } catch (Throwable t) {
             LOG.warn("could not cleanup CRLs.{}: {}", t.getClass().getName(),
                     t.getMessage());
         }
     }
 
-    private void cleanupCRLs()
+    private void cleanupCrls()
     throws OperationException {
         int numCrls = caInfo.getNumCrls();
-        LOG.info("     START cleanupCRLs: ca={}, numCrls={}", caInfo.getName(), numCrls);
+        LOG.info("     START cleanupCrls: ca={}, numCrls={}", caInfo.getName(), numCrls);
 
         boolean successful = false;
 
         try {
-            int numOfRemovedCRLs;
+            int numOfRemovedCrls;
             if (numCrls > 0) {
-                numOfRemovedCRLs = certstore.cleanupCRLs(caInfo.getCertificate(),
+                numOfRemovedCrls = certstore.cleanupCrls(caInfo.getCertificate(),
                         caInfo.getNumCrls());
             } else {
-                numOfRemovedCRLs = 0;
+                numOfRemovedCrls = 0;
             }
             successful = true;
-            LOG.info("SUCCESSFUL cleanupCRLs: ca={}, numOfRemovedCRLs={}", caInfo.getName(),
-                    numOfRemovedCRLs);
+            LOG.info("SUCCESSFUL cleanupCrls: ca={}, numOfRemovedCRLs={}", caInfo.getName(),
+                    numOfRemovedCrls);
         } catch (RuntimeException e) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     e.getClass().getName() + ": " + e.getMessage());
         } finally {
             if (!successful) {
-                LOG.info("    FAILED cleanupCRLs: ca={}", caInfo.getName());
+                LOG.info("    FAILED cleanupCrls: ca={}", caInfo.getName());
             }
         }
-    } // method cleanupCRLs
+    } // method cleanupCrls
 
-    public X509CRL generateCRLonDemand(
+    public X509CRL generateCrlOnDemand(
             final AuditEvent auditEvent)
     throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -693,17 +693,17 @@ public class X509Ca {
         crlGenInProcess.set(true);
         try {
             Date thisUpdate = new Date();
-            Date nextUpdate = getCRLNextUpdate(thisUpdate);
+            Date nextUpdate = getCrlNextUpdate(thisUpdate);
             if (nextUpdate != null && !nextUpdate.after(thisUpdate)) {
                 nextUpdate = null;
             }
 
-            long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
-            X509CRL crl = generateCRL(false, thisUpdate, nextUpdate, auditEvent);
+            long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(caInfo.getCertificate());
+            X509CRL crl = generateCrl(false, thisUpdate, nextUpdate, auditEvent);
 
             if (crl != null) {
                 try {
-                    certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
+                    certstore.clearDeltaCrlCache(caInfo.getCertificate(), maxIdOfDeltaCrlCache);
                 } catch (Throwable t) {
                     final String msg = "could not clear DeltaCRLCache of CA " + caInfo.getName();
                     if (LOG.isErrorEnabled()) {
@@ -718,10 +718,10 @@ public class X509Ca {
         } finally {
             crlGenInProcess.set(false);
         }
-    } // method generateCRLonDemand
+    } // method generateCrlonDemand
 
-    private X509CRL generateCRL(
-            final boolean deltaCRL,
+    private X509CRL generateCrl(
+            final boolean deltaCrl,
             final Date thisUpdate,
             final Date nextUpdate,
             final AuditEvent auditEvent)
@@ -732,13 +732,13 @@ public class X509Ca {
                     "CRL generation is not allowed");
         }
 
-        LOG.info("     START generateCRL: ca={}, deltaCRL={}, nextUpdate={}",
-                new Object[]{caInfo.getName(), deltaCRL, nextUpdate});
+        LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}",
+                new Object[]{caInfo.getName(), deltaCrl, nextUpdate});
 
         if (auditEvent != null) {
             auditEvent.addEventData(
                     new AuditEventData("crlType",
-                            deltaCRL
+                            deltaCrl
                                 ? "DELTA_CRL"
                                 : "FULL_CRL"));
 
@@ -761,18 +761,18 @@ public class X509Ca {
             }
         }
 
-        CrlControl crlControl = crlSigner.getCRLControl();
+        CrlControl crlControl = crlSigner.getCrlControl();
         boolean successful = false;
 
         try {
             ConcurrentContentSigner localCrlSigner = crlSigner.getSigner();
 
-            CrlControl control = crlSigner.getCRLControl();
+            CrlControl control = crlSigner.getCrlControl();
 
-            boolean directCRL = localCrlSigner == null;
+            boolean directCrl = (localCrlSigner == null);
             X500Name crlIssuer;
-            if (directCRL) {
-                crlIssuer = caInfo.getPublicCAInfo().getX500Subject();
+            if (directCrl) {
+                crlIssuer = caInfo.getPublicCaInfo().getX500Subject();
             } else {
                 crlIssuer = X500Name.getInstance(
                         localCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
@@ -788,7 +788,7 @@ public class X509Ca {
 
             X509Cert caCert = caInfo.getCertificate();
             List<CertRevInfoWithSerial> revInfos;
-            boolean isFirstCRLEntry = true;
+            boolean isFirstCrlEntry = true;
 
             Date notExpireAt;
             if (control.isIncludeExpiredCerts()) {
@@ -799,13 +799,13 @@ public class X509Ca {
             }
 
             do {
-                if (deltaCRL) {
-                    revInfos = certstore.getCertificatesForDeltaCRL(caCert, startSerial, numEntries,
-                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
+                if (deltaCrl) {
+                    revInfos = certstore.getCertsForDeltaCrl(caCert, startSerial, numEntries,
+                            control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 } else {
-                    revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial,
+                    revInfos = certstore.getRevokedCerts(caCert, notExpireAt, startSerial,
                             numEntries,
-                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
+                            control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 }
 
                 BigInteger maxSerial = BigInteger.ONE;
@@ -840,7 +840,7 @@ public class X509Ca {
                                 + crlControl.getInvalidityDateMode());
                     }
 
-                    if (directCRL || !isFirstCRLEntry) {
+                    if (directCrl || !isFirstCrlEntry) {
                         if (invalidityTime != null) {
                             crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
                                     reason.getCode(), invalidityTime);
@@ -862,13 +862,13 @@ public class X509Ca {
                     }
 
                     Extension ext = createCertificateIssuerExtension(
-                            caInfo.getPublicCAInfo().getX500Subject());
+                            caInfo.getPublicCaInfo().getX500Subject());
                     extensions.add(ext);
 
                     Extensions asn1Extensions = new Extensions(
                             extensions.toArray(new Extension[0]));
                     crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime, asn1Extensions);
-                    isFirstCRLEntry = false;
+                    isFirstCrlEntry = false;
                 } // end for
 
                 startSerial = maxSerial.add(BigInteger.ONE);
@@ -876,13 +876,13 @@ public class X509Ca {
             } while (revInfos.size() >= numEntries);
             // end do
 
-            BigInteger crlNumber = caInfo.nextCRLNumber();
+            BigInteger crlNumber = caInfo.nextCrlNumber();
             if (auditEvent != null) {
                 auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
             }
 
             boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
-            boolean onlyCACerts = crlControl.isOnlyContainsCACerts();
+            boolean onlyCACerts = crlControl.isOnlyContainsCaCerts();
             if (onlyUserCerts && onlyCACerts) {
                 throw new RuntimeException(
                         "should not reach here, onlyUserCerts and onlyCACerts are both true");
@@ -890,8 +890,8 @@ public class X509Ca {
 
             try {
                 // AuthorityKeyIdentifier
-                byte[] akiValues = directCRL
-                        ? caInfo.getPublicCAInfo().getSubjectKeyIdentifer()
+                byte[] akiValues = directCrl
+                        ? caInfo.getPublicCaInfo().getSubjectKeyIdentifer()
                         : crlSigner.getSubjectKeyIdentifier();
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
                 crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
@@ -900,13 +900,13 @@ public class X509Ca {
                 crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber));
 
                 // IssuingDistributionPoint
-                if (onlyUserCerts || onlyCACerts || !directCRL) {
+                if (onlyUserCerts || onlyCACerts || !directCrl) {
                     IssuingDistributionPoint idp = new IssuingDistributionPoint(
                             (DistributionPointName) null, // distributionPoint,
                             onlyUserCerts, // onlyContainsUserCerts,
                             onlyCACerts, // onlyContainsCACerts,
                             (ReasonFlags) null, // onlySomeReasons,
-                            !directCRL, // indirectCRL,
+                            !directCrl, // indirectCRL,
                             false // onlyContainsAttributeCerts
                             );
 
@@ -923,7 +923,7 @@ public class X509Ca {
             }
 
             startSerial = BigInteger.ONE;
-            if (!deltaCRL && control.isXipkiCertsetIncluded()) { // XiPKI extension
+            if (!deltaCrl && control.isXipkiCertsetIncluded()) { // XiPKI extension
                 /*
                  * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
                  *
@@ -1019,18 +1019,18 @@ public class X509Ca {
 
             try {
                 X509CRL crl = new X509CRLObject(crlHolder.toASN1Structure());
-                publishCRL(crl);
+                publishCrl(crl);
 
                 successful = true;
-                LOG.info("SUCCESSFUL generateCRL: ca={}, crlNumber={}, thisUpdate={}",
+                LOG.info("SUCCESSFUL generateCrl: ca={}, crlNumber={}, thisUpdate={}",
                         new Object[]{caInfo.getName(), crlNumber, crl.getThisUpdate()});
 
-                if (deltaCRL) {
+                if (deltaCrl) {
                     return crl;
                 }
 
                 // clean up the CRL
-                cleanupCRLsWithoutException();
+                cleanupCrlsWithoutException();
                 return crl;
             } catch (CRLException e) {
                 throw new OperationException(ErrorCode.CRL_FAILURE, "CRLException: "
@@ -1038,13 +1038,13 @@ public class X509Ca {
             }
         } finally {
             if (!successful) {
-                LOG.info("    FAILED generateCRL: ca={}", caInfo.getName());
+                LOG.info("    FAILED generateCrl: ca={}", caInfo.getName());
             }
         }
-    } // method generateCRL
+    } // method generateCrl
 
     public X509CertificateInfo generateCertificate(
-            final boolean requestedByRA,
+            final boolean requestedByRa,
             final RequestorInfo requestor,
             final String certprofileName,
             final String user,
@@ -1054,7 +1054,7 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
-        return generateCertificate(requestedByRA, requestor, certprofileName, user, subject,
+        return generateCertificate(requestedByRa, requestor, certprofileName, user, subject,
                 publicKeyInfo,
                 (Date) null, // notBefore
                 (Date) null, // notAfter
@@ -1062,7 +1062,7 @@ public class X509Ca {
     }
 
     public X509CertificateInfo generateCertificate(
-            final boolean requestedByRA,
+            final boolean requestedByRa,
             final RequestorInfo requestor,
             final String certprofileName,
             final String user,
@@ -1074,14 +1074,14 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
-        final String subjectText = X509Util.getRFC4519Name(subject);
+        final String subjectText = X509Util.getRfc4519Name(subject);
         LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successful = false;
         try {
             X509CertificateInfo ret = doGenerateCertificate(
-                    requestedByRA, requestor,
+                    requestedByRa, requestor,
                     certprofileName, user,
                     subject, publicKeyInfo,
                     notBefore, notAfter, extensions, false,
@@ -1114,7 +1114,7 @@ public class X509Ca {
     } // method generateCertificate
 
     public X509CertificateInfo regenerateCertificate(
-            final boolean requestedByRA,
+            final boolean requestedByRa,
             final RequestorInfo requestor,
             final String certprofileName,
             final String user,
@@ -1126,7 +1126,7 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
-        final String subjectText = X509Util.getRFC4519Name(subject);
+        final String subjectText = X509Util.getRfc4519Name(subject);
         LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
@@ -1134,7 +1134,7 @@ public class X509Ca {
 
         try {
             X509CertificateInfo ret = doGenerateCertificate(
-                    requestedByRA, requestor, certprofileName, user,
+                    requestedByRa, requestor, certprofileName, user,
                     subject, publicKeyInfo, notBefore, notAfter, extensions, false,
                     reqType, transactionId);
             successful = true;
@@ -1464,10 +1464,10 @@ public class X509Ca {
         return true;
     } // method publishCertsInQueue
 
-    private boolean publishCRL(
+    private boolean publishCrl(
             final X509CRL crl) {
         X509Cert caCert = caInfo.getCertificate();
-        if (!certstore.addCRL(caCert, crl)) {
+        if (!certstore.addCrl(caCert, crl)) {
             return false;
         }
 
@@ -1486,7 +1486,7 @@ public class X509Ca {
         } // end for
 
         return true;
-    } // method publishCRL
+    } // method publishCrl
 
     public X509CertWithRevocationInfo revokeCertificate(
             final BigInteger serialNumber,
@@ -1583,9 +1583,9 @@ public class X509Ca {
             LOG.error("removing certificate issuer='{}', serial={}, subject='{}' "
                     + "from publisher {} failed.",
                     new Object[] {
-                            X509Util.getRFC4519Name(c.getIssuerX500Principal()),
+                            X509Util.getRfc4519Name(c.getIssuerX500Principal()),
                             c.getSerialNumber(),
-                            X509Util.getRFC4519Name(c.getSubjectX500Principal()),
+                            X509Util.getRfc4519Name(c.getSubjectX500Principal()),
                             publisher.getName()});
         } // end for
 
@@ -1612,7 +1612,7 @@ public class X509Ca {
         CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
         revokedCert = certstore.revokeCertificate(
                 caInfo.getCertificate(),
-                serialNumber, revInfo, force, shouldPublishToDeltaCRLCache());
+                serialNumber, revInfo, force, shouldPublishToDeltaCrlCache());
         if (revokedCert == null) {
             return null;
         }
@@ -1676,7 +1676,7 @@ public class X509Ca {
         X509CertWithDbId unrevokedCert = null;
 
         unrevokedCert = certstore.unrevokeCertificate(
-                caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCRLCache());
+                caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCrlCache());
         if (unrevokedCert == null) {
             return null;
         }
@@ -1727,24 +1727,24 @@ public class X509Ca {
         return unrevokedCert;
     } // do_unrevokeCertificate
 
-    private boolean shouldPublishToDeltaCRLCache() {
+    private boolean shouldPublishToDeltaCrlCache() {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
             return false;
         }
 
-        CrlControl control = crlSigner.getCRLControl();
+        CrlControl control = crlSigner.getCrlControl();
         if (control.getUpdateMode() == UpdateMode.onDemand) {
             return false;
         }
 
-        int deltaCRLInterval = control.getDeltaCRLIntervals();
-        if (deltaCRLInterval == 0 || deltaCRLInterval >= control.getFullCRLIntervals()) {
+        int deltaCrlInterval = control.getDeltaCrlIntervals();
+        if (deltaCrlInterval == 0 || deltaCrlInterval >= control.getFullCrlIntervals()) {
             return false;
         }
 
         return true;
-    } // method shouldPublishToDeltaCRLCache
+    } // method shouldPublishToDeltaCrlCache
 
     public void revoke(
             final CertRevocationInfo revocationInfo)
@@ -1846,12 +1846,12 @@ public class X509Ca {
                     "unknown cert version " + certprofile);
         }
 
-        if (certprofile.isOnlyForRA() && !requestedByRA) {
+        if (certprofile.isOnlyForRa() && !requestedByRA) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "profile " + certprofileName + " not applied to non-RA");
         }
 
-        X500Name localRequestedSubject = removeEmptyRDNs(requestedSubject);
+        X500Name localRequestedSubject = removeEmptyRdns(requestedSubject);
 
         if (!certprofile.isSerialNumberInReqPermitted()) {
             RDN[] rdns = localRequestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
@@ -1907,7 +1907,7 @@ public class X509Ca {
             RDN[] cnRDNs = localRequestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if (cnRDNs != null && cnRDNs.length > 0) {
                 String requestedCN = X509Util.rdnValueToString(cnRDNs[0].getFirst().getValue());
-                Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
+                Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCommonName(
                         requestedCN, certprofileName);
                 if (gsmckFirstNotBeforeInSecond != null) {
                     gsmckFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * MS_PER_SECOND);
@@ -1953,7 +1953,7 @@ public class X509Ca {
 
         // make sure that the grantedSubject does not equal the CA's subject
         if (X509Util.canonicalizName(grantedSubject).equals(
-                caInfo.getPublicCAInfo().getC14nSubject())) {
+                caInfo.getPublicCaInfo().getC14nSubject())) {
             throw new OperationException(ErrorCode.ALREADY_ISSUED,
                     "certificate with the same subject as CA is not allowed");
         }
@@ -1970,7 +1970,7 @@ public class X509Ca {
         }
 
         long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
-        String grandtedSubjectText = X509Util.getRFC4519Name(grantedSubject);
+        String grandtedSubjectText = X509Util.getRfc4519Name(grantedSubject);
 
         byte[] subjectPublicKeyData =    localPublicKeyInfo.getPublicKeyData().getBytes();
         long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
@@ -2066,7 +2066,7 @@ public class X509Ca {
                     String latestSN;
                     try {
                         Object[] objs = incSerialNumber(certprofile, grantedSubject, null);
-                        latestSN = certstore.getLatestSN((X500Name) objs[0]);
+                        latestSN = certstore.getLatestSerialNumber((X500Name) objs[0]);
                     } catch (BadFormatException e) {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                 "BadFormatException: " + e.getMessage());
@@ -2178,7 +2178,7 @@ public class X509Ca {
             }
 
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-                    caInfo.getPublicCAInfo().getX500Subject(),
+                    caInfo.getPublicCaInfo().getX500Subject(),
                     caInfo.nextSerial(),
                     localNotBefore,
                     localNotAfter,
@@ -2195,7 +2195,7 @@ public class X509Ca {
 
                 ExtensionValues extensionTuples = certprofile.getExtensions(
                         localRequestedSubject, extensions,
-                        localPublicKeyInfo, caInfo.getPublicCAInfo(), crlSignerCert,
+                        localPublicKeyInfo, caInfo.getPublicCaInfo(), crlSignerCert,
                         localNotBefore, localNotAfter);
                 if (extensionTuples != null) {
                     for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
@@ -2285,7 +2285,7 @@ public class X509Ca {
             return null;
         }
 
-        Map<String, String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
+        Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
         if (profileNames == null || !profileNames.containsKey(certprofileLocalName)) {
             return null;
         }
@@ -2297,7 +2297,7 @@ public class X509Ca {
             final String certprofileLocalName) {
         ParamUtil.assertNotNull("certprofileLocalName", certprofileLocalName);
 
-        Map<String, String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
+        Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
         return profileNames.containsKey(certprofileLocalName);
     }
 
@@ -2308,7 +2308,7 @@ public class X509Ca {
         }
 
         Set<CaHasRequestorEntry> requestorEntries =
-                caManager.getCmpRequestorsForCA(caInfo.getName());
+                caManager.getCmpRequestorsForCa(caInfo.getName());
         if (CollectionUtil.isEmpty(requestorEntries)) {
             return null;
         }
@@ -2323,25 +2323,25 @@ public class X509Ca {
         return null;
     } // method getRequestor
 
-    public CaManagerImpl getCAManager() {
+    public CaManagerImpl getCaManager() {
         return caManager;
     }
 
-    private Date getCRLNextUpdate(
+    private Date getCrlNextUpdate(
             final Date thisUpdate) {
-        CrlControl control = getCrlSigner().getCRLControl();
+        CrlControl control = getCrlSigner().getCrlControl();
         if (control.getUpdateMode() != UpdateMode.interval) {
             return null;
         }
 
-        int intervalsTillNextCRL = 0;
+        int intervalsTillNextCrl = 0;
         for (int i = 1;; i++) {
-            if (i % control.getFullCRLIntervals() == 0) {
-                intervalsTillNextCRL = i;
+            if (i % control.getFullCrlIntervals() == 0) {
+                intervalsTillNextCrl = i;
                 break;
-            } else if (!control.isExtendedNextUpdate() && control.getDeltaCRLIntervals() > 0) {
-                if (i % control.getDeltaCRLIntervals() == 0) {
-                    intervalsTillNextCRL = i;
+            } else if (!control.isExtendedNextUpdate() && control.getDeltaCrlIntervals() > 0) {
+                if (i % control.getDeltaCrlIntervals() == 0) {
+                    intervalsTillNextCrl = i;
                     break;
                 }
             }
@@ -2349,14 +2349,14 @@ public class X509Ca {
 
         Date nextUpdate;
         if (control.getIntervalMinutes() != null) {
-            int minutesTillNextUpdate = intervalsTillNextCRL * control.getIntervalMinutes()
+            int minutesTillNextUpdate = intervalsTillNextCrl * control.getIntervalMinutes()
                     + control.getOverlapMinutes();
             nextUpdate = new Date(MS_PER_SECOND * (thisUpdate.getTime() / MS_PER_SECOND / 60
                     + minutesTillNextUpdate) * 60);
         } else {
             Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             c.setTime(thisUpdate);
-            c.add(Calendar.DAY_OF_YEAR, intervalsTillNextCRL);
+            c.add(Calendar.DAY_OF_YEAR, intervalsTillNextCrl);
             c.set(Calendar.HOUR_OF_DAY, control.getIntervalDayTime().getHour());
             c.set(Calendar.MINUTE, control.getIntervalDayTime().getMinute());
             c.add(Calendar.MINUTE, control.getOverlapMinutes());
@@ -2366,7 +2366,7 @@ public class X509Ca {
         }
 
         return nextUpdate;
-    } // method getCRLNextUpdate
+    } // method getCrlNextUpdate
 
     private int removeExpirtedCerts(Date expiredAtTime)
     throws OperationException {
@@ -2627,7 +2627,7 @@ public class X509Ca {
     }
 
     // remove the RDNs with empty content
-    private static X500Name removeEmptyRDNs(
+    private static X500Name removeEmptyRdns(
             final X500Name name) {
         RDN[] rdns = name.getRDNs();
         List<RDN> l = new ArrayList<RDN>(rdns.length);

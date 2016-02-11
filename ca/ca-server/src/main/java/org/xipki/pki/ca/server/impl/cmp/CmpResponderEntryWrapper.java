@@ -96,7 +96,7 @@ public class CmpResponderEntryWrapper {
         if (dbEntry.getBase64Cert() == null) {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(
-                    signer.getCertificateAsBCObject().getSubject());
+                    signer.getCertificateAsBcObject().getSubject());
             subjectAsGeneralName = new GeneralName(subjectAsX500Name);
         }
     } // method initSigner

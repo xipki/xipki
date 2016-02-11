@@ -117,7 +117,7 @@ public class SubjectControl {
     public RdnControl getControl(
             final ASN1ObjectIdentifier type) {
         return controls.isEmpty()
-                ? SubjectDnSpec.getRDNControl(type)
+                ? SubjectDnSpec.getRdnControl(type)
                 : controls.get(type);
     }
 

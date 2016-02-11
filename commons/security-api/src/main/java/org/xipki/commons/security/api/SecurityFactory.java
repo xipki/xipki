@@ -115,7 +115,7 @@ public interface SecurityFactory {
             SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
 
-    boolean verifyPOPO(
+    boolean verifyPopo(
             CertificationRequest p10Req);
 
     P11CryptService getP11CryptService(

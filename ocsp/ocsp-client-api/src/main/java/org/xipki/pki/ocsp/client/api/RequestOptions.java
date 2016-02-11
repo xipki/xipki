@@ -260,10 +260,10 @@ public class RequestOptions {
 
         AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
         return new RSASSAPSSparams(
-            digAlgId,
-            new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
-            new ASN1Integer(saltSize),
-            RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
+                digAlgId,
+                new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
+                new ASN1Integer(saltSize),
+                RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     } // method createPSSRSAParams
 
 }

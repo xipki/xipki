@@ -188,7 +188,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509ChangeCaEntry getChangeCAEntry()
+    protected X509ChangeCaEntry getChangeCaEntry()
     throws Exception {
         X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
         if (caStatus != null) {
@@ -212,7 +212,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         if (signerConf != null) {
             String localSignerType = signerType;
             if (localSignerType == null) {
-                CaEntry caEntry = caManager.getCA(caName);
+                CaEntry caEntry = caManager.getCa(caName);
                 if (caEntry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
@@ -295,7 +295,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.changeCA(getChangeCAEntry());
+        boolean b = caManager.changeCa(getChangeCaEntry());
         output(b, "updated", "could not update", "CA " + caName);
         return null;
     }

@@ -44,11 +44,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public abstract class QaPolicyQualifierInfo {
 
-    public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo {
+    public static class QaCpsUriPolicyQualifier extends QaPolicyQualifierInfo {
 
         private final String cPSUri;
 
-        public QaCPSUriPolicyQualifier(
+        public QaCpsUriPolicyQualifier(
                 final String cPSUri) {
             ParamUtil.assertNotBlank("cPSUri", cPSUri);
             this.cPSUri = cPSUri;

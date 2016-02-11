@@ -123,11 +123,11 @@ public class XmlUtil {
         return cal;
     }
 
-    public static XMLGregorianCalendar currentXMLDate() {
-        return getXMLDate(new Date());
+    public static XMLGregorianCalendar currentXmlDate() {
+        return getXmlDate(new Date());
     }
 
-    public static XMLGregorianCalendar getXMLDate(
+    public static XMLGregorianCalendar getXmlDate(
             final Calendar calendar) {
         GregorianCalendar c;
         if (calendar instanceof GregorianCalendar) {
@@ -147,7 +147,7 @@ public class XmlUtil {
         }
     }
 
-    public static XMLGregorianCalendar getXMLDate(
+    public static XMLGregorianCalendar getXmlDate(
             final Date dateAndTime) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTimeZone(UTC);

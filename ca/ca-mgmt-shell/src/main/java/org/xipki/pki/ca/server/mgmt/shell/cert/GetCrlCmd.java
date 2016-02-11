@@ -72,22 +72,22 @@ public class GetCrlCmd extends CrlCommandSupport {
     private String baseCRLOut;
 
     @Override
-    protected X509CRL retrieveCRL()
+    protected X509CRL retrieveCrl()
     throws Exception {
-        return caManager.getCurrentCRL(caName);
+        return caManager.getCurrentCrl(caName);
     }
 
     @Override
     protected Object doExecute()
     throws Exception {
-        CaEntry ca = caManager.getCA(caName);
+        CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
             throw new UnexpectedException("CA " + caName + " not available");
         }
 
         X509CRL crl = null;
         try {
-            crl = retrieveCRL();
+            crl = retrieveCrl();
         } catch (Exception e) {
             throw new CmdFailure("received no CRL from server: " + e.getMessage());
         }
@@ -109,7 +109,7 @@ public class GetCrlCmd extends CrlCommandSupport {
                 BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
                 try {
-                    crl = caManager.getCRL(caName, baseCrlNumber);
+                    crl = caManager.getCrl(caName, baseCrlNumber);
                 } catch (Exception e) {
                     throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
                 }

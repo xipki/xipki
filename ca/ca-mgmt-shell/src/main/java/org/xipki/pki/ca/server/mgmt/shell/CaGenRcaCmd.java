@@ -77,9 +77,9 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        X509CaEntry caEntry = getCAEntry();
+        X509CaEntry caEntry = getCaEntry();
         byte[] p10Req = IoUtil.read(p10ReqFile);
-        X509Certificate rcaCert = caManager.generateRootCA(caEntry, rcaProfile, p10Req);
+        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, p10Req);
         if (rcaCertOutFile != null) {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());

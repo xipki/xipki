@@ -58,7 +58,7 @@ public class GenCrlCmd extends CrlCommandSupport {
     throws CaClientException, PkiErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            return caClient.generateCRL(caName, debug);
+            return caClient.generateCrl(caName, debug);
         } finally {
             saveRequestResponse(debug);
         }

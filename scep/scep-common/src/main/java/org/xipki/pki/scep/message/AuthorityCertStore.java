@@ -47,17 +47,17 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class AuthorityCertStore {
 
-    private final X509Certificate cACert;
+    private final X509Certificate caCert;
 
     private final X509Certificate signatureCert;
 
     private final X509Certificate encryptionCert;
 
     private AuthorityCertStore(
-            final X509Certificate cACert,
+            final X509Certificate caCert,
             final X509Certificate signatureCert,
             final X509Certificate encryptionCert) {
-        this.cACert = cACert;
+        this.caCert = caCert;
         this.signatureCert = signatureCert;
         this.encryptionCert = encryptionCert;
     }
@@ -70,23 +70,23 @@ public class AuthorityCertStore {
         return encryptionCert;
     }
 
-    public X509Certificate getCACert() {
-        return cACert;
+    public X509Certificate getCaCert() {
+        return caCert;
     }
 
     public static AuthorityCertStore getInstance(
-            final X509Certificate cACert,
-            final X509Certificate... rACerts) {
-        ParamUtil.assertNotNull("cACert", cACert);
+            final X509Certificate caCert,
+            final X509Certificate... raCerts) {
+        ParamUtil.assertNotNull("cACert", caCert);
 
         X509Certificate encryptionCert = null;
         X509Certificate signatureCert = null;
 
-        if (rACerts == null || rACerts.length == 0) {
-            signatureCert = cACert;
-            encryptionCert = cACert;
+        if (raCerts == null || raCerts.length == 0) {
+            signatureCert = caCert;
+            encryptionCert = caCert;
         } else {
-            for (X509Certificate cert : rACerts) {
+            for (X509Certificate cert : raCerts) {
                 boolean[] keyusage = cert.getKeyUsage();
                 if (hasKeyusage(keyusage, KeyUsage.keyEncipherment)) {
                     if (encryptionCert != null) {
@@ -117,7 +117,7 @@ public class AuthorityCertStore {
             }
         }
 
-        return new AuthorityCertStore(cACert, signatureCert, encryptionCert);
+        return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
     } // method getInstance
 
     private static boolean hasKeyusage(

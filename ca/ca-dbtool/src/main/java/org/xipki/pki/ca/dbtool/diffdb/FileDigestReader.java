@@ -99,7 +99,7 @@ public class FileDigestReader implements DigestReader {
 
         this.certsFilesReader = new BufferedReader(
                 new FileReader(new File(caDirname, "certs-manifest")));
-        this.caSubjectName = X509Util.getRFC4519Name(this.caCert.getSubjectX500Principal());
+        this.caSubjectName = X509Util.getRfc4519Name(this.caCert.getSubjectX500Principal());
         this.next = retrieveNext(true);
     }
 

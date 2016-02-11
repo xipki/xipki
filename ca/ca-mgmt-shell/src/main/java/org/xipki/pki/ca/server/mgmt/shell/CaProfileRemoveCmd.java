@@ -66,7 +66,7 @@ public class CaProfileRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.removeCertprofileFromCA(profileLocalname, caName);
+        boolean b = caManager.removeCertprofileFromCa(profileLocalname, caName);
         output(b, "removed", "could not remove",
                 "certificate with localname " + profileLocalname + " from CA " + caName);
         return null;

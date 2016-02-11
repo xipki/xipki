@@ -245,9 +245,9 @@ public class CrlControl implements Serializable {
 
     private boolean includeExpiredCerts;
 
-    private int fullCRLIntervals = 1;
+    private int fullCrlIntervals = 1;
 
-    private int deltaCRLIntervals;
+    private int deltaCrlIntervals;
 
     private int overlapMinutes = 10;
 
@@ -259,13 +259,13 @@ public class CrlControl implements Serializable {
 
     private boolean onlyContainsUserCerts;
 
-    private boolean onlyContainsCACerts;
+    private boolean onlyContainsCaCerts;
 
     private boolean excludeReason;
 
     private TripleState invalidityDateMode = TripleState.OPTIONAL;
 
-    private final Set<String> extensionOIDs;
+    private final Set<String> extensionOids;
 
     public CrlControl(
             final String conf)
@@ -304,7 +304,7 @@ public class CrlControl implements Serializable {
 
         s = props.getValue(KEY_EYTENSIONS);
         if (s == null) {
-            this.extensionOIDs = Collections.emptySet();
+            this.extensionOids = Collections.emptySet();
         } else {
             Set<String> oids = StringUtil.splitAsSet(s, ", ");
             // check the OID
@@ -315,16 +315,16 @@ public class CrlControl implements Serializable {
                     throw new InvalidConfException(oid + " is not a valid OID");
                 }
             }
-            this.extensionOIDs = oids;
+            this.extensionOids = oids;
         }
 
-        this.onlyContainsCACerts = getBoolean(props, KEY_ONLY_CONTAINS_CACERTS, false);
+        this.onlyContainsCaCerts = getBoolean(props, KEY_ONLY_CONTAINS_CACERTS, false);
         this.onlyContainsUserCerts = getBoolean(props, KEY_ONLY_CONTAINS_USERCERTS, false);
         this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
 
         if (this.updateMode != UpdateMode.onDemand) {
-            this.fullCRLIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
-            this.deltaCRLIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
+            this.fullCrlIntervals = getInteger(props, KEY_FULLCRL_INTERVALS, 1);
+            this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
             this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
             this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
             s = props.getValue(KEY_INTERVAL_TIME);
@@ -363,14 +363,14 @@ public class CrlControl implements Serializable {
         pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
         pairs.putPair(KEY_XIPKI_CERTSET_CERTS, Boolean.toString(xipkiCertsetCertIncluded));
         pairs.putPair(KEY_XIPKI_CERTSET, Boolean.toString(xipkiCertsetIncluded));
-        pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCACerts));
+        pairs.putPair(KEY_ONLY_CONTAINS_CACERTS, Boolean.toString(onlyContainsCaCerts));
         pairs.putPair(KEY_ONLY_CONTAINS_USERCERTS, Boolean.toString(onlyContainsUserCerts));
         pairs.putPair(KEY_EXCLUDE_REASON, Boolean.toString(excludeReason));
         pairs.putPair(KEY_INVALIDITY_DATE, invalidityDateMode.name());
         if (updateMode != UpdateMode.onDemand) {
-            pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCRLIntervals));
+            pairs.putPair(KEY_FULLCRL_INTERVALS, Integer.toString(fullCrlIntervals));
             pairs.putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate));
-            pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCRLIntervals));
+            pairs.putPair(KEY_DELTACRL_INTERVALS, Integer.toString(deltaCrlIntervals));
 
             if (intervalDayTime != null) {
                 pairs.putPair(KEY_INTERVAL_TIME, intervalDayTime.toString());
@@ -381,9 +381,9 @@ public class CrlControl implements Serializable {
             }
         }
 
-        if (CollectionUtil.isNotEmpty(extensionOIDs)) {
+        if (CollectionUtil.isNotEmpty(extensionOids)) {
             StringBuilder extensionsSb = new StringBuilder(200);
-            for (String oid : extensionOIDs) {
+            for (String oid : extensionOids) {
                 extensionsSb.append(oid).append(",");
             }
             extensionsSb.deleteCharAt(extensionsSb.length() - 1);
@@ -418,12 +418,12 @@ public class CrlControl implements Serializable {
         return includeExpiredCerts;
     }
 
-    public int getFullCRLIntervals() {
-        return fullCRLIntervals;
+    public int getFullCrlIntervals() {
+        return fullCrlIntervals;
     }
 
-    public int getDeltaCRLIntervals() {
-        return deltaCRLIntervals;
+    public int getDeltaCrlIntervals() {
+        return deltaCrlIntervals;
     }
 
     public int getOverlapMinutes() {
@@ -438,8 +438,8 @@ public class CrlControl implements Serializable {
         return intervalDayTime;
     }
 
-    public Set<String> getExtensionOIDs() {
-        return extensionOIDs;
+    public Set<String> getExtensionOids() {
+        return extensionOids;
     }
 
     public boolean isExtendedNextUpdate() {
@@ -450,8 +450,8 @@ public class CrlControl implements Serializable {
         return onlyContainsUserCerts;
     }
 
-    public boolean isOnlyContainsCACerts() {
-        return onlyContainsCACerts;
+    public boolean isOnlyContainsCaCerts() {
+        return onlyContainsCaCerts;
     }
 
     public boolean isExcludeReason() {
@@ -464,7 +464,7 @@ public class CrlControl implements Serializable {
 
     public void validate()
     throws InvalidConfException {
-        if (onlyContainsCACerts && onlyContainsUserCerts) {
+        if (onlyContainsCaCerts && onlyContainsUserCerts) {
             throw new InvalidConfException(
                     "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
         }
@@ -473,20 +473,20 @@ public class CrlControl implements Serializable {
             return;
         }
 
-        if (fullCRLIntervals < deltaCRLIntervals) {
+        if (fullCrlIntervals < deltaCrlIntervals) {
             throw new InvalidConfException(
                     "fullCRLIntervals could not be less than deltaCRLIntervals "
-                    + fullCRLIntervals + " < " + deltaCRLIntervals);
+                    + fullCrlIntervals + " < " + deltaCrlIntervals);
         }
 
-        if (fullCRLIntervals < 1) {
+        if (fullCrlIntervals < 1) {
             throw new InvalidConfException(
-                    "fullCRLIntervals could not be less than 1: " + fullCRLIntervals);
+                    "fullCRLIntervals could not be less than 1: " + fullCrlIntervals);
         }
 
-        if (deltaCRLIntervals < 0) {
+        if (deltaCrlIntervals < 0) {
             throw new InvalidConfException(
-                    "deltaCRLIntervals could not be less than 0: " + deltaCRLIntervals);
+                    "deltaCRLIntervals could not be less than 0: " + deltaCrlIntervals);
         }
     }
 
@@ -503,23 +503,23 @@ public class CrlControl implements Serializable {
         }
 
         CrlControl b = (CrlControl) obj;
-        if (deltaCRLIntervals != b.deltaCRLIntervals
+        if (deltaCrlIntervals != b.deltaCrlIntervals
                 || xipkiCertsetIncluded != b.xipkiCertsetIncluded
                 || xipkiCertsetCertIncluded != b.xipkiCertsetCertIncluded
                 || xipkiCertsetProfilenameIncluded != b.xipkiCertsetProfilenameIncluded
                 || extendedNextUpdate != b.extendedNextUpdate
-                || fullCRLIntervals != b.fullCRLIntervals
+                || fullCrlIntervals != b.fullCrlIntervals
                 || includeExpiredCerts != b.includeExpiredCerts
-                || onlyContainsCACerts != b.onlyContainsCACerts
+                || onlyContainsCaCerts != b.onlyContainsCaCerts
                 || onlyContainsUserCerts != b.onlyContainsUserCerts) {
             return false;
         }
 
-        if (extensionOIDs == null) {
-            if (b.extensionOIDs != null) {
+        if (extensionOids == null) {
+            if (b.extensionOids != null) {
                 return false;
             }
-        } else if (!extensionOIDs.equals(b.extensionOIDs)) {
+        } else if (!extensionOids.equals(b.extensionOids)) {
             return false;
         }
 

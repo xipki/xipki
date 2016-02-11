@@ -43,7 +43,7 @@ import javax.xml.bind.JAXBElement;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 
 /**
@@ -68,7 +68,7 @@ public class QaPolicyQualifiers {
 
             QaPolicyQualifierInfo info;
             if ("cpsUri".equals(localPart)) {
-                info = new QaCPSUriPolicyQualifier(value);
+                info = new QaCpsUriPolicyQualifier(value);
             } else if ("userNotice".equals(localPart)) {
                 info = new QaUserNoticePolicyQualifierInfo(value);
             } else {

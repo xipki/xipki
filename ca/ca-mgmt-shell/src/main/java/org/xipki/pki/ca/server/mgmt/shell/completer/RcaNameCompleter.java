@@ -55,7 +55,7 @@ public class RcaNameCompleter extends MgmtNameCompleter {
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
         for (String name : caManager.getCaNames()) {
-            CaEntry caEntry = caManager.getCA(name);
+            CaEntry caEntry = caManager.getCa(name);
             if (!(caEntry instanceof X509CaEntry)) {
                 continue;
             }

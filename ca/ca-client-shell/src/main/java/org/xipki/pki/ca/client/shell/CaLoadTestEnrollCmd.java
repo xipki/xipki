@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.pki.ca.client.shell.completer.RandomDNCompleter;
+import org.xipki.pki.ca.client.shell.completer.RandomDnCompleter;
 import org.xipki.pki.ca.client.shell.internal.loadtest.CaLoadTestEnroll;
 import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry;
 import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.DSAKeyEntry;
@@ -75,7 +75,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "--random-dn",
             description = "DN name to be incremented")
-    @Completion(RandomDNCompleter.class)
+    @Completion(RandomDnCompleter.class)
     private String randomDNStr = "O";
 
     @Option(name = "--duration",

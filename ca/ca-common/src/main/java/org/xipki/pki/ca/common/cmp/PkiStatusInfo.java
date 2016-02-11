@@ -95,7 +95,7 @@ public class PkiStatusInfo {
 
     @Override
     public String toString() {
-        return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
+        return SecurityUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
 }

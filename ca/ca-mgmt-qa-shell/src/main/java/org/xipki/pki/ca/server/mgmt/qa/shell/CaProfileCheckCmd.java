@@ -81,14 +81,14 @@ public class CaProfileCheckCmd extends CaCommandSupport {
     throws Exception {
         out("checking CA profile CA='" + caName +    "', profile='" + profileName + "'");
 
-        if (caManager.getCA(caName) == null) {
+        if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         if (profileLocalname == null) {
             profileLocalname = profileName;
         }
-        Map<String, String> entries = caManager.getCertprofilesForCA(caName);
+        Map<String, String> entries = caManager.getCertprofilesForCa(caName);
         if (!entries.containsKey(profileLocalname)) {
             throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
         }

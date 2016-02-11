@@ -197,7 +197,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             importCert(certstore, processLogFile);
 
             importPublishQueue(certstore.getPublishQueue());
-            importDeltaCRLCache(certstore.getDeltaCRLCache());
+            importDeltaCrlCache(certstore.getDeltaCRLCache());
 
             recoverIndexes();
             processLogFile.delete();
@@ -493,7 +493,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table PUBLISHQUEUE");
     } // method importPublishQueue
 
-    private void importDeltaCRLCache(
+    private void importDeltaCrlCache(
             final DeltaCRLCache deltaCRLCache)
     throws DataAccessException {
         final String sql = "INSERT INTO DELTACRL_CACHE (ID, SN, CA_ID) VALUES (?, ?, ?)";
@@ -610,7 +610,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                 X509CRL c = null;
                 try {
-                    c = X509Util.parseCRL(new ByteArrayInputStream(encodedCrl));
+                    c = X509Util.parseCrl(new ByteArrayInputStream(encodedCrl));
                 } catch (Exception e) {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, e);

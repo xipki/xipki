@@ -171,7 +171,7 @@ import org.xipki.pki.ca.qa.impl.internal.QaNameConstraints;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyConstraints;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyMappingsOption;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo;
-import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.pki.ca.qa.impl.internal.QaPolicyQualifiers;
 import org.xipki.pki.ca.qa.impl.internal.QaTlsFeature;
@@ -221,7 +221,7 @@ public class ExtensionsChecker {
 
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
-    private boolean includeIssuerAndSerialInAKI;
+    private boolean includeIssuerAndSerialInAki;
 
     private QaCertificatePolicies certificatePolicies;
 
@@ -333,7 +333,7 @@ public class ExtensionsChecker {
                         getExtensionValue(type, extensionsType,
                             org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier.class);
                 if (extConf != null) {
-                    this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
+                    this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
                 }
             }
 
@@ -713,7 +713,7 @@ public class ExtensionsChecker {
                             jceCert.getNotBefore(), jceCert.getNotAfter());
                 } else if (Extension.qCStatements.equals(oid)) {
                     // qCStatements
-                    checkExtensionQCStatements(failureMsg, extensionValue, requestExtensions,
+                    checkExtensionQcStatements(failureMsg, extensionValue, requestExtensions,
                             extControl);
                 } else if (Extension.biometricInfo.equals(oid)) {
                     // biometricInfo
@@ -920,7 +920,7 @@ public class ExtensionsChecker {
         // CRLDistributionPoints
         type = Extension.cRLDistributionPoints;
         if (wantedExtensionTypes.contains(type)) {
-            if (issuerInfo.getCrlURLs() != null) {
+            if (issuerInfo.getCrlUrls() != null) {
                 types.add(type);
             }
         }
@@ -936,7 +936,7 @@ public class ExtensionsChecker {
         // FreshestCRL
         type = Extension.freshestCRL;
         if (wantedExtensionTypes.contains(type)) {
-            if (issuerInfo.getDeltaCrlURLs() != null) {
+            if (issuerInfo.getDeltaCrlUrls() != null) {
                 types.add(type);
             }
         }
@@ -944,7 +944,7 @@ public class ExtensionsChecker {
         // AuthorityInfoAccess
         type = Extension.authorityInfoAccess;
         if (wantedExtensionTypes.contains(type)) {
-            if (issuerInfo.getOcspURLs() != null) {
+            if (issuerInfo.getOcspUrls() != null) {
                 types.add(type);
             }
         }
@@ -1071,7 +1071,7 @@ public class ExtensionsChecker {
         BigInteger serialNumber = asn1.getAuthorityCertSerialNumber();
         GeneralNames names = asn1.getAuthorityCertIssuer();
 
-        if (includeIssuerAndSerialInAKI) {
+        if (includeIssuerAndSerialInAki) {
             if (serialNumber == null) {
                 failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'");
                 failureMsg.append("; ");
@@ -1237,8 +1237,8 @@ public class ExtensionsChecker {
             if (eSubtree.getDirectoryName() != null) {
                 eBase = new GeneralName(X509Util.reverse(
                         new X500Name(eSubtree.getDirectoryName())));
-            } else if (eSubtree.getDNSName() != null) {
-                eBase = new GeneralName(GeneralName.dNSName, eSubtree.getDNSName());
+            } else if (eSubtree.getDnsName() != null) {
+                eBase = new GeneralName(GeneralName.dNSName, eSubtree.getDnsName());
             } else if (eSubtree.getIpAddress() != null) {
                 eBase = new GeneralName(GeneralName.iPAddress, eSubtree.getIpAddress());
             } else if (eSubtree.getRfc822Name() != null) {
@@ -1582,8 +1582,8 @@ public class ExtensionsChecker {
 
             List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
             for (QaPolicyQualifierInfo qualifierInfo : qualifierInfos) {
-                if (qualifierInfo instanceof QaCPSUriPolicyQualifier) {
-                    String value = ((QaCPSUriPolicyQualifier) qualifierInfo).getCPSUri();
+                if (qualifierInfo instanceof QaCpsUriPolicyQualifier) {
+                    String value = ((QaCpsUriPolicyQualifier) qualifierInfo).getCPSUri();
                     if (!iCpsUris.contains(value)) {
                         failureMsg.append("CPSUri '")
                             .append(value)
@@ -1952,7 +1952,7 @@ public class ExtensionsChecker {
                 }
             }
 
-            Set<String> eCRLUrls = issuerInfo.getCrlURLs();
+            Set<String> eCRLUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
@@ -2021,7 +2021,7 @@ public class ExtensionsChecker {
                 }
             }
 
-            Set<String> eCRLUrls = issuerInfo.getCrlURLs();
+            Set<String> eCRLUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
             if (CollectionUtil.isNotEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
@@ -2127,7 +2127,7 @@ public class ExtensionsChecker {
             }
         }
 
-        List<String> eProfessionOids = conf.getProfessionOIDs();
+        List<String> eProfessionOids = conf.getProfessionOids();
         ASN1ObjectIdentifier[] localIProfessionOids = iProfessionInfo.getProfessionOIDs();
         List<String> iProfessionOids = new LinkedList<>();
         if (localIProfessionOids != null) {
@@ -2180,14 +2180,14 @@ public class ExtensionsChecker {
             final X509IssuerInfo issuerInfo) {
         Set<String> eCaIssuerUris;
         if (aiaControl == null || aiaControl.includesCaIssuers()) {
-            eCaIssuerUris = issuerInfo.getCaIssuerURLs();
+            eCaIssuerUris = issuerInfo.getCaIssuerUrls();
         } else {
             eCaIssuerUris = Collections.emptySet();
         }
 
         Set<String> eOCSPUris;
         if (aiaControl == null || aiaControl.includesOcsp()) {
-            eOCSPUris = issuerInfo.getOcspURLs();
+            eOCSPUris = issuerInfo.getOcspUrls();
         } else {
             eOCSPUris = Collections.emptySet();
         }
@@ -2199,8 +2199,8 @@ public class ExtensionsChecker {
         }
 
         AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
-        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
-        checkAIA(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
+        checkAia(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
+        checkAia(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
     } // method checkExtensionAuthorityInfoAccess
 
     private void checkExtensionOcspNocheck(
@@ -2367,7 +2367,7 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionPrivateKeyUsagePeriod
 
-    private void checkExtensionQCStatements(
+    private void checkExtensionQcStatements(
             final StringBuilder failureMsg,
             final byte[] extensionValue,
             final Extensions requestExtensions,
@@ -3011,7 +3011,7 @@ public class ExtensionsChecker {
         return usages;
     }
 
-    private static void checkAIA(
+    private static void checkAia(
             final StringBuilder failureMsg,
             final AuthorityInformationAccess aia,
             final ASN1ObjectIdentifier accessMethod,

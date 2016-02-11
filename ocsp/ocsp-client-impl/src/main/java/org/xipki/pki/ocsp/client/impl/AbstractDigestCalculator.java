@@ -66,17 +66,11 @@ public abstract class AbstractDigestCalculator implements DigestCalculator {
 
     public byte[] getDigest() {
         byte[] bytes = bOut.toByteArray();
-
         bOut.reset();
-
         Digest digester = getDigester();
-
         digester.update(bytes, 0, bytes.length);
-
         byte[] digest = new byte[digester.getDigestSize()];
-
         digester.doFinal(digest, 0);
-
         return digest;
     }
 

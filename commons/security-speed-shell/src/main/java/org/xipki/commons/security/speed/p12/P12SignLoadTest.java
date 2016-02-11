@@ -135,7 +135,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         try {
             new ASN1ObjectIdentifier(curveNamOrOid);
         } catch (Exception e) {
-            oid = KeyUtil.getCurveOID(curveNamOrOid);
+            oid = KeyUtil.getCurveOid(curveNamOrOid);
         }
         if (oid == null) {
             return null;

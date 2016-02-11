@@ -286,7 +286,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                     "a newer version of CRL is available");
             updateCRLSuccessful = false;
 
-            X509CRL crl = X509Util.parseCRL(crlFilename);
+            X509CRL crl = X509Util.parseCrl(crlFilename);
 
             byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
             if (octetString == null) {
@@ -334,7 +334,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                     throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
                 }
 
-                deltaCrl = X509Util.parseCRL(deltaCrlFilename);
+                deltaCrl = X509Util.parseCrl(deltaCrlFilename);
                 octetString =
                         deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if (octetString == null) {
@@ -755,8 +755,8 @@ public class CrlCertStatusStore extends CertStatusStore {
             }
         }
 
-        if (isIncludeCrlID()) {
-            certStatusInfo.setCrlID(crlID);
+        if (isIncludeCrlId()) {
+            certStatusInfo.setCrlId(crlID);
         }
 
         if (isIncludeArchiveCutoff()) {
@@ -875,7 +875,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         X500Name issuer = X500Name.getInstance(pCaCert.getSubjectX500Principal().getEncoded());
-        byte[] issuerSKI = X509Util.extractSKI(pCaCert);
+        byte[] issuerSKI = X509Util.extractSki(pCaCert);
 
         final String profileName = "UNKNOWN";
         final boolean needsCert = !certHashAlgos.isEmpty();
@@ -904,7 +904,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             if (issuerSKI != null) {
                 byte[] aki = null;
                 try {
-                    aki = X509Util.extractAKI(bcCert);
+                    aki = X509Util.extractAki(bcCert);
                 } catch (CertificateEncodingException e) {
                     final String message = "could not extract AuthorityKeyIdentifier";
                     if (LOG.isErrorEnabled()) {
@@ -976,14 +976,14 @@ public class CrlCertStatusStore extends CertStatusStore {
         return ret;
     }
 
-    public void setCARevocationInfo(
+    public void setCaRevocationInfo(
             final Date revocationTime) {
         ParamUtil.assertNotNull("revocationTime", revocationTime);
         this.caRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
     }
 
     @Override
-    public CertRevocationInfo getCARevocationInfo(
+    public CertRevocationInfo getCaRevocationInfo(
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {

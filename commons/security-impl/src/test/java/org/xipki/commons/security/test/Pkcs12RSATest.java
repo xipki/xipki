@@ -55,7 +55,7 @@ import org.xipki.commons.security.api.util.X509Util;
  * @since 2.0.0
  */
 
-public abstract class Pkcs12_RSA_Test {
+public abstract class Pkcs12RSATest {
 
     private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
 
@@ -63,7 +63,7 @@ public abstract class Pkcs12_RSA_Test {
 
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
-    protected Pkcs12_RSA_Test() {
+    protected Pkcs12RSATest() {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }

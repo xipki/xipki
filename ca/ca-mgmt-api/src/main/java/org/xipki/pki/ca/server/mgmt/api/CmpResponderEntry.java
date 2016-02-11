@@ -156,10 +156,10 @@ public class CmpResponderEntry implements Serializable {
         if (certificate != null || base64Cert != null) {
             if (certificate != null) {
                 sb.append("\tissuer: ").append(
-                        X509Util.getRFC4519Name(certificate.getIssuerX500Principal())).append('\n');
+                        X509Util.getRfc4519Name(certificate.getIssuerX500Principal())).append('\n');
                 sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
                 sb.append("\tsubject: ").append(
-                        X509Util.getRFC4519Name(
+                        X509Util.getRfc4519Name(
                                 certificate.getSubjectX500Principal())).append('\n');
             }
             if (verbose) {

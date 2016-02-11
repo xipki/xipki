@@ -50,7 +50,7 @@ public class NoCmsSignerCertCaTest extends AbstractCaTest {
     }
 
     @Override
-    protected CaCapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCaCaps() {
         return null;
     }
 

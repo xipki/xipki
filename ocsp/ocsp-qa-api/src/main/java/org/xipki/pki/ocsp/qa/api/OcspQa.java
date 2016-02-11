@@ -50,7 +50,7 @@ import org.xipki.commons.common.qa.ValidationResult;
 
 public interface OcspQa {
 
-    ValidationResult checkOCSP(
+    ValidationResult checkOcsp(
             OCSPResp response,
             X509Certificate issuer,
             List<BigInteger> serialNumbers,

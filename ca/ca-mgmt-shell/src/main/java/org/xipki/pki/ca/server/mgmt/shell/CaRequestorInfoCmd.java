@@ -65,13 +65,13 @@ public class CaRequestorInfoCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if (caManager.getCA(caName) == null) {
+        if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
         StringBuilder sb = new StringBuilder();
 
-        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCa(caName);
         if (isNotEmpty(entries)) {
             sb.append("requestors trusted by CA " + caName).append("\n");
             for (CaHasRequestorEntry entry    : entries) {

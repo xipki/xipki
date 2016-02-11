@@ -151,7 +151,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         this.resume = resume;
     }
 
-    public void importToDB()
+    public void importToDb()
     throws Exception {
         CertStoreType certstore;
         try {

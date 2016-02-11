@@ -424,9 +424,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public boolean verifyPOPO(
+    public boolean verifyPopo(
             final CertificationRequest p10Req) {
-        return SignerUtil.verifyPOP(p10Req);
+        return SignerUtil.verifyPopo(p10Req);
     }
 
     public void setPkcs11Provider(
@@ -828,7 +828,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             verifier.update(dummyContent);
             boolean valid = verifier.verify(signatureValue);
             if (!valid) {
-                String subject = X509Util.getRFC4519Name(cert.getSubjectX500Principal());
+                String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("key and certificate not match. ");

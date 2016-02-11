@@ -793,7 +793,7 @@ public class OcspServer {
                                 new Date(), null);
                     }
                 } else if (answeredStore != null && responderOption.isInheritCaRevocation()) {
-                    CertRevocationInfo caRevInfo = answeredStore.getCARevocationInfo(
+                    CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
                             reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash());
                     if (caRevInfo != null) {
                         CertStatus certStatus = certStatusInfo.getCertStatus();
@@ -1279,7 +1279,7 @@ public class OcspServer {
                 if (caRevTime == null) {
                     throw new InvalidConfException("caRevocationTime is not specified");
                 }
-                crlStore.setCARevocationInfo(caRevTime.toGregorianCalendar().getTime());
+                crlStore.setCaRevocationInfo(caRevTime.toGregorianCalendar().getTime());
             }
 
             Integer i = conf.getRetentionInterval();
@@ -1315,7 +1315,7 @@ public class OcspServer {
 
         store.setIncludeArchiveCutoff(
                 getBoolean(conf.isIncludeArchiveCutoff(), true));
-        store.setIncludeCrlID(
+        store.setIncludeCrlId(
                 getBoolean(conf.isIncludeCrlID(), true));
 
         DataSourceWrapper datasource = null;

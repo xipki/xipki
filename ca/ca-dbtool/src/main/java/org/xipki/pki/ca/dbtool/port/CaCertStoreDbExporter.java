@@ -189,7 +189,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 exportUser(certstore);
                 exportCrl(certstore);
                 exportPublishQueue(certstore);
-                exportDeltaCRLCache(certstore);
+                exportDeltaCrlCache(certstore);
             }
             File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
             exception = exportCert(certstore, processLogFile);
@@ -310,7 +310,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     X509CRL x509Crl = null;
                     try {
-                        x509Crl = X509Util.parseCRL(new ByteArrayInputStream(crlBytes));
+                        x509Crl = X509Util.parseCrl(new ByteArrayInputStream(crlBytes));
                     } catch (Exception e) {
                         LOG.error("could not parse CRL with id {}", id);
                         LOG.debug("could not parse CRL with id " + id, e);
@@ -982,7 +982,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table PUBLISHQUEUE");
     } // method exportPublishQueue
 
-    private void exportDeltaCRLCache(
+    private void exportDeltaCrlCache(
             final CertStoreType certstore)
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table DELTACRL_CACHE");

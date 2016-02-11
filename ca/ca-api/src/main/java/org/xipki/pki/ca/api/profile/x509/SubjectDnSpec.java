@@ -366,7 +366,7 @@ public class SubjectDnSpec {
         return DFLT_STRING_TYPES.get(rdnType);
     }
 
-    public static RdnControl getRDNControl(
+    public static RdnControl getRdnControl(
             final ASN1ObjectIdentifier rdnType) {
         RdnControl control = CONTROLS.get(rdnType);
         if (control == null) {
@@ -379,7 +379,7 @@ public class SubjectDnSpec {
         return control;
     } // static
 
-    public static void fixRDNControl(
+    public static void fixRdnControl(
             final RdnControl control)
     throws CertprofileException {
         ASN1ObjectIdentifier type = control.getType();

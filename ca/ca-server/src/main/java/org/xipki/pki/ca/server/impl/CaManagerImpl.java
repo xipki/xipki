@@ -329,7 +329,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private boolean cmpControlInitialized;
 
-    private boolean cAsInitialized;
+    private boolean casInitialized;
 
     private boolean environmentParametersInitialized;
 
@@ -472,7 +472,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (masterMode) {
             boolean lockedSuccessful;
             try {
-                lockedSuccessful = lockCA(true);
+                lockedSuccessful = lockCa(true);
             } catch (DataAccessException e) {
                 throw new CaMgmtException("DataAccessException while locking CA", e);
             }
@@ -496,7 +496,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method init
 
     @Override
-    public CaSystemStatus getCASystemStatus() {
+    public CaSystemStatus getCaSystemStatus() {
         if (caSystemSetuped) {
             return masterMode
                     ? CaSystemStatus.STARTED_AS_MASTER
@@ -510,7 +510,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
     }
 
-    private boolean lockCA(
+    private boolean lockCa(
             final boolean forceRelock)
     throws DataAccessException, CaMgmtException {
         SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
@@ -538,7 +538,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method lockCA
 
     @Override
-    public boolean unlockCA() {
+    public boolean unlockCa() {
         if (!masterMode) {
             LOG.error("could not unlock CA in slave mode");
             return false;
@@ -548,7 +548,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         boolean successful = false;
         try {
-            queryExecutor.unlockCA();
+            queryExecutor.unlockCa();
             successful = true;
         } catch (DataAccessException | CaMgmtException e) {
             final String message = "error in unlockCA()";
@@ -564,7 +564,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } else {
             LOG.error("unlocking CA failed");
         }
-        auditLogPCIEvent(successful, "UNLOCK");
+        auditLogPciEvent(successful, "UNLOCK");
         return successful;
     } // method unlockCA
 
@@ -577,7 +577,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         publishersInitialized = false;
         crlSignersInitialized = false;
         cmpControlInitialized = false;
-        cAsInitialized = false;
+        casInitialized = false;
         environmentParametersInitialized = false;
         scepsInitialized = false;
 
@@ -594,7 +594,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         initRequestors();
         initResponders();
         initCrlSigners();
-        initCAs();
+        initCas();
         initSceps();
         markLastSeqValues();
     } // method initDataObjects
@@ -609,12 +609,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.error(msg);
         }
 
-        auditLogPCIEvent(caSystemStarted, "CA_CHANGE");
+        auditLogPciEvent(caSystemStarted, "CA_CHANGE");
         return caSystemStarted;
     } // method restartCaSystem
 
     @Override
-    public boolean notifyCAChange()
+    public boolean notifyCaChange()
     throws CaMgmtException {
         try {
             SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId,
@@ -652,7 +652,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.error(msg);
         }
 
-        auditLogPCIEvent(caSystemStarted, "START");
+        auditLogPciEvent(caSystemStarted, "START");
     } // method startCaSystem
 
     private boolean doStartCaSystem() {
@@ -687,7 +687,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
             // Add the CAs to the store
             for (String caName : caInfos.keySet()) {
-                if (!startCA(caName)) {
+                if (!startCa(caName)) {
                     return false;
                 }
             }
@@ -736,7 +736,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return true;
     } // method do_startCaSystem
 
-    private boolean startCA(
+    private boolean startCa(
             final String caName) {
         X509CaInfo caEntry = caInfos.get(caName);
         boolean signerRequired = caEntry.isSignerRequired();
@@ -786,7 +786,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         // referesh the SCEP
         if (sceps.containsKey(caName)) {
             try {
-                sceps.get(caName).refreshCA();
+                sceps.get(caName).refreshCa();
             } catch (CaMgmtException e) {
                 final String message = "X509CA.SCEP (ca=" + caName + ")";
                 if (LOG.isErrorEnabled()) {
@@ -818,7 +818,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String caName : x509cas.keySet()) {
             X509Ca ca = x509cas.get(caName);
             try {
-                ca.getCAInfo().commitNextSerial();
+                ca.getCaInfo().commitNextSerial();
             } catch (Throwable t) {
                 LOG.info("Exception while calling CAInfo.commitNextSerial for CA '{}': {}",
                         caName, t.getMessage());
@@ -826,7 +826,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         if (caLockedByMe) {
-            unlockCA();
+            unlockCa();
         }
 
         File caLockFile = new File("calock");
@@ -849,11 +849,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         LOG.info("stopped CA system");
-        auditLogPCIEvent(true, "SHUTDOWN");
+        auditLogPciEvent(true, "SHUTDOWN");
     } // method shutdown
 
     @Override
-    public X509CaCmpResponder getX509CACmpResponder(
+    public X509CaCmpResponder getX509CaCmpResponder(
             final String name) {
         ParamUtil.assertNotBlank("name", name);
         return x509Responders.get(name.toUpperCase());
@@ -1138,9 +1138,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         scepsInitialized = true;
     } // method initSceps
 
-    private void initCAs()
+    private void initCas()
     throws CaMgmtException {
-        if (cAsInitialized) {
+        if (casInitialized) {
             return;
         }
 
@@ -1151,12 +1151,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         List<String> names = queryExecutor.getNamesFromTable("CA");
         for (String name : names) {
-            createCA(name);
+            createCa(name);
         }
-        cAsInitialized = true;
+        casInitialized = true;
     } // method initCAs
 
-    private boolean createCA(
+    private boolean createCa(
             final String name)
     throws CaMgmtException {
         caInfos.remove(name);
@@ -1169,7 +1169,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             oldCa.shutdown();
         }
 
-        X509CaInfo ca = queryExecutor.createCAInfo(name, masterMode, certstore);
+        X509CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
         try {
             ca.markMaxSerial();
         } catch (OperationException e) {
@@ -1177,13 +1177,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
         caInfos.put(name, ca);
 
-        Set<CaHasRequestorEntry> caHasRequestorList = queryExecutor.createCAhasRequestors(name);
+        Set<CaHasRequestorEntry> caHasRequestorList = queryExecutor.createCaHasRequestors(name);
         caHasRequestors.put(name, caHasRequestorList);
 
-        Map<String, String> profileNames = queryExecutor.createCAhasProfiles(name);
+        Map<String, String> profileNames = queryExecutor.createCaHasProfiles(name);
         caHasProfiles.put(name, profileNames);
 
-        Set<String> publisherNames = queryExecutor.createCAhasPublishers(name);
+        Set<String> publisherNames = queryExecutor.createCaHasPublishers(name);
         caHasPublishers.put(name, publisherNames);
 
         return true;
@@ -1205,7 +1205,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method markLastSeqValues
 
     @Override
-    public boolean addCA(
+    public boolean addCa(
             final CaEntry caEntry)
     throws CaMgmtException {
         ParamUtil.assertNotNull("caEntry", caEntry);
@@ -1236,14 +1236,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
-        queryExecutor.addCA(caEntry);
-        createCA(name);
-        startCA(name);
+        queryExecutor.addCa(caEntry);
+        createCa(name);
+        startCa(name);
         return true;
     } // method addCA
 
     @Override
-    public X509CaEntry getCA(
+    public X509CaEntry getCa(
             final String name) {
         ParamUtil.assertNotBlank("name", name);
         X509CaInfo caInfo = caInfos.get(name.toUpperCase());
@@ -1253,26 +1253,26 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public boolean changeCA(
+    public boolean changeCa(
             final ChangeCaEntry entry)
     throws CaMgmtException {
         ParamUtil.assertNotNull("entry", entry);
         asssertMasterMode();
         String name = entry.getName();
 
-        boolean changed = queryExecutor.changeCA(entry, securityFactory);
+        boolean changed = queryExecutor.changeCa(entry, securityFactory);
         if (!changed) {
             LOG.info("no change of CA '{}' is processed", name);
         } else {
-            createCA(name);
-            startCA(name);
+            createCa(name);
+            startCa(name);
         }
 
         return changed;
     } // method addCA
 
     @Override
-    public boolean removeCertprofileFromCA(
+    public boolean removeCertprofileFromCa(
             final String profileLocalname,
             final String caName)
     throws CaMgmtException {
@@ -1280,7 +1280,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("caName", caName);
         asssertMasterMode();
         String localCaName = caName.toUpperCase();
-        boolean b = queryExecutor.removeCertprofileFromCA(profileLocalname, localCaName);
+        boolean b = queryExecutor.removeCertprofileFromCa(profileLocalname, localCaName);
         if (!b) {
             return false;
         }
@@ -1295,7 +1295,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method removeCertprofileFromCA
 
     @Override
-    public boolean addCertprofileToCA(
+    public boolean addCertprofileToCa(
             final String profileName,
             final String profileLocalname,
             final String caName)
@@ -1327,13 +1327,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("certprofile '" + localProfileName + "' is faulty");
         }
 
-        queryExecutor.addCertprofileToCA(localProfileName, localProfileLocalname, localCaName);
+        queryExecutor.addCertprofileToCa(localProfileName, localProfileLocalname, localCaName);
         map.put(localProfileLocalname, localProfileName);
         return true;
     } // method addCertprofileToCA
 
     @Override
-    public boolean removePublisherFromCA(
+    public boolean removePublisherFromCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
@@ -1343,7 +1343,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         String localCaName = caName;
         localCaName = localCaName.toUpperCase();
-        boolean b = queryExecutor.removePublisherFromCA(publisherName, localCaName);
+        boolean b = queryExecutor.removePublisherFromCa(publisherName, localCaName);
         if (!b) {
             return false;
         }
@@ -1356,7 +1356,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method removePublisherFromCA
 
     @Override
-    public boolean addPublisherToCA(
+    public boolean addPublisherToCa(
             final String publisherName,
             final String caName)
     throws CaMgmtException {
@@ -1379,7 +1379,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("publisher '" + publisherName + "' is faulty");
         }
 
-        queryExecutor.addPublisherToCA(publisherName, localCaName);
+        queryExecutor.addPublisherToCa(publisherName, localCaName);
         publisherNames.add(publisherName);
         caHasPublishers.get(localCaName).add(publisherName);
 
@@ -1388,14 +1388,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method addPublisherToCA
 
     @Override
-    public Map<String, String> getCertprofilesForCA(
+    public Map<String, String> getCertprofilesForCa(
             final String caName) {
         ParamUtil.assertNotBlank("caName", caName);
         return caHasProfiles.get(caName.toUpperCase());
     }
 
     @Override
-    public Set<CaHasRequestorEntry> getCmpRequestorsForCA(
+    public Set<CaHasRequestorEntry> getCmpRequestorsForCa(
             final String caName) {
         ParamUtil.assertNotBlank("caName", caName);
         return caHasRequestors.get(caName.toUpperCase());
@@ -1455,7 +1455,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("requestorName", requestorName);
         asssertMasterMode();
         for (String caName : caHasRequestors.keySet()) {
-            removeCmpRequestorFromCA(requestorName, caName);
+            removeCmpRequestorFromCa(requestorName, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
@@ -1494,7 +1494,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method changeCmpRequestor
 
     @Override
-    public boolean removeCmpRequestorFromCA(
+    public boolean removeCmpRequestorFromCa(
             final String requestorName,
             final String caName)
     throws CaMgmtException {
@@ -1503,7 +1503,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
 
         String localCaName = caName.toUpperCase();
-        boolean b = queryExecutor.removeCmpRequestorFromCA(requestorName, localCaName);
+        boolean b = queryExecutor.removeCmpRequestorFromCa(requestorName, localCaName);
         if (b && caHasRequestors.containsKey(localCaName)) {
             Set<CaHasRequestorEntry> entries = caHasRequestors.get(localCaName);
             CaHasRequestorEntry entry = null;
@@ -1518,7 +1518,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method removeCmpRequestorFromCA
 
     @Override
-    public boolean addCmpRequestorToCA(
+    public boolean addCmpRequestorToCa(
             final CaHasRequestorEntry requestor,
             final String caName)
     throws CaMgmtException {
@@ -1547,7 +1547,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         cmpRequestors.add(requestor);
-        queryExecutor.addCmpRequestorToCA(requestor, localCaName);
+        queryExecutor.addCmpRequestorToCa(requestor, localCaName);
         caHasRequestors.get(localCaName).add(requestor);
         return true;
     } // method addCmpRequestorToCA
@@ -1565,7 +1565,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("profileName", profileName);
         asssertMasterMode();
         for (String caName : caHasProfiles.keySet()) {
-            removeCertprofileFromCA(profileName, caName);
+            removeCertprofileFromCa(profileName, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(profileName, "PROFILE");
@@ -1843,7 +1843,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method addPublisher
 
     @Override
-    public List<PublisherEntry> getPublishersForCA(
+    public List<PublisherEntry> getPublishersForCa(
             final String caName) {
         ParamUtil.assertNotBlank("caName", caName);
         Set<String> publisherNames = caHasPublishers.get(caName.toUpperCase());
@@ -1873,7 +1873,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("name", name);
         asssertMasterMode();
         for (String caName : caHasPublishers.keySet()) {
-            removePublisherFromCA(name, caName);
+            removePublisherFromCa(name, caName);
         }
 
         boolean b = queryExecutor.deleteRowWithName(name, "PUBLISHER");
@@ -2127,7 +2127,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public Set<String> getAliasesForCA(
+    public Set<String> getAliasesForCa(
             final String caName) {
         ParamUtil.assertNotBlank("caName", caName);
         String localCaName = caName.toUpperCase();
@@ -2149,14 +2149,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public boolean removeCA(
+    public boolean removeCa(
             final String caName)
     throws CaMgmtException {
         ParamUtil.assertNotBlank("caName", caName);
         asssertMasterMode();
         String localCaName = caName.toUpperCase();
 
-        boolean b = queryExecutor.removeCA(localCaName);
+        boolean b = queryExecutor.removeCa(localCaName);
         if (!b) {
             return false;
         }
@@ -2200,7 +2200,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method removeCA
 
     @Override
-    public boolean publishRootCA(
+    public boolean publishRootCa(
             final String caName,
             final String certprofile)
     throws CaMgmtException {
@@ -2213,7 +2213,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("could not find CA named " + localCaName);
         }
 
-        X509Cert certInfo = ca.getCAInfo().getCertificate();
+        X509Cert certInfo = ca.getCaInfo().getCertificate();
 
         X509CertWithDbId certInfoWithId = new X509CertWithDbId(certInfo.getCert());
         if (!certInfo.getCert().getSubjectX500Principal().equals(
@@ -2288,7 +2288,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         LOG.info("revoking CA '{}'", localCaName);
         X509Ca ca = x509cas.get(localCaName);
 
-        CertRevocationInfo currentRevInfo = ca.getCAInfo().getRevocationInfo();
+        CertRevocationInfo currentRevInfo = ca.getCaInfo().getRevocationInfo();
         if (currentRevInfo != null) {
             CrlReason currentReason = currentRevInfo.getReason();
             if (currentReason != CrlReason.CERTIFICATE_HOLD) {
@@ -2308,7 +2308,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("error while revoking CA " + e.getMessage(), e);
         }
         LOG.info("revoked CA '{}'", localCaName);
-        auditLogPCIEvent(true, "REVOKE CA " + localCaName);
+        auditLogPciEvent(true, "REVOKE CA " + localCaName);
         return true;
     } // method revokeCa
 
@@ -2338,7 +2338,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
         LOG.info("unrevoked CA '{}'", lcoalCaName);
 
-        auditLogPCIEvent(true, "UNREVOKE CA " + lcoalCaName);
+        auditLogPciEvent(true, "UNREVOKE CA " + lcoalCaName);
         return true;
     } // method unrevokeCa
 
@@ -2357,7 +2357,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
     } // method setAuditServiceRegister
 
-    private void auditLogPCIEvent(
+    private void auditLogPciEvent(
             final boolean successful,
             final String eventType) {
         AuditService auditService = (auditServiceRegister == null)
@@ -2429,7 +2429,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     throws CaMgmtException {
         ParamUtil.assertNotBlank("caName", caName);
         ParamUtil.assertNotNull("serialNumber", serialNumber);
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         try {
             return ca.revokeCertificate(serialNumber, reason, invalidityTime) != null;
         } catch (OperationException e) {
@@ -2444,7 +2444,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     throws CaMgmtException {
         ParamUtil.assertNotBlank("caName", caName);
         ParamUtil.assertNotNull("serialNumber", serialNumber);
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         try {
             return ca.unrevokeCertificate(serialNumber) != null;
         } catch (OperationException e) {
@@ -2460,7 +2460,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("caName", caName);
         ParamUtil.assertNotNull("serialNumber", serialNumber);
         asssertMasterMode();
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         if (ca == null) {
             return false;
         }
@@ -2483,7 +2483,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.assertNotBlank("profileName", profileName);
         ParamUtil.assertNotNull("encodedPkcs10Request", encodedPkcs10Request);
 
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         CertificationRequest p10cr;
         try {
             p10cr = CertificationRequest.getInstance(encodedPkcs10Request);
@@ -2491,7 +2491,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("invalid PKCS#10 request. ERROR: " + e.getMessage());
         }
 
-        if (!securityFactory.verifyPOPO(p10cr)) {
+        if (!securityFactory.verifyPopo(p10cr)) {
             throw new CaMgmtException("could not validate POP for the pkcs#10 requst");
         }
 
@@ -2519,7 +2519,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return certInfo.getCert().getCert();
     } // method generateCertificate
 
-    public X509Ca getX509CA(
+    public X509Ca getX509Ca(
             final String name)
     throws CaMgmtException {
         X509Ca ca = x509cas.get(name.toUpperCase());
@@ -2552,7 +2552,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method getIdentifiedPublishersForCa
 
     @Override
-    public X509Certificate generateRootCA(
+    public X509Certificate generateRootCa(
             final X509CaEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)
@@ -2564,7 +2564,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         long nextSerial = caEntry.getNextSerial();
         int numCrls = caEntry.getNumCrls();
         int expirationPeriod = caEntry.getExpirationPeriod();
-        int nextCrlNumber = caEntry.getNextCRLNumber();
+        int nextCrlNumber = caEntry.getNextCrlNumber();
         CaStatus status = caEntry.getStatus();
         List<String> crlUris = caEntry.getCrlUris();
         List<String> deltaCrlUris = caEntry.getDeltaCrlUris();
@@ -2613,7 +2613,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             nextSerial++;
         } else {
             serialOfThisCert =
-                    RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
+                    RandomSerialNumberGenerator.getInstance().nextSerialNumber().longValue();
         }
 
         GenerateSelfSignedResult result;
@@ -2657,7 +2657,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setStatus(status);
         entry.setValidityMode(caEntry.getValidityMode());
 
-        addCA(entry);
+        addCa(entry);
         return caCert;
     } // method generateRootCA
 
@@ -2839,16 +2839,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public X509CRL generateCRLonDemand(
+    public X509CRL generateCrlOnDemand(
             final String caName)
     throws CaMgmtException {
         ParamUtil.assertNotBlank("caName", caName);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
         auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND"));
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         try {
-            return ca.generateCRLonDemand(auditEvent);
+            return ca.generateCrlOnDemand(auditEvent);
         } catch (OperationException e) {
             auditEvent.setStatus(AuditStatus.FAILED);
             auditEvent.addEventData(new AuditEventData("message", e.getErrorCode().name()));
@@ -2861,7 +2861,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method generateCRLonDemand
 
     @Override
-    public X509CRL getCRL(
+    public X509CRL getCrl(
             final String caName,
             final BigInteger crlNumber)
     throws CaMgmtException {
@@ -2870,9 +2870,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         AuditEvent auditEvent = new AuditEvent(new Date());
         auditEvent.addEventData(new AuditEventData("eventType", "CRL_DOWNLOAD_WITH_SN"));
         auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         try {
-            CertificateList crl = ca.getCRL(crlNumber);
+            CertificateList crl = ca.getCrl(crlNumber);
             if (crl == null) {
                 auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
                 return null;
@@ -2894,16 +2894,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method getCRL
 
     @Override
-    public X509CRL getCurrentCRL(
+    public X509CRL getCurrentCrl(
             final String caName)
     throws CaMgmtException {
         ParamUtil.assertNotBlank("caName", caName);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
         auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_DOWNLOAD"));
-        X509Ca ca = getX509CA(caName);
+        X509Ca ca = getX509Ca(caName);
         try {
-            CertificateList crl = ca.getCurrentCRL();
+            CertificateList crl = ca.getCurrentCrl();
             if (crl == null) {
                 auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
                 return null;
@@ -2935,7 +2935,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         boolean b = queryExecutor.addScep(dbEntry);
         if (b) {
             final String caName = dbEntry.getCaName();
-            scep.refreshCA();
+            scep.refreshCa();
             scepDbEntries.put(caName, dbEntry);
             sceps.put(caName, scep);
         }
@@ -2977,7 +2977,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (scep == null) {
             return false;
         }
-        scep.refreshCA();
+        scep.refreshCa();
 
         sceps.remove(caName);
         scepDbEntries.remove(caName);

@@ -133,7 +133,7 @@ class X509SelfSignedCertBuilder {
             final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException, InvalidConfException {
-        if (!securityFactory.verifyPOPO(p10Request)) {
+        if (!securityFactory.verifyPopo(p10Request)) {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
 

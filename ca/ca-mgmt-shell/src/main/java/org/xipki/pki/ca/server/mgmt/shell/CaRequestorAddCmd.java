@@ -112,7 +112,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         }
         entry.setPermissions(localPermissions);
 
-        boolean b = caManager.addCmpRequestorToCA(entry, caName);
+        boolean b = caManager.addCmpRequestorToCa(entry, caName);
         output(b, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
         return null;
     }

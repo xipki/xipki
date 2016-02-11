@@ -129,7 +129,7 @@ public class SubjectChecker {
             rdnControl.setPrefix(t.getPrefix());
             rdnControl.setSuffix(t.getSuffix());
             rdnControl.setGroup(t.getGroup());
-            SubjectDnSpec.fixRDNControl(rdnControl);
+            SubjectDnSpec.fixRdnControl(rdnControl);
 
             subjectDNControls.put(type, rdnControl);
         }

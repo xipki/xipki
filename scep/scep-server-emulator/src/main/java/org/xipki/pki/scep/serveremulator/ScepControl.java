@@ -44,7 +44,7 @@ import org.xipki.pki.scep.util.ParamUtil;
 
 public class ScepControl {
 
-    private final boolean sendCACert;
+    private final boolean sendCaCert;
 
     private final boolean pendingCert;
 
@@ -55,21 +55,21 @@ public class ScepControl {
     private final String secret;
 
     public ScepControl(
-            final boolean sendCACert,
+            final boolean sendCaCert,
             final boolean pendingCert,
             final boolean sendSignerCert,
             final boolean useInsecureAlg,
             final String secret) {
         ParamUtil.assertNotBlank("secret", secret);
-        this.sendCACert = sendCACert;
+        this.sendCaCert = sendCaCert;
         this.pendingCert = pendingCert;
         this.sendSignerCert = sendSignerCert;
         this.useInsecureAlg = useInsecureAlg;
         this.secret = secret;
     }
 
-    public boolean isSendCACert() {
-        return sendCACert;
+    public boolean isSendCaCert() {
+        return sendCaCert;
     }
 
     public boolean isPendingCert() {
