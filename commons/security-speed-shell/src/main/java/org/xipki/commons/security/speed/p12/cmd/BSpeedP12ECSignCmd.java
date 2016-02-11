@@ -58,7 +58,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
     protected List<LoadExecutor> getTesters()
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOIDMap();
+        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
         for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P12ECSignLoadTest(securityFactory, sigAlgo, curveName));
         }

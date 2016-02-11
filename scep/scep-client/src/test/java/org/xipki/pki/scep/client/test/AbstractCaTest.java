@@ -85,9 +85,9 @@ public abstract class AbstractCaTest {
 
     private ScepServer scepServer;
 
-    protected abstract CaCapability[] getExcludedCACaps();
+    protected abstract CaCapability[] getExcludedCaCaps();
 
-    protected boolean isWithRA() {
+    protected boolean isWithRa() {
         return true;
     }
 
@@ -99,11 +99,11 @@ public abstract class AbstractCaTest {
         return false;
     }
 
-    protected boolean isWithNextCA() {
+    protected boolean isWithNextCa() {
         return true;
     }
 
-    protected boolean isSendCACert() {
+    protected boolean isSendCaCert() {
         return false;
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractCaTest {
         return false;
     }
 
-    protected boolean isGenerateCRL() {
+    protected boolean isGenerateCrl() {
         return true;
     }
 
@@ -122,7 +122,7 @@ public abstract class AbstractCaTest {
         }
     }
 
-    protected CaCaps getDefaultCACaps() {
+    protected CaCaps getDefaultCaCaps() {
         final CaCaps caCaps = new CaCaps();
         caCaps.addCapability(CaCapability.DES3);
         caCaps.addCapability(CaCapability.AES);
@@ -136,17 +136,17 @@ public abstract class AbstractCaTest {
     public synchronized void startScepServer()
     throws Exception {
         if (scepServerContainer == null) {
-            CaCaps caCaps = getExpectedCACaps();
+            CaCaps caCaps = getExpectedCaCaps();
 
-            ScepControl control = new ScepControl(isSendCACert(), isPendingCert(),
+            ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(),
                     sendSignerCert(), useInsecureAlgorithms(), secret);
 
             this.scepServer = new ScepServer(
                     "scep",
                     caCaps,
-                    isWithRA(),
-                    isWithNextCA(),
-                    isGenerateCRL(),
+                    isWithRa(),
+                    isWithNextCa(),
+                    isGenerateCrl(),
                     control);
             this.scepServerContainer = new ScepServerContainer(8080, scepServer);
         }
@@ -167,29 +167,29 @@ public abstract class AbstractCaTest {
     throws Exception {
         CaIdentifier cAId = new CaIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
         CaCertValidator cACertValidator = new PreprovisionedCaCertValidator(
-                new X509CertificateObject(scepServer.getCACert()));
+                new X509CertificateObject(scepServer.getCaCert()));
         ScepClient client = new ScepClient(cAId, cACertValidator);
         client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 
         client.refresh();
 
-        CaCaps expCACaps = getExpectedCACaps();
+        CaCaps expCACaps = getExpectedCaCaps();
 
         // CACaps
-        CaCaps cACaps = client.getCACaps();
+        CaCaps cACaps = client.getCaCaps();
         Assert.assertEquals("CACaps", expCACaps, cACaps);
 
         // CA certificate
-        Certificate expCACert = scepServer.getCACert();
-        X509Certificate cACert = client.getAuthorityCertStore().getCACert();
+        Certificate expCACert = scepServer.getCaCert();
+        X509Certificate cACert = client.getAuthorityCertStore().getCaCert();
         if (!equals(expCACert, cACert)) {
             Assert.fail("Configured and received CA certificate not the same");
         }
 
-        boolean withRA = isWithRA();
+        boolean withRA = isWithRa();
         // RA
         if (withRA) {
-            Certificate expRACert = scepServer.getRACert();
+            Certificate expRACert = scepServer.getRaCert();
             X509Certificate rASigCert = client.getAuthorityCertStore().getSignatureCert();
             X509Certificate rAEncCert = client.getAuthorityCertStore().getEncryptionCert();
             Assert.assertEquals("RA certificate", rASigCert, rAEncCert);
@@ -200,17 +200,17 @@ public abstract class AbstractCaTest {
         }
 
         // getNextCA
-        if (isWithNextCA()) {
-            AuthorityCertStore nextCA = client.scepNextCACert();
+        if (isWithNextCa()) {
+            AuthorityCertStore nextCA = client.scepNextCaCert();
 
-            Certificate expNextCACert = scepServer.getNextCACert();
-            X509Certificate nextCACert = nextCA.getCACert();
+            Certificate expNextCACert = scepServer.getNextCaCert();
+            X509Certificate nextCACert = nextCA.getCaCert();
             if (!equals(expNextCACert, nextCACert)) {
                 Assert.fail("Configured and received next CA certificate not the same");
             }
 
             if (withRA) {
-                Certificate expNextRACert = scepServer.getNextRACert();
+                Certificate expNextRACert = scepServer.getNextRaCert();
                 X509Certificate nextRASigCert = nextCA.getSignatureCert();
                 X509Certificate nextRAEncCert = nextCA.getEncryptionCert();
                 Assert.assertEquals("Next RA certificate", nextRASigCert, nextRAEncCert);
@@ -290,24 +290,24 @@ public abstract class AbstractCaTest {
         Assert.assertNotNull("received certificate", cert);
 
         // getCRL
-        X509CRL crl = client.scepGetCRL(privKey, enroledCert, issuerName,
+        X509CRL crl = client.scepGetCrl(privKey, enroledCert, issuerName,
                 enroledCert.getSerialNumber());
         Assert.assertNotNull("received CRL", crl);
 
         // getNextCA
-        AuthorityCertStore nextCA = client.scepNextCACert();
+        AuthorityCertStore nextCA = client.scepNextCaCert();
         Assert.assertNotNull("nextCA", nextCA);
     }
 
-    private CaCaps getExpectedCACaps() {
-        CaCaps caCaps = getDefaultCACaps();
-        CaCapability[] excludedCACaps = getExcludedCACaps();
+    private CaCaps getExpectedCaCaps() {
+        CaCaps caCaps = getDefaultCaCaps();
+        CaCapability[] excludedCACaps = getExcludedCaCaps();
         if (excludedCACaps != null) {
             for (CaCapability m : excludedCACaps) {
                 caCaps.removeCapability(m);
             }
         }
-        if (isWithNextCA()) {
+        if (isWithNextCa()) {
             if (!caCaps.containsCapability(CaCapability.GetNextCACert)) {
                 caCaps.addCapability(CaCapability.GetNextCACert);
             }

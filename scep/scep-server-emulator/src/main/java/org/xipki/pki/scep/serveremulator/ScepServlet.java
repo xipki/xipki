@@ -147,7 +147,7 @@ public class ScepServlet extends HttpServlet {
         OutputStream respStream = response.getOutputStream();
 
         try {
-            CaCaps cACaps = responder.getCACaps();
+            CaCaps cACaps = responder.getCaCaps();
             if (post && !cACaps.containsCapability(CaCapability.POSTPKIOperation)) {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
@@ -231,25 +231,25 @@ public class ScepServlet extends HttpServlet {
             } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_TEXT_PLAIN);
-                byte[] caCapsBytes = responder.getCACaps().getBytes();
+                byte[] caCapsBytes = responder.getCaCaps().getBytes();
                 respStream.write(caCapsBytes);
                 response.setContentLength(caCapsBytes.length);
             } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 byte[] respBytes;
                 String ct;
-                if (responder.getRAEmulator() == null) {
+                if (responder.getRaEmulator() == null) {
                     ct = ScepConstants.CT_X509_CA_CERT;
-                    respBytes = responder.getCAEmulator().getCACertBytes();
+                    respBytes = responder.getCaEmulator().getCaCertBytes();
                 } else {
                     ct = ScepConstants.CT_X509_CA_RA_CERT;
                     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
                     try {
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                                responder.getCAEmulator().getCACert()));
+                                responder.getCaEmulator().getCaCert()));
                         ct = ScepConstants.CT_X509_CA_RA_CERT;
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                                responder.getRAEmulator().getRACert()));
+                                responder.getRaEmulator().getRaCert()));
                         CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
                                 new CMSAbsentContent());
                         respBytes = degenerateSignedData.getEncoded();
@@ -273,7 +273,7 @@ public class ScepServlet extends HttpServlet {
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
             } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
-                if (responder.getNextCAandRA() == null) {
+                if (responder.getNextCaAndRa() == null) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentLength(0);
 
@@ -285,10 +285,10 @@ public class ScepServlet extends HttpServlet {
                 try {
                     NextCaMessage nextCAMsg = new NextCaMessage();
                     nextCAMsg.setCaCert(
-                            new X509CertificateObject(responder.getNextCAandRA().getCACert()));
-                    if (responder.getNextCAandRA().getRACert() != null) {
+                            new X509CertificateObject(responder.getNextCaAndRa().getCaCert()));
+                    if (responder.getNextCaAndRa().getRaCert() != null) {
                         X509Certificate raCert = new X509CertificateObject(
-                                responder.getNextCAandRA().getRACert());
+                                responder.getNextCaAndRa().getRaCert());
                         nextCAMsg.setRaCerts(Arrays.asList(raCert));
                     }
 
@@ -349,7 +349,7 @@ public class ScepServlet extends HttpServlet {
         } // end try
     } // method service
 
-    protected PKIMessage generatePKIMessage(
+    protected PKIMessage generatePkiMessage(
             final InputStream is)
     throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);

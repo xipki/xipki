@@ -548,7 +548,7 @@ public class ObjectIdentifiers {
         return name;
     }
 
-    public static ASN1ObjectIdentifier nameToOID(
+    public static ASN1ObjectIdentifier nameToOid(
             final String name) {
         for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
             if (oidNameMap.get(oid).equalsIgnoreCase(name)) {

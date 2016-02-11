@@ -368,7 +368,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
             throw new SignerException("server answered with ERROR: "
-                    + SecurityUtil.formatPKIStatusInfo(statusInfo));
+                    + SecurityUtil.formatPkiStatusInfo(statusInfo));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new SignerException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP    + ", "

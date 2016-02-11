@@ -46,23 +46,23 @@ import org.bouncycastle.asn1.x509.Certificate;
 
 public class RaEmulator {
 
-    private final PrivateKey rAKey;
+    private final PrivateKey raKey;
 
-    private final Certificate rACert;
+    private final Certificate raCert;
 
     public RaEmulator(
-            final PrivateKey rAKey,
-            final Certificate rACert) {
-        this.rAKey = rAKey;
-        this.rACert = rACert;
+            final PrivateKey raKey,
+            final Certificate raCert) {
+        this.raKey = raKey;
+        this.raCert = raCert;
     }
 
-    public PrivateKey getRAKey() {
-        return rAKey;
+    public PrivateKey getRaKey() {
+        return raKey;
     }
 
-    public Certificate getRACert() {
-        return rACert;
+    public Certificate getRaCert() {
+        return raCert;
     }
 
 }

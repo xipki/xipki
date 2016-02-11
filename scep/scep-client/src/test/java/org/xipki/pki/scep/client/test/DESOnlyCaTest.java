@@ -49,7 +49,7 @@ public class DESOnlyCaTest extends AbstractCaTest {
     }
 
     @Override
-    protected CaCapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCaCaps() {
         return new CaCapability[]{CaCapability.AES, CaCapability.DES3};
     }
 

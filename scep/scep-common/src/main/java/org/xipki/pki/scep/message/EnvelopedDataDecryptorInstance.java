@@ -60,6 +60,7 @@ public final class EnvelopedDataDecryptorInstance {
         final PrivateKey privKey) {
         ParamUtil.assertNotNull("recipientCert", recipientCert);
         ParamUtil.assertNotNull("privKey", privKey);
+
         this.recipientId = new JceKeyTransRecipientId(recipientCert);
         this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }

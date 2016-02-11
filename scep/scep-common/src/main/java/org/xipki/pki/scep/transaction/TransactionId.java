@@ -58,6 +58,7 @@ public class TransactionId {
     public TransactionId(
             final String id) {
         ParamUtil.assertNotBlank("id", id);
+
         this.id = id;
     }
 
@@ -67,6 +68,7 @@ public class TransactionId {
         if (bytes.length < 1) {
             throw new IllegalArgumentException("bytes could not be null");
         }
+
         this.id = Hex.toHexString(bytes);
     }
 
@@ -81,12 +83,13 @@ public class TransactionId {
     }
 
     public static TransactionId sha1TransactionId(
-            final SubjectPublicKeyInfo spk)
+            final SubjectPublicKeyInfo spki)
     throws InvalidKeySpecException {
-        ParamUtil.assertNotNull("spk", spk);
+        ParamUtil.assertNotNull("spki", spki);
+
         byte[] encoded;
         try {
-            encoded = spk.getEncoded();
+            encoded = spki.getEncoded();
         } catch (IOException e) {
             throw new InvalidKeySpecException("IO exception while ");
         }
@@ -97,6 +100,7 @@ public class TransactionId {
     public static TransactionId sha1TransactionId(
             final byte[] content) {
         ParamUtil.assertNotNull("content", content);
+
         SHA1Digest dgst = new SHA1Digest();
         dgst.update(content, 0, content.length);
         final int size = 20;

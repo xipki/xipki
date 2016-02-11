@@ -139,7 +139,7 @@ public final class SunP11CryptService implements P11CryptService {
         Set<SunP11Identity> currentIdentifies = new HashSet<>();
 
         // try to initialize with the slot 0
-        Provider p11ProviderOfSlot0 = getPKCS11Provider(nativeLib, 0);
+        Provider p11ProviderOfSlot0 = getPkcs11Provider(nativeLib, 0);
 
         long[] slotList = allSlots(nativeLib);
 
@@ -155,7 +155,7 @@ public final class SunP11CryptService implements P11CryptService {
                 if (i == 0) {
                     provider = p11ProviderOfSlot0;
                 } else {
-                    provider = getPKCS11Provider(nativeLib, i);
+                    provider = getPkcs11Provider(nativeLib, i);
                 }
 
                 KeyStore keystore = KeyStore.getInstance("PKCS11", provider);
@@ -443,7 +443,7 @@ public final class SunP11CryptService implements P11CryptService {
     private synchronized void ensureResource() {
     }
 
-    private static Provider getPKCS11Provider(
+    private static Provider getPkcs11Provider(
             final String pkcs11Module,
             final int slotIndex) {
         File f = new File(pkcs11Module);
