@@ -77,7 +77,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
             required = true,
             description = "OCSP responder URL\n"
                     + "required")
-    private String serverURL;
+    private String serverUrlS;
 
     @Override
     protected Object doExecute()
@@ -116,9 +116,9 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         URL serverUrl;
         try {
-            serverUrl = new URL(serverURL);
+            serverUrl = new URL(serverUrlS);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("invalid URL: " + serverURL);
+            throw new RuntimeException("invalid URL: " + serverUrlS);
         }
 
         StringBuilder description = new StringBuilder();

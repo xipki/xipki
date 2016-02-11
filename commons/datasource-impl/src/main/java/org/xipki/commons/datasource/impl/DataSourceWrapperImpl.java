@@ -90,7 +90,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -233,7 +233,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -303,7 +303,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -399,7 +399,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
          *
          */
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -531,7 +531,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -599,7 +599,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSQL(
+        public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
                 final String orderBy) {
@@ -824,7 +824,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public String createFetchFirstSelectSQL(
             final String coreSql,
             final int rows) {
-        return createFetchFirstSelectSQL(coreSql, rows, null);
+        return createFetchFirstSelectSql(coreSql, rows, null);
     }
 
     @Override
@@ -1505,7 +1505,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         // try SQLState
         if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
-            if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode)) {
+            if (sqlStateCodes.getBadSqlGrammarCodes().contains(classCode)) {
                 return new BadSqlGrammarException(buildMessage(localSql, sqlEx), ex);
             } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode)) {
                 return new DataIntegrityViolationException(buildMessage(localSql, ex), ex);

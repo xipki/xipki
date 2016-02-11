@@ -210,7 +210,7 @@ public class KeystoreP11Identity extends P11Identity {
                     + publicKey.getAlgorithm() + " public key");
         }
 
-        return doDsaX962Sign(hash);
+        return doDSAX962Sign(hash);
     }
     public byte[] CKM_ECDSA(
             final byte[] hash)
@@ -226,7 +226,7 @@ public class KeystoreP11Identity extends P11Identity {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
-        return doDsaX962Sign(hash);
+        return doDSAX962Sign(hash);
     }
 
     public byte[] CKM_DSA(
@@ -236,7 +236,7 @@ public class KeystoreP11Identity extends P11Identity {
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
-    private byte[] doDsaX962Sign(
+    private byte[] doDSAX962Sign(
             final byte[] hash)
     throws SignerException {
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());

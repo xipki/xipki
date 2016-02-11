@@ -133,7 +133,7 @@ public class CmpUtil {
         builder.setBody(pkiMessage.getBody());
 
         if (addSignerCert) {
-            X509CertificateHolder signerCert = signer.getCertificateAsBCObject();
+            X509CertificateHolder signerCert = signer.getCertificateAsBcObject();
             builder.addCMPCertificate(signerCert);
         }
 

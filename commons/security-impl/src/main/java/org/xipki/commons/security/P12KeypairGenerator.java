@@ -173,7 +173,7 @@ public abstract class P12KeypairGenerator {
                 this.curveName = KeyUtil.getCurveName(this.curveOid);
             } else {
                 this.curveName = curveNameOrOid;
-                this.curveOid = KeyUtil.getCurveOID(this.curveName);
+                this.curveOid = KeyUtil.getCurveOid(this.curveName);
                 if (this.curveOid == null) {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);

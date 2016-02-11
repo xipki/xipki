@@ -932,7 +932,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
             if (n == 0) {
                 LOG.warn("found no certificate with subject {}",
-                        X509Util.getRFC4519Name(subject));
+                        X509Util.getRfc4519Name(subject));
                 return null;
             }
 

@@ -152,13 +152,13 @@ public class SignerUtil {
         throw new IllegalArgumentException("unknown trailer field");
     }
 
-    public static    boolean verifyPOP(
+    public static boolean verifyPopo(
             final CertificationRequest p10Request) {
         PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
-        return verifyPOP(p10Req);
+        return verifyPopo(p10Req);
     }
 
-    public static    boolean verifyPOP(
+    public static boolean verifyPopo(
             final PKCS10CertificationRequest p10Request) {
         try {
             SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();

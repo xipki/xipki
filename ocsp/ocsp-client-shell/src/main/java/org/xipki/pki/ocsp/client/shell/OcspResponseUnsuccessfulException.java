@@ -49,7 +49,7 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
 
     public OcspResponseUnsuccessfulException(
             final int status) {
-        super(getOCSPResponseStatus(status));
+        super(getOcspResponseStatus(status));
         this.status = status;
     }
 
@@ -58,10 +58,10 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
     }
 
     public String getStatusText() {
-        return getOCSPResponseStatus(status);
+        return getOcspResponseStatus(status);
     }
 
-    private static String getOCSPResponseStatus(
+    private static String getOcspResponseStatus(
             final int statusCode) {
         switch (statusCode) {
         case 1:

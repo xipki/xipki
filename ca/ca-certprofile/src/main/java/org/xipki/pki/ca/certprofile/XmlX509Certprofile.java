@@ -423,7 +423,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             rdnControl.setPrefix(t.getPrefix());
             rdnControl.setSuffix(t.getSuffix());
             rdnControl.setGroup(t.getGroup());
-            SubjectDnSpec.fixRDNControl(rdnControl);
+            SubjectDnSpec.fixRdnControl(rdnControl);
         }
         this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
         this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
@@ -1391,7 +1391,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public boolean isCA() {
+    public boolean isCa() {
         return ca;
     }
 
@@ -1416,7 +1416,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public boolean isOnlyForRA() {
+    public boolean isOnlyForRa() {
         return raOnly;
     }
 

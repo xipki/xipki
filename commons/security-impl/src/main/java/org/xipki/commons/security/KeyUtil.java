@@ -335,7 +335,7 @@ public class KeyUtil {
                 new ASN1Integer(publicKey.getY()));
     }
 
-    public static ASN1ObjectIdentifier getCurveOID(
+    public static ASN1ObjectIdentifier getCurveOid(
             final String curveName) {
         ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
         if (curveOID == null) {
@@ -367,7 +367,7 @@ public class KeyUtil {
         return curveName;
     }
 
-    public static Map<String, ASN1ObjectIdentifier> getCurveNameOIDMap() {
+    public static Map<String, ASN1ObjectIdentifier> getCurveNameOidMap() {
         Map<String, ASN1ObjectIdentifier> map = new HashMap<>();
         Enumeration<?> names = X962NamedCurves.getNames();
         while (names.hasMoreElements()) {

@@ -98,7 +98,7 @@ public class CertPollCmd extends ClientCommandSupport {
             throw new CmdFailure("server returned 'pending'");
         }
 
-        X509Certificate cert = extractEECerts(resp.getCertStore());
+        X509Certificate cert = extractEeCerts(resp.getCertStore());
 
         if (cert == null) {
             throw new Exception("received no certificate");

@@ -49,7 +49,7 @@ public class MD5OnlyCaTest extends AbstractCaTest {
     }
 
     @Override
-    protected CaCapability[] getExcludedCACaps() {
+    protected CaCapability[] getExcludedCaCaps() {
         return new CaCapability[]{CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512};
     }
 

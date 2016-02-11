@@ -81,7 +81,7 @@ public interface DataSourceWrapper {
             String coreSql,
             int rows);
 
-    String createFetchFirstSelectSQL(
+    String createFetchFirstSelectSql(
             String coreSql,
             int rows,
             String orderBy);

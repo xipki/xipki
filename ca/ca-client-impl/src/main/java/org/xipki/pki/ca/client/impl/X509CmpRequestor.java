@@ -171,22 +171,22 @@ abstract class X509CmpRequestor extends CmpRequestor {
         xmlDocBuilder = newDocumentBuilder();
     }
 
-    public CrlResultType generateCRL(
+    public CrlResultType generateCrl(
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
         int action = XipkiCmpConstants.ACTION_GEN_CRL;
         PKIMessage request = buildMessageWithXipkAction(action, null);
         PkiResponse response = signAndSend(request, debug);
-        return evaluateCRLResponse(response, action);
+        return evaluateCrlResponse(response, action);
     }
 
-    public CrlResultType downloadCurrentCRL(
+    public CrlResultType downloadCurrentCrl(
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
-        return downloadCRL((BigInteger) null, debug);
+        return downloadCrl((BigInteger) null, debug);
     }
 
-    public CrlResultType downloadCRL(
+    public CrlResultType downloadCrl(
             final BigInteger crlNumber,
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
@@ -201,10 +201,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
         }
 
         PkiResponse response = signAndSend(request, debug);
-        return evaluateCRLResponse(response, action);
+        return evaluateCrlResponse(response, action);
     }
 
-    private CrlResultType evaluateCRLResponse(
+    private CrlResultType evaluateCrlResponse(
             final PkiResponse response,
             final Integer xipkiAction)
     throws CmpRequestorException, PkiErrorException {
@@ -355,7 +355,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
             if (certId == null) {
                 LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
-                        X509Util.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
+                        X509Util.getRfc4519Name(re.getIssuer()), re.getSerialNumber());
                 certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
                 continue;
             }
@@ -372,7 +372,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final String username,
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
-        PKIMessage request = buildPKIMessage(p10Req, username);
+        PKIMessage request = buildPkiMessage(p10Req, username);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
         return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
@@ -383,7 +383,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final String username,
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
-        PKIMessage request = buildPKIMessage(req, username);
+        PKIMessage request = buildPkiMessage(req, username);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
 
@@ -437,7 +437,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         if (caPubs != null && caPubs.length > 0) {
             for (int i = 0; i < caPubs.length; i++) {
                 if (caPubs[i] != null) {
-                    result.addCACertificate(caPubs[i]);
+                    result.addCaCertificate(caPubs[i]);
                 }
             }
         }
@@ -539,7 +539,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final ASN1OctetString tid,
             final CertificateConfirmationContentBuilder certConfirmBuilder)
     throws CmpRequestorException {
-        PKIHeader header = buildPKIHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
+        PKIHeader header = buildPkiHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
         CertificateConfirmationContent certConfirm;
         try {
             certConfirm = certConfirmBuilder.build(DIGEST_CALCULATOR_PROVIDER);
@@ -553,7 +553,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     private PKIMessage buildRevokeCertRequest(
             final RevokeCertRequestType request)
     throws CmpRequestorException {
-        PKIHeader header = buildPKIHeader(null);
+        PKIHeader header = buildPkiHeader(null);
 
         List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
         List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
@@ -596,7 +596,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final UnrevokeOrRemoveCertRequestType request,
             final int reasonCode)
     throws CmpRequestorException {
-        PKIHeader header = buildPKIHeader(null);
+        PKIHeader header = buildPkiHeader(null);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
         List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
@@ -625,7 +625,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     } // method buildUnrevokeOrRemoveCertRequest
 
-    private PKIMessage buildPKIMessage(
+    private PKIMessage buildPkiMessage(
             final P10EnrollCertRequestType p10Req,
             final String username) {
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
@@ -634,16 +634,16 @@ abstract class X509CmpRequestor extends CmpRequestor {
             utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
         }
 
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, utf8Pairs);
+        PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs);
         PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, p10Req.getP10Req());
 
         return new PKIMessage(header, body);
     }
 
-    private PKIMessage buildPKIMessage(
+    private PKIMessage buildPkiMessage(
             final EnrollCertRequestType req,
             final String username) {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username);
+        PKIHeader header = buildPkiHeader(implicitConfirm, null, username);
 
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
         CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
@@ -676,12 +676,12 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     } // method buildPKIMessage
 
-    private PKIMessage buildPKIMessage(
+    private PKIMessage buildPkiMessage(
             final CertRequest req,
             final ProofOfPossession pop,
             final String profileName,
             final String username) {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username);
+        PKIHeader header = buildPkiHeader(implicitConfirm, null, username);
 
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
         AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
@@ -698,7 +698,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final String profileName,
             final String username)
     throws CmpRequestorException {
-        PKIMessage request = buildPKIMessage(req, pop, profileName, username);
+        PKIMessage request = buildPkiMessage(req, pop, profileName, username);
         return sign(request);
     }
 
@@ -710,7 +710,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return reqMessage;
     }
 
-    public CaInfo retrieveCAInfo(
+    public CaInfo retrieveCaInfo(
             final String caName,
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {

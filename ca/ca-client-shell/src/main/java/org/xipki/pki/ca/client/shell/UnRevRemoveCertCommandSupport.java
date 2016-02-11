@@ -90,8 +90,8 @@ public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport
             return "the given certificate is not issued by the given issuer";
         }
 
-        byte[] caSki = X509Util.extractSKI(caCert);
-        byte[] aki = X509Util.extractAKI(cert);
+        byte[] caSki = X509Util.extractSki(caCert);
+        byte[] aki = X509Util.extractAki(cert);
         if (caSki != null && aki != null) {
             if (!Arrays.equals(aki, caSki)) {
                 return "the given certificate is not issued by the given issuer";

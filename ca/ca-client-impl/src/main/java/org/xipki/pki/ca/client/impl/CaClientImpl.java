@@ -162,7 +162,7 @@ public final class CaClientImpl implements CaClient {
                     return;
                 }
 
-                autoConfCAs(null);
+                autoConfCas(null);
             } finally {
                 lastUpdate = System.currentTimeMillis();
                 inProcess.set(false);
@@ -199,7 +199,7 @@ public final class CaClientImpl implements CaClient {
      *
      * @return names of CAs which could not been configured
      */
-    private Set<String> autoConfCAs(
+    private Set<String> autoConfCas(
             final Set<String> caNamesToBeConfigured) {
         Set<String> caNamesWithError = new HashSet<>();
 
@@ -216,7 +216,7 @@ public final class CaClientImpl implements CaClient {
             }
 
             try {
-                CaInfo caInfo = ca.getRequestor().retrieveCAInfo(name, null);
+                CaInfo caInfo = ca.getRequestor().retrieveCaInfo(name, null);
                 if (ca.isCertAutoconf()) {
                     ca.setCert(caInfo.getCert());
                 }
@@ -449,7 +449,7 @@ public final class CaClientImpl implements CaClient {
             sb.append(caNames);
 
             LOG.info(sb.toString());
-            caNames = autoConfCAs(caNames);
+            caNames = autoConfCas(caNames);
 
             if (CollectionUtil.isNotEmpty(caNames)) {
                 final String msg = "could not configured following CAs " + caNames;
@@ -584,7 +584,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         for (CaConf ca : casMap.values()) {
-            if (!ca.isCAInfoConfigured()) {
+            if (!ca.isCaInfoConfigured()) {
                 continue;
             }
             if (!ca.supportsProfile(certprofile)) {
@@ -691,15 +691,15 @@ public final class CaClientImpl implements CaClient {
     }
 
     @Override
-    public X509CRL downloadCRL(
+    public X509CRL downloadCrl(
             final String caName,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        return downloadCRL(caName, (BigInteger) null, debug);
+        return downloadCrl(caName, (BigInteger) null, debug);
     }
 
     @Override
-    public X509CRL downloadCRL(
+    public X509CRL downloadCrl(
             final String caName,
             final BigInteger crlNumber,
             final RequestResponseDebug debug)
@@ -715,9 +715,9 @@ public final class CaClientImpl implements CaClient {
         CrlResultType result;
         try {
             if (crlNumber == null) {
-                result = requestor.downloadCurrentCRL(debug);
+                result = requestor.downloadCurrentCrl(debug);
             } else {
-                result = requestor.downloadCRL(crlNumber, debug);
+                result = requestor.downloadCrl(crlNumber, debug);
             }
         } catch (CmpRequestorException e) {
             throw new CaClientException(e.getMessage(), e);
@@ -727,7 +727,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     @Override
-    public X509CRL generateCRL(
+    public X509CRL generateCrl(
             final String caName,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
@@ -740,7 +740,7 @@ public final class CaClientImpl implements CaClient {
 
         X509CmpRequestor requestor = ca.getRequestor();
         try {
-            CrlResultType result = requestor.generateCRL(debug);
+            CrlResultType result = requestor.generateCrl(debug);
             return result.getCrl();
         } catch (CmpRequestorException e) {
             throw new CaClientException(e.getMessage(), e);
@@ -757,7 +757,7 @@ public final class CaClientImpl implements CaClient {
 
         for (String name : casMap.keySet()) {
             final CaConf ca = casMap.get(name);
-            if (!ca.isCAInfoConfigured()) {
+            if (!ca.isCaInfoConfigured()) {
                 continue;
             }
 
@@ -774,7 +774,7 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException {
         String caName = null;
         for (CaConf ca : casMap.values()) {
-            if (!ca.isCAInfoConfigured()) {
+            if (!ca.isCaInfoConfigured()) {
                 continue;
             }
 
@@ -1203,7 +1203,7 @@ public final class CaClientImpl implements CaClient {
             certOrErrors.put(resultEntry.getId(), certOrError);
         }
 
-        List<CMPCertificate> cmpCaPubs = result.getCACertificates();
+        List<CMPCertificate> cmpCaPubs = result.getCaCertificates();
 
         if (CollectionUtil.isEmpty(cmpCaPubs)) {
             return new EnrollCertResult(null, certOrErrors);

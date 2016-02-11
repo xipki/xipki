@@ -66,20 +66,20 @@ public class GetCrlCmd extends CrlCommandSupport {
 
     @Option(name = "--with-basecrl",
             description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    private Boolean withBaseCRL = Boolean.FALSE;
+    private Boolean withBaseCrl = Boolean.FALSE;
 
     @Option(name = "--basecrl-out",
             description = "where to save the baseCRL\n"
                     + "(defaults to <out>-baseCRL)")
     @Completion(FilePathCompleter.class)
-    private String baseCRLOut;
+    private String baseCrlOut;
 
     @Override
     protected X509CRL retrieveCrl()
     throws CaClientException, PkiErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            return caClient.downloadCRL(caName, debug);
+            return caClient.downloadCrl(caName, debug);
         } finally {
             saveRequestResponse(debug);
         }
@@ -120,7 +120,7 @@ public class GetCrlCmd extends CrlCommandSupport {
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
 
-        if (!withBaseCRL.booleanValue()) {
+        if (!withBaseCrl.booleanValue()) {
             return null;
         }
 
@@ -129,8 +129,8 @@ public class GetCrlCmd extends CrlCommandSupport {
             return null;
         }
 
-        if (baseCRLOut == null) {
-            baseCRLOut = outFile + "-baseCRL";
+        if (baseCrlOut == null) {
+            baseCrlOut = outFile + "-baseCRL";
         }
 
         byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
@@ -138,7 +138,7 @@ public class GetCrlCmd extends CrlCommandSupport {
 
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            crl = caClient.downloadCRL(caName, baseCrlNumber, debug);
+            crl = caClient.downloadCrl(caName, baseCrlNumber, debug);
         } catch (PkiErrorException ex) {
             throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
         } finally {
@@ -149,7 +149,7 @@ public class GetCrlCmd extends CrlCommandSupport {
             throw new CmdFailure("received no baseCRL from server");
         }
 
-        saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
+        saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
         return null;
     } // method doExecute
 

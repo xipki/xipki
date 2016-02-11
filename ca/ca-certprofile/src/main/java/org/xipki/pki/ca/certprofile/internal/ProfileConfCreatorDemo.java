@@ -69,6 +69,7 @@ import org.xipki.commons.security.api.TlsExtensionType;
 import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
@@ -186,7 +187,7 @@ public class ProfileConfCreatorDemo {
             ms.setProperty("com.sun.xml.internal.bind.indentString", "    ");
 
             // RootCA
-            X509ProfileType profile = certprofileRootCA();
+            X509ProfileType profile = certprofileRootCa();
             marshall(ms, profile, "Certprofile_RootCA.xml");
 
             // Cross
@@ -194,7 +195,7 @@ public class ProfileConfCreatorDemo {
             marshall(ms, profile, "Certprofile_Cross.xml");
 
             // SubCA
-            profile = certprofileSubCA();
+            profile = certprofileSubCa();
             marshall(ms, profile, "Certprofile_SubCA.xml");
 
             profile = certprofileSubCaComplex();
@@ -225,15 +226,15 @@ public class ProfileConfCreatorDemo {
             marshall(ms, profile, "Certprofile_TLSwithIncSN.xml");
 
             //gSMC-K
-            profile = certprofileGSMCk();
+            profile = certprofileGsmcK();
             marshall(ms, profile, "Certprofile_gSMC_K.xml");
 
             //multiple-OUs
-            profile = certprofileMultipleOUs();
+            profile = certprofileMultipleOus();
             marshall(ms, profile, "Certprofile_multipleOUs.xml");
 
             //multiple-valued RDN
-            profile = certprofileMultipleValuedRDN();
+            profile = certprofileMultipleValuedRdn();
             marshall(ms, profile, "Certprofile_multiValuedRDN.xml");
 
             //NOTAFTER = 9999-12-31-59-59
@@ -262,7 +263,7 @@ public class ProfileConfCreatorDemo {
         }
     } // method marshall
 
-    private static X509ProfileType certprofileRootCA()
+    private static X509ProfileType certprofileRootCa()
     throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile RootCA",
                 true, "10y", false, new String[]{"SHA256", "SHA1"});
@@ -272,13 +273,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -315,13 +316,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -351,7 +352,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method Certprofile_Cross
 
-    private static X509ProfileType certprofileSubCA()
+    private static X509ProfileType certprofileSubCa()
     throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SubCA", true, "8y", false,
                 new String[]{"SHA256", "SHA1"});
@@ -361,13 +362,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -410,13 +411,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -527,13 +528,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -583,12 +584,12 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -632,13 +633,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
                 new String[]{REGEX_FQDN}, null, null));
 
         // Extensions
@@ -705,13 +706,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -761,13 +762,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
                 new String[]{REGEX_FQDN}, null, null));
 
         // Extensions
@@ -808,7 +809,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method Certprofile_TLSwithIncSN
 
-    private static X509ProfileType certprofileGSMCk()
+    private static X509ProfileType certprofileGsmcK()
     throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", false, "5y", false,
                 new String[]{"SHA256"});
@@ -830,17 +831,17 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_L, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_ST, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_L, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_STREET, 0, 1));
         // regex: ICCSN-yyyyMMdd
         String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}, null, null));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -901,7 +902,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method Certprofile_gSMC_K
 
-    private static X509ProfileType certprofileMultipleOUs()
+    private static X509ProfileType certprofileMultipleOus()
     throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO",
                 false, "5y", false,
@@ -912,17 +913,17 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
 
         final String regexOu1 = "[A-Z]{1,1}[\\d]{5,5}";
         final String regexOu2 = "[\\d]{5,5}";
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2,
                 new String[]{regexOu1, regexOu2}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         // Extensions - general
@@ -957,7 +958,7 @@ public class ProfileConfCreatorDemo {
     /*
      * O and OU in one RDN
      */
-    private static X509ProfileType certprofileMultipleValuedRDN()
+    private static X509ProfileType certprofileMultipleValuedRdn()
     throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple Valued RDN",
                 false, "5y", false,
@@ -968,13 +969,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         // Extensions - general
@@ -1016,16 +1017,16 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
 
         // Extensions
         // Extensions - general
@@ -1115,13 +1116,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1,
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
                 new String[]{REGEX_FQDN}, null, null));
 
         // Extensions
@@ -1154,24 +1155,24 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method Certprofile_MaxTime
 
-    private static RdnType createRDN(
+    private static RdnType createRdn(
             final ASN1ObjectIdentifier type,
             final int min,
             final int max) {
-        return createRDN(type, min, max, null, null, null);
+        return createRdn(type, min, max, null, null, null);
     }
 
-    private static RdnType createRDN(
+    private static RdnType createRdn(
             final ASN1ObjectIdentifier type,
             final int min,
             final int max,
             final String[] regexArrays,
             final String prefix,
             final String suffix) {
-        return createRDN(type, min, max, regexArrays, prefix, suffix, null);
+        return createRdn(type, min, max, regexArrays, prefix, suffix, null);
     }
 
-    private static RdnType createRDN(
+    private static RdnType createRdn(
             final ASN1ObjectIdentifier type,
             final int min,
             final int max,
@@ -1287,7 +1288,7 @@ public class ProfileConfCreatorDemo {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
         if (requiredUsages != null) {
             List<ASN1ObjectIdentifier> l = Arrays.asList(requiredUsages);
-            l = X509Util.sortOIDList(l);
+            l = X509Util.sortOidList(l);
             for (ASN1ObjectIdentifier usage : l) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
             }
@@ -1295,7 +1296,7 @@ public class ProfileConfCreatorDemo {
 
         if (optionalUsages != null) {
             List<ASN1ObjectIdentifier> l = Arrays.asList(optionalUsages);
-            l = X509Util.sortOIDList(l);
+            l = X509Util.sortOidList(l);
             for (ASN1ObjectIdentifier usage : l) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
             }
@@ -1574,7 +1575,7 @@ public class ProfileConfCreatorDemo {
         profile.setAppInfo(createDescription(description));
         profile.setCa(ca);
         profile.setMaxSize(5000);
-        profile.setVersion(3);
+        profile.setVersion(X509CertVersion.V3.getVersion());
         profile.setValidity(validity);
         profile.setNotBeforeTime(useMidnightNotBefore
                 ? "midnight"

@@ -153,7 +153,7 @@ class CaConf {
         return profiles.get(profileName);
     }
 
-    public boolean isCAInfoConfigured() {
+    public boolean isCaInfoConfigured() {
         return cert != null;
     }
 

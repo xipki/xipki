@@ -98,7 +98,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
-        BasicOCSPResp basicResp = OcspUtils.extractBasicOCSPResp(response);
+        BasicOCSPResp basicResp = OcspUtils.extractBasicOcspResp(response);
 
         boolean extendedRevoke = basicResp.getExtension(
                 ObjectIdentifiers.id_pkix_ocsp_extendedRevoke) != null;
@@ -174,7 +174,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             } // end if(validOn)
 
             if (verbose.booleanValue()) {
-                out("responder is " + X509Util.getRFC4519Name(responderCerts[0].getSubject()));
+                out("responder is " + X509Util.getRfc4519Name(responderCerts[0].getSubject()));
             }
         } // end if
 

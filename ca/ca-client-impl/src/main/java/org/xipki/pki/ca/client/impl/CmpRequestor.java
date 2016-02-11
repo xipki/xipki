@@ -137,7 +137,7 @@ public abstract class CmpRequestor {
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
-        this.c14nRecipientName = getSortedRFC4519Name(subject);
+        this.c14nRecipientName = getSortedRfc4519Name(subject);
     }
 
     public CmpRequestor(
@@ -167,7 +167,7 @@ public abstract class CmpRequestor {
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
-        this.c14nRecipientName = getSortedRFC4519Name(subject);
+        this.c14nRecipientName = getSortedRfc4519Name(subject);
     }
 
     protected abstract byte[] send(
@@ -334,7 +334,7 @@ public abstract class CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
+            throw new CmpRequestorException(SecurityUtil.formatPkiStatusInfo(
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
@@ -362,18 +362,18 @@ public abstract class CmpRequestor {
         return itv.getInfoValue();
     } // method extractGeneralRepContent
 
-    protected PKIHeader buildPKIHeader(
+    protected PKIHeader buildPkiHeader(
             final ASN1OctetString tid) {
-        return buildPKIHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
+        return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
     }
 
-    protected PKIHeader buildPKIHeader(
+    protected PKIHeader buildPkiHeader(
             final ASN1OctetString tid,
             final String username) {
-        return buildPKIHeader(false, tid, username);
+        return buildPkiHeader(false, tid, username);
     }
 
-    protected PKIHeader buildPKIHeader(
+    protected PKIHeader buildPkiHeader(
             final boolean addImplictConfirm,
             final ASN1OctetString tid,
             final String username) {
@@ -381,10 +381,10 @@ public abstract class CmpRequestor {
         if (StringUtil.isNotBlank(username)) {
             utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
         }
-        return buildPKIHeader(addImplictConfirm, tid, utf8Pairs, (InfoTypeAndValue[]) null);
+        return buildPkiHeader(addImplictConfirm, tid, utf8Pairs, (InfoTypeAndValue[]) null);
     }
 
-    protected PKIHeader buildPKIHeader(
+    protected PKIHeader buildPkiHeader(
             final boolean addImplictConfirm,
             final ASN1OctetString tid,
             final CmpUtf8Pairs utf8Pairs,
@@ -477,7 +477,7 @@ public abstract class CmpRequestor {
             if (h.getSender().getTagNo() != GeneralName.directoryName) {
                 authorizedResponder = false;
             } else {
-                String c14nMsgSender = getSortedRFC4519Name((X500Name) h.getSender().getName());
+                String c14nMsgSender = getSortedRfc4519Name((X500Name) h.getSender().getName());
                 authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
             }
 
@@ -506,7 +506,7 @@ public abstract class CmpRequestor {
             final int action,
             final ASN1Encodable value)
     throws CmpRequestorException {
-        PKIHeader header = buildPKIHeader(null);
+        PKIHeader header = buildPkiHeader(null);
 
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(action));
@@ -526,7 +526,7 @@ public abstract class CmpRequestor {
             final ASN1ObjectIdentifier type,
             final ASN1Encodable value)
     throws CmpRequestorException {
-        PKIHeader header = buildPKIHeader(null);
+        PKIHeader header = buildPkiHeader(null);
         InfoTypeAndValue itv;
         if (value != null) {
             itv = new InfoTypeAndValue(type, value);
@@ -566,9 +566,9 @@ public abstract class CmpRequestor {
         this.sendRequestorCert = sendRequestorCert;
     }
 
-    private static String getSortedRFC4519Name(
+    private static String getSortedRfc4519Name(
             final X500Name name) {
-        return X509Util.getRFC4519Name(X509Util.sortX509Name(name));
+        return X509Util.getRfc4519Name(X509Util.sortX509Name(name));
     }
 
 }
