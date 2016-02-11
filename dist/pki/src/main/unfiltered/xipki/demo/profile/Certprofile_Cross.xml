@@ -6,7 +6,7 @@
         <my:details>Certprofile Cross</my:details>
     </my:myDescription>
     </appInfo>
-    <version>3</version>
+    <version>2</version>
     <signatureAlgorithms>
         <algorithm>SHA256withRSA</algorithm>
         <algorithm>SHA1withRSA</algorithm>
