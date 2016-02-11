@@ -6,7 +6,7 @@
         <my:details>Certprofile Multiple OUs DEMO</my:details>
     </my:myDescription>
     </appInfo>
-    <version>3</version>
+    <version>2</version>
     <signatureAlgorithms>
         <algorithm>SHA1withRSA</algorithm>
         <algorithm>SHA1withDSA</algorithm>
