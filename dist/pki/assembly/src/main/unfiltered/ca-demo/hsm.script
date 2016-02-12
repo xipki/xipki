@@ -15,7 +15,7 @@ ca:gen-rca -name RCA1 \
   -nextSerial 1 \
   -maxValidity 1825 \
   -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$RCA_KEY_LABEL \
+  -signerConf algo=$CA_SIGNER_ALGO,slot=1,key-label=$RCA_KEY_LABEL \
   --duplicateSubject permitted \
   --duplicateKey permitted \
   -validityMode CUTOFF
@@ -81,7 +81,7 @@ ca:ca-add -name SubCA1 \
   -nextSerial 1 \
   -maxValidity 730 \
   -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCA_KEY_LABEL \
+  -signerConf algo=$CA_SIGNER_ALGO,slot=1,key-label=$SubCA_KEY_LABEL \
   -ocspUri http://example.org/ocsp \
   --duplicateSubject permitted \
   --duplicateKey permitted
@@ -109,7 +109,7 @@ ca:ca-add -name SubCAwithCRL1 \
   -nextSerial 1 \
   -maxValidity 1460 \
   -signerType PKCS11 \
-  -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCAwithCRL_KEY_LABEL \
+  -signerConf algo=$CA_SIGNER_ALGO,slot=1,key-label=$SubCAwithCRL_KEY_LABEL \
   -crlUri http://example.org/crl \
   -deltaCrlUri http://example.org/deltacrl \
   -crlSigner CASIGN.CRLSIGNER \

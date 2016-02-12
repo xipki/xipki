@@ -70,7 +70,7 @@ import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.PublisherType;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
@@ -164,8 +164,8 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 throw new Exception("Unkwown publisher type " + type);
             }
 
-            CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(publisherType.getConf());
-            String v = utf8pairs.getValue("publish.goodcerts");
+            ConfPairs confPairs = new ConfPairs(publisherType.getConf());
+            String v = confPairs.getValue("publish.goodcerts");
             boolean revokedOnly = false;
             if(v != null)
             {

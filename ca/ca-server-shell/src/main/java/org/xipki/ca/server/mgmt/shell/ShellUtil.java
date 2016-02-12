@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -55,10 +55,10 @@ class ShellUtil
             return signerConf;
         }
 
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
-        String keystoreConf = utf8Pairs.getValue("keystore");
-        String passwordHint = utf8Pairs.getValue("password");
-        String keyLabel     = utf8Pairs.getValue("key-label");
+        ConfPairs confPairs = new ConfPairs(signerConf);
+        String keystoreConf = confPairs.getValue("keystore");
+        String passwordHint = confPairs.getValue("password");
+        String keyLabel     = confPairs.getValue("key-label");
 
         if(passwordHint == null)
         {
@@ -93,8 +93,8 @@ class ShellUtil
         keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
                 keystoreBytes, keyLabel, password);
 
-        utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
-        return utf8Pairs.getEncoded();
+        confPairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return confPairs.getEncoded();
     }
 
 }

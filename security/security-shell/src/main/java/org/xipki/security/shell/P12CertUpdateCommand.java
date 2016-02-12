@@ -47,7 +47,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -125,10 +125,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
     private void assertMatch(X509Certificate cert, String password)
     throws SignerException, PasswordResolverException
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);
+        ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if(password != null)
         {
-            pairs.putUtf8Pair("password", new String(password));
+            pairs.putPair("password", new String(password));
         }
 
         securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", false, cert);

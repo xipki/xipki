@@ -84,7 +84,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
@@ -134,7 +134,7 @@ class SelfSignedCertBuilder
     {
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
         {
-            CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+            ConfPairs keyValues = new ConfPairs(signerConf);
             String keystoreConf = keyValues.getValue("keystore");
             if(keystoreConf == null)
             {

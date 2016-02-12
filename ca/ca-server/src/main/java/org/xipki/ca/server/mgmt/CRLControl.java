@@ -42,7 +42,7 @@ import java.util.Set;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.StringUtil;
 
@@ -208,10 +208,10 @@ public class CRLControl implements Serializable
     public static CRLControl getInstance(String conf)
     throws ConfigurationException
     {
-        CmpUtf8Pairs props;
+        ConfPairs props;
         try
         {
-            props = new CmpUtf8Pairs(conf);
+            props = new ConfPairs(conf);
         }catch(RuntimeException e)
         {
             throw new ConfigurationException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -331,7 +331,7 @@ public class CRLControl implements Serializable
         return control;
     }
 
-    private static Integer getInteger(CmpUtf8Pairs props, String propKey)
+    private static Integer getInteger(ConfPairs props, String propKey)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);
@@ -348,7 +348,7 @@ public class CRLControl implements Serializable
         return null;
     }
 
-    private static Boolean getBoolean(CmpUtf8Pairs props, String propKey)
+    private static Boolean getBoolean(ConfPairs props, String propKey)
     throws ConfigurationException
     {
         String s = props.getValue(propKey);
@@ -373,26 +373,26 @@ public class CRLControl implements Serializable
 
     public String getConf()
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs();
-        pairs.putUtf8Pair(KEY_updateMode, updateMode.name());
-        pairs.putUtf8Pair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
-        pairs.putUtf8Pair(KEY_certs_embedded, Boolean.toString(embedsCerts));
-        pairs.putUtf8Pair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
-        pairs.putUtf8Pair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
+    	ConfPairs pairs = new ConfPairs();
+        pairs.putPair(KEY_updateMode, updateMode.name());
+        pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
+        pairs.putPair(KEY_certs_embedded, Boolean.toString(embedsCerts));
+        pairs.putPair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
+        pairs.putPair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
         if(updateMode != UpdateMode.onDemand)
         {
-            pairs.putUtf8Pair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
-            pairs.putUtf8Pair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
-            pairs.putUtf8Pair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
+            pairs.putPair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
+            pairs.putPair(KEY_fullCRL_extendedNextUpdate, Boolean.toString(extendedNextUpdate));
+            pairs.putPair(KEY_deltaCRL_intervals, Integer.toString(deltaCRLIntervals));
 
             if(intervalDayTime != null)
             {
-                pairs.putUtf8Pair(KEY_interval_time, intervalDayTime.toString());
+                pairs.putPair(KEY_interval_time, intervalDayTime.toString());
             }
 
             if(intervalMinutes != null)
             {
-                pairs.putUtf8Pair(KEY_interval_minutes, intervalMinutes.toString());
+                pairs.putPair(KEY_interval_minutes, intervalMinutes.toString());
             }
         }
 
@@ -404,7 +404,7 @@ public class CRLControl implements Serializable
                 extensionsSb.append(oid).append(",");
             }
             extensionsSb.deleteCharAt(extensionsSb.length() - 1);
-            pairs.putUtf8Pair(KEY_extensions, extensionsSb.toString());
+            pairs.putPair(KEY_extensions, extensionsSb.toString());
         }
 
         return pairs.getEncoded();

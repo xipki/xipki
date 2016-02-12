@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.publisher.OCSPCertPublisher;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -115,10 +115,10 @@ public class PublisherEntryWrapper
         }
 
         String datasourceName = null;
-        CmpUtf8Pairs confPairs = null;
+        ConfPairs confPairs = null;
         try
         {
-            confPairs = new CmpUtf8Pairs(conf);
+            confPairs = new ConfPairs(conf);
             datasourceName = confPairs.getValue("datasource");
         }catch(Exception e)
         {

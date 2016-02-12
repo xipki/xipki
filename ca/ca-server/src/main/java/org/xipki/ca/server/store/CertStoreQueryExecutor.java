@@ -755,11 +755,7 @@ class CertStoreQueryExecutor
     void removeCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
     throws OperationException, SQLException
     {
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return;
-        }
+        int caId = getCaId(caCert);
 
         final String SQL_REVOKE_CERT = "DELETE FROM CERT WHERE CAINFO_ID=? AND SERIAL=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
@@ -767,7 +763,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, serialNumber.longValue());
 
             int count = ps.executeUpdate();
@@ -796,11 +792,7 @@ class CertStoreQueryExecutor
     {
         ParamChecker.assertNotNull("caCert", caCert);
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return null;
-        }
+        int caId = getCaId(caCert);
 
         String sql = "SELECT MAX(SERIAL) FROM CERT WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1092,11 +1084,7 @@ class CertStoreQueryExecutor
     {
         ParamChecker.assertNotNull("caCert", caCert);
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return null;
-        }
+        int caId = getCaId(caCert);
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=?");
@@ -1112,7 +1100,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             if(crlNumber != null)
             {
                 ps.setLong(idx++, crlNumber.longValue());
@@ -1151,11 +1139,7 @@ class CertStoreQueryExecutor
         }
 
         ParamChecker.assertNotNull("caCert", caCert);
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return 0;
-        }
+        int caId = getCaId(caCert);
 
         String sql = "SELECT CRL_NUMBER FROM CRL WHERE CAINFO_ID=? AND DELTACRL=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1166,7 +1150,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setBoolean(idx++, false);
             rs = ps.executeQuery();
 
@@ -1196,7 +1180,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setInt(idx++, crlNumber + 1);
             ps.executeUpdate();
         }finally
@@ -1329,11 +1313,7 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("serial", serial);
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return null;
-        }
+        int caId = getCaId(caCert);
 
         String sql = "T1.ID ID, T1.REVOKED REVOKED,"
                 + " T1.REV_REASON REV_REASON,"
@@ -1350,7 +1330,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, serial.longValue());
             rs = ps.executeQuery();
 
@@ -1399,11 +1379,7 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("serial", serial);
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return null;
-        }
+        int caId = getCaId(caCert);
 
         final String col_certprofileinfo_id = "CERTPROFILEINFO_ID";
         final String col_revoked = "REVOKED";
@@ -1428,7 +1404,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, serial.longValue());
             rs = ps.executeQuery();
 
@@ -1490,11 +1466,7 @@ class CertStoreQueryExecutor
             throw new IllegalArgumentException("numEntries is not positive");
         }
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return Collections.emptyList();
-        }
+        int caId = getCaId(caCert);
 
         StringBuilder sqlBuiler = new StringBuilder();
         sqlBuiler.append("SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CERT");
@@ -1515,7 +1487,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             setBoolean(ps, idx++, true);
             ps.setLong(idx++, startSerial.longValue() - 1);
             ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
@@ -1555,11 +1527,7 @@ class CertStoreQueryExecutor
             throw new IllegalArgumentException("numEntries is not positive");
         }
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return Collections.emptyList();
-        }
+        int caId = getCaId(caCert);
 
         String sql = "SERIAL FROM DELTACRL_CACHE WHERE CAINFO_ID=? AND SERIAL>?";
         sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "SERIAL ASC");
@@ -1570,7 +1538,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, startSerial.longValue() - 1);
             rs = ps.executeQuery();
 

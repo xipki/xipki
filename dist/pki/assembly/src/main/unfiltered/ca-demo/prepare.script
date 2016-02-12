@@ -41,14 +41,14 @@ ca:profile-add -name gSMC_K -type XML -confFile ca-demo/profile/CertProfile_gSMC
 
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
-  -conf datasource?ocsp%publish.goodcerts?true
+  -conf datasource=ocsp,publish.goodcerts=true
 
 # CMP Responder
 ca:responder-set -signerType JKS \
-  -signerConf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
+  -signerConf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 # CMP Requestors
 ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
 
 ## CRL Signer
-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode?onDemand
+ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode=onDemand

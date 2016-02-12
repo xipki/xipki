@@ -35,12 +35,6 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.Session;
-import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
-import iaik.pkcs.pkcs11.objects.Object;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,11 +47,17 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11Util;
+
+import iaik.pkcs.pkcs11.Session;
+import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
+import iaik.pkcs.pkcs11.objects.Object;
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
@@ -184,14 +184,14 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     private void assertMatch(X509Certificate cert)
     throws SignerException, PasswordResolverException
     {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
+        ConfPairs pairs = new ConfPairs("slot", slotIndex.toString());
         if(keyId != null)
         {
-            pairs.putUtf8Pair("key-id", keyId);
+            pairs.putPair("key-id", keyId);
         }
         if(keyLabel != null)
         {
-            pairs.putUtf8Pair("key-label", keyLabel);
+            pairs.putPair("key-label", keyLabel);
         }
 
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", false, cert);

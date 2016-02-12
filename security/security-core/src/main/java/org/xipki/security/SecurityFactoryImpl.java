@@ -102,7 +102,7 @@ import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.security.api.p11.P11PasswordRetriever;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
@@ -232,13 +232,13 @@ public class SecurityFactoryImpl implements SecurityFactory
                 sb.append("key and certificate not match. ");
                 sb.append("key type='").append(signerType).append("'; ");
 
-                CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+                ConfPairs keyValues = new ConfPairs(signerConf);
                 String pwd = keyValues.getValue("password");
                 if(pwd != null)
                 {
-                    keyValues.putUtf8Pair("password", "****");
+                    keyValues.putPair("password", "****");
                 }
-                keyValues.putUtf8Pair("algo", signatureAlgoName);
+                keyValues.putPair("algo", signatureAlgoName);
                 sb.append("conf='").append(keyValues.getEncoded()).append("', ");
                 sb.append("certificate subject='").append(subject).append("'");
 
@@ -265,7 +265,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     {
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
-            CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
+            ConfPairs keyValues = new ConfPairs(conf);
 
             String s = keyValues.getValue("parallelism");
             int parallelism = defaultParallelism;
@@ -478,7 +478,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     private AlgorithmIdentifier getSignatureAlgoId(String signerConf)
     throws SignerException
     {
-        CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
+    	ConfPairs keyValues = new ConfPairs(signerConf);
         String algoS = keyValues.getValue("algo");
         if(algoS == null)
         {
@@ -847,14 +847,14 @@ public class SecurityFactoryImpl implements SecurityFactory
         ParamChecker.assertNotEmpty("password", password);
         ParamChecker.assertNotNull("signatureAlgorithm", signatureAlgorithm);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
-        conf.putUtf8Pair("algo", signatureAlgorithm);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
         if(keyLabel != null)
         {
-            conf.putUtf8Pair("key-label", keyLabel);
+            conf.putPair("key-label", keyLabel);
         }
-        conf.putUtf8Pair("keystore", "file:" + keystoreFile);
+        conf.putPair("keystore", "file:" + keystoreFile);
 
         return conf.getEncoded();
     }
@@ -870,13 +870,13 @@ public class SecurityFactoryImpl implements SecurityFactory
         ParamChecker.assertNotEmpty("keystoreFile", keystoreFile);
         ParamChecker.assertNotEmpty("password", password);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("password", password);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(parallelism));
         if(keyLabel != null)
         {
-            conf.putUtf8Pair("key-label", keyLabel);
+            conf.putPair("key-label", keyLabel);
         }
-        conf.putUtf8Pair("keystore", "file:" + keystoreFile);
+        conf.putPair("keystore", "file:" + keystoreFile);
 
         return conf.getEncoded();
     }
@@ -887,31 +887,31 @@ public class SecurityFactoryImpl implements SecurityFactory
         ParamChecker.assertNotNull("algo", signatureAlgorithm);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs("algo", signatureAlgorithm);
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
 
         if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
-            conf.putUtf8Pair("module", pkcs11ModuleName);
+            conf.putPair("module", pkcs11ModuleName);
         }
 
         if(slotId.getSlotId() != null)
         {
-            conf.putUtf8Pair("slot-id", slotId.getSlotId().toString());
+            conf.putPair("slot-id", slotId.getSlotId().toString());
         }
         else
         {
-            conf.putUtf8Pair("slot", slotId.getSlotIndex().toString());
+            conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
         if(keyId.getKeyId() != null)
         {
-            conf.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
         if(keyId.getKeyLabel() != null)
         {
-            conf.putUtf8Pair("key-label", keyId.getKeyLabel());
+            conf.putPair("key-label", keyId.getKeyLabel());
         }
 
         return conf.getEncoded();
@@ -922,31 +922,31 @@ public class SecurityFactoryImpl implements SecurityFactory
     {
         ParamChecker.assertNotNull("keyId", keyId);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs();
-        conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
+        ConfPairs conf = new ConfPairs();
+        conf.putPair("parallelism", Integer.toString(parallelism));
 
         if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
-            conf.putUtf8Pair("module", pkcs11ModuleName);
+            conf.putPair("module", pkcs11ModuleName);
         }
 
         if(slotId.getSlotId() != null)
         {
-            conf.putUtf8Pair("slot-id", slotId.getSlotId().toString());
+            conf.putPair("slot-id", slotId.getSlotId().toString());
         }
         else
         {
-            conf.putUtf8Pair("slot", slotId.getSlotIndex().toString());
+            conf.putPair("slot", slotId.getSlotIndex().toString());
         }
 
         if(keyId.getKeyId() != null)
         {
-            conf.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
         }
 
         if(keyId.getKeyLabel() != null)
         {
-            conf.putUtf8Pair("key-label", keyId.getKeyLabel());
+            conf.putPair("key-label", keyId.getKeyLabel());
         }
 
         return conf.getEncoded();

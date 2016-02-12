@@ -387,7 +387,7 @@ public class OcspResponder
             try
             {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-                        responderSignerType, "algo?" + sigAlgo + "%" + responderKeyConf,
+                        responderSignerType, "algo=" + sigAlgo + "," + responderKeyConf,
                         explicitCertificateChain);
                 signers.add(requestorSigner);
             } catch (SignerException e)

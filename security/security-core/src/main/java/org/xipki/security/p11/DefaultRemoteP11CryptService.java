@@ -45,7 +45,7 @@ import java.net.URL;
 
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11ModuleConf;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -66,7 +66,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
         ParamChecker.assertNotNull("moduleConf", moduleConf);
 
-        CmpUtf8Pairs conf = new CmpUtf8Pairs(moduleConf.getNativeLibrary());
+        ConfPairs conf = new ConfPairs(moduleConf.getNativeLibrary());
         serverUrl = conf.getValue("url");
         if(serverUrl == null || serverUrl.isEmpty())
         {

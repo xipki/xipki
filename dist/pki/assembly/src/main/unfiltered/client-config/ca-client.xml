@@ -12,7 +12,7 @@
       <!-- Required if signRequest is true -->
       <!--
       <signerType>JKS</signerType>
-      <signerConf>password?1234%algo?SHA256withRSA%keystore?file:etc/tlskeys/tls-client-keystore.jks</signerConf>
+      <signerConf>password=1234,algo=SHA256withRSA,keystore=file:etc/tlskeys/tls-client-keystore.jks</signerConf>
       -->
     </requestor>
   </requestors>

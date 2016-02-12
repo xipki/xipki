@@ -55,7 +55,7 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CertRevocationInfo;
-import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfPairs;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
@@ -87,11 +87,11 @@ public class OCSPCertPublisher extends CertPublisher
         ParamChecker.assertNotNull("conf", conf);
         ParamChecker.assertNotNull("dataSource", dataSource);
 
-        CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
-        String v = utf8pairs.getValue("publish.goodcerts");
+        ConfPairs confPairs = new ConfPairs(conf);
+        String v = confPairs.getValue("publish.goodcerts");
         this.publishsGoodCert = (v == null) ? true : Boolean.parseBoolean(v);
 
-        v = utf8pairs.getValue("asyn");
+        v = confPairs.getValue("asyn");
         this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
 
         try
