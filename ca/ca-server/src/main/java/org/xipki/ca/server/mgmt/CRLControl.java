@@ -373,7 +373,7 @@ public class CRLControl implements Serializable
 
     public String getConf()
     {
-    	ConfPairs pairs = new ConfPairs();
+        ConfPairs pairs = new ConfPairs();
         pairs.putPair(KEY_updateMode, updateMode.name());
         pairs.putPair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
         pairs.putPair(KEY_certs_embedded, Boolean.toString(embedsCerts));
