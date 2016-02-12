@@ -396,24 +396,42 @@ public class DbCertStatusStore extends CertStatusStore
                         boolean revoked = rs.getBoolean("REVOKED");
                         if(revoked)
                         {
-                            int reason = rs.getInt("REV_REASON");
                             long revocationTime = rs.getLong("REV_TIME");
-                            long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
 
-                            Date invTime = null;
-                            if(invalidatityTime != 0 && invalidatityTime != revocationTime)
-                            {
-                                invTime = new Date(invalidatityTime * 1000);
+                            Date revocationDate = new Date(revocationTime * 1000);
+                            Date invalidatityDate = null;
+                            int reason;
+                            
+                            if(inheritCaRevocation && issuer.isRevoked()
+                                    && issuer.getRevocationTime().before(revocationDate)) {
+                                reason = CRLReason.CA_COMPROMISE.getCode();
+                                revocationDate = issuer.getRevocationTime();
+                                invalidatityDate = null;
+                            } else {
+                                reason = rs.getInt("REV_REASON");
+                                long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
+                                if(invalidatityTime != 0 && invalidatityTime != revocationTime) {
+                                    invalidatityDate = new Date(invalidatityTime * 1000); 
+                                }
                             }
-                            CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
-                                    invTime);
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo, certHashAlgo, certHash,
-                                    thisUpdate, null, certprofile);
+
+                            CertRevocationInfo revInfo = new CertRevocationInfo(reason, 
+                                    revocationDate, invalidatityDate);
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
+                                    certHashAlgo, certHash, thisUpdate, null, certprofile);
                         }
                         else
                         {
-                            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
-                                    null, certprofile);
+                        	if(inheritCaRevocation && issuer.isRevoked()) {
+                                CertRevocationInfo revInfo = new CertRevocationInfo(
+                                	    CRLReason.CA_COMPROMISE.getCode(), 
+                                	    issuer.getRevocationTime(), null);
+                        	    certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
+                                        certHashAlgo, certHash, thisUpdate, null, certprofile);
+                        	} else {
+                        		certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
+                        				certHash, thisUpdate, null, certprofile);
+                        	}
                         }
                     }
                 }

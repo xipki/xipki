@@ -64,9 +64,8 @@ public class CertRevocationInfo implements Serializable
     public CertRevocationInfo(CRLReason reason, Date revocationTime, Date invalidityTime)
     {
         ParamChecker.assertNotNull("reason", reason);
-        ParamChecker.assertNotNull("revocationTime", revocationTime);
         this.reason = reason;
-        this.revocationTime = revocationTime;
+        this.revocationTime = revocationTime == null ? new Date() : revocationTime;
         this.invalidityTime = invalidityTime;
         this.serialVersion = SERIAL_VERSION;
     }
