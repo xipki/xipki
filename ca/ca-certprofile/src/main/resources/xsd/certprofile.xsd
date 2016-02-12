@@ -19,10 +19,10 @@
   <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="appInfo" type="anyType" minOccurs="0"/>
-      <xs:element name="version" type="xs:int" minOccurs="0">
+      <xs:element name="version" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            version of the certificate, e.g. 3 for v3 certificate.
+            version of the certificate, current support values are v1, v2 and v3
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -220,10 +220,14 @@
       <xs:complexContent>
         <xs:extension base="BaseRSAParametersType">
           <xs:sequence>
-            <xs:element name="hashAlgorithm" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="maskGenAlgorithm" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="saltLength" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="trailerField" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="hashAlgorithm" type="oidWithDescType" minOccurs="0"
+                maxOccurs="unbounded"/>
+            <xs:element name="maskGenAlgorithm" type="oidWithDescType" minOccurs="0"
+                maxOccurs="unbounded"/>
+            <xs:element name="saltLength" type="xs:int" minOccurs="0"
+                maxOccurs="unbounded"/>
+            <xs:element name="trailerField" type="xs:int" minOccurs="0"
+                maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:extension>
       </xs:complexContent>
@@ -258,9 +262,12 @@
   <xs:element name="GostParameters">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="publicKeyParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="digestParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="encryptionParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="publicKeyParamSet" type="oidWithDescType" minOccurs="0"
+            maxOccurs="unbounded"/>
+        <xs:element name="digestParamSet" type="oidWithDescType" minOccurs="0"
+            maxOccurs="unbounded"/>
+        <xs:element name="encryptionParamSet" type="oidWithDescType" minOccurs="0"
+            maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -302,7 +309,8 @@
   <xs:element name="certificatePolicies">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="certificatePolicyInformation" type="certificatePolicyInformationType" maxOccurs="unbounded"/>
+        <xs:element name="certificatePolicyInformation" type="certificatePolicyInformationType"
+            maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -372,7 +380,8 @@
   <xs:element name="admission">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="professionOid" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="professionOid" type="oidWithDescType" minOccurs="0"
+            maxOccurs="unbounded"/>
         <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="registrationNumber" type="xs:string" minOccurs="0"/>
         <xs:element name="addProfessionInfo" type="xs:hexBinary" minOccurs="0"/>
