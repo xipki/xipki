@@ -110,6 +110,8 @@ class IdentifiedX509Certprofile {
 
     private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSION_TYPES;
 
+    private static final Set<ASN1ObjectIdentifier> CA_CRITICAL_ONLY_EXTENSION_TYPES;
+
     private static final Set<ASN1ObjectIdentifier> NONCRITICAL_ONLY_EXTENSION_TYPES;
 
     private static final Set<ASN1ObjectIdentifier> CA_ONLY_EXTENSION_TYPES;
@@ -118,13 +120,15 @@ class IdentifiedX509Certprofile {
 
     static {
         CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
-        CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.basicConstraints);
         CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.keyUsage);
         CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyMappings);
         CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.nameConstraints);
         CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.policyConstraints);
         CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
         CRITICAL_ONLY_EXTENSION_TYPES.add(ObjectIdentifiers.id_pe_tlsfeature);
+
+        CA_CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
+        CA_CRITICAL_ONLY_EXTENSION_TYPES.add(Extension.basicConstraints);
 
         NONCRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
         NONCRITICAL_ONLY_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
@@ -681,6 +685,12 @@ class IdentifiedX509Certprofile {
         for (ASN1ObjectIdentifier type : controls.keySet()) {
             ExtensionControl control = controls.get(type);
             if (CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
+                if (!control.isCritical()) {
+                    set.add(type);
+                }
+            }
+            
+            if(ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
                 if (!control.isCritical()) {
                     set.add(type);
                 }
