@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0" default-activation="lazy">
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+    default-activation="lazy">
   <!--
      Properties
   -->
@@ -17,7 +18,8 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
-  <bean id="caClient" class="org.xipki.pki.ca.client.impl.CAClientImpl" init-method="init" destroy-method="shutdown">
+  <bean id="caClient" class="org.xipki.pki.ca.client.impl.CaClientImpl"
+      init-method="init" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="confFile" value="${clientConfFile}"/>
   </bean>

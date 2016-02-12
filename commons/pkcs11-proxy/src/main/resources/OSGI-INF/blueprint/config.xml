@@ -2,13 +2,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
-  <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11proxy" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11proxy"
+      update-strategy="reload">
     <cm:default-properties>
       <cm:property name="urlPatterns" value="/p11proxy/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
-  <bean id="localP11CryptServicePool" class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
+  <bean id="localP11CryptServicePool"
+      class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->

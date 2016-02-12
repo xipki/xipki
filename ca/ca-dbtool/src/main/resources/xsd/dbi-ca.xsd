@@ -291,7 +291,8 @@
       <xs:element name="deltaCRLCache">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="entry" type="deltaCRLCacheEntryType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="entry" type="deltaCRLCacheEntryType" minOccurs="0"
+                maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

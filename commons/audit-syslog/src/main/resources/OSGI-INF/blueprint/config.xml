@@ -32,8 +32,9 @@
       <cm:property name="messageFormat" value="rfc_5424"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="syslogAuditServiceImpl" class="org.xipki.commons.audit.syslog.impl.SyslogAuditServiceImpl"
-     init-method="init" destroy-method="destroy">
+  <bean id="syslogAuditServiceImpl"
+      class="org.xipki.commons.audit.syslog.impl.SyslogAuditServiceImpl"
+      init-method="init" destroy-method="destroy">
     <property name="facility" value="${facility}"/>
     <property name="host" value="${host}"/>
     <property name="prefix" value="${prefix}"/>
