@@ -1040,7 +1040,7 @@ public class ProfileConfCreatorDemo {
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
-        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+        list.add(createExtension(Extension.basicConstraints, true, false, extensionValue));
 
         // Extensions - AuthorityInfoAccess
         extensionValue = createAuthorityInfoAccess();
@@ -1575,7 +1575,7 @@ public class ProfileConfCreatorDemo {
         profile.setAppInfo(createDescription(description));
         profile.setCa(ca);
         profile.setMaxSize(5000);
-        profile.setVersion(X509CertVersion.V3.getVersion());
+        profile.setVersion(X509CertVersion.v3.name());
         profile.setValidity(validity);
         profile.setNotBeforeTime(useMidnightNotBefore
                 ? "midnight"

@@ -73,7 +73,7 @@ public abstract class X509Certprofile {
     }
 
     public X509CertVersion getVersion() {
-        return X509CertVersion.V3;
+        return X509CertVersion.v3;
     }
 
     public List<String> getSignatureAlgorithms() {

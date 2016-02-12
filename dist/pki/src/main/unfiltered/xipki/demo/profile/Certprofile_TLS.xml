@@ -6,7 +6,7 @@
         <my:details>Certprofile TLS</my:details>
     </my:myDescription>
     </appInfo>
-    <version>2</version>
+    <version>v3</version>
     <signatureAlgorithms>
         <algorithm>SHA1withRSA</algorithm>
         <algorithm>SHA1withDSA</algorithm>

@@ -1841,7 +1841,7 @@ public class X509Ca {
         }
 
         final String certprofileName = certprofile.getName();
-        if (certprofile.getVersion() != X509CertVersion.V3) {
+        if (certprofile.getVersion() != X509CertVersion.v3) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "unknown cert version " + certprofile);
         }
