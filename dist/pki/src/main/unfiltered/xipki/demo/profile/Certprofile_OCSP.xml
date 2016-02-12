@@ -6,7 +6,7 @@
         <my:details>Certprofile OCSP</my:details>
     </my:myDescription>
     </appInfo>
-    <version>2</version>
+    <version>v3</version>
     <signatureAlgorithms>
         <algorithm>SHA256withRSA</algorithm>
         <algorithm>SHA256withDSA</algorithm>

@@ -223,10 +223,10 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
         // syntax version
         issue = new ValidationIssue("X509.VERSION", "certificate version");
         resultIssues.add(issue);
-        int versionNumber = cert.getVersion();
-        if (versionNumber != version.getVersion()) {
+        int versionNumber = tbsCert.getVersionNumber();
+        if (versionNumber != version.getVersionNumber()) {
             issue.setFailureMessage("is '" + versionNumber
-                    + "' but expected '" + version.getVersion() + "'");
+                    + "' but expected '" + version.getVersionNumber() + "'");
         }
 
         // serialNumber

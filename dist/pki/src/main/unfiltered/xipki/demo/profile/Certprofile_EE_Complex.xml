@@ -6,7 +6,7 @@
         <my:details>Certprofile EE complex</my:details>
     </my:myDescription>
     </appInfo>
-    <version>2</version>
+    <version>v3</version>
     <signatureAlgorithms>
         <algorithm>SHA1withRSA</algorithm>
         <algorithm>SHA1withDSA</algorithm>
@@ -108,7 +108,7 @@
         </extension>
         <extension required="true" permittedInRequest="false">
             <type description="basicConstraints">2.5.29.19</type>
-            <critical>true</critical>
+            <critical>false</critical>
         </extension>
         <extension required="true" permittedInRequest="false">
             <type description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</type>

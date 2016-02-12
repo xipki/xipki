@@ -42,25 +42,35 @@ package org.xipki.pki.ca.api.profile.x509;
 
 public enum X509CertVersion {
 
-    V1(0),
-    V2(1),
-    V3(2);
+    v1(1),
+    v2(2),
+    v3(3);
 
-    private int version;
+    private int versionNumber;
 
     X509CertVersion(
-            final int version) {
-        this.version = version;
+            final int versionNumber) {
+        this.versionNumber = versionNumber;
     }
 
-    public int getVersion() {
-        return version;
+    public int getVersionNumber() {
+        return versionNumber;
     }
 
     public static X509CertVersion getInstance(
-            final int version) {
+            final String version) {
         for (X509CertVersion m : values()) {
-            if (m.version == version) {
+            if (m.name().equalsIgnoreCase(version)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    public static X509CertVersion getInstance(
+            final int versionNumber) {
+        for (X509CertVersion m : values()) {
+            if (m.versionNumber == versionNumber) {
                 return m;
             }
         }
