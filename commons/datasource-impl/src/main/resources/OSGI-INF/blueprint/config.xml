@@ -4,5 +4,6 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <bean id="datasourceFactoryImpl" class="org.xipki.commons.datasource.impl.DataSourceFactoryImpl">
     </bean>
-  <service ref="datasourceFactoryImpl" interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
+  <service ref="datasourceFactoryImpl"
+      interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
 </blueprint>

@@ -11,14 +11,16 @@
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
       <cm:property name="defaultParallelism" value="20"/>
       <cm:property name="pkcs11.confFile" value=""/>
-      <cm:property name="pkcs11.provider" value="org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory"/>
+      <cm:property name="pkcs11.provider"
+          value="org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory"/>
       <cm:property name="signerType.map" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
 
   <reference id="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
 
-  <bean id="XipkiProviderNssRegister" class="org.xipki.commons.security.p11.sun.nss.XipkiNssProviderRegister"
+  <bean id="XipkiProviderNssRegister"
+      class="org.xipki.commons.security.p11.sun.nss.XipkiNssProviderRegister"
       init-method="regist" destroy-method="unregist"/>
 
   <bean id="securityFactoryImpl" class="org.xipki.commons.security.SecurityFactoryImpl">
@@ -31,7 +33,8 @@
     <property name="signerTypeMap" value="${signerType.map}"/>
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.commons.security.api.SecurityFactory"/>
-  <bean id="XipkiProviderRegister" class="org.xipki.commons.security.provider.XipkiProviderRegister"
+  <bean id="XipkiProviderRegister"
+      class="org.xipki.commons.security.provider.XipkiProviderRegister"
       init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
