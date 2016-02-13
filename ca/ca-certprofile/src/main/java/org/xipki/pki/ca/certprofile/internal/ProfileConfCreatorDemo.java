@@ -184,7 +184,7 @@ public class ProfileConfCreatorDemo {
             URL url = XmlX509Certprofile.class.getResource("/xsd/certprofile.xsd");
             ms.setSchema(schemaFact.newSchema(url));
             ms.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            ms.setProperty("com.sun.xml.internal.bind.indentString", "    ");
+            ms.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
             // RootCA
             X509ProfileType profile = certprofileRootCa();
@@ -684,7 +684,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
         // Extensions - SMIMECapabilities
-        extensionValue = createSMIMECapabilities();
+        extensionValue = createSmimeCapabilities();
         list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
                 extensionValue));
 
@@ -1731,8 +1731,8 @@ public class ProfileConfCreatorDemo {
             final String details) {
         StringBuilder sb = new StringBuilder();
         sb.append("<my:myDescription xmlns:my=\"http://example.org\">\n");
-        sb.append("        <my:category>cat A</my:category>\n");
-        sb.append("        <my:details>").append(details).append("</my:details>\n");
+        sb.append("      <my:category>cat A</my:category>\n");
+        sb.append("      <my:details>").append(details).append("</my:details>\n");
         sb.append("    </my:myDescription>\n");
         Element element;
         try {
@@ -1771,7 +1771,7 @@ public class ProfileConfCreatorDemo {
         return createExtensionValueType(tlsFeature);
     }
 
-    private static ExtensionValueType createSMIMECapabilities() {
+    private static ExtensionValueType createSmimeCapabilities() {
         SMIMECapabilities caps = new SMIMECapabilities();
 
         // DES-EDE3-CBC
