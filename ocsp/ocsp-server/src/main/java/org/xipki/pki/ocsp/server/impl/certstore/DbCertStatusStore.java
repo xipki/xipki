@@ -341,6 +341,15 @@ public class DbCertStatusStore extends CertStatusStore {
             ResultSet rs = null;
             CertStatusInfo certStatusInfo = null;
 
+            boolean unknown = true;
+            boolean ignore = false;
+            String certprofile = null;
+            String b64CertHash = null;
+            boolean revoked = false;
+            int reason = 0;
+            long revocationTime = 0;
+            long invalidatityTime = 0;
+
             PreparedStatement ps = borrowPreparedStatement(
                     dataSource.createFetchFirstSelectSQL(coreSql, 1));
 
@@ -351,52 +360,60 @@ public class DbCertStatusStore extends CertStatusStore {
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    String certprofile = rs.getString("PN");
-                    boolean ignore = certprofile != null
-                            && certprofileOption != null
+                    unknown = false;
+                    certprofile = rs.getString("PN");
+                    ignore = (certprofile != null)
+                            && (certprofileOption != null)
                             && !certprofileOption.include(certprofile);
-                    if (ignore) {
-                        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
-                    } else {
-                        byte[] certHash = null;
+                    if (!ignore) {
                         if (includeCertHash) {
-                            certHash = Base64.decode(rs.getString(certHashAlgo.getShortName()));
+                            b64CertHash = rs.getString(certHashAlgo.getShortName());
                         }
 
-                        boolean revoked = rs.getBoolean("REV");
+                        revoked = rs.getBoolean("REV");
                         if (revoked) {
-                            int reason = rs.getInt("RR");
-                            long revocationTime = rs.getLong("RT");
-                            long invalidatityTime = rs.getLong("RIT");
-
-                            Date invTime = null;
-                            if (invalidatityTime != 0 && invalidatityTime != revocationTime) {
-                                invTime = new Date(invalidatityTime * 1000);
-                            }
-                            CertRevocationInfo revInfo = new CertRevocationInfo(reason,
-                                    new Date(revocationTime * 1000),
-                                    invTime);
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
-                                    certHashAlgo, certHash,
-                                    thisUpdate, null, certprofile);
-                        } else {
-                            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
-                                    certHash, thisUpdate,
-                                    null, certprofile);
+                            reason = rs.getInt("RR");
+                            revocationTime = rs.getLong("RT");
+                            invalidatityTime = rs.getLong("RIT");
                         }
-                    } // end if (ignore)
-                } else {
-                    if (isUnknownSerialAsGood()) {
-                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
-                                thisUpdate, null, null);
-                    } else {
-                        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
                 } // end if (rs.next())
             } catch (SQLException e) {
                 throw dataSource.translate(coreSql, e);
             } finally {
                 releaseDbResources(ps, rs);
+            }
+
+            if (unknown) {
+                if (isUnknownSerialAsGood()) {
+                    certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
+                            thisUpdate, null, null);
+                } else {
+                    certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
+                }
+            } else {
+                if (ignore) {
+                    certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
+                } else {
+                    byte[] certHash = null;
+                    if (b64CertHash != null) {
+                        certHash = Base64.decode(b64CertHash);
+                    }
+
+                    if (revoked) {
+                        Date invTime = null;
+                        if (invalidatityTime != 0 && invalidatityTime != revocationTime) {
+                            invTime = new Date(invalidatityTime * 1000);
+                        }
+                        CertRevocationInfo revInfo = new CertRevocationInfo(reason,
+                                new Date(revocationTime * 1000), invTime);
+                        certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
+                                certHashAlgo, certHash, thisUpdate, null, certprofile);
+                    } else {
+                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo,
+                                certHash, thisUpdate, null, certprofile);
+                    }
+                }
             }
 
             if (isIncludeArchiveCutoff()) {
