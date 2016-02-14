@@ -44,7 +44,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
 import java.util.LinkedList;
@@ -140,7 +139,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, rs);
+            dataSource.releaseResources(ps, rs);
         }
     } // method initIssuerStore
 
@@ -183,37 +182,9 @@ class OcspStoreQueryExecutor {
         }
 
         if (certRegistered) {
-            final String sql =
-                "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
-            PreparedStatement ps = borrowPreparedStatement(sql);
-
-            try {
-                int idx = 1;
-                ps.setLong(idx++, new Date().getTime() / 1000);
-                setBoolean(ps, idx++, revoked);
-                if (revoked) {
-                    ps.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
-                    if (revInfo.getInvalidityTime() != null) {
-                        ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
-                    } else {
-                        ps.setNull(idx++, Types.INTEGER);
-                    }
-                    ps.setInt(idx++, revInfo.getReason().getCode());
-                } else {
-                    ps.setNull(idx++, Types.INTEGER); // rev_time
-                    ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
-                    ps.setNull(idx++, Types.INTEGER); // rev_reason
-                }
-                ps.setInt(idx++, issuerId);
-                ps.setLong(idx++, serialNumber.longValue());
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
-            } finally {
-                releaseDbResources(ps, null);
-            }
+            updateRegisteredCert(issuer, certificate, revInfo);
             return;
-        } // end if
+        }
 
         final String sqlAddCert = revoked
                 ? SQL_ADD_REVOKED_CERT
@@ -228,8 +199,13 @@ class OcspStoreQueryExecutor {
         String sha384Fp = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert);
         String sha512Fp = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert);
 
-        PreparedStatement[] pss = borrowPreparedStatements(
-                sqlAddCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
+        long currentTimeSeconds = System.currentTimeMillis() / 1000;
+        X509Certificate cert = certificate.getCert();
+        long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
+        long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
+        String cuttedSubject = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
+
+        PreparedStatement[] pss = borrowPreparedStatements(sqlAddCert, SQL_ADD_CRAW, SQL_ADD_CHASH);
         // all statements have the same connection
         Connection conn = null;
 
@@ -240,12 +216,11 @@ class OcspStoreQueryExecutor {
             conn = psAddcert.getConnection();
 
             // CERT
-            X509Certificate cert = certificate.getCert();
             int idx = 2;
-            psAddcert.setLong(idx++, System.currentTimeMillis() / 1000);
+            psAddcert.setLong(idx++, currentTimeSeconds);
             psAddcert.setLong(idx++, serialNumber.longValue());
-            psAddcert.setLong(idx++, cert.getNotBefore().getTime() / 1000);
-            psAddcert.setLong(idx++, cert.getNotAfter().getTime() / 1000);
+            psAddcert.setLong(idx++, notBeforeSeconds);
+            psAddcert.setLong(idx++, notAfterSeconds);
             setBoolean(psAddcert, idx++, revoked);
             psAddcert.setInt(idx++, issuerId);
             psAddcert.setString(idx++, certprofile);
@@ -265,8 +240,7 @@ class OcspStoreQueryExecutor {
 
             // CRAW
             idx = 2;
-            psAddRawcert.setString(idx++,
-                    X509Util.cutText(certificate.getSubject(), maxX500nameLen));
+            psAddRawcert.setString(idx++, cuttedSubject);
             psAddRawcert.setString(idx++, b64Cert);
 
             // CHASH
@@ -344,6 +318,49 @@ class OcspStoreQueryExecutor {
         }
     } // method addOrUpdateCert
 
+    private void updateRegisteredCert(
+            final X509Cert issuer,
+            final X509CertWithDbId certificate,
+            final CertRevocationInfo revInfo)
+    throws CertificateEncodingException, DataAccessException {
+
+        boolean revoked = revInfo != null;
+        int issuerId = getIssuerId(issuer);
+        BigInteger serialNumber = certificate.getCert().getSerialNumber();
+
+        final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+
+        long currentTimeSeconds = System.currentTimeMillis() / 1000;
+
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setLong(idx++, currentTimeSeconds);
+            setBoolean(ps, idx++, revoked);
+            if (revoked) {
+                ps.setLong(idx++, revInfo.getRevocationTime().getTime() / 1000);
+                if (revInfo.getInvalidityTime() != null) {
+                    ps.setLong(idx++, revInfo.getInvalidityTime().getTime() / 1000);
+                } else {
+                    ps.setNull(idx++, Types.INTEGER);
+                }
+                ps.setInt(idx++, revInfo.getReason().getCode());
+            } else {
+                ps.setNull(idx++, Types.INTEGER); // rev_time
+                ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
+                ps.setNull(idx++, Types.INTEGER); // rev_reason
+            }
+            ps.setInt(idx++, issuerId);
+            ps.setLong(idx++, serialNumber.longValue());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw dataSource.translate(sql, e);
+        } finally {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
     void revokeCert(
             final X509Cert caCert,
             final X509CertWithDbId cert,
@@ -376,7 +393,7 @@ class OcspStoreQueryExecutor {
 
             try {
                 int idx = 1;
-                ps.setLong(idx++, new Date().getTime() / 1000);
+                ps.setLong(idx++, System.currentTimeMillis() / 1000);
                 setBoolean(ps, idx++, false);
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setNull(idx++, Types.INTEGER);
@@ -387,7 +404,7 @@ class OcspStoreQueryExecutor {
             } catch (SQLException e) {
                 throw dataSource.translate(sql, e);
             } finally {
-                releaseDbResources(ps, null);
+                dataSource.releaseResources(ps, null);
             }
         } else {
             final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
@@ -401,7 +418,7 @@ class OcspStoreQueryExecutor {
             } catch (SQLException e) {
                 throw dataSource.translate(sql, e);
             } finally {
-                releaseDbResources(ps, null);
+                dataSource.releaseResources(ps, null);
             }
         }
 
@@ -427,7 +444,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, null);
+            dataSource.releaseResources(ps, null);
         }
     } // method removeCert
 
@@ -456,7 +473,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, null);
+            dataSource.releaseResources(ps, null);
         }
     } // method revokeCa
 
@@ -478,7 +495,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, null);
+            dataSource.releaseResources(ps, null);
         }
     } // method unrevokeCa
 
@@ -514,29 +531,44 @@ class OcspStoreQueryExecutor {
         long maxId = dataSource.getMax(null, "ISSUER", "ID");
         int id = (int) maxId + 1;
 
+        byte[] encodedCert = issuerCert.getEncodedCert();
+        long notBeforeSeconds = issuerCert.getCert().getNotBefore().getTime() / 1000;
+        long notAfterSeconds  = issuerCert.getCert().getNotAfter().getTime() / 1000;
+        String b64Sha1FpName   = HashCalculator.base64Hash(HashAlgoType.SHA1,   encodedName);
+        String b64Sha1FpKey    = HashCalculator.base64Hash(HashAlgoType.SHA1,   encodedKey);
+        String b64Sha224FpName = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName);
+        String b64Sha224FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey);
+        String b64Sha256FpName = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName);
+        String b64Sha256FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey);
+        String b64Sha384FpName = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName);
+        String b64Sha384FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey);
+        String b64Sha512FpName = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName);
+        String b64Sha512FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey);
+
         final String sql =
-            "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"
-            + "S384S,S384K,S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"
+                + "S384S,S384K,S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            String b64Cert = Base64.toBase64String(issuerCert.getEncodedCert());
+            String b64Cert = Base64.toBase64String(encodedCert);
             String subject = issuerCert.getSubject();
             int idx = 1;
             ps.setInt(idx++, id);
             ps.setString(idx++, subject);
-            ps.setLong(idx++, issuerCert.getCert().getNotBefore().getTime() / 1000);
-            ps.setLong(idx++, issuerCert.getCert().getNotAfter() .getTime() / 1000);
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
-            ps.setString(idx++, HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+            ps.setLong(idx++, notBeforeSeconds);
+            ps.setLong(idx++, notAfterSeconds);
+            ps.setString(idx++, b64Sha1FpName);
+            ps.setString(idx++, b64Sha1FpKey);
+            ps.setString(idx++, b64Sha224FpName);
+            ps.setString(idx++, b64Sha224FpKey);
+            ps.setString(idx++, b64Sha256FpName);
+            ps.setString(idx++, b64Sha256FpKey);
+            ps.setString(idx++, b64Sha384FpName);
+            ps.setString(idx++, b64Sha384FpKey);
+            ps.setString(idx++, b64Sha512FpName);
+            ps.setString(idx++, b64Sha512FpKey);
             ps.setString(idx++, sha1FpCert);
             ps.setString(idx++, b64Cert);
 
@@ -547,7 +579,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, null);
+            dataSource.releaseResources(ps, null);
         }
     } // method addIssuer
 
@@ -628,7 +660,7 @@ class OcspStoreQueryExecutor {
         } catch (SQLException e) {
             throw dataSource.translate(sql, e);
         } finally {
-            releaseDbResources(ps, rs);
+            dataSource.releaseResources(ps, rs);
         }
 
         return false;
@@ -644,7 +676,7 @@ class OcspStoreQueryExecutor {
             try {
                 rs = ps.executeQuery();
             } finally {
-                releaseDbResources(ps, rs);
+                dataSource.releaseResources(ps, rs);
             }
             return true;
         } catch (Exception e) {
@@ -657,12 +689,6 @@ class OcspStoreQueryExecutor {
             return false;
         }
     } // method isHealthy
-
-    private void releaseDbResources(
-            final Statement ps,
-            final ResultSet rs) {
-        dataSource.releaseResources(ps, rs);
-    }
 
     private int nextCertId()
     throws DataAccessException {
