@@ -184,13 +184,13 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             final String schemaFile) {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
-        msg.append("driver      = ").append(dbParams.getDriver()).append("\n");
-        msg.append("user        = ").append(dbParams.getUsername()).append("\n");
-        msg.append("url         = ").append(dbParams.getUrl()).append("\n");
+        msg.append("     driver: ").append(dbParams.getDriver()).append("\n");
+        msg.append("       user: ").append(dbParams.getUsername()).append("\n");
+        msg.append("        url: ").append(dbParams.getUrl()).append("\n");
         if (dbParams.getSchema() != null) {
-            msg.append("schema        = ").append(dbParams.getSchema()).append("\n");
+            msg.append("     schema: ").append(dbParams.getSchema()).append("\n");
         }
-        msg.append("schema file = ").append(schemaFile).append("\n");
+        msg.append("schema file: ").append(schemaFile).append("\n");
 
         System.out.println(msg);
     }

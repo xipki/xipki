@@ -312,7 +312,7 @@ public abstract class CmpRequestor {
 
         if (action != localAction) {
             throw new CmpRequestorException("received XiPKI action '" + localAction
-                    + "' instead the exceptected '" + action    + "'");
+                    + "' instead the exceptected '" + action + "'");
         }
 
         return (n == 1)

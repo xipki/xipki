@@ -782,7 +782,7 @@ public class Scep {
     private static byte[] getTransactionIdBytes(
             final String tid) {
         final int n = tid.length();
-        if (n % 2 != 0) {     // neither hex nor base64 encoded
+        if (n % 2 != 0) { // neither hex nor base64 encoded
             return tid.getBytes();
         }
 

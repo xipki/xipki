@@ -470,7 +470,7 @@ public class X509Util {
 
     private static String bytesToString(
             final byte[] data) {
-        char[]    cs = new char[data.length];
+        char[] cs = new char[data.length];
 
         for (int i = 0; i != cs.length; i++) {
             cs[i] = (char) (data[i] & 0xff);

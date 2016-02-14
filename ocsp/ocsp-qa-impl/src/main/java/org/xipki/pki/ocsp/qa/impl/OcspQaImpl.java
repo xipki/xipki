@@ -145,8 +145,7 @@ public class OcspQaImpl implements OcspQa {
         if (n == 0) {
             issue.setFailureMessage("received no status from server");
         } else if (n != serialNumbers.size()) {
-            issue.setFailureMessage(
-                    "is '" + n + "', but expected '" + serialNumbers.size() +    "'");
+            issue.setFailureMessage("is '" + n + "', but expected '" + serialNumbers.size() + "'");
         }
 
         if (issue.isFailed()) {
@@ -164,8 +163,7 @@ public class OcspQaImpl implements OcspQa {
 
         if (hasSignature) {
             // signature algorithm
-            issue = new ValidationIssue("OCSP.SIG.ALG",
-                    "signature algorithm");
+            issue = new ValidationIssue("OCSP.SIG.ALG", "signature algorithm");
             resultIssues.add(issue);
 
             String expectedSigalgo = responseOption.getSignatureAlgName();
@@ -208,9 +206,9 @@ public class OcspQaImpl implements OcspQa {
                 for (int i = 0; i < singleResponses.length; i++) {
                     SingleResp singleResp = singleResponses[i];
                     if (!respSigner.isValidOn(singleResp.getThisUpdate())) {
-                        issue.setFailureMessage(
-                                "responder certificate is not valid on the thisUpdate[ " + i
-                                + "]" + singleResp.getThisUpdate());
+                        issue.setFailureMessage(String.format(
+                                "responder certificate is not valid on the thisUpdate[%d]: %s",
+                                i, singleResp.getThisUpdate()));
                     }
                 } // end for
 

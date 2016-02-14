@@ -128,9 +128,9 @@ public class SunNamedCurveExtender {
 
     private static final Logger LOG = LoggerFactory.getLogger(SunNamedCurveExtender.class);
 
-    private static final int P    = 1; // prime curve
+    private static final int P = 1; // prime curve
 
-    private static final int B    = 2; // binary curve
+    private static final int B = 2; // binary curve
 
     private static final Pattern SPLIT_PATTERN = Pattern.compile(",|\\[|\\]");
 

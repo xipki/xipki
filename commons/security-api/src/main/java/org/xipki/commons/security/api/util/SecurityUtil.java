@@ -234,7 +234,7 @@ public class SecurityUtil {
         System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
 
         // shift the bits to the right
-        if (bitCount % 8 > 0)    {
+        if (bitCount % 8 > 0) {
             int shiftBits = 8 - (bitCount % 8);
 
             for (int i = byteLenKey - 1; i > 0; i--) {

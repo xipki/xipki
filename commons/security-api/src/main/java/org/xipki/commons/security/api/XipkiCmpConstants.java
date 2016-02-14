@@ -54,33 +54,33 @@ public class XipkiCmpConstants {
             new GeneralName(GeneralName.uniformResourceIdentifier,
                     "http://xipki.org/remotep11/client");
 
-    public static final int ACTION_GEN_CRL                 = 1;
+    public static final int ACTION_GEN_CRL = 1;
 
-    public static final int ACTION_GET_CRL_WITH_SN         = 2;
+    public static final int ACTION_GET_CRL_WITH_SN = 2;
 
-    public static final int ACTION_GET_CAINFO            = 3;
+    public static final int ACTION_GET_CAINFO = 3;
 
-    public static final int ACTION_RP11_VERSION            = 80;
+    public static final int ACTION_RP11_VERSION = 80;
 
-    public static final int ACTION_RP11_GET_PUBLICKEY    = 81;
+    public static final int ACTION_RP11_GET_PUBLICKEY = 81;
 
-    public static final int ACTION_RP11_GET_CERTIFICATE    = 82;
+    public static final int ACTION_RP11_GET_CERTIFICATE = 82;
 
-    public static final int ACTION_RP11_LIST_SLOTS         = 83;
+    public static final int ACTION_RP11_LIST_SLOTS = 83;
 
-    public static final int ACTION_RP11_LIST_KEYLABELS     = 84;
+    public static final int ACTION_RP11_LIST_KEYLABELS = 84;
 
-    public static final int ACTION_RP11_PSO_RSA_X509     = 90;
+    public static final int ACTION_RP11_PSO_RSA_X509 = 90;
 
-    public static final int ACTION_RP11_PSO_RSA_PKCS     = 91;
+    public static final int ACTION_RP11_PSO_RSA_PKCS = 91;
 
-    public static final int ACTION_RP11_PSO_ECDSA_PLAIN    = 92;
+    public static final int ACTION_RP11_PSO_ECDSA_PLAIN = 92;
 
-    public static final int ACTION_RP11_PSO_ECDSA_X962     = 93;
+    public static final int ACTION_RP11_PSO_ECDSA_X962 = 93;
 
-    public static final int ACTION_RP11_PSO_DSA_PLAIN    = 94;
+    public static final int ACTION_RP11_PSO_DSA_PLAIN = 94;
 
-    public static final int ACTION_RP11_PSO_DSA_X962     = 95;
+    public static final int ACTION_RP11_PSO_DSA_X962 = 95;
 
     private XipkiCmpConstants() {
     }

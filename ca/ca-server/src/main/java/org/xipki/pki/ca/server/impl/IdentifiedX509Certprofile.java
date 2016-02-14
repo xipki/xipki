@@ -170,7 +170,7 @@ class IdentifiedX509Certprofile {
         X509Certprofile tmpCertprofile = null;
 
         final String type = (realType == null)
-                ?    dbEntry.getType()
+                ? dbEntry.getType()
                 : realType;
         String className;
         if (type.equalsIgnoreCase("xml")) {
@@ -619,7 +619,7 @@ class IdentifiedX509Certprofile {
         return certprofile.isSerialNumberInReqPermitted();
     }
 
-    public    String getParameter(
+    public String getParameter(
             final String paramName) {
         return certprofile.getParameter(paramName);
     }
@@ -689,7 +689,7 @@ class IdentifiedX509Certprofile {
                     set.add(type);
                 }
             }
-            
+
             if(ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
                 if (!control.isCritical()) {
                     set.add(type);

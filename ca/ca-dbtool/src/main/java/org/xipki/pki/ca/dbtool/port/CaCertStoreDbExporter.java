@@ -372,7 +372,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                                 "tmp-crls-" + System.currentTimeMillis() + ".zip");
                         currentCrlsZip = getZipOutputStream(currentCrlsZipFile);
                     }
-                }    // end while (rs.next)
+                } // end while (rs.next)
                 rs.close();
             } // end for
 
@@ -617,7 +617,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
                     }
-                }    // end while (rs.next)
+                } // end while (rs.next)
 
                 rs.close();
             } // end for
@@ -888,7 +888,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     }
-                }    // end while (rs.next)
+                } // end while (rs.next)
 
                 rs.close();
             } // end for

@@ -287,7 +287,7 @@ public class HealthCheckResult {
             childBlocks.put(blockName, blockValue);
 
             offset += blockName.length() + 4 + blockValue.length();
-            if (offset >=    block.length() - 1) {
+            if (offset >= block.length() - 1) {
                 break;
             }
         }

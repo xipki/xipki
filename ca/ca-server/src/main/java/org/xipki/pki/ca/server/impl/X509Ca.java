@@ -1103,7 +1103,7 @@ public class X509Ca {
                         e.getMessage());
             }
             LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException:    "
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException: "
                     + e.getMessage());
         } finally {
             if (!successful) {
@@ -1152,7 +1152,7 @@ public class X509Ca {
             }
             LOG.debug(message, e);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "RuntimeException:    " + e.getMessage());
+                    "RuntimeException: " + e.getMessage());
         } finally {
             if (!successful) {
                 LOG.warn("    FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
@@ -1972,7 +1972,7 @@ public class X509Ca {
         long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
         String grandtedSubjectText = X509Util.getRfc4519Name(grantedSubject);
 
-        byte[] subjectPublicKeyData =    localPublicKeyInfo.getPublicKeyData().getBytes();
+        byte[] subjectPublicKeyData = localPublicKeyInfo.getPublicKeyData().getBytes();
         long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
         if (keyUpdate) {

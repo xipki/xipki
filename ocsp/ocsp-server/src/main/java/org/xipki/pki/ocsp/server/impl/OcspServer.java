@@ -475,8 +475,8 @@ public class OcspServer {
                 InputStream dsStream = null;
                 try {
                     dsStream = getInputStream(m.getConf());
-                    datasource    = dataSourceFactory.createDataSource(name,
-                                dsStream, securityFactory.getPasswordResolver());
+                    datasource = dataSourceFactory.createDataSource(name,
+                                    dsStream, securityFactory.getPasswordResolver());
                 } catch (IOException e) {
                     throw new InvalidConfException(e.getMessage(), e);
                 } finally {
@@ -631,7 +631,7 @@ public class OcspServer {
             try {
                 store.shutdown();
             } catch (Exception e) {
-                final String message =    "shutdown store " + store.getName();
+                final String message = "shutdown store " + store.getName();
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
                             e.getMessage());
@@ -732,7 +732,7 @@ public class OcspServer {
                 }
 
                 Req req = requestList[i];
-                CertificateID certID =    req.getCertID();
+                CertificateID certID = req.getCertID();
                 String certIdHashAlgo = certID.getHashAlgOID().getId();
                 HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
                 if (reqHashAlgo == null) {
@@ -1323,7 +1323,7 @@ public class OcspServer {
             datasource = datasources.get(datasourceName);
             if (datasource == null) {
                 throw new InvalidConfException("datasource named '" + datasourceName
-                        + "'    not definied");
+                        + "' not definied");
             }
         }
         try {

@@ -319,9 +319,9 @@ abstract class CmpResponder {
     } // method processPKIMessage
 
     protected byte[] randomTransactionId() {
-        byte[] b = new byte[10];
-        random.nextBytes(b);
-        return    b;
+        byte[] bytes = new byte[10];
+        random.nextBytes(bytes);
+        return bytes;
     }
 
     private ProtectionVerificationResult verifyProtection(
@@ -387,7 +387,7 @@ abstract class CmpResponder {
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
 
-            if (auditEvent !=    null) {
+            if (auditEvent != null) {
                 auditEvent.setLevel(AuditLevel.ERROR);
                 auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.addEventData(

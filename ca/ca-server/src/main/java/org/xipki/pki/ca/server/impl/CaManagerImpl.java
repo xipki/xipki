@@ -3030,7 +3030,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ConfPairs pairs = new ConfPairs(signerConf);
         String keystoreConf = pairs.getValue("keystore");
         String passwordHint = pairs.getValue("password");
-        String keyLabel     = pairs.getValue("key-label");
+        String keyLabel = pairs.getValue("key-label");
 
         byte[] keystoreBytes;
         if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {

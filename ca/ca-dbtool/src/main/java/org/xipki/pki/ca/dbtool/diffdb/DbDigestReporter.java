@@ -171,21 +171,21 @@ public class DbDigestReporter {
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 
         StringBuilder sb = new StringBuilder(200);
-        sb.append("sum :         ")
+        sb.append("      sum : ")
             .append(StringUtil.formatAccount(sum, false)).append("\n");
-        sb.append("good:         ")
+        sb.append("      good: ")
             .append(StringUtil.formatAccount(numGood.get(), false)).append("\n");
-        sb.append("diff:         ")
+        sb.append("      diff: ")
             .append(StringUtil.formatAccount(numDiff.get(), false)).append("\n");
-        sb.append("missing:    ")
+        sb.append("   missing: ")
             .append(StringUtil.formatAccount(numMissing.get(), false)).append("\n");
-        sb.append("error:        ")
+        sb.append("     error: ")
             .append(StringUtil.formatAccount(numError.get(), false)).append("\n");
-        sb.append("duration:     ")
+        sb.append("  duration: ")
             .append(StringUtil.formatTime(durationSec, false)).append("\n");
         sb.append("start time: ").append(startTime).append("\n");
-        sb.append("end time:     ").append(now).append("\n");
-        sb.append("speed:        ");
+        sb.append("  end time: ").append(now).append("\n");
+        sb.append("     speed: ");
         if (durationSec > 0) {
             sb.append(
                 StringUtil.formatAccount(sum / durationSec, false)).append(" /s");

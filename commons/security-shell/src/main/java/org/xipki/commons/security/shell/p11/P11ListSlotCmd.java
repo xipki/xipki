@@ -268,7 +268,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         }
 
         sb.append("\t\tCertificate:\n");
-        sb.append("\t\t\tSubject:    ")
+        sb.append("\t\t\tSubject: ")
             .append(subject)
             .append("\n");
 
@@ -280,7 +280,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         } catch (Exception e) {
             issuer = new String(bytes);
         }
-        sb.append("\t\t\tIssuer:     ")
+        sb.append("\t\t\tIssuer: ")
             .append(issuer)
             .append("\n");
 
@@ -294,16 +294,16 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
             return;
         }
 
-        sb.append("\t\t\tSerial:     ")
+        sb.append("\t\t\tSerial: ")
             .append(x509Cert.getSerialNumber())
             .append("\n");
         sb.append("\t\t\tStart time: ")
             .append(x509Cert.getNotBefore())
             .append("\n");
-        sb.append("\t\t\tEnd time:     ")
+        sb.append("\t\t\tEnd time: ")
             .append(x509Cert.getNotAfter())
             .append("\n");
-        sb.append("\t\t\tSHA1 Sum:     ")
+        sb.append("\t\t\tSHA1 Sum: ")
             .append(HashCalculator.hexSha1(certBytes))
             .append("\n");
     }
@@ -319,25 +319,25 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         }
 
         sb.append("\t\tCertificate:\n");
-        sb.append("\t\t\tSubject:    ")
+        sb.append("\t\t\tSubject: ")
             .append(subject)
             .append("\n");
 
         String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
-        sb.append("\t\t\tIssuer:     ")
+        sb.append("\t\t\tIssuer: ")
             .append(issuer)
             .append("\n");
 
-        sb.append("\t\t\tSerial:     ")
+        sb.append("\t\t\tSerial: ")
             .append(cert.getSerialNumber())
             .append("\n");
         sb.append("\t\t\tStart time: ")
             .append(cert.getNotBefore())
             .append("\n");
-        sb.append("\t\t\tEnd time:     ")
+        sb.append("\t\t\tEnd time: ")
             .append(cert.getNotAfter())
             .append("\n");
-        sb.append("\t\t\tSHA1 Sum:     ");
+        sb.append("\t\t\tSHA1 Sum: ");
         try {
             sb.append(HashCalculator.hexSha1(cert.getEncoded()));
         } catch (CertificateEncodingException e) {

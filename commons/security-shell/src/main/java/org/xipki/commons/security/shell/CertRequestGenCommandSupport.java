@@ -358,7 +358,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         PKCS10CertificationRequest p10Req;
         try {
-            p10Req    = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
+            p10Req = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
         } finally {
             identifiedSigner.returnContentSigner(signer);
         }

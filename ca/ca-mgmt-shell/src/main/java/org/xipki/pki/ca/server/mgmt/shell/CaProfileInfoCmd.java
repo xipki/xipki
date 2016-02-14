@@ -74,7 +74,7 @@ public class CaProfileInfoCmd extends CaCommandSupport {
         if (CollectionUtil.isNotEmpty(entries)) {
             sb.append("certificate Profiles supported by CA " + caName).append("\n");
 
-            for (String localname    : entries.keySet()) {
+            for (String localname: entries.keySet()) {
                 String name = entries.get(localname);
                 sb.append("\t");
                 sb.append(name);

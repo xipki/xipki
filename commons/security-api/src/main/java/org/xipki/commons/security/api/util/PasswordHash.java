@@ -72,8 +72,8 @@ public class PasswordHash {
     /**
      * Returns a salted PBKDF2 hash of the password.
      *
-     * @param     password    the password to hash
-     * @return                a salted PBKDF2 hash of the password
+     * @param password - the password to hash
+     * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(
             final String password)
@@ -84,8 +84,8 @@ public class PasswordHash {
     /**
      * Returns a salted PBKDF2 hash of the password.
      *
-     * @param     password    the password to hash
-     * @return                a salted PBKDF2 hash of the password
+     * @param password - the password to hash
+     * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(
             final byte[] password)
@@ -96,8 +96,8 @@ public class PasswordHash {
     /**
      * Returns a salted PBKDF2 hash of the password.
      *
-     * @param     password    the password to hash
-     * @return                a salted PBKDF2 hash of the password
+     * @param password - the password to hash
+     * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(
             final byte[] password,
@@ -113,15 +113,15 @@ public class PasswordHash {
         // Hash the password
         byte[] hash = pbkdf2(password, salt, iterations, dkSize);
         // format iterations:salt:hash
-        return iterations + ":" + toHex(salt) + ":" +    toHex(hash);
+        return iterations + ":" + toHex(salt) + ":" + toHex(hash);
     }
 
     /**
      * Validates a password using a hash.
      *
-     * @param     password        the password to check
-     * @param     correctHash     the hash of the valid password
-     * @return                    true if the password is correct, false if not
+     * @param password - the password to check
+     * @param correctHash - the hash of the valid password
+     * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(
             final String password,
@@ -133,9 +133,9 @@ public class PasswordHash {
     /**
      * Validates a password using a hash.
      *
-     * @param     password        the password to check
-     * @param     correctHash     the hash of the valid password
-     * @return                    true if the password is correct, false if not
+     * @param password - the password to check
+     * @param correctHash - the hash of the valid password
+     * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(
             final byte[] password,
@@ -159,9 +159,9 @@ public class PasswordHash {
      * is used so that password hashes cannot be extracted from an on-line
      * system using a timing attack and then attacked off-line.
      *
-     * @param     a         the first byte array
-     * @param     b         the second byte array
-     * @return            true if both byte arrays are the same, false if not
+     * @param a - the first byte array
+     * @param b - the second byte array
+     * @return true if both byte arrays are the same, false if not
      */
     private static boolean slowEquals(
             final byte[] a,
@@ -174,13 +174,13 @@ public class PasswordHash {
     }
 
     /**
-     *    Computes the PBKDF2 hash of a password.
+     * Computes the PBKDF2 hash of a password.
      *
-     * @param     password    the password to hash.
-     * @param     salt        the salt
-     * @param     iterations    the iteration count (slowness factor)
-     * @param     bytes         the length of the hash to compute in bytes
-     * @return                the PBDKF2 hash of the password
+     * @param password - the password to hash.
+     * @param salt - the salt
+     * @param iterations - the iteration count (slowness factor)
+     * @param bytes - the length of the hash to compute in bytes
+     * @return the PBDKF2 hash of the password
      */
     public static byte[] pbkdf2(
             final byte[] password,
@@ -204,8 +204,8 @@ public class PasswordHash {
     /**
      * Converts a string of hexadecimal characters into a byte array.
      *
-     * @param     hex         the hex string
-     * @return                the hex string decoded into a byte array
+     * @param hex - the hex string
+     * @return the hex string decoded into a byte array
      */
     private static byte[] fromHex(
             final String hex) {
@@ -220,8 +220,8 @@ public class PasswordHash {
     /**
      * Converts a byte array into a hexadecimal string.
      *
-     * @param     array         the byte array to convert
-     * @return                a length*2 character string encoding the byte array
+     * @param array - the byte array to convert
+     * @return a length*2 character string encoding the byte array
      */
     private static String toHex(
             final byte[] array) {
