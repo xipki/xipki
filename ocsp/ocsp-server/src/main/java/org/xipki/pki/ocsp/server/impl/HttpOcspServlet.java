@@ -77,7 +77,7 @@ public class HttpOcspServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String CT_REQUEST    = "application/ocsp-request";
+    private static final String CT_REQUEST = "application/ocsp-request";
 
     private static final String CT_RESPONSE = "application/ocsp-response";
 

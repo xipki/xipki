@@ -238,8 +238,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
-            // '    FETCH FIRST    ': 15
-            // ' ROWS ONLY': 10
+            // ' FETCH FIRST ': 15
+            // ' ROWS ONLY' : 10
             // rows (till 9999): 4
             int size = coreSql.length() + 36;
             if (StringUtil.isNotBlank(orderBy)) {

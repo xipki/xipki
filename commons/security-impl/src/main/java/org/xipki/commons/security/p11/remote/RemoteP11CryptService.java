@@ -101,7 +101,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptService.class);
 
-    private final    Random random = new Random();
+    private final Random random = new Random();
 
     private final GeneralName sender = XipkiCmpConstants.REMOTE_P11_CMP_CLIENT;
 
@@ -371,7 +371,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
                     + SecurityUtil.formatPkiStatusInfo(statusInfo));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new SignerException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP    + ", "
+                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP + ", "
                     + PKIBody.TYPE_ERROR + "]");
         }
 
@@ -395,7 +395,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         ASN1Encodable itvValue = itv.getInfoValue();
         if (itvValue == null) {
             throw new SignerException("value of InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'    is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
         try {
             ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
@@ -403,14 +403,14 @@ public abstract class RemoteP11CryptService implements P11CryptService {
                     .getPositiveValue().intValue();
             if (receivedAction != action) {
                 throw new SignerException("xipki action '"
-                        + receivedAction + "'    is not the expected '" + action + "'");
+                        + receivedAction + "' is not the expected '" + action + "'");
             }
             return seq.size() > 1
                     ? seq.getObjectAt(1)
                     : null;
         } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
-                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'    is incorrect");
+                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
     } // method extractItvInfoValue
 

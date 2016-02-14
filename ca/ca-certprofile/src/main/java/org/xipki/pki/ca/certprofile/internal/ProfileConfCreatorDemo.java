@@ -304,11 +304,11 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_RootCA
+    } // method certprofileRootCA
 
     private static X509ProfileType certprofileCross()
     throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross",    true, "10y", false,
+        X509ProfileType profile = getBaseProfile("Certprofile Cross", true, "10y", false,
                 new String[]{"SHA256", "SHA1"});
 
         // Subject
@@ -350,7 +350,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_Cross
+    } // method certprofileCross
 
     private static X509ProfileType certprofileSubCa()
     throws Exception {
@@ -398,7 +398,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_SubCA
+    } // method certprofileSubCa
 
     private static X509ProfileType certprofileSubCaComplex()
     throws Exception {
@@ -516,7 +516,7 @@ public class ProfileConfCreatorDemo {
                 "custom extension 1"));
 
         return profile;
-    } // method Certprofile_SubCA_Complex
+    } // method certprofileSubCaComplex
 
     private static X509ProfileType certprofileOcsp()
     throws Exception {
@@ -570,7 +570,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    } // method Certprofile_OCSP
+    } // method certprofileOcsp
 
     private static X509ProfileType certprofileScep()
     throws Exception {
@@ -618,7 +618,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_SCEP
+    } // method certprofileScep
 
     private static X509ProfileType certprofileTls()
     throws Exception {
@@ -694,7 +694,7 @@ public class ProfileConfCreatorDemo {
                 true, false, extensionValue));
 
         return profile;
-    } // method Certprofile_TLS
+    } // method certprofileTls
 
     private static X509ProfileType certprofileTlsC()
     throws Exception {
@@ -747,7 +747,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    } // method Certprofile_TLS_C
+    } // method certprofileTlsC
 
     private static X509ProfileType certprofileTlsWithIncSerial()
     throws Exception {
@@ -807,7 +807,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
-    } // method Certprofile_TLSwithIncSN
+    } // method certprofileTlsWithIncSerial
 
     private static X509ProfileType certprofileGsmcK()
     throws Exception {
@@ -900,7 +900,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.subjectAlternativeName, false, false, extensionValue));
 
         return profile;
-    } // method Certprofile_gSMC_K
+    } // method certprofileGsmcK
 
     private static X509ProfileType certprofileMultipleOus()
     throws Exception {
@@ -953,7 +953,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_MultipleOUs
+    } // method certprofileMultipleOus
 
     /*
      * O and OU in one RDN
@@ -1005,7 +1005,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_MultipleValuedRDN
+    } // method certprofileMultipleValuedRdn
 
     private static X509ProfileType certprofileEeComplex()
     throws Exception {
@@ -1103,7 +1103,7 @@ public class ProfileConfCreatorDemo {
                 true, false, extensionValue));
 
         return profile;
-    } // method    Certprofile_EE_complex
+    } // method certprofileEeComplex
 
     private static X509ProfileType certprofileMaxTime()
     throws Exception {
@@ -1153,7 +1153,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method Certprofile_MaxTime
+    } // method certprofileMaxTime
 
     private static RdnType createRdn(
             final ASN1ObjectIdentifier type,

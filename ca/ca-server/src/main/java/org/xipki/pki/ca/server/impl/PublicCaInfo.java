@@ -70,7 +70,7 @@ class PublicCaInfo {
 
     private final byte[] subjectKeyIdentifier;
 
-    private final GeneralNames    subjectAltName;
+    private final GeneralNames subjectAltName;
 
     private final BigInteger serialNumber;
 

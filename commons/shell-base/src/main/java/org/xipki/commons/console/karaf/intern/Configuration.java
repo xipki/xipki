@@ -71,7 +71,7 @@ public class Configuration {
     }
 
     /**
-     * Get the default encoding.    Will first look at the LC_CTYPE environment variable, then the
+     * Get the default encoding. Will first look at the LC_CTYPE environment variable, then the
      * input.encoding system property, then the default charset according to the JVM.
      *
      * @return The default encoding to use when none is specified.

@@ -222,7 +222,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             System.err.println("error while importing issuer with id=" + issuer.getId());
             throw e;
         }
-    }  // method doImportIssuer
+    } // method doImportIssuer
 
     private void importCert(
             final CertStoreType certstore,

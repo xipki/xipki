@@ -503,7 +503,7 @@ public abstract class Client {
             encAlgId = CMSAlgorithm.DES_EDE3_CBC;
         } else if (useInsecureAlgorithms) {
             encAlgId = CMSAlgorithm.DES_CBC;
-        } else {    // no support of DES
+        } else { // no support of DES
             throw new ScepClientException("DES will not be supported by this client");
         }
 

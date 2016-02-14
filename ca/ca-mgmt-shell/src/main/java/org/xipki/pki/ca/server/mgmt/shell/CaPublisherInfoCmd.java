@@ -74,7 +74,7 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
         if (isNotEmpty(entries)) {
             sb.append("publishers for CA " + caName).append("\n");
-            for (PublisherEntry entry    : entries) {
+            for (PublisherEntry entry : entries) {
                 sb.append("\t").append(entry.getName()).append("\n");
             }
         } else {

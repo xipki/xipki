@@ -1001,7 +1001,7 @@ public class ExtensionsChecker {
     private void checkExtensionBasicConstraints(
             final StringBuilder failureMsg,
             final byte[] extensionValue) {
-        BasicConstraints bc =    BasicConstraints.getInstance(extensionValue);
+        BasicConstraints bc = BasicConstraints.getInstance(extensionValue);
         if (ca != bc.isCA()) {
             failureMsg.append("ca is '").append(bc.isCA());
             failureMsg.append("' but expected '").append(ca).append("'");

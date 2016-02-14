@@ -122,7 +122,7 @@ public class ScepUtil {
                     new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
             return spki;
         } else {
-            throw new IllegalArgumentException("unsupported public key    " + publicKey);
+            throw new IllegalArgumentException("unsupported public key " + publicKey);
         }
     }
 

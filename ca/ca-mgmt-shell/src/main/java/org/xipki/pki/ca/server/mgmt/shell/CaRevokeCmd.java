@@ -67,7 +67,7 @@ public class CaRevokeCmd extends CaCommandSupport {
                 CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.CA_COMPROMISE,
                 CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED,
                 CrlReason.CESSATION_OF_OPERATION,
-                CrlReason.CERTIFICATE_HOLD,    CrlReason.PRIVILEGE_WITHDRAWN}));
+                CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaNameCompleter.class)

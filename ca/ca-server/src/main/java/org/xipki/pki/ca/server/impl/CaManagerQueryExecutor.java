@@ -1222,7 +1222,7 @@ class CaManagerQueryExecutor {
                     }
                 } catch (SignerException e) {
                     throw new CaMgmtException(
-                            "could not create signer for    CA '" + name + "'" + e.getMessage(), e);
+                            "could not create signer for CA '" + name + "'" + e.getMessage(), e);
                 }
             } catch (SQLException e) {
                 DataAccessException tEx = dataSource.translate(sql, e);

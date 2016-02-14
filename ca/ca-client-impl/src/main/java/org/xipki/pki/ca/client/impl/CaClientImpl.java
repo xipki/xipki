@@ -1125,7 +1125,7 @@ public final class CaClientImpl implements CaClient {
                     && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR) {
                 inputStream.close();
                 throw new IOException(String.format(
-                        "bad response: %s    %s",
+                        "bad response: code='%s', message='%s'",
                         httpUrlConnection.getResponseCode(),
                         httpUrlConnection.getResponseMessage()));
             }

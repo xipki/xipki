@@ -548,7 +548,7 @@ class CertStoreQueryExecutor {
     boolean hasCrl(
             final X509Cert caCert)
     throws DataAccessException {
-        Integer caId =    caInfoStore.getCaIdForCert(caCert.getEncodedCert());
+        Integer caId = caInfoStore.getCaIdForCert(caCert.getEncodedCert());
         if (caId == null) {
             return false;
         }
@@ -894,7 +894,7 @@ class CertStoreQueryExecutor {
         }
 
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
         if (caId == null) {
             return Collections.emptyList();
         }
@@ -1799,7 +1799,7 @@ class CertStoreQueryExecutor {
             final long subjectFp)
     throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
         if (caId == null) {
             return CertStatus.Unknown;
         }
@@ -1871,7 +1871,7 @@ class CertStoreQueryExecutor {
             final String profile)
     throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
 
         if (caId == null) {
             return null;
@@ -1934,7 +1934,7 @@ class CertStoreQueryExecutor {
             final String profile)
     throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
 
         if (caId == null) {
             return false;
@@ -1985,7 +1985,7 @@ class CertStoreQueryExecutor {
             final X509Cert caCert)
     throws OperationException {
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer id =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer id = caInfoStore.getCaIdForCert(encodedCert);
         if (id != null) {
             return id.intValue();
         }
@@ -2290,7 +2290,7 @@ class CertStoreQueryExecutor {
             final String seqName)
     throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =    caInfoStore.getCaIdForCert(encodedCert);
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
         if (caId == null) {
             return;
         }
@@ -2416,7 +2416,7 @@ class CertStoreQueryExecutor {
         final String sql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND SN=?";
 
         Connection conn = dataSource.getConnection();
-        PreparedStatement ps =  null;
+        PreparedStatement ps = null;
 
         try {
             ps = dataSource.prepareStatement(conn, sql);

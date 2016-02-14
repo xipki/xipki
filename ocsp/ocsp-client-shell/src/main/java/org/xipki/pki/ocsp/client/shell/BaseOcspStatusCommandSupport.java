@@ -182,7 +182,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
-        X509Certificate respIssuer    = null;
+        X509Certificate respIssuer = null;
         if (respIssuerFile != null) {
             respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }

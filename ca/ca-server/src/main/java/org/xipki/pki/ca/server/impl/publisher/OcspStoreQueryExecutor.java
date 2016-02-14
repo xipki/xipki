@@ -374,7 +374,7 @@ class OcspStoreQueryExecutor {
             final X509Cert issuer,
             final X509CertWithDbId cert)
     throws DataAccessException {
-        Integer issuerId =    issuerStore.getIdForCert(issuer.getEncodedCert());
+        Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
         if (issuerId == null) {
             return;
         }
@@ -428,7 +428,7 @@ class OcspStoreQueryExecutor {
             final X509Cert issuer,
             final X509CertWithDbId cert)
     throws DataAccessException {
-        Integer issuerId =    issuerStore.getIdForCert(issuer.getEncodedCert());
+        Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
         if (issuerId == null) {
             return;
         }
@@ -533,17 +533,17 @@ class OcspStoreQueryExecutor {
 
         byte[] encodedCert = issuerCert.getEncodedCert();
         long notBeforeSeconds = issuerCert.getCert().getNotBefore().getTime() / 1000;
-        long notAfterSeconds  = issuerCert.getCert().getNotAfter().getTime() / 1000;
-        String b64Sha1FpName   = HashCalculator.base64Hash(HashAlgoType.SHA1,   encodedName);
-        String b64Sha1FpKey    = HashCalculator.base64Hash(HashAlgoType.SHA1,   encodedKey);
+        long notAfterSeconds = issuerCert.getCert().getNotAfter().getTime() / 1000;
+        String b64Sha1FpName = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName);
+        String b64Sha1FpKey = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey);
         String b64Sha224FpName = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName);
-        String b64Sha224FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey);
+        String b64Sha224FpKey = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey);
         String b64Sha256FpName = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName);
-        String b64Sha256FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey);
+        String b64Sha256FpKey = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey);
         String b64Sha384FpName = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName);
-        String b64Sha384FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey);
+        String b64Sha384FpKey = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey);
         String b64Sha512FpName = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName);
-        String b64Sha512FpKey  = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey);
+        String b64Sha512FpKey = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey);
 
         final String sql =
                 "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"

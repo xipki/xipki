@@ -267,7 +267,7 @@ public abstract class P12KeypairGenerator {
         @Override
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception {
-            KeyPair kp =    KeyUtil.generateDSAKeypair(pLength, qLength, random);
+            KeyPair kp = KeyUtil.generateDSAKeypair(pLength, qLength, random);
             SubjectPublicKeyInfo spki = KeyUtil.creatDSASubjectPublicKeyInfo(
                     (DSAPublicKey) kp.getPublic());
             return new KeyPairWithSubjectPublicKeyInfo(kp, spki);

@@ -468,7 +468,7 @@ public class X509CaCmpResponder extends CmpResponder {
             OptionalValidity validity = certTemp.getValidity();
 
             try {
-                CmpUtf8Pairs keyvalues    = CmpUtil.extract(reqMsg.getRegInfo());
+                CmpUtf8Pairs keyvalues = CmpUtil.extract(reqMsg.getRegInfo());
                 String certprofileName = (keyvalues == null)
                         ? null
                         : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);

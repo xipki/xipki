@@ -122,7 +122,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             String lLang = lang.toLowerCase();
             if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8")) {
                 throw new Exception(
-                        "The environment LANG does not satisfy the pattern    'en_*.UTF-8': '"
+                        "The environment LANG does not satisfy the pattern 'en_*.UTF-8': '"
                         + lang + "'");
             }
 

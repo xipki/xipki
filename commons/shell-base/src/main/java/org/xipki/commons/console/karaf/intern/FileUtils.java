@@ -2,11 +2,11 @@
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.    See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.    You may obtain a copy of the License at
+ * the License. You may obtain a copy of the License at
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -44,7 +44,7 @@ public class FileUtils {
      *
      * Deletes a directory recursively.
      *
-     * @param directory    directory to delete
+     * @param directory - directory to delete
      * @throws IOException in case deletion is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
@@ -78,7 +78,7 @@ public class FileUtils {
      * For code that runs on Java 1.7 or later, use the following method instead:
      * <br>
      * {@code boolean java.nio.file.Files.isSymbolicLink(Path path)}
-     * @param file the file to check
+     * @param file - the file to check
      * @return true if the file is a Symbolic Link
      * @throws IOException if an IO error occurs while checking the file
      * @since 2.0.0
@@ -109,7 +109,7 @@ public class FileUtils {
      *
      * Cleans a directory without deleting it.
      *
-     * @param directory directory to clean
+     * @param directory - directory to clean
      * @throws IOException in case cleaning is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
@@ -125,7 +125,8 @@ public class FileUtils {
         }
 
         final File[] files = directory.listFiles();
-        if (files == null) {    // null if security restricted
+        // null if security restricted
+        if (files == null) {
             throw new IOException("Failed to list contents of " + directory);
         }
 
@@ -155,7 +156,7 @@ public class FileUtils {
      *        (java.io.File methods returns a boolean)</li>
      * </ul>
      *
-     * @param file    file or directory to delete, must not be {@code null}
+     * @param file - file or directory to delete, must not be {@code null}
      * @throws NullPointerException if the directory is {@code null}
      * @throws FileNotFoundException if the file was not found
      * @throws IOException in case deletion is unsuccessful
@@ -187,11 +188,11 @@ public class FileUtils {
      * input file is truncated part way
      * through copying the data and the new file size is less than the current position.
      *
-     * @param srcFile            the validated source file, must not be {@code null}
-     * @param destFile         the validated destination file, must not be {@code null}
+     * @param srcFile - the validated source file, must not be {@code null}
+     * @param destFile - the validated destination file, must not be {@code null}
      * @param preserveFileDate whether to preserve the file date
-     * @throws IOException                if an error occurs
-     * @throws IOException                if the output file length is not the same as the input
+     * @throws IOException if an error occurs
+     * @throws IOException if the output file length is not the same as the input
      *     file length after the copy completes
      * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size
      *     is less than the
@@ -258,11 +259,11 @@ public class FileUtils {
      *
      * Internal copy directory method.
      *
-     * @param srcDir             the validated source directory, must not be {@code null}
-     * @param destDir            the validated destination directory, must not be {@code null}
-     * @param filter             the filter to apply, null means copy all directories and files
-     * @param preserveFileDate whether to preserve the file date
-     * @param exclusionList    List of files and directories to exclude from the copy, may be null
+     * @param srcDir - the validated source directory, must not be {@code null}
+     * @param destDir - the validated destination directory, must not be {@code null}
+     * @param filter - the filter to apply, null means copy all directories and files
+     * @param preserveFileDate - whether to preserve the file date
+     * @param exclusionList - List of files and directories to exclude from the copy, may be null
      * @throws IOException if an error occurs
      * @since 1.1
      */

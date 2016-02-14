@@ -102,7 +102,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking CA requestor CA='" + caName +    "', requestor='" + requestorName + "'");
+        out("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
 
         if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -156,7 +156,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
             }
         }
 
-        out("checking CA requestor CA='" + caName +    "', requestor='" + requestorName + "'");
+        out("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
         return null;
     } // method doExecute
 
