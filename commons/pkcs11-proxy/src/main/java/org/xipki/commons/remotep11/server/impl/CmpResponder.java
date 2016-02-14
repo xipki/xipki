@@ -306,11 +306,11 @@ class CmpResponder {
     }
 
     private byte[] randomTransactionId() {
-        byte[] b = new byte[10];
+        byte[] bytes = new byte[10];
         synchronized (random) {
-            random.nextBytes(b);
+            random.nextBytes(bytes);
         }
-        return    b;
+        return bytes;
     }
 
 }

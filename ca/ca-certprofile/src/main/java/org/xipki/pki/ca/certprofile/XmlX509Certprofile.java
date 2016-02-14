@@ -1451,7 +1451,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     throws CertprofileException {
         if (CollectionUtil.isEmpty(professionItems)
                 && CollectionUtil.isEmpty(professionOIDs)
-                &&    StringUtil.isBlank(registrationNumber)
+                && StringUtil.isBlank(registrationNumber)
                 && (addProfessionInfo == null || addProfessionInfo.length == 0)) {
             return null;
         }

@@ -92,7 +92,7 @@ public class ObjectIdentifiers {
 
     public static final String id_alg_SHA1withDSA = "1.2.840.10040.4.3";
 
-    public static final String id_alg_SHA1withECDSA     = "1.2.840.10045.4.1";
+    public static final String id_alg_SHA1withECDSA = "1.2.840.10045.4.1";
 
     public static final String id_alg_SHA224withECDSA = "1.2.840.10045.4.3.1";
 
@@ -302,41 +302,41 @@ public class ObjectIdentifiers {
      * Key usage bits that may be consistent: digitalSignature,
      * keyEncipherment or keyAgreement
      */
-    public static final ASN1ObjectIdentifier id_kp_serverAuth        = id_kp.branch("1");
+    public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
 
     /**
      * TLS WWW client authentication
      * Key usage bits that may be consistent: digitalSignature
      * and/or keyAgreement
      */
-    public static final ASN1ObjectIdentifier id_kp_clientAuth        = id_kp.branch("2");
+    public static final ASN1ObjectIdentifier id_kp_clientAuth = id_kp.branch("2");
 
     /**
      * Signing of downloadable executable code
      * Key usage bits that may be consistent: digitalSignature
      */
-    public static final ASN1ObjectIdentifier id_kp_codeSigning        = id_kp.branch("3");
+    public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
 
     /**
      * Email protection
      * Key usage bits that may be consistent: digitalSignature,
      * nonRepudiation, and/or (keyEncipherment or keyAgreement)
      */
-    public static final ASN1ObjectIdentifier id_kp_emailProtection    = id_kp.branch("4");
+    public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
 
     /**
      * Binding the hash of an object to a time
      * Key usage bits that may be consistent: digitalSignature
      * and/or nonRepudiation
      */
-    public static final ASN1ObjectIdentifier id_kp_timeStamping         = id_kp.branch("8");
+    public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
 
     /**
      * Signing OCSP responses
      * Key usage bits that may be consistent: digitalSignature
      * and/or nonRepudiation
      */
-    public static final ASN1ObjectIdentifier id_kp_OCSPSigning        = id_kp.branch("9");
+    public static final ASN1ObjectIdentifier id_kp_OCSPSigning = id_kp.branch("9");
 
     /*
      * The following purposes have been included in a predecessor draft of RFC 3280
@@ -346,17 +346,17 @@ public class ObjectIdentifiers {
     /**
      * IP security end system
      */
-    public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem    = id_kp.branch("5");
+    public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
 
     /**
      * IP security tunnel termination
      */
-    public static final ASN1ObjectIdentifier id_kp_ipsecTunnel    = id_kp.branch("6");
+    public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
 
     /**
      * IP security user
      */
-    public static final ASN1ObjectIdentifier id_kp_ipsecUser    = id_kp.branch("7");
+    public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
 
     // OCSP
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs

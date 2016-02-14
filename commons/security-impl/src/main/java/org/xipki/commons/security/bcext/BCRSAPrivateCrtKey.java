@@ -27,17 +27,17 @@ public class BCRSAPrivateCrtKey extends BCRSAPrivateKey implements RSAPrivateCrt
 
     static final long serialVersionUID = 7834723820638524718L;
 
-    private BigInteger    publicExponent;
+    private BigInteger publicExponent;
 
-    private BigInteger    primeP;
+    private BigInteger primeP;
 
-    private BigInteger    primeQ;
+    private BigInteger primeQ;
 
-    private BigInteger    primeExponentP;
+    private BigInteger primeExponentP;
 
-    private BigInteger    primeExponentQ;
+    private BigInteger primeExponentQ;
 
-    private BigInteger    crtCoefficient;
+    private BigInteger crtCoefficient;
 
     /**
      * construct a private key from it's org.bouncycastle.crypto equivalent.
@@ -221,25 +221,25 @@ public class BCRSAPrivateCrtKey extends BCRSAPrivateKey implements RSAPrivateCrt
     }
 
     public String toString() {
-        StringBuilder    buf = new StringBuilder();
-        String            nl = System.getProperty("line.separator");
+        StringBuilder buf = new StringBuilder();
+        String nl = System.getProperty("line.separator");
 
         buf.append("RSA Private CRT Key").append(nl);
-        buf.append("            modulus: ")
+        buf.append("        modulus: ")
             .append(this.getModulus().toString(16)).append(nl);
-        buf.append("    public exponent: ")
+        buf.append("public exponent: ")
             .append(this.getPublicExponent().toString(16)).append(nl);
-        buf.append("     private exponent: ")
+        buf.append("private exponent: ")
             .append(this.getPrivateExponent().toString(16)).append(nl);
-        buf.append("             primeP: ")
+        buf.append("          primeP: ")
             .append(this.getPrimeP().toString(16)).append(nl);
-        buf.append("             primeQ: ")
+        buf.append("          primeQ: ")
             .append(this.getPrimeQ().toString(16)).append(nl);
-        buf.append("     primeExponentP: ")
+        buf.append("  primeExponentP: ")
             .append(this.getPrimeExponentP().toString(16)).append(nl);
-        buf.append("     primeExponentQ: ")
+        buf.append("  primeExponentQ: ")
             .append(this.getPrimeExponentQ().toString(16)).append(nl);
-        buf.append("     crtCoefficient: ")
+        buf.append("  crtCoefficient: ")
             .append(this.getCrtCoefficient().toString(16)).append(nl);
 
         return buf.toString();

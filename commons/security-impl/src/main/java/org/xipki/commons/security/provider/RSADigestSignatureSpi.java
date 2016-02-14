@@ -193,12 +193,12 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     protected byte[] engineSign()
     throws SignatureException {
-        byte[]    hash = new byte[digest.getDigestSize()];
+        byte[] hash = new byte[digest.getDigestSize()];
 
         digest.doFinal(hash, 0);
 
         try {
-            byte[]    bytes = derEncode(hash);
+            byte[] bytes = derEncode(hash);
 
             return signingKey.CKM_RSA_PKCS(bytes);
         } catch (ArrayIndexOutOfBoundsException e) {

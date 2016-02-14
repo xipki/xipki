@@ -64,7 +64,7 @@ public class HttpCmpServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String CT_REQUEST    = "application/pkixcmp";
+    private static final String CT_REQUEST = "application/pkixcmp";
 
     private static final String CT_RESPONSE = "application/pkixcmp";
 

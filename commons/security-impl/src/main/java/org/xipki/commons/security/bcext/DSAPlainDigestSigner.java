@@ -89,7 +89,7 @@ public class DSAPlainDigestSigner implements Signer {
      * update the internal digest with the byte array in
      */
     public void update(
-            final byte[]    input,
+            final byte[] input,
             final int inOff,
             final int length) {
         digest.update(input, inOff, length);
@@ -172,7 +172,7 @@ public class DSAPlainDigestSigner implements Signer {
         }
 
         BigInteger[] ret = new BigInteger[2];
-        byte[] buffer = new    byte[blockSize];
+        byte[] buffer = new byte[blockSize];
         System.arraycopy(encoding, 0, buffer, 0, blockSize);
         ret[0] = new BigInteger(1, buffer);
 

@@ -830,8 +830,9 @@ public class IaikP11Slot implements P11WritableSlot {
             }
             for (int i = 0; i < tmpObjects.size(); i++) {
                 PrivateKey privKey = (PrivateKey) tmpObjects.get(i);
-                msg.append("------------------------PrivateKey ")
-                    .append(i + 1).append("-------------------------\n");
+                msg.append("------------------------PrivateKey ");
+                msg.append(i + 1);
+                msg.append("-------------------------\n");
 
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = privKey.getId();
@@ -847,7 +848,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
                 msg.append("\n");
 
-                msg.append("\tlabel:     ");
+                msg.append("\tlabel: ");
                 CharArrayAttribute label = privKey.getLabel();
                 char[] chars = null;
                 if (label != null) {
@@ -1058,7 +1059,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
                 msg.append("\n");
 
-                msg.append("\tlabel:     ");
+                msg.append("\tlabel: ");
                 CharArrayAttribute label = cert.getLabel();
                 char[] chars = null;
                 if (label != null) {
@@ -1300,7 +1301,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
                 msg.append("\n");
 
-                msg.append("\tlabel:     ");
+                msg.append("\tlabel: ");
                 CharArrayAttribute label = pubKey.getLabel();
                 char[] chars = null;
                 if (label != null) {
@@ -1544,7 +1545,7 @@ public class IaikP11Slot implements P11WritableSlot {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
 
-        X9ECParameters ecParams =    ECNamedCurveTable.getByOID(curveId);
+        X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
         if (ecParams == null) {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
@@ -1583,7 +1584,7 @@ public class IaikP11Slot implements P11WritableSlot {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }
 
-        X9ECParameters ecParams =    ECNamedCurveTable.getByOID(curveId);
+        X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
         if (ecParams == null) {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }

@@ -94,7 +94,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     }
 
     protected void engineUpdate(
-            final byte[]    b,
+            final byte[] b,
             final int off,
             final int len)
     throws SignatureException {
@@ -103,7 +103,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
 
     protected byte[] engineSign()
     throws SignatureException {
-        byte[]    hash = new byte[digest.getDigestSize()];
+        byte[] hash = new byte[digest.getDigestSize()];
 
         digest.doFinal(hash, 0);
 
@@ -130,8 +130,8 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
      * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
     protected void engineSetParameter(
-            final String    param,
-            final Object    value) {
+            final String param,
+            final Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 

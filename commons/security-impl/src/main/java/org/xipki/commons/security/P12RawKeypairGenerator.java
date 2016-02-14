@@ -71,10 +71,10 @@ public abstract class P12RawKeypairGenerator {
 
             if (isOid) {
                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-                this.curveName =    KeyUtil.getCurveName(this.curveOid);
+                this.curveName = KeyUtil.getCurveName(this.curveOid);
             } else {
                 this.curveName = curveNameOrOid;
-                this.curveOid =    KeyUtil.getCurveOid(this.curveName);
+                this.curveOid = KeyUtil.getCurveOid(this.curveName);
                 if (this.curveOid == null) {
                     throw new IllegalArgumentException("no OID is defined for the curve "
                             + this.curveName);
