@@ -77,7 +77,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     /**
      * The default facility is USER.
      */
-    public static final String    DFLT_SYSLOG_FACILITY = "user";
+    public static final String DFLT_SYSLOG_FACILITY = "user";
 
     /**
      * The default ip is localhost.

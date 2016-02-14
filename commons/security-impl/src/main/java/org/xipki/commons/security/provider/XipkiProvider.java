@@ -123,38 +123,38 @@ public class XipkiProvider extends Provider {
             provider.put("Signature.NONEwithPlain-ECDSA",
                     PlainECDSASignatureSpi.NONE.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithNONE", "NONEwithPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.NONEwithPlainECDSA",    "NONEwithPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithNONE",    "NONEwithPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.NONEwithPlainECDSA", "NONEwithPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithNONE", "NONEwithPlain-ECDSA");
 
             provider.put("Signature.SHA1withPlain-ECDSA",
                     PlainECDSASignatureSpi.SHA1.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA1", "SHA1withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.SHAwithPlainECDSA1",    "SHA1withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA1",    "SHA1withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.SHAwithPlainECDSA1", "SHA1withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA1", "SHA1withPlain-ECDSA");
 
             provider.put("Signature.SHA224withPlain-ECDSA",
                     PlainECDSASignatureSpi.SHA224.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA224", "SHA224withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.SHA224withPlainECDSA",    "SHA224withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA224",    "SHA224withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.SHA224withPlainECDSA", "SHA224withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA224", "SHA224withPlain-ECDSA");
 
             provider.put("Signature.SHA256withPlain-ECDSA",
                     PlainECDSASignatureSpi.SHA256.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA256", "SHA256withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.SHA256withPlainECDSA",    "SHA256withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA256",    "SHA256withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.SHA256withPlainECDSA", "SHA256withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA256", "SHA256withPlain-ECDSA");
 
             provider.put("Signature.SHA384withPlain-ECDSA",
                     PlainECDSASignatureSpi.SHA384.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA384", "SHA384withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.SHA384withPlainECDSA",    "SHA384withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA384",    "SHA384withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.SHA384withPlainECDSA", "SHA384withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA384", "SHA384withPlain-ECDSA");
 
             provider.put("Signature.SHA512withPlain-ECDSA",
                     PlainECDSASignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.Plain-ECDSAwithSHA512", "SHA512withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.SHA512withPlainECDSA",    "SHA512withPlain-ECDSA");
-            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA512",    "SHA512withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.SHA512withPlainECDSA", "SHA512withPlain-ECDSA");
+            provider.put("Alg.Alias.Signature.PlainECDSAwithSHA512", "SHA512withPlain-ECDSA");
 
             provider.put("Signature.RIPEMD160withPlain-ECDSA",
                     PlainECDSASignatureSpi.RIPEMD160.class.getName());

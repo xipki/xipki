@@ -111,7 +111,7 @@ public class SignerUtil {
 
     public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId,
-            final    AsymmetricBlockCipher cipher)
+            final AsymmetricBlockCipher cipher)
     throws OperatorCreationException {
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
@@ -183,16 +183,18 @@ public class SignerUtil {
                     + inLen);
         }
 
-        byte[]    block = new byte[blockSize];
+        byte[] block = new byte[blockSize];
 
         block[0] = 0x00;
-        block[1] = 0x01;                        // type code 1
+        // type code 1
+        block[1] = 0x01;
 
         for (int i = 2; i != block.length - inLen - 1; i++) {
             block[i] = (byte) 0xFF;
         }
 
-        block[block.length - inLen - 1] = 0x00;         // mark the end of the padding
+        // mark the end of the padding
+        block[block.length - inLen - 1] = 0x00;
         System.arraycopy(in, 0, block, block.length - inLen, inLen);
         return block;
     }

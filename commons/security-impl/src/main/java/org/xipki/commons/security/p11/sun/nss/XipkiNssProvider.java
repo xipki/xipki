@@ -207,7 +207,7 @@ public class XipkiNssProvider extends Provider {
         }
 
         // Signature RSA
-        regist(Service.Signature, "SHA1withRSA",     "SHA1withRSA",
+        regist(Service.Signature, "SHA1withRSA", "SHA1withRSA",
                 ObjectIdentifiers.id_alg_SHA1withRSA);
         regist(Service.Signature, "SHA224withRSA", "SHA224withRSA",
                 ObjectIdentifiers.id_alg_SHA224withRSA);
@@ -219,7 +219,7 @@ public class XipkiNssProvider extends Provider {
                 ObjectIdentifiers.id_alg_SHA512withRSA);
 
         // Signature ECDSA
-        regist(Service.Signature, "SHA1withECDSA",     "SHA1withECDSA",
+        regist(Service.Signature, "SHA1withECDSA", "SHA1withECDSA",
                 ObjectIdentifiers.id_alg_SHA1withECDSA);
         regist(Service.Signature, "SHA224withECDSA", "SHA224withECDSA",
                 ObjectIdentifiers.id_alg_SHA224withECDSA);

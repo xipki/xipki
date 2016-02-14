@@ -83,7 +83,7 @@ public class FileListCmd extends XipkiCommandSupport {
         File[] children = target.listFiles();
         int maxLen = -1;
         for (File child : children) {
-            String name    = child.getName();
+            String name = child.getName();
             if (child.isDirectory()) {
                 name += File.separator;
             }

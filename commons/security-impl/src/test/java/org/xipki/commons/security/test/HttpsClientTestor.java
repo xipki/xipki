@@ -138,13 +138,6 @@ public class HttpsClientTestor {
 
     public static void main(
             final String[] args) {
-        System.out.println("HELLO".hashCode());
-        System.out.println(("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
-                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda").hashCode());
-        System.out.println(hashCode("HELLO"));
-        System.out.println(hashCode("HELLO world a bd  wee 234  24  12  wer   wre243popokh "
-                + "HELLO world a bd  wee 234  24  12  wer   wre243popokh  hzjasda"));
-        System.exit(1);
         try {
             prepare();
         } catch (Exception e) {

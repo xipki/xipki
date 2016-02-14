@@ -46,7 +46,7 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
  * @since 2.0.0
  */
 
-public class OBFPasswordResolver    implements SinglePasswordResolver {
+public class OBFPasswordResolver implements SinglePasswordResolver {
 
     public static final String OBFUSCATE = "OBF:";
 
