@@ -166,7 +166,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     {
         try
         {
-            service.shutdown();
+            service.close();
         } catch (Exception e)
         {
             LOG.warn("Could not shutdown datasource: {}", e.getMessage());

@@ -478,7 +478,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     private AlgorithmIdentifier getSignatureAlgoId(String signerConf)
     throws SignerException
     {
-    	ConfPairs keyValues = new ConfPairs(signerConf);
+        ConfPairs keyValues = new ConfPairs(signerConf);
         String algoS = keyValues.getValue("algo");
         if(algoS == null)
         {

@@ -52,7 +52,7 @@
     <feature>bouncycastle</feature>
     <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
+    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki/security-iaikp11/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-sunp11/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
@@ -128,10 +128,8 @@
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
-    <bundle>mvn:com.google.guava/guava/13.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.1</bundle>
-    <bundle><![CDATA[wrap:mvn:org.xipki.thirdparty/ness-syslog4j/${syslog4j.version}_1/$Bundle-SymbolicName=ness-syslog4j&Bundle-Version=${syslog4j.version4bundle}]]></bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle>mvn:org.xipki/syslog-audit-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">

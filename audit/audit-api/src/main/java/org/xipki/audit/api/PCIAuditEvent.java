@@ -35,6 +35,7 @@
 
 package org.xipki.audit.api;
 
+import java.io.CharArrayWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -231,10 +232,21 @@ public class PCIAuditEvent
 
     public String createMessage()
     {
-        StringBuilder buffer = new StringBuilder();
+        return toCharArrayWriter(null).toString();
+    }
 
-        char delimiter = DEFAULT_DELIMITER;
-        String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+    public CharArrayWriter toCharArrayWriter(
+            final String prefix)
+            {
+        CharArrayWriter buffer = new CharArrayWriter(100);
+
+        final char delimiter = DEFAULT_DELIMITER;
+        final String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+
+        if (prefix != null && !prefix.isEmpty())
+        {
+            buffer.append(prefix);
+        }
 
         buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
@@ -250,7 +262,7 @@ public class PCIAuditEvent
         buffer.append(delimiter);
         buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
 
-        return buffer.toString();
+        return buffer;
     }
 
     public static boolean isBlank(CharSequence cs)

@@ -47,36 +47,39 @@ import liquibase.integration.commandline.CommandLineUtils;
 import liquibase.lockservice.LockService;
 import liquibase.lockservice.LockServiceFactory;
 import liquibase.logging.LogFactory;
+import liquibase.logging.Logger;
 import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
+import liquibase.resource.ResourceAccessor;
 
 /**
  * Class for executing Liquibase via the command line.
  *
  * @author Lijun Liao
+ * @since 2.0.0
  */
 
 public class LiquibaseMain
 {
+
     private final LiquibaseDatabaseConf dbConf;
+
     private final String changeLogFile;
 
     private Database database;
+
     private Liquibase liquibase;
 
-    public static boolean loglevelIsSevereOrOff(String logLevel)
-    {
-        return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
-    }
-
-    public LiquibaseMain(LiquibaseDatabaseConf dbConf, String changeLogFile)
-    {
-        if(dbConf == null)
+    public LiquibaseMain(
+            final LiquibaseDatabaseConf dbConf,
+            final String changeLogFile)
+            {
+        if (dbConf == null)
         {
             throw new IllegalArgumentException("dbConf could not be null");
         }
 
-        if(changeLogFile == null || changeLogFile.isEmpty())
+        if (changeLogFile == null | changeLogFile.isEmpty())
         {
             throw new IllegalArgumentException("changeLogFile could not be empty");
         }
@@ -85,45 +88,68 @@ public class LiquibaseMain
         this.changeLogFile = changeLogFile;
     }
 
-    public void changeLogLevel(String logLevel)
+    public void changeLogLevel(
+            final String logLevel, String logFile)
     throws CommandLineParsingException
     {
         try
         {
-            LogFactory.getInstance().getLog().setLogLevel(logLevel);
+            Logger log = LogFactory.getInstance().getLog();
+            if (logFile != null && logFile.length() > 0)
+            {
+                log.setLogLevel(logLevel, logFile);
+            } else
+            {
+                log.setLogLevel(logLevel);
+            }
         } catch (IllegalArgumentException e)
         {
             throw new CommandLineParsingException(e.getMessage(), e);
         }
     }
 
-    public void init(String logLevel)
+    public void init(
+            final String logLevel, String logFile)
     throws Exception
     {
-        changeLogLevel(logLevel);
+        changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
         ClassLoader classLoader = getClass().getClassLoader();
-        CommandLineResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
+        ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
         String defaultSchemaName = dbConf.getSchema();
-        this.database = CommandLineUtils.createDatabaseObject(classLoader,
-            dbConf.getUrl(), dbConf.getUsername(), dbConf.getPassword(), dbConf.getDriver(),
-            null, defaultSchemaName,
-            false, false, null, null, null, null);
-
+        this.database = CommandLineUtils.createDatabaseObject(
+            clOpener, // resourceAccessor
+            dbConf.getUrl(), // url
+            dbConf.getUsername(), // username
+            dbConf.getPassword(), // password
+            dbConf.getDriver(), // driver
+            (String) null, // defaultCatalogName
+            defaultSchemaName, // defaultSchemaName
+            false, // outputDefaultCatalog
+            false, // outputDefaultSchema
+            (String) null, // databaseClass
+            (String) null, // driverPropertiesFile
+            (String) null, // propertyProviderClass
+            (String) null, // liquibaseCatalogName
+            (String) null, // liquibaseSchemaName
+            (String) null, // databaseChangeLogTableName
+            (String) null); // databaseChangeLogLockTableName
         try
         {
-            CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener, clOpener);
+            CompositeResourceAccessor fileOpener =
+                    new CompositeResourceAccessor(fsOpener, clOpener);
 
             boolean includeCatalog = false;
             boolean includeSchema = false;
             boolean includeTablespace = false;
-            DiffOutputControl diffOutputControl = new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
+            DiffOutputControl diffOutputControl =
+                    new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
 
             CompareControl.SchemaComparison[] finalSchemaComparisons;
             finalSchemaComparisons = new CompareControl.SchemaComparison[]
-                    {
+            {
                         new CompareControl.SchemaComparison(
                             new CatalogAndSchema(null, defaultSchemaName),
                             new CatalogAndSchema(null, defaultSchemaName))
@@ -136,7 +162,7 @@ public class LiquibaseMain
             }
 
             this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
-        } catch(Exception e)
+        } catch (Exception e)
         {
             try
             {
@@ -148,36 +174,35 @@ public class LiquibaseMain
             }
             throw e;
         }
-
-    }
+    } // method init
 
     public void releaseLocks()
     throws Exception
     {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
-        System.out.println("Successfully released the database");
+        System.out.println("successfully released the database");
     }
 
     public void dropAll()
     throws Exception
     {
         liquibase.dropAll();
-        System.out.println("Successfully dropped the database");
+        System.out.println("successfully  dropped the database");
     }
 
     public void update()
     throws Exception
     {
         liquibase.update((String) null);
-        System.out.println("Successfully updated the database");
+        System.out.println("successfully  updated the database");
     }
 
     public void shutdown()
     {
         try
         {
-            if(database != null)
+            if (database != null)
             {
                 database.rollback();
                 database.close();
@@ -191,4 +216,11 @@ public class LiquibaseMain
             liquibase = null;
         }
     }
+
+    public static boolean loglevelIsSevereOrOff(
+            final String logLevel)
+            {
+        return "off".equalsIgnoreCase(logLevel) || "severe".equalsIgnoreCase(logLevel);
+    }
+
 }

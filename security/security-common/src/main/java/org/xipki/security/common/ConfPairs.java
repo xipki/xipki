@@ -1,7 +1,7 @@
 /*
  *
  * This file is part of the XiPKI project.
- * Copyright (c) 2013 - 2016 Lijun Liao
+ * Copyright (c) 2014 Lijun Liao
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -47,7 +47,8 @@ import java.util.Set;
  * @since 2.0.0
  */
 
-public class ConfPairs {
+public class ConfPairs
+{
 
     public static final char NAME_TERM = '=';
 
@@ -57,16 +58,20 @@ public class ConfPairs {
 
     public ConfPairs(
             final String name,
-            final String value) {
+            final String value)
+            {
         putPair(name, value);
     }
 
-    public ConfPairs() {
+    public ConfPairs()
+    {
     }
 
     public ConfPairs(
-            final String string) {
-        if (string == null || string.length() < 2) {
+            final String string)
+            {
+        if (string == null || string.length() < 2)
+        {
             return;
         }
 
@@ -75,10 +80,13 @@ public class ConfPairs {
 
         StringBuilder tokenBuilder = new StringBuilder();
 
-        for (int i = 0; i < n;) {
+        for (int i = 0; i < n;)
+        {
             char c = string.charAt(i);
-            if (TOKEN_TERM == c) {
-                if (tokenBuilder.length() > 0) {
+            if (TOKEN_TERM == c)
+            {
+                if (tokenBuilder.length() > 0)
+                {
                     tokens.add(tokenBuilder.toString());
                 }
                 // reset tokenBuilder
@@ -87,8 +95,10 @@ public class ConfPairs {
                 continue;
             }
 
-            if ('\\' == c) {
-                if (i == n - 1) {
+            if ('\\' == c)
+            {
+                if (i == n - 1)
+                {
                     throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
                 }
 
@@ -101,45 +111,57 @@ public class ConfPairs {
             i++;
         }
 
-        if (tokenBuilder.length() > 0) {
+        if (tokenBuilder.length() > 0)
+        {
             tokens.add(tokenBuilder.toString());
         }
 
-        for (String token : tokens) {
+        for (String token : tokens)
+        {
             int termPosition = -1;
             n = token.length();
-            for (int i = 0; i < n;) {
+            for (int i = 0; i < n;)
+            {
                 char c = token.charAt(i);
-                if (c == NAME_TERM) {
+                if (c == NAME_TERM)
+                {
                     termPosition = i;
                     break;
                 }
 
-                if ('\\' == c) {
-                    if (i == n - 1) {
+                if ('\\' == c)
+                {
+                    if (i == n - 1)
+                    {
                         throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
                     }
 
                     i += 2;
-                } else {
+                } else
+                {
                     i++;
                 }
             }
 
-            if (termPosition < 1) {
+            if (termPosition < 1)
+            {
                 throw new IllegalArgumentException("invalid ConfPair '" + token + "'");
             }
 
             tokenBuilder = new StringBuilder();
-            for (int i = 0; i < termPosition;) {
+            for (int i = 0; i < termPosition;)
+            {
                 char c = token.charAt(i);
-                if ('\\' == c) {
-                    if (i == termPosition - 1) {
+                if ('\\' == c)
+                {
+                    if (i == termPosition - 1)
+                    {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
                     }
 
                     i += 2;
-                } else {
+                } else
+                {
                     tokenBuilder.append(c);
                     i++;
                 }
@@ -148,10 +170,13 @@ public class ConfPairs {
             String name = tokenBuilder.toString();
 
             tokenBuilder = new StringBuilder();
-            for (int i = termPosition + 1; i < n;) {
+            for (int i = termPosition + 1; i < n;)
+            {
                 char c = token.charAt(i);
-                if ('\\' == c) {
-                    if (i == n - 1) {
+                if ('\\' == c)
+                {
+                    if (i == n - 1)
+                    {
                         throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
                     }
 
@@ -170,49 +195,60 @@ public class ConfPairs {
 
     public void putPair(
             final String name,
-            final String value) {
+            final String value)
+            {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("value", value);
 
         char c = name.charAt(0);
-        if (c >= '0' && c <= '9') {
+        if (c >= '0' && c <= '9')
+        {
             throw new IllegalArgumentException("name begin with " + c);
         }
         pairs.put(name, value);
     }
 
     public void removePair(
-            final String name) {
+            final String name)
+            {
         pairs.remove(name);
     }
 
     public String getValue(
-            final String name) {
+            final String name)
+            {
         return pairs.get(name);
     }
 
-    public Set<String> getNames() {
+    public Set<String> getNames()
+    {
         return Collections.unmodifiableSet(pairs.keySet());
     }
 
-    public String getEncoded() {
+    public String getEncoded()
+    {
         StringBuilder sb = new StringBuilder();
         List<String> names = new LinkedList<>();
-        for (String name : pairs.keySet()) {
+        for (String name : pairs.keySet())
+        {
             String value = pairs.get(name);
-            if (value.length() <= 100) {
+            if (value.length() <= 100)
+            {
                 names.add(name);
             }
         }
         Collections.sort(names);
 
-        for (String name : pairs.keySet()) {
-            if (!names.contains(name)) {
+        for (String name : pairs.keySet())
+        {
+            if (!names.contains(name))
+            {
                 names.add(name);
             }
         }
 
-        for (String name : names) {
+        for (String name : names)
+        {
             String value = pairs.get(name);
             sb.append(encodeNameOrValue(name));
             sb.append(NAME_TERM);
@@ -222,26 +258,31 @@ public class ConfPairs {
             sb.append(TOKEN_TERM);
         }
 
-        if (sb.length() > 0) {
+        if (sb.length() > 0)
+        {
             sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     } // method getEncoded
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return getEncoded();
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return getEncoded().hashCode();
     }
 
     @Override
     public boolean equals(
-            final Object obj) {
-        if (!(obj instanceof ConfPairs)) {
+            final Object obj)
+            {
+        if (!(obj instanceof ConfPairs))
+        {
             return false;
         }
 
@@ -250,16 +291,20 @@ public class ConfPairs {
     }
 
     private static String encodeNameOrValue(
-            final String s) {
-        if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1) {
+            final String s)
+            {
+        if (s.indexOf(NAME_TERM) == -1 && s.indexOf(TOKEN_TERM) == -1)
+        {
             return s;
         }
 
         final int n = s.length();
         StringBuilder sb = new StringBuilder(n + 1);
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
+        {
             char c = s.charAt(i);
-            if (c == NAME_TERM || c == TOKEN_TERM) {
+            if (c == NAME_TERM || c == TOKEN_TERM)
+            {
                 sb.append('\\');
             }
             sb.append(c);

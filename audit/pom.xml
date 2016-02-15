@@ -13,7 +13,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>ness-syslog4j</module>
     <module>audit-api</module>
     <module>syslog-audit-impl</module>
     <module>slf4j-audit-impl</module>

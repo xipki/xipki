@@ -79,6 +79,10 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
             description = "Log level, valid values are debug, info, warning, severe, off")
     protected String logLevel = "warning";
 
+    @Option(name = "--log-file",
+            description = "log file")
+    private String logFile;
+
     protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
     throws Exception
     {
@@ -95,18 +99,18 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
         try
         {
-            liquibase.init(logLevel);
+            liquibase.init(logLevel, logFile);
             liquibase.releaseLocks();
 
             if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
             {
-                liquibase.init("severe");
+                liquibase.init("severe", logFile);
             }
             liquibase.dropAll();
 
             if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
             {
-                liquibase.init(logLevel);
+                liquibase.init(logLevel, logFile);
             }
             liquibase.update();
         }finally

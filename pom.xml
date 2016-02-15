@@ -35,17 +35,21 @@
   </developers>
   <properties>
     <karaf.version>2.3.4</karaf.version>
-    <bc.version>1.49</bc.version>
-    <slf4j.version>1.5.11</slf4j.version>
-    <servlet-api.version>2.3</servlet-api.version>
+    <karaf-plugin.version>4.0.4</karaf-plugin.version>
+    <pax.web.version>4.2.5</pax.web.version>
+    <bc.version>1.54</bc.version>
+    <slf4j.version>1.7.7</slf4j.version>
+    <servlet-api.version>2.5</servlet-api.version>
+    <jscep.version>2.3.0</jscep.version>
     <junit.version>4.8.2</junit.version>
-    <pkcs11Wrapper.version>1.2.18</pkcs11Wrapper.version>
-    <hikaricp.version>1.3.8</hikaricp.version>
-    <ldapsdk.version>2.3.6</ldapsdk.version>
+    <pkcs11-wrapper.version>1.3</pkcs11-wrapper.version>
+    <!--ldapsdk.version>2.3.6</ldapsdk.version-->
+    <liquibase.version>3.4.1</liquibase.version>
+    <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
-    <liquibase.version>3.2.2</liquibase.version>
-    <syslog4j.version>0.9.47-NESS-8</syslog4j.version>
-    <syslog4j.version4bundle>0.9.47.1</syslog4j.version4bundle>
+    <hikaricp.version>2.4.3</hikaricp.version>
+    <syslog-java-client.version>1.0.8</syslog-java-client.version>
+    <jsr305.version>3.0.0_1</jsr305.version>
   </properties>
   <modules>
     <module>console-karaf</module>

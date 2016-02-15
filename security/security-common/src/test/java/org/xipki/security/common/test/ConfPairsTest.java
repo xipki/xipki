@@ -1,7 +1,7 @@
 /*
  *
  * This file is part of the XiPKI project.
- * Copyright (c) 2013 - 2016 Lijun Liao
+ * Copyright (c) 2014 Lijun Liao
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -49,10 +49,12 @@ import junit.framework.Assert;
  * @since 2.0.0
  */
 
-public class ConfPairsTest {
+public class ConfPairsTest
+{
 
     @Test
-    public void test1() {
+    public void test1()
+    {
         ConfPairs pairs = new ConfPairs("key-a?", "value-a=");
         pairs.putPair("key-b", "value-b");
 
@@ -64,7 +66,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test2() {
+    public void test2()
+    {
         ConfPairs pairs = new ConfPairs("key-a=value-a");
 
         String expEncoded = "key-a=value-a";
@@ -74,7 +77,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test3() {
+    public void test3()
+    {
         ConfPairs pairs = new ConfPairs("key-empty-value=");
 
         String expEncoded = "key-empty-value=";
@@ -84,7 +88,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test4() {
+    public void test4()
+    {
         ConfPairs pairs = new ConfPairs("key-empty-value=,key-b=value-b");
 
         String expEncoded = "key-b=value-b,key-empty-value=";
@@ -95,7 +100,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test5() {
+    public void test5()
+    {
         ConfPairs pairs = new ConfPairs("key-a=value-a\\,");
 
         String expEncoded = "key-a=value-a\\,";
@@ -105,7 +111,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test6() {
+    public void test6()
+    {
         ConfPairs pairs = new ConfPairs("key-a=value-a\\=\\,");
 
         String expEncoded = "key-a=value-a\\=\\,";
@@ -115,7 +122,8 @@ public class ConfPairsTest {
     }
 
     @Test
-    public void test7() {
+    public void test7()
+    {
         ConfPairs pairs = new ConfPairs("key-a=value-a\\=\\?");
 
         String expEncoded = "key-a=value-a\\=?";
@@ -127,14 +135,16 @@ public class ConfPairsTest {
     private static void check(
             final ConfPairs confPairs,
             final String expEncoded,
-            final Map<String, String> expNameValues) {
+            final Map<String, String> expNameValues)
+            {
         String iEncoded = confPairs.getEncoded();
         Assert.assertEquals("encoded", expEncoded, iEncoded);
 
         Set<String> iNames = confPairs.getNames();
         Assert.assertEquals("names", expNameValues.size(), iNames.size());
 
-        for (String iName : iNames) {
+        for (String iName : iNames)
+        {
             String expValue = expNameValues.get(iName);
             Assert.assertNotNull("name " + iName + " is not expected", expValue);
             Assert.assertEquals("value of name " + iName, expValue, confPairs.getValue(iName));

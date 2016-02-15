@@ -9,51 +9,40 @@
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
   <cm:property-placeholder persistent-id="org.xipki.audit.syslog" update-strategy="reload">
     <cm:default-properties>
-      <!--  default charset for syslog messages -->
-      <cm:property name="charSet" value="ISO8859-15"/>
       <!--  the default facility for syslog message -->
-      <cm:property name="facility" value="user"/>
+      <cm:property name="facility" value="USER"/>
       <!--  the default syslog host -->
       <cm:property name="host" value="127.0.0.1"/>
-      <!-- the identification id to use in audit syslog messages. -->
-      <cm:property name="ident" value="IDENT"/>
+      <!-- prefix of the syslog message, a space will be added if not empty -->
+      <cm:property name="prefix" value=""/>
       <!-- enable this if the default hostname of the sending side should be avoided. -->
-      <cm:property name="localName" value=""/>
+      <cm:property name="localname" value=""/>
       <cm:property name="maxMessageLength" value="1024"/>
-      <!-- maxShutdownWait -->
       <!-- the default port for the syslog host -->
       <cm:property name="port" value="514"/>
       <!--  the default protocol for the syslog host -->
       <cm:property name="protocol" value="udp"/>
-      <!-- splitMessageBeginText -->
-      <!-- splitMessageEndText -->
-      <!--  thread loop interval -->
-      <cm:property name="threadLoopInterval" value="400"/>
-      <!-- truncateMessage -->
-      <!--  enable if each syslog message need to have a individual message number based on sequence, starting with 0 -->
-      <cm:property name="useSequenceNumbers" value="true"/>
-      <!--  TODO  -->
-      <cm:property name="useStructuredData" value="false"/>
-      <!--  true if the syslog client should use multiple threads (no blocking) -->
-      <cm:property name="useThreading" value="false"/>
-      <!--  if a write to syslog host fails, how many retries should be done.  -->
+      <!--  if a write to syslog host fails, how many retries should be done, not applied to UDP -->
       <cm:property name="writeRetries" value="5"/>
+      <!-- whether uses SSL to secure the communication, not applied to UDP -->
+      <cm:property name="ssl" value="false"/>
+      <!-- message format, RFC_3164 or RFC_5424 -->
+      <cm:property name="messageFormat" value="rfc_5424"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="syslogAuditLoggingServiceImpl" class="org.xipki.audit.syslog.SyslogAuditLoggingServiceImpl" init-method="init" destroy-method="destroy">
-    <property name="charSet" value="${charSet}"/>
+  <bean id="syslogAuditLoggingServiceImpl"
+      class="org.xipki.audit.syslog.SyslogAuditLoggingServiceImpl"
+      init-method="init" destroy-method="destroy">
     <property name="facility" value="${facility}"/>
     <property name="host" value="${host}"/>
-    <property name="ident" value="${ident}"/>
-    <property name="localName" value="${localName}"/>
+    <property name="prefix" value="${prefix}"/>
+    <property name="localname" value="${localname}"/>
     <property name="maxMessageLength" value="${maxMessageLength}"/>
     <property name="port" value="${port}"/>
     <property name="protocol" value="${protocol}"/>
-    <property name="threadLoopInterval" value="${threadLoopInterval}"/>
-    <property name="useSequenceNumbers" value="${useSequenceNumbers}"/>
-    <property name="useStructuredData" value="${useStructuredData}"/>
-    <property name="useThreading" value="${useThreading}"/>
     <property name="writeRetries" value="${writeRetries}"/>
+    <property name="ssl" value="${ssl}"/>
+    <property name="messageFormat" value="${messageFormat}"/>
   </bean>
   <service ref="syslogAuditLoggingServiceImpl" interface="org.xipki.audit.api.AuditLoggingService"/>
 </blueprint>

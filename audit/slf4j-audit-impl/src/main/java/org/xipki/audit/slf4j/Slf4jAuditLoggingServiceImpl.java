@@ -35,6 +35,7 @@
 
 package org.xipki.audit.slf4j;
 
+import java.io.CharArrayWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -160,21 +161,20 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
 
         try
         {
+            CharArrayWriter msg = event.toCharArrayWriter("");
             AuditLevel al = event.getLevel();
             switch(al)
             {
                 case DEBUG:
                     if(LOG.isDebugEnabled())
                     {
-                        LOG.debug("{} | {}", al.getAlignedText(), event.createMessage());
+                        LOG.debug("{} | {}", al.getAlignedText(), msg);
                     }
                     break;
                 default:
-                    LOG.info("{} | {}", al.getAlignedText(), event.createMessage());
+                    LOG.info("{} | {}", al.getAlignedText(), msg);
                     break;
             }
-
-            event.createMessage();
         }catch(Throwable t)
         {
             LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());

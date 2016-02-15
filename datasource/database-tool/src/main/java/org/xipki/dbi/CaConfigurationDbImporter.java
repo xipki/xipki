@@ -203,7 +203,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table RESPONDER");
     }
 
-    @SuppressWarnings("resource")
     private void import_environment(Environments environments)
     throws Exception
     {
@@ -233,7 +232,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table ENVIRONMENT");
     }
 
-    @SuppressWarnings("resource")
     private void import_crlsigner(Crlsigners crlsigners)
     throws Exception
     {
@@ -269,7 +267,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CRLSIGNER");
     }
 
-    @SuppressWarnings("resource")
     private void import_requestor(Requestors requestors)
     throws Exception
     {
@@ -301,7 +298,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table REQUESTOR");
     }
 
-    @SuppressWarnings("resource")
     private void import_publisher(Publishers publishers)
     throws Exception
     {
@@ -333,7 +329,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table PUBLISHER");
     }
 
-    @SuppressWarnings("resource")
     private void import_certprofile(Certprofiles certprofiles)
     throws Exception
     {
@@ -443,7 +438,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CA");
     }
 
-    @SuppressWarnings("resource")
     private void import_caalias(Caaliases caaliases)
     throws Exception
     {
@@ -509,7 +503,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CA_HAS_REQUESTOR");
     }
 
-    @SuppressWarnings("resource")
     private void import_ca_has_publisher(CaHasPublishers ca_has_publishers)
     throws Exception
     {
@@ -540,7 +533,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CA_HAS_PUBLISHER");
     }
 
-    @SuppressWarnings("resource")
     private void import_ca_has_certprofile(CaHasCertprofiles ca_has_certprofiles)
     throws Exception
     {
