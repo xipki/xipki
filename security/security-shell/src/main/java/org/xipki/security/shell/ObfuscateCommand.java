@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.OBFPasswordResolver;
 
 /**
@@ -43,6 +44,7 @@ import org.xipki.security.OBFPasswordResolver;
  */
 
 @Command(scope = "keytool", name = "obfuscate", description="Obfuscate password")
+@Service
 public class ObfuscateCommand extends SecurityCommand
 {
     @Override

@@ -41,14 +41,18 @@ import java.security.cert.X509CRL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.IoCertUtil;
 
@@ -57,15 +61,18 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "keytool", name = "extract-cert", description="Extract certificates from CRL")
+@Service
 public class ExtractCertFromCRLCommand extends SecurityCommand
 {
 
     @Option(name = "-crl",
             required = true, description = "Required. CRL file")
+    @Completion(FilePathCompleter.class)
     protected String crlFile;
 
     @Option(name = "-out",
             required = true, description = "Required. Zip file to save the extracted certificates")
+    @Completion(FilePathCompleter.class)
     protected String outFile;
 
     @Override
@@ -77,8 +84,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {
-            err("No certificate is contained in " + crlFile);
-            return null;
+            throw new CmdFailure("No certificate is contained in " + crlFile);
         }
 
         extnValue = removingTagAndLenFromExtensionValue(extnValue);
@@ -86,8 +92,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         int n = asn1Set.size();
         if(n == 0)
         {
-            err("No certificate is contained in " + crlFile);
-            return null;
+            throw new CmdFailure("No certificate is contained in " + crlFile);
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();

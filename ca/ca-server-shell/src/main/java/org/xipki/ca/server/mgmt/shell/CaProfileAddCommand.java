@@ -37,24 +37,31 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "caprofile-add", description="Add certificate profiles to CA")
+@Service
 public class CaProfileAddCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = " Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-profile",
         description = "Required. Profile profileNames, multi values allowed",
         required = true, multiValued = true)
+    @Completion(ProfileNameCompleter.class)
     protected List<String> profileNames;
 
     @Override

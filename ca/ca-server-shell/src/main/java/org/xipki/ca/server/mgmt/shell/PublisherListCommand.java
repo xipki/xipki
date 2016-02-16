@@ -40,18 +40,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "publisher-list", description="List publishers")
+@Service
 public class PublisherListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = false)
+    @Completion(PublisherNameCompleter.class)
     protected String name;
 
     @Override

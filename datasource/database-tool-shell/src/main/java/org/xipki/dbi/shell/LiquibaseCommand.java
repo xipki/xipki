@@ -45,15 +45,18 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import jline.console.ConsoleReader;
-
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.liquibase.LiquibaseDatabaseConf;
 import org.xipki.liquibase.LiquibaseMain;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.ConsoleReader;
 
 /**
  * @author Lijun Liao
@@ -63,6 +66,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 {
     private static final Set<String> yesNo = new HashSet<>();
 
+    @Reference
     private PasswordResolver passwordResolver;
 
     static
@@ -81,6 +85,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "--log-file",
             description = "log file")
+    @Completion(FilePathCompleter.class)
     private String logFile;
 
     protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
@@ -236,8 +241,4 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         }
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
 }

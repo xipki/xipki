@@ -39,9 +39,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 
@@ -50,6 +55,7 @@ import org.xipki.security.common.CertRevocationInfo;
  */
 
 @Command(scope = "ca", name = "ca-revoke", description="Revoke CA")
+@Service
 public class CaRevokeCommand extends CaCommand
 {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
@@ -60,6 +66,7 @@ public class CaRevokeCommand extends CaCommand
                 CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-reason",
@@ -73,6 +80,7 @@ public class CaRevokeCommand extends CaCommand
                     "5: cessationOfOperation\n" +
                     "6: certificateHold\n" +
                     "9: privilegeWithdrawn")
+    @Completion(CACRLReasonCompleter.class)
     protected String reason;
 
     @Override
@@ -83,20 +91,17 @@ public class CaRevokeCommand extends CaCommand
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
         if(permitted_reasons.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
         if(caManager.getCaNames().contains(caName) == false)
         {
-            err("invalid CA name " + caName);
-            return null;
+            throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         CertRevocationInfo revInfo = new CertRevocationInfo(crlReason);

@@ -35,7 +35,8 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.PBEPasswordResolver;
 
 /**
@@ -43,6 +44,7 @@ import org.xipki.security.PBEPasswordResolver;
  */
 
 @Command(scope = "keytool", name = "pbe-enc", description="Encrypt password with master password")
+@Service
 public class PBEEncryptCommand extends SecurityCommand
 {
     @Override

@@ -37,9 +37,14 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.shell.completer.CrlSignerTypeCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
@@ -48,6 +53,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
+@Service
 public class CrlSignerAddCommand extends CaCommand
 {
     @Option(name = "-name",
@@ -58,6 +64,7 @@ public class CrlSignerAddCommand extends CaCommand
     @Option(name = "-signerType",
             description = "Required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
             required = true)
+    @Completion(CrlSignerTypeCompleter.class)
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -66,12 +73,14 @@ public class CrlSignerAddCommand extends CaCommand
 
     @Option(name = "-cert",
             description = "CRL signer's certificate file")
+    @Completion(FilePathCompleter.class)
     protected String signerCertFile;
 
     @Option(name = "-crlControl",
             required = true, description = "Required. CRL control")
     protected String crlControl;
 
+    @Reference
     private SecurityFactory securityFactory;
 
     @Override
@@ -106,11 +115,6 @@ public class CrlSignerAddCommand extends CaCommand
         caManager.addCrlSigner(entry);
         out("added CRL signer " + name);
         return null;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
     }
 
 }

@@ -40,8 +40,10 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 import org.xipki.security.common.AbstractLoadTest;
@@ -53,6 +55,7 @@ import org.xipki.security.common.StringUtil;
  */
 
 @Command(scope = "ocsp", name = "loadtest-status", description="OCSP Load test")
+@Service
 public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
@@ -94,8 +97,8 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
                     if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
                     {
-                        err("invalid serial number " + this.serialNumbers);
-                        return null;
+                        throw new IllegalCmdParamException(
+                                "invalid serial number " + this.serialNumbers);
                     }
                     for(long i = startSerial; i <= endSerial; i++)
                     {
@@ -104,20 +107,17 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                 }
                 else
                 {
-                    err("invalid serial number " + this.serialNumbers);
-                    return null;
+                    throw new IllegalCmdParamException("invalid serial number " + this.serialNumbers);
                 }
             }
         }catch(Exception e)
         {
-            err("invalid serial numbers " + this.serialNumbers);
-            return null;
+            throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
 
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("Invalid number of threads " + numThreads);
         }
 
         URL serverUrl = getServiceURL();

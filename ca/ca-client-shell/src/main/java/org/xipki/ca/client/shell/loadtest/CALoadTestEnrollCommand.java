@@ -35,13 +35,18 @@
 
 package org.xipki.ca.client.shell.loadtest;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.ca.client.shell.completer.ECCurveNameCompleter;
+import org.xipki.ca.client.shell.completer.RandomDNCompleter;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.AbstractLoadTest;
 
 /**
@@ -49,6 +54,7 @@ import org.xipki.security.common.AbstractLoadTest;
  */
 
 @Command(scope = "caclient", name = "loadtest-enroll", description="CA Client Enroll Load test")
+@Service
 public class CALoadTestEnrollCommand extends ClientCommand
 {
 
@@ -66,6 +72,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
             required = false,
             description = "DN name to be incremented, valid values are\n"
                     + "GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
+    @Completion(RandomDNCompleter.class)
     protected String randomDNStr = "O";
 
     @Option(name = "-duration",
@@ -95,6 +102,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
     @Option(name = "-curve",
             description = "EC curve name or OID of EC key",
             required = false)
+    @Completion(ECCurveNameCompleter.class)
     protected String curveName = "brainpoolp256r1";
 
     @Option(name = "-n",
@@ -108,14 +116,12 @@ public class CALoadTestEnrollCommand extends ClientCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("Invalid number of threads " + numThreads);
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
-            return null;
+            throw new IllegalCmdParamException("Invalid duration " + durationInSecond);
         }
 
         StringBuilder startMsg = new StringBuilder();
@@ -140,8 +146,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
             randomDN = RandomDN.getInstance(randomDNStr);
             if(randomDN == null)
             {
-                err("Invalid randomDN " + randomDNStr);
-                return null;
+                throw new IllegalCmdParamException("Invalid randomDN " + randomDNStr);
             }
         }
 
@@ -160,8 +165,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
         }
         else
         {
-            err("Invalid keyType " + keyType);
-            return null;
+            throw new IllegalCmdParamException("Invalid keyType " + keyType);
         }
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certProfile, keyEntry, subjectTemplate, randomDN);

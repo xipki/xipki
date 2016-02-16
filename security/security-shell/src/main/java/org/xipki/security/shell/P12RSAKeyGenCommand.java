@@ -37,8 +37,10 @@ package org.xipki.security.shell;
 
 import java.math.BigInteger;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.p10.P12KeypairGenerator;
 
@@ -47,6 +49,7 @@ import org.xipki.security.p10.P12KeypairGenerator;
  */
 
 @Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Service
 public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-keysize",
@@ -60,8 +63,7 @@ public class P12RSAKeyGenCommand extends P12KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
-            return null;
+            throw new IllegalCmdParamException("Keysize is not multiple of 1024: " + keysize);
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(

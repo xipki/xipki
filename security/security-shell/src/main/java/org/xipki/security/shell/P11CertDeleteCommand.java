@@ -35,24 +35,28 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.Session;
-import iaik.pkcs.pkcs11.objects.Object;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+
+import iaik.pkcs.pkcs11.Session;
+import iaik.pkcs.pkcs11.objects.Object;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "keytool", name = "rm-cert", description="Remove certificate from PKCS#11 device")
+@Service
 public class P11CertDeleteCommand extends SecurityCommand
 {
     @Option(name = "-slot",
@@ -65,6 +69,7 @@ public class P11CertDeleteCommand extends SecurityCommand
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
@@ -73,23 +78,14 @@ public class P11CertDeleteCommand extends SecurityCommand
     {
         IaikExtendedModule module = getModule(moduleName);
 
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
 
         X509PublicKeyCertificate[] existingCerts = slot.getCertificateObjects(
                 Hex.decode(keyId), null);
 
         if(existingCerts == null || existingCerts.length == 0)
         {
-            err("Could not find certificates with id " + keyId);
-            return null;
+            throw new IllegalCmdParamException("Could not find certificates with id " + keyId);
         }
 
         Session session = slot.borrowWritableSession();

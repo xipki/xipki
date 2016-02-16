@@ -35,8 +35,12 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -44,12 +48,14 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ca", name = "profile-update", description="Update certificate profile")
+@Service
 public class ProfileUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
                 description = "Required. Profile name",
                 required = true, multiValued = false)
+    @Completion(ProfileNameCompleter.class)
     protected String name;
 
     @Option(name = "-type",
@@ -62,6 +68,7 @@ public class ProfileUpdateCommand extends CaCommand
 
     @Option(name = "-confFile",
             description = "Profile configuration file")
+    @Completion(FilePathCompleter.class)
     protected String confFile;
 
     @Override

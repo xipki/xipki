@@ -35,12 +35,20 @@
 
 package org.xipki.console.karaf;
 
-import org.apache.karaf.shell.console.Completer;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0.0
  */
 
-public interface YesNoCompleter extends Completer
+@Service
+public class YesNoCompleter extends EnumCompleter
 {
+
+    public YesNoCompleter()
+    {
+        setTokens("yes, no");
+    }
+
 }

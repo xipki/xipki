@@ -35,23 +35,30 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "caprofile-rm", description="Remove certificate profile from CA")
+@Service
 public class CaProfileRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile name")
+    @Completion(ProfileNameCompleter.class)
     protected String profileName;
 
     @Override

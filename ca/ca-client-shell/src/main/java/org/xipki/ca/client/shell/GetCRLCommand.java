@@ -40,19 +40,24 @@ import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "caclient", name = "getcrl", description="Download CRL")
+@Service
 public class GetCRLCommand extends CRLCommand
 {
     @Option(name = "-with-basecrl",
@@ -62,6 +67,7 @@ public class GetCRLCommand extends CRLCommand
     @Option(name = "-basecrl-out",
             required = false, description = "Where to save the baseCRL"
                     + "\nThe default is <out>-baseCRL")
+    @Completion(FilePathCompleter.class)
     protected String baseCRLOut;
 
     @Override
@@ -78,14 +84,12 @@ public class GetCRLCommand extends CRLCommand
         Set<String> caNames = raWorker.getCaNames();
         if(caNames.isEmpty())
         {
-            err("No CA is configured");
-            return  null;
+            throw new CmdFailure("No CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new CmdFailure("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -96,16 +100,14 @@ public class GetCRLCommand extends CRLCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new CmdFailure("No caname is specified, one of " + caNames + " is required");
             }
         }
 
         X509CRL crl = retrieveCRL(caName);
         if(crl == null)
         {
-            err("Received no CRL from server");
-            return null;
+            throw new CmdFailure("Received no CRL from server");
         }
 
         saveVerbose("Saved CRL to file", new File(outFile), crl.getEncoded());
@@ -125,7 +127,7 @@ public class GetCRLCommand extends CRLCommand
                 crl = raWorker.downloadCRL(caName, baseCrlNumber);
                 if(crl == null)
                 {
-                    err("Received no baseCRL from server");
+                    throw new CmdFailure("Received no baseCRL from server");
                 }
                 else
                 {

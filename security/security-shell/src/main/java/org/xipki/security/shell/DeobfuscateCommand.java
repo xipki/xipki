@@ -35,8 +35,10 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.OBFPasswordResolver;
 
 /**
@@ -44,6 +46,7 @@ import org.xipki.security.OBFPasswordResolver;
  */
 
 @Command(scope = "keytool", name = "deobfuscate", description="Deobfuscate password")
+@Service
 public class DeobfuscateCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
@@ -56,18 +59,13 @@ public class DeobfuscateCommand extends SecurityCommand
     {
         if(passwordHint.startsWith("OBF:") == false)
         {
-            err("encrypted password '" + passwordHint + "' does not start with OBF:");
-            return null;
+            throw new IllegalCmdParamException(
+                    "encrypted password '" + passwordHint + "' does not start with OBF:");
         }
 
-        try
-        {
-            String password = OBFPasswordResolver.deobfuscate(passwordHint);
-            out("The deobfuscated password is: '" + new String(password) + "'");
-        }catch(Exception e)
-        {
-            err(e.getMessage());
-        }
+        String password = OBFPasswordResolver.deobfuscate(passwordHint);
+        out("The deobfuscated password is: '" + new String(password) + "'");
+
         return null;
     }
 

@@ -38,38 +38,51 @@ package org.xipki.ca.server.mgmt.shell.cert;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.completer.FileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "enroll-cert", description="Enroll certificate")
+@Service
 public class EnrollCertCommand extends CaCommand
 {
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
 
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
+    @Completion(FileNameCompleter.class)
     protected String p10File;
 
     @Option(name = "-out",
             description = "Required. Where to save the certificate",
             required = true)
+    @Completion(FileNameCompleter.class)
     protected String outFile;
 
     @Option(name = "-profile",
             required = true, description = "Required. Profile name")
+    @Completion(ProfileNameCompleter.class)
     protected String profileName;
 
     @Option(name = "-user",
@@ -83,8 +96,7 @@ public class EnrollCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " not available");
         }
 
         byte[] encodedP10Request = IoCertUtil.read(p10File);
@@ -97,8 +109,7 @@ public class EnrollCertCommand extends CaCommand
         {
             LOG.warn("Exception: {}", e.getMessage());
             LOG.debug("Exception", e);
-            err("ERROR: " + e.getMessage());
-            return null;
+            throw new CmdFailure("ERROR: " + e.getMessage());
         }
 
         return null;

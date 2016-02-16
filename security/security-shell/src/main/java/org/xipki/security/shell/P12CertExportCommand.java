@@ -40,8 +40,11 @@ import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.SignerException;
 
 /**
@@ -49,10 +52,12 @@ import org.xipki.security.api.SignerException;
  */
 
 @Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
+@Service
 public class P12CertExportCommand extends P12SecurityCommand
 {
     @Option(name = "-out",
             required = true, description = "Required. Where to save the certificate")
+    @Completion(FilePathCompleter.class)
     protected String outFile;
 
     @Override

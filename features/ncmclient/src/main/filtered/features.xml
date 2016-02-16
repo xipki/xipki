@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="xipki-ncmclient-${project.version}"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
+  <feature name="xipki-pkiconsole" version="${project.version}">
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
+    <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/pkiconsole-client/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-pkiconsole-shell" version="${project.version}">
+    <feature>xipki-pkiconsole</feature>
+    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
+  </feature>
+</features>

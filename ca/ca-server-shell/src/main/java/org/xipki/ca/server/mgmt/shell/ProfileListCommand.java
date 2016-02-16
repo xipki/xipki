@@ -40,8 +40,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**
@@ -49,6 +50,7 @@ import org.xipki.ca.server.mgmt.api.CertProfileEntry;
  */
 
 @Command(scope = "ca", name = "profile-list", description="List profiles")
+@Service
 public class ProfileListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)

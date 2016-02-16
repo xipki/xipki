@@ -35,35 +35,43 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.common.CmpControl;
+import org.xipki.console.karaf.YesNoCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "cmpcontrol-set", description="Set CMP control")
+@Service
 public class CmpControlSetCommand extends CaCommand
 {
     @Option(name = "-cc", aliases = { "--confirmCert" },
             description = "Whether confirm of certificate is required.\n"
                 + "Valid values are 'yes' and 'no'")
+    @Completion(YesNoCompleter.class)
     protected String confirmCertS = "no";
 
     @Option(name = "-scc", aliases = { "--sendCaCert" },
             description = "Whether CA certificate is included in response.\n"
                 + "Valid values are 'yes' and 'no'")
+    @Completion(YesNoCompleter.class)
     protected String sendCaCertS = "no";
 
     @Option(name = "-src", aliases = { "--sendResponderCert" },
             description = "Whether responder certificate is included in response.\n"
                 + "Valid values are 'yes' and 'no'")
+    @Completion(YesNoCompleter.class)
     protected String sendResponderCertS = "yes";
 
     @Option(name = "-mt", aliases = { "--messageTime" },
             description = "Whether message time is required in request.\n"
                 + "Valid values are 'yes' and 'no'")
+    @Completion(YesNoCompleter.class)
     protected String requireMessageTimeS = "yes";
 
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },

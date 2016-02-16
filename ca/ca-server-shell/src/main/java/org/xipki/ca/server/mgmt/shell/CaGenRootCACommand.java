@@ -40,12 +40,16 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.ConfigurationException;
 
 /**
@@ -53,6 +57,7 @@ import org.xipki.security.common.ConfigurationException;
  */
 
 @Command(scope = "ca", name = "gen-rca", description="Generate selfsigned CA")
+@Service
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
     @Option(name = "-subject",
@@ -67,6 +72,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
 
     @Option(name = "-out",
             description = "Where to save the generated CA certificate")
+    @Completion(FilePathCompleter.class)
     protected String rcaCertOutFile;
 
     @Override
@@ -75,45 +81,40 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     {
         if(nextSerial < 0)
         {
-            err("invalid serial number: " + nextSerial);
-            return null;
+            throw new IllegalCmdParamException("invalid serial number: " + nextSerial);
         }
 
         if(numCrls < 0)
         {
-            err("invalid numCrls: " + numCrls);
-            return null;
+            throw new IllegalCmdParamException("invalid numCrls: " + numCrls);
         }
 
         if(expirationPeriod < 0)
         {
-            err("invalid expirationPeriod: " + expirationPeriod);
-            return null;
+            throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
         CAStatus status = CAStatus.getCAStatus(caStatus);
         if(status == null)
         {
-            err("invalid status: " + caStatus);
-            return null;
+            throw new IllegalCmdParamException("invalid status: " + caStatus);
         }
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
         {
-            err("invalid duplication mode: " + duplicateKeyS);
+            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateKeyS);
         }
         DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
         if(duplicateSubject == null)
         {
-            err("invalid duplication mode: " + duplicateSubjectS);
+            throw new IllegalCmdParamException("invalid duplication mode: " + duplicateSubjectS);
         }
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if(validityMode == null)
         {
-            err("invalid validityMode: " + validityModeS);
-            return null;
+            throw new IllegalCmdParamException("invalid validityMode: " + validityModeS);
         }
 
         Set<Permission> _permissions = new HashSet<>();

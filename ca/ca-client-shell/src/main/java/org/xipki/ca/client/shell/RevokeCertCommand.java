@@ -38,11 +38,16 @@ package org.xipki.ca.client.shell;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.ca.client.shell.completer.ClientCRLReasonCompleter;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.IoCertUtil;
 
@@ -51,6 +56,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "revoke", description="Revoke certificate")
+@Service
 public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Option(name = "-reason",
@@ -63,6 +69,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
                     "  5: cessationOfOperation\n" +
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
+    @Completion(ClientCRLReasonCompleter.class)
     protected String reason;
 
     @Override
@@ -71,21 +78,18 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
+            throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
         CertIDOrError certIdOrError;
@@ -104,7 +108,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            err("Revocation failed: " + error);
+            throw new CmdFailure("Revocation failed: " + error);
         }
         else
         {

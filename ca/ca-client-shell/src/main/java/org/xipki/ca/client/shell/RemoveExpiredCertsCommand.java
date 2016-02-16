@@ -37,19 +37,26 @@ package org.xipki.ca.client.shell;
 
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
+import org.xipki.ca.client.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "caclient", name = "remove-expired-certs", description="Remove expired certificates")
+@Service
 public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",
             required = false, description = "Required if multiple CAs are configured. CA name")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-profile",
@@ -72,14 +79,12 @@ public class RemoveExpiredCertsCommand extends ClientCommand
         Set<String> caNames = raWorker.getCaNames();
         if(caNames.isEmpty())
         {
-            err("No CA is configured");
-            return  null;
+            throw new CmdFailure("No CA is configured");
         }
 
         if(caName != null && ! caNames.contains(caName))
         {
-            err("CA " + caName + " is not within the configured CAs " + caNames);
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " is not within the configured CAs " + caNames);
         }
 
         if(caName == null)
@@ -90,8 +95,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
             }
             else
             {
-                err("No caname is specified, one of " + caNames + " is required");
-                return null;
+                throw new IllegalCmdParamException("No caname is specified, one of " + caNames + " is required");
             }
         }
 

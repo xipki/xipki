@@ -35,8 +35,13 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -44,12 +49,14 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ca", name = "publisher-update", description="Update publisher")
+@Service
 public class PublisherUpdateCommand extends CaCommand
 {
 
     @Option(name = "-name",
                 description = "Required. Publisher Name",
                 required = true, multiValued = false)
+    @Completion(PublisherNameCompleter.class)
     protected String name;
 
     @Option(name = "-type",
@@ -62,6 +69,7 @@ public class PublisherUpdateCommand extends CaCommand
 
     @Option(name = "-confFile",
             description = "Profile configuration file")
+    @Completion(FilePathCompleter.class)
     protected String confFile;
 
     @Override
@@ -70,8 +78,7 @@ public class PublisherUpdateCommand extends CaCommand
     {
         if(type == null && conf == null && confFile == null)
         {
-            err("Nothing to update");
-            return null;
+            throw new IllegalCmdParamException("Nothing to update");
         }
 
         if(conf == null && confFile != null)

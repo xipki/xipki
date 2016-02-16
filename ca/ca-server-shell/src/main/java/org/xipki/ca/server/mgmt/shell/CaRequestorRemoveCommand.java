@@ -35,23 +35,30 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "careq-rm", description="Remove requestor in CA")
+@Service
 public class CaRequestorRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")
+    @Completion(RequestorNameCompleter.class)
     protected String requestorName;
 
     @Override

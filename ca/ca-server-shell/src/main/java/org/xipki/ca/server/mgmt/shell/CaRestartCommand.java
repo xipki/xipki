@@ -38,13 +38,16 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "ca-restart", description="Restart CA system")
+@Service
 public class CaRestartCommand extends CaCommand
 {
 
@@ -55,8 +58,7 @@ public class CaRestartCommand extends CaCommand
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)
         {
-            err("Could not restart CA system");
-            return null;
+            throw new CmdFailure("Could not restart CA system");
         }
 
         StringBuilder sb = new StringBuilder("Restarted CA system");

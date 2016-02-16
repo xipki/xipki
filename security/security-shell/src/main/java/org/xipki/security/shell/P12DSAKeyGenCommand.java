@@ -35,8 +35,10 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.p10.P12KeypairGenerator;
 
@@ -44,7 +46,8 @@ import org.xipki.security.p10.P12KeypairGenerator;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "keytool", name = "dsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Service
 public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-plen",
@@ -63,8 +66,7 @@ public class P12DSAKeyGenCommand extends P12KeyGenCommand
     {
         if(pLen % 1024 != 0)
         {
-            err("plen is not multiple of 1024: " + pLen);
-            return null;
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
         }
 
         if(qLen == null)

@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.CaRevokeCommand;
 import org.xipki.console.karaf.EnumCompleter;
 import org.xipki.security.common.CRLReason;
@@ -42,7 +43,7 @@ import org.xipki.security.common.CRLReason;
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class CACRLReasonCompleter extends EnumCompleter
 {
     public CACRLReasonCompleter()

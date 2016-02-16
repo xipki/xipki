@@ -35,6 +35,7 @@
 
 package org.xipki.ca.client.shell;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.client.api.RAWorker;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
@@ -44,11 +45,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class ClientCommand extends XipkiOsgiCommandSupport
 {
+    @Reference
     protected RAWorker raWorker;
-
-    public final void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
-    }
 
 }

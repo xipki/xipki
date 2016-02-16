@@ -42,10 +42,16 @@ import java.nio.charset.Charset;
  * Provides access to configuration values.
  *
  * @author Lijun Liao
+ * @since 2.0.0
  */
 
 public class Configuration
 {
+
+    private Configuration()
+    {
+    }
+
     public static String getLineSeparator()
     {
         return System.getProperty("line.separator");
@@ -72,8 +78,8 @@ public class Configuration
     }
 
     /**
-     * Get the default encoding.  Will first look at the LC_CTYPE environment variable, then the input.encoding
-     * system property, then the default charset according to the JVM.
+     * Get the default encoding. Will first look at the LC_CTYPE environment variable, then the
+     * input.encoding system property, then the default charset according to the JVM.
      *
      * @return The default encoding to use when none is specified.
      */
@@ -89,14 +95,16 @@ public class Configuration
     }
 
     /**
-     * Parses the LC_CTYPE value to extract the encoding according to the POSIX standard, which says that the LC_CTYPE
-     * environment variable may be of the format <code>[language[_territory][.codeset][@modifier]]</code>
+     * Parses the LC_CTYPE value to extract the encoding according to the POSIX standard, which
+     * says that the LC_CTYPE environment variable may be of the format
+     * <code>[language[_territory][.codeset][@modifier]]</code>
      *
      * @param ctype The ctype to parse, may be null
      * @return The encoding, if one was present, otherwise null
      */
-    static String extractEncodingFromCtype(String ctype)
-    {
+    static String extractEncodingFromCtype(
+            final String ctype)
+            {
         if (ctype != null && ctype.indexOf('.') > 0)
         {
             String encodingAndModifier = ctype.substring(ctype.indexOf('.') + 1);
@@ -110,4 +118,5 @@ public class Configuration
         }
         return null;
     }
+
 }

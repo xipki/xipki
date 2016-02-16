@@ -35,6 +35,7 @@
 
 package org.xipki.security.shell;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -49,18 +50,8 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 public abstract class SecurityCommand extends XipkiOsgiCommandSupport
 {
-
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     protected IaikExtendedModule getModule(String moduleName)
     throws SignerException

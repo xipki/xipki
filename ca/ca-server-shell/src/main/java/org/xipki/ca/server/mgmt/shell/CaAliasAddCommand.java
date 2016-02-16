@@ -35,19 +35,24 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "caalias-add", description="Add CA alias")
+@Service
 public class CaAliasAddCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-alias",

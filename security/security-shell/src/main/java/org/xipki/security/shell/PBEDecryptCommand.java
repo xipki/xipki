@@ -35,8 +35,10 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.PBEPasswordResolver;
 
 /**
@@ -44,6 +46,7 @@ import org.xipki.security.PBEPasswordResolver;
  */
 
 @Command(scope = "keytool", name = "pbe-dec", description="Decrypt password with master password")
+@Service
 public class PBEDecryptCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
@@ -56,19 +59,13 @@ public class PBEDecryptCommand extends SecurityCommand
     {
         if(passwordHint.startsWith("PBE:") == false)
         {
-            err("encrypted password '" + passwordHint + "' does not start with PBE:");
-            return null;
+            throw new IllegalCmdParamException(
+                    "encrypted password '" + passwordHint + "' does not start with PBE:");
         }
 
         char[] masterPassword = readPassword("Please enter the master password");
-        try
-        {
-            char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
-            out("The decrypted password is: '" + new String(password) + "'");
-        }catch(Exception e)
-        {
-            err(e.getMessage());
-        }
+        char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
+        out("The decrypted password is: '" + new String(password) + "'");
         return null;
     }
 

@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-group</artifactId>
     <version>1.0.2-SNAPSHOT</version>
   </parent>
+  <groupId>org.xipki.dist</groupId>
   <artifactId>dist-group</artifactId>
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
-  <properties>
-    <bc.version>1.51</bc.version>
-    <hikaricp.version>1.4.0</hikaricp.version>
-    <karaf.version>2.3.7</karaf.version>
-    <jetty.version>7.6.16.v20140903</jetty.version>
-  </properties>
   <modules>
     <module>pki</module>
-    <module>pkiconsole</module>
-    <module>remotep11</module>
+    <module>ncmclient</module>
+    <module>pkcs11proxy</module>
   </modules>
 </project>

@@ -35,9 +35,12 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -45,6 +48,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ca", name = "publisher-add", description="Add publisher")
+@Service
 public class PublisherAddCommand extends CaCommand
 {
 
@@ -64,6 +68,7 @@ public class PublisherAddCommand extends CaCommand
 
     @Option(name = "-confFile",
             description = "Publisher configuration file")
+    @Completion(FilePathCompleter.class)
     protected String confFile;
 
     @Override

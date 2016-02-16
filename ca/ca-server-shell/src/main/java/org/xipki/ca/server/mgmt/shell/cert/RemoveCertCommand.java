@@ -37,19 +37,26 @@ package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.math.BigInteger;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "remove-cert", description="Remove certificate")
+@Service
 public class RemoveCertCommand extends CaCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-serial",
@@ -63,8 +70,7 @@ public class RemoveCertCommand extends CaCommand
     {
         if(caManager.getCA(caName) == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " not available");
         }
 
         boolean successful =
@@ -76,7 +82,7 @@ public class RemoveCertCommand extends CaCommand
         }
         else
         {
-            err("Could not remove certificate");
+            throw new CmdFailure("Could not remove certificate");
         }
 
         return null;

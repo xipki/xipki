@@ -7,8 +7,15 @@ Please copy them to this directory.
 
 2. DB2
   Driver: db2jcc4.jar
+  
 
 3. MySQL
+
+3.1 Debian
+  Use the mysql-connector-java.jar from the package libmysql-java:
+    /usr/share/java/mysql-connector-java.jar
+
+3.2 Non-debian
   Driver: mysql-connector-java.jar
   Download URL: https://dev.mysql.com/downloads/connector/j
   

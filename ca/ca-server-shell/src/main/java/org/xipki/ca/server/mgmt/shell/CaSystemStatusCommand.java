@@ -35,14 +35,17 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.common.CASystemStatus;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "system-status", description="Show CA system status")
+@Service
 public class CaSystemStatusCommand extends CaCommand
 {
     @Override
@@ -56,7 +59,7 @@ public class CaSystemStatusCommand extends CaCommand
         }
         else
         {
-            err("status is NULL");
+            throw new CmdFailure("status is NULL");
         }
         return null;
     }

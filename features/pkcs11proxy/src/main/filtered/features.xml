@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="xipki-pkcs11proxy-${project.version}"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
+  <feature name="xipki-security-p11" version="${project.version}">
+    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-iaikp11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-sunp11/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-remotep11-server" version="${project.version}">
+    <feature>xipki-security-p11</feature>
+    <bundle>mvn:org.xipki/remotep11-server/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-security-shell" version="${project.version}">
+    <feature>xipki-security-p11</feature>
+    <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
+  </feature>
+</features>

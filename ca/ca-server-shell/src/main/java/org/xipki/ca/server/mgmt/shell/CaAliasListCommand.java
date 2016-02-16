@@ -40,17 +40,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "caalias-list", description="List CA aliases")
+@Service
 public class CaAliasListCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = false)
+    @Completion(CaAliasCompleter.class)
     protected String caAlias;
 
     @Override

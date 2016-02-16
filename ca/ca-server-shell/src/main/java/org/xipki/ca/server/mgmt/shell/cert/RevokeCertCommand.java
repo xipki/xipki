@@ -37,10 +37,16 @@ package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.math.BigInteger;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ClientCRLReasonCompleter;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.CRLReason;
 
 /**
@@ -48,10 +54,12 @@ import org.xipki.security.common.CRLReason;
  */
 
 @Command(scope = "ca", name = "revoke-cert", description="Revoke certificate")
+@Service
 public class RevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-serial",
@@ -69,6 +77,7 @@ public class RevokeCertCommand extends CaCommand
                     "5: cessationOfOperation\n" +
                     "6: certificateHold\n" +
                     "9: privilegeWithdrawn")
+    @Completion(ClientCRLReasonCompleter.class)
     protected String reason;
 
     @Override
@@ -78,21 +87,18 @@ public class RevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " not available");
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            err("invalid reason " + reason);
-            return null;
+            throw new IllegalCmdParamException("invalid reason " + reason);
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            err("reason " + reason + " is not permitted");
-            return null;
+            throw new IllegalCmdParamException("reason " + reason + " is not permitted");
         }
 
         boolean successful = caManager.revokeCertificate(caName, BigInteger.valueOf(serialNumber), crlReason, null);
@@ -103,7 +109,7 @@ public class RevokeCertCommand extends CaCommand
         }
         else
         {
-            err("Could not revoke certificate");
+            throw new CmdFailure("Could not revoke certificate");
         }
 
         return null;

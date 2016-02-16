@@ -46,8 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -66,8 +68,10 @@ import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
-import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
@@ -79,6 +83,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ocsp", name = "status", description="Request certificate status")
+@Service
 public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
@@ -87,6 +92,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
     @Option(name = "-cert",
             description = "Certificate")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "-v", aliases="--verbose",
@@ -108,8 +114,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     {
         if(serialNumber == null && certFile == null)
         {
-            err("Neither serialNumber nor certFile is set");
-            return null;
+            throw new IllegalCmdParamException("Neither serialNumber nor certFile is set");
         }
 
         X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
@@ -131,15 +136,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
         RequestOptions options = getRequestOptions();
 
-        BasicOCSPResp basicResp;
-        try
-        {
-            basicResp = requestor.ask(caCert, sn, serverUrl, options);
-        }catch(OCSPResponseNotSuccessfullException e)
-        {
-            err(e.getMessage());
-            return null;
-        }
+        BasicOCSPResp basicResp = requestor.ask(caCert, sn, serverUrl, options);
 
         // check the signature if available
         if(null == basicResp.getSignature())
@@ -151,7 +148,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if(responderCerts == null || responderCerts.length < 1)
             {
-                err("No responder certificate is contained in the response");
+                throw new CmdFailure("No responder certificate is contained in the response");
             }
             else
             {
@@ -160,11 +157,11 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 boolean sigValid = basicResp.isSignatureValid(cvp);
                 if(sigValid == false)
                 {
-                    err("Response is equipped with invalid signature");
+                    out("Response is equipped with invalid signature");
                 }
                 else
                 {
-                    err("Response is equipped with valid signature");
+                    out("Response is equipped with valid signature");
                 }
 
                 if(verbose.booleanValue())
@@ -181,11 +178,11 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            err("Received no status from server");
+            throw new CmdFailure("Received no status from server");
         }
         else if(n != 1)
         {
-            err("Received status with " + n +
+            throw new CmdFailure("Received status with " + n +
                     " single responses from server, but 1 was requested");
         }
         else

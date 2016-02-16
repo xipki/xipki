@@ -37,22 +37,19 @@ package org.xipki.ca.client.shell.completer;
 
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.RAWorker;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class CaNameCompleter extends DynamicEnumCompleter
 {
-
+    @Reference
     protected RAWorker            raWorker;
-
-    public final void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
-    }
 
     @Override
     protected Set<String> getEnums()

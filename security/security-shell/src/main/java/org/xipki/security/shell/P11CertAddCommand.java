@@ -35,29 +35,34 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.Session;
-import iaik.pkcs.pkcs11.objects.Object;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11Util;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+
+import iaik.pkcs.pkcs11.Session;
+import iaik.pkcs.pkcs11.objects.Object;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "keytool", name = "add-cert", description="Add certificate to PKCS#11 device")
+@Service
 public class P11CertAddCommand extends SecurityCommand
 {
 
@@ -67,10 +72,12 @@ public class P11CertAddCommand extends SecurityCommand
 
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
@@ -79,15 +86,7 @@ public class P11CertAddCommand extends SecurityCommand
     {
         IaikExtendedModule module = getModule(moduleName);
 
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
 
         X509Certificate cert = IoCertUtil.parseCert(certFile);
 
@@ -106,8 +105,8 @@ public class P11CertAddCommand extends SecurityCommand
                         P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
                                 certObj.getId().getByteArrayValue(),
                                 new String(certObj.getLabel().getCharArrayValue()));
-                        err("Given certificate already exists under " + p11KeyId);
-                        return null;
+                        throw new CmdFailure(
+                                "Given certificate already exists under " + p11KeyId);
                     }
                 }
             }

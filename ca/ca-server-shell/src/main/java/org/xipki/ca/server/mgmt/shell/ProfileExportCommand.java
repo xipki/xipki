@@ -37,25 +37,33 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.File;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "profile-export", description="Export profile configuration")
+@Service
 public class ProfileExportCommand extends CaCommand
 {
     @Option(name = "-name",
             description = "Required. Profile name",
             required = true, multiValued = false)
+    @Completion(ProfileNameCompleter.class)
     protected String name;
 
     @Option(name = "-out",
             description = "Required. Where to save the profile configuration",
             required = true)
+    @Completion(FilePathCompleter.class)
     protected String confFile;
 
     @Override
@@ -65,8 +73,7 @@ public class ProfileExportCommand extends CaCommand
         CertProfileEntry entry = caManager.getCertProfile(name);
         if(entry == null)
         {
-            err("No cert profile named " + name + " is defined");
-            return null;
+            throw new IllegalCmdParamException("No cert profile named " + name + " is defined");
         }
 
         saveVerbose("Saved cert profile configuration to", new File(confFile), entry.getConf().getBytes("UTF-8"));

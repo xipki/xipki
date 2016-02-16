@@ -38,7 +38,9 @@ package org.xipki.security.shell;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.xipki.console.karaf.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -48,6 +50,7 @@ public abstract class P12SecurityCommand extends SecurityCommand
 {
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")
+    @Completion(FilePathCompleter.class)
     protected String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },

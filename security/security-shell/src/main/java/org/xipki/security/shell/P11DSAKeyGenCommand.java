@@ -35,8 +35,10 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
@@ -45,6 +47,7 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
  */
 
 @Command(scope = "keytool", name = "dsa", description="Generate DSA keypair in PKCS#11 device")
+@Service
 public class P11DSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-plen",
@@ -63,8 +66,7 @@ public class P11DSAKeyGenCommand extends P11KeyGenCommand
     {
         if(pLen % 1024 != 0)
         {
-            err("plen is not multiple of 1024: " + pLen);
-            return null;
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
         }
 
         if(qLen == null)

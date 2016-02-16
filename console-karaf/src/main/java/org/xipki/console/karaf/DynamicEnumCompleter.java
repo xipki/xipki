@@ -38,8 +38,10 @@ package org.xipki.console.karaf;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.console.Completer;
-import org.apache.karaf.shell.console.completer.StringsCompleter;
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
  * @author Lijun Liao
@@ -47,19 +49,23 @@ import org.apache.karaf.shell.console.completer.StringsCompleter;
 
 public abstract class DynamicEnumCompleter implements Completer
 {
+
     protected abstract Set<String> getEnums();
 
     @Override
-    public int complete(String buffer, int cursor, List<String> candidates)
-    {
+    public int complete(
+            final Session session,
+            final CommandLine commandLine,
+            final List<String> candidates)
+            {
         StringsCompleter delegate = new StringsCompleter();
 
-        for(String s : getEnums())
+        for (String s : getEnums())
         {
             delegate.getStrings().add(s);
         }
 
-        return delegate.complete(buffer, cursor, candidates);
+        return delegate.complete(session, commandLine, candidates);
     }
 
 }

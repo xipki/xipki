@@ -40,19 +40,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "ca-list", description="List CAs")
+@Service
 public class CaListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = false)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-v", aliases="--verbose",

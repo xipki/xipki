@@ -35,17 +35,22 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "caalias-rm", description="Remove CA alias")
+@Service
 public class CaAliasRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = true)
+    @Completion(CaAliasCompleter.class)
     protected String caAlias;
 
     @Override

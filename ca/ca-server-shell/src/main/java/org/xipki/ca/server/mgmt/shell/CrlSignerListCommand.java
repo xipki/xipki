@@ -40,19 +40,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "crlsigner-list", description="List CRL signers")
+@Service
 public class CrlSignerListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = false)
+    @Completion(CrlSignerNameCompleter.class)
     protected String name;
 
     @Option(name = "-v", aliases="--verbose",

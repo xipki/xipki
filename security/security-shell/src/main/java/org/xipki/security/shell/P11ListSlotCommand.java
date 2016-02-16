@@ -35,13 +35,6 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.PublicKey;
-import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,26 +43,37 @@ import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
+
+import iaik.pkcs.pkcs11.objects.DSAPublicKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.PublicKey;
+import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "keytool", name = "list", description="List objects in PKCS#11 device")
+@Service
 public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-v", aliases="--verbose",
@@ -78,6 +82,7 @@ public class P11ListSlotCommand extends SecurityCommand
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "-slot",
@@ -91,8 +96,7 @@ public class P11ListSlotCommand extends SecurityCommand
         IaikExtendedModule module = getModule(moduleName);
         if(module == null)
         {
-            err("Undefined module " + moduleName);
-            return null;
+            throw new IllegalCmdParamException("Undefined module " + moduleName);
         }
 
         List<P11SlotIdentifier> slots = module.getSlotIds();
@@ -121,20 +125,11 @@ public class P11ListSlotCommand extends SecurityCommand
         }
 
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(slotId);
-        }catch(SignerException e)
-        {
-            err("\tError:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(slotId);
 
         if(slot == null)
         {
-            err("slot with index " + slotIndex + " does not exist");
-            return null;
+            throw new IllegalCmdParamException("slot with index " + slotIndex + " does not exist");
         }
 
         List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);

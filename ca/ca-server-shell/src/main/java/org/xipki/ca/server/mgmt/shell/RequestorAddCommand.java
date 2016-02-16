@@ -35,16 +35,21 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.completer.FileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "requestor-add", description="Add requestor")
+@Service
 public class RequestorAddCommand extends CaCommand
 {
     @Option(name = "-name",
@@ -55,6 +60,7 @@ public class RequestorAddCommand extends CaCommand
     @Option(name = "-cert",
             description = "Required. Requestor certificate file",
             required = true)
+    @Completion(FileNameCompleter.class)
     protected String certFile;
 
     @Override

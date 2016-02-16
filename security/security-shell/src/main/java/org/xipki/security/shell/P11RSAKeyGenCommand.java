@@ -37,8 +37,10 @@ package org.xipki.security.shell;
 
 import java.math.BigInteger;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
@@ -47,6 +49,7 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
  */
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
+@Service
 public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-keysize",
@@ -65,8 +68,7 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     {
         if(keysize % 1024 != 0)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
-            return null;
+            throw new IllegalCmdParamException("Keysize is not multiple of 1024: " + keysize);
         }
 
         BigInteger _publicExponent = new BigInteger(publicExponent);

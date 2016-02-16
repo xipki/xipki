@@ -43,8 +43,11 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ConfPairs;
@@ -55,14 +58,17 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
+@Service
 public class P12CertUpdateCommand extends P12SecurityCommand
 {
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "-cacert",
             required = false, multiValued = true, description = "CA Certificate files")
+    @Completion(FilePathCompleter.class)
     protected Set<String> caCertFiles;
 
     @Override

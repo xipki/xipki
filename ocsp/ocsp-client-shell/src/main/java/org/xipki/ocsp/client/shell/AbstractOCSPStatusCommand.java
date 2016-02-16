@@ -38,10 +38,13 @@ package org.xipki.ocsp.client.shell;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -61,6 +64,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
+    @Completion(FilePathCompleter.class)
     protected String caCertFile;
 
     @Option(name = "-nonce",
@@ -83,6 +87,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
             required = false, description = "Sign request")
     protected Boolean signRequest = Boolean.FALSE;
 
+    @Reference
     protected OCSPRequestor requestor;
 
     protected URL getServiceURL()
@@ -133,13 +138,4 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
         return options;
     }
 
-    public OCSPRequestor getRequestor()
-    {
-        return requestor;
-    }
-
-    public void setRequestor(OCSPRequestor requestor)
-    {
-        this.requestor = requestor;
-    }
 }

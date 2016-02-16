@@ -35,9 +35,13 @@
 
 package org.xipki.ca.client.shell.loadtest;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.AbstractLoadTest;
 
 /**
@@ -45,12 +49,14 @@ import org.xipki.security.common.AbstractLoadTest;
  */
 
 @Command(scope = "caclient", name = "loadtest-template-enroll", description="CA Client Template Enroll Load test")
+@Service
 public class CALoadTestTemplateEnrollCommand extends ClientCommand
 {
 
     @Option(name = "-template",
             required = true,
             description = "Required. Template file")
+    @Completion(FilePathCompleter.class)
     protected String templateFile;
 
     @Option(name = "-duration",
@@ -69,14 +75,12 @@ public class CALoadTestTemplateEnrollCommand extends ClientCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("Invalid number of threads " + numThreads);
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
-            return null;
+            throw new IllegalCmdParamException("Invalid duration " + durationInSecond);
         }
 
         StringBuilder startMsg = new StringBuilder();

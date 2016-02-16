@@ -35,10 +35,12 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
+import org.xipki.security.shell.completer.ECCurveNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -50,6 +52,7 @@ public class P11ECKeyGenCommand extends P11KeyGenCommand
     @Option(name = "-curve",
             description = "EC Curve name",
             required = false)
+    @Completion(ECCurveNameCompleter.class)
     protected String curveName = "brainpoolp256r1";
 
     @Override

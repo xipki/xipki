@@ -39,21 +39,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class P11ModuleNameCompleter extends DynamicEnumCompleter
 {
+    @Reference
     private SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Set<String> getEnums()

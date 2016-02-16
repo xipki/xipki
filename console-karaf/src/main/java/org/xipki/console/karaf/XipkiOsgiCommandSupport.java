@@ -40,82 +40,109 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Collection;
 
-import jline.console.ConsoleReader;
-
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.console.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
+public abstract class XipkiOsgiCommandSupport implements Action
 {
-    protected boolean isTrue(Boolean b)
+
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiOsgiCommandSupport.class);
+
+    @Reference
+    protected Session session;
+
+    protected abstract Object doExecute()
+    throws Exception;
+
+    @Override
+    public Object execute()
+    throws Exception
     {
+        try
+        {
+            return doExecute();
+        } catch (Exception e)
+        {
+            LOG.debug("Exception caught while executing command", e);
+            throw new Exception(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    protected boolean isTrue(
+            final Boolean b)
+            {
         return b != null && b.booleanValue();
     }
 
-    protected void saveVerbose(String promptPrefix, File file, byte[] encoded)
+    protected void saveVerbose(
+            final String promptPrefix,
+            final File file,
+            final byte[] encoded)
     throws IOException
     {
-        ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
         File saveTo = expandFilepath(file);
 
         boolean randomSaveTo = false;
-        if(saveTo.exists())
+        if (saveTo.exists())
         {
             try
             {
                 boolean b = true;
-                while(saveTo.exists())
+                while (saveTo.exists())
                 {
-                    if(b)
+                    if (b)
                     {
-                        out("A file named '" +
-                                saveTo.getPath() + "' already exists. Do you want to replace it [yes/no]? ");
+                        out("A file named '" + saveTo.getPath()
+                            + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
-                    String answer = reader.readLine();
-                    if(answer == null)
+                    String answer = session.readLine(null, null);
+                    if (answer == null)
                     {
                         throw new IOException("interrupted");
                     }
 
-                    if("yes".equalsIgnoreCase(answer))
+                    if ("yes".equalsIgnoreCase(answer))
                     {
                         break;
-                    }
-                    else if("no".equalsIgnoreCase(answer))
+                    } else if ("no".equalsIgnoreCase(answer))
                     {
                         out("Enter name of file to save to ... ");
                         String newFn = null;
-                        while(true)
+                        while (true)
                         {
-                            newFn = reader.readLine();
-                            if(newFn.trim().isEmpty() == false)
+                            newFn = session.readLine(null, null);
+                            if (!newFn.trim().isEmpty())
                             {
                                 break;
                             }
                         }
 
                         saveTo = new File(newFn);
-                    }
-                    else
+                    } else
                     {
                         out("Please answer with yes or no. ");
                         b = false;
                     }
-                }
-            } catch(IOException e)
+                } // end while
+            } catch (IOException e)
             {
                 saveTo = new File("tmp-" + randomHex(6));
                 randomSaveTo = true;
             }
-        }
+        } // end if(saveTo.exists())
 
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }
@@ -123,34 +150,37 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         try
         {
             save(saveTo, encoded);
-        } catch(IOException e)
+        } catch (IOException e)
         {
-            if(randomSaveTo == false)
+            if (!randomSaveTo)
             {
                 saveTo = new File("tmp-" + randomHex(6));
                 save(saveTo, encoded);
             }
         }
 
-        if(promptPrefix == null || promptPrefix.isEmpty())
+        String localPromptPrefix = promptPrefix;
+        if (localPromptPrefix == null || localPromptPrefix.isEmpty())
         {
-            promptPrefix = "Saved to file";
+            localPromptPrefix = "saved to file";
         }
 
-        out(promptPrefix + " " + saveTo.getPath());
-    }
+        out(localPromptPrefix + " " + saveTo.getPath());
+    } // method saveVerbose
 
-    protected void save(File file, byte[] encoded)
+    protected void save(
+            final File file,
+            final byte[] encoded)
     throws IOException
     {
-        file = expandFilepath(file);
-        File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
+        File localFile = expandFilepath(file);
+        File parent = localFile.getParentFile();
+        if (parent != null && !parent.exists())
         {
             parent.mkdirs();
         }
 
-        FileOutputStream out = new FileOutputStream(file);
+        FileOutputStream out = new FileOutputStream(localFile);
         try
         {
             out.write(encoded);
@@ -160,52 +190,63 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    private static final String randomHex(int n)
-    {
+    private static String randomHex(
+            final int n)
+            {
         SecureRandom r = new SecureRandom();
         byte[] bytes = new byte[n];
         r.nextBytes(bytes);
         return new BigInteger(1, bytes).toString(16);
     }
 
-    protected static Boolean isEnabled(String enabledS, String optionName)
-    {
-        if(enabledS == null)
+    protected static Boolean isEnabled(
+            final String enabledS,
+            final String optionName)
+            {
+        if (enabledS == null)
         {
             return null;
         }
-        return intern_isEnabled(enabledS, optionName);
+        return internIsEnabled(enabledS, optionName);
     }
 
-    protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName)
-    {
-        if(enabledS == null)
+    protected static boolean isEnabled(
+            final String enabledS,
+            final boolean defaultEnabled,
+            final String optionName)
+            {
+        if (enabledS == null)
         {
             return defaultEnabled;
         }
 
-        return intern_isEnabled(enabledS, optionName);
+        return internIsEnabled(enabledS, optionName);
     }
 
-    private static boolean intern_isEnabled(String enabledS, String optionName)
-    {
-        if("yes".equalsIgnoreCase(enabledS) || "enabled".equalsIgnoreCase(enabledS) || "true".equalsIgnoreCase(enabledS))
-        {
+    private static boolean internIsEnabled(
+            final String enabledS,
+            final String optionName)
+            {
+        if ("yes".equalsIgnoreCase(enabledS)
+                || "enabled".equalsIgnoreCase(enabledS)
+                || "true".equalsIgnoreCase(enabledS))
+                {
             return true;
-        }
-        else if("no".equalsIgnoreCase(enabledS) || "disabled".equalsIgnoreCase(enabledS) || "false".equalsIgnoreCase(enabledS))
-        {
+        } else if ("no".equalsIgnoreCase(enabledS)
+                || "disabled".equalsIgnoreCase(enabledS)
+                || "false".equalsIgnoreCase(enabledS))
+                {
             return false;
-        }
-        else
+        } else
         {
             throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
         }
     }
 
-    protected char[] readPasswordIfNotSet(String password)
-    {
-        if(password != null)
+    protected char[] readPasswordIfNotSet(
+            final String password)
+            {
+        if (password != null)
         {
             return password.toCharArray();
         }
@@ -218,30 +259,34 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         return readPassword("Enter the password");
     }
 
-    protected char[] readPassword(String prompt)
-    {
+    protected char[] readPassword(
+            final String prompt)
+            {
         String passwordUi = System.getProperty("org.xipki.console.passwordui");
-        if("gui".equalsIgnoreCase(passwordUi))
+        if ("gui".equalsIgnoreCase(passwordUi))
         {
             return SecurePasswordInputPanel.readPassword(prompt);
-        }
-        else
+        } else
         {
-            ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-            out(prompt);
+            String tPrompt = prompt;
+            if (prompt != null && !prompt.endsWith("\n"))
+            {
+                tPrompt += "\n";
+            }
             try
             {
-                String pwd = reader.readLine('*');
+                String pwd = session.readLine(tPrompt, '*');
                 return pwd.toCharArray();
-            }catch(IOException e)
+            } catch (IOException e)
             {
                 return new char[0];
             }
         }
     }
 
-    public static String expandFilepath(String path)
-    {
+    protected static String expandFilepath(
+            final String path)
+            {
         if (path.startsWith("~" + File.separator))
         {
             return System.getProperty("user.home") + path.substring(1);
@@ -252,26 +297,100 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
     }
 
-    public static File expandFilepath(File file)
-    {
+    protected static File expandFilepath(
+            final File file)
+            {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
-        if(path.equals(expandedPath) == false)
+        if(path.equals(expandedPath))
         {
-            file = new File(expandedPath);
+            return file;
         }
 
-        return file;
+        return new File(expandedPath);
     }
 
-    protected void err(String message)
-    {
-        System.err.println(message);
-    }
-
-    protected void out(String message)
-    {
+    protected void out(
+            final String message)
+            {
         System.out.println(message);
+    }
+
+    protected static boolean isBlank(
+            final String s)
+            {
+        return s == null || s.isEmpty();
+    }
+
+    protected static boolean isNotBlank(
+            final String s)
+            {
+        return !isBlank(s);
+    }
+
+    protected static boolean isEmpty(
+            final Collection<?> c)
+            {
+        return c == null || c.isEmpty();
+    }
+
+    protected static boolean isNotEmpty(
+            final Collection<?> c)
+            {
+        return !isNotEmpty(c);
+    }
+
+    protected static BigInteger toBigInt(
+            final String s)
+            {
+        String localS = s.trim();
+        if (localS.startsWith("0x") || localS.startsWith("0X"))
+        {
+            if (localS.length() > 2)
+            {
+                return new BigInteger(localS.substring(2), 16);
+            } else
+            {
+                throw new NumberFormatException("invalid integer '" + localS + "'");
+            }
+        }
+        return new BigInteger(localS);
+    }
+
+    protected boolean confirm(
+            final String prompt,
+            final int maxTries)
+    throws IOException
+    {
+        String tPrompt = prompt;
+        if (prompt != null && !prompt.endsWith("\n"))
+        {
+            tPrompt += "\n";
+        }
+        String answer = session.readLine(tPrompt, null);
+        if (answer == null)
+        {
+            throw new IOException("interrupted");
+        }
+
+        int tries = 1;
+
+        while (tries < maxTries)
+        {
+            answer = session.readLine("Please answer with yes or no\n", null);
+            if ("yes".equalsIgnoreCase(answer))
+            {
+                return true;
+            } else if ("no".equalsIgnoreCase(answer))
+            {
+                return false;
+            } else
+            {
+                tries++;
+            }
+        }
+
+        return false;
     }
 
 }

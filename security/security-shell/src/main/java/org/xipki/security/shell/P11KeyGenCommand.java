@@ -37,11 +37,14 @@ package org.xipki.security.shell;
 
 import java.io.File;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -64,10 +67,12 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
 
     @Option(name = "-certout",
             required = false, description = "Where to save the self-signed certificate")
+    @Completion(FilePathCompleter.class)
     protected String outputFilename;
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected String getSubject()

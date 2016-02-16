@@ -38,13 +38,16 @@ package org.xipki.security.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
@@ -54,6 +57,7 @@ import org.xipki.security.p10.Pkcs10RequestGenerator;
  */
 
 @Command(scope = "keytool", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
+@Service
 public class P12CertRequestGenCommand extends P12SecurityCommand
 {
     @Option(name = "-subject",
@@ -68,6 +72,7 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
 
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
+    @Completion(FilePathCompleter.class)
     protected String outputFilename;
 
     @Override

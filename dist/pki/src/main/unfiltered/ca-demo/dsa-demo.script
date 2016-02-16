@@ -1,0 +1,33 @@
+PLEN = 1024
+
+# Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
+#
+CA_SIGNER_ALGO = SHA256withDSA
+
+feature:install xipki-security-shell
+
+# Wait one second
+sleep 1000
+
+keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/RCA1.p12 \
+  -subject "CN=RCA1"
+
+keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCA1.p12 \
+  -subject "CN=SubCA1"
+
+keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCAwithCRL1.p12 \
+  -subject "CN=SubCAwithCRL1"
+
+source ./ca-demo/prepare.script
+
+source ./ca-demo/p12.script
+
+source ./ca-demo/ra.script
+
+source ./ca-demo/ocsp.script
+
+source ./ca-demo/loadtest-enroll.script
+
+source ./ca-demo/loadtest-ocsp.script
+
+

@@ -35,8 +35,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 
 /**
@@ -44,6 +45,7 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
  */
 
 @Command(scope = "ca", name = "responder-list", description="List responder")
+@Service
 public class ResponderListCommand extends CaCommand
 {
 

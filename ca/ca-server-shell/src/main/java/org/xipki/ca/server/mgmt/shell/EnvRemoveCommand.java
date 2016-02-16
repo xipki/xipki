@@ -35,14 +35,16 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "env-rm", description="Remove environment parameter")
+@Service
 public class EnvRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Environment parameter name", required = true)

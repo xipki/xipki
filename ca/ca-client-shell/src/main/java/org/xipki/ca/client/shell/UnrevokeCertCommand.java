@@ -38,10 +38,13 @@ package org.xipki.ca.client.shell;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -49,6 +52,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
+@Service
 public class UnrevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Override
@@ -57,8 +61,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
+            throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
         }
 
         CertIDOrError certIdOrError;
@@ -77,7 +80,7 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            err("Releasing revocation failed: " + error);
+            throw new CmdFailure("Releasing revocation failed: " + error);
         }
         else
         {

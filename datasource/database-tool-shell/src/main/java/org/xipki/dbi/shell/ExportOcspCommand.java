@@ -35,8 +35,13 @@
 
 package org.xipki.dbi.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.DirPathCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.OcspDbExporter;
@@ -47,6 +52,7 @@ import org.xipki.security.api.PasswordResolver;
  */
 
 @Command(scope = "dbtool", name = "export-ocsp", description="Export OCSP database")
+@Service
 public class ExportOcspCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";
@@ -54,11 +60,13 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
 
     @Option(name = "-dbconf",
             description = "Database configuration file.")
+    @Completion(FilePathCompleter.class)
     protected String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
             description = "Required. Output directory",
             required = true)
+    @Completion(DirPathCompleter.class)
     protected String outdir;
 
     @Option(name = "-n",
@@ -68,7 +76,10 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     @Option(name = "-resume")
     protected Boolean resume = Boolean.FALSE;
 
+    @Reference
     private DataSourceFactory dataSourceFactory;
+
+    @Reference
     private PasswordResolver passwordResolver;
 
     @Override
@@ -80,13 +91,4 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
-    {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
 }

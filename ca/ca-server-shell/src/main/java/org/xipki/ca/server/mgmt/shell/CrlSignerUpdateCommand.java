@@ -37,10 +37,14 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -48,15 +52,18 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ca", name = "crlsigner-update", description="Update CRL signer")
+@Service
 public class CrlSignerUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
             description = "Required. CRL signer name",
             required = true, multiValued = false)
+    @Completion(CrlSignerNameCompleter.class)
     protected String name;
 
     @Option(name = "-signerType",
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
+    @Completion(CrlSignerNameCompleter.class)
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -65,6 +72,7 @@ public class CrlSignerUpdateCommand extends CaCommand
 
     @Option(name = "-cert",
             description = "CRL signer's certificate file or 'NULL'")
+    @Completion(FilePathCompleter.class)
     protected String signerCert;
 
     @Option(name = "-crlControl",

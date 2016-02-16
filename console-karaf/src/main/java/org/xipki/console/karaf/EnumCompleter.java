@@ -39,36 +39,43 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.karaf.shell.console.Completer;
-import org.apache.karaf.shell.console.completer.StringsCompleter;
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class EnumCompleter implements Completer
+public abstract class EnumCompleter implements Completer
 {
+
     private final List<String> enums = new LinkedList<>();
 
-    public void setTokens(String tokens)
-    {
+    protected void setTokens(
+            final String tokens)
+            {
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
-        while(st.hasMoreTokens())
+        while (st.hasMoreTokens())
         {
             enums.add(st.nextToken());
         }
     }
 
     @Override
-    public int complete(String buffer, int cursor, List<String> candidates)
-    {
+    public int complete(
+            final Session session,
+            final CommandLine commandLine,
+            final List<String> candidates)
+            {
         StringsCompleter delegate = new StringsCompleter();
-        for(String entry : enums)
+        for (String entry : enums)
         {
             delegate.getStrings().add(entry);
         }
-        return delegate.complete(buffer, cursor, candidates);
+        return delegate.complete(session, commandLine, candidates);
     }
 
 }

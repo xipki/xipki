@@ -35,13 +35,14 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.console.karaf.EnumCompleter;
 import org.xipki.security.common.CRLReason;
 
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class ClientCRLReasonCompleter extends EnumCompleter
 {
     public ClientCRLReasonCompleter()

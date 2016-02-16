@@ -40,9 +40,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -64,15 +68,18 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
  */
 
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
+@Service
 public class P11CertUpdateCommand extends P11SecurityCommand
 {
 
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "-cacert",
             required = false, multiValued = true, description = "CA Certificate files")
+    @Completion(FilePathCompleter.class)
     protected Set<String> caCertFiles;
 
     @Override
@@ -83,15 +90,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
 
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
 
         char[] keyLabelChars = (keyLabel == null) ?
                 null : keyLabel.toCharArray();
@@ -100,8 +99,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
 
         if(privKey == null)
         {
-            err("Could not find private key " + keyIdentifier);
-            return null;
+            throw new IllegalCmdParamException("Could not find private key " + keyIdentifier);
         }
 
         byte[] keyId = privKey.getId().getByteArrayValue();

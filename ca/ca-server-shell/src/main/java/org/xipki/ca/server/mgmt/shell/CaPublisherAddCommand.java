@@ -37,23 +37,30 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "capub-add", description="Add publishers to CA")
+@Service
 public class CaPublisherAddCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
+    @Completion(PublisherNameCompleter.class)
     protected List<String> publisherNames;
 
     @Override

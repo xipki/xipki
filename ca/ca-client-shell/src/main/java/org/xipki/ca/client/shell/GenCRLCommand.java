@@ -37,7 +37,8 @@ package org.xipki.ca.client.shell;
 
 import java.security.cert.X509CRL;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 
@@ -46,6 +47,7 @@ import org.xipki.ca.common.RAWorkerException;
  */
 
 @Command(scope = "caclient", name = "gencrl", description="Generate CRL")
+@Service
 public class GenCRLCommand extends CRLCommand
 {
     @Override

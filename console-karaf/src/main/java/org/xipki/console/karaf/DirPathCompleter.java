@@ -35,13 +35,21 @@
 
 package org.xipki.console.karaf;
 
-import org.apache.karaf.shell.console.Completer;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
+ * @since 2.0.0
  */
 
-public interface DirPathCompleter extends Completer
+@Service
+public class DirPathCompleter extends AbstractPathCompleter
 {
+
+    @Override
+    protected boolean isDirOnly()
+    {
+        return true;
+    }
 
 }

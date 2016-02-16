@@ -37,20 +37,27 @@ package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.math.BigInteger;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "unrevoke-cert", description="Unrevoke certificate")
+@Service
 public class UnrevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-serial",
@@ -65,8 +72,7 @@ public class UnrevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            err("CA " + caName + " not available");
-            return null;
+            throw new IllegalCmdParamException("CA " + caName + " not available");
         }
 
         boolean successful = caManager.unrevokeCertificate(caName, BigInteger.valueOf(serialNumber));
@@ -77,7 +83,7 @@ public class UnrevokeCertCommand extends CaCommand
         }
         else
         {
-            err("Could not unrevoke certificate");
+            throw new CmdFailure("Could not unrevoke certificate");
         }
 
         return null;

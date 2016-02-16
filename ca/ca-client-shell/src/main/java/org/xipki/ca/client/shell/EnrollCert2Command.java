@@ -38,7 +38,9 @@ package org.xipki.ca.client.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
@@ -51,6 +53,8 @@ import org.xipki.ca.cmp.client.type.EnrollCertRequestEntryType;
 import org.xipki.ca.cmp.client.type.EnrollCertRequestType;
 import org.xipki.ca.common.CertificateOrError;
 import org.xipki.ca.common.EnrollCertResult;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -73,6 +77,7 @@ public abstract class EnrollCert2Command extends ClientCommand
 
     @Option(name = "-out",
             required = true, description = "Where to save the certificate")
+    @Completion(FilePathCompleter.class)
     protected String outputFile;
 
     @Option(name = "-user",
@@ -83,12 +88,8 @@ public abstract class EnrollCert2Command extends ClientCommand
             required = false, description = "Hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     protected abstract ConcurrentContentSigner getSigner()
     throws SignerException;
@@ -137,8 +138,7 @@ public abstract class EnrollCert2Command extends ClientCommand
 
         if(cert == null)
         {
-            err("No certificate received from the server");
-            return null;
+            throw new CmdFailure("No certificate received from the server");
         }
 
         File certFile = new File(outputFile);

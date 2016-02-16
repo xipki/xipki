@@ -35,13 +35,15 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "cmpcontrol-remove", description="Remove CMP control")
+@Service
 public class CmpControlRemoveCommand extends CaCommand
 {
     @Override

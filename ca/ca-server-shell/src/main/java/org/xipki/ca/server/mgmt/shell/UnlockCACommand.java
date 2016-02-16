@@ -35,13 +35,16 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "unlock", description="Unlock the CA syste")
+@Service
 public class UnlockCACommand extends CaCommand
 {
     @Override
@@ -56,7 +59,7 @@ public class UnlockCACommand extends CaCommand
         }
         else
         {
-            err("Could not unlock CA system");
+            throw new CmdFailure("Could not unlock CA system");
         }
 
         return null;

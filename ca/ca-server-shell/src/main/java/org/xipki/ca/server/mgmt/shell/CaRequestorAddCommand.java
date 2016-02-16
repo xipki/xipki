@@ -38,10 +38,17 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.Permission;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ProfileNamePlusAllCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
+import org.xipki.console.karaf.YesNoCompleter;
 import org.xipki.security.common.ConfigurationException;
 
 /**
@@ -49,31 +56,37 @@ import org.xipki.security.common.ConfigurationException;
  */
 
 @Command(scope = "ca", name = "careq-add", description="Add requestor to CA")
+@Service
 public class CaRequestorAddCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")
+    @Completion(RequestorNameCompleter.class)
     protected String requestorName;
 
     @Option(name = "-ra",
             description = "Whether as RA.\n"
                     + "Valid values are 'yes' and 'no'")
+    @Completion(YesNoCompleter.class)
     protected String raS = "no";
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
             required = true, multiValued = true)
+    @Completion(PermissionCompleter.class)
     protected Set<String> permissions;
 
     @Option(name = "-profile",
             description = "Required. Profile name or 'all' for all profiles, multi options is allowed",
             required = true, multiValued = true)
+    @Completion(ProfileNamePlusAllCompleter.class)
     protected Set<String> profiles;
 
     @Override

@@ -37,22 +37,30 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.completer.FileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "responder-set", description="Set responder")
+@Service
 public class ResponderSetCommand extends CaCommand
 {
     @Option(name = "-signerType",
             description = "Required. Type of the responder signer",
             required = true)
+    @Completion(SignerTypeCompleter.class)
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -61,8 +69,10 @@ public class ResponderSetCommand extends CaCommand
 
     @Option(name = "-cert",
             description = "Requestor certificate")
+    @Completion(FileNameCompleter.class)
     protected String certFile;
 
+    @Reference
     private SecurityFactory securityFactory;
 
     @Override
@@ -91,11 +101,6 @@ public class ResponderSetCommand extends CaCommand
         caManager.setCmpResponder(entry);
         out("configured CMP responder");
         return null;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
     }
 
 }

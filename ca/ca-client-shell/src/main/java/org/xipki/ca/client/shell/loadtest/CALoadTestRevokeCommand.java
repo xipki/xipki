@@ -38,10 +38,15 @@ package org.xipki.ca.client.shell.loadtest;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.console.karaf.FilePathCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.SecurityFactory;
@@ -53,11 +58,13 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "loadtest-revoke", description="CA Client Revoke Load test")
+@Service
 public class CALoadTestRevokeCommand extends ClientCommand
 {
     @Option(name = "-cacert",
             required = true,
             description = "CA Certificate file")
+    @Completion(FilePathCompleter.class)
     protected String caCertFile;
 
     @Option(name = "-duration",
@@ -73,6 +80,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
     @Option(name = "-cadb",
             required = true,
             description = "CA database configuration file")
+    @Completion(FilePathCompleter.class)
     protected String caDbConfFile;
 
     @Option(name = "-maxCerts",
@@ -85,7 +93,10 @@ public class CALoadTestRevokeCommand extends ClientCommand
             required = false)
     protected Integer n = 1;
 
+    @Reference
     private DataSourceFactory dataSourceFactory;
+
+    @Reference
     private SecurityFactory securityFactory;
 
     @Override
@@ -94,14 +105,12 @@ public class CALoadTestRevokeCommand extends ClientCommand
     {
         if(numThreads < 1)
         {
-            err("Invalid number of threads " + numThreads);
-            return null;
+            throw new IllegalCmdParamException("Invalid number of threads " + numThreads);
         }
 
         if(durationInSecond < 1)
         {
-            err("Invalid duration " + durationInSecond);
-            return null;
+            throw new IllegalCmdParamException("Invalid duration " + durationInSecond);
         }
 
         StringBuilder startMsg = new StringBuilder();
@@ -144,13 +153,4 @@ public class CALoadTestRevokeCommand extends ClientCommand
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
-    {
-        this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 }

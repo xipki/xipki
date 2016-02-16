@@ -1,0 +1,54 @@
+#################################################################
+#                      Initialize the database                  #
+#################################################################
+
+feature:install xipki-database-tool
+dbtool:initdb --quiet
+feature:uninstall xipki-database-tool
+
+feature:install xipki-caserver-shell
+
+ca:ca-restart
+
+#################################################################
+#                       PREPARE ENVIRONMENET                    #
+#################################################################
+
+## Environment parameters
+ca:env-add -name add.prefix -value true
+
+ca:env-add -name add.suffix -value true
+
+## CMP control: messageTimeBias is set to 300 seconds.
+ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
+
+## Certificate Profiles
+ca:profile-add -name RCA-Cross -type XML -confFile ca-demo/profile/CertProfile_RootCA_Cross.xml
+
+ca:profile-add -name SubCA -type XML -confFile ca-demo/profile/CertProfile_SubCA.xml
+
+ca:profile-add -name SubCA.Complex -type XML -confFile ca-demo/profile/CertProfile_SubCA_Complex.xml
+
+ca:profile-add -name OCSP -type XML -confFile ca-demo/profile/CertProfile_OCSP.xml
+
+ca:profile-add -name TLS -type XML -confFile ca-demo/profile/CertProfile_TLS.xml
+
+ca:profile-add -name TLS_C -type XML -confFile ca-demo/profile/CertProfile_TLS_C.xml
+
+ca:profile-add -name TLSwithIncSN -type XML -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
+
+ca:profile-add -name gSMC_K -type XML -confFile ca-demo/profile/CertProfile_gSMC_K.xml
+
+## Publishers
+ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
+  -conf datasource=ocsp,publish.goodcerts=true
+
+# CMP Responder
+ca:responder-set -signerType JKS \
+  -signerConf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
+
+# CMP Requestors
+ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
+
+## CRL Signer
+ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode=onDemand

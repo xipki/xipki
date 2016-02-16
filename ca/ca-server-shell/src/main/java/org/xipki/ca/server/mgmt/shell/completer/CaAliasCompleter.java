@@ -35,36 +35,21 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import java.util.List;
+import java.util.Set;
 
-import org.apache.karaf.shell.console.Completer;
-import org.apache.karaf.shell.console.completer.StringsCompleter;
-import org.xipki.ca.server.mgmt.api.CAManager;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
  */
-
-public class CaAliasCompleter implements Completer
+@Service
+public class CaAliasCompleter extends MgmtNameCompleter
 {
-    private CAManager caManager;
-
-    public void setCaManager(CAManager caManager)
-    {
-        this.caManager = caManager;
-    }
 
     @Override
-    public int complete(String buffer, int cursor, List<String> candidates)
+    protected Set<String> getEnums()
     {
-        StringsCompleter delegate = new StringsCompleter();
-
-        for(String s : caManager.getCaAliasNames())
-        {
-            delegate.getStrings().add(s);
-        }
-
-        return delegate.complete(buffer, cursor, candidates);
+        return caManager.getCaAliasNames();
     }
 
 }

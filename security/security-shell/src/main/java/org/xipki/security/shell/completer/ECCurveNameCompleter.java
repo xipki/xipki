@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
@@ -48,7 +49,7 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
 /**
  * @author Lijun Liao
  */
-
+@Service
 public class ECCurveNameCompleter extends DynamicEnumCompleter
 {
 

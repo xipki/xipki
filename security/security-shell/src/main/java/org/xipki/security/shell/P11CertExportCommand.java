@@ -35,29 +35,34 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-
 import java.io.File;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.SignerException;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
+
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "keytool", name = "export-cert", description="Export certificate from PKCS#11 device")
+@Service
 public class P11CertExportCommand extends P11SecurityCommand
 {
 
     @Option(name = "-out",
             required = true, description = "Required. Where to save the certificate")
+    @Completion(FilePathCompleter.class)
     protected String outFile;
 
     @Override
@@ -68,15 +73,7 @@ public class P11CertExportCommand extends P11SecurityCommand
 
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
 
         char[] keyLabelChars = (keyLabel == null) ?
                 null : keyLabel.toCharArray();
@@ -84,15 +81,13 @@ public class P11CertExportCommand extends P11SecurityCommand
         PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
         if(privKey == null)
         {
-            err("Could not find private key " + keyIdentifier);
-            return null;
+            throw new CmdFailure("Could not find private key " + keyIdentifier);
         }
 
         X509PublicKeyCertificate cert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
         if(cert == null)
         {
-            err("Could not find certificate " + keyIdentifier);
-            return null;
+            throw new CmdFailure("Could not find certificate " + keyIdentifier);
         }
 
         saveVerbose("Saved certificate to file", new File(outFile), cert.getValue().getByteArrayValue());

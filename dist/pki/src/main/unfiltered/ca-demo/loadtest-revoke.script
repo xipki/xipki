@@ -1,0 +1,17 @@
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+feature:install xipki-caclient-shell
+
+# Wait one second
+sleep 1000
+
+echo "Revoke load test"
+caclient:loadtest-revoke \
+ -cacert output/SubCA1.der -cadb ca-config/ca-db.properties \
+ -excludeSerials 1 -duration 15 -thread 8
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-caclient-shell

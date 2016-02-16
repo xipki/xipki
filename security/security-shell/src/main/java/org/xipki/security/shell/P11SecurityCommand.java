@@ -35,10 +35,13 @@
 
 package org.xipki.security.shell;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -62,6 +65,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
 
     @Option(name = "-module",
             required = false, description = "Name of the PKCS#11 module.")
+    @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11KeyIdentifier getKeyIdentifier()
@@ -78,7 +82,7 @@ public abstract class P11SecurityCommand extends SecurityCommand
         }
         else
         {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+            throw new CmdFailure("Exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

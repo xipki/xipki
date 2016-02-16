@@ -37,26 +37,34 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.completer.FileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "requestor-update", description="Update requestor")
+@Service
 public class RequestorUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
             description = "Required. Requestor name",
             required = true)
+    @Completion(RequestorNameCompleter.class)
     protected String name;
 
     @Option(name = "-cert",
             description = "Required. Requestor certificate file",
             required = true)
+    @Completion(FileNameCompleter.class)
     protected String certFile;
 
     @Override

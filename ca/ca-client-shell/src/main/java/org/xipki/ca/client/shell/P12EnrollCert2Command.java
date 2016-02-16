@@ -37,8 +37,11 @@ package org.xipki.ca.client.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.FilePathCompleter;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -48,10 +51,12 @@ import org.xipki.security.api.SignerException;
  */
 
 @Command(scope = "caclient", name = "enroll2-p12", description="Enroll certificate as non-RA (PKCS#12 keystore)")
+@Service
 public class P12EnrollCert2Command extends EnrollCert2Command
 {
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 request file")
+    @Completion(FilePathCompleter.class)
     protected String p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },

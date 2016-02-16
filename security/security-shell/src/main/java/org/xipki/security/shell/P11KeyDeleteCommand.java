@@ -35,24 +35,26 @@
 
 package org.xipki.security.shell;
 
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.p11.iaik.IaikExtendedModule;
+import org.xipki.security.p11.iaik.IaikExtendedSlot;
+
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11KeyIdentifier;
-import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.p11.iaik.IaikExtendedModule;
-import org.xipki.security.p11.iaik.IaikExtendedSlot;
-
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "keytool", name = "delete-key", description="Generate EC keypair in PKCS#11 device")
+@Service
 public class P11KeyDeleteCommand extends P11SecurityCommand
 {
     @Override
@@ -62,15 +64,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         IaikExtendedModule module = getModule(moduleName);
 
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
+        IaikExtendedSlot slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
 
         char[] keyLabelChars = (keyLabel == null) ?
                 null : keyLabel.toCharArray();
@@ -78,8 +72,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
         PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
         if(privKey == null)
         {
-            err("Could not find private key " + keyIdentifier);
-            return null;
+            throw new IllegalCmdParamException("Could not find private key " + keyIdentifier);
         }
 
         Session session = slot.borrowWritableSession();
@@ -91,7 +84,8 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                 out("Deleted private key");
             }catch(TokenException e)
             {
-                err("Could not delete private key");
+                out("Could not delete private key");
+                throw e;
             }
 
             PublicKey pubKey = slot.getPublicKeyObject(null, null,
@@ -104,7 +98,8 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                     out("Deleted public key");
                 }catch(TokenException e)
                 {
-                    err("Could not delete public key");
+                    out("Could not delete public key");
+                    throw e;
                 }
             }
 
@@ -120,7 +115,8 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                         nDeleted++;
                     }catch(TokenException e)
                     {
-                        err("Could not delete certificate at index " + i);
+                        out("Could not delete certificate at index " + i);
+                        throw e;
                     }
                 }
                 if(nDeleted > 0)

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ Copyright (c) 2014 Lijun Liao
+-->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="xipki-pkcs11proxy-${project.version}"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
+  <!--
+        Note: instead of defining all features monolithically in a central features file,
+        Project-plugins should be defined in their own feature descriptors and then aggregated later
+    -->
+  <feature name="bouncycastle" version="${project.version}">
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+  </feature>
+  <feature name="xipki-datasource" version="${project.version}">
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.javassist/javassist/3.18.1-GA</bundle>
+    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-security" version="${project.version}">
+    <feature>bouncycastle</feature>
+    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki/security-iaikp11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-sunp11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ca-api" version="${project.version}">
+    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-cabase" version="${project.version}">
+    <feature>xipki-security</feature>
+    <feature>xipki-ca-api</feature>
+    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
+    <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caserver" version="${project.version}">
+    <feature>xipki-datasource</feature>
+    <feature>xipki-cabase</feature>
+    <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caserver-shell" version="${project.version}">
+    <feature>xipki-caserver</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caclient" version="${project.version}">
+    <feature>xipki-cabase</feature>
+    <bundle>mvn:org.xipki/ca-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-client-impl/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caclient-shell" version="${project.version}">
+    <feature>xipki-caclient</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-security-shell" version="${project.version}">
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspserver" version="${project.version}">
+    <feature>xipki-datasource</feature>
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspclient" version="${project.version}">
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki/ocsp-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-client-impl/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspclient-shell" version="${project.version}">
+    <feature>xipki-ocspclient</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ocsp-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-database-tool" version="${project.version}">
+    <feature>xipki-datasource</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
+    <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
+    <bundle>mvn:org.xipki/database-liquibase/${project.version}</bundle>
+    <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
+    <bundle>mvn:org.xipki/database-tool-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-audit-slf4j" version="${project.version}">
+    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-audit-syslog" version="${project.version}">
+    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
+    <bundle>mvn:org.xipki/syslog-audit-impl/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-pkiconsole-server" version="${project.version}">
+    <feature>xipki-caserver</feature>
+    <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
+    <bundle>mvn:org.xipki/pkiconsole-server/${project.version}</bundle>
+  </feature>
+</features>

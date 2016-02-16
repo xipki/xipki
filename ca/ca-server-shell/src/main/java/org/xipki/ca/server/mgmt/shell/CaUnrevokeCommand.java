@@ -35,17 +35,23 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.console.karaf.IllegalCmdParamException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "ca-unrevoke", description="Unrevoke CA")
+@Service
 public class CaUnrevokeCommand extends CaCommand
 {
     @Argument(index = 0, name="name", description = "CA name", required = true)
+    @Completion(CaNameCompleter.class)
     protected String caName;
 
     @Override
@@ -54,8 +60,7 @@ public class CaUnrevokeCommand extends CaCommand
     {
         if(caManager.getCaNames().contains(caName) == false)
         {
-            err("invalid CA name " + caName);
-            return null;
+            throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
         caManager.unrevokeCa(caName);

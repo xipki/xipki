@@ -37,7 +37,8 @@ package org.xipki.dbi.shell;
 
 import java.util.Map;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.liquibase.LiquibaseDatabaseConf;
 
 /**
@@ -45,6 +46,7 @@ import org.xipki.liquibase.LiquibaseDatabaseConf;
  */
 
 @Command(scope = "dbtool", name = "initdb", description="Reset and initialize the CA and OCSP databases")
+@Service
 public class InitDbAllCommand extends LiquibaseCommand
 {
     private static final String ca_schemaFile = "sql/ca-init.xml";

@@ -35,7 +35,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.common.CmpControl;
 
 /**
@@ -43,6 +44,7 @@ import org.xipki.ca.common.CmpControl;
  */
 
 @Command(scope = "ca", name = "cmpcontrol-list", description="List CMP control")
+@Service
 public class CmpControlListCommand extends CaCommand
 {
     @Override

@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 
@@ -44,11 +45,7 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
 
 public abstract class MgmtNameCompleter extends DynamicEnumCompleter
 {
+    @Reference
     protected CAManager caManager;
-
-    public void setCaManager(CAManager caManager)
-    {
-        this.caManager = caManager;
-    }
 
 }

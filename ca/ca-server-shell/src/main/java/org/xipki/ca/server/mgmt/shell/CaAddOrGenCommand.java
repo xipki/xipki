@@ -38,7 +38,15 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.ca.server.mgmt.shell.completer.CaStatusCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.DuplicationModeCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -53,6 +61,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
 
     @Option(name = "-status",
             description = "CA status, active|pending|deactivated")
+    @Completion(CaStatusCompleter.class)
     protected String caStatus = "active";
 
     @Option(name = "-ocspUri",
@@ -74,6 +83,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "Required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
             required = true, multiValued = true)
+    @Completion(PermissionCompleter.class)
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
@@ -88,6 +98,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
 
     @Option(name = "-crlSigner",
             description = "CRL signer name")
+    @Completion(CrlSignerNameCompleter.class)
     protected String crlSignerName;
 
     @Option(name = "-numCrls",
@@ -101,6 +112,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
     @Option(name = "-signerType",
             description = "Required. CA signer type",
             required = true)
+    @Completion(SignerTypeCompleter.class)
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -112,6 +124,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
+    @Completion(DuplicationModeCompleter.class)
     protected String duplicateKeyS = "forbiddenWithinProfile";
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
@@ -119,6 +132,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
+    @Completion(DuplicationModeCompleter.class)
     protected String duplicateSubjectS = "forbiddenWithinProfile";
 
     @Option(name = "-validityMode",
@@ -127,12 +141,10 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
                     + "\t        notBefore + validigty and CA's notAfter")
+    @Completion(ValidityModeCompleter.class)
     protected String validityModeS = "STRICT";
 
+    @Reference
     protected SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 }

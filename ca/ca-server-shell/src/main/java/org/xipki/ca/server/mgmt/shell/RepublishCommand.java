@@ -37,24 +37,32 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter;
+import org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "republish", description="Republish certificates")
+@Service
 public class RepublishCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name or 'all' for all CAs",
             required = true)
+    @Completion(CaNamePlusAllCompleter.class)
     protected String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true,
         description = "Required. Publisher name or 'all' for all publishers. Multivalued")
+    @Completion(PublisherNamePlusAllCompleter.class)
     protected List<String> publisherNames;
 
     @Override
@@ -88,7 +96,7 @@ public class RepublishCommand extends CaCommand
         }
         else
         {
-            err("Replubishing certificates failed");
+            throw new CmdFailure("Replubishing certificates failed");
         }
         return null;
     }

@@ -35,14 +35,16 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "env-add", description="Add environment parameter")
+@Service
 public class EnvAddCommand extends CaCommand
 {
 

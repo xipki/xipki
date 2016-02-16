@@ -1,0 +1,148 @@
+#################################################################
+#              MANAGE CERTIFICATE WITH CAServer Shell           #
+#################################################################
+# Wait one second
+sleep 1000
+
+keytool:rsa-p12 -pwd 1234 -out output/RCA2.p12 \
+  -subject "CN=RCA2,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/RCA2.p12 -pwd 1234 -out output/RCA2.p10
+
+ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2-cross.der
+
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+feature:install xipki-caclient-shell
+
+# Wait two seconds
+sleep 2000
+
+## Enroll certificates
+# Certificate OCSP1
+keytool:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"
+
+caclient:enroll2-p12 -p12 output/OCSP1.p12 -pwd 1234 -out output/OCSP1.der -profile OCSP -user USER-O
+
+keytool:update-cert-p12 -p12 output/OCSP1.p12 -pwd 1234 -cert output/OCSP1.der \
+  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+
+# Certificate OCSP2
+keytool:rsa-p12 -pwd 1234 -out output/OCSP2.p12 -subject "CN=OCSP2,O=xipki,C=DE"
+
+caclient:enroll2-p12 -p12 output/OCSP2.p12 -pwd 1234 -out output/OCSP2.der -profile OCSP -user USER-O
+
+keytool:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der \
+  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+
+## Revocate certificates
+caclient:revoke -cert output/OCSP2.der -reason keyCompromise
+
+# Certificate TLS1
+keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TLS1.xipki.org,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS1.p12 -pwd 1234 -out output/TLS1.p10
+
+caclient:enroll -p10 output/TLS1.p10 -out output/TLS1.der -profile TLS -user USER-T
+
+keytool:update-cert-p12 -p12 output/TLS1.p12 -pwd 1234 -cert output/TLS1.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+ 
+# Try to enroll with another profile
+caclient:enroll -p10 output/TLS1.p10 -out output/TLS1-TLS_C.der -profile TLS_C -user USER-T
+
+# Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
+# 1.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1.p12 -pwd 1234 -out output/TLSwithIncSN1.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1.p10 -out output/TLSwithIncSN1.der -profile TLSwithIncSN -user USER-T
+
+# 2.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1-1.p12 -pwd 1234 -out output/TLSwithIncSN1-1.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1-1.p10 -out output/TLSwithIncSN1-1.der -profile TLSwithIncSN -user USER-T
+
+# 3.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-2.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1-2.p12 -pwd 1234 -out output/TLSwithIncSN1-2.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1-2.p10 -out output/TLSwithIncSN1-2.der -profile TLSwithIncSN -user USER-T
+ 
+# Certificate TLS2
+keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TLS2.xipki.org,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS2.p12 -pwd 1234 -out output/TLS2.p10
+
+caclient:enroll -p10 output/TLS2.p10 -out output/TLS2.der -profile TLS -user USER-T
+
+keytool:update-cert-p12 -p12 output/TLS2.p12 -pwd 1234 -cert output/TLS2.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+## Revocate certificates
+caclient:revoke -cert output/TLS2.der -reason affiliationChanged
+
+## Enroll certificates
+# Certificate TLS_C1
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TLS_C1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS_C1.p12 -pwd 1234 -out output/TLS_C1.p10
+
+caclient:enroll -p10 output/TLS_C1.p10 -out output/TLS_C1.der -profile TLS_C -user USER-T
+
+keytool:update-cert-p12 -p12 output/TLS_C1.p12 -pwd 1234 -cert output/TLS_C1.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+# Certificate TLS_C2
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TLS_C2,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS_C2.p12 -pwd 1234 -out output/TLS_C2.p10
+
+caclient:enroll -p10 output/TLS_C2.p10 -out output/TLS_C2.der -profile TLS_C -user USER-T
+
+keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+## Revocate certificates
+caclient:revoke -cert output/TLS_C2.der -reason affiliationChanged
+
+## Enroll certificates gSMC-K
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K1.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -out output/gSMC_K1.p10
+
+caclient:enroll -p10 output/gSMC_K1.p10 -out output/gSMC_K1.der -profile gSMC_K -user USER-T
+
+keytool:update-cert-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -cert output/gSMC_K1.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+# sleept 1.2 seconds to ensure different notBefore in certificate
+sleep 1200
+
+# with the same CN
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -out output/gSMC_K2.p10
+
+caclient:enroll -p10 output/gSMC_K2.p10 -out output/gSMC_K2.der -profile gSMC_K -user USER-T
+
+keytool:update-cert-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -cert output/gSMC_K2.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+## Generate CRL
+caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
+
+## Get CRL
+caclient:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-caclient-shell
+feature:uninstall xipki-caserver-shell
+feature:uninstall xipki-security-shell

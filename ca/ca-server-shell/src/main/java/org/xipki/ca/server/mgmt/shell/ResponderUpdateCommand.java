@@ -37,23 +37,31 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.shell.completer.SignerTypeCompleter;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
+
+import jline.console.completer.FileNameCompleter;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "responder-update", description="Update responder")
+@Service
 public class ResponderUpdateCommand extends CaCommand
 {
     @Option(name = "-signerType",
             description = "Type of the responder signer",
             required = true)
+    @Completion(SignerTypeCompleter.class)
     protected String signerType;
 
     @Option(name = "-signerConf",
@@ -62,14 +70,11 @@ public class ResponderUpdateCommand extends CaCommand
 
     @Option(name = "-cert",
             description = "Requestor certificate file or 'NULL'")
+    @Completion(FileNameCompleter.class)
     protected String certFile;
 
+    @Reference
     protected SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()
