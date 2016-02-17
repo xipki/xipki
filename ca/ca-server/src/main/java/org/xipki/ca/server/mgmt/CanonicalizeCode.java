@@ -1,7 +1,7 @@
 /*
  *
  * This file is part of the XiPKI project.
- * Copyright (c) 2014 Lijun Liao
+ * Copyright (c) 2013-2016 Lijun Liao
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
@@ -56,7 +56,7 @@ public class CanonicalizeCode
             "/*\n" +
             " *\n" +
             " * This file is part of the XiPKI project.\n" +
-            " * Copyright (c) 2014 Lijun Liao\n" +
+            " * Copyright (c) 2013-2016 Lijun Liao\n" +
             " * Author: Lijun Liao\n" +
             " *\n" +
             " * This program is free software; you can redistribute it and/or modify\n" +
@@ -73,7 +73,7 @@ public class CanonicalizeCode
             " * GNU Affero General Public License for more details.\n" +
             " *\n" +
             " * You should have received a copy of the GNU Affero General Public License\n" +
-            " * along with this program.  If not, see <http://www.gnu.org/licenses/>.\n" +
+            " * along with this program. If not, see <http://www.gnu.org/licenses/>.\n" +
             " *\n" +
             " * The interactive user interfaces in modified source and object code versions\n" +
             " * of this program must display Appropriate Legal Notices, as required under\n" +
