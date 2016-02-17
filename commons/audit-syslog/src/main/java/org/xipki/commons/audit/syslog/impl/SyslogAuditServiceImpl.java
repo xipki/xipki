@@ -92,7 +92,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditServiceImpl.class);
 
     /**
-     * The syslog4j client instance.
+     * The syslog client instance.
      */
     protected AbstractSyslogMessageSender syslog;
 
