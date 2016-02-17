@@ -139,13 +139,26 @@ public class CanonicalizeCode
             boolean skip = true;
             boolean lastLineEmpty = false;
             boolean licenseTextAdded = false;
+            boolean thirdparty = false;
+            int lineNumber = 0;
+
             while((line = reader.readLine()) != null)
             {
+                if (lineNumber == 0 && line.startsWith("// #THIRDPARTY#"))
+                {
+                    thirdparty = true;
+                    skip = false;
+                }
+                lineNumber++;
+
                 if(line.trim().startsWith("package ") || line.trim().startsWith("import "))
                 {
                     if(licenseTextAdded == false)
                     {
-                        writer.write(licenseText.getBytes());
+                        if (!thirdparty)
+                        {
+                            writer.write(licenseText.getBytes());
+                        }
                         licenseTextAdded = true;
                     }
                     skip = false;
@@ -307,6 +320,7 @@ public class CanonicalizeCode
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         boolean authorsLineAvailable = false;
+        boolean thirdparty = false;
         List<Integer> lineNumbers = new LinkedList<>();
 
         int lineNumber = 0;
@@ -316,6 +330,11 @@ public class CanonicalizeCode
             String line;
             while((line = reader.readLine()) != null)
             {
+                if (lineNumber == 0 && line.startsWith("// #THIRDPARTY"))
+                {
+                    thirdparty = true;
+                }
+
                 if(authorsLineAvailable == false && line.contains("* @author Lijun Liao"))
                 {
                     authorsLineAvailable = true;
@@ -395,7 +414,7 @@ public class CanonicalizeCode
                 ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
-        if(authorsLineAvailable == false)
+        if(authorsLineAvailable == false && thirdparty == false)
         {
             System.out.println("Please check file " + file.getPath() +
                     ": no authors line");

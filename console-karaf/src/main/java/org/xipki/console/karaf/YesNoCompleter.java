@@ -39,7 +39,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 @Service

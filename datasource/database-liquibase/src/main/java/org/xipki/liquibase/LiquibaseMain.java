@@ -56,7 +56,6 @@ import liquibase.resource.ResourceAccessor;
  * Class for executing Liquibase via the command line.
  *
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class LiquibaseMain

@@ -37,7 +37,6 @@ package org.xipki.security.api;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public enum CertpathValidationModel

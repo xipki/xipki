@@ -43,7 +43,6 @@ import org.xipki.security.common.ParamChecker;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class CertWithEncoded
