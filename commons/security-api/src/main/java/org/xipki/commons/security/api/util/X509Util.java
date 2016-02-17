@@ -650,8 +650,8 @@ public class X509Util {
     throws CertificateEncodingException {
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (equals) {
-            byte[] ski = X509Util.extractSki(cert);
-            byte[] aki = X509Util.extractAki(cert);
+            byte[] ski = extractSki(cert);
+            byte[] aki = extractAki(cert);
             if (ski != null && aki != null) {
                 equals = Arrays.equals(ski, aki);
             }
@@ -671,8 +671,8 @@ public class X509Util {
         boolean issues = issuerCert.getSubjectX500Principal().equals(
                 cert.getIssuerX500Principal());
         if (issues) {
-            byte[] ski = X509Util.extractSki(issuerCert);
-            byte[] aki = X509Util.extractAki(cert);
+            byte[] ski = extractSki(issuerCert);
+            byte[] aki = extractAki(cert);
             if (ski != null) {
                 issues = Arrays.equals(ski, aki);
             }

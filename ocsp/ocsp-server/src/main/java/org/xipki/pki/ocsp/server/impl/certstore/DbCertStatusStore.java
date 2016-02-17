@@ -296,6 +296,11 @@ public class DbCertStatusStore extends CertStatusStore {
             final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption)
     throws CertStatusStoreException {
+        // our database supports up to 63 bit (8 byte positive) serialNumber
+        if (serialNumber.bitLength() > 63) {
+            return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
+        }
+
         // wait for max. 0.5 second
         int n = 5;
         while (!initialized && (n-- > 0)) {
@@ -331,11 +336,6 @@ public class DbCertStatusStore extends CertStatusStore {
                     issuerKeyHash);
             if (issuer == null) {
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, null);
-            }
-
-            // our database supports up to 63 bit (8 byte positive) serialNumber
-            if (serialNumber.bitLength() > 63) {
-                return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
             ResultSet rs = null;
