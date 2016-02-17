@@ -1,36 +1,18 @@
-/*
+// #THIRDPARTY# syslog4j PCISyslogMessage.java
+
+/**
  *
- * This file is part of the XiPKI project.
- * Copyright (c) 2014 Lijun Liao
- * Author: Lijun Liao
+ * (C) Copyright 2008-2011 syslog4j.org
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  */
 
 package org.xipki.audit.api;
@@ -48,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This file is copied from PCISyslogMessage from syslog4j.org
  *
  * PCISyslogMessage provides support for audit trails defined by section
  * 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
@@ -67,7 +48,6 @@ import java.util.List;
  * @author &lt;syslog4j@productivity.org&gt;
  * @version $Id: PCISyslogMessage.java,v 1.3 2008/11/14 04:32:00 cvs Exp $
  *
- * @author Lijun Liao
  */
 
 public class PCIAuditEvent
