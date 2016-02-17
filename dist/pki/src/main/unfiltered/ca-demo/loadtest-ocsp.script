@@ -1,7 +1,7 @@
 #################################################################
 #                              OCSP                             #
 #################################################################
-features:install xipki-ocspclient-shell
+feature:install xipki-ocspclient-shell
 
 # Wait one second
 sleep 1000
@@ -12,5 +12,4 @@ ocsp:loadtest-status -cacert output/SubCA1.der -duration 15 -serial 1-500 -threa
 echo "Loadtest OCSP status (CRL based cert source)"
 ocsp:loadtest-status -cacert output/SubCAwithCRL1.der -duration 15 -serial 1-2 -thread 8
 
-features:uninstall xipki-ocspclient-shell
-features:uninstall xipki-ocspclient
+feature:uninstall xipki-ocspclient-shell
