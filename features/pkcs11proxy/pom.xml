@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.features</groupId>
     <artifactId>features-group</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>pkcs11proxy</artifactId>
   <packaging>pom</packaging>
