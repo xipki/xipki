@@ -44,24 +44,20 @@ import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreParameters;
 import java.security.cert.CertificateException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.conf.jaxb.NonceType;
 import org.xipki.ocsp.conf.jaxb.RequestType;
 import org.xipki.ocsp.conf.jaxb.RequestType.CertpathValidation;
 import org.xipki.ocsp.conf.jaxb.RequestType.HashAlgorithms;
+import org.xipki.security.api.CertpathValidationModel;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.IoCertUtil;
 
@@ -90,9 +86,9 @@ class RequestOptions
     private final int nonceMinLen;
     private final int nonceMaxLen;
     private final Set<HashAlgoType> hashAlgos;
-    private final Set<TrustAnchor> trustAnchors;
-    private final CertStore certs;
-    private final int certpathValidationModel;
+    private final Set<CertWithEncoded> trustAnchors;
+    private final Set<X509Certificate> certs;
+    private final CertpathValidationModel certpathValidationModel;
 
     public RequestOptions(RequestType conf)
     throws OcspResponderException
@@ -172,17 +168,17 @@ class RequestOptions
             }
             trustAnchors = null;
             certs = null;
-            certpathValidationModel = ExtendedPKIXBuilderParameters.PKIX_VALIDITY_MODEL;
+            certpathValidationModel = CertpathValidationModel.PKIX;
         }
         else
         {
             switch(certpathConf.getValidationModel())
             {
                 case CHAIN:
-                    certpathValidationModel = ExtendedPKIXBuilderParameters.CHAIN_VALIDITY_MODEL;
+                    certpathValidationModel = CertpathValidationModel.CHAIN;
                     break;
                 case PKIX:
-                    certpathValidationModel = ExtendedPKIXBuilderParameters.PKIX_VALIDITY_MODEL;
+                    certpathValidationModel = CertpathValidationModel.PKIX;
                     break;
                 default:
                     throw new RuntimeException("should not reach here");
@@ -190,10 +186,10 @@ class RequestOptions
             try
             {
                 Set<X509Certificate> certs = getCerts(certpathConf.getTrustAnchors());
-                Set<TrustAnchor> _trustAnchors = new HashSet<TrustAnchor>();
+                Set<CertWithEncoded> _trustAnchors = new HashSet<CertWithEncoded>();
                 for(X509Certificate cert : certs)
                 {
-                    _trustAnchors.add(new TrustAnchor(cert, null));
+                    _trustAnchors.add(new CertWithEncoded(cert));
                 }
                 this.trustAnchors = Collections.unmodifiableSet(_trustAnchors);
             }catch(Exception e)
@@ -210,8 +206,7 @@ class RequestOptions
             {
                 try
                 {
-                    CertStoreParameters csp = new CollectionCertStoreParameters(getCerts(certsType));
-                    this.certs = CertStore.getInstance("Collection", csp, "BC");
+                    this.certs = getCerts(certsType);
                 }catch(Exception e)
                 {
                     throw new OcspResponderException("Error while initializing the certs: " + e.getMessage(), e);
@@ -261,17 +256,17 @@ class RequestOptions
         return hashAlgos.contains(hashAlgo);
     }
 
-    public int getCertpathValidationModel()
+    public CertpathValidationModel getCertpathValidationModel()
     {
         return certpathValidationModel;
     }
 
-    public Set<TrustAnchor> getTrustAnchors()
+    public Set<CertWithEncoded> getTrustAnchors()
     {
         return trustAnchors;
     }
 
-    public CertStore getCerts()
+    public Set<X509Certificate> getCerts()
     {
         return certs;
     }

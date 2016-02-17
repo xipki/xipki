@@ -39,21 +39,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.security.cert.CertPath;
-import java.security.cert.CertPathBuilder;
-import java.security.cert.CertPathBuilderException;
-import java.security.cert.CertPathBuilderResult;
-import java.security.cert.CertStore;
-import java.security.cert.CertStoreParameters;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,8 +91,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
-import org.bouncycastle.x509.X509CertStoreSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
@@ -134,6 +122,7 @@ import org.xipki.ocsp.conf.jaxb.ResponseType;
 import org.xipki.ocsp.conf.jaxb.SignerType;
 import org.xipki.ocsp.crlstore.CrlCertStatusStore;
 import org.xipki.ocsp.dbstore.DbCertStatusStore;
+import org.xipki.security.api.CertpathValidationModel;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -176,7 +165,6 @@ public class OcspResponder
     private Set<String> excludeCertProfiles;
 
     private AuditLoggingServiceRegister auditServiceRegister;
-    private CertPathBuilder certpathBuilder;
 
     public OcspResponder()
     {
@@ -287,17 +275,6 @@ public class OcspResponder
 
         // RequestOptions
         this.requestOptions = new RequestOptions(conf.getRequest());
-
-        if(this.requestOptions.isValidateSignature())
-        {
-            try
-            {
-                this.certpathBuilder = CertPathBuilder.getInstance("PKIX", "BC");
-            } catch (NoSuchAlgorithmException | NoSuchProviderException e)
-            {
-                throw new OcspResponderException(e.getMessage(), e);
-            }
-        }
 
         // CertHash hash algorithm of the response
         HashAlgoType certHashAlgo = null;
@@ -659,55 +636,67 @@ public class OcspResponder
                         x509Certs.add(new X509CertificateObject(cert.toASN1Structure()));
                     }
 
-                    X509CertStoreSelector certSelector = new X509CertStoreSelector();
-                    certSelector.setCertificateValid(new Date());
-                    certSelector.setCertificate(x509Certs.get(0));
-                    Set<TrustAnchor> trustAnchors = requestOptions.getTrustAnchors();
-                    ExtendedPKIXBuilderParameters cpp = new ExtendedPKIXBuilderParameters(trustAnchors, certSelector);
-                    cpp.setRevocationEnabled(false);
-                    cpp.setValidityModel(requestOptions.getCertpathValidationModel());
-                    CertStore additionalCertStore;
-                    try
+                    X509Certificate target = x509Certs.get(0);
+                    Set<CertWithEncoded> trustAnchors = requestOptions.getTrustAnchors();
+                    Set<Certificate> certstore = new HashSet<>();
+
+                    for (CertWithEncoded m : trustAnchors)
                     {
-                        CertStoreParameters csp = new CollectionCertStoreParameters(x509Certs);
-                        additionalCertStore = CertStore.getInstance("Collection", csp, "BC");
-                    }catch(Exception e)
-                    {
-                        throw new OcspResponderException("Error while initializing the CertStore of type Collection: "
-                                + e.getMessage(), e);
+                        certstore.add(m.getCertificate());
                     }
-                    cpp.addCertStore(additionalCertStore);
+
+                    final int size = x509Certs.size();
+                    if (size > 1)
+                    {
+                        for (int i = 1; i < size; i++)
+                        {
+                            certstore.add(x509Certs.get(i));
+                        }
+                    }
 
                     if(requestOptions.getCerts() != null)
                     {
-                        cpp.addCertStore(requestOptions.getCerts());
+                        certstore.addAll(requestOptions.getCerts());
                     }
 
-                    CertPathBuilderResult result;
-                    try
-                    {
-                        result = certpathBuilder.build(cpp);
-                    }catch(CertPathBuilderException | InvalidAlgorithmParameterException e)
-                    {
-                        final String message = "could not build certpath for the request's signer certifcate";
-                        if(LOG.isWarnEnabled())
-                        {
-                            LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                        }
-                        LOG.debug(message, e);
-                        if(auditEvent != null)
-                        {
-                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
-                        }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
-                    }
-
-                    CertPath certPath = result.getCertPath();
+                    X509Certificate[] certpath = X509Util.buildCertPath(target, certstore);
+                    CertpathValidationModel model = requestOptions.getCertpathValidationModel();
 
                     boolean pathValid = true;
-                    if(certPath.getCertificates().isEmpty())
+                    Date now = new Date();
+                    if (model == null || model == CertpathValidationModel.PKIX)
+                    {
+                        for (X509Certificate m : certpath)
+                        {
+                            if (m.getNotBefore().after(now) || m.getNotAfter().before(now))
+                            {
+                                pathValid = false;
+                                break;
+                            }
+                        }
+                    } else if (model == CertpathValidationModel.CHAIN)
+                    {
+                        // do nothing
+                    } else
+                    {
+                        throw new RuntimeException("invalid CertpathValidationModel " + model.name());
+                    }
+
+                    if (pathValid)
                     {
                         pathValid = false;
+                        for (int i = certpath.length - 1; i >= 0; i--)
+                        {
+                            X509Certificate targetCert = certpath[i];
+                            for (CertWithEncoded m : trustAnchors)
+                            {
+                                if (m.equalsCert(targetCert))
+                                {
+                                    pathValid = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if(pathValid == false)
