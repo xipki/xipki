@@ -629,6 +629,18 @@ public class IoCertUtil
         return sb.length() < 3 ? "" : sb.substring(2);
     }
 
+    public static boolean hasKeyusage(
+            final X509Certificate cert,
+            final KeyUsage usage)
+            {
+        boolean[] keyusage = cert.getKeyUsage();
+        if (keyusage != null && keyusage.length > usage.getBit())
+        {
+            return keyusage[usage.getBit()];
+        }
+        return false;
+    }
+
     public static boolean isSelfSigned(X509Certificate cert)
     {
         return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());

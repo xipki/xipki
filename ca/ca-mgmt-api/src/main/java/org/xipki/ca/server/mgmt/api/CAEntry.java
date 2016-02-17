@@ -49,6 +49,7 @@ import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.KeyUsage;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -103,6 +104,11 @@ public class CAEntry implements Serializable
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("signerType", signerType);
         ParamChecker.assertNotNull("cert", cert);
+
+        if(IoCertUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+        {
+            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
+        }
 
         if(initialSerial < 0)
         {
@@ -292,10 +298,18 @@ public class CAEntry implements Serializable
         }
 
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
-        sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
-        sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
-        sb.append("validityMode: ").append(validityMode).append('\n');
-        sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
+        sb.append("duplicateKey: ")
+            .append(duplicateKeyMode == null ? "null" : duplicateKeyMode.getDescription())
+            .append('\n');
+        sb.append("duplicateSubject: ")
+            .append(duplicateKeyMode == null ? "null" : duplicateSubjectMode.getDescription())
+            .append('\n');
+        sb.append("validityMode: ")
+            .append(validityMode == null ? "null" : validityMode.name())
+            .append('\n');
+        sb.append("permissions: ")
+            .append(permissions == null ? "null" : Permission.toString(permissions))
+            .append('\n');
         sb.append("lastCRLInterval: ").append(lastCRLInterval).append('\n');
         sb.append("lastCRLIntervalDate: ").append(lastCRLIntervalDate).append('\n');
 

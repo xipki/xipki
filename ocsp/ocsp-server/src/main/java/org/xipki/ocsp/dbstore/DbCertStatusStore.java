@@ -319,6 +319,12 @@ public class DbCertStatusStore extends CertStatusStore
             BigInteger serialNumber, Set<String> excludeCertProfiles)
     throws CertStatusStoreException
     {
+        // our database supports up to 63 bit (8 byte positive) serialNumber
+        if (serialNumber.bitLength() > 63)
+        {
+            return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
+        }
+
         // wait for max. 0.5 second
         int n = 5;
         while(initialized == false && (n-- > 0))

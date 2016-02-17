@@ -174,11 +174,14 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                     }
 
                     P11KeyIdentifier keyId = new P11KeyIdentifier(keyLabel);
-                    P11PrivateKey key = new P11PrivateKey(p11Servcie, slotId, keyId);
                     X509Certificate[] chain = p11Servcie.getCertificates(slotId, keyId);
 
-                    KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
-                    keyCerts.put(alias, keyCertEntry);
+                    if(chain != null && chain.length > 0)
+                    {
+                        P11PrivateKey key = new P11PrivateKey(p11Servcie, slotId, keyId);
+                        KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
+                        keyCerts.put(alias, keyCertEntry);
+                    }
                 }
             }
         } catch (SignerException | InvalidKeyException e)

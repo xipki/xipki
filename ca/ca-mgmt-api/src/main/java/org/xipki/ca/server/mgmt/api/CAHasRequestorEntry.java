@@ -88,6 +88,14 @@ public class CAHasRequestorEntry implements Serializable
     public void setProfiles(Set<String> profiles)
     {
         this.profiles = Collections.unmodifiableSet(profiles);
+        if(profiles == null)
+        {
+            this.profiles = Collections.emptySet();
+        }
+        else
+        {
+            this.profiles = Collections.unmodifiableSet(profiles);
+        }
     }
 
     public Set<String> getProfiles()
