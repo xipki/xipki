@@ -563,8 +563,8 @@ public class SunNamedCurveExtender
 
             this.a = curve.getA().toBigInteger().toString(16);
             this.b = curve.getB().toBigInteger().toString(16);
-            this.x = params.getG().getX().toBigInteger().toString(16);
-            this.y = params.getG().getY().toBigInteger().toString(16);
+            this.x = params.getG().getAffineXCoord().toBigInteger().toString(16);
+            this.y = params.getG().getAffineYCoord().toBigInteger().toString(16);
             this.n = params.getN().toString(16);
             this.h = params.getH().intValue();
 
