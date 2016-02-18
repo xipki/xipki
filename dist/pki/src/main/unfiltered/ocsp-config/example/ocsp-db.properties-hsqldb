@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.hsqldb.jdbc.JDBCDataSource
 
-dataSource.url = jdbc:hsqldb:file:~/hsqldb_ocsp;sql.syntax_pgs=true
+dataSource.url = jdbc:hsqldb:file:./db/hsqldb/ocsp;sql.syntax_pgs=true
 dataSource.user = root
 dataSource.password = 123456
 
@@ -15,7 +15,7 @@ autoCommit = true
 readOnly = false
 maximumPoolSize = 20
 minimumIdle = 10
-connectionTimeout = 60000
+connectionTimeout = 10000
 idleTimeout = 600000
 maxLifetime = 1800000
 transactionIsolation = TRANSACTION_READ_COMMITTED

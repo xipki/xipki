@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 
-dataSource.url = jdbc:h2:~/h2_ocsp
+dataSource.url = jdbc:h2:./db/h2/ocsp
 dataSource.user = root
 dataSource.password = 123456
 
@@ -15,7 +15,7 @@ autoCommit = true
 readOnly = false
 maximumPoolSize = 20
 minimumIdle = 10
-connectionTimeout = 60000
+connectionTimeout = 10000
 idleTimeout = 600000
 maxLifetime = 1800000
 transactionIsolation = TRANSACTION_READ_COMMITTED

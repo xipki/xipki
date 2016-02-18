@@ -10,7 +10,7 @@ dataSourceClassName = org.postgresql.ds.PGSimpleDataSource
 dataSource.serverName = localhost
 dataSource.portNumber = 5432
 dataSource.databaseName = ocsp
-dataSource.user = root
+dataSource.user = pguser1
 dataSource.password = 123456
 
 dataSource.prepareThreshold = 0
@@ -19,7 +19,7 @@ autoCommit = true
 readOnly = false
 maximumPoolSize = 20
 minimumIdle = 10
-connectionTimeout = 60000
+connectionTimeout = 10000
 idleTimeout = 600000
 maxLifetime = 1800000
 transactionIsolation = TRANSACTION_READ_COMMITTED
