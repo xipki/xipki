@@ -13,8 +13,6 @@
       <cm:property name="pkcs11.module" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
-  </bean>
   <bean id="passwordResolverImpl" class="org.xipki.security.PasswordResolverImpl">
     <property name="passwordResolvers">
       <list>
