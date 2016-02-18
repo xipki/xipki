@@ -415,6 +415,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             break;
         default:
             exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
+            break;
         }
 
         return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType);
@@ -723,6 +724,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             break;
         default:
             bodyType = PKIBody.TYPE_CROSS_CERT_REQ;
+            break;
         }
 
         PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));

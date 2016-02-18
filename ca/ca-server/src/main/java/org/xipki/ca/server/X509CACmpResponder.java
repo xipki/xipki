@@ -400,6 +400,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     eventType = "CONFIRM";
                     respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
+                    break;
                 }
                 case PKIBody.TYPE_ERROR:
                 {
@@ -979,6 +980,7 @@ public class X509CACmpResponder extends CmpResponder
                     failureInfo = PKIFailureInfo.badRequest;
                     auditStatus = AuditStatus.ERROR;
                     auditMessage = "BAD_REQUEST";
+                    break;
                 case CERT_REVOKED:
                     failureInfo = PKIFailureInfo.certRevoked;
                     auditStatus = AuditStatus.FAILED;
