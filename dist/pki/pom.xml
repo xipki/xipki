@@ -16,9 +16,9 @@
     <features.artifactId>pki</features.artifactId>
     <assembly.finalName>xipki-pki</assembly.finalName>
     <boot.features>http-whiteboard, xipki-caserver</boot.features>
-    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
-    <h2-jdbc.version>1.4.185</h2-jdbc.version>
-    <hsqldb.version>2.3.2</hsqldb.version>
+    <postgresql.version>9.4.1207.jre7</postgresql.version>
+    <h2-jdbc.version>1.4.191</h2-jdbc.version>
+    <hsqldb.version>2.3.3</hsqldb.version>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
