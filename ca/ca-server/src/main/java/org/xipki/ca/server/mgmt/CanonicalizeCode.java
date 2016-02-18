@@ -5,7 +5,8 @@
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
+ * it under the terms of the GNU Affero General Public License
+ * (version 3 or later at your option)
  * as published by the Free Software Foundation with the addition of the
  * following permission added to Section 15 as permitted in Section 7(a):
  * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
@@ -60,7 +61,8 @@ public class CanonicalizeCode
             " * Author: Lijun Liao\n" +
             " *\n" +
             " * This program is free software; you can redistribute it and/or modify\n" +
-            " * it under the terms of the GNU Affero General Public License version 3\n" +
+            " * it under the terms of the GNU Affero General Public License\n" +
+            " * (version 3 or later at your option)\n" +
             " * as published by the Free Software Foundation with the addition of the\n" +
             " * following permission added to Section 15 as permitted in Section 7(a):\n" +
             " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY\n" +
