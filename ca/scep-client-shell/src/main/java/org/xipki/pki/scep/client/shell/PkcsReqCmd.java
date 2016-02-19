@@ -34,28 +34,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.xipki.pki.scep.client.shell;
 
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.pki.scep.client.EnrolmentResponse;
+import org.xipki.pki.scep.client.ScepClient;
+import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
+@Command(scope = "scep", name = "pkcs-req",
+        description = "enroll certificate via messageType PkcsReq")
 @Service
-public class RandomDnCompleter extends AbstractEnumCompleter {
+public class PkcsReqCmd extends EnrollCertCommandSupport {
 
-    public RandomDnCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+    @Override
+    protected EnrolmentResponse requestCertificate(
+            final ScepClient client,
+            final CertificationRequest csr,
+            final PrivateKey identityKey,
+            final X509Certificate identityCert)
+    throws ScepClientException {
+        return client.scepPkcsReq(csr, identityKey, identityCert);
     }
 
 }

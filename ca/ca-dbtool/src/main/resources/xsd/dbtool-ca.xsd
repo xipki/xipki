@@ -4,18 +4,8 @@
 -->
 <xs:schema xmlns="http://xipki.org/pki/ca/dbtool/ca/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   targetNamespace="http://xipki.org/pki/ca/dbtool/ca/v2"
-  elementFormDefault="qualified"
-  version="1.0"
-  jxb:version="2.0">
-  <xs:annotation>
-    <xs:appinfo>
-      <jxb:schemaBindings>
-        <jxb:package name="org.xipki.pki.ca.dbtool.jaxb.ca"/>
-      </jxb:schemaBindings>
-    </xs:appinfo>
-  </xs:annotation>
+  elementFormDefault="qualified">
   <!--  CAConfiguration -->
   <xs:element name="CAConfiguration" type="CAConfigurationType"/>
   <xs:complexType name="CAConfigurationType">

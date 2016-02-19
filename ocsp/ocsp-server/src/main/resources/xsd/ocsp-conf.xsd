@@ -4,18 +4,8 @@
 -->
 <xs:schema xmlns="http://xipki.org/pki/ocsp/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   targetNamespace="http://xipki.org/pki/ocsp/conf/v2"
-  elementFormDefault="qualified"
-  version="1.0"
-  jxb:version="2.0">
-  <xs:annotation>
-    <xs:appinfo>
-      <jxb:schemaBindings>
-        <jxb:package name="org.xipki.pki.ocsp.server.impl.jaxb"/>
-      </jxb:schemaBindings>
-    </xs:appinfo>
-  </xs:annotation>
+  elementFormDefault="qualified">
   <!-- CertStore -->
   <xs:element name="OCSPServer">
     <xs:complexType>

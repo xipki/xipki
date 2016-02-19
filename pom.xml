@@ -255,6 +255,13 @@
           </executions>
           <configuration>
             <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+            <schemaIncludes>
+              <include>*.xsd</include>
+            </schemaIncludes>
+            <bindingDirectory>src/main/bindings</bindingDirectory>
+            <bindingIncludes>
+              <include>*.jxb</include>
+            </bindingIncludes> 
             <extension>true</extension>
             <args>
               <arg>-no-header</arg>

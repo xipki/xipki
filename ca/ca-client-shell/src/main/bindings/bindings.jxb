@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings 
+   version="2.1"
+   xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+   xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+   jxb:extensionBindingPrefixes="xjc inheritence"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb bindingschema_2_0.xsd">
+
+    <!--jxb:globalBindings
+        fixedAttributeAsConstantProperty="false"
+        typesafeEnumBase="xsd:NCName"
+        choiceContentProperty="false"
+        typesafeEnumMemberName="generateError"
+        enableFailFastCheck="false"
+        generateIsSetMethod="true"
+        underscoreBinding="asCharInWord"
+        typesafeEnumMaxMembers="1000"
+        generateElementProperty="true"
+    </jxb:globalBindings-->
+
+    <jxb:bindings schemaLocation="../resources/xsd/loadtest.xsd" node="/xsd:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="org.xipki.pki.ca.client.shell.loadtest.jaxb"/>
+        </jxb:schemaBindings>
+    </jxb:bindings>
+
+</jxb:bindings>

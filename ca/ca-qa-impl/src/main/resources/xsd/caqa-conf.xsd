@@ -4,18 +4,8 @@
 -->
 <xs:schema xmlns="http://xipki.org/pki/ca/qa/qa/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   targetNamespace="http://xipki.org/pki/ca/qa/qa/conf/v2"
-  elementFormDefault="qualified"
-  version="1.0"
-  jxb:version="2.0">
-  <xs:annotation>
-    <xs:appinfo>
-      <jxb:schemaBindings>
-        <jxb:package name="org.xipki.pki.ca.qa.impl.jaxb"/>
-      </jxb:schemaBindings>
-    </xs:appinfo>
-  </xs:annotation>
+  elementFormDefault="qualified">
   <xs:element name="QAConf" type="QAConfType"/>
   <xs:complexType name="QAConfType">
     <xs:sequence>
