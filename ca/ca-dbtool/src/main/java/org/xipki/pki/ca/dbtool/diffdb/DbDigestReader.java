@@ -174,8 +174,9 @@ abstract class DbDigestReader implements DigestReader {
                 for (DigestDbEntrySet result : results) {
                     if (result.getException() != null) {
                         exception = new DataAccessException(
-                                "error while reading from ID " + result.getStartId()
-                                    + ": " + result.getException().getMessage(),
+                                String.format(
+                                        "error while reading from ID %d: %s",
+                                        result.getStartId(), result.getException().getMessage()),
                                 result.getException());
                         return;
                     }
@@ -293,8 +294,7 @@ abstract class DbDigestReader implements DigestReader {
 
         int numSkipped = 0;
         if (revokedOnly) {
-            numSkipped = getNumSkippedCerts(entries.get(0).getId(),
-                    entries.get(k - 1).getId(), k);
+            numSkipped = getNumSkippedCerts(entries.get(0).getId(), entries.get(k - 1).getId(), k);
         }
 
         List<Long> serialNumbers = new ArrayList<>(k);

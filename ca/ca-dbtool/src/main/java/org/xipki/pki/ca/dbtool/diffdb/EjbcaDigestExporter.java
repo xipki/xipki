@@ -122,20 +122,20 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
             String lLang = lang.toLowerCase();
             if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8")) {
-                throw new Exception(
-                        "The environment LANG does not satisfy the pattern 'en_*.UTF-8': '"
-                        + lang + "'");
+                throw new Exception(String.format(
+                        "The environment LANG does not satisfy the pattern 'en_*.UTF-8': '%s'",
+                        lang));
             }
 
             String osName = System.getProperty("os.name");
             if (!osName.toLowerCase().contains("linux")) {
-                throw new Exception("Exporting EJBCA database is only possible in Linux, but not '"
-                        + osName + "'");
+                throw new Exception(String.format(
+                        "Exporting EJBCA database is only possible in Linux, but not '%s'",
+                        osName));
             }
 
             tblCertHasId = false;
-            String coreSql =
-                    "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
+            String coreSql = "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
                     + "revocationDate FROM CertificateData WHERE fingerprint > ?";
             sql = dataSource.createFetchFirstSelectSql(coreSql, numCertsPerSelect,
                     "fingerprint ASC");

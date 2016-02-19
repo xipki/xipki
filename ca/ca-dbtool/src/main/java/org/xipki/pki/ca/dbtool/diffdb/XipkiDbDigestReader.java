@@ -184,28 +184,20 @@ public class XipkiDbDigestReader extends DbDigestReader {
         sb.append(dbControl.getColRevTime()).append(",");
         sb.append(dbControl.getColRevInvTime()).append(",");
         sb.append(dbControl.getColCerthash());
-        sb.append(" FROM CERT INNER JOIN ")
-            .append(dbControl.getTblCerthash());
-        sb.append(" ON CERT.")
-            .append(dbControl.getColCaId())
-            .append("=").append(pCaId);
+        sb.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
+        sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(pCaId);
         sb.append(" AND CERT.ID>=? AND CERT.ID<?");
 
         if (revokedOnly) {
-            sb.append(" AND CERT.")
-                .append(dbControl.getColRevoked()).
-                append("=1");
+            sb.append(" AND CERT.").append(dbControl.getColRevoked()).append("=1");
         }
 
-        sb.append(" AND CERT.ID=")
-            .append(dbControl.getTblCerthash())
-            .append(".")
-            .append(dbControl.getColCertId());
+        sb.append(" AND CERT.ID=").append(dbControl.getTblCerthash())
+            .append(".").append(dbControl.getColCertId());
 
         this.selectCertSql = sb.toString();
 
-        this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + pCaId
-                + " AND ID>=? AND ID<=?";
+        this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + pCaId + " AND ID>=? AND ID<=?";
 
         this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
 
@@ -326,10 +318,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
                     ? rs.getInt(1)
                     : 1;
 
-            XipkiDbDigestReader reader = new XipkiDbDigestReader(
-                    datasource, caCert, revokedOnly,
-                    totalAccount, minId, maxId, numThreads,
-                    numCertsToPredicate, stopMe);
+            XipkiDbDigestReader reader = new XipkiDbDigestReader(datasource, caCert, revokedOnly,
+                    totalAccount, minId, maxId, numThreads, numCertsToPredicate, stopMe);
             reader.init(dbSchemaType, caId);
             return reader;
         } catch (SQLException e) {

@@ -188,16 +188,14 @@ public class DbDigestReporter {
         sb.append("  end time: ").append(now).append("\n");
         sb.append("     speed: ");
         if (durationSec > 0) {
-            sb.append(
-                StringUtil.formatAccount(sum / durationSec, false)).append(" /s");
+            sb.append(StringUtil.formatAccount(sum / durationSec, false)).append(" /s");
         } else {
             sb.append("--");
         }
         sb.append("\n");
 
         try {
-            IoUtil.save(reportDirname + File.separator + "overview.txt",
-                    sb.toString().getBytes());
+            IoUtil.save(reportDirname + File.separator + "overview.txt", sb.toString().getBytes());
         } catch (IOException e) {
             System.out.println("Could not write overview.txt with following content\n"
                     + sb.toString());

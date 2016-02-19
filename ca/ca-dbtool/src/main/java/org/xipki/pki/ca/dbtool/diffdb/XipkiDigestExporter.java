@@ -123,8 +123,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         }
 
         CaEntryContainer caEntryContainer = new CaEntryContainer(caEntries);
-        XipkiDigestExportReader certsReader = new XipkiDigestExportReader(
-                dataSource, dbControl, numThreads);
+        XipkiDigestExportReader certsReader = new XipkiDigestExportReader(dataSource, dbControl,
+                numThreads);
 
         Exception exception = null;
         try {
@@ -220,8 +220,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
             List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
             for (IdentifiedDbDigestEntry cert : certs) {
-                caEntryContainer.addDigestEntry(cert.getCaId().intValue(),
-                        cert.getId(), cert.getContent());
+                caEntryContainer.addDigestEntry(cert.getCaId().intValue(), cert.getId(),
+                        cert.getContent());
             }
             processLog.addNumProcessed(certs.size());
             processLog.printStatus();

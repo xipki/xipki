@@ -154,13 +154,11 @@ public class DbDigestDiffWorker extends DbPortWorker {
         try {
             DbDigestDiff diff;
             if (refDirname != null) {
-                diff = DbDigestDiff.getInstanceForDirRef(
-                    refDirname, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numThreads);
+                diff = DbDigestDiff.getInstanceForDirRef(refDirname, dataSource, reportDir,
+                        revokedOnly, stopMe, numCertsPerSelect, numThreads);
             } else {
-                diff = DbDigestDiff.getInstanceForDbRef(
-                    refDatasource, dataSource, reportDir, revokedOnly, stopMe,
-                    numCertsPerSelect, numThreads);
+                diff = DbDigestDiff.getInstanceForDbRef(refDatasource, dataSource, reportDir,
+                        revokedOnly, stopMe, numCertsPerSelect, numThreads);
             }
             diff.setIncludeCaCerts(includeCaCerts);
             diff.diff();

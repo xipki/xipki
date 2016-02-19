@@ -125,8 +125,7 @@ public class DbDigestDiff {
         // number of threads
         this.numRefThreads = (refDatasource == null)
                 ? 1
-                : Math.min(numThreads.getNumRefThreads(),
-                        refDatasource.getMaximumPoolSize() - 1);
+                : Math.min(numThreads.getNumRefThreads(), refDatasource.getMaximumPoolSize() - 1);
         if (this.numRefThreads != numThreads.getNumRefThreads()) {
             LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
         }
@@ -159,8 +158,7 @@ public class DbDigestDiff {
             File refDir = new File(this.refDirname);
             File[] childFiles = refDir.listFiles();
             for (File caDir : childFiles) {
-                if (!caDir.isDirectory()
-                        || !caDir.getName().startsWith("ca-")) {
+                if (!caDir.isDirectory() || !caDir.getName().startsWith("ca-")) {
                     continue;
                 }
 
@@ -169,8 +167,7 @@ public class DbDigestDiff {
                 diffSingleCa(refReader, caIdCertMap);
             }
         } else {
-            DbSchemaType refDbSchemaType = DbDigestExportWorker
-                    .detectDbSchemaType(refDatasource);
+            DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);
             List<Integer> refCaIds = new LinkedList<>();
 
             XipkiDbControl refDbControl = null;
@@ -208,17 +205,20 @@ public class DbDigestDiff {
                 refDatasource.releaseResources(refStmt, null);
             }
 
-            boolean dbContainsMultipleCAs = refCaIds.size() > 1;
+            boolean dbContainsMultipleCAs = (refCaIds.size() > 1);
 
             final int numCertsToPredicate = (numTargetThreads * 3 / 2) * numPerSelect;
             for (Integer refCaId : refCaIds) {
-                DigestReader refReader = (refDbSchemaType == DbSchemaType.EJBCA_CA_v3)
-                        ? EjbcaDbDigestReader.getInstance(refDatasource,
+                DigestReader refReader;
+                if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
+                    refReader = EjbcaDbDigestReader.getInstance(refDatasource,
                                 refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads,
-                                numCertsToPredicate, new StopMe(stopMe))
-                        : XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
+                                numCertsToPredicate, new StopMe(stopMe));
+                } else {
+                    refReader = XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
                                 refCaId, revokedOnly, numRefThreads,
                                 numCertsToPredicate, new StopMe(stopMe));
+                }
                 diffSingleCa(refReader, caIdCertMap);
             }
         }
@@ -296,7 +296,7 @@ public class DbDigestDiff {
                 target.close();
             }
         }
-    } // method diffSingleCA
+    } // method diffSingleCa
 
     public static DbDigestDiff getInstanceForDirRef(
             final String refDirname,
@@ -337,9 +337,8 @@ public class DbDigestDiff {
             throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
         }
 
-        return new DbDigestDiff(null, refDatasource,
-                targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numThreads);
+        return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
+                stopMe, numPerSelect, numThreads);
     }
 
     private static Map<Integer, byte[]> getCas(

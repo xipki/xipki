@@ -182,8 +182,7 @@ public class FileDigestReader implements DigestReader {
                 return null;
             }
             String filePath = "certs" + File.separator + nextFileName;
-            certsReader = new BufferedReader(
-                    new FileReader(new File(caDirname, filePath)));
+            certsReader = new BufferedReader(new FileReader(new File(caDirname, filePath)));
             line = certsReader.readLine();
         }
 
