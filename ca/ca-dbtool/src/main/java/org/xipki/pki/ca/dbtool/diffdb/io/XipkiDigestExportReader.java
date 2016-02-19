@@ -215,8 +215,9 @@ public class XipkiDigestExportReader {
         for (DigestDbEntrySet result : results) {
             if (result.getException() != null) {
                 throw new DataAccessException(
-                        "error while reading from ID " + result.getStartId()
-                            + ": " + result.getException().getMessage(),
+                        String.format(
+                                "error while reading from ID %d: %s", result.getStartId(),
+                                result.getException().getMessage()),
                         result.getException());
             }
 
