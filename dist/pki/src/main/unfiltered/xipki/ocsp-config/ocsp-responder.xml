@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OCSPServer xmlns="http://xipki.org.xipki.pki.ocsp.conf/v2">
+<OCSPServer xmlns="http://xipki.org/pki/ocsp/conf/v2">
   <!-- responders -->
   <responders>
     <responder name="responder1">

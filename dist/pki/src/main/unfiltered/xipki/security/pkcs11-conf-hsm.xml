@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PKCS11Conf xmlns="http://xipki.org/commons/pkcs11/conf/v1">
+<PKCS11Conf xmlns="http://xipki.org/commons/security/pkcs11/conf/v2">
   <modules defaultModule="cknfast">
     <module name="cknfast">
       <nativeLibraries>
