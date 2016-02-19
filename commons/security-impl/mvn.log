@@ -1,0 +1,1466 @@
+Apache Maven 3.3.3 (7994120775791599e205a5524ec3e0dfe41d4a06; 2015-04-22T13:57:37+02:00)
+Maven home: /usr/local/maven
+Java version: 1.8.0_45, vendor: Oracle Corporation
+Java home: /Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre
+Default locale: de_DE, platform encoding: UTF-8
+OS name: "mac os x", version: "10.10.5", arch: "x86_64", family: "mac"
+[DEBUG] Created new class realm maven.api
+[DEBUG] Importing foreign packages into class realm maven.api
+[DEBUG]   Imported: javax.enterprise.inject.* < plexus.core
+[DEBUG]   Imported: javax.enterprise.util.* < plexus.core
+[DEBUG]   Imported: javax.inject.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.artifact < plexus.core
+[DEBUG]   Imported: org.apache.maven.classrealm < plexus.core
+[DEBUG]   Imported: org.apache.maven.cli < plexus.core
+[DEBUG]   Imported: org.apache.maven.configuration < plexus.core
+[DEBUG]   Imported: org.apache.maven.exception < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution < plexus.core
+[DEBUG]   Imported: org.apache.maven.execution.scope < plexus.core
+[DEBUG]   Imported: org.apache.maven.lifecycle < plexus.core
+[DEBUG]   Imported: org.apache.maven.model < plexus.core
+[DEBUG]   Imported: org.apache.maven.monitor < plexus.core
+[DEBUG]   Imported: org.apache.maven.plugin < plexus.core
+[DEBUG]   Imported: org.apache.maven.profiles < plexus.core
+[DEBUG]   Imported: org.apache.maven.project < plexus.core
+[DEBUG]   Imported: org.apache.maven.reporting < plexus.core
+[DEBUG]   Imported: org.apache.maven.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.rtinfo < plexus.core
+[DEBUG]   Imported: org.apache.maven.settings < plexus.core
+[DEBUG]   Imported: org.apache.maven.toolchain < plexus.core
+[DEBUG]   Imported: org.apache.maven.usability < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.* < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authentication < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.authorization < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.events < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.observers < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.proxy < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.repository < plexus.core
+[DEBUG]   Imported: org.apache.maven.wagon.resource < plexus.core
+[DEBUG]   Imported: org.codehaus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.* < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.classworlds < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.component < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.configuration < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.container < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.context < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.lifecycle < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.logging < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.personality < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.Xpp3Dom < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParser < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlPullParserException < plexus.core
+[DEBUG]   Imported: org.codehaus.plexus.util.xml.pull.XmlSerializer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.* < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.artifact < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.collection < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.deployment < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.graph < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.installation < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.internal.impl < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.metadata < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.repository < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.resolution < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.spi < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.transfer < plexus.core
+[DEBUG]   Imported: org.eclipse.aether.version < plexus.core
+[DEBUG]   Imported: org.slf4j.* < plexus.core
+[DEBUG]   Imported: org.slf4j.spi.* < plexus.core
+[DEBUG] Populating class realm maven.api
+[INFO] Error stacktraces are turned on.
+[DEBUG] Reading global settings from /usr/local/maven/conf/settings.xml
+[DEBUG] Reading user settings from /Users/lliao/.m2/settings.xml
+[DEBUG] Reading global toolchains from /usr/local/maven/conf/toolchains.xml
+[DEBUG] Reading user toolchains from /Users/lliao/.m2/toolchains.xml
+[DEBUG] Using local repository at /Users/lliao/.m2/repository
+[DEBUG] Using manager EnhancedLocalRepositoryManager with priority 10.0 for /Users/lliao/.m2/repository
+[INFO] Scanning for projects...
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=2, ConflictMarker.markTime=1, ConflictMarker.nodeCount=197, ConflictIdSorter.graphTime=1, ConflictIdSorter.topsortTime=1, ConflictIdSorter.conflictIdCount=51, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=11, ConflictResolver.conflictItemCount=114, DefaultDependencyCollector.collectTime=266, DefaultDependencyCollector.transformTime=18}
+[DEBUG] org.apache.felix:maven-bundle-plugin:jar:2.5.3:
+[DEBUG]    biz.aQute.bnd:bndlib:jar:2.3.0:compile
+[DEBUG]       org.osgi:org.osgi.core:jar:4.3.1:compile
+[DEBUG]    org.apache.felix:org.apache.felix.bundlerepository:jar:1.6.6:compile
+[DEBUG]       org.easymock:easymock:jar:2.4:compile
+[DEBUG]    org.apache.felix:org.apache.felix.utils:jar:1.6.0:compile
+[DEBUG]       org.osgi:org.osgi.compendium:jar:4.2.0:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-settings:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.7:compile
+[DEBUG]       org.apache.maven.reporting:maven-reporting-api:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-model:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-artifact:jar:2.0.7:compile
+[DEBUG]       org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]          junit:junit:jar:3.8.1:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-project:jar:2.0.7:compile
+[DEBUG]          org.apache.maven:maven-plugin-registry:jar:2.0.7:compile
+[DEBUG]       commons-cli:commons-cli:jar:1.0:compile
+[DEBUG]       org.apache.maven:maven-plugin-api:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.0.7:compile
+[DEBUG]       org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.0.7:compile
+[DEBUG]       org.apache.maven:maven-monitor:jar:2.0.7:compile
+[DEBUG]       classworlds:classworlds:jar:1.1:compile
+[DEBUG]    org.apache.maven:maven-archiver:jar:2.5:compile
+[DEBUG]       org.codehaus.plexus:plexus-archiver:jar:2.1:compile
+[DEBUG]          org.codehaus.plexus:plexus-io:jar:2.0.2:compile
+[DEBUG]       org.codehaus.plexus:plexus-interpolation:jar:1.15:compile
+[DEBUG]    org.apache.maven.shared:maven-dependency-tree:jar:2.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-component-annotations:jar:1.5.5:compile
+[DEBUG]       org.eclipse.aether:aether-util:jar:0.9.0.M2:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:3.0.10:compile
+[DEBUG]    org.apache.maven.doxia:doxia-sink-api:jar:1.0:compile
+[DEBUG]    org.apache.maven.doxia:doxia-site-renderer:jar:1.0:compile
+[DEBUG]       org.apache.maven.doxia:doxia-core:jar:1.0:compile
+[DEBUG]       org.codehaus.plexus:plexus-i18n:jar:1.0-beta-7:compile
+[DEBUG]       org.codehaus.plexus:plexus-velocity:jar:1.1.7:compile
+[DEBUG]       org.apache.velocity:velocity:jar:1.5:compile
+[DEBUG]          commons-lang:commons-lang:jar:2.1:compile
+[DEBUG]          oro:oro:jar:2.0.8:compile
+[DEBUG]       org.apache.maven.doxia:doxia-decoration-model:jar:1.0:compile
+[DEBUG]       commons-collections:commons-collections:jar:3.2:compile
+[DEBUG]       org.apache.maven.doxia:doxia-module-apt:jar:1.0:compile
+[DEBUG]       org.apache.maven.doxia:doxia-module-fml:jar:1.0:compile
+[DEBUG]       org.apache.maven.doxia:doxia-module-xdoc:jar:1.0:compile
+[DEBUG]       org.apache.maven.doxia:doxia-module-xhtml:jar:1.0:compile
+[DEBUG] Created new class realm extension>org.apache.felix:maven-bundle-plugin:2.5.3
+[DEBUG] Importing foreign packages into class realm extension>org.apache.felix:maven-bundle-plugin:2.5.3
+[DEBUG]   Imported:  < maven.api
+[DEBUG] Populating class realm extension>org.apache.felix:maven-bundle-plugin:2.5.3
+[DEBUG]   Included: org.apache.felix:maven-bundle-plugin:jar:2.5.3
+[DEBUG]   Included: biz.aQute.bnd:bndlib:jar:2.3.0
+[DEBUG]   Included: org.osgi:org.osgi.core:jar:4.3.1
+[DEBUG]   Included: org.apache.felix:org.apache.felix.bundlerepository:jar:1.6.6
+[DEBUG]   Included: org.easymock:easymock:jar:2.4
+[DEBUG]   Included: org.apache.felix:org.apache.felix.utils:jar:1.6.0
+[DEBUG]   Included: org.osgi:org.osgi.compendium:jar:4.2.0
+[DEBUG]   Included: org.apache.maven.reporting:maven-reporting-api:jar:2.0.7
+[DEBUG]   Included: junit:junit:jar:3.8.1
+[DEBUG]   Included: commons-cli:commons-cli:jar:1.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+[DEBUG]   Included: org.apache.maven:maven-archiver:jar:2.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-archiver:jar:2.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-io:jar:2.0.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-interpolation:jar:1.15
+[DEBUG]   Included: org.apache.maven.shared:maven-dependency-tree:jar:2.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
+[DEBUG]   Included: org.eclipse.aether:aether-util:jar:0.9.0.M2
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:3.0.10
+[DEBUG]   Included: org.apache.maven.doxia:doxia-sink-api:jar:1.0
+[DEBUG]   Included: org.apache.maven.doxia:doxia-site-renderer:jar:1.0
+[DEBUG]   Included: org.apache.maven.doxia:doxia-core:jar:1.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-i18n:jar:1.0-beta-7
+[DEBUG]   Included: org.codehaus.plexus:plexus-velocity:jar:1.1.7
+[DEBUG]   Included: org.apache.velocity:velocity:jar:1.5
+[DEBUG]   Included: commons-lang:commons-lang:jar:2.1
+[DEBUG]   Included: oro:oro:jar:2.0.8
+[DEBUG]   Included: org.apache.maven.doxia:doxia-decoration-model:jar:1.0
+[DEBUG]   Included: commons-collections:commons-collections:jar:3.2
+[DEBUG]   Included: org.apache.maven.doxia:doxia-module-apt:jar:1.0
+[DEBUG]   Included: org.apache.maven.doxia:doxia-module-fml:jar:1.0
+[DEBUG]   Included: org.apache.maven.doxia:doxia-module-xdoc:jar:1.0
+[DEBUG]   Included: org.apache.maven.doxia:doxia-module-xhtml:jar:1.0
+[DEBUG] Extension realms for project org.xipki.commons:security-impl:bundle:2.0.0-SNAPSHOT: [ClassRealm[extension>org.apache.felix:maven-bundle-plugin:2.5.3, parent: sun.misc.Launcher$AppClassLoader@5c647e05]]
+[DEBUG] Created new class realm project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Looking up lifecyle mappings for packaging bundle from ClassRealm[project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT, parent: ClassRealm[maven.api, parent: null]]
+[DEBUG] Extension realms for project org.xipki.commons:commons-group:pom:2.0.0-SNAPSHOT: [ClassRealm[extension>org.apache.felix:maven-bundle-plugin:2.5.3, parent: sun.misc.Launcher$AppClassLoader@5c647e05]]
+[DEBUG] Looking up lifecyle mappings for packaging pom from ClassRealm[project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT, parent: ClassRealm[maven.api, parent: null]]
+[DEBUG] Extension realms for project org.xipki:xipki-group:pom:2.0.0-SNAPSHOT: [ClassRealm[extension>org.apache.felix:maven-bundle-plugin:2.5.3, parent: sun.misc.Launcher$AppClassLoader@5c647e05]]
+[DEBUG] Looking up lifecyle mappings for packaging pom from ClassRealm[project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT, parent: ClassRealm[maven.api, parent: null]]
+[DEBUG] Extension realms for project org.sonatype.oss:oss-parent:pom:7: (none)
+[DEBUG] Looking up lifecyle mappings for packaging pom from ClassRealm[plexus.core, parent: null]
+[DEBUG] === REACTOR BUILD PLAN ================================================
+[DEBUG] Project: org.xipki.commons:security-impl:bundle:2.0.0-SNAPSHOT
+[DEBUG] Tasks:   [clean, package]
+[DEBUG] Style:   Regular
+[DEBUG] =======================================================================
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building XiPKI :: security-impl 2.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[DEBUG] Resolving plugin version for org.apache.maven.plugins:maven-surefire-plugin
+[DEBUG] Could not find metadata org.apache.maven.plugins:maven-surefire-plugin/maven-metadata.xml in local (/Users/lliao/.m2/repository)
+[DEBUG] Skipped remote request for org.apache.maven.plugins:maven-surefire-plugin/maven-metadata.xml, locally cached metadata up-to-date.
+[DEBUG] Resolved plugin version for org.apache.maven.plugins:maven-surefire-plugin to 2.18.1 from repository central (https://repo.maven.apache.org/maven2, default, releases)
+[DEBUG] Resolving plugin version for org.apache.maven.plugins:maven-install-plugin
+[DEBUG] Could not find metadata org.apache.maven.plugins:maven-install-plugin/maven-metadata.xml in local (/Users/lliao/.m2/repository)
+[DEBUG] Skipped remote request for org.apache.maven.plugins:maven-install-plugin/maven-metadata.xml, locally cached metadata up-to-date.
+[DEBUG] Resolved plugin version for org.apache.maven.plugins:maven-install-plugin to 2.5.2 from repository central (https://repo.maven.apache.org/maven2, default, releases)
+[DEBUG] Resolving plugin version for org.apache.maven.plugins:maven-deploy-plugin
+[DEBUG] Could not find metadata org.apache.maven.plugins:maven-deploy-plugin/maven-metadata.xml in local (/Users/lliao/.m2/repository)
+[DEBUG] Skipped remote request for org.apache.maven.plugins:maven-deploy-plugin/maven-metadata.xml, locally cached metadata up-to-date.
+[DEBUG] Resolved plugin version for org.apache.maven.plugins:maven-deploy-plugin to 2.8.2 from repository central (https://repo.maven.apache.org/maven2, default, releases)
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] Lifecycle default -> [validate, initialize, generate-sources, process-sources, generate-resources, process-resources, compile, process-classes, generate-test-sources, process-test-sources, generate-test-resources, process-test-resources, test-compile, process-test-classes, test, prepare-package, package, pre-integration-test, integration-test, post-integration-test, verify, install, deploy]
+[DEBUG] Lifecycle clean -> [pre-clean, clean, post-clean]
+[DEBUG] Lifecycle site -> [pre-site, site, post-site, site-deploy]
+[DEBUG] === PROJECT BUILD PLAN ================================================
+[DEBUG] Project:       org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Dependencies (collect): []
+[DEBUG] Dependencies (resolve): [compile, test]
+[DEBUG] Repositories (dependencies): [jetty-releases (https://oss.sonatype.org/content/repositories/jetty-releases, default, releases), apache-snapshot (https://repository.apache.org/content/groups/snapshots-group, default, snapshots), ops4j-snapshots (https://oss.sonatype.org/content/repositories/ops4j-snapshots, default, snapshots), sonatype-snapshots (https://oss.sonatype.org/content/repositories/snapshots, default, snapshots), sonatype-nexus-snapshots (https://oss.sonatype.org/content/repositories/snapshots, default, snapshots), central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] Repositories (plugins)     : [central (https://repo.maven.apache.org/maven2, default, releases)]
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-clean-plugin:2.5:clean (default-clean)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <directory default-value="${project.build.directory}"/>
+  <excludeDefaultDirectories default-value="false">${clean.excludeDefaultDirectories}</excludeDefaultDirectories>
+  <failOnError default-value="true">${maven.clean.failOnError}</failOnError>
+  <followSymLinks default-value="false">${clean.followSymLinks}</followSymLinks>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <reportDirectory default-value="${project.reporting.outputDirectory}"/>
+  <retryOnError default-value="true">${maven.clean.retryOnError}</retryOnError>
+  <skip default-value="false">${clean.skip}</skip>
+  <testOutputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <verbose>${clean.verbose}</verbose>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-enforcer-plugin:1.0:enforce (enforce-maven)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <fail default-value="true">${enforcer.fail}</fail>
+  <failFast default-value="false">${enforcer.failFast}</failFast>
+  <ignoreCache default-value="false">${enforcer.ignoreCache}</ignoreCache>
+  <project>${project}</project>
+  <rules>
+    <requireMavenVersion>
+      <version>(,2.1.0),(2.1.0,2.2.0),(2.2.0,)</version>
+      <message>Maven 2.1.0 and 2.2.0 produce incorrect GPG signatures and checksums respectively.</message>
+    </requireMavenVersion>
+  </rules>
+  <session>${session}</session>
+  <skip default-value="false">${enforcer.skip}</skip>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.codehaus.mojo:buildnumber-maven-plugin:1.3:create (default)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildNumberPropertiesFileLocation default-value="${basedir}/buildNumber.properties"/>
+  <buildNumberPropertyName default-value="buildNumber">${maven.buildNumber.buildNumberPropertyName}</buildNumberPropertyName>
+  <doCheck default-value="false">false</doCheck>
+  <doUpdate default-value="false">false</doUpdate>
+  <format>${maven.buildNumber.format}</format>
+  <getRevisionOnlyOnce default-value="false">true</getRevisionOnlyOnce>
+  <locale>${maven.buildNumber.locale}</locale>
+  <password>${password}</password>
+  <project default-value="${project}"/>
+  <reactorProjects default-value="${reactorProjects}"/>
+  <readUrlScm default-value="${project.scm.connection}"/>
+  <revisionOnScmFailure>NO_GIT</revisionOnScmFailure>
+  <scmBranchPropertyName default-value="scmBranch">${maven.buildNumber.scmBranchPropertyName}</scmBranchPropertyName>
+  <scmDirectory default-value="${basedir}">${maven.buildNumber.scmDirectory}</scmDirectory>
+  <session default-value="${session}"/>
+  <shortRevisionLength>8</shortRevisionLength>
+  <skip default-value="false">${maven.buildNumber.skip}</skip>
+  <timestampFormat>{0,date,yyyy-MM-dd-HH:mm:ss}</timestampFormat>
+  <timestampPropertyName default-value="timestamp">${maven.buildNumber.timestampPropertyName}</timestampPropertyName>
+  <urlScm default-value="${project.scm.developerConnection}"/>
+  <useLastCommittedRevision default-value="false">${maven.buildNumber.useLastCommittedRevision}</useLastCommittedRevision>
+  <username>${username}</username>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3:generate (default)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <accessExternalDTD default-value="all">${maven.xjc2.accessExternalDTD}</accessExternalDTD>
+  <addCompileSourceRoot default-value="true">${maven.xjc2.addCompileSourceRoot}</addCompileSourceRoot>
+  <addTestCompileSourceRoot default-value="false">${maven.xjc2.addTestCompileSourceRoot}</addTestCompileSourceRoot>
+  <args>
+    <arg>-no-header</arg>
+    <arg>-Xdefault-value</arg>
+  </args>
+  <bindingDirectory>src/main/bindings</bindingDirectory>
+  <bindingIncludes>
+    <include>*.jxb</include>
+  </bindingIncludes>
+  <catalog>${maven.xjc2.catalog}</catalog>
+  <catalogResolver>${maven.xjc2.catalogResolver}</catalogResolver>
+  <cleanPackageDirectories default-value="true">${maven.xjc2.removeOldPackages}</cleanPackageDirectories>
+  <debug default-value="false">${maven.xjc2.debug}</debug>
+  <disableDefaultExcludes default-value="false">${maven.xjc2.disableDefaultExcludes}</disableDefaultExcludes>
+  <disableXmlSecurity default-value="true">${maven.xjc2.disableXmlSecurity}</disableXmlSecurity>
+  <enableIntrospection default-value="false">${maven.xjc2.enableIntrospection}</enableIntrospection>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <episode default-value="true">${maven.xjc2.episode}</episode>
+  <episodeFile>${maven.xjc2.episodeFile}</episodeFile>
+  <extension default-value="true">true</extension>
+  <forceRegenerate default-value="false">${maven.xjc2.forceRegenerate}</forceRegenerate>
+  <generateDirectory default-value="${project.build.directory}/generated-sources/xjc">${maven.xjc2.generateDirectory}</generateDirectory>
+  <generatePackage>${maven.xjc2.generatePackage}</generatePackage>
+  <localRepository default-value="${localRepository}"/>
+  <locale>${locale}</locale>
+  <markGenerated default-value="false">${maven.xjc2.markGenerated}</markGenerated>
+  <noFileHeader default-value="false">${maven.xjc2.noFileHeader}</noFileHeader>
+  <packageLevelAnnotations default-value="true">${maven.xjc2.packageLevelAnnotations}</packageLevelAnnotations>
+  <pluginArtifacts default-value="${plugin.artifacts}"/>
+  <plugins>
+    <plugin>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>jaxb2-default-value</artifactId>
+      <version>1.1</version>
+    </plugin>
+  </plugins>
+  <readOnly default-value="false">${maven.xjc2.readOnly}</readOnly>
+  <removeOldOutput default-value="false">${maven.xjc2.removeOldOutput}</removeOldOutput>
+  <scanDependenciesForBindings default-value="false"/>
+  <schemaDirectory default-value="src/main/resources">src/main/resources/xsd</schemaDirectory>
+  <schemaIncludes>
+    <include>one/*/*.xsd</include>
+  </schemaIncludes>
+  <schemaLanguage>${maven.xjc2.schemaLanguage}</schemaLanguage>
+  <specVersion default-value="2.2"/>
+  <strict default-value="true">${maven.xjc2.strict}</strict>
+  <verbose default-value="false">${maven.xjc2.verbose}</verbose>
+  <writeCode default-value="true">${maven.xjc2.writeCode}</writeCode>
+  <project default-value="${project}"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-resources-plugin:2.7:resources (default-resources)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildFilters default-value="${project.build.filters}"/>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <escapeString>${maven.resources.escapeString}</escapeString>
+  <escapeWindowsPaths default-value="true">${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+  <includeEmptyDirs default-value="false">${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <overwrite default-value="false">${maven.resources.overwrite}</overwrite>
+  <project default-value="${project}"/>
+  <resources default-value="${project.resources}"/>
+  <session default-value="${session}"/>
+  <supportMultiLineFiltering default-value="false">${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-compiler-plugin:3.2:compile (default-compile)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <classpathElements default-value="${project.compileClasspathElements}"/>
+  <compileSourceRoots default-value="${project.compileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedSourcesDirectory default-value="${project.build.directory}/generated-sources/annotations"/>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution>${mojoExecution}</mojoExecution>
+  <optimize default-value="false">true</optimize>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <project default-value="${project}"/>
+  <projectArtifact default-value="${project.artifact}"/>
+  <session default-value="${session}"/>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="false">${maven.compiler.showWarnings}</showWarnings>
+  <skipMain>${maven.main.skip}</skipMain>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.5">1.8</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.5">1.8</target>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-resources-plugin:2.7:testResources (default-testResources)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildFilters default-value="${project.build.filters}"/>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <escapeString>${maven.resources.escapeString}</escapeString>
+  <escapeWindowsPaths default-value="true">${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+  <includeEmptyDirs default-value="false">${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+  <outputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <overwrite default-value="false">${maven.resources.overwrite}</overwrite>
+  <project default-value="${project}"/>
+  <resources default-value="${project.testResources}"/>
+  <session default-value="${session}"/>
+  <skip>${maven.test.skip}</skip>
+  <supportMultiLineFiltering default-value="false">${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-compiler-plugin:3.2:testCompile (default-testCompile)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <classpathElements default-value="${project.testClasspathElements}"/>
+  <compileSourceRoots default-value="${project.testCompileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedTestSourcesDirectory default-value="${project.build.directory}/generated-test-sources/test-annotations"/>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution>${mojoExecution}</mojoExecution>
+  <optimize default-value="false">true</optimize>
+  <outputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <project default-value="${project}"/>
+  <session default-value="${session}"/>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="false">${maven.compiler.showWarnings}</showWarnings>
+  <skip>${maven.test.skip}</skip>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.5">1.8</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.5">1.8</target>
+  <testSource>${maven.compiler.testSource}</testSource>
+  <testTarget>${maven.compiler.testTarget}</testTarget>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.maven.plugins:maven-surefire-plugin:2.18.1:test (default-test)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+  <argLine>${argLine}</argLine>
+  <basedir default-value="${basedir}"/>
+  <childDelegation default-value="false">${childDelegation}</childDelegation>
+  <classesDirectory default-value="${project.build.outputDirectory}"/>
+  <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+  <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+  <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+  <disableXmlReport default-value="false">${disableXmlReport}</disableXmlReport>
+  <enableAssertions default-value="true">${enableAssertions}</enableAssertions>
+  <excludedGroups>${excludedGroups}</excludedGroups>
+  <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+  <failIfNoTests>${failIfNoTests}</failIfNoTests>
+  <forkCount default-value="1">${forkCount}</forkCount>
+  <forkMode default-value="once">${forkMode}</forkMode>
+  <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+  <groups>${groups}</groups>
+  <junitArtifactName default-value="junit:junit">${junitArtifactName}</junitArtifactName>
+  <jvm>${jvm}</jvm>
+  <localRepository default-value="${localRepository}"/>
+  <objectFactory>${objectFactory}</objectFactory>
+  <parallel>${parallel}</parallel>
+  <parallelMavenExecution default-value="${session.parallel}"/>
+  <parallelOptimized default-value="true">${parallelOptimized}</parallelOptimized>
+  <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+  <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+  <perCoreThreadCount default-value="true">${perCoreThreadCount}</perCoreThreadCount>
+  <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+  <pluginDescriptor default-value="${plugin}"/>
+  <printSummary default-value="true">${surefire.printSummary}</printSummary>
+  <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+  <redirectTestOutputToFile default-value="false">${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+  <remoteRepositories default-value="${project.pluginArtifactRepositories}"/>
+  <reportFormat default-value="brief">${surefire.reportFormat}</reportFormat>
+  <reportNameSuffix default-value="">${surefire.reportNameSuffix}</reportNameSuffix>
+  <reportsDirectory default-value="${project.build.directory}/surefire-reports"/>
+  <rerunFailingTestsCount default-value="0">${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+  <reuseForks default-value="true">${reuseForks}</reuseForks>
+  <runOrder default-value="filesystem">${surefire.runOrder}</runOrder>
+  <skip default-value="false">${maven.test.skip}</skip>
+  <skipExec>${maven.test.skip.exec}</skipExec>
+  <skipTests default-value="false">${skipTests}</skipTests>
+  <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+  <test>${test}</test>
+  <testClassesDirectory default-value="${project.build.testOutputDirectory}"/>
+  <testFailureIgnore default-value="false">${maven.test.failure.ignore}</testFailureIgnore>
+  <testNGArtifactName default-value="org.testng:testng">${testNGArtifactName}</testNGArtifactName>
+  <testSourceDirectory default-value="${project.build.testSourceDirectory}"/>
+  <threadCount>${threadCount}</threadCount>
+  <threadCountClasses default-value="0">${threadCountClasses}</threadCountClasses>
+  <threadCountMethods default-value="0">${threadCountMethods}</threadCountMethods>
+  <threadCountSuites default-value="0">${threadCountSuites}</threadCountSuites>
+  <trimStackTrace default-value="true">${trimStackTrace}</trimStackTrace>
+  <useFile default-value="true">${surefire.useFile}</useFile>
+  <useManifestOnlyJar default-value="true">${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+  <useSystemClassLoader default-value="true">${surefire.useSystemClassLoader}</useSystemClassLoader>
+  <useUnlimitedThreads default-value="false">${useUnlimitedThreads}</useUnlimitedThreads>
+  <workingDirectory>${basedir}</workingDirectory>
+  <project default-value="${project}"/>
+  <session default-value="${session}"/>
+</configuration>
+[DEBUG] -----------------------------------------------------------------------
+[DEBUG] Goal:          org.apache.felix:maven-bundle-plugin:2.5.3:bundle (default-bundle)
+[DEBUG] Style:         Regular
+[DEBUG] Configuration: <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildDirectory>${project.build.directory}</buildDirectory>
+  <dumpClasspath>${dumpClasspath}</dumpClasspath>
+  <dumpInstructions>${dumpInstructions}</dumpInstructions>
+  <excludeDependencies>${excludeDependencies}</excludeDependencies>
+  <finalName>${project.build.finalName}</finalName>
+  <instructions>
+    <Import-Package>sun.security.pkcs11;resolution:=optional,
+              sun.security.pkcs11.wrapper;resolution:=optional,
+              iaik.pkcs.pkcs11;resolution:=optional,
+              iaik.pkcs.pkcs11.objects;resolution:=optional,
+              iaik.pkcs.pkcs11.wrapper;resolution:=optional,
+              *</Import-Package>
+    <Bundle-Vendor>Lijun Liao (xipki.org)</Bundle-Vendor>
+    <Bundle-Build-Id>${buildNumber}</Bundle-Build-Id>
+    <Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
+  </instructions>
+  <m_mavenSession default-value="${session}"/>
+  <manifestLocation default-value="${project.build.outputDirectory}/META-INF">${manifestLocation}</manifestLocation>
+  <niceManifest default-value="false">${niceManifest}</niceManifest>
+  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+  <project>${project}</project>
+  <unpackBundle>${unpackBundle}</unpackBundle>
+</configuration>
+[DEBUG] =======================================================================
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:security-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:commons-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:commons-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:commons-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:commons-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki:xipki-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki:xipki-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki:xipki-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki:xipki-group:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:common:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Skipped remote request for org.xipki.commons:password-api:2.0.0-SNAPSHOT/maven-metadata.xml, locally installed metadata up-to-date.
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=12, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=9, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=11, DefaultDependencyCollector.collectTime=26, DefaultDependencyCollector.transformTime=1}
+[DEBUG] org.xipki.commons:security-impl:bundle:2.0.0-SNAPSHOT
+[DEBUG]    org.xipki.commons:security-api:jar:2.0.0-SNAPSHOT:compile
+[DEBUG]       org.xipki.commons:common:jar:2.0.0-SNAPSHOT:compile
+[DEBUG]       org.xipki.commons:password-api:jar:2.0.0-SNAPSHOT:compile
+[DEBUG]       org.bouncycastle:bcpkix-jdk15on:jar:1.54:compile
+[DEBUG]          org.bouncycastle:bcprov-jdk15on:jar:1.54:compile
+[DEBUG]    at.tugraz.iaik:pkcs11-wrapper:jar:1.3:compile
+[DEBUG]    org.slf4j:slf4j-api:jar:1.7.7:compile
+[DEBUG]    org.slf4j:slf4j-simple:jar:1.7.7:test
+[DEBUG]    junit:junit:jar:4.8.2:test
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=3, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=3, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=3, DefaultDependencyCollector.collectTime=3, DefaultDependencyCollector.transformTime=1}
+[DEBUG] org.apache.maven.plugins:maven-clean-plugin:jar:2.5:
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.0.6:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:3.0:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-clean-plugin:2.5
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-clean-plugin:2.5
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-clean-plugin:2.5
+[DEBUG]   Included: org.apache.maven.plugins:maven-clean-plugin:jar:2.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:3.0
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-clean-plugin:2.5:clean from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-clean-plugin:2.5, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-clean-plugin:2.5:clean' with basic configurator -->
+[DEBUG]   (f) directory = /Users/lliao/Documents/source/xipki/commons/security-impl/target
+[DEBUG]   (f) excludeDefaultDirectories = false
+[DEBUG]   (f) failOnError = true
+[DEBUG]   (f) followSymLinks = false
+[DEBUG]   (f) outputDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG]   (f) reportDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/site
+[DEBUG]   (f) retryOnError = true
+[DEBUG]   (f) skip = false
+[DEBUG]   (f) testOutputDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/test-classes
+[DEBUG] -- end configuration --
+[INFO] Deleting /Users/lliao/Documents/source/xipki/commons/security-impl/target
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/test-classes/C.TSL.SIG1.p12
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/test-classes/C.TSL.SIG1.der
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/test-classes
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status/maven-compiler-plugin/compile/default-compile
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status/maven-compiler-plugin/compile
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status/maven-compiler-plugin
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/maven-status
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/xsd/pkcs11-conf.xsd
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/xsd
+[INFO] Deleting file /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/OSGI-INF/blueprint/config.xml
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/OSGI-INF/blueprint
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/OSGI-INF
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[INFO] Deleting directory /Users/lliao/Documents/source/xipki/commons/security-impl/target
+[DEBUG] Skipping non-existing directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG] Skipping non-existing directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/test-classes
+[DEBUG] Skipping non-existing directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/site
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=1, ConflictMarker.nodeCount=100, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=32, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=3, ConflictResolver.conflictItemCount=90, DefaultDependencyCollector.collectTime=82, DefaultDependencyCollector.transformTime=4}
+[DEBUG] org.apache.maven.plugins:maven-enforcer-plugin:jar:1.0:
+[DEBUG]    org.apache.maven:maven-artifact:jar:2.0.9:compile
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.0.9:compile
+[DEBUG]    org.apache.maven:maven-project:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-settings:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-model:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-plugin-registry:jar:2.0.9:compile
+[DEBUG]       org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]          junit:junit:jar:3.8.2:test
+[DEBUG]    org.apache.maven:maven-core:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.9:compile
+[DEBUG]       org.apache.maven.reporting:maven-reporting-api:jar:2.0.9:compile
+[DEBUG]          org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-10:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.0.9:compile
+[DEBUG]       commons-cli:commons-cli:jar:1.0:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.0.9:compile
+[DEBUG]       org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4:compile
+[DEBUG]       org.apache.maven:maven-monitor:jar:2.0.9:compile
+[DEBUG]       classworlds:classworlds:jar:1.1:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:1.5.8:compile
+[DEBUG]    commons-lang:commons-lang:jar:2.3:compile
+[DEBUG]    org.apache.maven.enforcer:enforcer-api:jar:1.0:compile
+[DEBUG]    org.apache.maven.enforcer:enforcer-rules:jar:1.0:compile
+[DEBUG]       org.apache.maven.shared:maven-common-artifact-filters:jar:1.2:compile
+[DEBUG]          org.apache.maven.shared:maven-plugin-testing-harness:jar:1.1:test
+[DEBUG]             org.codehaus.plexus:plexus-archiver:jar:1.0-alpha-7:test
+[DEBUG]       org.beanshell:bsh:jar:2.0b4:compile
+[DEBUG]       org.apache.maven.shared:maven-dependency-tree:jar:1.2:compile
+[DEBUG]       org.codehaus.plexus:plexus-i18n:jar:1.0-beta-6:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-enforcer-plugin:1.0
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-enforcer-plugin:1.0
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-enforcer-plugin:1.0
+[DEBUG]   Included: org.apache.maven.plugins:maven-enforcer-plugin:jar:1.0
+[DEBUG]   Included: org.apache.maven.reporting:maven-reporting-api:jar:2.0.9
+[DEBUG]   Included: org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-10
+[DEBUG]   Included: commons-cli:commons-cli:jar:1.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:1.5.8
+[DEBUG]   Included: commons-lang:commons-lang:jar:2.3
+[DEBUG]   Included: org.apache.maven.enforcer:enforcer-api:jar:1.0
+[DEBUG]   Included: org.apache.maven.enforcer:enforcer-rules:jar:1.0
+[DEBUG]   Included: org.apache.maven.shared:maven-common-artifact-filters:jar:1.2
+[DEBUG]   Included: org.beanshell:bsh:jar:2.0b4
+[DEBUG]   Included: org.apache.maven.shared:maven-dependency-tree:jar:1.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-i18n:jar:1.0-beta-6
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-enforcer-plugin:1.0:enforce from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-enforcer-plugin:1.0, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-enforcer-plugin:1.0:enforce' with basic configurator -->
+[DEBUG]   (s) fail = true
+[DEBUG]   (s) failFast = false
+[DEBUG]   (f) ignoreCache = false
+[DEBUG]   (s) project = MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml
+[DEBUG]   (s) version = (,2.1.0),(2.1.0,2.2.0),(2.2.0,)
+[DEBUG]   (f) message = Maven 2.1.0 and 2.2.0 produce incorrect GPG signatures and checksums respectively.
+[DEBUG]   (s) rules = [org.apache.maven.plugins.enforcer.RequireMavenVersion@203dd56b]
+[DEBUG]   (s) session = org.apache.maven.execution.MavenSession@e8fadb0
+[DEBUG]   (s) skip = false
+[DEBUG] -- end configuration --
+[DEBUG] Executing rule: org.apache.maven.plugins.enforcer.RequireMavenVersion
+[DEBUG] Rule org.apache.maven.plugins.enforcer.RequireMavenVersion is cacheable.
+[DEBUG] Detected Maven Version: 3.3.3
+[DEBUG] Detected Maven Version: 3.3.3 is allowed in the range (,2.1.0),(2.1.0,2.2.0),(2.2.0,).
+[INFO] 
+[INFO] --- buildnumber-maven-plugin:1.3:create (default) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=1, ConflictMarker.markTime=0, ConflictMarker.nodeCount=133, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=48, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=3, ConflictResolver.conflictItemCount=122, DefaultDependencyCollector.collectTime=88, DefaultDependencyCollector.transformTime=4}
+[DEBUG] org.codehaus.mojo:buildnumber-maven-plugin:jar:1.3:
+[DEBUG]    org.apache.maven:maven-project:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-model:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-plugin-registry:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-artifact:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-settings:jar:2.0.6:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.6:compile
+[DEBUG]       org.apache.maven.reporting:maven-reporting-api:jar:2.0.6:compile
+[DEBUG]          org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-7:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.0.6:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.0.6:compile
+[DEBUG]       commons-cli:commons-cli:jar:1.0:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.0.6:compile
+[DEBUG]       org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4:compile
+[DEBUG]       org.apache.maven:maven-monitor:jar:2.0.6:compile
+[DEBUG]       classworlds:classworlds:jar:1.1:compile
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.0.6:compile
+[DEBUG]    org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]       junit:junit:jar:4.11:test
+[DEBUG]          org.hamcrest:hamcrest-core:jar:1.3:test
+[DEBUG]    org.apache.maven.scm:maven-scm-api:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-manager-plexus:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-bazaar:jar:1.9:compile
+[DEBUG]       regexp:regexp:jar:1.3:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.9:compile
+[DEBUG]       commons-lang:commons-lang:jar:2.6:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-gitexe:jar:1.9:compile
+[DEBUG]       commons-io:commons-io:jar:2.2:compile
+[DEBUG]       org.apache.maven.scm:maven-scm-provider-git-commons:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-svn-commons:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-cvsexe:jar:1.9:compile
+[DEBUG]       org.apache.maven.scm:maven-scm-provider-cvs-commons:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-starteam:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-clearcase:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-perforce:jar:1.9:compile
+[DEBUG]    org.apache.maven.scm:maven-scm-provider-hg:jar:1.9:compile
+[DEBUG]    com.google.code.maven-scm-provider-svnjava:maven-scm-provider-svnjava:jar:1.13:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:2.0.5:compile
+[DEBUG]    org.tmatesoft.svnkit:svnkit:jar:1.3.5:compile
+[DEBUG]       org.tmatesoft.svnkit:trilead-ssh2:jar:build213-svnkit-1.3-patch:compile
+[DEBUG]       org.tmatesoft.sqljet:sqljet:jar:1.0.4:compile
+[DEBUG]          org.antlr:antlr-runtime:jar:3.1.3:compile
+[DEBUG]             org.antlr:stringtemplate:jar:3.2:compile
+[DEBUG]                antlr:antlr:jar:2.7.7:compile
+[DEBUG]    net.java.dev.jna:jna:jar:3.2.2:compile
+[DEBUG] Created new class realm plugin>org.codehaus.mojo:buildnumber-maven-plugin:1.3
+[DEBUG] Importing foreign packages into class realm plugin>org.codehaus.mojo:buildnumber-maven-plugin:1.3
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.codehaus.mojo:buildnumber-maven-plugin:1.3
+[DEBUG]   Included: org.codehaus.mojo:buildnumber-maven-plugin:jar:1.3
+[DEBUG]   Included: org.apache.maven.reporting:maven-reporting-api:jar:2.0.6
+[DEBUG]   Included: org.apache.maven.doxia:doxia-sink-api:jar:1.0-alpha-7
+[DEBUG]   Included: commons-cli:commons-cli:jar:1.0
+[DEBUG]   Included: org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-api:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-manager-plexus:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-bazaar:jar:1.9
+[DEBUG]   Included: regexp:regexp:jar:1.3
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-svnexe:jar:1.9
+[DEBUG]   Included: commons-lang:commons-lang:jar:2.6
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-gitexe:jar:1.9
+[DEBUG]   Included: commons-io:commons-io:jar:2.2
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-git-commons:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-svn-commons:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-cvsexe:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-cvs-commons:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-starteam:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-clearcase:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-perforce:jar:1.9
+[DEBUG]   Included: org.apache.maven.scm:maven-scm-provider-hg:jar:1.9
+[DEBUG]   Included: com.google.code.maven-scm-provider-svnjava:maven-scm-provider-svnjava:jar:1.13
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:2.0.5
+[DEBUG]   Included: org.tmatesoft.svnkit:svnkit:jar:1.3.5
+[DEBUG]   Included: org.tmatesoft.svnkit:trilead-ssh2:jar:build213-svnkit-1.3-patch
+[DEBUG]   Included: org.tmatesoft.sqljet:sqljet:jar:1.0.4
+[DEBUG]   Included: org.antlr:antlr-runtime:jar:3.1.3
+[DEBUG]   Included: org.antlr:stringtemplate:jar:3.2
+[DEBUG]   Included: antlr:antlr:jar:2.7.7
+[DEBUG]   Included: net.java.dev.jna:jna:jar:3.2.2
+[DEBUG] Configuring mojo org.codehaus.mojo:buildnumber-maven-plugin:1.3:create from plugin realm ClassRealm[plugin>org.codehaus.mojo:buildnumber-maven-plugin:1.3, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.codehaus.mojo:buildnumber-maven-plugin:1.3:create' with basic configurator -->
+[DEBUG]   (s) buildNumberPropertiesFileLocation = /Users/lliao/Documents/source/xipki/commons/security-impl/buildNumber.properties
+[DEBUG]   (f) buildNumberPropertyName = buildNumber
+[DEBUG]   (s) doCheck = false
+[DEBUG]   (s) doUpdate = false
+[DEBUG]   (f) getRevisionOnlyOnce = true
+[DEBUG]   (f) project = MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml
+[DEBUG]   (f) reactorProjects = [MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml]
+[DEBUG]   (f) readUrlScm = scm:git:git@github.com:xipki/xipki.git/commons-group/security-impl
+[DEBUG]   (s) revisionOnScmFailure = NO_GIT
+[DEBUG]   (f) scmBranchPropertyName = scmBranch
+[DEBUG]   (s) scmDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@e8fadb0
+[DEBUG]   (s) shortRevisionLength = 8
+[DEBUG]   (f) skip = false
+[DEBUG]   (f) timestampFormat = {0,date,yyyy-MM-dd-HH:mm:ss}
+[DEBUG]   (f) timestampPropertyName = timestamp
+[DEBUG]   (s) urlScm = scm:git:git@github.com:xipki/xipki.git/commons-group/security-impl
+[DEBUG]   (f) useLastCommittedRevision = false
+[DEBUG] -- end configuration --
+[DEBUG] Checking for local modifications: skipped.
+[DEBUG] Updating project files from SCM: skipped.
+[INFO] ShortRevision tag detected. The value is '8'.
+[INFO] Executing: /bin/sh -c cd /Users/lliao/Documents/source/xipki/commons/security-impl && git rev-parse --verify --short=8 HEAD
+[INFO] Working directory: /Users/lliao/Documents/source/xipki/commons/security-impl
+[DEBUG] consume line 0914a4a9
+[INFO] Storing buildNumber: 0914a4a9 at timestamp: 2016-02-19-11:13:31
+[INFO] Storing buildScmBranch: master
+[INFO] 
+[INFO] --- maven-jaxb2-plugin:0.12.3:generate (default) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=66, ConflictIdSorter.graphTime=0, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=38, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=65, DefaultDependencyCollector.collectTime=73, DefaultDependencyCollector.transformTime=1}
+[DEBUG] org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:jar:0.12.3:
+[DEBUG]    org.jvnet.jaxb2.maven2:maven-jaxb2-plugin-core:jar:0.12.3:compile
+[DEBUG]       org.slf4j:slf4j-api:jar:1.7.7:compile
+[DEBUG]       org.apache.commons:commons-lang3:jar:3.2.1:compile
+[DEBUG]       com.sun.org.apache.xml.internal:resolver:jar:20050927:compile
+[DEBUG]       org.apache.maven:maven-plugin-api:jar:2.0.9:compile
+[DEBUG]       org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile
+[DEBUG]       org.apache.maven:maven-project:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-settings:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-profile:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-model:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-artifact-manager:jar:2.0.9:compile
+[DEBUG]             org.apache.maven:maven-repository-metadata:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-plugin-registry:jar:2.0.9:compile
+[DEBUG]          org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]             junit:junit:jar:4.8.1:compile
+[DEBUG]             classworlds:classworlds:jar:1.1-alpha-2:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:1.5.15:compile
+[DEBUG]    org.jvnet.jaxb2.maven2:maven-jaxb22-plugin:jar:0.12.3:compile
+[DEBUG]    org.glassfish.jaxb:jaxb-runtime:jar:2.2.11:compile
+[DEBUG]       org.glassfish.jaxb:jaxb-core:jar:2.2.11:compile
+[DEBUG]          javax.xml.bind:jaxb-api:jar:2.2.12-b140109.1041:compile
+[DEBUG]          org.glassfish.jaxb:txw2:jar:2.2.11:compile
+[DEBUG]          com.sun.istack:istack-commons-runtime:jar:2.21:compile
+[DEBUG]       org.jvnet.staxex:stax-ex:jar:1.7.7:compile
+[DEBUG]       com.sun.xml.fastinfoset:FastInfoset:jar:1.2.13:compile
+[DEBUG]    org.glassfish.jaxb:jaxb-xjc:jar:2.2.11:compile
+[DEBUG]       com.sun.xsom:xsom:jar:20140925:compile
+[DEBUG]          relaxngDatatype:relaxngDatatype:jar:20020414:compile
+[DEBUG]       org.glassfish.jaxb:codemodel:jar:2.2.11:compile
+[DEBUG]       com.sun.xml.bind.external:rngom:jar:2.2.11:compile
+[DEBUG]       com.sun.xml.dtd-parser:dtd-parser:jar:1.1:compile
+[DEBUG]       com.sun.istack:istack-commons-tools:jar:2.21:compile
+[DEBUG]          org.apache.ant:ant:jar:1.7.0:compile
+[DEBUG]             org.apache.ant:ant-launcher:jar:1.7.0:compile
+[DEBUG]          com.sun:tools:jar:1.6:system
+[DEBUG]    org.apache.maven.plugin-tools:maven-plugin-annotations:jar:3.2:compile
+[DEBUG]       org.apache.maven:maven-artifact:jar:2.0.9:compile
+[DEBUG] Created new class realm plugin>org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3
+[DEBUG] Importing foreign packages into class realm plugin>org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3
+[DEBUG]   Included: org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:jar:0.12.3
+[DEBUG]   Included: org.jvnet.jaxb2.maven2:maven-jaxb2-plugin-core:jar:0.12.3
+[DEBUG]   Included: org.apache.commons:commons-lang3:jar:3.2.1
+[DEBUG]   Included: com.sun.org.apache.xml.internal:resolver:jar:20050927
+[DEBUG]   Included: org.sonatype.plexus:plexus-build-api:jar:0.0.7
+[DEBUG]   Included: junit:junit:jar:4.8.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:1.5.15
+[DEBUG]   Included: org.jvnet.jaxb2.maven2:maven-jaxb22-plugin:jar:0.12.3
+[DEBUG]   Included: org.glassfish.jaxb:jaxb-runtime:jar:2.2.11
+[DEBUG]   Included: org.glassfish.jaxb:jaxb-core:jar:2.2.11
+[DEBUG]   Included: javax.xml.bind:jaxb-api:jar:2.2.12-b140109.1041
+[DEBUG]   Included: org.glassfish.jaxb:txw2:jar:2.2.11
+[DEBUG]   Included: com.sun.istack:istack-commons-runtime:jar:2.21
+[DEBUG]   Included: org.jvnet.staxex:stax-ex:jar:1.7.7
+[DEBUG]   Included: com.sun.xml.fastinfoset:FastInfoset:jar:1.2.13
+[DEBUG]   Included: org.glassfish.jaxb:jaxb-xjc:jar:2.2.11
+[DEBUG]   Included: com.sun.xsom:xsom:jar:20140925
+[DEBUG]   Included: relaxngDatatype:relaxngDatatype:jar:20020414
+[DEBUG]   Included: org.glassfish.jaxb:codemodel:jar:2.2.11
+[DEBUG]   Included: com.sun.xml.bind.external:rngom:jar:2.2.11
+[DEBUG]   Included: com.sun.xml.dtd-parser:dtd-parser:jar:1.1
+[DEBUG]   Included: com.sun.istack:istack-commons-tools:jar:2.21
+[DEBUG]   Included: org.apache.ant:ant:jar:1.7.0
+[DEBUG]   Included: org.apache.ant:ant-launcher:jar:1.7.0
+[DEBUG]   Included: com.sun:tools:jar:1.6
+[DEBUG]   Included: org.apache.maven.plugin-tools:maven-plugin-annotations:jar:3.2
+[DEBUG] Configuring mojo org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3:generate from plugin realm ClassRealm[plugin>org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:0.12.3:generate' with basic configurator -->
+[DEBUG]   (s) accessExternalDTD = all
+[DEBUG]   (s) addCompileSourceRoot = true
+[DEBUG]   (s) addTestCompileSourceRoot = false
+[DEBUG]   (s) args = [-no-header, -Xdefault-value]
+[DEBUG]   (s) bindingDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings
+[DEBUG]   (s) bindingIncludes = [*.jxb]
+[DEBUG]   (s) cleanPackageDirectories = true
+[DEBUG]   (s) debug = false
+[DEBUG]   (s) disableDefaultExcludes = false
+[DEBUG]   (s) disableXmlSecurity = true
+[DEBUG]   (s) enableIntrospection = false
+[DEBUG]   (s) encoding = UTF-8
+[DEBUG]   (s) episode = true
+[DEBUG]   (s) extension = true
+[DEBUG]   (s) forceRegenerate = false
+[DEBUG]   (s) generateDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+[DEBUG]   (s) localRepository =       id: local
+      url: file:///Users/lliao/.m2/repository/
+   layout: default
+snapshots: [enabled => true, update => always]
+ releases: [enabled => true, update => always]
+
+[DEBUG]   (s) markGenerated = false
+[DEBUG]   (s) noFileHeader = false
+[DEBUG]   (s) packageLevelAnnotations = true
+[DEBUG]   (s) pluginArtifacts = [org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:maven-plugin:0.12.3:, org.jvnet.jaxb2.maven2:maven-jaxb2-plugin-core:jar:0.12.3:compile, org.slf4j:slf4j-api:jar:1.7.7:compile, org.apache.commons:commons-lang3:jar:3.2.1:compile, com.sun.org.apache.xml.internal:resolver:jar:20050927:compile, org.apache.maven:maven-plugin-api:jar:2.0.9:compile, org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile, org.apache.maven:maven-project:jar:2.0.9:compile, org.apache.maven:maven-settings:jar:2.0.9:compile, org.apache.maven:maven-profile:jar:2.0.9:compile, org.apache.maven:maven-model:jar:2.0.9:compile, org.apache.maven:maven-artifact-manager:jar:2.0.9:compile, org.apache.maven:maven-repository-metadata:jar:2.0.9:compile, org.apache.maven:maven-plugin-registry:jar:2.0.9:compile, org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile, junit:junit:jar:4.8.1:compile, classworlds:classworlds:jar:1.1-alpha-2:compile, org.codehaus.plexus:plexus-utils:jar:1.5.15:compile, org.jvnet.jaxb2.maven2:maven-jaxb22-plugin:jar:0.12.3:compile, org.glassfish.jaxb:jaxb-runtime:jar:2.2.11:compile, org.glassfish.jaxb:jaxb-core:jar:2.2.11:compile, javax.xml.bind:jaxb-api:jar:2.2.12-b140109.1041:compile, org.glassfish.jaxb:txw2:jar:2.2.11:compile, com.sun.istack:istack-commons-runtime:jar:2.21:compile, org.jvnet.staxex:stax-ex:jar:1.7.7:compile, com.sun.xml.fastinfoset:FastInfoset:jar:1.2.13:compile, org.glassfish.jaxb:jaxb-xjc:jar:2.2.11:compile, com.sun.xsom:xsom:jar:20140925:compile, relaxngDatatype:relaxngDatatype:jar:20020414:compile, org.glassfish.jaxb:codemodel:jar:2.2.11:compile, com.sun.xml.bind.external:rngom:jar:2.2.11:compile, com.sun.xml.dtd-parser:dtd-parser:jar:1.1:compile, com.sun.istack:istack-commons-tools:jar:2.21:compile, org.apache.ant:ant:jar:1.7.0:compile, org.apache.ant:ant-launcher:jar:1.7.0:compile, com.sun:tools:jar:1.6:system, org.apache.maven.plugin-tools:maven-plugin-annotations:jar:3.2:compile, org.apache.maven:maven-artifact:jar:2.0.9:compile]
+[DEBUG]   (s) groupId = org.jvnet.jaxb2_commons
+[DEBUG]   (s) artifactId = jaxb2-default-value
+[DEBUG]   (s) version = 1.1
+[DEBUG]   (s) plugins = [Dependency {groupId=org.jvnet.jaxb2_commons, artifactId=jaxb2-default-value, version=1.1, type=jar}]
+[DEBUG]   (s) readOnly = false
+[DEBUG]   (s) removeOldOutput = false
+[DEBUG]   (s) scanDependenciesForBindings = false
+[DEBUG]   (s) schemaDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources/xsd
+[DEBUG]   (s) schemaIncludes = [one/*/*.xsd]
+[DEBUG]   (s) specVersion = 2.2
+[DEBUG]   (s) strict = true
+[DEBUG]   (s) verbose = false
+[DEBUG]   (s) writeCode = true
+[DEBUG]   (s) project = MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml
+[DEBUG] -- end configuration --
+[DEBUG] org.xipki.commons:security-impl:bundle:2.0.0-SNAPSHOT (selected for null)
+[DEBUG]   org.jvnet.jaxb2_commons:jaxb2-default-value:jar:1.1:runtime (selected for runtime)
+[INFO] Started execution.
+Parse catalog: ./xcatalog
+Loading catalog: ./xcatalog
+Default BASE: file:/Users/lliao/Documents/source/xipki/commons/security-impl/xcatalog
+Catalog does not exist: file:/Users/lliao/Documents/source/xipki/commons/security-impl/xcatalog
+[DEBUG] Resolving publicId [null], systemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb].
+resolveSystem(file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb)
+[DEBUG] Parent resolver has resolved publicId [null], systemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb] to [null].
+[DEBUG] SystemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb] is not a Maven dependency resource URI. Returning parent resolver result [null].
+[DEBUG] Resolving publicId [null], systemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb].
+resolveSystem(file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb)
+[DEBUG] Parent resolver has resolved publicId [null], systemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb] to [null].
+[DEBUG] SystemId [file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb] is not a Maven dependency resource URI. Returning parent resolver result [null].
+[INFO] JAXB API is loaded from the [jar:file:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/rt.jar!].
+[INFO] Detected JAXB API version [2.2].
+[INFO] pluginArtifacts:[org.jvnet.jaxb2.maven2:maven-jaxb2-plugin:maven-plugin:0.12.3:, org.jvnet.jaxb2.maven2:maven-jaxb2-plugin-core:jar:0.12.3:compile, org.slf4j:slf4j-api:jar:1.7.7:compile, org.apache.commons:commons-lang3:jar:3.2.1:compile, com.sun.org.apache.xml.internal:resolver:jar:20050927:compile, org.apache.maven:maven-plugin-api:jar:2.0.9:compile, org.sonatype.plexus:plexus-build-api:jar:0.0.7:compile, org.apache.maven:maven-project:jar:2.0.9:compile, org.apache.maven:maven-settings:jar:2.0.9:compile, org.apache.maven:maven-profile:jar:2.0.9:compile, org.apache.maven:maven-model:jar:2.0.9:compile, org.apache.maven:maven-artifact-manager:jar:2.0.9:compile, org.apache.maven:maven-repository-metadata:jar:2.0.9:compile, org.apache.maven:maven-plugin-registry:jar:2.0.9:compile, org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile, junit:junit:jar:4.8.1:compile, classworlds:classworlds:jar:1.1-alpha-2:compile, org.codehaus.plexus:plexus-utils:jar:1.5.15:compile, org.jvnet.jaxb2.maven2:maven-jaxb22-plugin:jar:0.12.3:compile, org.glassfish.jaxb:jaxb-runtime:jar:2.2.11:compile, org.glassfish.jaxb:jaxb-core:jar:2.2.11:compile, javax.xml.bind:jaxb-api:jar:2.2.12-b140109.1041:compile, org.glassfish.jaxb:txw2:jar:2.2.11:compile, com.sun.istack:istack-commons-runtime:jar:2.21:compile, org.jvnet.staxex:stax-ex:jar:1.7.7:compile, com.sun.xml.fastinfoset:FastInfoset:jar:1.2.13:compile, org.glassfish.jaxb:jaxb-xjc:jar:2.2.11:compile, com.sun.xsom:xsom:jar:20140925:compile, relaxngDatatype:relaxngDatatype:jar:20020414:compile, org.glassfish.jaxb:codemodel:jar:2.2.11:compile, com.sun.xml.bind.external:rngom:jar:2.2.11:compile, com.sun.xml.dtd-parser:dtd-parser:jar:1.1:compile, com.sun.istack:istack-commons-tools:jar:2.21:compile, org.apache.ant:ant:jar:1.7.0:compile, org.apache.ant:ant-launcher:jar:1.7.0:compile, com.sun:tools:jar:1.6:system, org.apache.maven.plugin-tools:maven-plugin-annotations:jar:3.2:compile, org.apache.maven:maven-artifact:jar:2.0.9:compile]
+[INFO] specVersion:2.2
+[INFO] encoding:UTF-8
+[INFO] locale:null
+[INFO] schemaLanguage:null
+[INFO] schemaDirectory:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources/xsd
+[INFO] schemaIncludes:[one/*/*.xsd]
+[INFO] schemaExcludes:null
+[INFO] schemas:[]
+[INFO] bindingDirectory:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings
+[INFO] bindingIncludes:[*.jxb]
+[INFO] bindingExcludes:null
+[INFO] bindings:[]
+[INFO] disableDefaultExcludes:false
+[INFO] catalog:null
+[INFO] catalogResolver:null
+[INFO] generatePackage:null
+[INFO] generateDirectory:/Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+[INFO] readOnly:false
+[INFO] extension:true
+[INFO] strict:true
+[INFO] writeCode:true
+[INFO] verbose:true
+[INFO] debug:false
+[INFO] args:[-no-header, -Xdefault-value]
+[INFO] forceRegenerate:false
+[INFO] removeOldOutput:false
+[INFO] produces:[**/*.*, **/*.java, **/bgm.ser, **/jaxb.properties]
+[INFO] otherDepends:null
+[INFO] episodeFile:/Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc/META-INF/sun-jaxb.episode
+[INFO] episode:true
+[INFO] plugins:[Dependency {groupId=org.jvnet.jaxb2_commons, artifactId=jaxb2-default-value, version=1.1, type=jar}]
+[INFO] episodes:null
+[INFO] useDependenciesAsEpisodes:false
+[INFO] scanDependenciesForBindings:false
+[INFO] xjcPlugins:[Dependency {groupId=org.jvnet.jaxb2_commons, artifactId=jaxb2-default-value, version=1.1, type=jar}]
+[INFO] episodes:null
+[INFO] catalogURIs (calculated):[]
+[INFO] resolvedCatalogURIs (calculated):[]
+[INFO] schemaFiles (calculated):[]
+[INFO] schemaURIs (calculated):[]
+[INFO] resolvedSchemaURIs (calculated):[]
+[INFO] bindingFiles (calculated):[/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb]
+[INFO] bindingURIs (calculated):[file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb]
+[INFO] resolvedBindingURIs (calculated):[file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb]
+[INFO] xjcPluginArtifacts (resolved):[org.jvnet.jaxb2_commons:jaxb2-default-value:jar:1.1:runtime]
+[INFO] xjcPluginFiles (resolved):[/Users/lliao/.m2/repository/org/jvnet/jaxb2_commons/jaxb2-default-value/1.1/jaxb2-default-value-1.1.jar]
+[INFO] xjcPluginURLs (resolved):[file:/Users/lliao/.m2/repository/org/jvnet/jaxb2_commons/jaxb2-default-value/1.1/jaxb2-default-value-1.1.jar]
+[INFO] episodeArtifacts (resolved):[]
+[INFO] episodeFiles (resolved):[]
+[INFO] optionsConfiguration:OptionsConfiguration [specVersion=2.2
+ generateDirectory=/Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+ generatePackage=null
+ schemaLanguage=null
+ grammars.systemIds=[]
+ bindFiles.systemIds=[file:/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/bindings/bindings.jxb]
+ plugins=[file:/Users/lliao/.m2/repository/org/jvnet/jaxb2_commons/jaxb2-default-value/1.1/jaxb2-default-value-1.1.jar]
+ readOnly=false
+ packageLevelAnnotations=true
+ noFileHeader=false
+ enableIntrospection=false
+ disableXmlSecurity=true
+ accessExternalSchema=all
+ accessExternalDTD=all
+ contentForWildcard=false
+ extension=true
+ strict=true
+ verbose=true
+ debugMode=false
+ arguments=[-no-header, -Xdefault-value, -episode, /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc/META-INF/sun-jaxb.episode]]
+[WARNING] No schemas to compile. Skipping XJC execution. 
+[INFO] Finished execution.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.7:resources (default-resources) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=143, ConflictIdSorter.graphTime=1, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=36, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=88, DefaultDependencyCollector.collectTime=69, DefaultDependencyCollector.transformTime=2}
+[DEBUG] org.apache.maven.plugins:maven-resources-plugin:jar:2.7:
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.2.1:compile
+[DEBUG]    org.apache.maven:maven-project:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.2.1:compile
+[DEBUG]          backport-util-concurrent:backport-util-concurrent:jar:3.1:compile
+[DEBUG]       org.apache.maven:maven-plugin-registry:jar:2.2.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-container-default:jar:1.0-alpha-9-stable-1:compile
+[DEBUG]          junit:junit:jar:3.8.1:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.2.1:compile
+[DEBUG]       org.slf4j:slf4j-jdk14:jar:1.5.6:runtime
+[DEBUG]          org.slf4j:slf4j-api:jar:1.5.6:runtime
+[DEBUG]       org.slf4j:jcl-over-slf4j:jar:1.5.6:runtime
+[DEBUG]       org.apache.maven.reporting:maven-reporting-api:jar:2.2.1:compile
+[DEBUG]          org.apache.maven.doxia:doxia-sink-api:jar:1.1:compile
+[DEBUG]          org.apache.maven.doxia:doxia-logging-api:jar:1.1:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.2.1:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.2.1:compile
+[DEBUG]       commons-cli:commons-cli:jar:1.2:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.2.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4:compile
+[DEBUG]       classworlds:classworlds:jar:1.1:compile
+[DEBUG]       org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3:compile
+[DEBUG]          org.sonatype.plexus:plexus-cipher:jar:1.4:compile
+[DEBUG]    org.apache.maven:maven-artifact:jar:2.2.1:compile
+[DEBUG]    org.apache.maven:maven-settings:jar:2.2.1:compile
+[DEBUG]    org.apache.maven:maven-model:jar:2.2.1:compile
+[DEBUG]    org.apache.maven:maven-monitor:jar:2.2.1:compile
+[DEBUG]    org.codehaus.plexus:plexus-utils:jar:3.0.15:compile
+[DEBUG]    org.apache.maven.shared:maven-filtering:jar:1.2:compile
+[DEBUG]       org.apache.maven.shared:maven-shared-utils:jar:0.3:compile
+[DEBUG]          com.google.code.findbugs:jsr305:jar:2.0.1:compile
+[DEBUG]       org.sonatype.plexus:plexus-build-api:jar:0.0.4:compile
+[DEBUG]    org.codehaus.plexus:plexus-interpolation:jar:1.19:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.7
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.7
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-resources-plugin:2.7
+[DEBUG]   Included: org.apache.maven.plugins:maven-resources-plugin:jar:2.7
+[DEBUG]   Included: backport-util-concurrent:backport-util-concurrent:jar:3.1
+[DEBUG]   Included: junit:junit:jar:3.8.1
+[DEBUG]   Included: org.slf4j:slf4j-jdk14:jar:1.5.6
+[DEBUG]   Included: org.slf4j:jcl-over-slf4j:jar:1.5.6
+[DEBUG]   Included: org.apache.maven.reporting:maven-reporting-api:jar:2.2.1
+[DEBUG]   Included: org.apache.maven.doxia:doxia-sink-api:jar:1.1
+[DEBUG]   Included: org.apache.maven.doxia:doxia-logging-api:jar:1.1
+[DEBUG]   Included: commons-cli:commons-cli:jar:1.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-4
+[DEBUG]   Included: org.sonatype.plexus:plexus-sec-dispatcher:jar:1.3
+[DEBUG]   Included: org.sonatype.plexus:plexus-cipher:jar:1.4
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:3.0.15
+[DEBUG]   Included: org.apache.maven.shared:maven-filtering:jar:1.2
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-utils:jar:0.3
+[DEBUG]   Included: com.google.code.findbugs:jsr305:jar:2.0.1
+[DEBUG]   Included: org.sonatype.plexus:plexus-build-api:jar:0.0.4
+[DEBUG]   Included: org.codehaus.plexus:plexus-interpolation:jar:1.19
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-resources-plugin:2.7:resources from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-resources-plugin:2.7, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-resources-plugin:2.7:resources' with basic configurator -->
+[DEBUG]   (f) buildFilters = []
+[DEBUG]   (f) encoding = UTF-8
+[DEBUG]   (f) escapeWindowsPaths = true
+[DEBUG]   (s) includeEmptyDirs = false
+[DEBUG]   (s) outputDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG]   (s) overwrite = false
+[DEBUG]   (f) project = MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml
+[DEBUG]   (s) resources = [Resource {targetPath: null, filtering: false, FileSet {directory: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources, PatternSet [includes: {}, excludes: {}]}}, Resource {targetPath: null, filtering: false, FileSet {directory: /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc, PatternSet [includes: {META-INF/sun-jaxb.episode}, excludes: {}]}}]
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@e8fadb0
+[DEBUG]   (f) supportMultiLineFiltering = false
+[DEBUG]   (f) useBuildFilters = true
+[DEBUG]   (s) useDefaultDelimiters = true
+[DEBUG] -- end configuration --
+[DEBUG] properties used {java.vendor=Oracle Corporation, sun.java.launcher=SUN_STANDARD, env.XPC_SERVICE_NAME=0, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, env.COLORFGBG=7;0, os.name=Mac OS X, sun.boot.class.path=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/classes, env.TMPDIR=/var/folders/nq/_l48q66x1l9c8fgtv86hb_k8px_cj2/T/, env.PWD=/Users/lliao/Documents/source/xipki/commons/security-impl, env.LANG=de_DE.UTF-8, java.vm.specification.vendor=Oracle Corporation, env.JAVA_MAIN_CLASS_53161=org.codehaus.plexus.classworlds.launcher.Launcher, java.runtime.version=1.8.0_45-b14, env.Apple_PubSub_Socket_Render=/private/tmp/com.apple.launchd.cifSkJgK3b/Render, project.build.sourceEncoding=UTF-8, env.DISPLAY=/private/tmp/com.apple.launchd.9UgkKJAZdx/org.macosforge.xquartz:0, jscep.version=2.3.0, jsr305.version=3.0.0_1, user.name=lliao, maven.build.version=Apache Maven 3.3.3 (7994120775791599e205a5524ec3e0dfe41d4a06; 2015-04-22T13:57:37+02:00), env.USER=lliao, env.SHELL=/bin/bash, env.__CF_USER_TEXT_ENCODING=0x2DD53222:0x0:0x3, env.PATH=/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin, user.language=de, sun.boot.library.path=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib, classworlds.conf=/usr/local/maven/bin/m2.conf, env.XPC_FLAGS=0x0, java.version=1.8.0_45, user.timezone=Europe/Berlin, buildNumber=0914a4a9, sun.arch.data.model=64, http.nonProxyHosts=local|*.local|169.254/16|*.169.254/16, java.endorsed.dirs=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/endorsed, sun.cpu.isalist=, sun.jnu.encoding=UTF-8, env.ITERM_SESSION_ID=w0t1p0, file.encoding.pkg=sun.io, env.SHLVL=1, file.separator=/, java.specification.name=Java Platform API Specification, snakeyaml.version=1.13, java.class.version=52.0, org.slf4j.simpleLogger.defaultLogLevel=debug, user.country=DE, karaf.version=4.0.4, java.home=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre, java.vm.info=mixed mode, env.LOGNAME=lliao, os.version=10.10.5, hessian.version=4.0.38, DynamicImport-Package=*, path.separator=:, java.vm.version=25.45-b02, env.JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home, java.awt.printerjob=sun.lwawt.macosx.CPrinterJob, env.TERM=xterm-256color, sun.io.unicode.encoding=UnicodeBig, awt.toolkit=sun.lwawt.macosx.LWCToolkit, karaf-plugin.version=4.0.4, socksNonProxyHosts=local|*.local|169.254/16|*.169.254/16, ftp.nonProxyHosts=local|*.local|169.254/16|*.169.254/16, user.home=/Users/lliao, env.OLDPWD=/Users/lliao/Documents/source/xipki/commons/security-impl, java.specification.vendor=Oracle Corporation, syslog-java-client.version=1.0.8, env.TERM_PROGRAM=iTerm.app, java.library.path=/Users/lliao/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:., java.vendor.url=http://java.oracle.com/, pkcs11-wrapper.version=1.3, env.MAVEN_CMD_LINE_ARGS= clean package -X, java.vm.vendor=Oracle Corporation, gopherProxySet=false, maven.home=/usr/local/maven, java.runtime.name=Java(TM) SE Runtime Environment, sun.java.command=org.codehaus.plexus.classworlds.launcher.Launcher clean package -X, java.class.path=/usr/local/maven/boot/plexus-classworlds-2.5.2.jar, timestamp=2016-02-19-11:13:31, sonatypeOssDistMgmtSnapshotsUrl=https://oss.sonatype.org/content/repositories/snapshots/, maven.version=3.3.3, slf4j.version=1.7.7, java.vm.specification.name=Java Virtual Machine Specification, java.vm.specification.version=1.8, sun.cpu.endian=little, sun.os.patch.level=unknown, env.HOME=/Users/lliao, liquibase.version=3.4.1, java.io.tmpdir=/var/folders/nq/_l48q66x1l9c8fgtv86hb_k8px_cj2/T/, java.vendor.url.bug=http://bugreport.sun.com/bugreport/, maven.multiModuleProjectDirectory=/Users/lliao/Documents/source/xipki/commons/security-impl, env.SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.g4Uk0TdA8n/Listeners, pax.web.version=4.2.5, os.arch=x86_64, java.awt.graphicsenv=sun.awt.CGraphicsEnvironment, java.ext.dirs=/Users/lliao/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java, servlet-api.version=2.5, user.dir=/Users/lliao/Documents/source/xipki/commons/security-impl, line.separator=
+, java.vm.name=Java HotSpot(TM) 64-Bit Server VM, env.ITERM_PROFILE=Default, hikaricp.version=2.4.3, file.encoding=UTF-8, scmBranch=master, java.specification.version=1.8, junit.version=4.8.2, bc.version=1.54, env.MAVEN_PROJECTBASEDIR=/Users/lliao/Documents/source/xipki/commons/security-impl}
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[DEBUG] resource with targetPath null
+directory /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources
+excludes []
+includes []
+[DEBUG] ignoreDelta true
+[INFO] Copying 2 resources
+[DEBUG] file config.xml has a filtered file extension
+[DEBUG] copy /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources/OSGI-INF/blueprint/config.xml to /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/OSGI-INF/blueprint/config.xml
+[DEBUG] file pkcs11-conf.xsd has a filtered file extension
+[DEBUG] copy /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/resources/xsd/pkcs11-conf.xsd to /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes/xsd/pkcs11-conf.xsd
+[DEBUG] resource with targetPath null
+directory /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+excludes []
+includes [META-INF/sun-jaxb.episode]
+[INFO] skip non existing resourceDirectory /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+[DEBUG] no use filter components
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.2:compile (default-compile) @ security-impl ---
+[DEBUG] Dependency collection stats: {ConflictMarker.analyzeTime=0, ConflictMarker.markTime=0, ConflictMarker.nodeCount=160, ConflictIdSorter.graphTime=19, ConflictIdSorter.topsortTime=0, ConflictIdSorter.conflictIdCount=43, ConflictIdSorter.conflictIdCycleCount=0, ConflictResolver.totalTime=1, ConflictResolver.conflictItemCount=63, DefaultDependencyCollector.collectTime=33, DefaultDependencyCollector.transformTime=20}
+[DEBUG] org.apache.maven.plugins:maven-compiler-plugin:jar:3.2:
+[DEBUG]    org.apache.maven:maven-plugin-api:jar:2.0.9:compile
+[DEBUG]    org.apache.maven:maven-artifact:jar:2.0.9:compile
+[DEBUG]       org.codehaus.plexus:plexus-utils:jar:1.5.1:compile
+[DEBUG]    org.apache.maven:maven-core:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-settings:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-plugin-parameter-documenter:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-profile:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-model:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-repository-metadata:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-error-diagnostics:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-project:jar:2.0.9:compile
+[DEBUG]          org.apache.maven:maven-plugin-registry:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-plugin-descriptor:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-artifact-manager:jar:2.0.9:compile
+[DEBUG]       org.apache.maven:maven-monitor:jar:2.0.9:compile
+[DEBUG]    org.apache.maven:maven-toolchain:jar:1.0:compile
+[DEBUG]    org.apache.maven.shared:maven-shared-utils:jar:0.1:compile
+[DEBUG]       com.google.code.findbugs:jsr305:jar:2.0.1:compile
+[DEBUG]    org.apache.maven.shared:maven-shared-incremental:jar:1.1:compile
+[DEBUG]       org.codehaus.plexus:plexus-component-annotations:jar:1.5.5:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-api:jar:2.4:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-manager:jar:2.4:compile
+[DEBUG]    org.codehaus.plexus:plexus-compiler-javac:jar:2.4:runtime
+[DEBUG]    org.codehaus.plexus:plexus-container-default:jar:1.5.5:compile
+[DEBUG]       org.codehaus.plexus:plexus-classworlds:jar:2.2.2:compile
+[DEBUG]       org.apache.xbean:xbean-reflect:jar:3.4:compile
+[DEBUG]          log4j:log4j:jar:1.2.12:compile
+[DEBUG]          commons-logging:commons-logging-api:jar:1.1:compile
+[DEBUG]       com.google.collections:google-collections:jar:1.0:compile
+[DEBUG]       junit:junit:jar:3.8.2:compile
+[DEBUG] Created new class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.2
+[DEBUG] Importing foreign packages into class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.2
+[DEBUG]   Imported:  < project>org.xipki.commons:security-impl:2.0.0-SNAPSHOT
+[DEBUG] Populating class realm plugin>org.apache.maven.plugins:maven-compiler-plugin:3.2
+[DEBUG]   Included: org.apache.maven.plugins:maven-compiler-plugin:jar:3.2
+[DEBUG]   Included: org.codehaus.plexus:plexus-utils:jar:1.5.1
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-utils:jar:0.1
+[DEBUG]   Included: com.google.code.findbugs:jsr305:jar:2.0.1
+[DEBUG]   Included: org.apache.maven.shared:maven-shared-incremental:jar:1.1
+[DEBUG]   Included: org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-api:jar:2.4
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-manager:jar:2.4
+[DEBUG]   Included: org.codehaus.plexus:plexus-compiler-javac:jar:2.4
+[DEBUG]   Included: org.apache.xbean:xbean-reflect:jar:3.4
+[DEBUG]   Included: log4j:log4j:jar:1.2.12
+[DEBUG]   Included: commons-logging:commons-logging-api:jar:1.1
+[DEBUG]   Included: com.google.collections:google-collections:jar:1.0
+[DEBUG]   Included: junit:junit:jar:3.8.2
+[DEBUG] Configuring mojo org.apache.maven.plugins:maven-compiler-plugin:3.2:compile from plugin realm ClassRealm[plugin>org.apache.maven.plugins:maven-compiler-plugin:3.2, parent: sun.misc.Launcher$AppClassLoader@5c647e05]
+[DEBUG] Configuring mojo 'org.apache.maven.plugins:maven-compiler-plugin:3.2:compile' with basic configurator -->
+[DEBUG]   (f) basedir = /Users/lliao/Documents/source/xipki/commons/security-impl
+[DEBUG]   (f) buildDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target
+[DEBUG]   (f) classpathElements = [/Users/lliao/Documents/source/xipki/commons/security-impl/target/classes, /Users/lliao/.m2/repository/org/xipki/commons/security-api/2.0.0-SNAPSHOT/security-api-2.0.0-SNAPSHOT.jar, /Users/lliao/.m2/repository/org/xipki/commons/common/2.0.0-SNAPSHOT/common-2.0.0-SNAPSHOT.jar, /Users/lliao/.m2/repository/org/xipki/commons/password-api/2.0.0-SNAPSHOT/password-api-2.0.0-SNAPSHOT.jar, /Users/lliao/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.54/bcpkix-jdk15on-1.54.jar, /Users/lliao/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.54/bcprov-jdk15on-1.54.jar, /Users/lliao/.m2/repository/at/tugraz/iaik/pkcs11-wrapper/1.3/pkcs11-wrapper-1.3.jar, /Users/lliao/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar]
+[DEBUG]   (f) compileSourceRoots = [/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java, /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc]
+[DEBUG]   (f) compilerId = javac
+[DEBUG]   (f) debug = true
+[DEBUG]   (f) encoding = UTF-8
+[DEBUG]   (f) failOnError = true
+[DEBUG]   (f) forceJavacCompilerUse = false
+[DEBUG]   (f) fork = false
+[DEBUG]   (f) generatedSourcesDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations
+[DEBUG]   (f) mojoExecution = org.apache.maven.plugins:maven-compiler-plugin:3.2:compile {execution: default-compile}
+[DEBUG]   (f) optimize = true
+[DEBUG]   (f) outputDirectory = /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG]   (f) project = MavenProject: org.xipki.commons:security-impl:2.0.0-SNAPSHOT @ /Users/lliao/Documents/source/xipki/commons/security-impl/pom.xml
+[DEBUG]   (f) projectArtifact = org.xipki.commons:security-impl:bundle:2.0.0-SNAPSHOT
+[DEBUG]   (f) session = org.apache.maven.execution.MavenSession@e8fadb0
+[DEBUG]   (f) showDeprecation = false
+[DEBUG]   (f) showWarnings = false
+[DEBUG]   (f) skipMultiThreadWarning = false
+[DEBUG]   (f) source = 1.8
+[DEBUG]   (f) staleMillis = 0
+[DEBUG]   (f) target = 1.8
+[DEBUG]   (f) useIncrementalCompilation = true
+[DEBUG]   (f) verbose = false
+[DEBUG] -- end configuration --
+[DEBUG] Using compiler 'javac'.
+[DEBUG] Source directories: [/Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java]
+[DEBUG] Classpath: [/Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+ /Users/lliao/.m2/repository/org/xipki/commons/security-api/2.0.0-SNAPSHOT/security-api-2.0.0-SNAPSHOT.jar
+ /Users/lliao/.m2/repository/org/xipki/commons/common/2.0.0-SNAPSHOT/common-2.0.0-SNAPSHOT.jar
+ /Users/lliao/.m2/repository/org/xipki/commons/password-api/2.0.0-SNAPSHOT/password-api-2.0.0-SNAPSHOT.jar
+ /Users/lliao/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.54/bcpkix-jdk15on-1.54.jar
+ /Users/lliao/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.54/bcprov-jdk15on-1.54.jar
+ /Users/lliao/.m2/repository/at/tugraz/iaik/pkcs11-wrapper/1.3/pkcs11-wrapper-1.3.jar
+ /Users/lliao/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar]
+[DEBUG] Output directory: /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG] Adding /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations to compile source roots:
+  /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java
+  /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+[DEBUG] New compile source roots:
+  /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java
+  /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+  /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations
+[DEBUG] CompilerReuseStrategy: reuseCreated
+[DEBUG] useIncrementalCompilation enabled
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunP11RSAPrivateKeyParameters.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/DSAPlainDigestSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/DefaultConcurrentContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11RSAKeyParameter.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/remote/RemoteP11CryptService.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11DSAPlainContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/PlainECDSASignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11ModulePool.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/P12RawKeypairGenerator.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/ECDSAContentSignerBuilder.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11Module.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11RSAPSSContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11ModulePool.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11DSAX962Signer.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/XipkiKeyStoreSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SignerUtil.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/HttpsHostnameVerifier.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11CryptService.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/remote/ASN1Util.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11Slot.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11PlainRSASigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11Util.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11DSAX962ContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunP11CryptService.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/ECDSASignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/P10RequestGenerator.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11CryptServiceFactory.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunNamedCurveExtender.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSAPSSSignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/XipkiProviderRegister.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunP11CryptServiceFactory.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11DSAPlainSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11Module.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/ECParameters.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/BCRSAPrivateKey.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/nss/XipkiNssProviderRegister.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/XipkiSunECProvider.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11Identity.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/BadInputException.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11CryptServiceFactory.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/AbstractECDSASignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11Identity.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/DigestOutputStream.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/P12KeypairGenerator.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11ContentSignerBuilder.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11KeyParameter.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/BcRSAContentVerifierProviderBuilder.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/ECDSAContentVerifierProviderBuilder.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/nss/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/keystore/KeystoreP11Slot.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SignatureSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11PasswordRetrieverImpl.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/nss/XipkiNssProvider.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSADigestSignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/remote/RemoteP11CryptServiceFactory.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11RSAContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/nss/NssSignatureSpi.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/IaikP11CryptService.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11ECDSAX962Signer.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSAUtil.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11ECDSAPlainSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11ECDSAX962ContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SoftTokenContentSignerBuilder.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/remote/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/P11PrivateKey.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/AbstractP11DSASigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/P11ECDSAPlainContentSigner.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/remote/DefaultRemoteP11CryptService.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/KeyUtil.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/bcext/BCRSAPrivateCrtKey.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/iaik/package-info.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/XipkiProvider.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunP11ECDSAPrivateKeyParameters.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/sun/SunP11Identity.java
+[DEBUG] Stale source detected: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/p11/AbstractP11DSAContentSigner.java
+[INFO] Changes detected - recompiling the module!
+[DEBUG] Classpath:
+[DEBUG]  /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG]  /Users/lliao/.m2/repository/org/xipki/commons/security-api/2.0.0-SNAPSHOT/security-api-2.0.0-SNAPSHOT.jar
+[DEBUG]  /Users/lliao/.m2/repository/org/xipki/commons/common/2.0.0-SNAPSHOT/common-2.0.0-SNAPSHOT.jar
+[DEBUG]  /Users/lliao/.m2/repository/org/xipki/commons/password-api/2.0.0-SNAPSHOT/password-api-2.0.0-SNAPSHOT.jar
+[DEBUG]  /Users/lliao/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.54/bcpkix-jdk15on-1.54.jar
+[DEBUG]  /Users/lliao/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.54/bcprov-jdk15on-1.54.jar
+[DEBUG]  /Users/lliao/.m2/repository/at/tugraz/iaik/pkcs11-wrapper/1.3/pkcs11-wrapper-1.3.jar
+[DEBUG]  /Users/lliao/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar
+[DEBUG] Source roots:
+[DEBUG]  /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java
+[DEBUG]  /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/xjc
+[DEBUG]  /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations
+[DEBUG] Command line options:
+[DEBUG] -d /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes -classpath /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes:/Users/lliao/.m2/repository/org/xipki/commons/security-api/2.0.0-SNAPSHOT/security-api-2.0.0-SNAPSHOT.jar:/Users/lliao/.m2/repository/org/xipki/commons/common/2.0.0-SNAPSHOT/common-2.0.0-SNAPSHOT.jar:/Users/lliao/.m2/repository/org/xipki/commons/password-api/2.0.0-SNAPSHOT/password-api-2.0.0-SNAPSHOT.jar:/Users/lliao/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.54/bcpkix-jdk15on-1.54.jar:/Users/lliao/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.54/bcprov-jdk15on-1.54.jar:/Users/lliao/.m2/repository/at/tugraz/iaik/pkcs11-wrapper/1.3/pkcs11-wrapper-1.3.jar:/Users/lliao/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar: -sourcepath /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java:/Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations: -s /Users/lliao/Documents/source/xipki/commons/security-impl/target/generated-sources/annotations -O -g -nowarn -target 1.8 -source 1.8 -encoding UTF-8
+[DEBUG] incrementalBuildHelper#beforeRebuildExecution
+[INFO] Compiling 82 source files to /Users/lliao/Documents/source/xipki/commons/security-impl/target/classes
+[DEBUG] incrementalBuildHelper#afterRebuildExecution
+[INFO] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSAPSSSignatureSpi.java: /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSAPSSSignatureSpi.java uses or overrides a deprecated API.
+[INFO] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/provider/RSAPSSSignatureSpi.java: Recompile with -Xlint:deprecation for details.
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[112,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[113,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[114,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[115,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[116,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[117,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[118,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[119,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[120,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[1042,19] cannot find symbol
+  symbol:   class SlotsType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[522,63] cannot find symbol
+  symbol:   class ObjectFactory
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[530,25] cannot find symbol
+  symbol:   class PKCS11ConfType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[530,68] cannot find symbol
+  symbol:   class PKCS11ConfType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[532,13] cannot find symbol
+  symbol:   class PKCS11ConfType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[533,13] cannot find symbol
+  symbol:   class ModulesType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[536,18] cannot find symbol
+  symbol:   class ModuleType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[550,17] cannot find symbol
+  symbol:   class PasswordsType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[558,26] cannot find symbol
+  symbol:   class PasswordType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[570,22] cannot find symbol
+  symbol:   class NativeLibraryType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[1049,14] cannot find symbol
+  symbol:   class SlotType
+  location: class org.xipki.commons.security.SecurityFactoryImpl
+[INFO] 20 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.084 s
+[INFO] Finished at: 2016-02-19T11:13:33+01:00
+[INFO] Final Memory: 26M/361M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.2:compile (default-compile) on project security-impl: Compilation failure: Compilation failure:
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[112,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[113,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[114,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[115,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[116,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[117,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[118,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[119,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[120,48] package org.xipki.commons.security.p11.conf.jaxb does not exist
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[1042,19] cannot find symbol
+[ERROR] symbol:   class SlotsType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[522,63] cannot find symbol
+[ERROR] symbol:   class ObjectFactory
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[530,25] cannot find symbol
+[ERROR] symbol:   class PKCS11ConfType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[530,68] cannot find symbol
+[ERROR] symbol:   class PKCS11ConfType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[532,13] cannot find symbol
+[ERROR] symbol:   class PKCS11ConfType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[533,13] cannot find symbol
+[ERROR] symbol:   class ModulesType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[536,18] cannot find symbol
+[ERROR] symbol:   class ModuleType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[550,17] cannot find symbol
+[ERROR] symbol:   class PasswordsType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[558,26] cannot find symbol
+[ERROR] symbol:   class PasswordType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[570,22] cannot find symbol
+[ERROR] symbol:   class NativeLibraryType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] /Users/lliao/Documents/source/xipki/commons/security-impl/src/main/java/org/xipki/commons/security/SecurityFactoryImpl.java:[1049,14] cannot find symbol
+[ERROR] symbol:   class SlotType
+[ERROR] location: class org.xipki.commons.security.SecurityFactoryImpl
+[ERROR] -> [Help 1]
+org.apache.maven.lifecycle.LifecycleExecutionException: Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.2:compile (default-compile) on project security-impl: Compilation failure
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:116)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:80)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:51)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:128)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:307)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:193)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:106)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:862)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:286)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:197)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:289)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:229)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:415)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:356)
+Caused by: org.apache.maven.plugin.compiler.CompilationFailureException: Compilation failure
+	at org.apache.maven.plugin.compiler.AbstractCompilerMojo.execute(AbstractCompilerMojo.java:909)
+	at org.apache.maven.plugin.compiler.CompilerMojo.execute(CompilerMojo.java:129)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:134)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:208)
+	... 20 more
+[ERROR] 
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

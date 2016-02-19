@@ -34,28 +34,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.xipki.pki.ca.client.shell.loadtest;
 
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.pki.ca.client.api.CaClient;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Service
-public class RandomDnCompleter extends AbstractEnumCompleter {
+public abstract class CaLoadTestCommandSupport extends XipkiCommandSupport {
 
-    public RandomDnCompleter() {
-        StringBuilder enums = new StringBuilder();
-
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
-        }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
-    }
+    @Reference
+    protected CaClient caClient;
 
 }

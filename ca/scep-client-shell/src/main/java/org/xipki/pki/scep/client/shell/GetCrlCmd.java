@@ -34,28 +34,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.completer;
+package org.xipki.pki.scep.client.shell;
 
+import java.io.File;
+import java.security.cert.X509CRL;
+
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.scep.client.ScepClient;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
+@Command(scope = "scep", name = "getcrl",
+        description = "download CRL")
 @Service
-public class RandomDnCompleter extends AbstractEnumCompleter {
+public class GetCrlCmd extends ClientCommandSupport {
 
-    public RandomDnCompleter() {
-        StringBuilder enums = new StringBuilder();
+    @Option(name = "--cert", aliases = "-c",
+            required = true,
+            description = "certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
 
-        for (RandomDN dn : RandomDN.values()) {
-            enums.append(dn.name()).append(",");
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
+
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
+        ScepClient client = getScepClient();
+        X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),
+                cert.getIssuer(), cert.getSerialNumber().getPositiveValue());
+        if (crl == null) {
+            throw new CmdFailure("received no CRL from server");
         }
-        enums.deleteCharAt(enums.length() - 1);
-        setTokens(enums.toString());
+
+        saveVerbose("saved CRL to file", new File(outputFile), crl.getEncoded());
+        return null;
     }
 
 }

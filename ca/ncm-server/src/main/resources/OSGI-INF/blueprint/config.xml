@@ -2,15 +2,8 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
-  <!--
-      Properties
-  -->
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <!--
-      Note: Don't include a "-" in the persistent-id, or the config admin will
-      interpret it as a service-factory.
-  -->
   <cm:property-placeholder persistent-id="org.xipki.pki.ncm.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="truststore.type" value="PKCS12"/>
