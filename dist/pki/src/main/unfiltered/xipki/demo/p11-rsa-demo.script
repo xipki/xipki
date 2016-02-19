@@ -1,12 +1,13 @@
-PLEN = 1024
-CA_SIGNER_ALGO = SHA256withDSA:SHA1withDSA
+# Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
+#
+CA_SIGNER_ALGO = SHA256withRSA:SHA1withRSA
 
 RCA_KEY_LABEL = RCA1
 SubCA_KEY_LABEL = SubCA1
 SubCAwithCRL_KEY_LABEL = SubCAwithCRL1
 
 echo "========================================================"
-echo "||              DEMO DSA with HSM Key                 ||"
+echo "||      DEMO RSA (PKCS#1 v1.5) with HSM Key           ||"
 echo "========================================================"
 
 feature:install xipki-security-shell
@@ -15,23 +16,20 @@ sleep 1000
 
 xipki-cmd:rm -r -f output
 
-source ./xipki/demo/demo.d/hsm-rm-keys.script
+source ./xipki/demo/demo.d/p11-rm-keys.script
 
-xipki-tk:dsa \
-  --plen $PLEN \
+xipki-tk:rsa \
   --slot 1 \
   --key-label $RCA_KEY_LABEL
 
-xipki-tk:dsa \
-  --plen $PLEN \
+xipki-tk:rsa \
   --slot 1 \
   --key-label $SubCA_KEY_LABEL
 
-xipki-tk:dsa \
-  --plen $PLEN \
+xipki-tk:rsa \
   --slot 1 \
   --key-label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
 
-source ./xipki/demo/demo.d/do-hsm-demo.script
+source ./xipki/demo/demo.d/do-p11-demo.script

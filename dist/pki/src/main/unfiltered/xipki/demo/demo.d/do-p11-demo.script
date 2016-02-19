@@ -8,7 +8,7 @@ source ./xipki/demo/demo.d/initdb.script
 
 source ./xipki/demo/demo.d/prepare.script
 
-source ./xipki/demo/demo.d/hsm.script
+source ./xipki/demo/demo.d/p11.script
 
 source ./xipki/demo/demo.d/ra.script
 
