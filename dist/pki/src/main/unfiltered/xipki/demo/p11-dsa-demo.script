@@ -1,14 +1,12 @@
-# Curve name or OID, e.g. secp256r1, brainpoolp256r1
-EC_CURVE = secp256r1
-
-CA_SIGNER_ALGO = SHA256withECDSA:SHA1withECDSA
+PLEN = 1024
+CA_SIGNER_ALGO = SHA256withDSA:SHA1withDSA
 
 RCA_KEY_LABEL = RCA1
 SubCA_KEY_LABEL = SubCA1
 SubCAwithCRL_KEY_LABEL = SubCAwithCRL1
 
 echo "========================================================"
-echo "||               DEMO EC with HSM Key                 ||"
+echo "||              DEMO DSA with HSM Key                 ||"
 echo "========================================================"
 
 feature:install xipki-security-shell
@@ -17,23 +15,23 @@ sleep 1000
 
 xipki-cmd:rm -r -f output
 
-source ./xipki/demo/demo.d/hsm-rm-keys.script
+source ./xipki/demo/demo.d/p11-rm-keys.script
 
-xipki-tk:ec \
-  --curve $EC_CURVE \
+xipki-tk:dsa \
+  --plen $PLEN \
   --slot 1 \
   --key-label $RCA_KEY_LABEL
 
-xipki-tk:ec \
-  --curve $EC_CURVE \
+xipki-tk:dsa \
+  --plen $PLEN \
   --slot 1 \
   --key-label $SubCA_KEY_LABEL
 
-xipki-tk:ec \
-  --curve $EC_CURVE \
+xipki-tk:dsa \
+  --plen $PLEN \
   --slot 1 \
   --key-label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
 
-source ./xipki/demo/demo.d/do-hsm-demo.script
+source ./xipki/demo/demo.d/do-p11-demo.script

@@ -8,13 +8,13 @@ source ./xipki/demo/p12-ec-demo.script
 
 source ./xipki/demo/p12-plainec-demo.script
 
-source ./xipki/demo/hsm-rsa-demo.script
+source ./xipki/demo/p11-rsa-demo.script
 
-source ./xipki/demo/hsm-rsapss-demo.script
+source ./xipki/demo/p11-rsapss-demo.script
 
-source ./xipki/demo/hsm-dsa-demo.script
+source ./xipki/demo/p11-dsa-demo.script
 
-source ./xipki/demo/hsm-ec-demo.script
+source ./xipki/demo/p11-ec-demo.script
 
-source ./xipki/demo/hsm-plainec-demo.script
+source ./xipki/demo/p11-plainec-demo.script
 
