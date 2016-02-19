@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<QAConf xmlns="http://xipki.org/caqa/conf/v1">
+<QAConf xmlns="http://xipki.org/pki/ca/qa/qa/conf/v2">
   <X509Issuers>
     <X509Issuer name="RCA">
       <cert>

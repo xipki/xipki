@@ -16,9 +16,9 @@
     <features.artifactId>pki</features.artifactId>
     <assembly.finalName>xipki-pki</assembly.finalName>
     <boot.features>http-whiteboard, xipki-caserver</boot.features>
-    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
-    <h2-jdbc.version>1.4.185</h2-jdbc.version>
-    <hsqldb.version>2.3.2</hsqldb.version>
+    <postgresql.version>9.4.1207.jre7</postgresql.version>
+    <h2-jdbc.version>1.4.191</h2-jdbc.version>
+    <hsqldb.version>2.3.3</hsqldb.version>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
@@ -163,54 +163,14 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
+              <outputDirectory>${output.directory}/xipki</outputDirectory>
               <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ocsp-server</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
-                </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>
                   <artifactId>security-impl</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-dbtool</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-client-impl</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-client-shell</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-qa-shell</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -218,27 +178,48 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
                 </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Extract the CA-Server XSD -->
-            <id>unpack-caserver-xsd</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ca-client-impl</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ca-client-shell</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ca-dbtool</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ca-qa-shell</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ocsp-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

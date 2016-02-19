@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<X509Profile xmlns="http://xipki.org/xmlprofile/v2" maxSize="5000">
+<X509Profile xmlns="http://xipki.org/pki/ca/xmlprofile/v2" maxSize="5000">
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>

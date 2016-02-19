@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CAClient xmlns="http://xipki.org/caclient/conf/v2">
+<CAClient xmlns="http://xipki.org/pki/ca/client/conf/v2">
   <devMode>true</devMode>
   <requestors>
     <requestor>
