@@ -96,8 +96,7 @@ public class CaEntry {
         this.certsDir = new File(caDir, "certs");
         this.certsDir.mkdirs();
 
-        this.certsManifestOs = new FileOutputStream(
-                new File(caDir, "certs-manifest"), true);
+        this.certsManifestOs = new FileOutputStream(new File(caDir, "certs-manifest"), true);
 
         createNewCsvFile();
     }
@@ -143,12 +142,9 @@ public class CaEntry {
     throws IOException {
         // write the account
         StringBuilder sb = new StringBuilder(50);
-        sb.append(PROPKEY_ACCOUNT)
-            .append("=").append(numProcessed).append("\n");
-        sb.append(PROPKEY_ACCOUNT_REVOKED)
-            .append("=").append(numProcessedRevoked).append("\n");
-        IoUtil.save(new File(caDir, FILENAME_OVERVIEW),
-                sb.toString().getBytes());
+        sb.append(PROPKEY_ACCOUNT).append("=").append(numProcessed).append("\n");
+        sb.append(PROPKEY_ACCOUNT_REVOKED).append("=").append(numProcessedRevoked).append("\n");
+        IoUtil.save(new File(caDir, FILENAME_OVERVIEW), sb.toString().getBytes());
 
         closeCurrentCsvFile();
         IoUtil.closeStream(certsManifestOs);
