@@ -257,8 +257,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
         ProcessLog processLog = new ProcessLog(total);
 
-        final String sql = "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ?"
-                + " ORDER BY ID ASC";
+        final String sql =
+                "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
         PreparedStatement ps = prepareStatement(sql);
 
         int numCrlsInCurrentFile = 0;
