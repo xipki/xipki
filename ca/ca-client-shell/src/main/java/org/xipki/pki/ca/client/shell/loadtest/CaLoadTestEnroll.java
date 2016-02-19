@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.internal.loadtest;
+package org.xipki.pki.ca.client.shell.loadtest;
 
 import java.security.cert.X509Certificate;
 import java.util.HashMap;

@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.internal.loadtest;
+package org.xipki.pki.ca.client.shell.loadtest;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -73,13 +73,9 @@ import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.DSAKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.ECKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.RSAKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
-import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollCertType;
-import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollTemplateType;
-import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.ObjectFactory;
+import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollCertType;
+import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollTemplateType;
+import org.xipki.pki.ca.client.shell.loadtest.jaxb.ObjectFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -212,17 +208,17 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
         for (EnrollCertType entry : list) {
             KeyEntry keyEntry;
             if (entry.getEcKey() != null) {
-                keyEntry = new ECKeyEntry(entry.getEcKey().getCurve());
+                keyEntry = new KeyEntry.ECKeyEntry(entry.getEcKey().getCurve());
             } else if (entry.getRsaKey() != null) {
-                keyEntry = new RSAKeyEntry(entry.getRsaKey().getModulusLength());
+                keyEntry = new KeyEntry.RSAKeyEntry(entry.getRsaKey().getModulusLength());
             } else if (entry.getDsaKey() != null) {
-                keyEntry = new DSAKeyEntry(entry.getDsaKey().getPLength());
+                keyEntry = new KeyEntry.DSAKeyEntry(entry.getDsaKey().getPLength());
             } else {
                 throw new RuntimeException("should not reach here, unknown child of KeyEntry");
             }
 
             String randomDNStr = entry.getRandomDN();
-            RandomDN randomDN = RandomDN.getInstance(randomDNStr);
+            LoadTestEntry.RandomDN randomDN = LoadTestEntry.RandomDN.getInstance(randomDNStr);
             if (randomDN == null) {
                 throw new InvalidConfException("invalid randomDN " + randomDNStr);
             }

@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell;
+package org.xipki.pki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -44,13 +44,10 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.pki.ca.client.shell.completer.RandomDnCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.CaLoadTestEnroll;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.DSAKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.ECKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.KeyEntry.RSAKeyEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry;
-import org.xipki.pki.ca.client.shell.internal.loadtest.LoadTestEntry.RandomDN;
+import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
+import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
+import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
+import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 
 /**
  * @author Lijun Liao

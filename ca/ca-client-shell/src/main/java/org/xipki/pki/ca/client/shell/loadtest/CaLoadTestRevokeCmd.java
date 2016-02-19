@@ -34,47 +34,78 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell;
+package org.xipki.pki.ca.client.shell.loadtest;
 
 import java.io.FileInputStream;
+import java.util.Properties;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.client.shell.internal.loadtest.CaLoadTestTemplateEnroll;
-import org.xipki.pki.ca.client.shell.internal.loadtest.jaxb.EnrollTemplateType;
+import org.xipki.commons.datasource.api.DataSourceFactory;
+import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "loadtest-template-enroll",
-        description = "CA Client Template Enroll Load test")
+@Command(scope = "xipki-cli", name = "loadtest-revoke",
+        description = "CA Client Revoke Load test")
 @Service
-public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
+public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
 
-    @Option(name = "--template", aliases = "-t",
+    @Option(name = "--issuer",
             required = true,
-            description = "template file\n"
+            description = "issuer certificate file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String templateFile;
+    private String issuerCertFile;
 
     @Option(name = "--duration",
-            description = "duration in seconds")
+            description = "maximal duration in seconds")
     private Integer durationInSecond = 30;
 
     @Option(name = "--thread",
             description = "number of threads")
     private Integer numThreads = 5;
 
+    @Option(name = "--ca-db",
+            required = true,
+            description = "CA database configuration file\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String caDbConfFile;
+
+    @Option(name = "--max-certs",
+            description = "maximal number of certificates to be revoked\n"
+                    + "0 for unlimited")
+    private Integer maxCerts = 0;
+
+    @Option(name = "-n",
+            description = "number of certificates to be revoked in one request")
+    private Integer n = 1;
+
+    @Reference(optional = true)
+    private DataSourceFactory dataSourceFactory;
+
+    @Reference
+    private SecurityFactory securityFactory;
+
     @Override
     protected Object doExecute()
     throws Exception {
+        if (dataSourceFactory == null) {
+            throw new IllegalStateException("dataSourceFactory is not available");
+        }
+
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
@@ -83,12 +114,10 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
             throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
-        EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(
-                new FileInputStream(templateFile));
-        int n = template.getEnrollCert().size();
-
         StringBuilder description = new StringBuilder(200);
-        description.append("template: ").append(templateFile).append("\n");
+        description.append("issuer: ").append(issuerCertFile).append("\n");
+        description.append("cadb: ").append(caDbConfFile).append("\n");
+        description.append("maxCerts: ").append(maxCerts).append("\n");
         description.append("#certs/req: ").append(n).append("\n");
         description.append("unit: ").append(n).append(" certificate");
         if (n > 1) {
@@ -96,11 +125,26 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
         }
         description.append("\n");
 
-        CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient,
-                template, description.toString());
-        loadTest.setDuration(durationInSecond);
-        loadTest.setThreads(numThreads);
-        loadTest.test();
+        Certificate caCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
+        Properties props = new Properties();
+        props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
+        props.setProperty("autoCommit", "false");
+        props.setProperty("readOnly", "true");
+        props.setProperty("maximumPoolSize", "1");
+        props.setProperty("minimumIdle", "1");
+
+        DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(
+                null, props, securityFactory.getPasswordResolver());
+        try {
+            CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
+                    caClient, caCert, caDataSource, maxCerts, n, description.toString());
+
+            loadTest.setDuration(durationInSecond);
+            loadTest.setThreads(numThreads);
+            loadTest.test();
+        } finally {
+            caDataSource.shutdown();
+        }
 
         return null;
     } // method doExecute

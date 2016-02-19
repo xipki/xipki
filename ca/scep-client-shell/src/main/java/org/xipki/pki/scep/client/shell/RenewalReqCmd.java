@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.scep.client.shell;
+package org.xipki.pki.scep.client.shell;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -51,10 +51,10 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
  * @since 2.0.0
  */
 
-@Command(scope = "scep", name = "pkcs-req",
-        description = "enroll certificate via messageType PkcsReq")
+@Command(scope = "scep", name = "renewal-req",
+        description = "enroll certificate via messageType RenewalReq")
 @Service
-public class PkcsReqCmd extends EnrollCertCommandSupport {
+public class RenewalReqCmd extends EnrollCertCommandSupport {
 
     @Override
     protected EnrolmentResponse requestCertificate(
@@ -63,7 +63,7 @@ public class PkcsReqCmd extends EnrollCertCommandSupport {
             final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
-        return client.scepPkcsReq(csr, identityKey, identityCert);
+        return client.scepRenewalReq(csr, identityKey, identityCert);
     }
 
 }

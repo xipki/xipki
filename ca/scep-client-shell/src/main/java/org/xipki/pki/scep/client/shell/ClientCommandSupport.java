@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.scep.client.shell;
+package org.xipki.pki.scep.client.shell;
 
 import java.io.FileInputStream;
 import java.io.IOException;

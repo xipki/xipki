@@ -34,35 +34,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.scep.client.shell;
+package org.xipki.pki.scep.client.shell;
 
 import java.io.File;
-import java.security.PrivateKey;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
+import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.commons.common.util.IoUtil;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.scep.client.EnrolmentResponse;
 import org.xipki.pki.scep.client.ScepClient;
-import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
+@Command(scope = "scep", name = "getcert",
+        description = "download certificate")
+@Service
+public class GetCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--serial", aliases = "-s",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "serial number\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String serialNumber;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -71,31 +73,20 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrolmentResponse requestCertificate(
-            ScepClient client,
-            CertificationRequest csr,
-            PrivateKey identityKey,
-            X509Certificate identityCert)
-    throws ScepClientException;
-
     @Override
     protected Object doExecute()
     throws Exception {
         ScepClient client = getScepClient();
-
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
-        EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
-                getIdentityCert());
-        if (resp.isFailure()) {
-            throw new CmdFailure("server returned 'failure'");
+        BigInteger serial = toBigInt(serialNumber);
+        X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
+        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+        List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
+                caSubject, serial);
+        if (certs == null || certs.isEmpty()) {
+            throw new CmdFailure("received no certficate from server");
         }
 
-        if (resp.isPending()) {
-            throw new CmdFailure("server returned 'pending'");
-        }
-
-        X509Certificate cert = resp.getCertificates().get(0);
-        saveVerbose("saved enrolled certificate to file", new File(outputFile), cert.getEncoded());
+        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
         return null;
     }
 

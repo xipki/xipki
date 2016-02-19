@@ -34,4 +34,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.client.shell.internal.loadtest;
+package org.xipki.pki.ca.client.shell.loadtest;
+
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.pki.ca.client.api.CaClient;
+
+/**
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public abstract class CaLoadTestCommandSupport extends XipkiCommandSupport {
+
+    @Reference
+    protected CaClient caClient;
+
+}

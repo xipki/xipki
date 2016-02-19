@@ -5,10 +5,6 @@
     default-activation="lazy">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <!--
-      Note: Don't include a "-" in the persistent-id, or the config admin will
-      interpret it as a service-factory.
-  -->
   <cm:property-placeholder persistent-id="org.xipki.pki.ca.qa" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="confFile" value="xipki/ca-qa/caqa-conf.xml"/>

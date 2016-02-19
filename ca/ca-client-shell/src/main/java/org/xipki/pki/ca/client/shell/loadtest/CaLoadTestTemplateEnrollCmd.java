@@ -34,60 +34,74 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.scep.client.shell;
+package org.xipki.pki.ca.client.shell.loadtest;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-import java.util.List;
+import java.io.FileInputStream;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.scep.client.ScepClient;
+import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollTemplateType;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "scep", name = "getcert",
-        description = "download certificate")
+@Command(scope = "xipki-cli", name = "loadtest-template-enroll",
+        description = "CA Client Template Enroll Load test")
 @Service
-public class GetCertCmd extends ClientCommandSupport {
+public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
 
-    @Option(name = "--serial", aliases = "-s",
+    @Option(name = "--template", aliases = "-t",
             required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumber;
-
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
+            description = "template file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String outputFile;
+    private String templateFile;
+
+    @Option(name = "--duration",
+            description = "duration in seconds")
+    private Integer durationInSecond = 30;
+
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        ScepClient client = getScepClient();
-        BigInteger serial = toBigInt(serialNumber);
-        X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
-        X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
-                caSubject, serial);
-        if (certs == null || certs.isEmpty()) {
-            throw new CmdFailure("received no certficate from server");
+        if (numThreads < 1) {
+            throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        saveVerbose("saved certificate to file", new File(outputFile), certs.get(0).getEncoded());
+        if (durationInSecond < 1) {
+            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
+        }
+
+        EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(
+                new FileInputStream(templateFile));
+        int n = template.getEnrollCert().size();
+
+        StringBuilder description = new StringBuilder(200);
+        description.append("template: ").append(templateFile).append("\n");
+        description.append("#certs/req: ").append(n).append("\n");
+        description.append("unit: ").append(n).append(" certificate");
+        if (n > 1) {
+            description.append("s");
+        }
+        description.append("\n");
+
+        CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient,
+                template, description.toString());
+        loadTest.setDuration(durationInSecond);
+        loadTest.setThreads(numThreads);
+        loadTest.test();
+
         return null;
-    }
+    } // method doExecute
 
 }
