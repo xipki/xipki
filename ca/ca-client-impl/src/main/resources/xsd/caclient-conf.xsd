@@ -2,10 +2,10 @@
 <!--
  Copyright (c) 2014 - 2015 Lijun Liao
 -->
-<xs:schema xmlns="http://xipki.org/caclient/conf/v2"
+<xs:schema xmlns="http://xipki.org/pki/ca/client/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-  targetNamespace="http://xipki.org/caclient/conf/v2"
+  targetNamespace="http://xipki.org/pki/ca/client/conf/v2"
   elementFormDefault="qualified"
   version="1.0"
   jxb:version="2.0">
