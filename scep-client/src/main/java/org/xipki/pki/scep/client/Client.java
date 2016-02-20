@@ -580,7 +580,7 @@ public abstract class Client {
         }
 
         return resp.getAuthorityCertStore();
-    } // method retrieveNextCAAuthorityCertStore
+    } // method retrieveNextCaAuthorityCertStore
 
     private void initIfNotInited()
     throws ScepClientException {
@@ -748,7 +748,7 @@ public abstract class Client {
             }
             return cs;
         }
-    } // method retrieveCACertStore
+    } // method retrieveCaCertStore
 
     private static void assertSameNonce(
             final PkiMessage request,
