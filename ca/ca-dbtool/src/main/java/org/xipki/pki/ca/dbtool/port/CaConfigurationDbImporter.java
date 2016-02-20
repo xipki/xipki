@@ -106,7 +106,7 @@ class CaConfigurationDbImporter extends DbPorter {
         this.unmarshaller = unmarshaller;
     }
 
-    public void importToDB()
+    public void importToDb()
     throws Exception {
         CAConfigurationType caconf;
         try {
@@ -144,7 +144,7 @@ class CaConfigurationDbImporter extends DbPorter {
             throw e;
         }
         System.out.println(" imported CA configuration to database");
-    } // method importToDB
+    } // method importToDb
 
     private void importCmpcontrol(
             final Cmpcontrols controls)

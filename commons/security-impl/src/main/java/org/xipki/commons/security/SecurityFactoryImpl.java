@@ -350,8 +350,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                         signatureAlgId = getSignatureAlgoId(conf);
                     } else {
                         PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(
-                                pubKey, hashAlgo, sigAlgoControl);
+                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
+                                sigAlgoControl);
                     }
 
                     return signerBuilder.createSigner(
@@ -698,13 +698,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
             String alias = st2.nextToken();
             if (signerTypeMapping.containsKey(alias)) {
-                LOG.warn("signerType alias '{}' already defined, ignore map '{}'",
-                        alias, token);
+                LOG.warn("signerType alias '{}' already defined, ignore map '{}'", alias, token);
                 continue;
             }
             String signerType = st2.nextToken();
             signerTypeMapping.put(alias, signerType);
-            LOG.info("add alias '" + alias + "' for signerType '" + signerType + "'");
+            LOG.info("add alias '{}' for signerType '{}'", alias, signerType);
         }
     }
 
@@ -913,10 +912,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         if (keyLabel != null) {
             conf.putPair("key-label", keyLabel);
         }
-        conf.putPair("keystore", "base64:"
-                + Base64.toBase64String(
-                        IoUtil.read(keystoreStream)));
-
+        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
         return conf.getEncoded();
     }
 
@@ -949,7 +945,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             conf.putPair("key-label", keyLabel);
         }
         conf.putPair("keystore", "file:" + keystoreFile);
-
         return conf.getEncoded();
     }
 
@@ -967,10 +962,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         if (keyLabel != null) {
             conf.putPair("key-label", keyLabel);
         }
-        conf.putPair("keystore", "base64:"
-                + Base64.toBase64String(
-                        IoUtil.read(keystoreStream)));
-
+        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
         return conf.getEncoded();
     }
 

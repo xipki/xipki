@@ -164,7 +164,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    public void importToDB()
+    public void importToDb()
     throws Exception {
         CertStoreType certstore;
         try {
@@ -207,7 +207,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             throw e;
         }
         System.out.println(" imported CA certstore to database");
-    } // method importToDB
+    } // method importToDb
 
     private void importCa(
             final Cas cas)

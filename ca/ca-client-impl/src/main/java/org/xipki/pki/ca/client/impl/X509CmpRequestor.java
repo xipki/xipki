@@ -264,7 +264,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         CrlResultType result = new CrlResultType();
         result.setCrl(crl);
         return result;
-    } // method evaluateCRLResponse
+    } // method evaluateCrlResponse
 
     public RevokeCertResultType revokeCertificate(
             final RevokeCertRequestType request,
@@ -675,7 +675,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         PKIBody body = new PKIBody(bodyType, new CertReqMessages(certReqMsgs));
         return new PKIMessage(header, body);
-    } // method buildPKIMessage
+    } // method buildPkiMessage
 
     private PKIMessage buildPkiMessage(
             final CertRequest req,
@@ -786,7 +786,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         } else {
             throw new CmpRequestorException("unknown CAInfo version " + version);
         }
-    } // method retrieveCAInfo
+    } // method retrieveCaInfo
 
     private static DocumentBuilder newDocumentBuilder() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

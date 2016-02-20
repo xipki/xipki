@@ -330,7 +330,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         }
 
         return entry;
-    } // method getCAEntry
+    } // method getCaEntry
 
     private String getStrProp(
             final Properties props,

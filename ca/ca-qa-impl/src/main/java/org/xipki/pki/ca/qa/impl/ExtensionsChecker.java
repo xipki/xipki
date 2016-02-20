@@ -2557,7 +2557,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
         }
-    } // method checkExtensionQCStatements
+    } // method checkExtensionQcStatements
 
     private void checkExtensionBiometricInfo(
             final StringBuilder failureMsg,
@@ -3075,6 +3075,6 @@ public class ExtensionsChecker {
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
-    } // method checkAIA
+    } // method checkAia
 
 }

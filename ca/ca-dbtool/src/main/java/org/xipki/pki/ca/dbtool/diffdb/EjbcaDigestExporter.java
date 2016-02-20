@@ -370,7 +370,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    } // method doDigest_noTableId
+    } // method doDigestNoTableId
 
     private void doDigestWithTableId(
             final EjbcaDigestExportReader certsReader,
@@ -432,6 +432,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    } // method doDigest_withTableId
+    } // method doDigestWithTableId
 
 }

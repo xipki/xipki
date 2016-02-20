@@ -549,7 +549,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         List<OidWithDescType> oidWithDescs = (type == null)
                 ? null
                 : extConf.getProfessionOid();
-        professionOIDs = XmlX509CertprofileUtil.toOIDList(oidWithDescs);
+        professionOIDs = XmlX509CertprofileUtil.toOidList(oidWithDescs);
 
         this.admission = createAdmission(extensionControls.get(type).isCritical(),
                 professionOIDs, professionItems,

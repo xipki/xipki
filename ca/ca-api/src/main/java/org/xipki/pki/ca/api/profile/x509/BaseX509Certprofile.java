@@ -430,7 +430,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                         oidToDisplayName(occurence.getType())));
             }
         }
-    } // method verifySubjectDNOccurence
+    } // method verifySubjectDnOccurence
 
     protected RDN createSubjectRdn(
             final String text,
@@ -595,7 +595,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         }
 
         return stringType.createString(ttext.trim());
-    } // method createRDNValue
+    } // method createRdnValue
 
     private static String oidToDisplayName(
             final ASN1ObjectIdentifier type) {
@@ -633,6 +633,6 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 throw new BadCertTemplateException(
                         String.format("invalid point encoding 0x%02x", encoded[0]));
         }
-    } // method checkECSubjectPublicKeyInfo
+    } // method checkEcSubjectPublicKeyInfo
 
 }

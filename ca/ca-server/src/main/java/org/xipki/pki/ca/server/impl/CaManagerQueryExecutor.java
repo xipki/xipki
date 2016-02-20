@@ -655,7 +655,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    } // method createCAInfo
+    } // method createCaInfo
 
     Set<CaHasRequestorEntry> createCaHasRequestors(
             final String caName)
@@ -696,7 +696,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    } // method createCAhasRequestors
+    } // method createCaHasRequestors
 
     Map<String, String> createCaHasProfiles(
             final String caName)
@@ -725,7 +725,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    } // method createCAhasProfiles
+    } // method createCaHasProfiles
 
     Set<String> createCaHasPublishers(
             final String caName)
@@ -760,7 +760,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, rs);
         }
-    } // method createCAhasNames
+    } // method createCaHasNames
 
     boolean deleteRowWithName(
             final String name,
@@ -878,7 +878,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method addCA
+    } // method addCa
 
     void addCaAlias(
             final String aliasName,
@@ -949,7 +949,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method addCertprofileToCA
+    } // method addCertprofileToCa
 
     void addCmpControl(
             final CmpControlEntry dbEntry)
@@ -1034,7 +1034,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method addCmpRequestorToCA
+    } // method addCmpRequestorToCa
 
     void addCrlSigner(
             final X509CrlSignerEntry dbEntry)
@@ -1144,7 +1144,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method addPublisherToCA
+    } // method addPublisherToCa
 
     boolean changeCa(
             final ChangeCaEntry changeCAEntry,
@@ -1216,7 +1216,7 @@ class CaManagerQueryExecutor {
                 }
 
                 try {
-                    List<String[]> signerConfs = CaManagerImpl.splitCASignerConfs(localSignerConf);
+                    List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(localSignerConf);
                     for (String[] m : signerConfs) {
                         String signerConf = m[1];
                         securityFactory.createSigner(localSignerType, signerConf, localCert);
@@ -1422,7 +1422,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method changeCA
+    } // method changeCa
 
     IdentifiedX509Certprofile changeCertprofile(
             final String name,
@@ -2032,7 +2032,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method removeCA
+    } // method removeCa
 
     boolean removeCaAlias(
             final String aliasName)
@@ -2077,7 +2077,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method removeCertprofileFromCA
+    } // method removeCertprofileFromCa
 
     boolean removeCmpRequestorFromCa(
             final String requestorName,
@@ -2100,7 +2100,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method removeCmpRequestorFromCA
+    } // method removeCmpRequestorFromCa
 
     boolean removePublisherFromCa(
             final String publisherName,
@@ -2123,7 +2123,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(ps, null);
         }
-    } // method removePublisherFromCA
+    } // method removePublisherFromCa
 
     boolean revokeCa(
             final String caName,
@@ -2201,7 +2201,7 @@ class CaManagerQueryExecutor {
         } finally {
             dataSource.releaseResources(stmt, null);
         }
-    } // method unlockCA
+    } // method unlockCa
 
     boolean unrevokeCa(
             final String caName)

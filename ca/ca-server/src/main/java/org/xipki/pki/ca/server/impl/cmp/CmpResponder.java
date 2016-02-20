@@ -317,7 +317,7 @@ abstract class CmpResponder {
         }
 
         return resp;
-    } // method processPKIMessage
+    } // method processPkiMessage
 
     protected byte[] randomTransactionId() {
         byte[] bytes = new byte[10];

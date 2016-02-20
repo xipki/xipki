@@ -255,7 +255,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             throw e;
         }
         System.out.println(" imported OCSP certstore to database");
-    } // method importToDB
+    } // method importToDb
 
     private List<Integer> getIssuerIds(
             final Cas issuers,

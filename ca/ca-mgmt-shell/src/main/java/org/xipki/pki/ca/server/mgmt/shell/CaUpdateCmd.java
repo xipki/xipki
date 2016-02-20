@@ -291,7 +291,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         return entry;
-    } // method getChangeCAEntry
+    } // method getChangeCaEntry
 
     @Override
     protected Object doExecute()

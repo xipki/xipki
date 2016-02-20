@@ -436,7 +436,7 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableMap(controls);
     } // method buildExtensionControls
 
-    public static List<ASN1ObjectIdentifier> toOIDList(
+    public static List<ASN1ObjectIdentifier> toOidList(
             final List<OidWithDescType> oidWithDescTypes) {
         if (CollectionUtil.isEmpty(oidWithDescTypes)) {
             return null;
@@ -447,7 +447,7 @@ public class XmlX509CertprofileUtil {
             oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
         return Collections.unmodifiableList(oids);
-    } // method toOIDList
+    } // method toOidList
 
     public static Set<KeyUsageControl> buildKeyUsageOptions(
             final org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf) {

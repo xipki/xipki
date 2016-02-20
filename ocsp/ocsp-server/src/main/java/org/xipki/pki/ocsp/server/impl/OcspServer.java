@@ -624,7 +624,7 @@ public class OcspServer {
                     statusStores);
             responders.put(name, responder);
         } // end for
-    } // method do_init
+    } // method doInit
 
     public void shutdown() {
         LOG.info("stopped OCSP Responder");
