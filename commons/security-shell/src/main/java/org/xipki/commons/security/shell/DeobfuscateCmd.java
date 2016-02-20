@@ -38,10 +38,11 @@ package org.xipki.commons.security.shell;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.password.OBFPasswordResolver;
+import org.xipki.commons.password.api.OBFPasswordService;
 
 /**
  * @author Lijun Liao
@@ -52,6 +53,9 @@ import org.xipki.commons.password.OBFPasswordResolver;
         description = "deobfuscate password")
 @Service
 public class DeobfuscateCmd extends SecurityCommandSupport {
+
+    @Reference
+    private OBFPasswordService obfPasswordService;
 
     @Option(name = "--password",
             required = true,
@@ -67,7 +71,7 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
                     + "' does not start with OBF:");
         }
 
-        String password = OBFPasswordResolver.deobfuscate(passwordHint);
+        String password = obfPasswordService.deobfuscate(passwordHint);
         out("the deobfuscated password is: '" + new String(password) + "'");
         return null;
     }
