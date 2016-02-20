@@ -124,26 +124,26 @@ public class SoftTokenContentSignerBuilder {
                         + sigAlgId.getAlgorithm().getId() + "'");
             }
 
-            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-                if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null) {
-                    NssPlainRSASigner plainRSASigner;
-                    try {
-                        plainRSASigner = new NssPlainRSASigner();
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    } catch (NoSuchProviderException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    } catch (NoSuchPaddingException e) {
-                        throw new OperatorCreationException(e.getMessage(), e);
-                    }
-                    return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
-                } else {
-                    return SignerUtil.createPSSRSASigner(sigAlgId);
-                }
-            } else {
+            if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
                 Digest dig = digestProvider.get(digAlgId);
                 return new RSADigestSigner(dig);
             }
+
+            if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) == null) {
+                return SignerUtil.createPSSRSASigner(sigAlgId);
+            }
+
+            NssPlainRSASigner plainRSASigner;
+            try {
+                plainRSASigner = new NssPlainRSASigner();
+            } catch (NoSuchAlgorithmException e) {
+                throw new OperatorCreationException(e.getMessage(), e);
+            } catch (NoSuchProviderException e) {
+                throw new OperatorCreationException(e.getMessage(), e);
+            } catch (NoSuchPaddingException e) {
+                throw new OperatorCreationException(e.getMessage(), e);
+            }
+            return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
         }
 
     } // class RSAContentSignerBuilder
@@ -254,7 +254,6 @@ public class SoftTokenContentSignerBuilder {
             try {
                 cipher.init(Cipher.ENCRYPT_MODE, signingKey);
             } catch (InvalidKeyException e) {
-                e.printStackTrace();
                 throw new RuntimeCryptoException("could not initialize the cipher: "
                         + e.getMessage());
             }
@@ -310,8 +309,7 @@ public class SoftTokenContentSignerBuilder {
             final char[] keyPassword,
             final X509Certificate[] certificateChain)
     throws SignerException {
-        if (!("PKCS12".equalsIgnoreCase(keystoreType)
-                || "JKS".equalsIgnoreCase(keystoreType))) {
+        if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
 
@@ -346,8 +344,7 @@ public class SoftTokenContentSignerBuilder {
 
             this.key = (PrivateKey) ks.getKey(localKeyname, keyPassword);
 
-            if (!(key instanceof RSAPrivateKey
-                    || key instanceof DSAPrivateKey
+            if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
                     || key instanceof ECPrivateKey)) {
                 throw new SignerException("unsupported key " + key.getClass().getName());
             }

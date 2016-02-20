@@ -320,7 +320,7 @@ public class SunNamedCurveExtender {
         }
 
         logAddedCurves(addedCurves);
-    } // method addNamedCurves_jdk18on
+    } // method addNamedCurvesJdk18on
 
     private static ASN1ObjectIdentifier getCurveId(
             final String curveName) {
