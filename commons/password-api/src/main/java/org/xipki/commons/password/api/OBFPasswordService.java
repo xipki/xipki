@@ -34,28 +34,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
-
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
+package org.xipki.commons.password.api;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class NopPasswordResolver implements PasswordResolver {
+public interface OBFPasswordService {
 
-    public static final NopPasswordResolver INSTANCE = new NopPasswordResolver();
+    String obfuscate(
+            String s);
 
-    private NopPasswordResolver() {
-    }
-
-    @Override
-    public char[] resolvePassword(
-            final String passwordHint)
-    throws PasswordResolverException {
-        return passwordHint.toCharArray();
-    }
+    String deobfuscate(
+            String s);
 
 }

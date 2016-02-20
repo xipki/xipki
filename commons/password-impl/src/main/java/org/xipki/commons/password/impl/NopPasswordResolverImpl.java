@@ -34,47 +34,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell;
+package org.xipki.commons.password.impl;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.password.api.PBEPasswordService;
+import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "pbe-dec",
-        description = "decrypt password with master password")
-@Service
-public class PBEDecryptCmd extends SecurityCommandSupport {
+public class NopPasswordResolverImpl implements PasswordResolver {
 
-    @Reference
-    private PBEPasswordService pbePasswordService;
+    public static final NopPasswordResolverImpl INSTANCE = new NopPasswordResolverImpl();
 
-    @Option(name = "--password",
-            required = true,
-            description = "encrypted password, starts with PBE:\n"
-                    + "(required)")
-    private String passwordHint;
+    private NopPasswordResolverImpl() {
+    }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
-            throw new IllegalCmdParamException("encrypted password '" + passwordHint
-                    + "' does not start with PBE:");
-        }
-
-        char[] masterPassword = readPassword("please enter the master password");
-        char[] password = pbePasswordService.decryptPassword(masterPassword, passwordHint);
-        out("the decrypted password is: '" + new String(password) + "'");
-        return null;
+    public char[] resolvePassword(
+            final String passwordHint)
+    throws PasswordResolverException {
+        return passwordHint.toCharArray();
     }
 
 }

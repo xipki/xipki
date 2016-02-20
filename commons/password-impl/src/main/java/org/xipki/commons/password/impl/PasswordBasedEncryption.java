@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
+package org.xipki.commons.password.impl;
 
 import java.security.GeneralSecurityException;
 import java.security.Security;

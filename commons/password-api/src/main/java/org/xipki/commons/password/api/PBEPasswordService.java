@@ -34,39 +34,24 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
-
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.password.api.PasswordCallback;
-import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.password.api.SecurePasswordInputPanel;
+package org.xipki.commons.password.api;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class GuiPasswordCallback implements PasswordCallback {
+public interface PBEPasswordService {
 
-    @Override
-    public char[] getPassword(
-            final String prompt)
-    throws PasswordResolverException {
-        String localPrompt = prompt;
-        if (StringUtil.isBlank(localPrompt)) {
-            localPrompt = "Password required";
-        }
-        char[] password = SecurePasswordInputPanel.readPassword(localPrompt);
-        if (password == null) {
-            throw new PasswordResolverException("user has cancelled");
-        }
-        return password;
-    }
+    char[] decryptPassword(
+            final char[] masterPassword,
+            final String passwordHint)
+    throws PasswordResolverException;
 
-    @Override
-    public void init(
-            final String conf)
-    throws PasswordResolverException {
-    }
+    String encryptPassword(
+            int iterationCount,
+            char[] masterPassword,
+            char[] password)
+    throws PasswordResolverException;
 
 }
