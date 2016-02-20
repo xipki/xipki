@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
+package org.xipki.commons.password.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -89,8 +89,8 @@ public class FilePasswordCallback implements PasswordCallback {
             throw new PasswordResolverException("no password is specified in file " + passwordFile);
         }
 
-        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordResolver.OBFUSCATE)) {
-            return OBFPasswordResolver.deobfuscate(passwordHint).toCharArray();
+        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordServiceImpl.OBFUSCATE)) {
+            return OBFPasswordServiceImpl.doDeobfuscate(passwordHint).toCharArray();
         } else {
             return passwordHint.toCharArray();
         }

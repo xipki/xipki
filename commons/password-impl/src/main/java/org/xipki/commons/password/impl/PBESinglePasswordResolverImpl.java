@@ -34,12 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
-
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Base64;
+package org.xipki.commons.password.impl;
 
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
@@ -51,9 +46,7 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
  * @since 2.0.0
  */
 
-public class PBEPasswordResolver implements SinglePasswordResolver {
-
-    private static final int ITERATION_COUNT = 2000;
+public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
 
     private char[] masterPassword;
 
@@ -61,7 +54,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
 
     private PasswordCallback masterPwdCallback;
 
-    public PBEPasswordResolver() {
+    public PBESinglePasswordResolverImpl() {
     }
 
     protected char[] getMasterPassword()
@@ -93,7 +86,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
     public char[] resolvePassword(
             final String passwordHint)
     throws PasswordResolverException {
-        return resolvePassword(getMasterPassword(), passwordHint);
+        return PBEPasswordServiceImpl.doDecryptPassword(getMasterPassword(), passwordHint);
     }
 
     public void setMasterPasswordCallback(
@@ -136,58 +129,5 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
                     + ", " + e.getClass().getName() + ": " + e.getMessage());
         }
     } // method setMasterPasswordCallback
-
-    public static char[] resolvePassword(
-            final char[] masterPassword,
-            final String passwordHint)
-    throws PasswordResolverException {
-        byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
-        int n = bytes.length;
-        if (n <= 16 && n != 0) {
-            throw new PasswordResolverException("invalid length of the encrypted password");
-        }
-
-        byte[] salt = Arrays.copyOf(bytes, 16);
-        byte[] cipherText = Arrays.copyOfRange(bytes, 16, n);
-
-        byte[] pwd;
-        try {
-            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, ITERATION_COUNT,
-                    salt);
-        } catch (GeneralSecurityException e) {
-            throw new PasswordResolverException("could not decrypt the password: "
-                    + e.getMessage());
-        }
-
-        char[] ret = new char[pwd.length];
-        for (int i = 0; i < pwd.length; i++) {
-            ret[i] = (char) pwd[i];
-        }
-
-        return ret;
-    } // method resolvePassword
-
-    public static String encryptPassword(
-            final char[] masterPassword,
-            final char[] password)
-    throws PasswordResolverException {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        byte[] encrypted;
-        try {
-            encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
-                    masterPassword, ITERATION_COUNT, salt);
-        } catch (GeneralSecurityException e) {
-            throw new PasswordResolverException("could not encrypt the password: "
-                    + e.getMessage());
-        }
-
-        byte[] encryptedWithSalt = new byte[salt.length + encrypted.length];
-        System.arraycopy(salt, 0, encryptedWithSalt, 0, salt.length);
-        System.arraycopy(encrypted, 0, encryptedWithSalt, salt.length, encrypted.length);
-        String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
-        return pbeText;
-    }
 
 }

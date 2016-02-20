@@ -37,8 +37,13 @@
 package org.xipki.commons.security.shell;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.password.PBEPasswordResolver;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.password.api.PBEPasswordService;
 
 /**
  * @author Lijun Liao
@@ -50,13 +55,27 @@ import org.xipki.commons.password.PBEPasswordResolver;
 @Service
 public class PBEEncryptCmd extends SecurityCommandSupport {
 
+    @Option(name = "--iteration-count", aliases = "-n",
+            description = "iteration count, between 1 and 65535")
+    private int iterationCount = 2000;
+
+    @Completion(FilePathCompleter.class)
+    private String outFile;
+
+    @Reference
+    private PBEPasswordService pbePasswordService;
+
     @Override
     protected Object doExecute()
     throws Exception {
+        if(iterationCount < 1 | iterationCount > 65535) {
+            throw new IllegalCmdParamException("iterationCount is not between 1 and 65535");
+        }
+
         char[] masterPassword = readPassword("Please enter the master password");
         char[] password = readPassword("Please enter the password");
 
-        String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
+        String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword, password);
         out("the encrypted password is: '" + passwordHint + "'");
         return null;
     }
