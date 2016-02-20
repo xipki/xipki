@@ -442,7 +442,7 @@ public abstract class CmpRequestor {
         }
 
         return hBuilder.build();
-    } // method buildPKIHeader
+    } // method buildPkiHeader
 
     protected PkiErrorException buildErrorResult(
             final ErrorMsgContent bodyContent) {

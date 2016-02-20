@@ -342,9 +342,9 @@ public abstract class P12KeypairGenerator {
 
         X509KeyUsage ku;
         if (keyUsage == null) {
-            ku = new X509KeyUsage(
-                    X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
-                    | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+            int intUsage = X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
+                    | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign;
+            ku = new X509KeyUsage(intUsage);
         } else {
             ku = new X509KeyUsage(keyUsage);
         }
@@ -394,9 +394,7 @@ public abstract class P12KeypairGenerator {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             ASN1ObjectIdentifier sigOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
 
-            builder = new BcRSAContentSignerBuilder(
-                    buildAlgId(sigOid),
-                    buildAlgId(hashOid));
+            builder = new BcRSAContentSignerBuilder(buildAlgId(sigOid), buildAlgId(hashOid));
         } else if (key instanceof DSAPrivateKey) {
             ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
             AlgorithmIdentifier sigId = new AlgorithmIdentifier(
@@ -425,8 +423,7 @@ public abstract class P12KeypairGenerator {
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
 
-            builder = new ECDSAContentSignerBuilder(
-                    new AlgorithmIdentifier(sigOid),
+            builder = new ECDSAContentSignerBuilder(new AlgorithmIdentifier(sigOid),
                     buildAlgId(hashOid));
         } else {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());

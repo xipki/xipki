@@ -244,7 +244,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         return caNamesWithError;
-    } // method autoConfCAs
+    } // method autoConfCas
 
     public void init()
     throws InvalidConfException, IOException {
@@ -547,7 +547,7 @@ public final class CaClientImpl implements CaClient {
             // make sure that all requests are targeted on the same CA
             for (EnrollCertRequestEntryType entry : request.getRequestEntries()) {
                 String profile = entry.getCertprofile();
-                checkCertprofileSupportInCA(profile, localCaName);
+                checkCertprofileSupportInCa(profile, localCaName);
             }
         }
 
@@ -566,7 +566,7 @@ public final class CaClientImpl implements CaClient {
         return parseEnrollCertResult((EnrollCertResultType) result, localCaName);
     } // method requestCerts
 
-    private void checkCertprofileSupportInCA(
+    private void checkCertprofileSupportInCa(
             final String certprofile,
             final String caName)
     throws CaClientException {
@@ -603,7 +603,7 @@ public final class CaClientImpl implements CaClient {
         if (localCaName == null) {
             throw new CaClientException("unsupported cert profile " + certprofile);
         }
-    } // method checkCertprofileSupportInCA
+    }
 
     @Override
     public CertIdOrError revokeCert(
@@ -833,7 +833,7 @@ public final class CaClientImpl implements CaClient {
                         + " is not supported by any CA");
             }
         } else {
-            checkCertprofileSupportInCA(profileName, localCaName);
+            checkCertprofileSupportInCa(profileName, localCaName);
         }
 
         CaConf ca = casMap.get(localCaName.trim());
