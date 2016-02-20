@@ -719,7 +719,7 @@ public class X509Ca {
         } finally {
             crlGenInProcess.set(false);
         }
-    } // method generateCrlonDemand
+    } // method generateCrlOnDemand
 
     private X509CRL generateCrl(
             final boolean deltaCrl,
@@ -1221,7 +1221,7 @@ public class X509Ca {
         } // end for
 
         return 0;
-    } // method intern_publishCertificate
+    } // method doPublishCertificate
 
     public boolean republishCertificates(
             final List<String> publisherNames) {
@@ -1596,7 +1596,7 @@ public class X509Ca {
 
         certstore.removeCertificate(caInfo.getCertificate(), serialNumber);
         return certToRemove;
-    } // method do_removeCertificate
+    } // method doRemoveCertificate
 
     private X509CertWithRevocationInfo doRevokeCertificate(
             final BigInteger serialNumber,
@@ -1665,7 +1665,7 @@ public class X509Ca {
                         invalidityTime, resultText});
 
         return revokedCert;
-    } // method do_revokeCertificate
+    } // method doRevokeCertificate
 
     private X509CertWithDbId doUnrevokeCertificate(
             final BigInteger serialNumber,
@@ -1726,7 +1726,7 @@ public class X509Ca {
                 new Object[]{caInfo.getName(), serialNumber, resultText});
 
         return unrevokedCert;
-    } // do_unrevokeCertificate
+    } // doUnrevokeCertificate
 
     private boolean shouldPublishToDeltaCrlCache() {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
@@ -2278,7 +2278,7 @@ public class X509Ca {
             } catch (OperationException e) {
             }
         }
-    } // method intern_generateCertificate
+    } // method doGenerateCertificate
 
     public IdentifiedX509Certprofile getX509Certprofile(
             final String certprofileLocalName) {
@@ -2647,7 +2647,7 @@ public class X509Ca {
         } else {
             return name;
         }
-    } // method removeEmptyRDNs
+    } // method removeEmptyRdns
 
     private static Object[] incSerialNumber(
             final IdentifiedX509Certprofile profile,

@@ -436,6 +436,6 @@ public class SubjectDnSpec {
         if (changed) {
             isRange.setRange(min, max);
         } // isRange
-    } // method fixRDNControl
+    } // method fixRdnControl
 
 }

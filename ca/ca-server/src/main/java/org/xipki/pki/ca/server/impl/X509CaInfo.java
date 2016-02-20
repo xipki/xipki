@@ -431,7 +431,7 @@ public class X509CaInfo {
         }
         dfltSigner = null;
 
-        List<String[]> signerConfs = CaManagerImpl.splitCASignerConfs(caEntry.getSignerConf());
+        List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(caEntry.getSignerConf());
 
         Map<String, ConcurrentContentSigner> tSigners = new HashMap<>();
         for (String[] m : signerConfs) {

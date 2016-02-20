@@ -1109,7 +1109,7 @@ class CertStoreQueryExecutor {
         }
 
         return Base64.decode(b64Crl);
-    } // method getEncodedCRL
+    } // method getEncodedCrl
 
     int cleanupCrls(
             final X509Cert caCert,
@@ -1168,7 +1168,7 @@ class CertStoreQueryExecutor {
         }
 
         return numCrlsToDelete;
-    } // method cleanupCRLs
+    } // method cleanupCrls
 
     X509CertificateInfo getCertForId(
             final X509Cert caCert,
@@ -1777,7 +1777,7 @@ class CertStoreQueryExecutor {
         } // end for
 
         return ret;
-    } // method getCertificatesForDeltaCRL
+    } // method getCertificatesForDeltaCrl
 
     CertStatus getCertStatusForSubject(
             final X509Cert caCert,
@@ -2247,7 +2247,7 @@ class CertStoreQueryExecutor {
         }
 
         return X509Util.rdnValueToString(rdns[0].getFirst().getValue());
-    } // method getLatestSN
+    } // method getLatestSerialNumber
 
     Long getNotBeforeOfFirstCertStartsWithCommonName(
             final String commonName,
@@ -2284,7 +2284,7 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    } // method getNotBeforeOfFirstCertStartsWithCN
+    } // method getNotBeforeOfFirstCertStartsWithCommonName
 
     void markMaxSerial(
             final X509Cert caCert,

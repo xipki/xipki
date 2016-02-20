@@ -149,7 +149,7 @@ class X509SelfSignedCertBuilder {
 
         ConcurrentContentSigner signer;
         try {
-            List<String[]> signerConfs = CaManagerImpl.splitCASignerConfs(signerConf);
+            List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(signerConf);
             List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
             String thisSignerConf = null;

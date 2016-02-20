@@ -305,7 +305,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
-    } // method certprofileRootCA
+    } // method certprofileRootCa
 
     private static X509ProfileType certprofileCross()
     throws Exception {
@@ -1209,7 +1209,7 @@ public class ProfileConfCreatorDemo {
         }
 
         return ret;
-    } // method createRDN
+    } // method createRdn
 
     private static ExtensionType createExtension(
             final ASN1ObjectIdentifier type,

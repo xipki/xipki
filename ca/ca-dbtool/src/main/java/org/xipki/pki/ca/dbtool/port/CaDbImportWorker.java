@@ -153,7 +153,7 @@ public class CaDbImportWorker extends DbPortWorker {
                 // CAConfiguration
                 CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
                         dataSource, unmarshaller, srcFolder, stopMe, evaluateOnly);
-                caConfImporter.importToDB();
+                caConfImporter.importToDb();
                 caConfImporter.shutdown();
             }
 
@@ -161,7 +161,7 @@ public class CaDbImportWorker extends DbPortWorker {
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
                     dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
                     evaluateOnly);
-            certStoreImporter.importToDB();
+            certStoreImporter.importToDb();
             certStoreImporter.shutdown();
 
             // create serialNumber generator

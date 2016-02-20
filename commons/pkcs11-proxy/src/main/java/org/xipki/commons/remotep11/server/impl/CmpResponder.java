@@ -293,7 +293,7 @@ class CmpResponder {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
                     t.getMessage());
         }
-    } // method processPKIMessage
+    } // method processPkiMessage
 
     private PKIMessage createRejectionPkiMessage(
             final PKIHeader header,

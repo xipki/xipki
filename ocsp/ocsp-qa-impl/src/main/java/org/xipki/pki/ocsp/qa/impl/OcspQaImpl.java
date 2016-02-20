@@ -272,7 +272,7 @@ public class OcspQaImpl implements OcspQa {
         } // end for
 
         return new ValidationResult(resultIssues);
-    } // method checkOCSP
+    } // method checkOcsp
 
     private List<ValidationIssue> checkSingleCert(
             final int index,

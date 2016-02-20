@@ -237,7 +237,7 @@ public class Scep {
         EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
                 responderKey);
         this.envelopedDataDecryptor = new EnvelopedDataDecryptor(di);
-    } // method refreshCA
+    } // method refreshCa
 
     public String getCaName() {
         return caName;

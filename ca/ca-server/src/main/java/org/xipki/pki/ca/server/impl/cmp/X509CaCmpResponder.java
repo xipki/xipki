@@ -354,7 +354,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         return new PKIMessage(respHeader.build(), respBody);
-    } // method intern_processPKIMessage
+    } // method doProcessPKIMessage
 
     /**
      * handle the PKI body with the choice {@code cr}
@@ -1058,7 +1058,7 @@ public class X509CaCmpResponder extends CmpResponder {
             LOG.debug(message, e);
         }
         return false;
-    } // method verifyPOP
+    } // method verifyPopo
 
     @Override
     protected CmpControl getCmpControl() {
