@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
+package org.xipki.commons.password.impl;
 
 import org.xipki.commons.password.api.PasswordResolverException;
 
@@ -45,7 +45,7 @@ import org.xipki.commons.password.api.PasswordResolverException;
  * @since 2.0.0
  */
 
-public class DummyPBEPasswordResolver extends PBEPasswordResolver {
+public class DummyPBESinglePasswordResolverImpl extends PBESinglePasswordResolverImpl {
 
     private char[] masterPassword;
 

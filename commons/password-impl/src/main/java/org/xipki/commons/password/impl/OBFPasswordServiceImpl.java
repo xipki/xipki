@@ -34,37 +34,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password;
+package org.xipki.commons.password.impl;
 
 import java.nio.charset.StandardCharsets;
 
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.password.api.SinglePasswordResolver;
+import org.xipki.commons.password.api.OBFPasswordService;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class OBFPasswordResolver implements SinglePasswordResolver {
+public class OBFPasswordServiceImpl implements OBFPasswordService {
 
     public static final String OBFUSCATE = "OBF:";
 
-    @Override
-    public boolean canResolveProtocol(
-            final String protocol) {
-        return "OBF".equalsIgnoreCase(protocol);
-    }
-
-    @Override
-    public char[] resolvePassword(
-            final String passwordHint)
-    throws PasswordResolverException {
-        return deobfuscate(passwordHint).toCharArray();
-    }
-
-    public static String obfuscate(
+    public static String doObfuscate(
             final String s) {
         StringBuilder buf = new StringBuilder();
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
@@ -91,7 +77,7 @@ public class OBFPasswordResolver implements SinglePasswordResolver {
         return buf.toString();
     }
 
-    public static String deobfuscate(
+    public static String doDeobfuscate(
             final String s) {
         String localS = s;
         if (StringUtil.startsWithIgnoreCase(localS, OBFUSCATE)) {
@@ -118,6 +104,18 @@ public class OBFPasswordResolver implements SinglePasswordResolver {
         } // end for
 
         return new String(b, 0, l, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String obfuscate(
+            final String s) {
+        return doObfuscate(s);
+    }
+
+    @Override
+    public String deobfuscate(
+            final String s) {
+        return doDeobfuscate(s);
     }
 
 }

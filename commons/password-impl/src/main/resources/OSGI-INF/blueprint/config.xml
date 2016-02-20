@@ -9,7 +9,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean id="passwordResolver" class="org.xipki.commons.password.PasswordResolverImpl"/>
+  <bean id="passwordResolver" class="org.xipki.commons.password.impl.PasswordResolverImpl"/>
   <reference-list id="singlePasswordResolvers"
       interface="org.xipki.commons.password.api.SinglePasswordResolver" availability="optional">
     <reference-listener ref="passwordResolver" bind-method="bindService"
@@ -17,13 +17,22 @@
   </reference-list>
   <service ref="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
 
-  <bean id="obfPasswordResolver" class="org.xipki.commons.password.OBFPasswordResolver"/>
-  <service ref="obfPasswordResolver"
+  <bean id="obfSinglePasswordResolver" class="org.xipki.commons.password.impl.OBFSinglePasswordResolverImpl"/>
+  <service ref="obfSinglePasswordResolver"
       interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
 
-  <bean id="pbePasswordResolver" class="org.xipki.commons.password.PBEPasswordResolver">
+  <bean id="pbeSinglePasswordResolver" class="org.xipki.commons.password.impl.PBESinglePasswordResolverImpl">
     <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
   </bean>
-  <service ref="pbePasswordResolver"
+  <service ref="pbeSinglePasswordResolver"
       interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
+
+  <bean id="obfPasswordService" class="org.xipki.commons.password.impl.OBFPasswordServiceImpl"/>
+  <service ref="obfPasswordService"
+      interface="org.xipki.commons.password.api.OBFPasswordService"/>
+
+  <bean id="pbePasswordService" class="org.xipki.commons.password.impl.PBEPasswordServiceImpl"/>
+  <service ref="pbePasswordService"
+      interface="org.xipki.commons.password.api.PBEPasswordService"/>
+
 </blueprint>

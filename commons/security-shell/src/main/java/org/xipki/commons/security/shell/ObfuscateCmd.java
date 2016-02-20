@@ -37,8 +37,9 @@
 package org.xipki.commons.security.shell;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.password.OBFPasswordResolver;
+import org.xipki.commons.password.api.OBFPasswordService;
 
 /**
  * @author Lijun Liao
@@ -50,12 +51,15 @@ import org.xipki.commons.password.OBFPasswordResolver;
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {
 
+    @Reference
+    private OBFPasswordService obfPasswordService;
+
     @Override
     protected Object doExecute()
     throws Exception {
         char[] password = readPassword("Please enter the password");
 
-        String passwordHint = OBFPasswordResolver.obfuscate(new String(password));
+        String passwordHint = obfPasswordService.obfuscate(new String(password));
         out("the obfuscated password is: '" + passwordHint + "'");
         return null;
     }
