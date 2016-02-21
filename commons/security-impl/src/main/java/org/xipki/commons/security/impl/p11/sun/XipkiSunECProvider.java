@@ -34,52 +34,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11.sun;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.Provider;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class XipkiSunECProvider extends Provider {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+    public static final String NAME = "XiPKI-SunEC";
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+    public static final double VERSION = 1.0;
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
+    private static final long serialVersionUID = 1L;
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
+    public XipkiSunECProvider() {
+        super(NAME, VERSION, NAME + " (version " + VERSION + ")");
+
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                put("AlgorithmParameters.EC", ECParameters.class.getName());
+                return null;
             }
-        }
-
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+        });
     }
 
 }

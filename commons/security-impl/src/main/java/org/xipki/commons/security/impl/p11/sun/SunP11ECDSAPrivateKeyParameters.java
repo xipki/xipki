@@ -34,52 +34,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11.sun;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import java.security.PrivateKey;
+
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class SunP11ECDSAPrivateKeyParameters extends AsymmetricKeyParameter {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private PrivateKey privateKey;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+    public SunP11ECDSAPrivateKeyParameters(
+            final PrivateKey privateKey) {
+        super(true);
+        this.privateKey = privateKey;
+    }
 
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
-
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
-
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+    public PrivateKey getPrivateKey() {
+        return privateKey;
     }
 
 }
