@@ -173,7 +173,17 @@ public class KeystoreP11Module implements P11Module {
         File slotDir = new File(moduleConf.getNativeLibrary(), localSlotId.getSlotIndex() + "-"
                 + localSlotId.getSlotId());
 
-        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, localSlotId, pwd,
+        if (pwd == null) {
+            throw new SignerException("no password is configured");
+        }
+
+        if (pwd.size() != 1) {
+            throw new SignerException(pwd.size() + " passwords are configured, but 1 is permitted");
+        }
+
+        PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
+
+        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, localSlotId, privateKeyCryptor,
                 moduleConf.getSecurityFactory());
 
         slots.put(localSlotId, extSlot);

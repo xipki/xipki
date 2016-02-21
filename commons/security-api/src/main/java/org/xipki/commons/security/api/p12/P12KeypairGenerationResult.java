@@ -38,7 +38,6 @@ package org.xipki.commons.security.api.p12;
 
 import java.security.KeyStore;
 
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.commons.security.api.KeypairGenerationResult;
 
 /**
@@ -53,9 +52,8 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult {
     private KeyStore keystoreObject;
 
     public P12KeypairGenerationResult(
-            final byte[] keystore,
-            final X509CertificateHolder certificate) {
-        super(certificate);
+            final byte[] keystore) {
+        super();
         this.keystore = keystore;
     }
 

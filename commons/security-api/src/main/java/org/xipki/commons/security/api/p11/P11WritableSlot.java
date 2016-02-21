@@ -43,8 +43,6 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 
@@ -88,41 +86,15 @@ public interface P11WritableSlot {
             String label)
     throws Exception;
 
-    P11KeypairGenerationResult generateRSAKeypairAndCert(
-            int keySize,
-            BigInteger publicExponent,
-            String label,
-            String subject,
-            Set<KeyUsage> keyUsage,
-            List<ASN1ObjectIdentifier> extendedKeyusage)
-    throws Exception;
-
     P11KeyIdentifier generateDSAKeypair(
             int pLength,
             int qLength,
             String label)
     throws Exception;
 
-    P11KeypairGenerationResult generateDSAKeypairAndCert(
-            int pLength,
-            int qLength,
-            String label,
-            String subject,
-            Set<KeyUsage> keyUsage,
-            List<ASN1ObjectIdentifier> extendedKeyusage)
-    throws Exception;
-
     P11KeyIdentifier generateECKeypair(
             String curveNameOrOid,
             String label)
-    throws Exception;
-
-    P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String curveNameOrOid,
-            String label,
-            String subject,
-            Set<KeyUsage> keyUsage,
-            List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
     X509Certificate exportCert(

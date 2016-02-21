@@ -39,15 +39,11 @@ package org.xipki.commons.security.shell.p12;
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
@@ -63,12 +59,6 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     @Reference
     protected P12KeypairGenerator keyGenerator;
 
-    @Option(name = "--subject", aliases = "-s",
-            required = true,
-            description = "subject in the self-signed certificate\n"
-                    + "(required)")
-    protected String subject;
-
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the key\n"
@@ -76,40 +66,20 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     @Completion(FilePathCompleter.class)
     protected String keyOutFile;
 
-    @Option(name = "--cert-out",
-            description = "where to save the self-signed certificate")
-    @Completion(FilePathCompleter.class)
-    protected String certOutFile;
-
     @Option(name = "--password",
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected void saveKeyAndCert(
-            final P12KeypairGenerationResult keyAndCert)
+    protected void saveKeypair(
+            final P12KeypairGenerationResult keypair)
     throws IOException {
         File p12File = new File(keyOutFile);
-        saveVerbose("saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
-        if (certOutFile != null) {
-            File certFile = new File(certOutFile);
-            saveVerbose("saved self-signed certificate to file", certFile,
-                    keyAndCert.getCertificate().getEncoded());
-        }
+        saveVerbose("saved PKCS#12 keystore to file", p12File, keypair.getKeystore());
     }
 
     protected P12KeystoreGenerationParameters getKeyGenParameters() {
         P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
-                getPassword(), subject);
-
-        Set<KeyUsage> keyUsage = getKeyUsage();
-        if (keyUsage != null) {
-            params.setKeyUsage(keyUsage);
-        }
-
-        List<ASN1ObjectIdentifier> extKeyUsage = getExtendedKeyUsage();
-        if (extKeyUsage != null) {
-            params.setExtendedKeyUsage(extKeyUsage);
-        }
+                getPassword());
 
         SecureRandom random = securityFactory.getRandom4Key();
         if (random != null) {

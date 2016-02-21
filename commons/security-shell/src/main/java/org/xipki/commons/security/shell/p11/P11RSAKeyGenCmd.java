@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -70,18 +69,9 @@ public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
         }
 
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        if (noCert) {
-            P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
-                    label);
-            finalize(keyId);
-        } else {
-            P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
-                    keysize, toBigInt(publicExponent),
-                    label, getSubject(),
-                    getKeyUsage(),
-                    getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
+        P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+                label);
+        finalize(keyId);
         return null;
     }
 

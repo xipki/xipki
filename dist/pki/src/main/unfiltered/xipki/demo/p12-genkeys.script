@@ -7,8 +7,7 @@ EC_CURVE = secp256r1
 ## SCEP responder
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out $P12_DIR/ee/SCEP1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ee/SCEP1.p12
 
 echo "========================================================"
 echo "||                     CA DSA Key                     ||"
@@ -22,20 +21,17 @@ sleep 1000
 xipki-tk:dsa-p12 \
   --password 1234 \
   --plen $DSA_PLEN \
-  --out $P12_DIR/ca-dsa/RCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-dsa/RCA1.p12
 
 xipki-tk:dsa-p12 \
   --password 1234 \
   --plen $DSA_PLEN \
-  --out $P12_DIR/ca-dsa/SubCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-dsa/SubCA1.p12
 
 xipki-tk:dsa-p12 \
   --password 1234 \
   --plen $DSA_PLEN \
-  --out $P12_DIR/ca-dsa/SubCAwithCRL1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-dsa/SubCAwithCRL1.p12
 
 echo "========================================================"
 echo "||                     CA RSA Key                     ||"
@@ -44,20 +40,17 @@ echo "========================================================"
 xipki-tk:rsa-p12 \
   --password 1234 \
   --key-size $RSA_NLEN \
-  --out $P12_DIR/ca-rsa/RCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-rsa/RCA1.p12
 
 xipki-tk:rsa-p12 \
   --password 1234 \
   --key-size $RSA_NLEN \
-  --out $P12_DIR/ca-rsa/SubCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-rsa/SubCA1.p12
 
 xipki-tk:rsa-p12 \
   --password 1234 \
   --key-size $RSA_NLEN \
-  --out $P12_DIR/ca-rsa/SubCAwithCRL1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-rsa/SubCAwithCRL1.p12
 
 echo "========================================================"
 echo "||                      CA EC Key                     ||"
@@ -66,20 +59,17 @@ echo "========================================================"
 xipki-tk:ec-p12 \
   --curve $EC_CURVE \
   --password 1234 \
-  --out $P12_DIR/ca-ec/RCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-ec/RCA1.p12
 
 xipki-tk:ec-p12 \
   --curve $EC_CURVE \
   --password 1234 \
-  --out $P12_DIR/ca-ec/SubCA1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-ec/SubCA1.p12
 
 xipki-tk:ec-p12 \
   --curve $EC_CURVE \
   --password 1234 \
-  --out $P12_DIR/ca-ec/SubCAwithCRL1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ca-ec/SubCAwithCRL1.p12
 
 echo "========================================================"
 echo "||                       EE Keys                      ||"
@@ -87,8 +77,7 @@ echo "========================================================"
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out $P12_DIR/ee/Cross1.p12 \
-  --subject "CN=DUMMY"
+  --out $P12_DIR/ee/Cross1.p12
 
 xipki-tk:rsa-p12 \
   --password 1234 \

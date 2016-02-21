@@ -278,27 +278,17 @@ public abstract class KeyEntry {
         public ECKeyEntry(
                 final String curveNameOrOid)
         throws Exception {
-            boolean isOid;
-            try {
-                new ASN1ObjectIdentifier(curveNameOrOid);
-                isOid = true;
-            } catch (Exception e) {
-                isOid = false;
+            ASN1ObjectIdentifier curveOid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+            if (curveOid == null) {
+                throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid
+                        + "'");
             }
 
-            ASN1ObjectIdentifier curveOid;
-            String curveName;
-            if (isOid) {
-                curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-                curveName = KeyUtil.getCurveName(curveOid);
-            } else {
-                curveName = curveNameOrOid;
-                curveOid = KeyUtil.getCurveOid(curveName);
-                if (curveOid == null) {
-                    throw new IllegalArgumentException(
-                            "no OID is defined for the curve " + curveName);
-                }
+            String curveName = KeyUtil.getCurveName(curveOid);
+            if (curveName == null) {
+                curveName = curveOid.getId();
             }
+
             algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
                     curveOid);
 

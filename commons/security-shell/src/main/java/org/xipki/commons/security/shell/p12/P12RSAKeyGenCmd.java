@@ -67,9 +67,9 @@ public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
-        P12KeypairGenerationResult keyAndCert = keyGenerator.generateRSAKeypair(keysize,
+        P12KeypairGenerationResult keypair = keyGenerator.generateRSAKeypair(keysize,
                 toBigInt(publicExponent), getKeyGenParameters());
-        saveKeyAndCert(keyAndCert);
+        saveKeypair(keypair);
 
         return null;
     }
