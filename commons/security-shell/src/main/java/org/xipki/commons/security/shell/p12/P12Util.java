@@ -34,41 +34,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api;
+package org.xipki.commons.security.shell.p12;
 
-import java.security.KeyStore;
-
-import org.bouncycastle.cert.X509CertificateHolder;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P12KeypairGenerationResult extends KeypairGenerationResult {
+class P12Util {
 
-    private final byte[] keystore;
-
-    private KeyStore keystoreObject;
-
-    public P12KeypairGenerationResult(
-            final byte[] keystore,
-            final X509CertificateHolder certificate) {
-        super(certificate);
-        this.keystore = keystore;
+    private P12Util() {
     }
 
-    public byte[] getKeystore() {
-        return keystore;
-    }
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final String keystoreFile,
+            final String password) {
+        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
+        ParamUtil.assertNotBlank("password", password);
 
-    public KeyStore getKeystoreObject() {
-        return keystoreObject;
-    }
-
-    public void setKeystoreObject(
-            final KeyStore keystoreObject) {
-        this.keystoreObject = keystoreObject;
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", "1");
+        conf.putPair("keystore", "file:" + keystoreFile);
+        return conf.getEncoded();
     }
 
 }

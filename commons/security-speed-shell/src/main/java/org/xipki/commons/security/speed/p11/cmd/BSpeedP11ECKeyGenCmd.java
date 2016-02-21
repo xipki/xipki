@@ -43,8 +43,8 @@ import java.util.Map;
 import org.apache.karaf.shell.api.action.Command;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.KeyUtil;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.speed.p11.P11ECKeyGenLoadTest;
 
 /**
@@ -62,7 +62,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
 
         for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P11ECKeyGenLoadTest(slot, curveName));

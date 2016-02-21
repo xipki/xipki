@@ -168,7 +168,7 @@ public class IaikP11Module implements P11Module {
         } catch (PasswordResolverException e) {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
-        extSlot = new IaikP11Slot(localSlotId, slot, pwd);
+        extSlot = new IaikP11Slot(moduleConf.getName(), localSlotId, slot, pwd);
 
         slots.put(localSlotId, extSlot);
         return extSlot;

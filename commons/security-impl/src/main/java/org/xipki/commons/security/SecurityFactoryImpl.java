@@ -101,11 +101,15 @@ import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.commons.security.api.p11.P11PasswordRetriever;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.p11.P11ContentSignerBuilder;
 import org.xipki.commons.security.p11.P11PasswordRetrieverImpl;
@@ -119,7 +123,9 @@ import org.xipki.commons.security.p11.conf.jaxb.PasswordsType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotsType;
 import org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory;
+import org.xipki.commons.security.p11.iaik.IaikP11ModulePool;
 import org.xipki.commons.security.p11.keystore.KeystoreP11CryptServiceFactory;
+import org.xipki.commons.security.p11.keystore.KeystoreP11ModulePool;
 import org.xipki.commons.security.p11.remote.RemoteP11CryptServiceFactory;
 import org.xml.sax.SAXException;
 
@@ -672,6 +678,49 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         } catch (SignerException e) {
             throw new InvalidKeyException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public P11Module getP11Module(
+            final String moduleName)
+    throws SignerException {
+        // this call initialization method
+        P11CryptService p11CryptService = getP11CryptService(moduleName);
+        if (p11CryptService == null) {
+            throw new SignerException("could not initialize P11CryptService " + moduleName);
+        }
+
+        P11Module module;
+        String pkcs11Provider = getPkcs11Provider();
+        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
+            // the returned object could not be null
+            module = IaikP11ModulePool.getInstance().getModule(moduleName);
+        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
+            module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
+        } else {
+            throw new SignerException("PKCS11 provider " + pkcs11Provider + " is not accepted");
+        }
+
+        return module;
+
+    }
+
+    @Override
+    public P11WritableSlot getP11WritablSlot(
+            final String moduleName,
+            final int slotIndex)
+    throws SignerException {
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+        P11Module module = getP11Module(moduleName);
+        if (module == null) {
+            throw new SignerException("module " + moduleName + " does not exist");
+        }
+        P11WritableSlot slot = module.getSlot(slotId);
+        if (slot == null) {
+            throw new SignerException("could not get slot " + slotIndex + " of module "
+                    + moduleName);
+        }
+        return slot;
     }
 
     public void setSignerTypeMap(

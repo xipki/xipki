@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security;
+package org.xipki.commons.security.api;
 
 /**
  * @author Lijun Liao

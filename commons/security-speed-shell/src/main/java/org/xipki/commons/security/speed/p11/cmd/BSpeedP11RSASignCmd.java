@@ -60,7 +60,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11SignCommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
 
         for (int keysize : keysizes) {
             ret.add(

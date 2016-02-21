@@ -38,8 +38,11 @@ package org.xipki.commons.security.speed.p12;
 
 import java.security.SecureRandom;
 
-import org.xipki.commons.security.P12KeypairGenerator;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
+import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 
 /**
  * @author Lijun Liao
@@ -49,25 +52,30 @@ import org.xipki.commons.security.api.SecurityFactory;
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
     public P12ECSignLoadTest(
+            final P12KeypairGenerator p12KeypairGenerator,
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final String curveNameOrOid)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
-                generateKeystore(curveNameOrOid),
+                generateKeystore(p12KeypairGenerator, curveNameOrOid),
                 "PKCS#12 EC signature creation\n"
                         + "curve: " + curveNameOrOid);
     }
 
     private static byte[] generateKeystore(
+            final P12KeypairGenerator p12KeypairGenerator,
             final String curveNameOrOid)
     throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
         if (keystoreBytes == null) {
-            P12KeypairGenerator kpGen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveNameOrOid, PASSWORD.toCharArray(), "CN=dummy", null, null,
-                new SecureRandom());
-            keystoreBytes = kpGen.generateIdentity().getKeystore();
+            ParamUtil.assertNotNull("p12KeypairGenerator", p12KeypairGenerator);
+            P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+                    PASSWORD.toCharArray(), "CN=dummy");
+            params.setRandom(new SecureRandom());
+            P12KeypairGenerationResult identity = p12KeypairGenerator.generateECKeypair(
+                    curveNameOrOid, params);
+            keystoreBytes = identity.getKeystore();
         }
         return keystoreBytes;
     }

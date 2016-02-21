@@ -19,7 +19,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.commons</groupId>
-      <artifactId>security-impl</artifactId>
+      <artifactId>security-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

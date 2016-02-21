@@ -48,8 +48,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.ncm.common.HessianCaManager;
 import org.xipki.pki.ca.ncm.common.HessianCaMgmtException;

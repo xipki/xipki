@@ -34,39 +34,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
+package org.xipki.commons.security.api.p12;
 
-import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
+import java.security.KeyStore;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
-import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.xipki.commons.security.api.KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
-        description = "performance test of PKCS#11 RSA key generation (batch)")
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
+public class P12KeypairGenerationResult extends KeypairGenerationResult {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    private final byte[] keystore;
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+    private KeyStore keystoreObject;
 
-        for (int keysize : keysizes) {
-            ret.add(
-                    new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
-        }
-        return ret;
+    public P12KeypairGenerationResult(
+            final byte[] keystore,
+            final X509CertificateHolder certificate) {
+        super(certificate);
+        this.keystore = keystore;
+    }
+
+    public byte[] getKeystore() {
+        return keystore;
+    }
+
+    public KeyStore getKeystoreObject() {
+        return keystoreObject;
+    }
+
+    public void setKeystoreObject(
+            final KeyStore keystoreObject) {
+        this.keystoreObject = keystoreObject;
     }
 
 }

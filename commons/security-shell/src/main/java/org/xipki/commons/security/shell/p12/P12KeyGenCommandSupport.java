@@ -38,11 +38,19 @@ package org.xipki.commons.security.shell.p12;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
+import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 
 /**
@@ -51,6 +59,9 @@ import org.xipki.commons.security.shell.KeyGenCommandSupport;
  */
 
 public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
+
+    @Reference
+    protected P12KeypairGenerator keyGenerator;
 
     @Option(name = "--subject", aliases = "-s",
             required = true,
@@ -86,7 +97,29 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
         }
     }
 
-    protected char[] getPassword() {
+    protected P12KeystoreGenerationParameters getKeyGenParameters() {
+        P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+                getPassword(), subject);
+
+        Set<KeyUsage> keyUsage = getKeyUsage();
+        if (keyUsage != null) {
+            params.setKeyUsage(keyUsage);
+        }
+
+        List<ASN1ObjectIdentifier> extKeyUsage = getExtendedKeyUsage();
+        if (extKeyUsage != null) {
+            params.setExtendedKeyUsage(extKeyUsage);
+        }
+
+        SecureRandom random = securityFactory.getRandom4Key();
+        if (random != null) {
+            params.setRandom(random);
+        }
+
+        return params;
+    }
+
+    private char[] getPassword() {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);

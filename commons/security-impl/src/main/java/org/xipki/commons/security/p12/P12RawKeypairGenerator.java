@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security;
+package org.xipki.commons.security.p12;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -43,6 +43,7 @@ import java.security.Security;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao

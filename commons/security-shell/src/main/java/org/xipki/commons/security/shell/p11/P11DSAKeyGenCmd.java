@@ -77,7 +77,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
             }
         }
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         if (noCert) {
             P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
             finalize(keyId);

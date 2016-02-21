@@ -44,4 +44,10 @@
     <property name="trustAll" value="${hostnameVerifier.trustAll}"/>
     <property name="commonnameHostMap" value="${hostnameVerifier.commonnameHostMap}"/>
   </bean>
+
+  <bean id="p12KeypairGenerator" class="org.xipki.commons.security.p12.P12KeypairGeneratorImpl">
+  </bean>
+  <service ref="p12KeypairGenerator"
+      interface="org.xipki.commons.security.api.p12.P12KeypairGenerator"/>
+  
 </blueprint>

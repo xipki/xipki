@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
