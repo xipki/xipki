@@ -34,39 +34,32 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
+package org.xipki.commons.security.api.p12;
 
 import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
-import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
-        description = "performance test of PKCS#11 RSA key generation (batch)")
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
+public interface P12KeypairGenerator {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    P12KeypairGenerationResult generateRSAKeypair(
+            int keysize,
+            BigInteger publicExponent,
+            P12KeystoreGenerationParameters params)
+    throws Exception;
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+    P12KeypairGenerationResult generateDSAKeypair(
+            int pLength,
+            int qLength,
+            P12KeystoreGenerationParameters params)
+    throws Exception;
 
-        for (int keysize : keysizes) {
-            ret.add(
-                    new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
-        }
-        return ret;
-    }
+    P12KeypairGenerationResult generateECKeypair(
+            String curveNameOrOid,
+            P12KeystoreGenerationParameters params)
+    throws Exception;
 
 }

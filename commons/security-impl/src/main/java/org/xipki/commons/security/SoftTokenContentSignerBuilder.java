@@ -94,6 +94,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.bcext.BCRSAPrivateCrtKey;
 import org.xipki.commons.security.bcext.BCRSAPrivateKey;

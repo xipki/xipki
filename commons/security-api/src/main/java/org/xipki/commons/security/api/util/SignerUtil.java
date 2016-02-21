@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security;
+package org.xipki.commons.security.api.util;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -68,7 +68,6 @@ import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
  * utility class for converting java.security RSA objects into their

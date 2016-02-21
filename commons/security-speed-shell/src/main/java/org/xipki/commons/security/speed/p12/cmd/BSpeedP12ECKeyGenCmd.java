@@ -43,7 +43,7 @@ import java.util.Map;
 import org.apache.karaf.shell.api.action.Command;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.KeyUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.commons.security.speed.p12.P12ECKeyGenLoadTest;
 

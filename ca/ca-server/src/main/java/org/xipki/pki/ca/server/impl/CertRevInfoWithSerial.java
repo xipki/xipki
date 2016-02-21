@@ -39,8 +39,8 @@ package org.xipki.pki.ca.server.impl;
 import java.math.BigInteger;
 import java.util.Date;
 
-import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.CrlReason;
 
 /**
  * @author Lijun Liao

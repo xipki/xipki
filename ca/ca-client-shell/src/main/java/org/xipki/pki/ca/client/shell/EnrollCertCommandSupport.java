@@ -80,7 +80,6 @@ import org.xipki.commons.console.karaf.completer.ExtensionNameCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
-import org.xipki.commons.security.P10RequestGenerator;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ExtensionExistence;
 import org.xipki.commons.security.api.KeyUsage;
@@ -244,15 +243,13 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
         if (isNotEmpty(subjectAltNames)) {
-            extensions.add(
-                    P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+            extensions.add(X509Util.createExtensionSubjectAltName(subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if (isNotEmpty(subjectInfoAccesses)) {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
-                    subjectInfoAccesses, false));
+            extensions.add(X509Util.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 

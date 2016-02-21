@@ -36,13 +36,17 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
@@ -50,6 +54,8 @@ import org.xipki.commons.security.api.SecurityFactory;
  */
 
 public interface P11WritableSlot {
+
+    String getModuleName();
 
     P11SlotIdentifier getSlotIdentifier();
 
@@ -87,7 +93,7 @@ public interface P11WritableSlot {
             BigInteger publicExponent,
             String label,
             String subject,
-            Integer keyUsage,
+            Set<KeyUsage> keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
@@ -102,7 +108,7 @@ public interface P11WritableSlot {
             int qLength,
             String label,
             String subject,
-            Integer keyUsage,
+            Set<KeyUsage> keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
@@ -115,7 +121,7 @@ public interface P11WritableSlot {
             String curveNameOrOid,
             String label,
             String subject,
-            Integer keyUsage,
+            Set<KeyUsage> keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception;
 
@@ -124,5 +130,10 @@ public interface P11WritableSlot {
     throws Exception;
 
     List<? extends P11Identity> getP11Identities();
+
+    void showDetails(
+            OutputStream stream,
+            boolean verbose)
+    throws IOException, SignerException;
 
 }

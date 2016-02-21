@@ -49,7 +49,9 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
@@ -63,6 +65,15 @@ public interface SecurityFactory {
     Set<String> getPkcs11ModuleNames();
 
     String getDefaultPkcs11ModuleName();
+
+    P11Module getP11Module(
+            String moduleName)
+    throws SignerException;
+
+    P11WritableSlot getP11WritablSlot(
+            String moduleName,
+            int slotIndex)
+    throws SignerException;
 
     PasswordResolver getPasswordResolver();
 

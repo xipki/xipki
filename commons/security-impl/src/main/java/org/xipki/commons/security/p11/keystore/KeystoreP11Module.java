@@ -173,7 +173,8 @@ public class KeystoreP11Module implements P11Module {
         File slotDir = new File(moduleConf.getNativeLibrary(), localSlotId.getSlotIndex() + "-"
                 + localSlotId.getSlotId());
 
-        extSlot = new KeystoreP11Slot(slotDir, localSlotId, pwd, moduleConf.getSecurityFactory());
+        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, localSlotId, pwd,
+                moduleConf.getSecurityFactory());
 
         slots.put(localSlotId, extSlot);
         return extSlot;
