@@ -36,37 +36,22 @@
 
 package org.xipki.commons.security;
 
-import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -125,158 +110,5 @@ public class P10RequestGenerator {
         }
         return p10ReqBuilder.build(contentSigner);
     }
-
-    public static Extension createExtensionSubjectAltName(
-            final List<String> taggedValues,
-            final boolean critical)
-    throws BadInputException {
-        GeneralNames names = createGeneralNames(taggedValues);
-        if (names == null) {
-            return null;
-        }
-
-        try {
-            return new Extension(Extension.subjectAlternativeName, critical, names.getEncoded());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static GeneralNames createGeneralNames(
-            final List<String> taggedValues)
-    throws BadInputException {
-        if (CollectionUtil.isEmpty(taggedValues)) {
-            return null;
-        }
-
-        int n = taggedValues.size();
-        GeneralName[] names = new GeneralName[n];
-        for (int i = 0; i < n; i++) {
-            names[i] = createGeneralName(taggedValues.get(i));
-        }
-        return new GeneralNames(names);
-    }
-
-    public static Extension createExtensionSubjectInfoAccess(
-            final List<String> accessMethodAndLocations,
-            final boolean critical)
-    throws BadInputException {
-        if (CollectionUtil.isEmpty(accessMethodAndLocations)) {
-            return null;
-        }
-
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        for (String accessMethodAndLocation : accessMethodAndLocations) {
-            vector.add(createAccessDescription(accessMethodAndLocation));
-        }
-        ASN1Sequence seq = new DERSequence(vector);
-        try {
-            return new Extension(Extension.subjectInfoAccess, critical, seq.getEncoded());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static AccessDescription createAccessDescription(
-            final String accessMethodAndLocation)
-    throws BadInputException {
-        ConfPairs pairs;
-        try {
-            pairs = new ConfPairs(accessMethodAndLocation);
-        } catch (IllegalArgumentException e) {
-            throw new BadInputException("invalid accessMethodAndLocation "
-                    + accessMethodAndLocation);
-        }
-
-        Set<String> oids = pairs.getNames();
-        if (oids == null || oids.size() != 1) {
-            throw new BadInputException("invalid accessMethodAndLocation "
-                    + accessMethodAndLocation);
-        }
-
-        String accessMethodS = oids.iterator().next();
-        String taggedValue = pairs.getValue(accessMethodS);
-        ASN1ObjectIdentifier accessMethod = new ASN1ObjectIdentifier(accessMethodS);
-
-        GeneralName location = createGeneralName(taggedValue);
-        return new AccessDescription(accessMethod, location);
-    }
-
-    /**
-     *
-     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
-     *     type=value.
-     * @param modes
-     * @return
-     * @throws BadInputException
-     */
-    public static GeneralName createGeneralName(
-            final String taggedValue)
-    throws BadInputException {
-        int tag = -1;
-        String value = null;
-        if (taggedValue.charAt(0) == '[') {
-            int idx = taggedValue.indexOf(']', 1);
-            if (idx > 1 && idx < taggedValue.length() - 1) {
-                String tagS = taggedValue.substring(1, idx);
-                try {
-                    tag = Integer.parseInt(tagS);
-                    value = taggedValue.substring(idx + 1);
-                } catch (NumberFormatException e) {
-                }
-            }
-        }
-
-        if (tag == -1) {
-            throw new BadInputException("invalid taggedValue " + taggedValue);
-        }
-
-        switch (tag) {
-        case GeneralName.otherName:
-            int idxSep = value.indexOf("=");
-            if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
-                throw new BadInputException("invalid otherName " + value);
-            }
-            String otherTypeOid = value.substring(0, idxSep);
-            ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(otherTypeOid);
-            String otherValue = value.substring(idxSep + 1);
-            ASN1EncodableVector vector = new ASN1EncodableVector();
-            vector.add(type);
-            vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
-            DERSequence seq = new DERSequence(vector);
-            return new GeneralName(GeneralName.otherName, seq);
-        case GeneralName.rfc822Name:
-            return new GeneralName(tag, value);
-        case GeneralName.dNSName:
-            return new GeneralName(tag, value);
-        case GeneralName.directoryName:
-            X500Name x500Name = X509Util.reverse(new X500Name(value));
-            return new GeneralName(GeneralName.directoryName, x500Name);
-        case GeneralName.ediPartyName:
-            idxSep = value.indexOf("=");
-            if (idxSep == -1 || idxSep == value.length() - 1) {
-                throw new BadInputException("invalid ediPartyName " + value);
-            }
-            String nameAssigner = (idxSep == 0)
-                    ? null
-                    : value.substring(0, idxSep);
-            String partyName = value.substring(idxSep + 1);
-            vector = new ASN1EncodableVector();
-            if (nameAssigner != null) {
-                vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-            }
-            vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-            seq = new DERSequence(vector);
-            return new GeneralName(GeneralName.ediPartyName, seq);
-        case GeneralName.uniformResourceIdentifier:
-            return new GeneralName(tag, value);
-        case GeneralName.iPAddress:
-            return new GeneralName(tag, value);
-        case GeneralName.registeredID:
-            return new GeneralName(tag, value);
-        default:
-            throw new RuntimeException("unsupported tag " + tag);
-        } // end switch (tag)
-    } // method createGeneralName
 
 }

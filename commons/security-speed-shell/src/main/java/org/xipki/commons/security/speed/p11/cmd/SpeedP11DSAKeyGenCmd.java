@@ -70,7 +70,7 @@ public class SpeedP11DSAKeyGenCmd extends SpeedP11CommandSupport {
             }
         }
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         return new P11DSAKeyGenLoadTest(slot, pLen, qLen);
     }
 

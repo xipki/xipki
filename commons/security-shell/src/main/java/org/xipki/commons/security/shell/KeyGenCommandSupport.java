@@ -37,10 +37,13 @@
 package org.xipki.commons.security.shell;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.KeyUsage;
+import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 
 /**
@@ -49,23 +52,33 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
  */
 
 public abstract class KeyGenCommandSupport extends SecurityCommandSupport {
+    private static final Set<KeyUsage> DFLT_KEYUSAGE;
+    private static final List<ASN1ObjectIdentifier> DFLT_EXT_KEYUSAGE;
 
-    protected Integer getKeyUsage()
-    throws Exception {
-        return KeyUsage.cRLSign
-                | KeyUsage.dataEncipherment
-                | KeyUsage.digitalSignature
-                | KeyUsage.keyAgreement
-                | KeyUsage.keyCertSign
-                | KeyUsage.keyEncipherment;
-    }
+    static {
+        Set<KeyUsage> usages = new HashSet<>(12);
+        usages.add(KeyUsage.cRLSign);
+        usages.add(KeyUsage.dataEncipherment);
+        usages.add(KeyUsage.digitalSignature);
+        usages.add(KeyUsage.keyAgreement);
+        usages.add(KeyUsage.keyCertSign);
+        usages.add(KeyUsage.keyEncipherment);
+        DFLT_KEYUSAGE = Collections.unmodifiableSet(usages);
 
-    protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
-    throws Exception {
-        return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
+        List<ASN1ObjectIdentifier> list =
+                Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
                 ObjectIdentifiers.id_kp_serverAuth,
                 ObjectIdentifiers.id_kp_emailProtection,
                 ObjectIdentifiers.id_kp_OCSPSigning);
+        DFLT_EXT_KEYUSAGE = Collections.unmodifiableList(list);
+    }
+
+    protected Set<KeyUsage> getKeyUsage() {
+        return DFLT_KEYUSAGE;
+    }
+
+    protected List<ASN1ObjectIdentifier> getExtendedKeyUsage() {
+        return DFLT_EXT_KEYUSAGE;
     }
 
 }

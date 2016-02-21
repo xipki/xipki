@@ -37,10 +37,10 @@
 package org.xipki.commons.security.speed.p12;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
-import org.xipki.commons.security.P12RawKeypairGenerator;
-import org.xipki.commons.security.P12RawKeypairGenerator.RSAKeypairGenerator;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -49,7 +49,8 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final RSAKeypairGenerator kpGen;
+    private final int keysize;
+    private final BigInteger publicExponent;
 
     public P12RSAKeyGenLoadTest(
             final int keysize,
@@ -61,12 +62,15 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
                 + "public exponent: " + publicExponent,
                 securityFactory);
 
-        this.kpGen = new RSAKeypairGenerator(keysize, publicExponent);
+        this.keysize = keysize;
+        this.publicExponent = publicExponent;
     }
 
     @Override
-    protected P12RawKeypairGenerator getKeypairGenerator() {
-        return kpGen;
+    protected void generateKeypair(
+            final SecureRandom random)
+    throws Exception {
+        KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     }
 
 }

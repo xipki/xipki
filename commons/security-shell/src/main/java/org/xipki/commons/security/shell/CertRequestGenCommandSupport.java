@@ -48,6 +48,7 @@ import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -79,11 +80,11 @@ import org.xipki.commons.console.karaf.completer.ExtensionNameCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
-import org.xipki.commons.security.P10RequestGenerator;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ExtensionExistence;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SecurityUtil;
@@ -192,6 +193,9 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
+    @Reference
+    private P10RequestGenerator p10Gen;
+
     protected abstract ConcurrentContentSigner getSigner(
             SignatureAlgoControl signatureAlgoControl)
     throws Exception;
@@ -199,8 +203,6 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     @Override
     protected Object doExecute()
     throws Exception {
-        P10RequestGenerator p10Gen = new P10RequestGenerator();
-
         hashAlgo = hashAlgo.trim().toUpperCase();
         if (hashAlgo.indexOf('-') != -1) {
             hashAlgo = hashAlgo.replaceAll("-", "");
@@ -214,14 +216,14 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         List<Extension> extensions = new LinkedList<>();
 
         if (isNotEmpty(subjectAltNames)) {
-            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(
+            extensions.add(X509Util.createExtensionSubjectAltName(
                     subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if (isNotEmpty(subjectInfoAccesses)) {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(
+            extensions.add(X509Util.createExtensionSubjectInfoAccess(
                     subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }

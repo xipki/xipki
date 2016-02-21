@@ -60,13 +60,13 @@ import javax.crypto.NoSuchPaddingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.SignerUtil;
 import org.xipki.commons.security.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao

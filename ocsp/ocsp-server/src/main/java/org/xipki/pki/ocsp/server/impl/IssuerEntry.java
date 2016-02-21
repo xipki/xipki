@@ -42,8 +42,8 @@ import java.util.Date;
 import java.util.Map;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 

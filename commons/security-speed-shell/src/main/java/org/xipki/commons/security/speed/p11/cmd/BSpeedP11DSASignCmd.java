@@ -59,7 +59,7 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
 
         for (int i = 0; i < pqLens.length; i += 2) {
             int pLen = pqLens[i];

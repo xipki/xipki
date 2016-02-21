@@ -60,8 +60,8 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.security.KeyUtil;
-import org.xipki.commons.security.SignerUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -99,8 +99,7 @@ public abstract class KeyEntry {
             try {
                 return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                         SignerUtil.generateRSAPublicKeyParameter(
-                                org.xipki.commons.security.KeyUtil.generateRSAPublicKey(modulus,
-                                        BigInteger.valueOf(65537))));
+                                KeyUtil.generateRSAPublicKey(modulus, BigInteger.valueOf(65537))));
             } catch (InvalidKeySpecException e) {
                 LOG.warn("InvalidKeySpecException: {}", e.getMessage());
                 return null;

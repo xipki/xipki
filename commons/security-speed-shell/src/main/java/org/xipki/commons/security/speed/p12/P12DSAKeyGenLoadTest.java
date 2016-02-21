@@ -36,9 +36,10 @@
 
 package org.xipki.commons.security.speed.p12;
 
-import org.xipki.commons.security.P12RawKeypairGenerator;
-import org.xipki.commons.security.P12RawKeypairGenerator.DSAKeypairGenerator;
+import java.security.SecureRandom;
+
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -46,8 +47,8 @@ import org.xipki.commons.security.api.SecurityFactory;
  */
 
 public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
-
-    private final DSAKeypairGenerator kpGen;
+    private final int pLength;
+    private final int qLength;
 
     public P12DSAKeyGenLoadTest(
             final int pLength,
@@ -58,12 +59,16 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
                 + "pLength: " + pLength + "\n"
                 + "qLength: " + qLength,
                 securityFactory);
-        this.kpGen = new DSAKeypairGenerator(pLength, qLength);
+
+        this.pLength = pLength;
+        this.qLength = qLength;
     }
 
     @Override
-    protected P12RawKeypairGenerator getKeypairGenerator() {
-        return kpGen;
+    protected void generateKeypair(
+            final SecureRandom random)
+    throws Exception {
+        KeyUtil.generateDSAKeypair(pLength, qLength, random);
     }
 
 }

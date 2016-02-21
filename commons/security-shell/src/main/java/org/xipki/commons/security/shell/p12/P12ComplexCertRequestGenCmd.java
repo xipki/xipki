@@ -56,7 +56,6 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.SecurityFactoryImpl;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SignatureAlgoControl;
@@ -115,8 +114,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     throws Exception {
         char[] pwd = getPassword();
 
-        String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
-                p12File, new String(pwd), 1);
+        String signerConf = P12Util.getKeystoreSignerConfWithoutAlgo(p12File, new String(pwd));
         return securityFactory.createSigner(
                 "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
     }

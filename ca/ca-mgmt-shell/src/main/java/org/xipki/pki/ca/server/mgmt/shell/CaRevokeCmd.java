@@ -48,8 +48,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.CrlReason;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaCrlReasonCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
