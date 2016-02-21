@@ -34,52 +34,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.bouncycastle.crypto.Digest;
+import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class P11DSAX962Signer extends AbstractP11DSASigner {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
-
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+    public P11DSAX962Signer(
+            final Digest digest) {
+        super(digest);
+    }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
-
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
-
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+    protected byte[] sign(
+            final byte[] hashValue)
+    throws SignerException {
+        return param.getP11CryptService().CKM_DSA_X962(hashValue, param.getSlot(),
+                param.getKeyId());
     }
 
 }

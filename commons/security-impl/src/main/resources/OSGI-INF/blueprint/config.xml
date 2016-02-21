@@ -12,7 +12,7 @@
       <cm:property name="defaultParallelism" value="20"/>
       <cm:property name="pkcs11.confFile" value=""/>
       <cm:property name="pkcs11.provider"
-          value="org.xipki.commons.security.p11.iaik.IaikP11CryptServiceFactory"/>
+          value="org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory"/>
       <cm:property name="signerType.map" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
@@ -20,10 +20,10 @@
   <reference id="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
 
   <bean id="XipkiProviderNssRegister"
-      class="org.xipki.commons.security.p11.sun.nss.XipkiNssProviderRegister"
+      class="org.xipki.commons.security.impl.p11.sun.nss.XipkiNssProviderRegister"
       init-method="regist" destroy-method="unregist"/>
 
-  <bean id="securityFactoryImpl" class="org.xipki.commons.security.SecurityFactoryImpl">
+  <bean id="securityFactoryImpl" class="org.xipki.commons.security.impl.SecurityFactoryImpl">
     <property name="strongRandom4KeyEnabled" value="${key.strongrandom.enabled}"/>
     <property name="strongRandom4SignEnabled" value="${sign.strongrandom.enabled}"/>
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
@@ -34,22 +34,22 @@
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="XipkiProviderRegister"
-      class="org.xipki.commons.security.provider.XipkiProviderRegister"
+      class="org.xipki.commons.security.impl.provider.XipkiProviderRegister"
       init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
-  <bean id="httpHostnameVerifier" class="org.xipki.commons.security.HttpsHostnameVerifier"
+  <bean id="httpHostnameVerifier" class="org.xipki.commons.security.impl.HttpsHostnameVerifier"
       init-method="init" destroy-method="shutdown">
     <property name="enabled" value="${hostnameVerifier.enabled}"/>
     <property name="trustAll" value="${hostnameVerifier.trustAll}"/>
     <property name="commonnameHostMap" value="${hostnameVerifier.commonnameHostMap}"/>
   </bean>
 
-  <bean id="p12KeypairGenerator" class="org.xipki.commons.security.p12.P12KeypairGeneratorImpl"/>
+  <bean id="p12KeypairGenerator" class="org.xipki.commons.security.impl.p12.P12KeypairGeneratorImpl"/>
   <service ref="p12KeypairGenerator"
       interface="org.xipki.commons.security.api.p12.P12KeypairGenerator"/>
   
-  <bean id="p10RequestGenerator" class="org.xipki.commons.security.P10RequestGeneratorImpl"/>
+  <bean id="p10RequestGenerator" class="org.xipki.commons.security.impl.P10RequestGeneratorImpl"/>
   <service ref="p10RequestGenerator"
       interface="org.xipki.commons.security.api.P10RequestGenerator"/>
 
