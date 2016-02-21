@@ -47,9 +47,9 @@ import org.bouncycastle.operator.ContentSigner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.security.SecurityFactoryImpl;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.impl.SecurityFactoryImpl;
 
 /**
  * @author Lijun Liao
