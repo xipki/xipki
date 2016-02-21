@@ -75,9 +75,9 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
             }
         }
 
-        P12KeypairGenerationResult keyAndCert = keyGenerator.generateDSAKeypair(pLen, qLen,
+        P12KeypairGenerationResult keypair = keyGenerator.generateDSAKeypair(pLen, qLen,
                 getKeyGenParameters());
-        saveKeyAndCert(keyAndCert);
+        saveKeypair(keypair);
 
         return null;
     }

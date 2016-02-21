@@ -50,7 +50,6 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -65,46 +64,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.asn1.x509.V3TBSCertificateGenerator;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.DSAParametersGenerator;
 import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
 import org.bouncycastle.crypto.params.DSAParameters;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +89,6 @@ import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -153,31 +123,6 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
  */
 
 public class IaikP11Slot implements P11WritableSlot {
-
-    private static class PrivateKeyAndPKInfo {
-
-        private final PrivateKey privateKey;
-
-        private final SubjectPublicKeyInfo publicKeyInfo;
-
-        PrivateKeyAndPKInfo(
-                final PrivateKey privateKey,
-                final SubjectPublicKeyInfo publicKeyInfo)
-        throws InvalidKeySpecException {
-            super();
-            this.privateKey = privateKey;
-            this.publicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
-        }
-
-        public PrivateKey getPrivateKey() {
-            return privateKey;
-        }
-
-        public SubjectPublicKeyInfo getPublicKeyInfo() {
-            return publicKeyInfo;
-        }
-
-    } // class PrivateKeyAndPKInfo
 
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
@@ -1142,7 +1087,7 @@ public class IaikP11Slot implements P11WritableSlot {
                         continue;
                     }
 
-                    byte[] caCertKeyId = IaikP11Util.generateKeyID(session);
+                    byte[] caCertKeyId = IaikP11Util.generateKeyId(session);
 
                     X500Name caX500Name = X500Name.getInstance(
                             caCert.getSubjectX500Principal().getEncoded());
@@ -1361,7 +1306,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
             }
 
-            byte[] keyId = IaikP11Util.generateKeyID(session);
+            byte[] keyId = IaikP11Util.generateKeyId(session);
 
             X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
             String cN = X509Util.getCommonName(x500Name);
@@ -1410,7 +1355,7 @@ public class IaikP11Slot implements P11WritableSlot {
                         "label " + label + " exists, please specify another one");
             }
 
-            byte[] id = IaikP11Util.generateKeyID(session);
+            byte[] id = IaikP11Util.generateKeyId(session);
 
             generateRSAKeyPair(
                     session,
@@ -1421,50 +1366,6 @@ public class IaikP11Slot implements P11WritableSlot {
             returnWritableSession(session);
         }
     } // method generateRSAKeypair
-
-    @Override
-    public P11KeypairGenerationResult generateRSAKeypairAndCert(
-            final int keySize,
-            final BigInteger publicExponent,
-            final String label,
-            final String subject,
-            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
-            final List<ASN1ObjectIdentifier> extendedKeyusage)
-    throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (keySize < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + keySize);
-        }
-
-        if (keySize % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
-        }
-
-        Session session = borrowWritableSession();
-        try {
-            if (IaikP11Util.labelExists(session, label)) {
-                throw new IllegalArgumentException(
-                        "label " + label + " exists, please specify another one");
-            }
-
-            byte[] id = IaikP11Util.generateKeyID(session);
-
-            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateRSAKeyPair(
-                    session, keySize, publicExponent, id, label);
-
-            AlgorithmIdentifier signatureAlgId = new AlgorithmIdentifier(
-                    PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE);
-
-            X509CertificateHolder certificate = generateCertificate(session,
-                    id, label, subject,
-                    signatureAlgId, privateKeyAndPKInfo,
-                    keyUsage, extendedKeyusage);
-            return new P11KeypairGenerationResult(id, label, certificate);
-        } finally {
-            returnWritableSession(session);
-        }
-    } // method generateRSAKeypairAndCert
 
     @Override
     public P11KeyIdentifier generateDSAKeypair(
@@ -1489,56 +1390,13 @@ public class IaikP11Slot implements P11WritableSlot {
                         "label " + label + " exists, please specify another one");
             }
 
-            byte[] id = IaikP11Util.generateKeyID(session);
+            byte[] id = IaikP11Util.generateKeyId(session);
             generateDSAKeyPair(session, pLength, qLength, id, label);
             return new P11KeyIdentifier(id, label);
         } finally {
             returnWritableSession(session);
         }
     }
-
-    @Override
-    public P11KeypairGenerationResult generateDSAKeypairAndCert(
-            final int pLength,
-            final int qLength,
-            final String label,
-            final String subject,
-            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
-            final List<ASN1ObjectIdentifier> extendedKeyusage)
-    throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (pLength < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + pLength);
-        }
-
-        if (pLength % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
-        }
-
-        Session session = borrowWritableSession();
-        try {
-            if (IaikP11Util.labelExists(session, label)) {
-                throw new IllegalArgumentException(
-                        "label " + label + " exists, please specify another one");
-            }
-
-            byte[] id = IaikP11Util.generateKeyID(session);
-
-            PrivateKeyAndPKInfo privateKeyAndPKInfo =
-                    generateDSAKeyPair(session, pLength, qLength, id, label);
-            AlgorithmIdentifier signatureAlgId =
-                    new AlgorithmIdentifier(NISTObjectIdentifiers.dsa_with_sha256);
-
-            X509CertificateHolder certificate = generateCertificate(session,
-                    id, label, subject,
-                    signatureAlgId, privateKeyAndPKInfo,
-                    keyUsage, extendedKeyusage);
-            return new P11KeypairGenerationResult(id, label, certificate);
-        } finally {
-            returnWritableSession(session);
-        }
-    } // method generateDSAKeypair
 
     @Override
     public P11KeyIdentifier generateECKeypair(
@@ -1565,7 +1423,7 @@ public class IaikP11Slot implements P11WritableSlot {
                         "label " + label + " exists, please specify another one");
             }
 
-            byte[] id = IaikP11Util.generateKeyID(session);
+            byte[] id = IaikP11Util.generateKeyId(session);
 
             generateECDSAKeyPair(
                     session, curveId, ecParams, id, label);
@@ -1576,68 +1434,7 @@ public class IaikP11Slot implements P11WritableSlot {
         }
     } // method generateECKeypair
 
-    @Override
-    public P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            final String curveNameOrOid,
-            final String label,
-            final String subject,
-            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
-            final List<ASN1ObjectIdentifier> extendedKeyusage)
-    throws Exception {
-        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
-        ParamUtil.assertNotBlank("label", label);
-
-        ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
-        if (curveId == null) {
-            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
-        }
-
-        X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
-        if (ecParams == null) {
-            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
-        }
-
-        Session session = borrowWritableSession();
-        try {
-            if (IaikP11Util.labelExists(session, label)) {
-                throw new IllegalArgumentException(
-                        "label " + label + " exists, please specify another one");
-            }
-
-            byte[] id = IaikP11Util.generateKeyID(session);
-
-            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateECDSAKeyPair(
-                    session, curveId, ecParams, id, label);
-
-            int keyBitLength = ecParams.getN().bitLength();
-
-            ASN1ObjectIdentifier sigAlgOid;
-            if (keyBitLength > 384) {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            } else if (keyBitLength > 256) {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            } else if (keyBitLength > 224) {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            } else if (keyBitLength > 160) {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            } else {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-            }
-
-            X509CertificateHolder certificate = generateCertificate(session,
-                    id, label, subject,
-                    new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE),
-                    privateKeyAndPKInfo,
-                    keyUsage,
-                    extendedKeyusage);
-
-            return new P11KeypairGenerationResult(id, label, certificate);
-        } finally {
-            returnWritableSession(session);
-        }
-    } // method generateECDSAKeypairAndCert
-
-    private PrivateKeyAndPKInfo generateDSAKeyPair(
+    private void generateDSAKeyPair(
             final Session session,
             final int pLength,
             final int qLength,
@@ -1659,149 +1456,11 @@ public class IaikP11Slot implements P11WritableSlot {
         publicKey.getSubprime().setByteArrayValue(dsaParams.getQ().toByteArray());
         publicKey.getBase().setByteArrayValue(dsaParams.getG().toByteArray());
 
-        KeyPair kp = session.generateKeyPair(
+        session.generateKeyPair(
                 Mechanism.get(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN), publicKey, privateKey);
-
-        publicKey = (DSAPublicKey) kp.getPublicKey();
-        BigInteger value = new BigInteger(1, publicKey.getValue().getByteArrayValue());
-
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(dsaParams.getP()));
-        v.add(new ASN1Integer(dsaParams.getQ()));
-        v.add(new ASN1Integer(dsaParams.getG()));
-        ASN1Sequence dssParams = new DERSequence(v);
-
-        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
-                new ASN1Integer(value));
-
-        return new PrivateKeyAndPKInfo((DSAPrivateKey) kp.getPrivateKey(), pkInfo);
     } // method generateDSAKeyPair
 
-    private X509CertificateHolder generateCertificate(
-            final Session session,
-            final byte[] id,
-            final String label,
-            final String subject,
-            final AlgorithmIdentifier signatureAlgId,
-            final PrivateKeyAndPKInfo privateKeyAndPkInfo,
-            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
-            final List<ASN1ObjectIdentifier> extendedKeyUsage)
-    throws Exception {
-        BigInteger serialNumber = BigInteger.ONE;
-        Date startDate = new Date();
-        Date endDate = new Date(startDate.getTime() + 20 * YEAR);
-
-        X500Name x500NameSubject = new X500Name(subject);
-        x500NameSubject = X509Util.sortX509Name(x500NameSubject);
-
-        V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
-        tbsGen.setSerialNumber(new ASN1Integer(serialNumber));
-        tbsGen.setSignature(signatureAlgId);
-        tbsGen.setIssuer(x500NameSubject);
-        tbsGen.setStartDate(new Time(startDate));
-        tbsGen.setEndDate(new Time(endDate));
-        tbsGen.setSubject(x500NameSubject);
-        tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
-
-        List<Extension> extensions = new ArrayList<>(2);
-        int localKeyUsage;
-
-        if (CollectionUtil.isNotEmpty(keyUsage)) {
-            localKeyUsage = 0;
-            for (org.xipki.commons.security.api.KeyUsage usage : keyUsage) {
-                localKeyUsage |= usage.getBcUsage();
-            }
-        } else {
-            localKeyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign
-                    | KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
-        }
-        extensions.add(new Extension(Extension.keyUsage, true,
-                new DEROctetString(new KeyUsage(localKeyUsage))));
-
-        if (CollectionUtil.isNotEmpty(extendedKeyUsage)) {
-            KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
-
-            int i = 0;
-            for (ASN1ObjectIdentifier oid : extendedKeyUsage) {
-                kps[i++] = KeyPurposeId.getInstance(oid);
-            }
-
-            extensions.add(new Extension(Extension.extendedKeyUsage, false,
-                    new DEROctetString(new ExtendedKeyUsage(kps))));
-        }
-
-        Extensions paramX509Extensions = new Extensions(extensions.toArray(new Extension[0]));
-        tbsGen.setExtensions(paramX509Extensions);
-
-        TBSCertificate tbsCertificate = tbsGen.generateTBSCertificate();
-        byte[] encodedTbsCertificate = tbsCertificate.getEncoded();
-        byte[] signature = null;
-        Digest digest = null;
-        Mechanism sigMechanism = null;
-
-        ASN1ObjectIdentifier sigAlgID = signatureAlgId.getAlgorithm();
-
-        if (sigAlgID.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption)) {
-            sigMechanism = Mechanism.get(PKCS11Constants.CKM_SHA256_RSA_PKCS);
-            session.signInit(sigMechanism, privateKeyAndPkInfo.getPrivateKey());
-            signature = session.sign(encodedTbsCertificate);
-        } else if (sigAlgID.equals(NISTObjectIdentifiers.dsa_with_sha256)) {
-            digest = new SHA256Digest();
-            byte[] digestValue = new byte[digest.getDigestSize()];
-            digest.update(encodedTbsCertificate, 0, encodedTbsCertificate.length);
-            digest.doFinal(digestValue, 0);
-
-            session.signInit(Mechanism.get(PKCS11Constants.CKM_DSA),
-                    privateKeyAndPkInfo.getPrivateKey());
-            byte[] rawSignature = session.sign(digestValue);
-            signature = convertToX962Signature(rawSignature);
-        } else {
-            if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA1)) {
-                digest = new SHA1Digest();
-            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA256)) {
-                digest = new SHA256Digest();
-            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA384)) {
-                digest = new SHA384Digest();
-            } else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA512)) {
-                digest = new SHA512Digest();
-            } else {
-                System.err.println("unknown algorithm ID: " + sigAlgID.getId());
-                return null;
-            }
-
-            byte[] digestValue = new byte[digest.getDigestSize()];
-            digest.update(encodedTbsCertificate, 0, encodedTbsCertificate.length);
-            digest.doFinal(digestValue, 0);
-
-            session.signInit(Mechanism.get(PKCS11Constants.CKM_ECDSA),
-                    privateKeyAndPkInfo.getPrivateKey());
-            byte[] rawSignature = session.sign(digestValue);
-            signature = convertToX962Signature(rawSignature);
-        }
-
-        // build DER certificate
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(tbsCertificate);
-        v.add(signatureAlgId);
-        v.add(new DERBitString(signature));
-        DERSequence cert = new DERSequence(v);
-
-        // build and store PKCS#11 certificate object
-        X509PublicKeyCertificate certTemp = new X509PublicKeyCertificate();
-        certTemp.getToken().setBooleanValue(true);
-        certTemp.getId().setByteArrayValue(id);
-        certTemp.getLabel().setCharArrayValue(label.toCharArray());
-        certTemp.getSubject().setByteArrayValue(x500NameSubject.getEncoded());
-        certTemp.getIssuer().setByteArrayValue(x500NameSubject.getEncoded());
-        certTemp.getSerialNumber().setByteArrayValue(serialNumber.toByteArray());
-        certTemp.getValue().setByteArrayValue(cert.getEncoded());
-        session.createObject(certTemp);
-
-        return new X509CertificateHolder(Certificate.getInstance(cert));
-    } // method generateCertificate
-
-    private PrivateKeyAndPKInfo generateRSAKeyPair(
+    private void generateRSAKeyPair(
             final Session session,
             final int keySize,
             final BigInteger publicExponent,
@@ -1822,48 +1481,25 @@ public class IaikP11Slot implements P11WritableSlot {
         publicKey.getModulusBits().setLongValue((long) keySize);
         publicKey.getPublicExponent().setByteArrayValue(localPublicExponent.toByteArray());
 
-        KeyPair kp = session.generateKeyPair(
+        session.generateKeyPair(
                 Mechanism.get(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN), publicKey, privateKey);
-
-        publicKey = (RSAPublicKey) kp.getPublicKey();
-
-        BigInteger modulus = new BigInteger(1, publicKey.getModulus().getByteArrayValue());
-        localPublicExponent = new BigInteger(1, publicKey.getPublicExponent().getByteArrayValue());
-        RSAKeyParameters keyParams = new RSAKeyParameters(false, modulus, localPublicExponent);
-        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-                keyParams);
-
-        return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
     } // method generateRSAKeyPair
 
-    private PrivateKeyAndPKInfo generateECDSAKeyPair(
+    private void generateECDSAKeyPair(
             final Session session,
             final ASN1ObjectIdentifier curveId,
             final X9ECParameters ecParams,
             final byte[] id,
             final String label)
     throws Exception {
-        KeyPair kp = null;
-
         try {
-            kp = generateNamedECDSAKeyPair(session, curveId, id, label);
+            generateNamedECDSAKeyPair(session, curveId, id, label);
         } catch (TokenException e) {
-            kp = generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
+            generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
         }
-
-        ECDSAPublicKey publicKey = (ECDSAPublicKey) kp.getPublicKey();
-
-        // build subjectPKInfo object
-        byte[] pubPoint = publicKey.getEcPoint().getByteArrayValue();
-        DEROctetString os = (DEROctetString) DEROctetString.fromByteArray(pubPoint);
-
-        AlgorithmIdentifier keyAlgID = new AlgorithmIdentifier(
-                X9ObjectIdentifiers.id_ecPublicKey, curveId);
-        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(keyAlgID, os.getOctets());
-        return new PrivateKeyAndPKInfo((ECDSAPrivateKey) kp.getPrivateKey(), pkInfo);
     }
 
-    private KeyPair generateNamedECDSAKeyPair(
+    private void generateNamedECDSAKeyPair(
             final Session session,
             final ASN1ObjectIdentifier curveId,
             final byte[] id,
@@ -1877,7 +1513,7 @@ public class IaikP11Slot implements P11WritableSlot {
         byte[] ecdsaParamsBytes = curveId.getEncoded();
         publicKeyTemplate.getEcdsaParams().setByteArrayValue(ecdsaParamsBytes);
 
-        return session.generateKeyPair(Mechanism.get(PKCS11Constants.CKM_EC_KEY_PAIR_GEN),
+        session.generateKeyPair(Mechanism.get(PKCS11Constants.CKM_EC_KEY_PAIR_GEN),
                 publicKeyTemplate, privateKeyTemplate);
     }
 
@@ -2048,22 +1684,6 @@ public class IaikP11Slot implements P11WritableSlot {
                 cert.getSerialNumber().toByteArray());
         newCertTemp.getValue().setByteArrayValue(localEncodedCert);
         return newCertTemp;
-    }
-
-    private static byte[] convertToX962Signature(
-            final byte[] signature)
-    throws IOException {
-        int n = signature.length / 2;
-        byte[] x = Arrays.copyOfRange(signature, 0, n);
-        byte[] y = Arrays.copyOfRange(signature, n, 2 * n);
-
-        ASN1EncodableVector sigder = new ASN1EncodableVector();
-        sigder.add(new ASN1Integer(
-                new BigInteger(1, x)));
-        sigder.add(new ASN1Integer(
-                new BigInteger(1, y)));
-
-        return new DERSequence(sigder).getEncoded();
     }
 
     private static void setKeyAttributes(

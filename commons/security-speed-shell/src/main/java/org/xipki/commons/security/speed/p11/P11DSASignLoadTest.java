@@ -38,7 +38,6 @@ package org.xipki.commons.security.speed.p11;
 
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -67,9 +66,7 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
             final int pLength,
             final int qLength)
     throws Exception {
-        P11KeypairGenerationResult kpAndCert = slot.generateDSAKeypairAndCert(
-                pLength, qLength, "loadtest-" + System.currentTimeMillis(), null, null, null);
-        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+        return slot.generateDSAKeypair(pLength, qLength, "loadtest-" + System.currentTimeMillis());
     }
 
 }

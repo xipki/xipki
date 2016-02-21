@@ -77,8 +77,6 @@ public class KeystoreP11Identity extends P11Identity {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 
-    private final String sha1sum;
-
     private final PrivateKey privateKey;
 
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
@@ -86,27 +84,19 @@ public class KeystoreP11Identity extends P11Identity {
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
 
     public KeystoreP11Identity(
-            final String sha1sum,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final PrivateKey privateKey,
+            final PublicKey publicKey,
             final X509Certificate[] certificateChain,
             final int maxSessions,
             final SecureRandom random4Sign)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-        super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
+        super(slotId, keyId, certificateChain, publicKey);
         ParamUtil.assertNotNull("privateKey", privateKey);
-        ParamUtil.assertNotBlank("sha1sum", sha1sum);
         ParamUtil.assertNotNull("random4Sign", random4Sign);
 
-        if (certificateChain == null
-                || certificateChain.length < 1
-                || certificateChain[0] == null) {
-            throw new IllegalArgumentException("no certificate is specified");
-        }
-
         this.privateKey = privateKey;
-        this.sha1sum = sha1sum;
 
         if (this.publicKey instanceof RSAPublicKey) {
             String providerName;
@@ -259,21 +249,8 @@ public class KeystoreP11Identity extends P11Identity {
         }
     }
 
-    public String getSha1Sum() {
-        return sha1sum;
-    }
-
     public PrivateKey getPrivateKey() {
         return privateKey;
-    }
-
-    private static PublicKey getPublicKeyOfFirstCert(
-            final X509Certificate[] certificateChain) {
-        if (certificateChain == null || certificateChain.length < 1
-                || certificateChain[0] == null) {
-            throw new IllegalArgumentException("no certificate is specified");
-        }
-        return certificateChain[0].getPublicKey();
     }
 
 }

@@ -59,13 +59,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
                 + "curve: " + curveNameOrOid,
                 securityFactory);
 
-        ASN1ObjectIdentifier oid = null;
-        try {
-            oid = new ASN1ObjectIdentifier(curveNameOrOid);
-        } catch (Exception e) {
-            oid = KeyUtil.getCurveOid(curveNameOrOid);
-        }
-
+        ASN1ObjectIdentifier oid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
         }
