@@ -68,7 +68,7 @@ public class SpeedP12DSASignCmd extends SpeedP12SignCommandSupport {
                 qLen = 160;
             }
         }
-        return new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen);
+        return new P12DSASignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo, pLen, qLen);
     }
 
 }

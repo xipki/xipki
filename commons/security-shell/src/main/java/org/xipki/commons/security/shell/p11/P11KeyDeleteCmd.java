@@ -54,7 +54,7 @@ public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
         if (deleted) {

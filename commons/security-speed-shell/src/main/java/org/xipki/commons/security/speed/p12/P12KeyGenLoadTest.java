@@ -36,9 +36,10 @@
 
 package org.xipki.commons.security.speed.p12;
 
+import java.security.SecureRandom;
+
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.P12RawKeypairGenerator;
 import org.xipki.commons.security.api.SecurityFactory;
 
 /**
@@ -52,10 +53,9 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
 
         @Override
         public void run() {
-            P12RawKeypairGenerator kpGen = getKeypairGenerator();
             while (!stop() && getErrorAccout() < 1) {
                 try {
-                    kpGen.genKeypair(securityFactory.getRandom4Key());
+                    generateKeypair(securityFactory.getRandom4Key());
                     account(1, 0);
                 } catch (Exception e) {
                     account(1, 1);
@@ -75,7 +75,9 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
         this.securityFactory = securityFactory;
     }
 
-    protected abstract P12RawKeypairGenerator getKeypairGenerator();
+    protected abstract void generateKeypair(
+            SecureRandom random)
+    throws Exception;
 
     @Override
     protected Runnable getTestor()

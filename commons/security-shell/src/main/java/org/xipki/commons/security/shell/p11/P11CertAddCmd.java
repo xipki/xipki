@@ -82,7 +82,7 @@ public class P11CertAddCmd extends SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         X509Certificate cert = X509Util.parseCert(certFile);
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);
         out("added certificate under " + p11KeyId);
         securityFactory.getP11CryptService(moduleName).refresh();

@@ -19,7 +19,7 @@ import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.xipki.commons.security.SignerUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 public class BcRSAContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
 

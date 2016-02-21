@@ -38,6 +38,7 @@ package org.xipki.commons.security.p11.iaik;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -112,6 +113,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -119,6 +121,7 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 import iaik.pkcs.pkcs11.Mechanism;
@@ -182,6 +185,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 
+    private final String moduleName;
     private Slot slot;
 
     private int maxSessionCount;
@@ -207,13 +211,16 @@ public class IaikP11Slot implements P11WritableSlot {
     private final P11SlotIdentifier slotId;
 
     IaikP11Slot(
+            final String moduleName,
             final P11SlotIdentifier slotId,
             final Slot slot,
             final List<char[]> password)
     throws SignerException {
+        ParamUtil.assertNotBlank("moduleName", moduleName);
         ParamUtil.assertNotNull("slotId", slotId);
         ParamUtil.assertNotNull("slot", slot);
 
+        this.moduleName = moduleName;
         this.slotId = slotId;
         this.slot = slot;
         this.password = password;
@@ -1421,7 +1428,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final BigInteger publicExponent,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("label", label);
@@ -1496,7 +1503,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final int qLength,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("label", label);
@@ -1574,7 +1581,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final String curveNameOrOid,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
@@ -1678,7 +1685,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final String subject,
             final AlgorithmIdentifier signatureAlgId,
             final PrivateKeyAndPKInfo privateKeyAndPkInfo,
-            final Integer keyUsage,
+            final Set<org.xipki.commons.security.api.KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception {
         BigInteger serialNumber = BigInteger.ONE;
@@ -1698,14 +1705,19 @@ public class IaikP11Slot implements P11WritableSlot {
         tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
 
         List<Extension> extensions = new ArrayList<>(2);
-        Integer locaKeyUsage = keyUsage;
+        int localKeyUsage;
 
-        if (locaKeyUsage == null) {
-            locaKeyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign
+        if (CollectionUtil.isNotEmpty(keyUsage)) {
+            localKeyUsage = 0;
+            for (org.xipki.commons.security.api.KeyUsage usage : keyUsage) {
+                localKeyUsage |= usage.getBcUsage();
+            }
+        } else {
+            localKeyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign
                     | KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
         }
         extensions.add(new Extension(Extension.keyUsage, true,
-                new DEROctetString(new KeyUsage(locaKeyUsage))));
+                new DEROctetString(new KeyUsage(localKeyUsage))));
 
         if (CollectionUtil.isNotEmpty(extendedKeyUsage)) {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
@@ -1905,6 +1917,11 @@ public class IaikP11Slot implements P11WritableSlot {
         X509PublicKeyCertificate cert =
                 getCertificateObject(privKey.getId().getByteArrayValue(), null);
         return X509Util.parseCert(cert.getValue().getByteArrayValue());
+    }
+
+    @Override
+    public String getModuleName() {
+        return moduleName;
     }
 
     @Override
@@ -2151,5 +2168,186 @@ public class IaikP11Slot implements P11WritableSlot {
             throw new SignerException("unknown public key class " + p11Key.getClass().getName());
         }
     } // method generatePublicKey
+
+    @Override
+    public void showDetails(
+            final OutputStream stream,
+            final boolean verbose)
+    throws IOException, SignerException {
+        List<PrivateKey> allPrivateObjects = getAllPrivateObjects(null, null);
+        int size = allPrivateObjects.size();
+
+        List<ComparableIaikPrivateKey> privateKeys = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            PrivateKey key = allPrivateObjects.get(i);
+            byte[] id = key.getId().getByteArrayValue();
+            if (id != null) {
+                char[] label = key.getLabel().getCharArrayValue();
+                ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label);
+                privateKeys.add(privKey);
+            }
+        }
+
+        Collections.sort(privateKeys);
+        size = privateKeys.size();
+
+        List<X509PublicKeyCertificate> allCertObjects = getAllCertificateObjects();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            ComparableIaikPrivateKey privKey = privateKeys.get(i);
+            byte[] keyId = privKey.getKeyId();
+            char[] keyLabel = privKey.getKeyLabel();
+
+            PublicKey pubKey = getPublicKeyObject(null, null, keyId, keyLabel);
+            sb.append("\t")
+                .append(i + 1)
+                .append(". ")
+                .append(privKey.getKeyLabelAsText())
+                .append(" (").append("id: ")
+                .append(Hex.toHexString(privKey.getKeyId()).toUpperCase())
+                .append(")\n");
+
+            sb.append("\t\tAlgorithm: ")
+                .append(getKeyAlgorithm(pubKey))
+                .append("\n");
+
+            X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId,
+                    keyLabel);
+            if (cert == null) {
+                sb.append("\t\tCertificate: NONE\n");
+            } else {
+                formatString(verbose, sb, cert);
+            }
+        }
+
+        for (int i = 0; i < allCertObjects.size(); i++) {
+            X509PublicKeyCertificate certObj = allCertObjects.get(i);
+            sb.append("\tCert-")
+                .append(i + 1)
+                .append(". ")
+                .append(certObj.getLabel().getCharArrayValue())
+                .append(" (").append("id: ")
+                .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
+                .append(")\n");
+
+            formatString(verbose, sb, certObj);
+        }
+
+        if (sb.length() > 0) {
+            stream.write(sb.toString().getBytes());
+        }
+    }
+
+    private static String getKeyAlgorithm(
+            final PublicKey key) {
+        if (key instanceof RSAPublicKey) {
+            return "RSA";
+        } else if (key instanceof ECDSAPublicKey) {
+            byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
+            if (paramBytes.length < 50) {
+                try {
+                    ASN1ObjectIdentifier curveId =
+                            (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
+                    String curveName = KeyUtil.getCurveName(curveId);
+                    return "EC (named curve " + curveName + ")";
+                } catch (Exception e) {
+                    return "EC";
+                }
+            } else {
+                return "EC (specified curve)";
+            }
+        } else if (key instanceof DSAPublicKey) {
+            return "DSA";
+        } else {
+            return "UNKNOWN";
+        }
+    }
+
+    private static X509PublicKeyCertificate removeCertificateObject(
+            final List<X509PublicKeyCertificate> certificateObjects,
+            final byte[] keyId,
+            final char[] keyLabel) {
+        X509PublicKeyCertificate cert = null;
+        for (X509PublicKeyCertificate certObj : certificateObjects) {
+            if (keyId != null
+                    && !Arrays.equals(keyId, certObj.getId().getByteArrayValue())) {
+                continue;
+            }
+
+            if (keyLabel != null
+                    && !Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue())) {
+                continue;
+            }
+
+            cert = certObj;
+            break;
+        }
+
+        if (cert != null) {
+            certificateObjects.remove(cert);
+        }
+
+        return cert;
+    }
+
+    private void formatString(
+            final boolean verbose,
+            final StringBuilder sb,
+            final X509PublicKeyCertificate cert) {
+        byte[] bytes = cert.getSubject().getByteArrayValue();
+        String subject;
+        try {
+            X500Principal x500Prin = new X500Principal(bytes);
+            subject = X509Util.getRfc4519Name(x500Prin);
+        } catch (Exception e) {
+            subject = new String(bytes);
+        }
+
+        if (!verbose) {
+            sb.append("\t\tCertificate: ").append(subject).append("\n");
+            return;
+        }
+
+        sb.append("\t\tCertificate:\n");
+        sb.append("\t\t\tSubject: ")
+            .append(subject)
+            .append("\n");
+
+        bytes = cert.getIssuer().getByteArrayValue();
+        String issuer;
+        try {
+            X500Principal x500Prin = new X500Principal(bytes);
+            issuer = X509Util.getRfc4519Name(x500Prin);
+        } catch (Exception e) {
+            issuer = new String(bytes);
+        }
+        sb.append("\t\t\tIssuer: ")
+            .append(issuer)
+            .append("\n");
+
+        byte[] certBytes = cert.getValue().getByteArrayValue();
+
+        X509Certificate x509Cert = null;
+        try {
+            x509Cert = X509Util.parseCert(certBytes);
+        } catch (Exception e) {
+            sb.append("\t\t\tError: " + e.getMessage());
+            return;
+        }
+
+        sb.append("\t\t\tSerial: ")
+            .append(x509Cert.getSerialNumber())
+            .append("\n");
+        sb.append("\t\t\tStart time: ")
+            .append(x509Cert.getNotBefore())
+            .append("\n");
+        sb.append("\t\t\tEnd time: ")
+            .append(x509Cert.getNotAfter())
+            .append("\n");
+        sb.append("\t\t\tSHA1 Sum: ")
+            .append(HashCalculator.hexSha1(certBytes))
+            .append("\n");
+    }
 
 }

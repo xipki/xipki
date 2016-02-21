@@ -68,7 +68,7 @@ public class P11CertExportCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate cert = slot.exportCert(keyIdentifier);
         if (cert == null) {

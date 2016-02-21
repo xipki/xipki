@@ -62,7 +62,7 @@ public class SpeedP11RSAKeyGenCmd extends SpeedP11CommandSupport {
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         return new P11RSAKeyGenLoadTest(slot, keysize, toBigInt(publicExponent));
     }
 

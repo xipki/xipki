@@ -65,7 +65,7 @@ public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
         if (noCert) {
             P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
             finalize(keyId);

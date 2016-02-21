@@ -37,11 +37,12 @@
 package org.xipki.commons.security.speed.p12;
 
 import java.security.SecureRandom;
-import java.util.List;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.commons.security.P12KeypairGenerator;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
+import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 
 /**
  * @author Lijun Liao
@@ -51,29 +52,33 @@ import org.xipki.commons.security.api.SecurityFactory;
 public class P12DSASignLoadTest extends P12SignLoadTest {
 
     public P12DSASignLoadTest(
+            final P12KeypairGenerator p12KeypairGenerator,
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final int pLength,
             final int qLength)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
-                generateKeystore(pLength, qLength),
+                generateKeystore(p12KeypairGenerator, pLength, qLength),
                 "PKCS#12 DSA signature creation\n"
                     + "pLength: " + pLength + "\n"
                     + "qLength: " + qLength);
     }
 
     private static byte[] generateKeystore(
+            final P12KeypairGenerator p12KeypairGenerator,
             final int pLength,
             final int qLength)
     throws Exception {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
         if (keystoreBytes == null) {
-            P12KeypairGenerator kpGen = new P12KeypairGenerator.DSAIdentityGenerator(
-                    pLength, qLength, PASSWORD.toCharArray(), "CN=dummy",
-                    (Integer) null, (List<ASN1ObjectIdentifier>) null,
-                    new SecureRandom());
-            keystoreBytes = kpGen.generateIdentity().getKeystore();
+            ParamUtil.assertNotNull("p12KeypairGenerator", p12KeypairGenerator);
+            P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+                    PASSWORD.toCharArray(), "CN=dummy");
+            params.setRandom(new SecureRandom());
+            P12KeypairGenerationResult identity = p12KeypairGenerator.generateDSAKeypair(pLength,
+                    qLength, params);
+            keystoreBytes = identity.getKeystore();
         }
         return keystoreBytes;
     }

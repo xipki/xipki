@@ -37,6 +37,8 @@
 package org.xipki.commons.security.speed.p12.cmd;
 
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 
 /**
@@ -51,5 +53,8 @@ public abstract class BSpeedP12SignCommandSupport extends BatchSpeedCommandSuppo
             description = "signature algorithm\n"
                     + "(required)")
     protected String sigAlgo;
+
+    @Reference
+    protected P12KeypairGenerator p12KeypairGenerator;
 
 }

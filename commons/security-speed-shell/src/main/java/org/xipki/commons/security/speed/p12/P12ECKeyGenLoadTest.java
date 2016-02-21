@@ -36,9 +36,11 @@
 
 package org.xipki.commons.security.speed.p12;
 
-import org.xipki.commons.security.P12RawKeypairGenerator;
-import org.xipki.commons.security.P12RawKeypairGenerator.ECKeypairGenerator;
+import java.security.SecureRandom;
+
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -47,7 +49,7 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
-    private final ECKeypairGenerator kpGen;
+    private final ASN1ObjectIdentifier curveOid;
 
     public P12ECKeyGenLoadTest(
             final String curveNameOrOid,
@@ -57,12 +59,26 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
                 + "curve: " + curveNameOrOid,
                 securityFactory);
 
-        this.kpGen = new ECKeypairGenerator(curveNameOrOid);
+        ASN1ObjectIdentifier oid = null;
+        try {
+            oid = new ASN1ObjectIdentifier(curveNameOrOid);
+        } catch (Exception e) {
+            oid = KeyUtil.getCurveOid(curveNameOrOid);
+        }
+
+        if (oid == null) {
+            throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
+        }
+
+        this.curveOid = oid;
     }
 
     @Override
-    protected P12RawKeypairGenerator getKeypairGenerator() {
-        return kpGen;
+    protected void generateKeypair(
+            final SecureRandom random)
+    throws Exception {
+        KeyUtil.generateECKeypair(curveOid, random);
+
     }
 
 }

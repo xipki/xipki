@@ -40,12 +40,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.ECPrivateKey;
@@ -69,10 +72,8 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.P12KeypairGenerator;
-import org.xipki.commons.security.P12KeypairGenerator.ECDSAIdentityGenerator;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -80,7 +81,11 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
+import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.p12.P12KeypairGeneratorImpl;
 
 /**
  * @author Lijun Liao
@@ -93,6 +98,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private static Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
 
+    private final String moduleName;
+
     private final File slotDir;
 
     private final P11SlotIdentifier slotId;
@@ -104,10 +111,12 @@ public class KeystoreP11Slot implements P11WritableSlot {
     private final SecurityFactory securityFactory;
 
     public KeystoreP11Slot(
+            final String moduleName,
             final File slotDir,
             final P11SlotIdentifier slotId,
             final List<char[]> password,
             final SecurityFactory securityFactory) {
+        ParamUtil.assertNotBlank("moduleName", moduleName);
         ParamUtil.assertNotNull("slotDir", slotDir);
         ParamUtil.assertNotNull("slotId", slotId);
         ParamUtil.assertNotNull("securityFactory", securityFactory);
@@ -119,6 +128,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     + password.size());
         }
 
+        this.moduleName = moduleName;
         this.slotDir = slotDir;
         this.slotId = slotId;
         this.securityFactory = securityFactory;
@@ -372,7 +382,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final BigInteger publicExponent,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("label", label);
@@ -390,12 +400,14 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     + " exists, please specify another one");
         }
 
-        P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keySize, publicExponent, password, subject,
-                keyUsage, extendedKeyusage,
-                securityFactory.getRandom4Key());
-
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        P12KeypairGenerator p12KeyGen = new P12KeypairGeneratorImpl();
+        P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(password,
+                subject);
+        params.setKeyUsage(keyUsage);
+        params.setExtendedKeyUsage(extendedKeyusage);
+        params.setRandom(securityFactory.getRandom4Key());
+        P12KeypairGenerationResult keyAndCert = p12KeyGen.generateRSAKeypair(keySize,
+                publicExponent, params);
 
         File file = new File(slotDir, label + ".p12");
         IoUtil.save(file, keyAndCert.getKeystore());
@@ -421,7 +433,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final int qLength,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("label", label);
@@ -439,12 +451,14 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     + " exists, please specify another one");
         }
 
-        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
-                pLength, qLength, password, subject,
-                keyUsage, extendedKeyusage,
-                securityFactory.getRandom4Key());
-
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        P12KeypairGenerator p12KeyGen = new P12KeypairGeneratorImpl();
+        P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(password,
+                subject);
+        params.setKeyUsage(keyUsage);
+        params.setExtendedKeyUsage(extendedKeyusage);
+        params.setRandom(securityFactory.getRandom4Key());
+        P12KeypairGenerationResult keyAndCert = p12KeyGen.generateDSAKeypair(pLength, qLength,
+                params);
 
         File file = new File(slotDir, label + ".p12");
         IoUtil.save(file, keyAndCert.getKeystore());
@@ -468,7 +482,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final String curveNameOrOid,
             final String label,
             final String subject,
-            final Integer keyUsage,
+            final Set<KeyUsage> keyUsage,
             final List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception {
         ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
@@ -479,10 +493,14 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     + " exists, please specify another one");
         }
 
-        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveNameOrOid, password, subject, keyUsage, extendedKeyusage,
-                securityFactory.getRandom4Key());
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        P12KeypairGenerator p12KeyGen = new P12KeypairGeneratorImpl();
+        P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(password,
+                subject);
+        params.setKeyUsage(keyUsage);
+        params.setExtendedKeyUsage(extendedKeyusage);
+        params.setRandom(securityFactory.getRandom4Key());
+        P12KeypairGenerationResult keyAndCert = p12KeyGen.generateECKeypair(curveNameOrOid,
+                params);
 
         File file = new File(slotDir, label + ".p12");
         IoUtil.save(file, keyAndCert.getKeystore());
@@ -556,6 +574,11 @@ public class KeystoreP11Slot implements P11WritableSlot {
     }
 
     @Override
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    @Override
     public P11SlotIdentifier getSlotIdentifier() {
         return slotId;
     }
@@ -571,6 +594,77 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         byte[] sha1Fp = HashCalculator.sha1(keyLabelBytes);
         return Arrays.copyOf(sha1Fp, 8);
+    }
+
+    @Override
+    public void showDetails(
+            final OutputStream stream,
+            final boolean verbose)
+    throws IOException, SignerException {
+        List<? extends P11Identity> identities = getP11Identities();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < identities.size(); i++) {
+            P11Identity identity = identities.get(i);
+            P11KeyIdentifier p11KeyId = identity.getKeyId();
+
+            sb.append("\t")
+                .append(i + 1)
+                .append(". ")
+                .append(p11KeyId.getKeyLabel())
+                .append(" (").append("id: ")
+                .append(Hex.toHexString(p11KeyId.getKeyId()).toUpperCase())
+                .append(")\n");
+
+            sb.append("\t\tAlgorithm: ")
+                .append(identity.getPublicKey().getAlgorithm())
+                .append("\n");
+
+            formatString(sb, identity.getCertificate(), verbose);
+        }
+
+        if (sb.length() > 0) {
+            stream.write(sb.toString().getBytes());
+        }
+    }
+
+    private void formatString(
+            final StringBuilder sb,
+            final X509Certificate cert,
+            final boolean verbose) {
+        String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+
+        if (!verbose) {
+            sb.append("\t\tCertificate: ").append(subject).append("\n");
+            return;
+        }
+
+        sb.append("\t\tCertificate:\n");
+        sb.append("\t\t\tSubject: ")
+            .append(subject)
+            .append("\n");
+
+        String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
+        sb.append("\t\t\tIssuer: ")
+            .append(issuer)
+            .append("\n");
+
+        sb.append("\t\t\tSerial: ")
+            .append(cert.getSerialNumber())
+            .append("\n");
+        sb.append("\t\t\tStart time: ")
+            .append(cert.getNotBefore())
+            .append("\n");
+        sb.append("\t\t\tEnd time: ")
+            .append(cert.getNotAfter())
+            .append("\n");
+        sb.append("\t\t\tSHA1 Sum: ");
+        try {
+            sb.append(HashCalculator.hexSha1(cert.getEncoded()));
+        } catch (CertificateEncodingException e) {
+            sb.append("ERROR");
+        }
+        sb.append("\n");
     }
 
 }

@@ -44,14 +44,15 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.KeyUtil;
-import org.xipki.commons.security.SecurityFactoryImpl;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -103,7 +104,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
         ParamUtil.assertNotNull("keystore", keystore);
 
-        String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(
+        String signerConf = getKeystoreSignerConf(
                 new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
     }
@@ -152,6 +153,23 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         return (in == null)
                 ? null
                 : IoUtil.read(in);
+    }
+
+    private static String getKeystoreSignerConf(
+            final InputStream keystoreStream,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism)
+    throws IOException {
+        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
+        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
+        return conf.getEncoded();
     }
 
 }

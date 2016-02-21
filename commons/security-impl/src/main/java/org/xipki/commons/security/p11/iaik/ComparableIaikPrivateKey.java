@@ -34,39 +34,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
-
-import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
-import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
+package org.xipki.commons.security.p11.iaik;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
-        description = "performance test of PKCS#11 RSA key generation (batch)")
-public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
+class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey> {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    private final byte[] keyId;
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+    private final char[] keyLabel;
 
-        for (int keysize : keysizes) {
-            ret.add(
-                    new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
-        }
-        return ret;
+    ComparableIaikPrivateKey(
+            final byte[] keyId,
+            final char[] keyLabel) {
+        this.keyId = keyId;
+        this.keyLabel = keyLabel;
     }
 
-}
+    @Override
+    public int compareTo(
+            final ComparableIaikPrivateKey o) {
+        if (keyLabel == null) {
+            if (o.keyLabel == null) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            if (o.keyLabel == null) {
+                return -1;
+            } else {
+                return new String(keyLabel).compareTo(new String(o.keyLabel));
+            }
+        }
+    }
+
+    public byte[] getKeyId() {
+        return keyId;
+    }
+
+    public char[] getKeyLabel() {
+        return keyLabel;
+    }
+
+    public String getKeyLabelAsText() {
+        return (keyLabel == null)
+                ? null
+                : new String(keyLabel);
+    }
+
+} // class ComparableIaikPrivateKey

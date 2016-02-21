@@ -64,8 +64,8 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
                 sigAlgo = "SHA1withDSA";
             }
 
-            ret.add(
-                    new P12DSASignLoadTest(securityFactory, sigAlgo, pLen, qLen));
+            ret.add(new P12DSASignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo, pLen,
+                    qLen));
         }
         return ret;
     }
