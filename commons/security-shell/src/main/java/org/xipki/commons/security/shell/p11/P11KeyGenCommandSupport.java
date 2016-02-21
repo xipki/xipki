@@ -36,15 +36,11 @@
 
 package org.xipki.commons.security.shell.p11;
 
-import java.io.File;
-
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -68,31 +64,10 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
                     + "(required)")
     protected String label;
 
-    @Option(name = "--no-cert",
-            required = false,
-            description = "Generate only keypair without self-signed certificate")
-    protected Boolean noCert = Boolean.FALSE;
-
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject in the self-signed certificate")
-    protected String subject;
-
-    @Option(name = "--cert-out",
-            description = "where to save the self-signed certificate")
-    @Completion(FilePathCompleter.class)
-    protected String outputFilename;
-
     @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
-
-    protected String getSubject() {
-        if (isBlank(subject)) {
-            return "CN=" + label;
-        }
-        return subject;
-    }
 
     protected P11SlotIdentifier getSlotId() {
         return new P11SlotIdentifier(slotIndex, null);
@@ -104,21 +79,6 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
         out("generate PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
         out("\tkey label: " + keyId.getKeyLabel());
-
-        securityFactory.getP11CryptService(moduleName).refresh();
-    }
-
-    protected void finalize(
-            final P11KeypairGenerationResult keyAndCert)
-    throws Exception {
-        out("generate PKCS#11 key");
-        out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
-        out("\tkey label: " + keyAndCert.getLabel());
-        if (outputFilename != null) {
-            File certFile = new File(outputFilename);
-            saveVerbose("\tsaved self-signed certificate to file", certFile,
-                    keyAndCert.getCertificate().getEncoded());
-        }
 
         securityFactory.getP11CryptService(moduleName).refresh();
     }

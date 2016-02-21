@@ -50,6 +50,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
+import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 
@@ -58,8 +59,9 @@ import org.xipki.commons.security.api.SignerException;
  * @since 2.0.0
  */
 
-public class P10RequestGenerator {
+public class P10RequestGeneratorImpl implements P10RequestGenerator {
 
+	@Override
     public PKCS10CertificationRequest generateRequest(
             final SecurityFactory securityFactory,
             final String signerType,
@@ -73,7 +75,8 @@ public class P10RequestGenerator {
                 subjectDN, attributes);
     }
 
-    public PKCS10CertificationRequest generateRequest(
+	@Override
+	public PKCS10CertificationRequest generateRequest(
             final SecurityFactory securityFactory,
             final String signerType,
             final String signerConf,
@@ -96,6 +99,7 @@ public class P10RequestGenerator {
         }
     }
 
+	@Override
     public PKCS10CertificationRequest generateRequest(
             final ContentSigner contentSigner,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,

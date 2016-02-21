@@ -5,7 +5,7 @@
   <cm:property-placeholder persistent-id="org.xipki.commons.password" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="masterPassword.callback"
-          value="org.xipki.commons.password.GuiPasswordCallback"/>
+          value="org.xipki.commons.password.impl.GuiPasswordCallback"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
