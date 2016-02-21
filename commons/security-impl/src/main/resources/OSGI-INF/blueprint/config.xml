@@ -34,7 +34,7 @@
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="XipkiProviderRegister"
-      class="org.xipki.commons.security.impl.provider.XipkiProviderRegister"
+      class="org.xipki.commons.security.provider.XipkiProviderRegister"
       init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
