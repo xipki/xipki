@@ -52,24 +52,24 @@ public class IaikP11Util {
     private IaikP11Util() {
     }
 
-    public static byte[] generateKeyID(
+    public static byte[] generateKeyId(
             final Session session)
     throws Exception {
         SecureRandom random = new SecureRandom();
-        byte[] keyID = null;
+        byte[] keyId = null;
         do {
-            keyID = new byte[8];
-            random.nextBytes(keyID);
-        } while (idExists(session, keyID));
+            keyId = new byte[8];
+            random.nextBytes(keyId);
+        } while (idExists(session, keyId));
 
-        return keyID;
+        return keyId;
     }
 
     public static boolean idExists(
-            final Session session, final byte[] keyID)
+            final Session session, final byte[] keyId)
     throws Exception {
         Key k = new Key();
-        k.getId().setByteArrayValue(keyID);
+        k.getId().setByteArrayValue(keyId);
 
         session.findObjectsInit(k);
         Object[] objects = session.findObjects(1);
@@ -79,7 +79,7 @@ public class IaikP11Util {
         }
 
         X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getId().setByteArrayValue(keyID);
+        c.getId().setByteArrayValue(keyId);
 
         session.findObjectsInit(c);
         objects = session.findObjects(1);

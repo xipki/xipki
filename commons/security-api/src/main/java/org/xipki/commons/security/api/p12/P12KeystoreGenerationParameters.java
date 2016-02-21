@@ -37,13 +37,8 @@
 package org.xipki.commons.security.api.p12;
 
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.KeyUsage;
 
 /**
  * @author Lijun Liao
@@ -54,26 +49,13 @@ public class P12KeystoreGenerationParameters {
 
     private final char[] password;
 
-    private final X500Name subject;
-
     private SecureRandom random;
 
-    private int serialNumber = 1;
-
-    private int validity = 3650;
-
-    private Set<KeyUsage> keyUsage;
-
-    private List<ASN1ObjectIdentifier> extendedKeyUsage;
-
     public P12KeystoreGenerationParameters(
-            final char[] password,
-            final String subject) {
+            final char[] password) {
         ParamUtil.assertNotNull("password", password);
-        ParamUtil.assertNotBlank("subject", subject);
 
         this.password = password;
-        this.subject = new X500Name(subject);
     }
 
     public SecureRandom getRandom() {
@@ -87,46 +69,6 @@ public class P12KeystoreGenerationParameters {
 
     public char[] getPassword() {
         return password;
-    }
-
-    public X500Name getSubject() {
-        return subject;
-    }
-
-    public int getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(
-            final int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public int getValidity() {
-        return validity;
-    }
-
-    public void setValidity(
-            final int validity) {
-        this.validity = validity;
-    }
-
-    public Set<KeyUsage> getKeyUsage() {
-        return keyUsage;
-    }
-
-    public void setKeyUsage(
-            final Set<KeyUsage> keyUsage) {
-        this.keyUsage = keyUsage;
-    }
-
-    public List<ASN1ObjectIdentifier> getExtendedKeyUsage() {
-        return extendedKeyUsage;
-    }
-
-    public void setExtendedKeyUsage(
-            final List<ASN1ObjectIdentifier> extendedKeyUsage) {
-        this.extendedKeyUsage = extendedKeyUsage;
     }
 
 }

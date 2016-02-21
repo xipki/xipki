@@ -40,7 +40,6 @@ import java.math.BigInteger;
 
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -69,10 +68,8 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
             final int keysize,
             final BigInteger publicExponent)
     throws Exception {
-        P11KeypairGenerationResult kpAndCert = slot.generateRSAKeypairAndCert(
-                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
-                null, null, null);
-        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+        return slot.generateRSAKeypair(
+                keysize, publicExponent, "loadtest-" + System.currentTimeMillis());
     }
 
 }

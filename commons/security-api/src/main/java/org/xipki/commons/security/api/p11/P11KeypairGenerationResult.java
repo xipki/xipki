@@ -38,7 +38,6 @@ package org.xipki.commons.security.api.p11;
 
 import java.util.Arrays;
 
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.commons.security.api.KeypairGenerationResult;
 
 /**
@@ -54,9 +53,8 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
     public P11KeypairGenerationResult(
             final byte[] id,
-            final String label,
-            final X509CertificateHolder certificate) {
-        super(certificate);
+            final String label) {
+        super();
         this.id = id;
         this.label = label;
     }

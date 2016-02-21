@@ -74,7 +74,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
         if (keystoreBytes == null) {
             ParamUtil.assertNotNull("p12KeypairGenerator", p12KeypairGenerator);
             P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
-                    PASSWORD.toCharArray(), "CN=dummy");
+                    PASSWORD.toCharArray());
             params.setRandom(new SecureRandom());
             P12KeypairGenerationResult identity = p12KeypairGenerator.generateDSAKeypair(pLength,
                     qLength, params);

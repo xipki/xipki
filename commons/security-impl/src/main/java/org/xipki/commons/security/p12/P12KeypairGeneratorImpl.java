@@ -52,7 +52,6 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
-import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
@@ -61,23 +60,18 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
-import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
@@ -193,27 +187,11 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
             final String curveNameOrOid,
             final SecureRandom random)
     throws Exception {
-        boolean isOid;
-        try {
-            new ASN1ObjectIdentifier(curveNameOrOid);
-            isOid = true;
-        } catch (Exception e) {
-            isOid = false;
+        ASN1ObjectIdentifier curveOid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+        if (curveOid == null) {
+            throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
         }
-
-        ASN1ObjectIdentifier curveOid;
-        if (isOid) {
-            curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-        } else {
-            curveOid = KeyUtil.getCurveOid(curveNameOrOid);
-            if (curveOid == null) {
-                throw new IllegalArgumentException("no OID is defined for the curve "
-                        + curveNameOrOid);
-            }
-        }
-
         KeyPair kp = KeyUtil.generateECKeypair(curveOid, random);
-
         AlgorithmIdentifier algId = new AlgorithmIdentifier(
                 X9ObjectIdentifiers.id_ecPublicKey, curveOid);
         BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
@@ -255,45 +233,15 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
     throws Exception {
         Date now = new Date();
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
-        Date notAfter = new Date(notBefore.getTime() + params.getValidity() * DAY);
+        Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
 
-        X500Name subjectDN = params.getSubject();
-        subjectDN = X509Util.sortX509Name(subjectDN);
+        X500Name subjectDN = new X500Name("CN=DUMMY");
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
         // Generate keystore
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                subjectDN, BigInteger.valueOf(params.getSerialNumber()), notBefore, notAfter,
-                subjectDN, subjectPublicKeyInfo);
-
-        X509KeyUsage ku;
-        if (params.getKeyUsage() == null) {
-            int intUsage = X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature
-                    | X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign;
-            ku = new X509KeyUsage(intUsage);
-        } else {
-            int intUsage = 0;
-            for (org.xipki.commons.security.api.KeyUsage usage : params.getKeyUsage()) {
-                intUsage |= usage.getBcUsage();
-            }
-            ku = new X509KeyUsage(intUsage);
-        }
-
-        certGenerator.addExtension(Extension.keyUsage, true, ku);
-
-        List<ASN1ObjectIdentifier> extendedKeyUsage = params.getExtendedKeyUsage();
-        if (CollectionUtil.isNotEmpty(extendedKeyUsage)) {
-            KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
-
-            int i = 0;
-            for (ASN1ObjectIdentifier oid : extendedKeyUsage) {
-                kps[i++] = KeyPurposeId.getInstance(oid);
-            }
-
-            certGenerator.addExtension(Extension.extendedKeyUsage, false,
-                    new ExtendedKeyUsage(kps));
-        }
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDN,
+                BigInteger.valueOf(1), notBefore, notAfter, subjectDN, subjectPublicKeyInfo);
 
         KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
                 kp.getKeypair().getPrivate());
@@ -312,7 +260,7 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
         }
 
         P12KeypairGenerationResult result = new P12KeypairGenerationResult(
-                ksStream.toByteArray(), identity.getCert());
+                ksStream.toByteArray());
         result.setKeystoreObject(ks);
         return result;
     } // method generateIdentity

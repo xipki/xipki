@@ -39,7 +39,6 @@ package org.xipki.commons.security.speed.p11;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -66,9 +65,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
             final String curveNameOrOid)
     throws Exception {
         ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-        P11KeypairGenerationResult kpAndCert = slot.generateECDSAKeypairAndCert(
-                curveNameOrOid, "loadtest-" + System.currentTimeMillis(), null, null, null);
-        return new P11KeyIdentifier(kpAndCert.getId(), kpAndCert.getLabel());
+        return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis());
     }
 
 }

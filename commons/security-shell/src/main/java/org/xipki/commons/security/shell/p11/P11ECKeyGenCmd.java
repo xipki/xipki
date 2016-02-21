@@ -42,7 +42,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -66,15 +65,8 @@ public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        if (noCert) {
-            P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
-            finalize(keyId);
-        } else {
-            P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
-                    curveName, label, getSubject(),
-                    getKeyUsage(), getExtendedKeyUsage());
-            finalize(keyAndCert);
-        }
+        P11KeyIdentifier keyId = slot.generateECKeypair(curveName, label);
+        finalize(keyId);
         return null;
     }
 

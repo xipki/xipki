@@ -95,6 +95,7 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.bcext.BcRSAContentVerifierProviderBuilder;
 import org.xipki.commons.security.bcext.ECDSAContentVerifierProviderBuilder;
 
@@ -119,6 +120,8 @@ public class KeyUtil {
     public static ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)
     throws OperatorCreationException, InvalidKeyException {
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
         if (keyAlg.equals("EC")) {
             keyAlg = "ECDSA";
@@ -197,10 +200,24 @@ public class KeyUtil {
         return kpGen.generateKeyPair();
     }
 
+    public static KeyPair generateECKeypairForCurveNameOrOid(
+            final String curveNameOrOid,
+            final SecureRandom random)
+    throws Exception {
+        ParamUtil.assertNotBlank("cureveNameOrOid", curveNameOrOid);
+        ASN1ObjectIdentifier oid = getCurveOidForCurveNameOrOid(curveNameOrOid);
+        if (oid == null) {
+            throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
+        }
+        return generateECKeypair(oid, random);
+    }
+
     public static KeyPair generateECKeypair(
             final ASN1ObjectIdentifier curveId,
             final SecureRandom random)
     throws Exception {
+        ParamUtil.assertNotNull("curveId", curveId);
+
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
         if (random == null) {
@@ -234,6 +251,8 @@ public class KeyUtil {
     public static PublicKey generatePublicKey(
             final SubjectPublicKeyInfo pkInfo)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
+        ParamUtil.assertNotNull("pkInfo", pkInfo);
+
         X509EncodedKeySpec keyspec;
         try {
             keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
@@ -260,16 +279,34 @@ public class KeyUtil {
             final BigInteger modulus,
             final BigInteger publicExponent)
     throws InvalidKeySpecException {
+        ParamUtil.assertNotNull("modulus", modulus);
+        ParamUtil.assertNotNull("publicExponent", publicExponent);
+
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
         KeyFactory kf = getKeyFactory("RSA");
         return (RSAPublicKey) kf.generatePublic(keySpec);
     }
 
-    public static ECPublicKey generateECPublicKey(
-            final String curveOid,
+    public static ECPublicKey generateECPublicKeyForNameOrOid(
+            final String curveNameOrOid,
             final byte[] encodedQ)
     throws InvalidKeySpecException {
-        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid);
+        ParamUtil.assertNotBlank("cureveNameOrOid", curveNameOrOid);
+
+        ASN1ObjectIdentifier oid = getCurveOidForCurveNameOrOid(curveNameOrOid);
+        if (oid == null) {
+            throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
+        }
+        return generateECPublicKey(oid, encodedQ);
+    }
+
+    public static ECPublicKey generateECPublicKey(
+            final ASN1ObjectIdentifier curveOid,
+            final byte[] encodedQ)
+    throws InvalidKeySpecException {
+        ParamUtil.assertNotNull("curveOid", curveOid);
+        ParamUtil.assertNotNull("encoded", encodedQ);
+        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid.getId());
         ECPoint q = spec.getCurve().decodePoint(encodedQ);
         ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
 
@@ -280,6 +317,8 @@ public class KeyUtil {
     public static AsymmetricKeyParameter generatePrivateKeyParameter(
             final PrivateKey key)
     throws InvalidKeyException {
+        ParamUtil.assertNotNull("key", key);
+
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
@@ -303,6 +342,8 @@ public class KeyUtil {
     public static AsymmetricKeyParameter generatePublicKeyParameter(
             final PublicKey key)
     throws InvalidKeyException {
+        ParamUtil.assertNotNull("key", key);
+
         if (key instanceof RSAPublicKey) {
             RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
@@ -325,6 +366,8 @@ public class KeyUtil {
     public static SubjectPublicKeyInfo creatDSASubjectPublicKeyInfo(
             final DSAPublicKey publicKey)
     throws IOException {
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(publicKey.getParams().getP()));
         v.add(new ASN1Integer(publicKey.getParams().getQ()));
@@ -336,8 +379,10 @@ public class KeyUtil {
                 new ASN1Integer(publicKey.getY()));
     }
 
-    public static ASN1ObjectIdentifier getCurveOid(
+    public static ASN1ObjectIdentifier getCurveOidForName(
             final String curveName) {
+        ParamUtil.assertNotBlank("curveName", curveName);
+
         ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
         if (curveOID == null) {
             curveOID = SECNamedCurves.getOID(curveName);
@@ -353,16 +398,18 @@ public class KeyUtil {
     }
 
     public static String getCurveName(
-            final ASN1ObjectIdentifier curveOID) {
-        String curveName = X962NamedCurves.getName(curveOID);
+            final ASN1ObjectIdentifier curveOid) {
+        ParamUtil.assertNotNull("curveOid", curveOid);
+
+        String curveName = X962NamedCurves.getName(curveOid);
         if (curveName == null) {
-            curveName = SECNamedCurves.getName(curveOID);
+            curveName = SECNamedCurves.getName(curveOid);
         }
         if (curveName == null) {
-            curveName = TeleTrusTNamedCurves.getName(curveOID);
+            curveName = TeleTrusTNamedCurves.getName(curveOid);
         }
         if (curveName == null) {
-            curveName = NISTNamedCurves.getName(curveOID);
+            curveName = NISTNamedCurves.getName(curveOid);
         }
 
         return curveName;
@@ -409,5 +456,18 @@ public class KeyUtil {
 
         return map;
     } // method getCurveNameOidMap
+
+    public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(
+            final String curveNameOrOid) {
+        ASN1ObjectIdentifier oid;
+
+        try {
+            oid = new ASN1ObjectIdentifier(curveNameOrOid);
+        } catch (Exception e) {
+            oid = getCurveOidForName(curveNameOrOid);
+        }
+
+        return oid;
+    }
 
 }

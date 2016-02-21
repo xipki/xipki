@@ -133,12 +133,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     protected static byte[] getPrecomputedECKeystore(
             final String curveNamOrOid)
     throws IOException {
-        ASN1ObjectIdentifier oid = null;
-        try {
-            new ASN1ObjectIdentifier(curveNamOrOid);
-        } catch (Exception e) {
-            oid = KeyUtil.getCurveOid(curveNamOrOid);
-        }
+        ASN1ObjectIdentifier oid = KeyUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
         if (oid == null) {
             return null;
         }
