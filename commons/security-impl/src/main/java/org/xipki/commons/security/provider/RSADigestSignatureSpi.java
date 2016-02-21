@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.provider;
+package org.xipki.commons.security.provider;
 
 import java.io.IOException;
 import java.security.AlgorithmParameters;
