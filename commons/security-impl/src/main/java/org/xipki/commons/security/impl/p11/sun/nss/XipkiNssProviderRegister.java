@@ -34,52 +34,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11.sun.nss;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import java.security.Security;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class XipkiNssProviderRegister {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiNssProviderRegister.class);
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
-
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
-
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
+    public void regist() {
+        if (Security.getProvider(XipkiNssProvider.PROVIDER_NAME) == null) {
+            try {
+                XipkiNssProvider provider = new XipkiNssProvider();
+                Security.addProvider(provider);
+            } catch (Throwable t) {
+                final String message = "could not add provider " + XipkiNssProvider.PROVIDER_NAME;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
+                            t.getMessage());
+                }
+                LOG.debug(message, t);
             }
         }
+    }
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+    public void unregist() {
+        if (Security.getProperty(XipkiNssProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(XipkiNssProvider.PROVIDER_NAME);
+        }
     }
 
 }

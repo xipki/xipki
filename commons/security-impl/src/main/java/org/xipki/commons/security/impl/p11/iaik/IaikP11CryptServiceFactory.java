@@ -34,52 +34,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11.iaik;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11Control;
+import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11ModuleConf;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
-
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+    private P11Control p11Control;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+    public void init(
+            final P11Control pP11Control) {
+        ParamUtil.assertNotNull("pP11Control", pP11Control);
+        this.p11Control = pP11Control;
+        IaikP11ModulePool.getInstance().setDefaultModuleName(pP11Control.getDefaultModuleName());
+    }
+
+    @Override
+    public P11CryptService createP11CryptService(
+            final String moduleName)
+    throws SignerException {
+        if (p11Control == null) {
+            throw new IllegalStateException("please call init() first");
         }
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
+        ParamUtil.assertNotNull("moduleName", moduleName);
+
+        String localModuleName = moduleName;
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(localModuleName)) {
+            localModuleName = p11Control.getDefaultModuleName();
         }
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+        P11ModuleConf conf = p11Control.getModuleConf(localModuleName);
+        if (conf == null) {
+            throw new SignerException("PKCS#11 module " + localModuleName + " is not defined");
+        }
+
+        return IaikP11CryptService.getInstance(conf);
     }
 
 }

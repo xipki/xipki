@@ -34,52 +34,83 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.provider;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.NullDigest;
+import org.bouncycastle.crypto.digests.RIPEMD160Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA224Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+    static class SHA1 extends PlainECDSASignatureSpi {
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
-
-    @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+        SHA1() {
+            super(new SHA1Digest());
         }
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
+    } // class SHA1
+
+    static class NONE extends PlainECDSASignatureSpi {
+
+        NONE() {
+            super(new NullDigest());
         }
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+    } // class NONE
+
+    static class SHA224 extends PlainECDSASignatureSpi {
+
+        SHA224() {
+            super(new SHA224Digest());
+        }
+
+    } // class SHA224
+
+    static class SHA256 extends PlainECDSASignatureSpi {
+
+        SHA256() {
+            super(new SHA256Digest());
+        }
+
+    } // class SHA256
+
+    static class SHA384 extends PlainECDSASignatureSpi {
+
+        SHA384() {
+            super(new SHA384Digest());
+        }
+
+    } // class SHA384
+
+    static class SHA512 extends PlainECDSASignatureSpi {
+
+        SHA512() {
+            super(new SHA512Digest());
+        }
+
+    }
+
+    static class RIPEMD160 extends PlainECDSASignatureSpi {
+
+        RIPEMD160() {
+            super(new RIPEMD160Digest());
+        }
+
+    } // class SHA512
+
+    PlainECDSASignatureSpi(
+            final Digest digest) {
+        super(digest, false);
     }
 
 }

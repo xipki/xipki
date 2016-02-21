@@ -34,52 +34,59 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
+package org.xipki.commons.security.impl.p11;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.bouncycastle.crypto.Digest;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "dsa",
-        description = "generate DSA keypair in PKCS#11 device")
-@Service
-public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
+public class DigestOutputStream extends OutputStream {
 
-    @Option(name = "--plen",
-            description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private Digest digest;
 
-    @Option(name = "--qlen",
-            description = "bit length of the sub-prime")
-    private Integer qLen;
+    public DigestOutputStream(
+            final Digest digest) {
+        this.digest = digest;
+    }
+
+    public void reset() {
+        digest.reset();
+    }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
-        }
+    public void write(
+            final byte[] bytes,
+            final int off,
+            final int len)
+    throws IOException {
+        digest.update(bytes, off, len);
+    }
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
-            } else {
-                qLen = 160;
-            }
-        }
+    @Override
+    public void write(
+            final byte[] bytes)
+    throws IOException {
+        digest.update(bytes, 0, bytes.length);
+    }
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
-        finalize(keyId);
-        return null;
+    @Override
+    public void write(
+            final int b)
+    throws IOException {
+        digest.update((byte) b);
+    }
+
+    public byte[] digest() {
+        byte[] result = new byte[digest.getDigestSize()];
+        digest.doFinal(result, 0);
+        reset();
+        return result;
     }
 
 }
