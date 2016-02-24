@@ -118,6 +118,7 @@ import org.xipki.commons.security.impl.p11.iaik.IaikP11ModulePool;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11ModulePool;
 import org.xipki.commons.security.impl.p11.remote.RemoteP11CryptServiceFactory;
+import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
 import org.xipki.commons.security.p11.conf.jaxb.ModulesType;
 import org.xipki.commons.security.p11.conf.jaxb.NativeLibraryType;
@@ -192,7 +193,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     throws SignerException {
         ConcurrentContentSigner signer = doCreateSigner(type, confWithoutAlgo, hashAlgo,
                 sigAlgoControl, certs);
-        validateSigner(signer, certs, type, confWithoutAlgo);
+        validateSigner(signer, type, confWithoutAlgo);
         return signer;
     }
 
@@ -204,7 +205,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     throws SignerException {
         ConcurrentContentSigner signer = doCreateSigner(type, conf, null, null,
                 certificateChain);
-        validateSigner(signer, certificateChain, type, conf);
+        validateSigner(signer, type, conf);
         return signer;
     }
 
@@ -841,12 +842,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private static void validateSigner(
             final ConcurrentContentSigner signer,
-            final X509Certificate[] certificateChain,
             final String signerType,
             final String signerConf)
     throws SignerException {
-        X509Certificate cert = signer.getCertificate();
-        if (certificateChain == null) {
+        if (signer.getPublicKey() == null) {
             return;
         }
 
@@ -873,24 +872,25 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             signatureStream.write(dummyContent);
             byte[] signatureValue = csigner.getSignature();
 
-            verifier.initVerify(cert.getPublicKey());
+            verifier.initVerify(signer.getPublicKey());
             verifier.update(dummyContent);
             boolean valid = verifier.verify(signatureValue);
             if (!valid) {
-                String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
-
                 StringBuilder sb = new StringBuilder();
-                sb.append("key and certificate not match. ");
+                sb.append("private key and public key does not match, ");
                 sb.append("key type='").append(signerType).append("'; ");
-
                 ConfPairs keyValues = new ConfPairs(signerConf);
                 String pwd = keyValues.getValue("password");
                 if (pwd != null) {
                     keyValues.putPair("password", "****");
                 }
                 keyValues.putPair("algo", signatureAlgoName);
-                sb.append("conf='").append(keyValues.getEncoded()).append("', ");
-                sb.append("certificate subject='").append(subject).append("'");
+                sb.append("conf='").append(keyValues.getEncoded());
+                X509Certificate cert = signer.getCertificate();
+                if (cert != null) {
+                    String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+                    sb.append("', certificate subject='").append(subject).append("'");
+                }
 
                 throw new SignerException(sb.toString());
             }

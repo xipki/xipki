@@ -66,7 +66,7 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
-import org.xipki.commons.security.impl.SoftTokenContentSignerBuilder;
+import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 
 /**
  * @author Lijun Liao
