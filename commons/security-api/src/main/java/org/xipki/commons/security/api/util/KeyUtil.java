@@ -70,13 +70,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -86,8 +81,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X962Parameters;
-import org.bouncycastle.asn1.x9.X9ECPoint;
-import org.bouncycastle.asn1.x9.X9IntegerConverter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.DSAParametersGenerator;
@@ -97,14 +90,11 @@ import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
@@ -519,16 +509,16 @@ public class KeyUtil {
         } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new InvalidKeySpecException(ex.getMessage(), ex);
         }
-
+        
         ASN1Encodable algParams;
         if (encodedAlgorithmIdParameters.length < 50) {
-            algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
+        	algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
         } else {
-            algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
+        	algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
         }
         AlgorithmIdentifier algId = new AlgorithmIdentifier(
                 X9ObjectIdentifiers.id_ecPublicKey, algParams);
-
+        
         SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
         X509EncodedKeySpec keySpec;
         try {
@@ -547,5 +537,5 @@ public class KeyUtil {
                 EC5Util.convertSpec(paramSpec, false);
         return ECUtil.getNamedCurveOid(bcParamSpec);
     }
-
+    
 }
