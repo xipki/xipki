@@ -156,6 +156,10 @@ public abstract class CmpRequestor {
         ParamUtil.assertNotNull("responderCert", responderCert);
         ParamUtil.assertNotNull("securityFactory", securityFactory);
 
+        if (requestor.getCertificate() == null) {
+            throw new IllegalArgumentException("requestor without certifiate is not allowed");
+        }
+
         this.requestor = requestor;
         this.securityFactory = securityFactory;
         this.signRequest = signRequest;

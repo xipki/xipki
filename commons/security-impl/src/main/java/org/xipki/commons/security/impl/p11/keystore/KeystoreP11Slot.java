@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -52,7 +53,13 @@ import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +71,13 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
@@ -92,15 +105,42 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class KeystoreP11Slot implements P11WritableSlot {
 
+    // slotinfo
+    private static final String FILE_SLOTINFO = "slotinfo";
+    private static final String PROP_NAMED_CURVE_SUPPORTED = "namedCurveSupported";
+
     private static final String DIR_PRIV_KEY = "privkey";
     private static final String DIR_PUB_KEY = "pubkey";
     private static final String DIR_CERT = "cert";
+
+    private static final String PROP_ID = "id";
+    private static final String PROP_LABEL = "label";
+    private static final String PROP_VALUE = "value";
+    private static final String PROP_SHA1SUM = "sha1";
+
+    private static final String PROP_ALGORITHM = "algorithm";
+
+    // RSA
+    private static final String PROP_RSA_MODUS = "modus";
+    private static final String PROP_RSA_PUBLIC_EXPONENT = "publicExponent";
+
+    // DSA
+    private static final String PROP_DSA_PRIME = "prime"; // p
+    private static final String PROP_DSA_SUBPRIME = "subprime"; // q
+    private static final String PROP_DSA_BASE = "base"; // g
+    private static final String PROP_DSA_VALUE = "value"; // y
+
+    // EC
+    private static final String PROP_EC_ECDSA_PARAMS = "ecdsaParams";
+    private static final String PROP_EC_EC_POINT = "ecPoint";
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
 
     private final String moduleName;
 
     private final File slotDir;
+
+    private final boolean namedCurveSupported;
 
     private final File privKeyDir;
 
@@ -121,7 +161,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final File slotDir,
             final P11SlotIdentifier slotId,
             final PrivateKeyCryptor privateKeyCryptor,
-            final SecurityFactory securityFactory) {
+            final SecurityFactory securityFactory)
+    throws SignerException {
         ParamUtil.assertNotBlank("moduleName", moduleName);
         ParamUtil.assertNotNull("slotDir", slotDir);
         ParamUtil.assertNotNull("slotId", slotId);
@@ -149,6 +190,20 @@ public class KeystoreP11Slot implements P11WritableSlot {
             this.certDir.mkdirs();
         }
 
+        File slotInfoFile = new File(slotDir, FILE_SLOTINFO);
+        if (slotInfoFile.exists()) {
+            Properties props;
+            try {
+                props = loadProperties(slotInfoFile);
+            } catch (IOException ex) {
+                throw new SignerException("cannot load properties file slot.info", ex);
+            }
+            this.namedCurveSupported = Boolean.parseBoolean(
+                    props.getProperty(PROP_NAMED_CURVE_SUPPORTED, "true"));
+        } else {
+            this.namedCurveSupported = true;
+        }
+
         refresh();
     }
 
@@ -169,7 +224,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
             try {
                 Properties props = loadProperties(privKeyFile);
-                String keyLabel = props.getProperty("LABEL");
+                String keyLabel = props.getProperty(PROP_LABEL);
 
                 P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId, keyLabel);
 
@@ -209,7 +264,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     }
                 }
 
-                String base64EncodedValue = props.getProperty("VALUE");
+                String base64EncodedValue = props.getProperty(PROP_VALUE);
 
                 PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(
                         Base64.decode(base64EncodedValue));
@@ -353,8 +408,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     continue;
                 }
 
-                if (sha1sum.equals(props.getProperty("SHA1SUM"))) {
-                    String label = props.getProperty("LABEL");
+                if (sha1sum.equals(props.getProperty(PROP_SHA1SUM))) {
+                    String label = props.getProperty(PROP_LABEL);
                     byte[] id = Hex.decode(cf.getName());
                     return new P11KeyIdentifier(id, label);
                 }
@@ -643,7 +698,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     return false;
                 }
 
-                if (label.equals(props.getProperty("LABEL"))) {
+                if (label.equals(props.getProperty("label"))) {
                     return f.delete();
                 } else {
                     return false;
@@ -667,7 +722,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 continue;
             }
 
-            if (label.equals(props.getProperty("LABEL"))) {
+            if (label.equals(props.getProperty("label"))) {
                 if (cf.delete()) {
                     deleted = true;
                 }
@@ -690,8 +745,117 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final byte[] id,
             final String label,
             final PublicKey publicKey)
-    throws IOException {
-        savePkcs11Entry(pubKeyDir, id, label, publicKey.getEncoded());
+    throws IOException, InvalidKeyException {
+        String hexId = Hex.toHexString(id).toUpperCase();
+
+        StringBuilder sb = new StringBuilder(100);
+        sb.append(PROP_ID).append('=').append(hexId).append('\n');
+        sb.append(PROP_LABEL).append('=').append(label).append('\n');
+
+        if (publicKey instanceof RSAPublicKey) {
+            RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
+
+            sb.append(PROP_ALGORITHM).append('=');
+            sb.append(PKCSObjectIdentifiers.rsaEncryption.getId());
+            sb.append('\n');
+
+            sb.append(PROP_RSA_MODUS).append('=');
+            sb.append(Hex.toHexString(rsaKey.getModulus().toByteArray()));
+            sb.append('\n');
+
+            sb.append(PROP_RSA_PUBLIC_EXPONENT).append('=');
+            sb.append(Hex.toHexString(rsaKey.getPublicExponent().toByteArray()));
+            sb.append('\n');
+        } else if (publicKey instanceof DSAPublicKey) {
+            DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
+
+            sb.append(PROP_ALGORITHM).append('=');
+            sb.append(X9ObjectIdentifiers.id_dsa.getId());
+            sb.append('\n');
+
+            sb.append(PROP_DSA_PRIME).append('=');
+            sb.append(Hex.toHexString(dsaKey.getParams().getP().toByteArray()));
+            sb.append('\n');
+
+            sb.append(PROP_DSA_SUBPRIME).append('=');
+            sb.append(Hex.toHexString(dsaKey.getParams().getQ().toByteArray()));
+            sb.append('\n');
+
+            sb.append(PROP_DSA_BASE).append('=');
+            sb.append(Hex.toHexString(dsaKey.getParams().getG().toByteArray()));
+            sb.append('\n');
+
+            sb.append(PROP_DSA_VALUE).append('=');
+            sb.append(Hex.toHexString(dsaKey.getY().toByteArray()));
+            sb.append('\n');
+        } else if (publicKey instanceof ECPublicKey) {
+            ECPublicKey ecKey = (ECPublicKey) publicKey;
+
+            sb.append(PROP_ALGORITHM).append('=');
+            sb.append(X9ObjectIdentifiers.id_ecPublicKey.getId());
+            sb.append('\n');
+
+            ECParameterSpec paramSpec = ecKey.getParams();
+
+            // ecdsaParams
+            org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
+                    EC5Util.convertSpec(paramSpec, false);
+            ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
+            if (curveOid == null) {
+                throw new InvalidKeyException("EC public key is not of namedCurve");
+            }
+
+            byte[] encodedParams;
+            if (namedCurveSupported) {
+                encodedParams = curveOid.getEncoded();
+            } else {
+                X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveOid);
+                encodedParams = ecParams.getEncoded();
+            }
+            sb.append(PROP_EC_ECDSA_PARAMS).append('=');
+            sb.append(Hex.toHexString(encodedParams));
+            sb.append('\n');
+
+            // EC point
+            java.security.spec.ECPoint w = ecKey.getW();
+            BigInteger wx = w.getAffineX();
+            if(wx.signum() != 1) {
+                throw new InvalidKeyException("Wx is not positive");
+            }
+
+            BigInteger wy = w.getAffineY();
+            if(wy.signum() != 1) {
+                throw new InvalidKeyException("Wy is not positive");
+            }
+
+            int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
+            byte[] wxBytes = wx.toByteArray();
+            byte[] wyBytes = wy.toByteArray();
+            byte[] ecPoint = new byte[1 + keysize * 2];
+            ecPoint[0] = 4; // uncompressed
+
+            int numBytesToCopy = Math.min(wxBytes.length, keysize);
+            int srcOffset = Math.max(0, wxBytes.length - numBytesToCopy);
+            int destOffset = 1 + Math.max(0, keysize - wxBytes.length);
+            System.arraycopy(wxBytes, srcOffset, ecPoint, destOffset, numBytesToCopy);
+
+            numBytesToCopy = Math.min(wyBytes.length, keysize);
+            srcOffset = Math.max(0, wyBytes.length - numBytesToCopy);
+            destOffset = 1 + keysize + Math.max(0, keysize - wyBytes.length);
+            System.arraycopy(wyBytes, srcOffset, ecPoint, destOffset, numBytesToCopy);
+
+            sb.append(PROP_EC_EC_POINT).append('=');
+            sb.append(Hex.toHexString(ecPoint));
+            sb.append('\n');
+        } else {
+            throw new IllegalArgumentException(
+                    "unsupported public key " + publicKey.getClass().getName());
+        }
+
+        File file = new File(pubKeyDir, hexId);
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(sb.toString().getBytes());
+        out.close();
     }
 
     private void savePkcs11Cert(
@@ -720,23 +884,26 @@ public class KeystoreP11Slot implements P11WritableSlot {
         String hexId = Hex.toHexString(id).toUpperCase();
         File file = new File(dir, hexId);
         FileOutputStream out = new FileOutputStream(file);
-        out.write("ID=".getBytes());
+        out.write(PROP_ID.getBytes());
+        out.write('=');
         out.write(hexId.getBytes());
         out.write('\n');
 
-        out.write("LABEL=".getBytes());
+        out.write(PROP_LABEL.getBytes());
+        out.write('=');
         out.write(label.getBytes());
         out.write('\n');
 
         String sha1sum = HashCalculator.hexSha1(value);
-        out.write("SHA1SUM=".getBytes());
+        out.write(PROP_SHA1SUM.getBytes());
+        out.write('=');
         out.write(sha1sum.getBytes());
         out.write('\n');
 
-        out.write("VALUE=".getBytes());
+        out.write(PROP_VALUE.getBytes());
+        out.write('=');
         Base64.encode(value, out);
         out.write('\n');
-        out.flush();
         out.close();
     }
 
@@ -773,11 +940,36 @@ public class KeystoreP11Slot implements P11WritableSlot {
         String hexKeyId = Hex.toHexString(keyId);
         File pubKeyFile = new File(pubKeyDir, hexKeyId);
         Properties props = loadProperties(pubKeyFile);
-        String base64EncodedValue = props.getProperty("VALUE");
 
-        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
-                Base64.decode(base64EncodedValue));
-        return KeyUtil.generatePublicKey(spki);
+        String algorithm = props.getProperty(PROP_ALGORITHM);
+        if (PKCSObjectIdentifiers.rsaEncryption.getId().equals(algorithm)) {
+            BigInteger exp = new BigInteger(1,
+                    Hex.decode(props.getProperty(PROP_RSA_PUBLIC_EXPONENT)));
+            BigInteger mod = new BigInteger(1, Hex.decode(props.getProperty(PROP_RSA_MODUS)));
+
+            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(keySpec);
+        } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
+            BigInteger prime = new BigInteger(1,
+                    Hex.decode(props.getProperty(PROP_DSA_PRIME))); // p
+            BigInteger subPrime = new BigInteger(1,
+                    Hex.decode(props.getProperty(PROP_DSA_SUBPRIME))); // q
+            BigInteger base = new BigInteger(1,
+                    Hex.decode(props.getProperty(PROP_DSA_BASE))); // g
+            BigInteger value = new BigInteger(1,
+                    Hex.decode(props.getProperty(PROP_DSA_VALUE))); // y
+
+            DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
+            KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+            return keyFactory.generatePublic(keySpec);
+        } else if(X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
+            byte[] ecdsaParams = Hex.decode(props.getProperty(PROP_EC_ECDSA_PARAMS));
+            byte[] ecPoint = Hex.decode(props.getProperty(PROP_EC_EC_POINT));
+            return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
+        } else {
+            throw new InvalidKeySpecException("unknown key algorithm " + algorithm);
+        }
     }
 
     private X509Certificate readCertificate(
@@ -786,7 +978,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         String hexKeyId = Hex.toHexString(keyId);
         File certFile = new File(certDir, hexKeyId);
         Properties props = loadProperties(certFile);
-        String base64EncodedCert = props.getProperty("VALUE");
+        String base64EncodedCert = props.getProperty(PROP_VALUE);
         return X509Util.parseBase64EncodedCert(base64EncodedCert);
     }
 

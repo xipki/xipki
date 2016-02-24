@@ -67,6 +67,9 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -78,6 +81,7 @@ import org.xipki.commons.security.api.SignerException;
  */
 
 public class SignerUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(SignerUtil.class);
 
     private SignerUtil() {
     }
@@ -168,6 +172,9 @@ public class SignerUtil {
             return p10Request.isSignatureValid(cvp);
         } catch (OperatorCreationException | InvalidKeyException | PKCSException
                 | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            String message = "error while validating POPO of PKCS#10 request";
+            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            LOG.error(message, e);
             return false;
         }
     }

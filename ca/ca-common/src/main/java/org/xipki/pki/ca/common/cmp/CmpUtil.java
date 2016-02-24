@@ -55,6 +55,7 @@ import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 
@@ -82,8 +83,16 @@ public class CmpUtil {
             final GeneralName signerName,
             final boolean addSignerCert)
     throws CMPException, NoIdleSignerException {
-        GeneralName localSignerName = signerName;
-        if (localSignerName == null) {
+        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
+        ParamUtil.assertNotNull("signer", signer);
+
+        final GeneralName localSignerName;
+        if (signerName != null) {
+            localSignerName = signerName;
+        } else {
+            if (signer.getCertificate() == null) {
+                throw new IllegalArgumentException("signer without certificate is not allowed");
+            }
             X500Name x500Name = X500Name.getInstance(
                     signer.getCertificate().getSubjectX500Principal().getEncoded());
             localSignerName = new GeneralName(x500Name);

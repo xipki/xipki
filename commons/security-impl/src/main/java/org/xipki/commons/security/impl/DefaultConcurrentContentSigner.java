@@ -39,6 +39,7 @@ package org.xipki.commons.security.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -76,6 +77,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<>();
 
     private final PrivateKey privateKey;
+
+    private PublicKey publicKey;
 
     private X509Certificate[] certificateChain;
 
@@ -173,13 +176,16 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public void setCertificateChain(
             final X509Certificate[] certificateChain) {
-        this.certificateChain = certificateChain;
-        if (this.certificateChain == null) {
+        if (certificateChain == null || certificateChain.length == 0) {
+            this.certificateChain = null;
             this.certificateChainAsBCObjects = null;
             return;
         }
 
+        this.certificateChain = certificateChain;
+        setPublicKey(certificateChain[0].getPublicKey());
         final int n = certificateChain.length;
+
         this.certificateChainAsBCObjects = new X509CertificateHolder[n];
         for (int i = 0; i < n; i++) {
             X509Certificate cert = this.certificateChain[i];
@@ -193,6 +199,17 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             }
         }
     }
+
+    @Override
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    @Override
+    public void setPublicKey(
+            final PublicKey publicKey) {
+        this.publicKey = publicKey;
+    };
 
     @Override
     public X509Certificate getCertificate() {
