@@ -77,6 +77,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -182,15 +183,26 @@ class X509SelfSignedCertBuilder {
                     e.getClass().getName() + ": " + e.getMessage());
         }
 
-        // this certificate is the dummy one which can be considered only as public key container
-        Certificate bcCert;
-        try {
-            bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-        } catch (Exception e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "could not reparse certificate: " + e.getMessage());
+        SubjectPublicKeyInfo publicKeyInfo;
+        if (signer.getCertificate() != null) {
+            // this certificate is the dummy one which can be considered only as public key container
+            Certificate bcCert;
+            try {
+                bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
+            } catch (Exception e) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                        "could not reparse certificate: " + e.getMessage());
+            }
+            publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
+        } else {
+            PublicKey signerPublicKey = signer.getPublicKey();
+            try {
+                publicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signerPublicKey);
+            } catch (InvalidKeyException ex) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                        "cannot generate SubjectPublicKeyInfo from publicKey: " + ex.getMessage());
+            }
         }
-        SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
         X509Certificate newCert = generateCertificate(
                 signer, certprofile, p10Request, serialNumber, publicKeyInfo,

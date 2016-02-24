@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl;
+package org.xipki.commons.security.impl.p12;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +44,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
@@ -99,6 +100,8 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.bcext.BCRSAPrivateCrtKey;
 import org.xipki.commons.security.bcext.BCRSAPrivateKey;
 import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
+import org.xipki.commons.security.impl.DefaultConcurrentContentSigner;
+import org.xipki.commons.security.impl.SignatureSigner;
 
 /**
  * @author Lijun Liao
@@ -293,12 +296,19 @@ public class SoftTokenContentSignerBuilder {
 
     private final PrivateKey key;
 
+    private final PublicKey publicKey;
+
     private final X509Certificate[] certificateChain;
 
     public SoftTokenContentSignerBuilder(
-            final PrivateKey privateKey)
+            final PrivateKey privateKey,
+            final PublicKey publicKey)
     throws SignerException {
+        ParamUtil.assertNotNull("privateKey", privateKey);
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
         this.key = privateKey;
+        this.publicKey = publicKey;
         this.certificateChain = null;
     }
 
@@ -374,6 +384,7 @@ public class SoftTokenContentSignerBuilder {
                 }
             }
 
+            this.publicKey = cert.getPublicKey();
             this.certificateChain = X509Util.buildCertPath(cert, caCerts);
         } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
                 | CertificateException | IOException | UnrecoverableKeyException
@@ -469,6 +480,8 @@ public class SoftTokenContentSignerBuilder {
         ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
         if (certificateChain != null) {
             concurrentSigner.setCertificateChain(certificateChain);
+        } else {
+            concurrentSigner.setPublicKey(publicKey);
         }
         return concurrentSigner;
     } // createSigner

@@ -75,6 +75,8 @@ import org.xipki.commons.security.provider.P11PrivateKey;
 
 public class P11ContentSignerBuilder {
 
+    private final PublicKey publicKey;
+
     private final X509Certificate[] certificateChain;
 
     private final P11CryptService cryptService;
@@ -100,13 +102,15 @@ public class P11ContentSignerBuilder {
         this.securityFactory = securityFactory;
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
-        boolean keyExists = (signerCertInP11 != null);
-        if (!keyExists) {
-            keyExists = (cryptService.getPublicKey(slot, keyId) != null);
+        PublicKey publicKeyInP11;
+        if (signerCertInP11 != null) {
+            publicKeyInP11 = signerCertInP11.getPublicKey();
+        } else {
+            publicKeyInP11 = cryptService.getPublicKey(slot, keyId);
         }
 
-        if (!keyExists) {
-            throw new SignerException("key with " + keyId + " does not exist");
+        if (publicKeyInP11 == null) {
+            throw new SignerException("public key with " + keyId + " does not exist");
         }
 
         this.cryptService = cryptService;
@@ -127,18 +131,24 @@ public class P11ContentSignerBuilder {
                     caCerts.add(certificateChain[i]);
                 }
             }
+            this.publicKey = cert.getPublicKey();
         } else {
+            this.publicKey = publicKeyInP11;
             cert = signerCertInP11;
         }
 
-        Certificate[] certsInKeystore = cryptService.getCertificates(slot, keyId);
-        if (certsInKeystore.length > 1) {
-            for (int i = 1; i < certsInKeystore.length; i++) {
-                caCerts.add(certsInKeystore[i]);
+        if (cert != null) {
+            Certificate[] certsInKeystore = cryptService.getCertificates(slot, keyId);
+            if (certsInKeystore != null && certsInKeystore.length > 1) {
+                for (int i = 1; i < certsInKeystore.length; i++) {
+                    caCerts.add(certsInKeystore[i]);
+                }
             }
-        }
 
-        this.certificateChain = X509Util.buildCertPath(cert, caCerts);
+            this.certificateChain = X509Util.buildCertPath(cert, caCerts);
+        } else {
+            this.certificateChain = null;
+        }
     } // constructor
 
     public ConcurrentContentSigner createSigner(
@@ -149,8 +159,6 @@ public class P11ContentSignerBuilder {
             throw new IllegalArgumentException("non-positive parallelism is not allowed: "
                     + parallelism);
         }
-
-        PublicKey publicKey = certificateChain[0].getPublicKey();
 
         if (publicKey instanceof RSAPublicKey) {
             if (!AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId)) {
@@ -224,7 +232,11 @@ public class P11ContentSignerBuilder {
 
         DefaultConcurrentContentSigner concurrentSigner =
                 new DefaultConcurrentContentSigner(signers, privateKey);
-        concurrentSigner.setCertificateChain(certificateChain);
+        if(certificateChain != null) {
+            concurrentSigner.setCertificateChain(certificateChain);
+        } else {
+            concurrentSigner.setPublicKey(publicKey);
+        }
 
         return concurrentSigner;
     } // method createSigner

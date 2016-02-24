@@ -93,7 +93,11 @@ public class CmpResponderEntryWrapper {
         dbEntry.setConfFaulty(true);
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
+        if (signer.getCertificate() == null) {
+            throw new SignerException("signer without certificate is not allowed");
+        }
         dbEntry.setConfFaulty(false);
+
         if (dbEntry.getBase64Cert() == null) {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(

@@ -1425,7 +1425,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
             byte[] id = IaikP11Util.generateKeyId(session);
 
-            generateECDSAKeyPair(
+            generateECKeyPair(
                     session, curveId, ecParams, id, label);
 
             return new P11KeyIdentifier(id, label);
@@ -1485,7 +1485,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 Mechanism.get(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN), publicKey, privateKey);
     } // method generateRSAKeyPair
 
-    private void generateECDSAKeyPair(
+    private void generateECKeyPair(
             final Session session,
             final ASN1ObjectIdentifier curveId,
             final X9ECParameters ecParams,
@@ -1493,13 +1493,13 @@ public class IaikP11Slot implements P11WritableSlot {
             final String label)
     throws Exception {
         try {
-            generateNamedECDSAKeyPair(session, curveId, id, label);
+            generateNamedECKeyPair(session, curveId, id, label);
         } catch (TokenException e) {
             generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
         }
     }
 
-    private void generateNamedECDSAKeyPair(
+    private void generateNamedECKeyPair(
             final Session session,
             final ASN1ObjectIdentifier curveId,
             final byte[] id,
@@ -1782,8 +1782,14 @@ public class IaikP11Slot implements P11WritableSlot {
                 throw new SignerException(e.getMessage(), e);
             }
         } else if (p11Key instanceof ECDSAPublicKey) {
-            // FIXME: implement me
-            return null;
+            ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
+            byte[] encodedAlgorithmIdParameters = ecP11Key.getEcdsaParams().getByteArrayValue();
+            byte[] encodedPoint = ecP11Key.getEcPoint().getByteArrayValue();
+            try {
+                return KeyUtil.createECPublicKey(encodedAlgorithmIdParameters, encodedPoint);
+            } catch (InvalidKeySpecException ex) {
+                throw new SignerException(ex.getMessage(), ex);
+            }
         } else {
             throw new SignerException("unknown public key class " + p11Key.getClass().getName());
         }

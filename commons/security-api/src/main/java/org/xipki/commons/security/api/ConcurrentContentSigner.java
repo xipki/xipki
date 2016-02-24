@@ -37,6 +37,7 @@
 package org.xipki.commons.security.api;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -58,6 +59,11 @@ public interface ConcurrentContentSigner {
      * @return the private key if possible. {@code null} may be returned.
      */
     PrivateKey getPrivateKey();
+
+    void setPublicKey(
+            PublicKey publicKey);
+
+    PublicKey getPublicKey();
 
     X509Certificate getCertificate();
 

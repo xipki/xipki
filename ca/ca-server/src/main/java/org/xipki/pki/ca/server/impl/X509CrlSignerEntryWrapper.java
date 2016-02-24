@@ -98,14 +98,22 @@ class X509CrlSignerEntryWrapper {
             return;
         }
 
+        dbEntry.setConfFaulty(true);
+
         X509Certificate responderCert = dbEntry.getCertificate();
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
-        if (dbEntry.getBase64Cert() == null) {
-            dbEntry.setCertificate(signer.getCertificate());
+
+        X509Certificate signerCert = signer.getCertificate();
+        if (signerCert == null) {
+            throw new SignerException("signer without certificate is not allowed");
         }
 
-        byte[] encodedSkiValue = signer.getCertificate().getExtensionValue(
+        if (dbEntry.getBase64Cert() == null) {
+            dbEntry.setCertificate(signerCert);
+        }
+
+        byte[] encodedSkiValue = signerCert.getExtensionValue(
                 Extension.subjectKeyIdentifier.getId());
         if (encodedSkiValue == null) {
             throw new OperationException(ErrorCode.INVALID_EXTENSION,
@@ -120,10 +128,11 @@ class X509CrlSignerEntryWrapper {
         }
         this.subjectKeyIdentifier = ski.getOctets();
 
-        if (!X509Util.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign)) {
+        if (!X509Util.hasKeyusage(signerCert, KeyUsage.cRLSign)) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "CRL signer does not have keyusage cRLSign");
         }
+        dbEntry.setConfFaulty(false);
     } // method initSigner
 
     public X509CrlSignerEntry getDbEntry() {

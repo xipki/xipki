@@ -56,18 +56,27 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAParameterSpec;
+import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -76,6 +85,9 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.asn1.x9.X962Parameters;
+import org.bouncycastle.asn1.x9.X9ECPoint;
+import org.bouncycastle.asn1.x9.X9IntegerConverter;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.DSAParametersGenerator;
@@ -85,10 +97,14 @@ import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
@@ -113,6 +129,25 @@ public class KeyUtil {
         = new HashMap<>();
 
     private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
+
+    private static final Map<String, ASN1ObjectIdentifier> ECC_CURVE_NAME_OID_MAP;
+
+    static {
+        Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
+
+        Enumeration<?> names = ECNamedCurveTable.getNames();
+        while (names.hasMoreElements()) {
+            String name = (String) names.nextElement();
+            ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
+            if (oid == null) {
+                continue;
+            }
+
+            nameOidMap.put(name, oid);
+        }
+
+        ECC_CURVE_NAME_OID_MAP = Collections.unmodifiableMap(nameOidMap);
+    }
 
     private KeyUtil() {
     }
@@ -356,45 +391,11 @@ public class KeyUtil {
         }
     }
 
-    /**
-     * Create a SubjectPublicKeyInfo public key.
-     *
-     * @param publicKey the SubjectPublicKeyInfo encoding
-     * @return the appropriate key parameter
-     * @throws java.io.IOException on an error encoding the key
-     */
-    public static SubjectPublicKeyInfo creatDSASubjectPublicKeyInfo(
-            final DSAPublicKey publicKey)
-    throws IOException {
-        ParamUtil.assertNotNull("publicKey", publicKey);
-
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(publicKey.getParams().getP()));
-        v.add(new ASN1Integer(publicKey.getParams().getQ()));
-        v.add(new ASN1Integer(publicKey.getParams().getG()));
-        ASN1Sequence dssParams = new DERSequence(v);
-
-        return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
-                new ASN1Integer(publicKey.getY()));
-    }
-
     public static ASN1ObjectIdentifier getCurveOidForName(
             final String curveName) {
         ParamUtil.assertNotBlank("curveName", curveName);
 
-        ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
-        if (curveOID == null) {
-            curveOID = SECNamedCurves.getOID(curveName);
-        }
-        if (curveOID == null) {
-            curveOID = TeleTrusTNamedCurves.getOID(curveName);
-        }
-        if (curveOID == null) {
-            curveOID = NISTNamedCurves.getOID(curveName);
-        }
-
-        return curveOID;
+        return ECC_CURVE_NAME_OID_MAP.get(curveName.toLowerCase());
     }
 
     public static String getCurveName(
@@ -416,45 +417,7 @@ public class KeyUtil {
     }
 
     public static Map<String, ASN1ObjectIdentifier> getCurveNameOidMap() {
-        Map<String, ASN1ObjectIdentifier> map = new HashMap<>();
-        Enumeration<?> names = X962NamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = X962NamedCurves.getOID(name);
-            if (oid != null) {
-                map.put(name, oid);
-            }
-        }
-
-        names = SECNamedCurves.getNames();
-
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = SECNamedCurves.getOID(name);
-            if (oid != null) {
-                map.put(name, oid);
-            }
-        }
-
-        names = TeleTrusTNamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = TeleTrusTNamedCurves.getOID(name);
-            if (oid != null) {
-                map.put(name, oid);
-            }
-        }
-
-        names = NISTNamedCurves.getNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = NISTNamedCurves.getOID(name);
-            if (oid != null) {
-                map.put(name, oid);
-            }
-        }
-
-        return map;
+        return ECC_CURVE_NAME_OID_MAP;
     } // method getCurveNameOidMap
 
     public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(
@@ -468,6 +431,121 @@ public class KeyUtil {
         }
 
         return oid;
+    }
+
+    public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(
+            final PublicKey publicKey)
+    throws InvalidKeyException {
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
+        if (publicKey instanceof DSAPublicKey) {
+            DSAPublicKey dsaPubKey = (DSAPublicKey) publicKey;
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            v.add(new ASN1Integer(dsaPubKey.getParams().getP()));
+            v.add(new ASN1Integer(dsaPubKey.getParams().getQ()));
+            v.add(new ASN1Integer(dsaPubKey.getParams().getG()));
+            ASN1Sequence dssParams = new DERSequence(v);
+
+            try {
+                return new SubjectPublicKeyInfo(
+                        new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
+                        new ASN1Integer(dsaPubKey.getY()));
+            } catch (IOException ex) {
+                throw new InvalidKeyException(ex.getMessage(), ex);
+            }
+        } else if (publicKey instanceof RSAPublicKey) {
+            RSAPublicKey rsaPubKey = (RSAPublicKey) publicKey;
+            try {
+                return new SubjectPublicKeyInfo(
+                        new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
+                                DERNull.INSTANCE),
+                        new org.bouncycastle.asn1.pkcs.RSAPublicKey(rsaPubKey.getModulus(),
+                                rsaPubKey.getPublicExponent()));
+            } catch (IOException ex) {
+                throw new InvalidKeyException(ex.getMessage(), ex);
+            }
+        } else if (publicKey instanceof ECPublicKey) {
+            ECPublicKey ecPubKey = (ECPublicKey) publicKey;
+
+            ECParameterSpec paramSpec = ecPubKey.getParams();
+            ASN1ObjectIdentifier curveOid = detectCurveOid(paramSpec);
+            if (curveOid == null) {
+                throw new InvalidKeyException("Cannot find the name of the given EC public key");
+            }
+
+            java.security.spec.ECPoint w = ecPubKey.getW();
+            BigInteger wx = w.getAffineX();
+            if(wx.signum() != 1) {
+                throw new InvalidKeyException("Wx is not positive");
+            }
+
+            BigInteger wy = w.getAffineY();
+            if(wy.signum() != 1) {
+                throw new InvalidKeyException("Wy is not positive");
+            }
+
+            int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
+            byte[] wxBytes = wx.toByteArray();
+            byte[] wyBytes = wy.toByteArray();
+            byte[] pubKey = new byte[1 + keysize * 2];
+            pubKey[0] = 4; // uncompressed
+
+            int numBytesToCopy = Math.min(wxBytes.length, keysize);
+            int srcOffset = Math.max(0, wxBytes.length - numBytesToCopy);
+            int destOffset = 1 + Math.max(0, keysize - wxBytes.length);
+            System.arraycopy(wxBytes, srcOffset, pubKey, destOffset, numBytesToCopy);
+
+            numBytesToCopy = Math.min(wyBytes.length, keysize);
+            srcOffset = Math.max(0, wyBytes.length - numBytesToCopy);
+            destOffset = 1 + keysize + Math.max(0, keysize - wyBytes.length);
+            System.arraycopy(wyBytes, srcOffset, pubKey, destOffset, numBytesToCopy);
+
+            AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
+                    curveOid);
+            return new SubjectPublicKeyInfo(algId, pubKey);
+        } else {
+            throw new InvalidKeyException(
+                    "unknown publicKey class " + publicKey.getClass().getName());
+        }
+    }
+
+    public static ECPublicKey createECPublicKey(
+            byte[] encodedAlgorithmIdParameters,
+            byte[] encodedPoint)
+    throws InvalidKeySpecException {
+        KeyFactory kf;
+        try {
+            kf = KeyFactory.getInstance("EC", "BC");
+        } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
+            throw new InvalidKeySpecException(ex.getMessage(), ex);
+        }
+
+        ASN1Encodable algParams;
+        if (encodedAlgorithmIdParameters.length < 50) {
+            algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
+        } else {
+            algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
+        }
+        AlgorithmIdentifier algId = new AlgorithmIdentifier(
+                X9ObjectIdentifiers.id_ecPublicKey, algParams);
+
+        SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
+        X509EncodedKeySpec keySpec;
+        try {
+            keySpec = new X509EncodedKeySpec(spki.getEncoded());
+        } catch (IOException ex) {
+            throw new InvalidKeySpecException(ex.getMessage(), ex);
+        }
+
+        return (ECPublicKey) kf.generatePublic(keySpec);
+    }
+
+    private static ASN1ObjectIdentifier detectCurveOid(
+            final ECParameterSpec paramSpec)
+    {
+        org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
+                EC5Util.convertSpec(paramSpec, false);
+        return ECUtil.getNamedCurveOid(bcParamSpec);
     }
 
 }

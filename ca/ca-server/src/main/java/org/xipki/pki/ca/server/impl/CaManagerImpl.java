@@ -1228,6 +1228,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     signer = securityFactory.createSigner(
                             xEntry.getSignerType(), signerConf, xEntry.getCertificate());
                     if (xEntry.getCertificate() == null) {
+                        if (signer.getCertificate() == null) {
+                            throw new CaMgmtException(
+                                    "CA signer without certificate is not allowed");
+                        }
                         xEntry.setCertificate(signer.getCertificate());
                     }
                 }
