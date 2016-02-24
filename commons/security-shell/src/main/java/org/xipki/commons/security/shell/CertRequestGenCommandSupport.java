@@ -87,6 +87,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -103,8 +104,9 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--subject", aliases = "-s",
+            required = true,
             description = "subject in the PKCS#10 request\n"
-                    + "default is the subject of self-signed certifite")
+                    + "(required)")
     private String subject;
 
     @Option(name = "--rsa-mgf1",
@@ -336,15 +338,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         ConcurrentContentSigner identifiedSigner = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
-        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
-        X500Name subjectDN;
-        if (subject != null) {
-            subjectDN = getSubject(subject);
-        } else {
-            subjectDN = cert.getSubject();
-        }
-
+        X500Name subjectDN = getSubject(subject);
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
         if (CollectionUtil.isNotEmpty(extensions)) {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
@@ -355,7 +350,16 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_challengePassword,
                     new DERPrintableString(challengePassword));
         }
-        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
+
+        SubjectPublicKeyInfo subjectPublicKeyInfo;
+        if (identifiedSigner.getCertificate() != null) {
+            Certificate cert = Certificate.getInstance(
+                    identifiedSigner.getCertificate().getEncoded());
+            subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
+        } else {
+            subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(
+                    identifiedSigner.getPublicKey());
+        }
 
         ContentSigner signer = identifiedSigner.borrowContentSigner();
 

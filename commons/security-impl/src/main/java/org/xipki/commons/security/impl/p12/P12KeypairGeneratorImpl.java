@@ -222,7 +222,7 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
             final SecureRandom random)
     throws Exception {
         KeyPair kp = KeyUtil.generateDSAKeypair(pLength, qLength, random);
-        SubjectPublicKeyInfo spki = KeyUtil.creatDSASubjectPublicKeyInfo(
+        SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(
                 (DSAPublicKey) kp.getPublic());
         return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
     }
