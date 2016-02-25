@@ -36,14 +36,12 @@
 
 package org.xipki.commons.security.test;
 
-import java.io.OutputStream;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.commons.common.ConfPairs;
@@ -117,15 +115,7 @@ public abstract class Pkcs12RSATest {
     protected byte[] sign(
             final byte[] data)
     throws Exception {
-        ConcurrentContentSigner signer = getSigner();
-        ContentSigner cSigner = signer.borrowContentSigner();
-        try {
-            OutputStream signatureStream = cSigner.getOutputStream();
-            signatureStream.write(data);
-            return cSigner.getSignature();
-        } finally {
-            signer.returnContentSigner(cSigner);
-        }
+        return getSigner().sign(data);
     }
 
     protected boolean verify(

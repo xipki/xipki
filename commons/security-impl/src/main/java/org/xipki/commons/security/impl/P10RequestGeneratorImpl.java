@@ -43,7 +43,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -86,25 +85,16 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
     throws PasswordResolverException, SignerException {
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
                 (X509Certificate[]) null);
-        ContentSigner contentSigner;
-        try {
-            contentSigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException ex) {
-            throw new SignerException(ex.getMessage(), ex);
-        }
-        try {
-            return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, attributes);
-        } finally {
-            signer.returnContentSigner(contentSigner);
-        }
+        return generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
     }
 
     @Override
     public PKCS10CertificationRequest generateRequest(
-            final ContentSigner contentSigner,
+            final ConcurrentContentSigner signer,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) {
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    throws SignerException {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
         if (CollectionUtil.isNotEmpty(attributes)) {
@@ -112,7 +102,12 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
             }
         }
-        return p10ReqBuilder.build(contentSigner);
+
+        try {
+            return signer.build(p10ReqBuilder);
+        } catch (NoIdleSignerException ex) {
+            throw new SignerException(ex.getMessage(), ex);
+        }
     }
 
 }

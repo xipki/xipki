@@ -70,7 +70,6 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
@@ -336,7 +335,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner identifiedSigner = getSigner(
+        ConcurrentContentSigner signer = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
 
         X500Name subjectDN = getSubject(subject);
@@ -352,23 +351,17 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         }
 
         SubjectPublicKeyInfo subjectPublicKeyInfo;
-        if (identifiedSigner.getCertificate() != null) {
+        if (signer.getCertificate() != null) {
             Certificate cert = Certificate.getInstance(
-                    identifiedSigner.getCertificate().getEncoded());
+                    signer.getCertificate().getEncoded());
             subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
         } else {
             subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(
-                    identifiedSigner.getPublicKey());
+                    signer.getPublicKey());
         }
 
-        ContentSigner signer = identifiedSigner.borrowContentSigner();
-
-        PKCS10CertificationRequest p10Req;
-        try {
-            p10Req = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
-        } finally {
-            identifiedSigner.returnContentSigner(signer);
-        }
+        PKCS10CertificationRequest p10Req = p10Gen.generateRequest(signer, subjectPublicKeyInfo,
+                subjectDN, attributes);
 
         File file = new File(outputFilename);
         saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
