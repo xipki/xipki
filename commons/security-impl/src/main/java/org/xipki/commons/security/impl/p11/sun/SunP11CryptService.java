@@ -169,8 +169,8 @@ public final class SunP11CryptService implements P11CryptService {
                     }
                     try {
                         keystore.load(null, singlePassword);
-                    } catch (Exception e) {
-                        throw new SignerException(e.getMessage(), e);
+                    } catch (Exception ex) {
+                        throw new SignerException(ex.getMessage(), ex);
                     }
                 }
 
@@ -224,23 +224,23 @@ public final class SunP11CryptService implements P11CryptService {
                         SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias,
                                 signatureKey, x509Certchain, pubKey);
                         currentIdentifies.add(p11Identity);
-                    } catch (SignerException e) {
+                    } catch (SignerException ex) {
                         String msg = "SignerException while constructing SunP11Identity for alias "
                                 + alias + " (slot: " + i + ", module: " + moduleConf.getName()
                                 + ")";
-                        LOG.warn(msg + ", message: {}", e.getMessage());
-                        LOG.debug(msg, e);
+                        LOG.warn(msg + ", message: {}", ex.getMessage());
+                        LOG.debug(msg, ex);
                         continue;
                     }
                 } // end while
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "could not initialize PKCS11 slot " + i + " (module: "
                         + moduleConf.getName() + ")";
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
                 continue;
             }
         } // end for(i)
@@ -486,15 +486,15 @@ public final class SunP11CryptService implements P11CryptService {
         try {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
                     pkcs11Module, functionList, pInitArgs, omitInitialize);
-        } catch (IOException | PKCS11Exception e) {
-            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+        } catch (IOException | PKCS11Exception ex) {
+            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         long[] slotList;
         try {
             slotList = pkcs11.C_GetSlotList(false);
-        } catch (PKCS11Exception e) {
-            throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
+        } catch (PKCS11Exception ex) {
+            throw new SignerException("PKCS11Exception: " + ex.getMessage(), ex);
         }
         return slotList;
     }

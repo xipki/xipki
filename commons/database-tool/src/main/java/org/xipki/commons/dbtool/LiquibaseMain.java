@@ -95,8 +95,8 @@ public class LiquibaseMain {
             } else {
                 log.setLogLevel(logLevel);
             }
-        } catch (IllegalArgumentException e) {
-            throw new CommandLineParsingException(e.getMessage(), e);
+        } catch (IllegalArgumentException ex) {
+            throw new CommandLineParsingException(ex.getMessage(), ex);
         }
     }
 
@@ -150,14 +150,14 @@ public class LiquibaseMain {
             }
 
             this.liquibase = new Liquibase(changeLogFile, fileOpener, database);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             try {
                 database.rollback();
                 database.close();
             } catch (Exception e2) {
-                LogFactory.getInstance().getLog().warning("problem closing connection", e);
+                LogFactory.getInstance().getLog().warning("problem closing connection", ex);
             }
-            throw e;
+            throw ex;
         }
     } // method init
 
@@ -186,8 +186,8 @@ public class LiquibaseMain {
                 database.rollback();
                 database.close();
             }
-        } catch (DatabaseException e) {
-            LogFactory.getInstance().getLog().warning("problem closing connection", e);
+        } catch (DatabaseException ex) {
+            LogFactory.getInstance().getLog().warning("problem closing connection", ex);
         } finally {
             database = null;
             liquibase = null;

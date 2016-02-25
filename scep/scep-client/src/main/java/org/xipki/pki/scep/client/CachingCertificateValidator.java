@@ -65,7 +65,7 @@ public final class CachingCertificateValidator implements CaCertValidator {
         String hexFp;
         try {
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             return false;
         }
 

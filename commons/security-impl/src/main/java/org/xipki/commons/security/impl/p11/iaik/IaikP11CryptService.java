@@ -111,15 +111,15 @@ public final class IaikP11CryptService implements P11CryptService {
         lastRefreshSuccessful = false;
         try {
             this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
-        } catch (SignerException e) {
+        } catch (SignerException ex) {
             final String message = "could not initialize the PKCS#11 Module for "
                     + moduleConf.getName();
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw e;
+            LOG.debug(message, ex);
+            throw ex;
         }
 
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
@@ -133,21 +133,21 @@ public final class IaikP11CryptService implements P11CryptService {
                     LOG.warn("could not initialize slot " + slotId);
                     continue;
                 }
-            } catch (SignerException e) {
+            } catch (SignerException ex) {
                 final String message = "SignerException while initializing slot " + slotId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 continue;
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "unexpected error while initializing slot " + slotId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
                 continue;
             }
 
@@ -189,17 +189,17 @@ public final class IaikP11CryptService implements P11CryptService {
 
         try {
             return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
-        } catch (PKCS11RuntimeException e) {
+        } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_RSA_PKCS()";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             if (reconnect()) {
                 return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
             } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
+                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage(), ex);
             }
         }
     }
@@ -222,17 +222,17 @@ public final class IaikP11CryptService implements P11CryptService {
 
         try {
             return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
+        } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_RSA_X_509()";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             if (reconnect()) {
                 return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
             } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
+                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage(), ex);
             }
         }
     }
@@ -265,17 +265,17 @@ public final class IaikP11CryptService implements P11CryptService {
 
         try {
             return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
+        } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_ECDSA()";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             if (reconnect()) {
                 return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
             } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
+                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage());
             }
         }
     }
@@ -308,17 +308,17 @@ public final class IaikP11CryptService implements P11CryptService {
 
         try {
             return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
-        } catch (PKCS11RuntimeException e) {
+        } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_DSA()";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             if (reconnect()) {
                 return CKM_DSA_noReconnect(hash, slotId, keyId);
             } else {
-                throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
+                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage());
             }
         }
     }

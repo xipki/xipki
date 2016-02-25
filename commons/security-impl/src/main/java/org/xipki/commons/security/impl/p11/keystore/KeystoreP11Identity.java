@@ -115,15 +115,15 @@ public class KeystoreP11Identity extends P11Identity {
                     final String algo = "RSA/ECB/NoPadding";
                     rsaCipher = Cipher.getInstance(algo, providerName);
                     LOG.info("use cipher algorithm {}", algo);
-                } catch (NoSuchPaddingException e) {
-                    throw new NoSuchAlgorithmException("NoSuchPadding", e);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchPaddingException ex) {
+                    throw new NoSuchAlgorithmException("NoSuchPadding", ex);
+                } catch (NoSuchAlgorithmException ex) {
                     final String algo = "RSA/NONE/NoPadding";
                     try {
                         rsaCipher = Cipher.getInstance(algo, providerName);
                         LOG.info("use cipher algorithm {}", algo);
                     } catch (NoSuchPaddingException e1) {
-                        throw new NoSuchAlgorithmException("NoSuchPadding", e);
+                        throw new NoSuchAlgorithmException("NoSuchPadding", ex);
                     }
                 }
                 rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
@@ -179,15 +179,15 @@ public class KeystoreP11Identity extends P11Identity {
         Cipher cipher;
         try {
             cipher = rsaCiphers.takeFirst();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ex) {
             throw new SignerException(
                     "InterruptedException occurs while retrieving idle signature");
         }
 
         try {
             return cipher.doFinal(paddedHash);
-        } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new SignerException("SignatureException: " + e.getMessage(), e);
+        } catch (BadPaddingException | IllegalBlockSizeException ex) {
+            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
         } finally {
             rsaCiphers.add(cipher);
         }
@@ -234,7 +234,7 @@ public class KeystoreP11Identity extends P11Identity {
         Signature sig;
         try {
             sig = dsaSignatures.takeFirst();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ex) {
             throw new SignerException(
                     "InterruptedException occurs while retrieving idle signature");
         }
@@ -242,8 +242,8 @@ public class KeystoreP11Identity extends P11Identity {
         try {
             sig.update(truncatedDigest);
             return sig.sign();
-        } catch (SignatureException e) {
-            throw new SignerException("SignatureException: " + e.getMessage(), e);
+        } catch (SignatureException ex) {
+            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
         } finally {
             dsaSignatures.add(sig);
         }

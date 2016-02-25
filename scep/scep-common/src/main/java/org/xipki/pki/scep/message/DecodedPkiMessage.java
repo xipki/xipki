@@ -282,8 +282,8 @@ public class DecodedPkiMessage extends PkiMessage {
         try {
             recipientNonce = getNonceAttrValue(signedAttrs,
                     ScepObjectIdentifiers.ID_RECIPIENT_NONCE);
-        } catch (MessageDecodingException e) {
-            ret.setFailureMessage("could not parse recipientNonce: " + e.getMessage());
+        } catch (MessageDecodingException ex) {
+            ret.setFailureMessage("could not parse recipientNonce: " + ex.getMessage());
         }
 
         if (recipientNonce != null) {
@@ -297,8 +297,8 @@ public class DecodedPkiMessage extends PkiMessage {
             try {
                 i = getIntegerPrintStringAttrValue(signedAttrs,
                         ScepObjectIdentifiers.ID_PKI_STATUS);
-            } catch (MessageDecodingException e) {
-                ret.setFailureMessage("could not parse pkiStatus: " + e.getMessage());
+            } catch (MessageDecodingException ex) {
+                ret.setFailureMessage("could not parse pkiStatus: " + ex.getMessage());
                 return ret;
             }
 
@@ -319,8 +319,8 @@ public class DecodedPkiMessage extends PkiMessage {
                 try {
                     i = getIntegerPrintStringAttrValue(signedAttrs,
                             ScepObjectIdentifiers.ID_FAILINFO);
-                } catch (MessageDecodingException e) {
-                    ret.setFailureMessage("could not parse failInfo: " + e.getMessage());
+                } catch (MessageDecodingException ex) {
+                    ret.setFailureMessage("could not parse failInfo: " + ex.getMessage());
                     return ret;
                 }
 
@@ -368,12 +368,12 @@ public class DecodedPkiMessage extends PkiMessage {
             try {
                 tmpDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 final String msg =
                         "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
-                        + e.getMessage();
+                        + ex.getMessage();
                 LOG.error(msg);
-                LOG.debug(msg, e);
+                LOG.debug(msg, ex);
                 ret.setFailureMessage(msg);
                 return ret;
             }
@@ -389,10 +389,10 @@ public class DecodedPkiMessage extends PkiMessage {
         X509Certificate signerCert;
         try {
             signerCert = new X509CertificateObject(tmpSignerCert.toASN1Structure());
-        } catch (CertificateParsingException e) {
-            final String msg = "could not construct X509CertificateObject: " + e.getMessage();
+        } catch (CertificateParsingException ex) {
+            final String msg = "could not construct X509CertificateObject: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -403,10 +403,10 @@ public class DecodedPkiMessage extends PkiMessage {
         try {
             verifier = new JcaSimpleSignerInfoVerifierBuilder().build(
                     signerCert.getPublicKey());
-        } catch (OperatorCreationException e) {
-            final String msg = "could not build signature verifier: " + e.getMessage();
+        } catch (OperatorCreationException ex) {
+            final String msg = "could not build signature verifier: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -414,10 +414,10 @@ public class DecodedPkiMessage extends PkiMessage {
         boolean signatureValid;
         try {
             signatureValid = signerInfo.verify(verifier);
-        } catch (CMSException e) {
-            final String msg = "could not verify the signature: " + e.getMessage();
+        } catch (CMSException ex) {
+            final String msg = "could not verify the signature: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -447,10 +447,10 @@ public class DecodedPkiMessage extends PkiMessage {
         CMSEnvelopedData envData;
         try {
             envData = new CMSEnvelopedData((byte[]) signedContent.getContent());
-        } catch (CMSException e) {
-            final String msg = "could not create the CMSEnvelopedData: " + e.getMessage();
+        } catch (CMSException ex) {
+            final String msg = "could not create the CMSEnvelopedData: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -459,10 +459,10 @@ public class DecodedPkiMessage extends PkiMessage {
         byte[] encodedMessageData;
         try {
             encodedMessageData = recipient.decrypt(envData);
-        } catch (MessageDecodingException e) {
-            final String msg = "could not create the CMSEnvelopedData: " + e.getMessage();
+        } catch (MessageDecodingException ex) {
+            final String msg = "could not create the CMSEnvelopedData: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
 
             ret.setDecryptionSuccessful(false);
@@ -492,10 +492,10 @@ public class DecodedPkiMessage extends PkiMessage {
                 throw new RuntimeException("should not reach here, unknown messageType "
                         + messageType);
             }
-        } catch (Exception e) {
-            final String msg = "error while trying to parse the messageData: " + e.getMessage();
+        } catch (Exception ex) {
+            final String msg = "error while trying to parse the messageData: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -529,7 +529,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
         try {
             return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             throw new MessageDecodingException("invalid integer '" + s + "'");
         }
     }

@@ -150,15 +150,15 @@ public class XmlX509CertprofileUtil {
                 rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(xmlConfStream);
                 try {
                     xmlConfStream.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
-            } catch (SAXException e) {
+            } catch (SAXException ex) {
                 throw new CertprofileException(
-                        "parse profile failed, message: " + e.getMessage(), e);
-            } catch (JAXBException e) {
+                        "parse profile failed, message: " + ex.getMessage(), ex);
+            } catch (JAXBException ex) {
                 throw new CertprofileException(
-                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) e),
-                        e);
+                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex),
+                        ex);
             }
 
             Object rootType = rootElement.getValue();
@@ -535,8 +535,8 @@ public class XmlX509CertprofileUtil {
             ASN1Encodable value;
             try {
                 value = parser.readObject();
-            } catch (IOException e) {
-                throw new CertprofileException("could not parse the constant extension value", e);
+            } catch (IOException ex) {
+                throw new CertprofileException("could not parse the constant extension value", ex);
             }
             ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
             map.put(oid, extension);

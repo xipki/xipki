@@ -335,7 +335,7 @@ public class FileUtils {
 
         try {
             closable.close();
-        } catch (Throwable t) {
+        } catch (Throwable th) {
         }
     }
 

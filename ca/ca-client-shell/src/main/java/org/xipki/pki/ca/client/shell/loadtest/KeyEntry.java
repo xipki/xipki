@@ -100,11 +100,11 @@ public abstract class KeyEntry {
                 return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                         SignerUtil.generateRSAPublicKeyParameter(
                                 KeyUtil.generateRSAPublicKey(modulus, BigInteger.valueOf(65537))));
-            } catch (InvalidKeySpecException e) {
-                LOG.warn("InvalidKeySpecException: {}", e.getMessage());
+            } catch (InvalidKeySpecException ex) {
+                LOG.warn("InvalidKeySpecException: {}", ex.getMessage());
                 return null;
-            } catch (IOException e) {
-                LOG.warn("IOException: {}", e.getMessage());
+            } catch (IOException ex) {
+                LOG.warn("IOException: {}", ex.getMessage());
                 return null;
             }
         }
@@ -261,8 +261,8 @@ public abstract class KeyEntry {
                 return new SubjectPublicKeyInfo(
                         algId,
                         new ASN1Integer(y));
-            } catch (IOException e) {
-                LOG.warn("IOException: {}", e.getMessage());
+            } catch (IOException ex) {
+                LOG.warn("IOException: {}", ex.getMessage());
                 return null;
             }
         }

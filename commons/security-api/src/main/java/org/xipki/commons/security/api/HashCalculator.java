@@ -170,7 +170,7 @@ public class HashCalculator {
             try {
                 md = mds.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
             }
         }
 

@@ -89,10 +89,10 @@ public class IaikP11Module implements P11Module {
         try {
             boolean cardPresent = true;
             slotList = module.getSlotList(cardPresent);
-        } catch (Throwable t) {
-            LOG.error("module.getSlotList(). {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("module.getSlotList()", t);
-            throw new SignerException("TokenException in module.getSlotList(): " + t.getMessage());
+        } catch (Throwable th) {
+            LOG.error("module.getSlotList(). {}: {}", th.getClass().getName(), th.getMessage());
+            LOG.debug("module.getSlotList()", th);
+            throw new SignerException("TokenException in module.getSlotList(): " + th.getMessage());
         }
 
         if (slotList == null || slotList.length == 0) {
@@ -122,18 +122,18 @@ public class IaikP11Module implements P11Module {
                     msg.append(slot.getSlotID()).append("\n");
                     try {
                         msg.append(slot.getSlotInfo().toString()).append("\n");
-                    } catch (TokenException e) {
-                        msg.append("error: " + e.getMessage());
+                    } catch (TokenException ex) {
+                        msg.append("error: " + ex.getMessage());
                     }
                 }
                 LOG.debug("{}", msg);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "unexpected error";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
             }
         } // end if(LOG.isDebugEnabled())
     } // constructor
@@ -165,8 +165,8 @@ public class IaikP11Module implements P11Module {
         List<char[]> pwd;
         try {
             pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
-        } catch (PasswordResolverException e) {
-            throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
+        } catch (PasswordResolverException ex) {
+            throw new SignerException("PasswordResolverException: " + ex.getMessage(), ex);
         }
         extSlot = new IaikP11Slot(moduleConf.getName(), localSlotId, slot, pwd);
 
@@ -183,7 +183,7 @@ public class IaikP11Module implements P11Module {
         for (P11SlotIdentifier slotId : slots.keySet()) {
             try {
                 slots.get(slotId).close();
-            } catch (Throwable t) {
+            } catch (Throwable th) {
             }
 
             availableSlots.remove(slotId);
@@ -194,7 +194,7 @@ public class IaikP11Module implements P11Module {
         for (P11SlotIdentifier slotId : availableSlots.keySet()) {
             try {
                 availableSlots.get(slotId).getToken().closeAllSessions();
-            } catch (Throwable t) {
+            } catch (Throwable th) {
             }
         }
         availableSlots.clear();
@@ -203,13 +203,13 @@ public class IaikP11Module implements P11Module {
         LOG.info("close", "close pkcs11 module: {}", module);
         try {
             module.finalize(null);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "error while module.finalize()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                        th.getMessage());
             }
-            LOG.debug(message, t);
+            LOG.debug(message, th);
         }
 
         module = null;

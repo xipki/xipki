@@ -74,9 +74,9 @@ public abstract class XipkiCommandSupport implements Action {
     throws Exception {
         try {
             return doExecute();
-        } catch (Exception e) {
-            LOG.debug("Exception caught while executing command", e);
-            throw new Exception(e.getClass().getName() + ": " + e.getMessage());
+        } catch (Exception ex) {
+            LOG.debug("Exception caught while executing command", ex);
+            throw new Exception(ex.getClass().getName() + ": " + ex.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public abstract class XipkiCommandSupport implements Action {
                         b = false;
                     }
                 } // end while
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 saveTo = new File("tmp-" + randomHex(6));
                 randomSaveTo = true;
             }
@@ -138,7 +138,7 @@ public abstract class XipkiCommandSupport implements Action {
 
         try {
             save(saveTo, encoded);
-        } catch (IOException e) {
+        } catch (IOException ex) {
             if (!randomSaveTo) {
                 saveTo = new File("tmp-" + randomHex(6));
                 save(saveTo, encoded);
@@ -241,7 +241,7 @@ public abstract class XipkiCommandSupport implements Action {
             try {
                 String pwd = session.readLine(tPrompt, '*');
                 return pwd.toCharArray();
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 return new char[0];
             }
         }

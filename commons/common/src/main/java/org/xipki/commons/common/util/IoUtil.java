@@ -70,7 +70,7 @@ public class IoUtil {
         }
         try {
             stream.close();
-        } catch (Throwable t) {
+        } catch (Throwable th) {
         }
     }
     public static byte[] read(
@@ -101,7 +101,7 @@ public class IoUtil {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
         }
@@ -200,7 +200,7 @@ public class IoUtil {
         } else {
             try {
                 return InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
+            } catch (UnknownHostException ex) {
                 return "UNKNOWN";
             }
         }

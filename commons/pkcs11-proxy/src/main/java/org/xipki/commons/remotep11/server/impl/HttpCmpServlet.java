@@ -100,15 +100,15 @@ public class HttpCmpServlet extends HttpServlet {
             PKIMessage pkiReq;
             try {
                 pkiReq = generatePKIMessage(request.getInputStream());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 final String message = "could not parse the request (PKIMessage)";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(message + ", class={}, message={}", e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(message + ", class={}, message={}", ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
                 return;
             }
@@ -148,16 +148,16 @@ public class HttpCmpServlet extends HttpServlet {
             ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
             asn1Out.writeObject(pkiResp);
             asn1Out.flush();
-        } catch (EOFException e) {
+        } catch (EOFException ex) {
             final String message = "connection reset by peer";
-            LOG.error(message + ". {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug(message, e);
+            LOG.error(message + ". {}: {}", ex.getClass().getName(), ex.getMessage());
+            LOG.debug(message, ex);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             LOG.error("Throwable thrown, this should not happen. {}: {}",
-                    t.getClass().getName(), t.getMessage());
-            LOG.debug("Throwable thrown, this should not happen.", t);
+                    th.getClass().getName(), th.getMessage());
+            LOG.debug("Throwable thrown, this should not happen.", th);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
@@ -172,12 +172,12 @@ public class HttpCmpServlet extends HttpServlet {
 
         try {
             return PKIMessage.getInstance(asn1Stream.readObject());
-        } catch (IOException | IllegalArgumentException e) {
-            throw new BadAsn1ObjectException("could not parse PKIMessage: " + e.getMessage(), e);
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException("could not parse PKIMessage: " + ex.getMessage(), ex);
         } finally {
             try {
                 asn1Stream.close();
-            } catch (IOException e) {
+            } catch (IOException ex) {
             }
         }
     }

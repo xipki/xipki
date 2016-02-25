@@ -83,7 +83,7 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
         byte[] actual;
         try {
             actual = hashAlgo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             return false;
         }
 

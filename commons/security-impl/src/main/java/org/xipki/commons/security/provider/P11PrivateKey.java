@@ -84,8 +84,8 @@ public class P11PrivateKey implements PrivateKey {
         PublicKey publicKey;
         try {
             publicKey = p11CryptService.getPublicKey(slotId, keyId);
-        } catch (SignerException e) {
-            throw new InvalidKeyException(e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
 
         if (publicKey instanceof RSAPublicKey) {
@@ -131,8 +131,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_RSA_PKCS(encodedDigestInfo, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -146,8 +146,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_RSA_X509(hash, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -161,8 +161,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_ECDSA_X962(hash, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -176,8 +176,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_ECDSA_Plain(hash, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -191,8 +191,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_DSA_X962(hash, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -206,8 +206,8 @@ public class P11PrivateKey implements PrivateKey {
 
         try {
             return p11CryptService.CKM_DSA_Plain(hash, slotId, keyId);
-        } catch (SignerException e) {
-            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 

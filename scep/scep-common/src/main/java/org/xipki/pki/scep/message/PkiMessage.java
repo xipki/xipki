@@ -297,8 +297,8 @@ public class PkiMessage {
         ContentSigner signer;
         try {
             signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
-        } catch (OperatorCreationException e) {
-            throw new MessageEncodingException(e);
+        } catch (OperatorCreationException ex) {
+            throw new MessageEncodingException(ex);
         }
         return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
     }
@@ -318,8 +318,8 @@ public class PkiMessage {
             byte[] encoded;
             try {
                 encoded = envelopedData.getEncoded();
-            } catch (IOException e) {
-                throw new MessageEncodingException(e);
+            } catch (IOException ex) {
+                throw new MessageEncodingException(ex);
             }
             content = new CMSProcessableByteArray(
                     CMSObjectIdentifiers.envelopedData, encoded);
@@ -347,18 +347,18 @@ public class PkiMessage {
             SignerInfoGenerator signerInfo;
             try {
                 signerInfo = signerInfoBuilder.build(signer, signerCert);
-            } catch (Exception e) {
-                throw new MessageEncodingException(e);
+            } catch (Exception ex) {
+                throw new MessageEncodingException(ex);
             }
 
             generator.addSignerInfoGenerator(signerInfo);
 
             CMSSignedData signedData = generator.generate(content, true);
             return signedData.toASN1Structure();
-        } catch (CMSException e) {
-            throw new MessageEncodingException(e);
-        } catch (Exception e) {
-            throw new MessageEncodingException(e);
+        } catch (CMSException ex) {
+            throw new MessageEncodingException(ex);
+        } catch (Exception ex) {
+            throw new MessageEncodingException(ex);
         }
     } // method encode
 
@@ -369,8 +369,8 @@ public class PkiMessage {
         byte[] messageDataBytes;
         try {
             messageDataBytes = messageData.toASN1Primitive().getEncoded();
-        } catch (IOException e) {
-            throw new MessageEncodingException(e);
+        } catch (IOException ex) {
+            throw new MessageEncodingException(ex);
         }
 
         CMSEnvelopedDataGenerator edGenerator = new CMSEnvelopedDataGenerator();
@@ -378,8 +378,8 @@ public class PkiMessage {
         RecipientInfoGenerator recipientGenerator;
         try {
             recipientGenerator = new JceKeyTransRecipientInfoGenerator(recipient);
-        } catch (CertificateEncodingException e) {
-            throw new MessageEncodingException(e);
+        } catch (CertificateEncodingException ex) {
+            throw new MessageEncodingException(ex);
         }
         edGenerator.addRecipientInfoGenerator(recipientGenerator);
         try {
@@ -388,8 +388,8 @@ public class PkiMessage {
 
             CMSEnvelopedData pkcsPkiEnvelope = edGenerator.generate(envelopable, encryptor);
             return pkcsPkiEnvelope;
-        } catch (CMSException e) {
-            throw new MessageEncodingException(e);
+        } catch (CMSException ex) {
+            throw new MessageEncodingException(ex);
         }
     }
 

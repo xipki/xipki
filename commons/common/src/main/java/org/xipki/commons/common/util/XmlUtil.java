@@ -81,10 +81,10 @@ public class XmlUtil {
     static {
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException ex) {
             System.err.println("could not initialize the XMLDocumentBuilder. Message: "
-                    + e.getMessage());
-            System.err.println("could not initialize the XMLDocumentBuilder" + e.getMessage());
+                    + ex.getMessage());
+            System.err.println("could not initialize the XMLDocumentBuilder" + ex.getMessage());
         }
         if (builder != null) {
             document = builder.newDocument();
@@ -143,7 +143,7 @@ public class XmlUtil {
             XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
-        } catch (DatatypeConfigurationException e) {
+        } catch (DatatypeConfigurationException ex) {
             return null;
         }
     }
@@ -158,7 +158,7 @@ public class XmlUtil {
             XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
-        } catch (DatatypeConfigurationException e) {
+        } catch (DatatypeConfigurationException ex) {
             return null;
         }
     }
@@ -349,7 +349,7 @@ public class XmlUtil {
             } else {
                 return sXPath.select(contextNode);
             }
-        } catch (XPathExpressionException e) {
+        } catch (XPathExpressionException ex) {
             System.err.println("invalid xpath {}" + relativeXPath);
             return Collections.emptyList();
         }
@@ -370,17 +370,17 @@ public class XmlUtil {
     }
 
     public static String getMessage(
-            final JAXBException e) {
-        String ret = e.getMessage();
-        if (ret == null && e.getLinkedException() != null) {
-            ret = e.getLinkedException().getMessage();
+            final JAXBException ex) {
+        String ret = ex.getMessage();
+        if (ret == null && ex.getLinkedException() != null) {
+            ret = ex.getLinkedException().getMessage();
         }
         return ret;
     }
 
     public static JAXBException convert(
-            final JAXBException e) {
-        return new JAXBException(getMessage(e), e.getLinkedException());
+            final JAXBException ex) {
+        return new JAXBException(getMessage(ex), ex.getLinkedException());
     }
 
 }

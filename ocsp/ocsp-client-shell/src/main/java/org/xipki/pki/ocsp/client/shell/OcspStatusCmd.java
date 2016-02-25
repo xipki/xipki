@@ -160,7 +160,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                     if (X509Util.issues(respIssuer, jceRespSigner)) {
                         try {
                             jceRespSigner.verify(respIssuer.getPublicKey());
-                        } catch (SignatureException e) {
+                        } catch (SignatureException ex) {
                             certValid = false;
                         }
                     }

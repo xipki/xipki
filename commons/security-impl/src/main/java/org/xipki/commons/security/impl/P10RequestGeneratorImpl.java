@@ -89,8 +89,8 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
         ContentSigner contentSigner;
         try {
             contentSigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (NoIdleSignerException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
         try {
             return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN, attributes);

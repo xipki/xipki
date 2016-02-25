@@ -112,13 +112,13 @@ public class ScepHttpResponse {
             }
 
             return bout.toByteArray();
-        } catch (IOException e) {
-            throw new ScepClientException(e);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex);
         } finally {
             if (content != null) {
                 try {
                     content.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
         }

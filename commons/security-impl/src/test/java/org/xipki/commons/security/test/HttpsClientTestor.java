@@ -82,10 +82,10 @@ public class HttpsClientTestor {
             //dump all the content
             //print_content(con);
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -108,12 +108,12 @@ public class HttpsClientTestor {
                     System.out.println("\n");
                 }
 
-            } catch (SSLPeerUnverifiedException e) {
-                //System.err.println(e.getMessage());
-                e.printStackTrace();
-            } catch (IOException e) {
-                //System.err.println(e.getMessage());
-                e.printStackTrace();
+            } catch (SSLPeerUnverifiedException ex) {
+                //System.err.println(ex.getMessage());
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                //System.err.println(ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -132,7 +132,7 @@ public class HttpsClientTestor {
                     System.out.println(input);
                 }
                 br.close();
-            } catch (IOException e) {
+            } catch (IOException ex) {
             }
         }
     }
@@ -141,8 +141,8 @@ public class HttpsClientTestor {
             final String[] args) {
         try {
             prepare();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return;
         }
 

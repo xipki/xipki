@@ -191,7 +191,7 @@ public class PasswordHash {
         byte[] pwdBytes;
         try {
             pwdBytes = new String(password).getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ex) {
             throw new NoSuchAlgorithmException("no charset UTF-8");
         }
         synchronized (GEN) {

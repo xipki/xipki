@@ -241,8 +241,8 @@ public class ProfileConfCreatorDemo {
             //NOTAFTER = 9999-12-31-59-59
             profile = certprofileMaxTime();
             marshall(ms, profile, "Certprofile_MaxTime.xml");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     } // method main
 
@@ -257,8 +257,8 @@ public class ProfileConfCreatorDemo {
         FileOutputStream out = new FileOutputStream(file);
         try {
             m.marshal(root, out);
-        } catch (JAXBException e) {
-            throw XmlUtil.convert(e);
+        } catch (JAXBException ex) {
+            throw XmlUtil.convert(ex);
         } finally {
             out.close();
         }
@@ -1398,8 +1398,8 @@ public class ProfileConfCreatorDemo {
         ConstantValueType value = new ConstantValueType();
         try {
             value.setValue(DERNull.INSTANCE.getEncoded());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         value.setDescription("DER NULL");
         statementValue.setConstant(value);
@@ -1738,8 +1738,8 @@ public class ProfileConfCreatorDemo {
         Element element;
         try {
             element = XmlUtil.getDocumentElment(sb.toString().getBytes());
-        } catch (IOException | SAXException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (IOException | SAXException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
         return new ExampleDescription(element);
     }
@@ -1800,8 +1800,8 @@ public class ProfileConfCreatorDemo {
         try {
             binary.setValue(new ASN1Integer(64).getEncoded());
             binary.setDescription("INTEGER 64");
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage());
         }
         cap.getParameters().setBase64Binary(binary);
 

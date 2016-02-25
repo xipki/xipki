@@ -186,8 +186,8 @@ public class ScepUtil {
         SubjectPublicKeyInfo pubKeyInfo;
         try {
             pubKeyInfo = createSubjectPublicKeyInfo(pubKey);
-        } catch (IOException e) {
-            throw new CertificateException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CertificateException(ex.getMessage(), ex);
         }
         return generateSelfsignedCert(subjectDN, pubKeyInfo, identityKey);
     }
@@ -211,17 +211,17 @@ public class ScepUtil {
                     | X509KeyUsage.keyEncipherment);
         try {
             certGenerator.addExtension(Extension.keyUsage, true, ku);
-        } catch (CertIOException e) {
+        } catch (CertIOException ex) {
             throw new CertificateException(
-                    "error while generating self-signed certificate: " + e.getMessage(), e);
+                    "error while generating self-signed certificate: " + ex.getMessage(), ex);
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgoType.SHA1);
         ContentSigner contentSigner;
         try {
             contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(identityKey);
-        } catch (OperatorCreationException e) {
-            throw new CertificateException("error whilc creating signer", e);
+        } catch (OperatorCreationException ex) {
+            throw new CertificateException("error whilc creating signer", ex);
         }
 
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
@@ -255,8 +255,8 @@ public class ScepUtil {
             try {
                 Certificate asn1Cert = Certificate.getInstance(set.getObjectAt(i));
                 cert = new X509CertificateObject(asn1Cert);
-            } catch (IllegalArgumentException e) {
-                throw new CertificateException(e);
+            } catch (IllegalArgumentException ex) {
+                throw new CertificateException(ex);
             }
 
             if (eeCert == null && cert.getBasicConstraints() == -1) {
@@ -284,8 +284,8 @@ public class ScepUtil {
         try {
             CertificateList cl = CertificateList.getInstance(set.getObjectAt(0));
             return new X509CRLObject(cl);
-        } catch (IllegalArgumentException e) {
-            throw new CRLException(e);
+        } catch (IllegalArgumentException ex) {
+            throw new CRLException(ex);
         }
     }
 
@@ -313,8 +313,8 @@ public class ScepUtil {
         CertificateFactory certFact;
         try {
             certFact = CertificateFactory.getInstance("X.509", "BC");
-        } catch (NoSuchProviderException e) {
-            throw new IOException("NoSuchProviderException: " + e.getMessage());
+        } catch (NoSuchProviderException ex) {
+            throw new IOException("NoSuchProviderException: " + ex.getMessage());
         }
 
         return (X509Certificate) certFact.generateCertificate(certStream);
@@ -330,8 +330,8 @@ public class ScepUtil {
 
         try {
             return ASN1OctetString.getInstance(extValue).getOctets();
-        } catch (IllegalArgumentException e) {
-            throw new CertificateEncodingException(e.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new CertificateEncodingException(ex.getMessage());
         }
     }
 
@@ -346,9 +346,9 @@ public class ScepUtil {
         try {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
             return aki.getKeyIdentifier();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException(
-                    "invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+                    "invalid extension AuthorityKeyIdentifier: " + ex.getMessage());
         }
     }
 
@@ -372,9 +372,9 @@ public class ScepUtil {
         }
         try {
             return ASN1OctetString.getInstance(fullExtValue).getOctets();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension " + type.getId()
-                    + ": " + e.getMessage());
+                    + ": " + ex.getMessage());
         }
     }
 
@@ -394,7 +394,7 @@ public class ScepUtil {
             } else {
                 return true;
             }
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             return false;
         }
     }
@@ -492,7 +492,7 @@ public class ScepUtil {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
         }

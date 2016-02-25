@@ -82,9 +82,9 @@ public class ScepServerContainer {
     throws Exception {
         try {
             server.start();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             server.stop();
-            throw e;
+            throw ex;
         }
     }
 

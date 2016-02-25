@@ -79,7 +79,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
 
         try {
             objServerUrl = new URL(serverUrl);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException ex) {
             throw new IllegalArgumentException("invalid url: " + serverUrl);
         }
     }
@@ -104,12 +104,12 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
         InputStream inputstream = null;
         try {
             inputstream = httpUrlConnection.getInputStream();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             InputStream errStream = httpUrlConnection.getErrorStream();
             if (errStream != null) {
                 errStream.close();
             }
-            throw e;
+            throw ex;
         }
 
         try {

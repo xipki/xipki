@@ -107,7 +107,7 @@ public class KeyIdentifier extends ASN1Object {
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        } catch (IllegalArgumentException | IOException e) {
+        } catch (IllegalArgumentException | IOException ex) {
             throw new BadAsn1ObjectException("unable to parse encoded KeyIdentifier");
         }
 
