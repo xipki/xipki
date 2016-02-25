@@ -48,7 +48,6 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.operator.ContentSigner;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
@@ -133,14 +132,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
         ProofOfPossessionSigningKeyBuilder popoBuilder =
                 new ProofOfPossessionSigningKeyBuilder(certReq);
-        ContentSigner contentSigner = signer.borrowContentSigner();
-        POPOSigningKey popoSk;
-        try {
-            popoSk = popoBuilder.build(contentSigner);
-        } finally {
-            signer.returnContentSigner(contentSigner);
-        }
-
+        POPOSigningKey popoSk = signer.build(popoBuilder);
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
         EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,

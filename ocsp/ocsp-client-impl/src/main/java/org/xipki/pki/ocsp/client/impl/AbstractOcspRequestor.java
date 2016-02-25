@@ -66,7 +66,6 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
@@ -413,18 +412,11 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                     } // end if
                 } // end synchronized
 
-                ContentSigner singleSigner;
-                try {
-                    singleSigner = signer.borrowContentSigner();
-                } catch (NoIdleSignerException ex) {
-                    throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
-                }
-
                 reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
                 try {
-                    return reqBuilder.build(singleSigner, signer.getCertificateChainAsBcObjects());
-                } finally {
-                    signer.returnContentSigner(singleSigner);
+                    return signer.build(reqBuilder, signer.getCertificateChainAsBcObjects());
+                } catch (NoIdleSignerException ex) {
+                    throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
                 }
             } else {
                 return reqBuilder.build();

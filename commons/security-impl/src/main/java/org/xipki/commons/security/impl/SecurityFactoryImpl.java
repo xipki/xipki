@@ -42,7 +42,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -74,7 +73,6 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
@@ -857,20 +855,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             throw new SignerException(ex.getMessage(), ex);
         }
 
-        ContentSigner csigner;
-        try {
-            csigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException ex) {
-            throw new SignerException(ex.getMessage(), ex);
-        }
-
         try {
             byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
             Signature verifier = Signature.getInstance(signatureAlgoName, "BC");
 
-            OutputStream signatureStream = csigner.getOutputStream();
-            signatureStream.write(dummyContent);
-            byte[] signatureValue = csigner.getSignature();
+            byte[] signatureValue = signer.sign(dummyContent);
 
             verifier.initVerify(signer.getPublicKey());
             verifier.update(dummyContent);
@@ -895,12 +884,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 throw new SignerException(sb.toString());
             }
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
-                | SignatureException | NoSuchProviderException ex) {
+                | SignatureException | NoSuchProviderException | NoIdleSignerException ex) {
             throw new SignerException(ex.getMessage(), ex);
-        } finally {
-            if (csigner != null) {
-                signer.returnContentSigner(csigner);
-            }
         }
     } // method validateSigner
 
