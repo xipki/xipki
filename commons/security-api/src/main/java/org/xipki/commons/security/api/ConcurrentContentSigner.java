@@ -68,6 +68,8 @@ import org.xipki.commons.password.api.PasswordResolver;
 
 public interface ConcurrentContentSigner {
 
+    String getName();
+
     AlgorithmIdentifier getAlgorithmIdentifier();
 
     /**
