@@ -70,7 +70,6 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.operator.ContentSigner;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -367,13 +366,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         ProofOfPossessionSigningKeyBuilder popoBuilder
                 = new ProofOfPossessionSigningKeyBuilder(certReq);
-        ContentSigner contentSigner = signer.borrowContentSigner();
-        POPOSigningKey popoSk;
-        try {
-            popoSk = popoBuilder.build(contentSigner);
-        } finally {
-            signer.returnContentSigner(contentSigner);
-        }
+        POPOSigningKey popoSk = signer.build(popoBuilder);
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 

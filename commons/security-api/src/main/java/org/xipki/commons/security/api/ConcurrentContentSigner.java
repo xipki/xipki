@@ -36,13 +36,29 @@
 
 package org.xipki.commons.security.api;
 
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
+import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.cert.X509v2CRLBuilder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.cmp.CMPException;
+import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
+import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
+import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.BasicOCSPRespBuilder;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.password.api.PasswordResolver;
 
 /**
@@ -81,21 +97,40 @@ public interface ConcurrentContentSigner {
             PasswordResolver passwordResolver)
     throws SignerException;
 
-    ContentSigner borrowContentSigner()
+    POPOSigningKey build(
+            ProofOfPossessionSigningKeyBuilder builder)
     throws NoIdleSignerException;
 
-    /**
-     *
-     * @param timeout timeout in milliseconds, 0 for infinitely
-     * @return
-     * @throws InterruptedException
-     */
-    ContentSigner borrowContentSigner(
-            int timeout)
+    ProtectedPKIMessage build(
+            ProtectedPKIMessageBuilder builder)
+    throws NoIdleSignerException, CMPException;
+
+    X509CRLHolder build(
+            X509v2CRLBuilder builder)
     throws NoIdleSignerException;
 
-    void returnContentSigner(
-            ContentSigner signer);
+    X509CertificateHolder build(
+            X509v3CertificateBuilder builder)
+    throws NoIdleSignerException;
+
+    OCSPReq build(
+            OCSPReqBuilder builder,
+            X509CertificateHolder[] chain)
+    throws NoIdleSignerException, OCSPException;
+
+    BasicOCSPResp build(
+            BasicOCSPRespBuilder builder,
+            X509CertificateHolder[] chain,
+            Date producedAt)
+    throws NoIdleSignerException, OCSPException;
+
+    PKCS10CertificationRequest build(
+            PKCS10CertificationRequestBuilder builder)
+    throws NoIdleSignerException;
+
+    byte[] sign(
+            byte[] data)
+    throws NoIdleSignerException, IOException;
 
     boolean isHealthy();
 

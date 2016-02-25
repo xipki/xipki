@@ -38,7 +38,6 @@ package org.xipki.commons.security.speed.p11;
 
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,6 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
@@ -62,27 +60,19 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     class Testor implements Runnable {
 
+        final byte[] data = new byte[] {1, 2, 3, 4};
+
         @Override
         public void run() {
-            ContentSigner singleSigner;
-            try {
-                singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException ex) {
-                account(1, 1);
-                return;
-            }
-
             while (!stop() && getErrorAccout() < 1) {
                 try {
-                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-                    singleSigner.getSignature();
+                    signer.sign(data);
                     account(1, 0);
                 } catch (Exception ex) {
                     account(1, 1);
                 }
             }
 
-            signer.returnContentSigner(singleSigner);
             close();
         }
 

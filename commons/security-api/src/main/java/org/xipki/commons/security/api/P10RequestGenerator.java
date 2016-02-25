@@ -42,7 +42,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.password.api.PasswordResolverException;
 
@@ -72,9 +71,10 @@ public interface P10RequestGenerator {
     throws PasswordResolverException, SignerException;
 
     PKCS10CertificationRequest generateRequest(
-            final ContentSigner contentSigner,
+            final ConcurrentContentSigner signer,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDN,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes);
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    throws SignerException;
 
 }
