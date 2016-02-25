@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -86,6 +87,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
+    private final String name;
+
     private final AlgorithmIdentifier algorithmIdentifier;
 
     private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<>();
@@ -99,6 +102,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private X509Certificate[] certificateChain;
 
     private X509CertificateHolder[] certificateChainAsBCObjects;
+
+    private static final AtomicInteger nameIndex = new AtomicInteger(1);
 
     static {
         String v = System.getProperty("org.xipki.signservice.timeout");
@@ -130,6 +135,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
 
         this.privateKey = privateKey;
+        this.name = "defaultSigner-" + nameIndex.getAndIncrement();
+    }
+
+    public String getName() {
+        return name;
     }
 
     private ContentSigner borrowContentSigner()
