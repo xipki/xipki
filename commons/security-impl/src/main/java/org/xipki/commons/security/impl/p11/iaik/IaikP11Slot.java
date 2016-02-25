@@ -173,40 +173,40 @@ public class IaikP11Slot implements P11WritableSlot {
         Session session;
         try {
             session = openSession();
-        } catch (TokenException e) {
+        } catch (TokenException ex) {
             final String message = "openSession";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             close();
-            throw new SignerException(e.getMessage(), e);
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         try {
             firstLogin(session, password);
-        } catch (TokenException e) {
+        } catch (TokenException ex) {
             final String message = "firstLogin";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             close();
-            throw new SignerException(e.getMessage(), e);
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         long maxSessionCount2 = 1;
         try {
             maxSessionCount2 = this.slot.getToken().getTokenInfo().getMaxSessionCount();
-        } catch (TokenException e) {
+        } catch (TokenException ex) {
             final String message = "getToken";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
         }
 
         if (maxSessionCount2 == 0) {
@@ -249,14 +249,14 @@ public class IaikP11Slot implements P11WritableSlot {
                     try {
                         signatureCert = (X509Certificate) X509Util.parseCert(
                                     new ByteArrayInputStream(encoded));
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         String keyIdStr = hex(keyId);
                         final String message = "could not parse certificate with id " + keyIdStr;
                         if (LOG.isWarnEnabled()) {
                             LOG.warn(LogUtil.buildExceptionLogFormat(message),
-                                    e.getClass().getName(), e.getMessage());
+                                    ex.getClass().getName(), ex.getMessage());
                         }
-                        LOG.debug(message, e);
+                        LOG.debug(message, ex);
                         continue;
                     }
                     signaturePublicKey = signatureCert.getPublicKey();
@@ -312,7 +312,7 @@ public class IaikP11Slot implements P11WritableSlot {
                             try {
                                 context.verify(issuerCert.getPublicKey());
                                 certChain.add(issuerCert);
-                            } catch (Exception e) {
+                            } catch (Exception ex) {
                             }
                         }
                     } // end while (true)
@@ -325,25 +325,25 @@ public class IaikP11Slot implements P11WritableSlot {
                 IaikP11Identity identity = new IaikP11Identity(slotId, tKeyId,
                         certChain.toArray(new X509Certificate[0]), signaturePublicKey);
                 currentIdentifies.add(identity);
-            } catch (SignerException e) {
+            } catch (SignerException ex) {
                 String keyIdStr = hex(keyId);
                 final String message = "SignerException while initializing key with key-id "
                         + keyIdStr;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 continue;
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 String keyIdStr = hex(keyId);
                 final String message =
                         "unexpected exception while initializing key with key-id " + keyIdStr;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
                 continue;
             }
         } // end for (PrivateKey signatureKey : signatureKeys)
@@ -429,8 +429,8 @@ public class IaikP11Slot implements P11WritableSlot {
                 }
                 return signature;
             }
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (TokenException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         } finally {
             returnIdleSession(session);
         }
@@ -465,8 +465,8 @@ public class IaikP11Slot implements P11WritableSlot {
         if (writableSession == null) {
             try {
                 writableSession = openSession(true);
-            } catch (TokenException e) {
-                throw new SignerException("could not open writable session", e);
+            } catch (TokenException ex) {
+                throw new SignerException("could not open writable session", ex);
             }
         }
 
@@ -495,9 +495,9 @@ public class IaikP11Slot implements P11WritableSlot {
                 // create new session
                 try {
                     session = openSession();
-                } catch (TokenException e) {
-                    LOG.error("openSession(), TokenException: {}", e.getMessage());
-                    LOG.debug("openSession()", e);
+                } catch (TokenException ex) {
+                    LOG.error("openSession(), TokenException: {}", ex.getMessage());
+                    LOG.debug("openSession()", ex);
                 }
             }
 
@@ -508,7 +508,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
         try {
             return idleSessions.poll(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ex) {
         }
 
         throw new SignerException("no idle session");
@@ -524,15 +524,15 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 idleSessions.put(session);
                 return;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
             }
         }
 
         try {
             closeSession(session);
-        } catch (TokenException e) {
-            LOG.error("closeSession.{}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("closeSession", e);
+        } catch (TokenException ex) {
+            LOG.error("closeSession.{}: {}", ex.getClass().getName(), ex.getMessage());
+            LOG.debug("closeSession", ex);
         }
     }
 
@@ -597,8 +597,8 @@ public class IaikP11Slot implements P11WritableSlot {
                     session.login(Session.UserType.USER, singlePwd);
                 }
             }
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (TokenException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
     }
 
@@ -607,13 +607,13 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 LOG.info("close all sessions on token: {}", slot.getSlotID());
                 slot.getToken().closeAllSessions();
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "error while slot.getToken().closeAllSessions()";
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
             }
 
             slot = null;
@@ -810,8 +810,8 @@ public class IaikP11Slot implements P11WritableSlot {
                 msg.append(chars).append("\n");
             }
             return msg.toString();
-        } catch (Throwable t) {
-            return "Exception while calling listPrivateKeyObjects(): " + t.getMessage();
+        } catch (Throwable th) {
+            return "Exception while calling listPrivateKeyObjects(): " + th.getMessage();
         }
     } // method listPrivateKeyObjects
 
@@ -1021,8 +1021,8 @@ public class IaikP11Slot implements P11WritableSlot {
                 msg.append(chars).append("\n");
             }
             return msg.toString();
-        } catch (Throwable t) {
-            return "Exception while calling listCertificateObjects(): " + t.getMessage();
+        } catch (Throwable th) {
+            return "Exception while calling listCertificateObjects(): " + th.getMessage();
         }
     } // method listCertificateObjects
 
@@ -1142,7 +1142,7 @@ public class IaikP11Slot implements P11WritableSlot {
         try {
             try {
                 session.destroyObject(privKey);
-            } catch (TokenException e) {
+            } catch (TokenException ex) {
                 msgBuilder.append("could not delete private key, ");
             }
 
@@ -1151,7 +1151,7 @@ public class IaikP11Slot implements P11WritableSlot {
             if (pubKey != null) {
                 try {
                     session.destroyObject(pubKey);
-                } catch (TokenException e) {
+                } catch (TokenException ex) {
                     msgBuilder.append("could not delete public key, ");
                 }
             }
@@ -1163,7 +1163,7 @@ public class IaikP11Slot implements P11WritableSlot {
                     for (int i = 0; i < certs.length; i++) {
                         try {
                             session.destroyObject(certs[i]);
-                        } catch (TokenException e) {
+                        } catch (TokenException ex) {
                             msgBuilder.append("could not delete certificate at index ")
                                 .append(i)
                                 .append(", ");
@@ -1263,8 +1263,8 @@ public class IaikP11Slot implements P11WritableSlot {
                 msg.append(chars).append("\n");
             } // end for
             return msg.toString();
-        } catch (Throwable t) {
-            return "Exception while calling listPublicKeyObjects(): " + t.getMessage();
+        } catch (Throwable th) {
+            return "Exception while calling listPublicKeyObjects(): " + th.getMessage();
         }
     } // method listPublicKeyObjects
 
@@ -1494,7 +1494,7 @@ public class IaikP11Slot implements P11WritableSlot {
     throws Exception {
         try {
             generateNamedECKeyPair(session, curveId, id, label);
-        } catch (TokenException e) {
+        } catch (TokenException ex) {
             generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
         }
     }
@@ -1571,8 +1571,8 @@ public class IaikP11Slot implements P11WritableSlot {
         SessionInfo info;
         try {
             info = session.getSessionInfo();
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (TokenException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
         if (LOG.isTraceEnabled()) {
             LOG.debug("SessionInfo: {}", info);
@@ -1622,12 +1622,12 @@ public class IaikP11Slot implements P11WritableSlot {
                     objList.add(object);
                 }
             }
-        } catch (TokenException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (TokenException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         } finally {
             try {
                 session.findObjectsFinal();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
 
@@ -1719,7 +1719,7 @@ public class IaikP11Slot implements P11WritableSlot {
         try {
             curveId = new ASN1ObjectIdentifier(curveNameOrOid);
             return curveId;
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
 
         curveId = X962NamedCurves.getOID(curveNameOrOid);
@@ -1762,8 +1762,8 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 return keyFactory.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                throw new SignerException(e.getMessage(), e);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+                throw new SignerException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof DSAPublicKey) {
             DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
@@ -1778,8 +1778,8 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("DSA");
                 return keyFactory.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                throw new SignerException(e.getMessage(), e);
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+                throw new SignerException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof ECDSAPublicKey) {
             ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
@@ -1877,7 +1877,7 @@ public class IaikP11Slot implements P11WritableSlot {
                             (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
                     String curveName = KeyUtil.getCurveName(curveId);
                     return "EC (named curve " + curveName + ")";
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     return "EC";
                 }
             } else {
@@ -1926,7 +1926,7 @@ public class IaikP11Slot implements P11WritableSlot {
         try {
             X500Principal x500Prin = new X500Principal(bytes);
             subject = X509Util.getRfc4519Name(x500Prin);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             subject = new String(bytes);
         }
 
@@ -1945,7 +1945,7 @@ public class IaikP11Slot implements P11WritableSlot {
         try {
             X500Principal x500Prin = new X500Principal(bytes);
             issuer = X509Util.getRfc4519Name(x500Prin);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             issuer = new String(bytes);
         }
         sb.append("\t\t\tIssuer: ")
@@ -1957,8 +1957,8 @@ public class IaikP11Slot implements P11WritableSlot {
         X509Certificate x509Cert = null;
         try {
             x509Cert = X509Util.parseCert(certBytes);
-        } catch (Exception e) {
-            sb.append("\t\t\tError: " + e.getMessage());
+        } catch (Exception ex) {
+            sb.append("\t\t\tError: " + ex.getMessage());
             return;
         }
 

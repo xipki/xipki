@@ -96,7 +96,7 @@ public class ScepEntry implements Serializable {
         if (this.base64Cert != null) {
             try {
                 this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 LOG.debug("could not parse the certificate of SCEP responder for CA '"
                         + caName + "'");
                 certFaulty = true;
@@ -182,7 +182,7 @@ public class ScepEntry implements Serializable {
                 sb.append("\tencoded: ");
                 try {
                     sb.append(Base64.toBase64String(certificate.getEncoded()));
-                } catch (CertificateEncodingException e) {
+                } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }
             }

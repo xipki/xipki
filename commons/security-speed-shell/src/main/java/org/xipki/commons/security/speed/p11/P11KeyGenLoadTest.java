@@ -57,7 +57,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
                 try {
                     genKeypair();
                     account(1, 0);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     account(1, 1);
                 }
             }

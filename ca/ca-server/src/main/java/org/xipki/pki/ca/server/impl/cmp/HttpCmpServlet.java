@@ -173,7 +173,7 @@ public class HttpCmpServlet extends HttpServlet {
             PKIMessage pkiReq;
             try {
                 pkiReq = generatePKIMessage(request.getInputStream());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
@@ -183,10 +183,10 @@ public class HttpCmpServlet extends HttpServlet {
                 final String message = "could not parse the request (PKIMessage)";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message),
-                            e.getClass().getName(),
-                            e.getMessage());
+                            ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
                 return;
             }
@@ -207,19 +207,19 @@ public class HttpCmpServlet extends HttpServlet {
             ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
             asn1Out.writeObject(pkiResp);
             asn1Out.flush();
-        } catch (EOFException e) {
+        } catch (EOFException ex) {
             final String message = "connection reset by peer";
             if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "Throwable thrown, this should not happen!";
-            LOG.error(message, t);
+            LOG.error(message, th);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
@@ -247,7 +247,7 @@ public class HttpCmpServlet extends HttpServlet {
         } finally {
             try {
                 asn1Stream.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
     }

@@ -126,8 +126,8 @@ public class SignerUtil {
         AlgorithmIdentifier digAlgId;
         try {
             digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
-        } catch (NoSuchAlgorithmException e) {
-            throw new OperatorCreationException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new OperatorCreationException(ex.getMessage(), ex);
         }
         Digest dig = digestProvider.get(digAlgId);
 
@@ -171,10 +171,10 @@ public class SignerUtil {
             ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
             return p10Request.isSignatureValid(cvp);
         } catch (OperatorCreationException | InvalidKeyException | PKCSException
-                | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             String message = "error while validating POPO of PKCS#10 request";
-            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-            LOG.error(message, e);
+            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(), ex.getMessage());
+            LOG.error(message, ex);
             return false;
         }
     }
@@ -221,8 +221,8 @@ public class SignerUtil {
         DERSequence seq = new DERSequence(sigder);
         try {
             return seq.getEncoded();
-        } catch (IOException e) {
-            throw new SignerException("IOException, message: " + e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new SignerException("IOException, message: " + ex.getMessage(), ex);
         }
     }
 

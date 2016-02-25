@@ -109,7 +109,7 @@ public class ExtractCertFromCrlCmd extends SecurityCommandSupport {
             try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
                 cert = Certificate.getInstance(seq.getObjectAt(0));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
                 // backwards compatibility
                 cert = Certificate.getInstance(asn1);
             }

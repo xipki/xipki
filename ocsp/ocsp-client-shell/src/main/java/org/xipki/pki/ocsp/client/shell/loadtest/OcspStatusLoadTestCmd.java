@@ -107,7 +107,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                             "invalid serial number " + this.serialNumbers);
                 }
             } // end for
-        } catch (Exception e) {
+        } catch (Exception ex) {
             throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
         }
 
@@ -118,7 +118,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
         URL serverUrl;
         try {
             serverUrl = new URL(serverUrlS);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException ex) {
             throw new RuntimeException("invalid URL: " + serverUrlS);
         }
 

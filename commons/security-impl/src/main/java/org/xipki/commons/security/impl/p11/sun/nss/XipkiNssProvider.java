@@ -176,7 +176,7 @@ public class XipkiNssProvider extends Provider {
         try {
             Object o = Class.forName(d.getClassName()).newInstance();
             return (o != null);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             return false;
         }
     }
@@ -203,8 +203,8 @@ public class XipkiNssProvider extends Provider {
                         new ByteArrayInputStream(sb.toString().getBytes()));
                 Security.addProvider(nssProvider);
             }
-        } catch (Throwable t) {
-            throw new ProviderException("could not initialize SunPKCS11 NSS provider", t);
+        } catch (Throwable th) {
+            throw new ProviderException("could not initialize SunPKCS11 NSS provider", th);
         }
 
         // Signature RSA

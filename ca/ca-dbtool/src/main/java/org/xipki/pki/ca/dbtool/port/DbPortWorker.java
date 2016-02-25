@@ -70,9 +70,9 @@ public abstract class DbPortWorker implements Runnable {
     public void run() {
         try {
             doRun();
-        } catch (Exception e) {
-            LOG.error("exception thrown", e);
-            exception = e;
+        } catch (Exception ex) {
+            LOG.error("exception thrown", ex);
+            exception = ex;
         }
     }
 

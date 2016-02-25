@@ -275,8 +275,8 @@ public class CrlControl implements Serializable {
         ConfPairs props;
         try {
             props = new ConfPairs(conf);
-        } catch (RuntimeException e) {
-            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
+        } catch (RuntimeException ex) {
+            throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         String s = props.getValue(KEY_UPDATE_MODE);
@@ -312,7 +312,7 @@ public class CrlControl implements Serializable {
             for (String oid : oids) {
                 try {
                     new ASN1ObjectIdentifier(oid);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     throw new InvalidConfException(oid + " is not a valid OID");
                 }
             }
@@ -340,7 +340,7 @@ public class CrlControl implements Serializable {
                     int hour = Integer.parseInt(tokens.get(0));
                     int minute = Integer.parseInt(tokens.get(1));
                     this.intervalDayTime = new HourMinute(hour, minute);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '"
                             + s + "'");
                 }
@@ -560,7 +560,7 @@ public class CrlControl implements Serializable {
         if (s != null) {
             try {
                 return Integer.parseInt(s.trim());
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 throw new InvalidConfException(propKey + " does not have numeric value: " + s);
             }
         }

@@ -197,9 +197,9 @@ public class SubjectChecker {
             ValidationIssue valIssue;
             try {
                 valIssue = checkSubjectAttribute(type, subject, requestedSubject);
-            } catch (BadCertTemplateException e) {
+            } catch (BadCertTemplateException ex) {
                 valIssue = new ValidationIssue("X509.SUBJECT.REQUEST", "Subject in request");
-                valIssue.setFailureMessage(e.getMessage());
+                valIssue.setFailureMessage(ex.getMessage());
             }
             result.add(valIssue);
         }

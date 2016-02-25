@@ -235,7 +235,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             if (s != null) {
                 try {
                     parallelism = Integer.parseInt(s);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ex) {
                     throw new SignerException("invalid parallelism " + s);
                 }
 
@@ -300,8 +300,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                         PublicKey pubKey;
                         try {
                             pubKey = getPkcs11PublicKey(pkcs11Module, slot, keyIdentifier);
-                        } catch (InvalidKeyException e) {
-                            throw new SignerException("invalid key: " + e.getMessage(), e);
+                        } catch (InvalidKeyException ex) {
+                            throw new SignerException("invalid key: " + ex.getMessage(), ex);
                         }
 
                         signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
@@ -309,8 +309,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     }
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
                 } catch (OperatorCreationException | NoSuchPaddingException
-                        | NoSuchAlgorithmException e) {
-                    throw new SignerException(e.getMessage(), e);
+                        | NoSuchAlgorithmException ex) {
+                    throw new SignerException(ex.getMessage(), ex);
                 }
             } else {
                 String passwordHint = keyValues.getValue("password");
@@ -323,9 +323,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     } else {
                         try {
                             password = passwordResolver.resolvePassword(passwordHint);
-                        } catch (PasswordResolverException e) {
+                        } catch (PasswordResolverException ex) {
                             throw new SignerException(
-                                    "could not resolve password. Message: " + e.getMessage());
+                                    "could not resolve password. Message: " + ex.getMessage());
                         }
                     }
                 }
@@ -341,7 +341,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     String fn = s.substring("file:".length());
                     try {
                         keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
-                    } catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException ex) {
                         throw new SignerException("file not found: " + fn);
                     }
                 } else {
@@ -364,9 +364,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     return signerBuilder.createSigner(
                             signatureAlgId, parallelism, getRandom4Sign());
                 } catch (OperatorCreationException | NoSuchPaddingException
-                        | NoSuchAlgorithmException e) {
+                        | NoSuchAlgorithmException ex) {
                     throw new SignerException(String.format("%s: %s",
-                            e.getClass().getName(), e.getMessage()));
+                            ex.getClass().getName(), ex.getMessage()));
                 }
             }
         } else if (StringUtil.startsWithIgnoreCase(localType, "java:")) {
@@ -376,8 +376,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 try {
                     Class<?> clazz = Class.forName(classname);
                     contentSigner = (ConcurrentContentSigner) clazz.newInstance();
-                } catch (Exception e) {
-                    throw new SignerException(e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new SignerException(ex.getMessage(), ex);
                 }
                 contentSigner.initialize(conf, passwordResolver);
 
@@ -404,8 +404,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
         try {
             return AlgorithmUtil.getSignatureAlgoId(algoS);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
     }
 
@@ -415,8 +415,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     throws InvalidKeyException {
         try {
             return KeyUtil.getContentVerifierProvider(publicKey);
-        } catch (OperatorCreationException e) {
-            throw new InvalidKeyException(e.getMessage(), e);
+        } catch (OperatorCreationException ex) {
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
     }
 
@@ -426,8 +426,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     throws InvalidKeyException {
         try {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new InvalidKeyException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
     }
 
@@ -497,8 +497,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 try {
                     Class<?> clazz = Class.forName(pkcs11Provider);
                     p11Provider = clazz.newInstance();
-                } catch (Exception e) {
-                    throw new SignerException(e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new SignerException(ex.getMessage(), ex);
                 }
             }
 
@@ -611,19 +611,19 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
 
             this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
-        } catch (JAXBException | SAXException | InvalidConfException e) {
+        } catch (JAXBException | SAXException | InvalidConfException ex) {
             final String message = "invalid configuration file " + pkcs11ConfFile;
             if (LOG.isErrorEnabled()) {
                 final String exceptionMessage;
-                if (e instanceof JAXBException) {
-                    exceptionMessage = getMessage((JAXBException) e);
+                if (ex instanceof JAXBException) {
+                    exceptionMessage = getMessage((JAXBException) ex);
                 } else {
-                    exceptionMessage = e.getMessage();
+                    exceptionMessage = ex.getMessage();
                 }
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         exceptionMessage);
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             throw new RuntimeException(message);
         }
@@ -676,8 +676,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return (p11 == null)
                     ? null
                     : p11.getPublicKey(slotId, keyId);
-        } catch (SignerException e) {
-            throw new InvalidKeyException(e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
     }
 
@@ -779,9 +779,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             } else {
                 try {
                     password = passwordResolver.resolvePassword(passwordHint);
-                } catch (PasswordResolverException e) {
+                } catch (PasswordResolverException ex) {
                     throw new SignerException("could not resolve password. Message: "
-                            + e.getMessage());
+                            + ex.getMessage());
                 }
             }
         }
@@ -797,7 +797,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             String fn = s.substring("file:".length());
             try {
                 keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException ex) {
                 throw new SignerException("file not found: " + fn);
             }
         } else {
@@ -834,9 +834,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
         try {
             return SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeCryptoException(
-                    "error while getting strong SecureRandom: " + e.getMessage());
+                    "error while getting strong SecureRandom: " + ex.getMessage());
         }
     }
 
@@ -853,15 +853,15 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         try {
             signatureAlgoName = AlgorithmUtil.getSignatureAlgoName(
                     signer.getAlgorithmIdentifier());
-        } catch (NoSuchAlgorithmException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         ContentSigner csigner;
         try {
             csigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException e) {
-            throw new SignerException(e.getMessage(), e);
+        } catch (NoIdleSignerException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         try {
@@ -895,8 +895,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 throw new SignerException(sb.toString());
             }
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
-                | SignatureException | NoSuchProviderException e) {
-            throw new SignerException(e.getMessage(), e);
+                | SignatureException | NoSuchProviderException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         } finally {
             if (csigner != null) {
                 signer.returnContentSigner(csigner);
@@ -1097,7 +1097,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     } else {
                         slotId = Long.parseLong(str);
                     }
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ex) {
                     String message = "invalid slotId '" + str + "'";
                     LOG.error(message);
                     throw new InvalidConfException(message);
@@ -1110,10 +1110,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     private static String getMessage(
-            final JAXBException e) {
-        String ret = e.getMessage();
-        if (ret == null && e.getLinkedException() != null) {
-            ret = e.getLinkedException().getMessage();
+            final JAXBException ex) {
+        String ret = ex.getMessage();
+        if (ret == null && ex.getLinkedException() != null) {
+            ret = ex.getLinkedException().getMessage();
         }
         return ret;
     }

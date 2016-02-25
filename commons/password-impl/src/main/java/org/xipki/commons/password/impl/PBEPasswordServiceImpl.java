@@ -74,9 +74,9 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
         try {
             pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
                     salt);
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException ex) {
             throw new PasswordResolverException("could not decrypt the password: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
 
         char[] ret = new char[pwd.length];
@@ -106,9 +106,9 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
         try {
             encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
                     masterPassword, iterationCount, salt);
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException ex) {
             throw new PasswordResolverException("could not encrypt the password: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
 
         byte[] encryptedWithSalt = new byte[2 + salt.length + encrypted.length];

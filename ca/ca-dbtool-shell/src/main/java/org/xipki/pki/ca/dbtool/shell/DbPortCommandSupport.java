@@ -79,14 +79,14 @@ public abstract class DbPortCommandSupport extends XipkiCommandSupport {
                 if (terminated) {
                     break;
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
                 myRun.setStopMe(true);
             }
         }
 
-        Exception e = myRun.getException();
-        if (e != null) {
-            String errMsg = e.getMessage();
+        Exception ex = myRun.getException();
+        if (ex != null) {
+            String errMsg = ex.getMessage();
             if (StringUtil.isBlank(errMsg)) {
                 errMsg = "ERROR";
             }

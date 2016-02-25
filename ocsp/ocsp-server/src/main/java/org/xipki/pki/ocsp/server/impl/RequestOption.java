@@ -200,9 +200,9 @@ class RequestOption {
             for (X509Certificate m : tmpCerts) {
                 trustAnchors.add(new CertWithEncoded(m));
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             throw new InvalidConfException(
-                    "error while initializing the trustAnchors: " + e.getMessage(), e);
+                    "error while initializing the trustAnchors: " + ex.getMessage(), ex);
         }
 
         CertCollectionType certsType = certpathConf.getCerts();
@@ -211,9 +211,9 @@ class RequestOption {
         } else {
             try {
                 this.certs = getCerts(certsType);
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 throw new InvalidConfException(
-                        "error while initializing the certs: " + e.getMessage(), e);
+                        "error while initializing the certs: " + ex.getMessage(), ex);
             }
         } // end if
     } // constructor

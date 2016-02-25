@@ -86,14 +86,14 @@ public class OcspLoadTest extends LoadExecutor {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
                         options, null);
                 basicResp = OcspUtils.extractBasicOcspResp(response);
-            } catch (OcspRequestorException e) {
-                LOG.warn("OCSPRequestorException: {}", e.getMessage());
+            } catch (OcspRequestorException ex) {
+                LOG.warn("OCSPRequestorException: {}", ex.getMessage());
                 return false;
-            } catch (OcspResponseException e) {
-                LOG.warn("OCSPResponseException: {}", e.getMessage());
+            } catch (OcspResponseException ex) {
+                LOG.warn("OCSPResponseException: {}", ex.getMessage());
                 return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+            } catch (Throwable th) {
+                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
                 return false;
             }
 

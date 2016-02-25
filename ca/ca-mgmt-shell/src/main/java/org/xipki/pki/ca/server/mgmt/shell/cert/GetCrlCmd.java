@@ -89,8 +89,8 @@ public class GetCrlCmd extends CrlCommandSupport {
         X509CRL crl = null;
         try {
             crl = retrieveCrl();
-        } catch (Exception e) {
-            throw new CmdFailure("received no CRL from server: " + e.getMessage());
+        } catch (Exception ex) {
+            throw new CmdFailure("received no CRL from server: " + ex.getMessage());
         }
 
         if (crl == null) {
@@ -111,8 +111,8 @@ public class GetCrlCmd extends CrlCommandSupport {
 
                 try {
                     crl = caManager.getCrl(caName, baseCrlNumber);
-                } catch (Exception e) {
-                    throw new CmdFailure("received no baseCRL from server: " + e.getMessage());
+                } catch (Exception ex) {
+                    throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
                 }
 
                 if (crl == null) {

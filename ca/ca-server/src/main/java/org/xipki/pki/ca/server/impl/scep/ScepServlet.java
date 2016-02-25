@@ -203,13 +203,13 @@ public class ScepServlet extends HttpServlet {
                     }
 
                     reqMessage = new CMSSignedData(content);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     final String message = "invalid request";
                     if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                                ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
@@ -222,13 +222,13 @@ public class ScepServlet extends HttpServlet {
                 ContentInfo ci;
                 try {
                     ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
-                } catch (MessageDecodingException e) {
+                } catch (MessageDecodingException ex) {
                     final String message = "could not decrypt and/or verify the request";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
+                                ex.getClass().getName(), ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
@@ -236,13 +236,13 @@ public class ScepServlet extends HttpServlet {
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
                     return;
-                } catch (OperationException e) {
+                } catch (OperationException ex) {
                     final String message = "system internal error";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
+                                ex.getClass().getName(), ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
 
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentLength(0);
@@ -283,19 +283,19 @@ public class ScepServlet extends HttpServlet {
                 auditStatus = AuditStatus.FAILED;
                 return;
             }
-        } catch (EOFException e) {
+        } catch (EOFException ex) {
             final String message = "connection reset by peer";
             if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "Throwable thrown, this should not happen!";
-            LOG.error(message, t);
+            LOG.error(message, th);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
@@ -323,7 +323,7 @@ public class ScepServlet extends HttpServlet {
         } finally {
             try {
                 asn1Stream.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
     } // method generatePKIMessage

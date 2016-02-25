@@ -122,7 +122,7 @@ public class CaManagerClient implements CaManager {
         } else {
             try {
                 version = Integer.parseInt(versionS);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 LOG.info("invalid version {}, reset it to 0", versionS);
             }
         }
@@ -592,8 +592,8 @@ public class CaManagerClient implements CaManager {
                 encodedPkcs10Request);
         try {
             return X509Util.parseCert(encodedCert);
-        } catch (CertificateException | IOException e) {
-            throw new CaMgmtException("could not parse the certificate: " + e.getMessage(), e);
+        } catch (CertificateException | IOException ex) {
+            throw new CaMgmtException("could not parse the certificate: " + ex.getMessage(), ex);
         }
     }
 
@@ -703,7 +703,7 @@ public class CaManagerClient implements CaManager {
 
             CAEntry caEntry = c.getCa("RCA1");
             System.out.println(caEntry);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             e.printStackTrace();
         }
     } */

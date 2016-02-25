@@ -161,7 +161,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 try {
                     ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
                         CrlReason.CESSATION_OF_OPERATION, invalidityDate);
-                } catch (Throwable t) {
+                } catch (Throwable th) {
                 }
             }
         } // method run
@@ -202,8 +202,8 @@ public class X509CaCmpResponder extends CmpResponder {
     public X509Ca getCa() {
         try {
             return caManager.getX509Ca(caName);
-        } catch (CaMgmtException e) {
-            throw new IllegalStateException(e.getMessage(), e);
+        } catch (CaMgmtException ex) {
+            throw new IllegalStateException(ex.getMessage(), ex);
         }
     }
 
@@ -229,7 +229,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             responderHealthy = caManager.getCmpResponderWrapper(
                     getResponderName()).getSigner().isHealthy();
-        } catch (InvalidConfException e) {
+        } catch (InvalidConfException ex) {
             responderHealthy = false;
         }
         healthy &= responderHealthy;
@@ -321,10 +321,10 @@ public class X509CaCmpResponder extends CmpResponder {
                         "unsupported type " + type);
                 break;
             } // end switch (type)
-        } catch (InsuffientPermissionException e) {
+        } catch (InsuffientPermissionException ex) {
             ErrorMsgContent emc = new ErrorMsgContent(
                     new PKIStatusInfo(PKIStatus.rejection,
-                            new PKIFreeText(e.getMessage()),
+                            new PKIFreeText(ex.getMessage()),
                             new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
 
             respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
@@ -486,16 +486,16 @@ public class X509CaCmpResponder extends CmpResponder {
                 certResponses[i] = generateCertificate(localRequestor, user, tid, certReqId,
                         subject, publicKeyInfo, validity, extensions,
                         certprofileName, keyUpdate, confirmWaitTime, childAuditEvent);
-            } catch (CMPException e) {
+            } catch (CMPException ex) {
                 final String message = "generateCertificate";
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
                 certResponses[i] = new CertResponse(certReqId,
-                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, e.getMessage()));
+                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, ex.getMessage()));
 
                 if (childAuditEvent != null) {
                     childAuditEvent.setStatus(AuditStatus.FAILED);
@@ -576,10 +576,10 @@ public class X509CaCmpResponder extends CmpResponder {
                 certResp = generateCertificate(requestor, user, tid, certReqId,
                     subject, publicKeyInfo, null, extensions, certprofileName,
                     false, confirmWaitTime, childAuditEvent);
-            } catch (CMPException e) {
+            } catch (CMPException ex) {
                 certResp = new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
-                        e.getMessage()));
+                        ex.getMessage()));
                 if (childAuditEvent != null) {
                     childAuditEvent.setStatus(AuditStatus.FAILED);
                     childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
@@ -672,10 +672,10 @@ public class X509CaCmpResponder extends CmpResponder {
             CertifiedKeyPair kp = new CertifiedKeyPair(cec);
             CertResponse certResp = new CertResponse(certReqId, statusInfo, kp, null);
             return certResp;
-        } catch (OperationException e) {
-            ErrorCode code = e.getErrorCode();
+        } catch (OperationException ex) {
+            ErrorCode code = ex.getErrorCode();
             LOG.warn("generate certificate, OperationException: code={}, message={}",
-                    code.name(), e.getErrorMessage());
+                    code.name(), ex.getErrorMessage());
 
             int failureInfo;
             switch (code) {
@@ -735,7 +735,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 errorMessage = code.name();
                 break;
             default:
-                errorMessage = code.name() + ": " + e.getErrorMessage();
+                errorMessage = code.name() + ": " + ex.getErrorMessage();
                 break;
             } // end switch code
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
@@ -787,7 +787,7 @@ public class X509CaCmpResponder extends CmpResponder {
                             "only version, issuer and serialNumber in RevDetails.certDetails are "
                             + "allowed, but more is specified");
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
                 return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "the request is not invalid");
             }
@@ -845,7 +845,7 @@ public class X509CaCmpResponder extends CmpResponder {
                         if (extValue != null) {
                             try {
                                 invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-                            } catch (ParseException e) {
+                            } catch (ParseException ex) {
                                 throw new OperationException(ErrorCode.INVALID_EXTENSION,
                                         "invalid extension " + extId.getId());
                             }
@@ -880,10 +880,10 @@ public class X509CaCmpResponder extends CmpResponder {
                 if (childAuditEvent != null) {
                     childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
                 }
-            } catch (OperationException e) {
-                ErrorCode code = e.getErrorCode();
+            } catch (OperationException ex) {
+                ErrorCode code = ex.getErrorCode();
                 LOG.warn("{} certificate, OperationException: code={}, message={}",
-                        new Object[]{permission.name(), code.name(), e.getErrorMessage()});
+                        new Object[]{permission.name(), code.name(), ex.getErrorMessage()});
 
                 int failureInfo;
                 switch (code) {
@@ -930,7 +930,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     errorMessage = code.name();
                     break;
                 default:
-                    errorMessage = code.name() + ": " + e.getErrorMessage();
+                    errorMessage = code.name() + ": " + ex.getErrorMessage();
                     break;
                 } // end switch (code)
 
@@ -978,14 +978,14 @@ public class X509CaCmpResponder extends CmpResponder {
             X509Ca ca = getCa();
             try {
                 ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date());
-            } catch (OperationException e) {
+            } catch (OperationException ex) {
                 final String msg = "could not revoke certificate ca=" + ca.getCaInfo().getName()
                         + " serialNumber=" + serialNumber;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(msg, e);
+                LOG.debug(msg, ex);
             }
 
             successful = false;
@@ -1023,7 +1023,7 @@ public class X509CaCmpResponder extends CmpResponder {
             try {
                 ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
                     CrlReason.CESSATION_OF_OPERATION, invalidityDate);
-            } catch (OperationException e) {
+            } catch (OperationException ex) {
                 successful = false;
             }
         }
@@ -1049,13 +1049,13 @@ public class X509CaCmpResponder extends CmpResponder {
                     certRequest.getCertTemplate().getPublicKey());
             ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
             return certRequest.isValidSigningKeyPOP(cvp);
-        } catch (InvalidKeyException | IllegalStateException | CRMFException e) {
+        } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
             final String message = "verifyPOP";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
         }
         return false;
     } // method verifyPopo
@@ -1443,7 +1443,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     if (seq.size() > 1) {
                         reqValue = seq.getObjectAt(1);
                     }
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     String statusMessage = "invalid value of the InfoTypeAndValue for "
                             + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
                     return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
@@ -1513,27 +1513,27 @@ public class X509CaCmpResponder extends CmpResponder {
 
             GenRepContent genRepContent = new GenRepContent(itvResp);
             return new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
-        } catch (OperationException e) {
+        } catch (OperationException ex) {
             failureInfo = PKIFailureInfo.systemFailure;
             String statusMessage = null;
-            ErrorCode code = e.getErrorCode();
+            ErrorCode code = ex.getErrorCode();
             switch (code) {
             case BAD_REQUEST:
                 failureInfo = PKIFailureInfo.badRequest;
-                statusMessage = e.getErrorMessage();
+                statusMessage = ex.getErrorMessage();
                 break;
             case DATABASE_FAILURE:
             case SYSTEM_FAILURE:
                 statusMessage = code.name();
                 break;
             default:
-                statusMessage = code.name() + ": " + e.getErrorMessage();
+                statusMessage = code.name() + ": " + ex.getErrorMessage();
                 break;
             } // end switch (code)
 
             return createErrorMsgPKIBody(PKIStatus.rejection, failureInfo, statusMessage);
-        } catch (CRLException e) {
-            String statusMessage = "CRLException: " + e.getMessage();
+        } catch (CRLException ex) {
+            String statusMessage = "CRLException: " + ex.getMessage();
             return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                     statusMessage);
         }

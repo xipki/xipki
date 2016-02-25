@@ -100,7 +100,7 @@ public class CaIdentifier {
             String urlMessage;
             try {
                 urlMessage = URLEncoder.encode(message, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException ex) {
                 urlMessage = URLEncoder.encode(message);
             }
             ub.append("&message=").append(urlMessage);

@@ -60,8 +60,8 @@ public class OcspUtils {
             BasicOCSPResp basicOcspResp;
             try {
                 basicOcspResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException e) {
-                throw new InvalidOcspResponseException(e.getMessage(), e);
+            } catch (OCSPException ex) {
+                throw new InvalidOcspResponseException(ex.getMessage(), ex);
             }
             return basicOcspResp;
         } else {

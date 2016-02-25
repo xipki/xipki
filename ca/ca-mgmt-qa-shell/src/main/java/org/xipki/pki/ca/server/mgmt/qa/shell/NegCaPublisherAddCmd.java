@@ -58,7 +58,7 @@ public class NegCaPublisherAddCmd extends CaPublisherAddCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

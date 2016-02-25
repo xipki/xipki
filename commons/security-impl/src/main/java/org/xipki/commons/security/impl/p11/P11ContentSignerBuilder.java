@@ -218,16 +218,16 @@ public class P11ContentSignerBuilder {
                 }
                 signers.add(signer);
             } // end for
-        } catch (NoSuchAlgorithmException e) {
-            throw new OperatorCreationException("no such algorithm", e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new OperatorCreationException("no such algorithm", ex);
         }
 
         PrivateKey privateKey;
         try {
             privateKey = new P11PrivateKey(cryptService, slot, keyId);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException ex) {
             throw new OperatorCreationException(
-                    "could not construct P11PrivateKey: " + e.getMessage(), e);
+                    "could not construct P11PrivateKey: " + ex.getMessage(), ex);
         }
 
         DefaultConcurrentContentSigner concurrentSigner =

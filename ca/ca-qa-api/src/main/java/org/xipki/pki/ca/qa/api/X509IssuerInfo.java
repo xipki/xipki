@@ -114,8 +114,8 @@ public class X509IssuerInfo {
 
         try {
             this.cert = X509Util.parseCert(certBytes);
-        } catch (IOException e) {
-            throw new CertificateException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CertificateException(ex.getMessage(), ex);
         }
         this.bcCert = Certificate.getInstance(certBytes);
         this.ski = X509Util.extractSki(cert);

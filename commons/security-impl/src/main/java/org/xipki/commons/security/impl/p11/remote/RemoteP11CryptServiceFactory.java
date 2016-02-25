@@ -98,10 +98,10 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
                     String url = ((DefaultRemoteP11CryptService) service).getServerUrl();
                     logServiceInfo(url, service);
                     services.put(moduleConf.getName(), service);
-                } catch (Exception e) {
-                    LOG.error("could not createP11CryptService: {}", e.getMessage());
-                    LOG.debug("could not createP11CryptService", e);
-                    throw new SignerException(e.getMessage(), e);
+                } catch (Exception ex) {
+                    LOG.error("could not createP11CryptService: {}", ex.getMessage());
+                    LOG.debug("could not createP11CryptService", ex);
+                    throw new SignerException(ex.getMessage(), ex);
                 }
             }
 
@@ -118,11 +118,11 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
         P11SlotIdentifier[] slotIds;
         try {
             slotIds = service.getSlotIdentifiers();
-        } catch (SignerException e) {
+        } catch (SignerException ex) {
             LOG.warn("RemoteP11CryptService.getSlotIdentifiers(); SignerException: "
                     + "url={}, message={}",
-                    url, e.getMessage());
-            LOG.debug("RemoteP11CryptService.getSlotIdentifiers(); SignerException", e);
+                    url, ex.getMessage());
+            LOG.debug("RemoteP11CryptService.getSlotIdentifiers(); SignerException", ex);
             return;
         }
 
@@ -136,11 +136,11 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
             String[] keyLabels;
             try {
                 keyLabels = service.getKeyLabels(slotId);
-            } catch (SignerException e) {
+            } catch (SignerException ex) {
                 LOG.warn("RemoteP11CryptService.getKeyLabels(); SignerException: "
                         + "url={}, slot={}, message={}",
-                        new Object[]{url, slotId, e.getMessage()});
-                LOG.debug("RemoteP11CryptService.getKeyLabels(); SignerException", e);
+                        new Object[]{url, slotId, ex.getMessage()});
+                LOG.debug("RemoteP11CryptService.getKeyLabels(); SignerException", ex);
                 continue;
             }
 

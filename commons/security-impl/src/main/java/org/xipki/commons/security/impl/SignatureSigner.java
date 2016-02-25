@@ -68,8 +68,8 @@ public class SignatureSigner implements ContentSigner {
         throws IOException {
             try {
                 signer.update((byte) b);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
+            } catch (SignatureException ex) {
+                throw new IOException(ex.getMessage(), ex);
             }
         }
 
@@ -79,8 +79,8 @@ public class SignatureSigner implements ContentSigner {
         throws IOException {
             try {
                 signer.update(b);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
+            } catch (SignatureException ex) {
+                throw new IOException(ex.getMessage(), ex);
             }
         }
 
@@ -92,8 +92,8 @@ public class SignatureSigner implements ContentSigner {
         throws IOException {
             try {
                 signer.update(b, off, len);
-            } catch (SignatureException e) {
-                throw new IOException(e.getMessage(), e);
+            } catch (SignatureException ex) {
+                throw new IOException(ex.getMessage(), ex);
             }
         }
 
@@ -129,8 +129,8 @@ public class SignatureSigner implements ContentSigner {
     public OutputStream getOutputStream() {
         try {
             signer.initSign(key);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeOperatorException("could not initSign", e);
+        } catch (InvalidKeyException ex) {
+            throw new RuntimeOperatorException("could not initSign", ex);
         }
         return stream;
     }
@@ -139,9 +139,9 @@ public class SignatureSigner implements ContentSigner {
     public byte[] getSignature() {
         try {
             return stream.getSignature();
-        } catch (SignatureException e) {
-            throw new RuntimeOperatorException("exception obtaining signature: " + e.getMessage(),
-                    e);
+        } catch (SignatureException ex) {
+            throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(),
+                    ex);
         }
     }
 

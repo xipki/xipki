@@ -189,10 +189,10 @@ public class DbPorter extends DbToolBase {
                 javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
             return schemaFact.newSchema(schemaUrl);
-        } catch (SAXException e) {
+        } catch (SAXException ex) {
             throw new JAXBException(
                     "error while loading schemas for the specified classes\nDetails:\n"
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 

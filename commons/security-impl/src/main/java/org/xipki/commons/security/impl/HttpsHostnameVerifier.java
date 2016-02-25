@@ -118,8 +118,8 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
             }
             commonName = X509Util.getCommonName(new X500Name(peerPrincipal.getName()));
             LOG.info("commonName: {}", commonName);
-        } catch (Exception e) {
-            LOG.error("Error: {}", e.getMessage());
+        } catch (Exception ex) {
+            LOG.error("Error: {}", ex.getMessage());
             return false;
         }
 

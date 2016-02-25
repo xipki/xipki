@@ -95,14 +95,14 @@ public class CertificateStore {
                     certInfo.getReqType(),
                     certInfo.getTransactionId(),
                     certInfo.getRequestedSubject());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (LOG.isErrorEnabled()) {
                 LOG.error("could not save certificate {}: {}. Message: {}",
                         new Object[]{certInfo.getCert().getSubject(),
                             Base64.toBase64String(certInfo.getCert().getEncodedCert()),
-                            e.getMessage()});
+                            ex.getMessage()});
             }
-            LOG.debug("error", e);
+            LOG.debug("error", ex);
             return false;
         }
 
@@ -116,11 +116,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.addToPublishQueue(publisherName, certId, caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -130,11 +130,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.removeFromPublishQueue(publisherName, certId);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -144,11 +144,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.clearPublishQueue(caCert, publisherName);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -157,11 +157,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getMaxIdOfDeltaCrlCache(caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -171,11 +171,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.clearDeltaCrlCache(caCert, maxId);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -198,11 +198,11 @@ public class CertificateStore {
             }
 
             return revokedCert;
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -224,11 +224,11 @@ public class CertificateStore {
             }
 
             return unrevokedCert;
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -238,11 +238,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCert(caCert, serialNumber);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -252,11 +252,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.removeCertificate(caCert, serialNumber);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -266,11 +266,11 @@ public class CertificateStore {
         try {
             queryExecutor.addCrl(caCert, crl);
             return true;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
                 new Object[]{caCert.getSubject(),
-                    crl.getThisUpdate(), e.getMessage()});
-            LOG.debug("Exception", e);
+                    crl.getThisUpdate(), ex.getMessage()});
+            LOG.debug("Exception", ex);
             return false;
         }
     }
@@ -280,11 +280,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.hasCrl(caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -293,11 +293,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getMaxCrlNumber(caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -306,11 +306,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getThisUpdateOfCurrentCrl(caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -319,11 +319,11 @@ public class CertificateStore {
             final BigInteger crlNumber) {
         try {
             return queryExecutor.getEncodedCrl(caCert, crlNumber);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOG.error("could not get CRL ca={}: error message: {}",
                     caCert.getSubject(),
-                    e.getMessage());
-            LOG.debug("Exception", e);
+                    ex.getMessage());
+            LOG.debug("Exception", ex);
             return null;
         }
     }
@@ -333,11 +333,11 @@ public class CertificateStore {
             final int numCRLs) {
         try {
             return queryExecutor.cleanupCrls(caCert, numCRLs);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOG.error("could not cleanup CRLs ca={}: error message: {}",
                     caCert.getSubject(),
-                    e.getMessage());
-            LOG.debug("Exception", e);
+                    ex.getMessage());
+            LOG.debug("Exception", ex);
             return 0;
         }
     }
@@ -348,11 +348,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.certIssuedForSubject(caCert, fpSubject);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -361,10 +361,10 @@ public class CertificateStore {
             final X500Principal subject) {
         try {
             return queryExecutor.getCertStatusForSubject(caCert, subject);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException ex) {
             LOG.error("queryExecutor.getCertStatusForSubject. DataAccessException: {}",
-                    e.getMessage());
-            LOG.debug("queryExecutor.getCertStatusForSubject", e);
+                    ex.getMessage());
+            LOG.debug("queryExecutor.getCertStatusForSubject", ex);
             return CertStatus.Unknown;
         }
     }
@@ -374,13 +374,13 @@ public class CertificateStore {
             final X500Name subject) {
         try {
             return queryExecutor.getCertStatusForSubject(caCert, subject);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException ex) {
             final String message = "queryExecutor.getCertStatusForSubject";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             return CertStatus.Unknown;
         }
     }
@@ -406,11 +406,11 @@ public class CertificateStore {
         try {
             return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial,
                     numEntries, onlyCaCerts, onlyUserCerts);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -424,11 +424,11 @@ public class CertificateStore {
         try {
             return queryExecutor.getCertificatesForDeltaCrl(caCert, startSerial, numEntries,
                     onlyCaCerts, onlyUserCerts);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -445,11 +445,11 @@ public class CertificateStore {
             return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial,
                     numEntries, onlyRevoked,
                     onlyCaCerts, onlyUserCerts);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -460,11 +460,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -475,11 +475,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getPublishQueueEntries(caCert, publisherName, numEntries);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -489,11 +489,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCertWithRevocationInfo(caCert, serial);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -503,11 +503,11 @@ public class CertificateStore {
     throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertificateInfo(caCert, serial);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -517,11 +517,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCertProfileForSerial(caCert, serial);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -531,11 +531,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCertificate(subjectName, transactionId);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -545,11 +545,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.authenticateUser(user, password);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -558,11 +558,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCnRegexForUser(user);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -572,11 +572,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.knowsCertForSerial(caCert, serial);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -585,11 +585,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getGreatestSerialNumber(caCert);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -605,11 +605,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getLatestCert(caCert, subjectFp, keyFp, profile);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -627,11 +627,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.isCertForSubjectIssued(caCert, subjectFp, profile);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -649,11 +649,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.isCertForKeyIssued(caCert, keyFp, profile);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -663,11 +663,11 @@ public class CertificateStore {
     throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertForId(caCert, certId);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -676,11 +676,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getCertForId(certId);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -689,8 +689,8 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.getLatestSerialNumber(nameWithSerialNumber);
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -701,11 +701,11 @@ public class CertificateStore {
         try {
             return queryExecutor.getNotBeforeOfFirstCertStartsWithCommonName(commonName,
                     profileName);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -714,11 +714,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.containsCertificates(caCert, false);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -727,11 +727,11 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.containsCertificates(caCert, true);
-        } catch (DataAccessException e) {
-            LOG.debug("DataAccessException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -741,10 +741,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.nextSerial(caCert, seqName);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -754,10 +754,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.commitNextSerialIfLess(caName, nextSerial);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -767,10 +767,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.markMaxSerial(caCert, seqName);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -780,10 +780,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.commitNextCrlNoIfLess(caName, nextCrlNo);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -792,10 +792,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.addCa(caCert);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -804,10 +804,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.addRequestorName(name);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -816,10 +816,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.addPublisherName(name);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -828,10 +828,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.addCertprofileName(name);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -841,10 +841,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             return queryExecutor.addCertInProcess(fpKey, fpSubject);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -854,10 +854,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.deleteCertInProcess(fpKey, fpSubject);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 
@@ -866,10 +866,10 @@ public class CertificateStore {
     throws OperationException {
         try {
             queryExecutor.deleteCertsInProcessOlderThan(time);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
 

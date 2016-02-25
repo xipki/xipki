@@ -291,15 +291,15 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         reset();
         try {
             doInitialize(data);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ex) {
             final String message = "RuntimeException";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             throw new CertprofileException(
-                    "caught RuntimeException while initializing certprofile: " + e.getMessage());
+                    "caught RuntimeException while initializing certprofile: " + ex.getMessage());
         }
     } // method initialize
 
@@ -309,7 +309,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         byte[] bytes;
         try {
             bytes = data.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ex) {
             bytes = data.getBytes();
         }
 
@@ -333,8 +333,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 try {
                     this.signatureAlgorithms.add(
                             AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
-                } catch (NoSuchAlgorithmException e) {
-                    throw new CertprofileException(e.getMessage(), e);
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new CertprofileException(ex.getMessage(), ex);
                 }
             }
         }
@@ -650,8 +650,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         try {
             this.biometricDataOption = new BiometricInfoOption(extConf);
-        } catch (NoSuchAlgorithmException e) {
-            throw new CertprofileException("NoSuchAlgorithmException: " + e.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            throw new CertprofileException("NoSuchAlgorithmException: " + ex.getMessage());
         }
     }
 
@@ -838,7 +838,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 try {
                     constantStatementValue = new ASN1StreamParser(
                             statementValue.getConstant().getValue()).readObject();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                     throw new CertprofileException(
                             "cannot parse the constant value of QcStatement");
                 }
@@ -1304,7 +1304,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 int expHashValueSize;
                 try {
                     expHashValueSize = AlgorithmUtil.getHashOutputSizeInOctets(hashAlgo);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException ex) {
                     throw new CertprofileException(
                             "should not happen, unknown hash algorithm " + hashAlgo);
                 }
@@ -1573,8 +1573,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {
             return parser.readObject();
-        } catch (IOException e) {
-            throw new CertprofileException("could not parse the constant extension value", e);
+        } catch (IOException ex) {
+            throw new CertprofileException("could not parse the constant extension value", ex);
         }
     }
 

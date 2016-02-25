@@ -58,7 +58,7 @@ public class NegCmpControlUpdateCmd extends CmpControlUpdateCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

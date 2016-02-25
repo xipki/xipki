@@ -215,7 +215,7 @@ public class HttpOcspServlet extends HttpServlet {
             try {
                 ASN1StreamParser parser = new ASN1StreamParser(requestStream);
                 ocspRequest = OCSPRequest.getInstance(parser.readObject());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
@@ -224,10 +224,10 @@ public class HttpOcspServlet extends HttpServlet {
 
                 final String message = "could not parse the request (OCSPRequest)";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
                 return;
             }
@@ -302,19 +302,19 @@ public class HttpOcspServlet extends HttpServlet {
                     asn1Out.flush();
                 }
             } // end if (ocspRespWithCacheInfo)
-        } catch (EOFException e) {
+        } catch (EOFException ex) {
             final String message = "Connection reset by peer";
             if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "Throwable thrown, this should not happen!";
-            LOG.error(message, t);
+            LOG.error(message, th);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);

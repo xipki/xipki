@@ -115,13 +115,13 @@ abstract class CmpResponder {
     public boolean isInService() {
         try {
             return getSigner() != null;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String msg = "error while getting responder signer";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
 
             return false;
         }
@@ -171,13 +171,13 @@ abstract class CmpResponder {
         if (reqHeader.getMessageTime() != null) {
             try {
                 messageTime = reqHeader.getMessageTime().getDate();
-            } catch (ParseException e) {
+            } catch (ParseException ex) {
                 final String msg = "tid=" + tidStr + ": could not parse messageDate";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(msg, e);
+                LOG.debug(msg, ex);
                 messageTime = null;
             }
         }
@@ -257,13 +257,13 @@ abstract class CmpResponder {
                         "should not reach here, unknown ProtectionResult " + pr);
                 } // end switch
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 final String msg = "tid=" + tidStr + ": error while verifying the signature";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(msg, e);
+                LOG.debug(msg, ex);
                 errorStatus = "request has invalid signature based protection";
             }
         } else if (tlsClientCert != null) {
@@ -375,14 +375,14 @@ abstract class CmpResponder {
                     getSigner(),
                     getSender(),
                     getCmpControl().isSendResponderCert());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "error while add protection to the PKI message";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message),
-                        e.getClass().getName(),
-                        e.getMessage());
+                        ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             PKIStatusInfo status = generateCmpRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");

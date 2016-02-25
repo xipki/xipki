@@ -126,8 +126,8 @@ class CaConfigurationDbExporter extends DbPorter {
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
         try {
             marshaller.marshal(root, new File(baseDir, FILENAME_CA_CONFIGURATION));
-        } catch (JAXBException e) {
-            throw XmlUtil.convert(e);
+        } catch (JAXBException ex) {
+            throw XmlUtil.convert(ex);
         }
 
         System.out.println(" exported CA configuration from database");
@@ -157,8 +157,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 cmpcontrol.setName(name);
                 cmpcontrol.setConf(conf);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -189,8 +189,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 environment.setValue(value);
                 environments.getEnvironment().add(environment);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -233,8 +233,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 crlsigners.getCrlsigner().add(crlsigner);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -266,8 +266,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 caaliases.getCaalias().add(caalias);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -300,8 +300,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 requestors.getRequestor().add(requestor);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -340,8 +340,8 @@ class CaConfigurationDbExporter extends DbPorter {
                         buildFileOrValue(cert, "ca-conf/cert-responder-" + name));
                 responders.getResponder().add(responder);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -376,8 +376,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 publishers.getPublisher().add(publisher);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -414,8 +414,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 profiles.getProfile().add(profile);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -516,8 +516,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 cas.getCa().add(ca);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -556,8 +556,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 caHasRequestors.getCaHasRequestor().add(caHasRequestor);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -589,8 +589,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 caHasPublishers.getCaHasPublisher().add(caHasPublisher);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -632,8 +632,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 scep.setControl(control);
                 sceps.getScep().add(scep);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -668,8 +668,8 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 caHasProfiles.getCaHasProfile().add(caHasProfile);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }

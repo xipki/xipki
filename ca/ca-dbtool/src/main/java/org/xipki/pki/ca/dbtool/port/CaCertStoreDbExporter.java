@@ -165,8 +165,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             try {
                 root = (JAXBElement<CertStoreType>)
                     unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CERTSTORE));
-            } catch (JAXBException e) {
-                throw XmlUtil.convert(e);
+            } catch (JAXBException ex) {
+                throw XmlUtil.convert(ex);
             }
 
             certstore = root.getValue();
@@ -199,12 +199,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             try {
                 marshaller.marshal(root,
                         new File(baseDir + File.separator + FILENAME_CA_CERTSTORE));
-            } catch (JAXBException e) {
-                throw XmlUtil.convert(e);
+            } catch (JAXBException ex) {
+                throw XmlUtil.convert(ex);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             System.err.println("error while exporting CA certstore from database");
-            exception = e;
+            exception = ex;
         }
 
         if (exception == null) {
@@ -225,12 +225,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             crlsFileOs = new FileOutputStream(crlsListFile, true);
             doExportCrl(certstore, crlsFileOs);
             return null;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-crls-");
             System.err.println("\nexporting table CRL has been cancelled due to error");
-            LOG.error("Exception", e);
-            return e;
+            LOG.error("Exception", ex);
+            return ex;
         } finally {
             IoUtil.closeStream(crlsFileOs);
         }
@@ -312,13 +312,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     X509CRL x509Crl = null;
                     try {
                         x509Crl = X509Util.parseCrl(new ByteArrayInputStream(crlBytes));
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         LOG.error("could not parse CRL with id {}", id);
-                        LOG.debug("could not parse CRL with id " + id, e);
-                        if (e instanceof CRLException) {
-                            throw (CRLException) e;
+                        LOG.debug("could not parse CRL with id " + id, ex);
+                        if (ex instanceof CRLException) {
+                            throw (CRLException) ex;
                         } else {
-                            throw new CRLException(e.getMessage(), e);
+                            throw new CRLException(ex.getMessage(), ex);
                         }
                     }
 
@@ -398,8 +398,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 currentCrlsZipFile.delete();
             }
 
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         } finally {
             releaseResources(ps, null);
         } // end try
@@ -431,8 +431,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                 cas.getCa().add(ca);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -461,8 +461,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 NameIdType info = createNameId(name, id);
                 infos.getRequestor().add(info);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -491,8 +491,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 NameIdType info = createNameId(name, id);
                 infos.getPublisher().add(info);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -512,12 +512,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             usersFileOs = new FileOutputStream(usersListFile, true);
             doExportUser(certstore, usersFileOs);
             return null;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-users-");
             System.err.println("\nexporting table USERNAME has been cancelled due to error");
-            LOG.error("Exception", e);
-            return e;
+            LOG.error("Exception", ex);
+            return ex;
         } finally {
             IoUtil.closeStream(usersFileOs);
         }
@@ -636,8 +636,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                 processLog.addNumProcessed(numUsersInCurrentFile);
             }
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         } finally {
             releaseResources(ps, null);
         } // end try
@@ -666,8 +666,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 NameIdType info = createNameId(name, id);
                 infos.getProfile().add(info);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -692,13 +692,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             certsFileOs = new FileOutputStream(certsListFile, true);
             doExportCert(certstore, processLogFile, certsFileOs);
             return null;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
                     + "please continue with the option '--resume'");
-            LOG.error("Exception", e);
-            return e;
+            LOG.error("Exception", ex);
+            return ex;
         } finally {
             IoUtil.closeStream(certsFileOs);
         }
@@ -918,8 +918,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 currentCertsZipFile.delete();
             }
 
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         } finally {
             releaseResources(ps, null);
         } // end try
@@ -975,8 +975,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     list.add(toPub);
                 }
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(ps, rs);
         }
@@ -1014,8 +1014,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 entry.setSerial(serial);
                 list.add(entry);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(ps, rs);
         }

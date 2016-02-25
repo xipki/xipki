@@ -74,13 +74,13 @@ public class FilePasswordCallback implements PasswordCallback {
                     break;
                 }
             }
-        } catch (IOException e) {
-            throw new PasswordResolverException("could not read file " + passwordFile, e);
+        } catch (IOException ex) {
+            throw new PasswordResolverException("could not read file " + passwordFile, ex);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
         }

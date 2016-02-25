@@ -80,8 +80,8 @@ public class ScepControl implements Serializable {
         ConfPairs props;
         try {
             props = new ConfPairs(conf);
-        } catch (RuntimeException e) {
-            throw new InvalidConfException(e.getClass().getName() + ": " + e.getMessage(), e);
+        } catch (RuntimeException ex) {
+            throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);

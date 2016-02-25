@@ -135,8 +135,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.publishRootCa(caName, certprofile);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -147,8 +147,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.republishCertificates(caName, publisherNames);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -159,8 +159,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.clearPublishQueue(caName, publisherNames);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -170,8 +170,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCa(caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -185,8 +185,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.notifyCaChange();
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -197,8 +197,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCaAlias(aliasName, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -208,8 +208,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCaAlias(aliasName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -271,8 +271,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCa(newCaDbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -288,8 +288,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCa(changeCAentry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -300,8 +300,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCertprofileFromCa(profileName, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -313,8 +313,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCertprofileToCa(profileName, profileLocalname, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -325,8 +325,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removePublisherFromCa(publisherName, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -337,8 +337,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addPublisherToCa(publisherName, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -366,8 +366,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCmpRequestor(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -377,8 +377,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCmpRequestor(requestorName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -389,8 +389,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCmpRequestor(name, base64Cert);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -401,8 +401,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCmpRequestorFromCa(requestorName, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -413,8 +413,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCmpRequestorToCa(requestor, caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -430,8 +430,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCertprofile(profileName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -443,8 +443,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCertprofile(name, type, conf);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -454,8 +454,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCertprofile(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -465,8 +465,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCmpResponder(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -476,8 +476,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCmpResponder(name);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -490,8 +490,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCmpResponder(name, type, conf, base64Cert);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -506,8 +506,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCrlSigner(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -517,8 +517,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCrlSigner(crlSignerName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -528,8 +528,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCrlSigner(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -545,8 +545,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addPublisher(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -568,8 +568,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removePublisher(publisherName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -581,8 +581,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changePublisher(name, type, conf);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -598,8 +598,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addCmpControl(dbEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -609,8 +609,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCmpControl(name);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -621,8 +621,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeCmpControl(name, conf);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -644,8 +644,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addEnvParam(name, value);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -655,8 +655,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeEnvParam(envParamName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -667,8 +667,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeEnvParam(name, value);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -679,8 +679,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.revokeCa(caName, revocationInfo);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -690,8 +690,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.unrevokeCa(caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -704,8 +704,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.revokeCertificate(caName, serialNumber, reason, invalidityTime);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -716,8 +716,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.unrevokeCertificate(caName, serialNumber);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -728,8 +728,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeCertificate(caName, serialNumber);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -744,11 +744,11 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
             X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
                     encodedPkcs10Request);
             return cert.getEncoded();
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
-        } catch (CertificateEncodingException e) {
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
+        } catch (CertificateEncodingException ex) {
             throw new HessianCaMgmtException("could not encode generated certificate: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
@@ -760,8 +760,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.generateRootCa(caEntry, certprofileName, p10Req);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -780,8 +780,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addUser(userEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -791,8 +791,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.getUser(username);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -804,8 +804,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeUser(username, password, cnRegex);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -815,8 +815,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeUser(username);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -826,8 +826,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.generateCrlOnDemand(caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -838,8 +838,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.getCrl(caName, crlNumber);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -849,8 +849,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.getCurrentCrl(caName);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -860,8 +860,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.addScep(scepEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -871,8 +871,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.removeScep(name);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -882,8 +882,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.changeScep(scepEntry);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -898,8 +898,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     throws HessianCaMgmtException {
         try {
             return caManager.getScepEntry(name);
-        } catch (CaMgmtException e) {
-            throw new HessianCaMgmtException(e.getMessage());
+        } catch (CaMgmtException ex) {
+            throw new HessianCaMgmtException(ex.getMessage());
         }
     }
 
@@ -980,13 +980,13 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
                     } // end if
                 } // end if
             } // end while
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "could not initialize CAManagerServlet";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
         }
     } // method initialize
 

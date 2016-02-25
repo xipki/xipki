@@ -89,15 +89,15 @@ public class KeystoreP11CryptService implements P11CryptService {
         LOG.info("Refreshing PKCS#11 module {}", moduleConf.getName());
         try {
             this.module = KeystoreP11ModulePool.getInstance().getModule(moduleConf);
-        } catch (SignerException e) {
+        } catch (SignerException ex) {
             final String message = "could not initialize the PKCS#11 Module for "
                     + moduleConf.getName();
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw e;
+            LOG.debug(message, ex);
+            throw ex;
         }
 
         Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
@@ -112,21 +112,21 @@ public class KeystoreP11CryptService implements P11CryptService {
                     continue;
                 }
                 slot.refresh();
-            } catch (SignerException e) {
+            } catch (SignerException ex) {
                 final String message = "SignerException while initializing slot " + slotId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 continue;
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "unexpected error while initializing slot " + slotId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
                 continue;
             }
 

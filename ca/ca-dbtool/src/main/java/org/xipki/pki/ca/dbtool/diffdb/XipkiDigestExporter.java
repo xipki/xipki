@@ -129,12 +129,12 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         Exception exception = null;
         try {
             doDigest(certsReader, processLog, caEntryContainer);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
             System.err.println("\ndigesting process has been cancelled due to error");
-            LOG.error("Exception", e);
-            exception = e;
+            LOG.error("Exception", ex);
+            exception = ex;
         } finally {
             caEntryContainer.close();
             certsReader.stop();
@@ -178,8 +178,8 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
                 caIdDirMap.put(id, caDir.getName());
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }

@@ -111,7 +111,7 @@ public class KeystoreP11Module implements P11Module {
             try {
                 slotIndex = Integer.parseInt(tokens[0]);
                 slotId = Long.parseLong(tokens[1]);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
                 continue;
             }
@@ -166,8 +166,8 @@ public class KeystoreP11Module implements P11Module {
         List<char[]> pwd;
         try {
             pwd = moduleConf.getPasswordRetriever().getPassword(localSlotId);
-        } catch (PasswordResolverException e) {
-            throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
+        } catch (PasswordResolverException ex) {
+            throw new SignerException("PasswordResolverException: " + ex.getMessage(), ex);
         }
 
         File slotDir = new File(moduleConf.getNativeLibrary(), localSlotId.getSlotIndex() + "-"

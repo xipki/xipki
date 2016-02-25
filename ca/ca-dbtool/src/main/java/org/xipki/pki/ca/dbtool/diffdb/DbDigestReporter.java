@@ -196,7 +196,7 @@ public class DbDigestReporter {
 
         try {
             IoUtil.save(reportDirname + File.separator + "overview.txt", sb.toString().getBytes());
-        } catch (IOException e) {
+        } catch (IOException ex) {
             System.out.println("Could not write overview.txt with following content\n"
                     + sb.toString());
         }
@@ -218,7 +218,7 @@ public class DbDigestReporter {
             final Writer writer) {
         try {
             writer.close();
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
     }
 

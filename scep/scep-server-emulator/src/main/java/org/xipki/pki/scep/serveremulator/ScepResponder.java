@@ -170,7 +170,7 @@ public class ScepResponder {
         X509CertificateObject recipientX509Obj;
         try {
             recipientX509Obj = new X509CertificateObject(recipientCert);
-        } catch (CertificateParsingException e) {
+        } catch (CertificateParsingException ex) {
             throw new MessageDecodingException("error while parsing recipintCert "
                     + recipientCert.getTBSCertificate().getSubject());
         }
@@ -211,8 +211,8 @@ public class ScepResponder {
                     certs,
                     req.getSignatureCert(),
                     req.getContentEncryptionAlgorithm());
-        } catch (Exception e) {
-            throw new CaException(e);
+        } catch (Exception ex) {
+            throw new CaException(ex);
         }
     } // method servicePkiOperation
 
@@ -229,8 +229,8 @@ public class ScepResponder {
                     getSigningKey(),
                     jceSignerCert,
                     certs);
-        } catch (Exception e) {
-            throw new CaException(e);
+        } catch (Exception ex) {
+            throw new CaException(ex);
         }
     }
 
@@ -364,8 +364,8 @@ public class ScepResponder {
             Certificate cert;
             try {
                 cert = caEmulator.generateCert(p10ReqInfo);
-            } catch (Exception e) {
-                throw new CaException("system failure: " + e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new CaException("system failure: " + ex.getMessage(), ex);
             }
 
             if (cert != null && control.isPendingCert()) {
@@ -410,8 +410,8 @@ public class ScepResponder {
                 p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
                     cert = caEmulator.generateCert(p10ReqInfo);
-                } catch (Exception e) {
-                    throw new CaException("system failure: " + e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new CaException("system failure: " + ex.getMessage(), ex);
                 }
                 if (cert != null) {
                     rep.setMessageData(createSignedData(cert));
@@ -429,8 +429,8 @@ public class ScepResponder {
                 p10ReqInfo = (CertificationRequest) req.getMessageData();
                 try {
                     cert = caEmulator.generateCert(p10ReqInfo);
-                } catch (Exception e) {
-                    throw new CaException("system failure: " + e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new CaException("system failure: " + ex.getMessage(), ex);
                 }
                 if (cert != null) {
                     rep.setMessageData(createSignedData(cert));
@@ -445,8 +445,8 @@ public class ScepResponder {
             CertificateList crl;
             try {
                 crl = caEmulator.getCrl(isn.getName(), isn.getSerialNumber().getValue());
-            } catch (Exception e) {
-                throw new CaException("system failure: " + e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new CaException("system failure: " + ex.getMessage(), ex);
             }
             if (crl != null) {
                 rep.setMessageData(createSignedData(crl));
@@ -472,8 +472,8 @@ public class ScepResponder {
         CMSSignedData cmsSigneddata;
         try {
             cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
-        } catch (CMSException e) {
-            throw new CaException(e.getMessage(), e);
+        } catch (CMSException ex) {
+            throw new CaException(ex.getMessage(), ex);
         }
 
         return cmsSigneddata.toASN1Structure();
@@ -493,8 +493,8 @@ public class ScepResponder {
             }
 
             cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
-        } catch (CMSException e) {
-            throw new CaException(e);
+        } catch (CMSException ex) {
+            throw new CaException(ex);
         }
 
         return cmsSigneddata.toASN1Structure();

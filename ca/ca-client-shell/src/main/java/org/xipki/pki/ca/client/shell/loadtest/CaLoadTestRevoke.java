@@ -198,11 +198,11 @@ public class CaLoadTestRevoke extends LoadExecutor {
             Map<String, CertIdOrError> result;
             try {
                 result = caClient.revokeCerts(request, null);
-            } catch (CaClientException | PkiErrorException e) {
-                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+            } catch (CaClientException | PkiErrorException ex) {
+                LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
                 return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+            } catch (Throwable th) {
+                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
                 return false;
             }
 
@@ -280,8 +280,8 @@ public class CaLoadTestRevoke extends LoadExecutor {
                         serials.addLast(serial);
                     }
                 }
-            } catch (SQLException e) {
-                throw caDataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw caDataSource.translate(sql, ex);
             } finally {
                 caDataSource.releaseResources(stmt, rs);
             }

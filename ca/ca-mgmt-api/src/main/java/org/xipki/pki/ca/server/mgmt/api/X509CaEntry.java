@@ -236,7 +236,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
                 String b64EncodedCert = null;
                 try {
                     b64EncodedCert = Base64.toBase64String(cert.getEncoded());
-                } catch (CertificateEncodingException e) {
+                } catch (CertificateEncodingException ex) {
                     b64EncodedCert = "ERROR, could not encode the certificate";
                 }
                 sb.append("\tEncoded: ").append(b64EncodedCert).append("\n");

@@ -95,8 +95,8 @@ public class DbToolBase {
         this.connection = this.dataSource.getConnection();
         try {
             this.connectionAutoCommit = connection.getAutoCommit();
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
@@ -105,8 +105,8 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             return connection.createStatement();
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
     }
 
@@ -115,8 +115,8 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             return connection.prepareStatement(sql);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         }
     }
 
@@ -132,16 +132,16 @@ public class DbToolBase {
         Statement stmt;
         try {
             stmt = createStatement();
-        } catch (DataAccessException e) {
-            log.error("could not create statement", e);
+        } catch (DataAccessException ex) {
+            log.error("could not create statement", ex);
             return false;
         }
         try {
             stmt.execute(sb.toString());
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             String msg = String.format(
                     "could not delete columns from table %s with %s > %s", tableName, idColumn, id);
-            log.error(msg, t);
+            log.error(msg, th);
             return false;
         } finally {
             releaseResources(stmt, null);
@@ -208,8 +208,8 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             return connection.setSavepoint();
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
     }
 
@@ -217,23 +217,23 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             connection.rollback();
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
     }
 
     protected DataAccessException translate(
             final String sql,
-            final SQLException e) {
-        return dataSource.translate(sql, e);
+            final SQLException ex) {
+        return dataSource.translate(sql, ex);
     }
 
     protected void disableAutoCommit()
     throws DataAccessException {
         try {
             connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
     }
 
@@ -241,8 +241,8 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             connection.setAutoCommit(connectionAutoCommit);
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         }
     }
 
@@ -251,8 +251,8 @@ public class DbToolBase {
     throws DataAccessException {
         try {
             connection.commit();
-        } catch (SQLException e) {
-            throw dataSource.translate(task, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(task, ex);
         }
     }
 
@@ -300,7 +300,7 @@ public class DbToolBase {
         } finally {
             try {
                 is.close();
-            } catch (IOException e) {
+            } catch (IOException ex) {
             }
         }
 
@@ -382,14 +382,14 @@ public class DbToolBase {
         if (ps != null) {
             try {
                 ps.close();
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
             }
         }
 
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
             }
         }
     }

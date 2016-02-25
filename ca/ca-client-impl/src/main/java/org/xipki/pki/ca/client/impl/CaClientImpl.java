@@ -225,15 +225,15 @@ public final class CaClientImpl implements CaClient {
                     ca.setCertprofiles(caInfo.getCertprofiles());
                 }
                 LOG.info("retrieved CAInfo for CA " + name);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 errorCANames.add(name);
                 caNamesWithError.add(name);
                 final String message = "could not retrieve CAInfo for CA " + name;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
             }
         }
 
@@ -284,15 +284,15 @@ public final class CaClientImpl implements CaClient {
             X509Certificate cert;
             try {
                 cert = X509Util.parseCert(readData(m.getCert()));
-            } catch (CertificateException e) {
+            } catch (CertificateException ex) {
                 final String message = "could not configure responder " + m.getName();
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
-                throw new InvalidConfException(e.getMessage(), e);
+                throw new InvalidConfException(ex.getMessage(), ex);
             }
             responders.put(m.getName(), cert);
         }
@@ -352,16 +352,16 @@ public final class CaClientImpl implements CaClient {
 
                 cas.add(ca);
                 configuredCaNames.add(caName);
-            } catch (IOException | CertificateException e) {
+            } catch (IOException | CertificateException ex) {
                 final String message = "could not configure CA " + caName;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
 
                 if (!devMode) {
-                    throw new InvalidConfException(e.getMessage(), e);
+                    throw new InvalidConfException(ex.getMessage(), ex);
                 }
             }
         }
@@ -380,8 +380,8 @@ public final class CaClientImpl implements CaClient {
                 try {
                     requestorCert = X509Util.parseCert(readData(requestorConf.getCert()));
                     requestorCerts.put(name, requestorCert);
-                } catch (Exception e) {
-                    throw new InvalidConfException(e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new InvalidConfException(ex.getMessage(), ex);
                 }
             }
 
@@ -391,8 +391,8 @@ public final class CaClientImpl implements CaClient {
                             requestorConf.getSignerType(), requestorConf.getSignerConf(),
                             requestorCert);
                     requestorSigners.put(name, requestorSigner);
-                } catch (SignerException e) {
-                    throw new InvalidConfException(e.getMessage(), e);
+                } catch (SignerException ex) {
+                    throw new InvalidConfException(ex.getMessage(), ex);
                 }
             } else {
                 if (requestorConf.isSignRequest()) {
@@ -476,7 +476,7 @@ public final class CaClientImpl implements CaClient {
             while (!scheduledThreadPoolExecutor.isTerminated()) {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ex) {
                 }
             }
             scheduledThreadPoolExecutor = null;
@@ -510,8 +510,8 @@ public final class CaClientImpl implements CaClient {
         EnrollCertResultType result;
         try {
             result = ca.getRequestor().requestCertificate(request, username, debug);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return parseEnrollCertResult((EnrollCertResultType) result, localCaName);
@@ -559,8 +559,8 @@ public final class CaClientImpl implements CaClient {
         EnrollCertResultType result;
         try {
             result = ca.getRequestor().requestCertificate(request, username, debug);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return parseEnrollCertResult((EnrollCertResultType) result, localCaName);
@@ -661,8 +661,8 @@ public final class CaClientImpl implements CaClient {
         RevokeCertResultType result;
         try {
             result = cmpRequestor.revokeCertificate(request, debug);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return parseRevokeCertResult(result);
@@ -720,8 +720,8 @@ public final class CaClientImpl implements CaClient {
             } else {
                 result = requestor.downloadCrl(crlNumber, debug);
             }
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return result.getCrl();
@@ -743,8 +743,8 @@ public final class CaClientImpl implements CaClient {
         try {
             CrlResultType result = requestor.generateCrl(debug);
             return result.getCrl();
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
     }
 
@@ -844,14 +844,14 @@ public final class CaClientImpl implements CaClient {
         PKIMessage pkiMessage;
         try {
             pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName, username);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException("CmpRequestorException: " + e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException("CmpRequestorException: " + ex.getMessage(), ex);
         }
 
         try {
             return pkiMessage.getEncoded();
-        } catch (IOException e) {
-            throw new CaClientException("IOException: " + e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CaClientException("IOException: " + ex.getMessage(), ex);
         }
     } // method envelope
 
@@ -899,7 +899,7 @@ public final class CaClientImpl implements CaClient {
                         tryXipkiNSStoVerify = Boolean.TRUE;
                         tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
                         return sigValid;
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
                         tryXipkiNSStoVerify = Boolean.FALSE;
                         tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
@@ -920,8 +920,8 @@ public final class CaClientImpl implements CaClient {
                 return true;
             }
         } catch (SignatureException | InvalidKeyException | CertificateException
-                | NoSuchAlgorithmException | NoSuchProviderException e) {
-            LOG.debug("{} while verifying signature: {}", e.getClass().getName(), e.getMessage());
+                | NoSuchAlgorithmException | NoSuchProviderException ex) {
+            LOG.debug("{} while verifying signature: {}", ex.getClass().getName(), ex.getMessage());
             return false;
         }
     } // method verify
@@ -944,8 +944,8 @@ public final class CaClientImpl implements CaClient {
         try {
             PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
             return pkiMessage.getEncoded();
-        } catch (CmpRequestorException | IOException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException | IOException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
     }
 
@@ -1010,8 +1010,8 @@ public final class CaClientImpl implements CaClient {
         RevokeCertResultType result;
         try {
             result = cmpRequestor.unrevokeCertificate(request, debug);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return parseRevokeCertResult(result);
@@ -1068,8 +1068,8 @@ public final class CaClientImpl implements CaClient {
         RevokeCertResultType result;
         try {
             result = cmpRequestor.removeCertificate(request, debug);
-        } catch (CmpRequestorException e) {
-            throw new CaClientException(e.getMessage(), e);
+        } catch (CmpRequestorException ex) {
+            throw new CaClientException(ex.getMessage(), ex);
         }
 
         return parseRevokeCertResult(result);
@@ -1111,7 +1111,7 @@ public final class CaClientImpl implements CaClient {
         URL serverUrl;
         try {
             serverUrl = new URL(healthUrlStr);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException ex) {
             throw new CaClientException("invalid URL '" + healthUrlStr + "'");
         }
 
@@ -1152,25 +1152,25 @@ public final class CaClientImpl implements CaClient {
                 try {
                     healthCheckResult = HealthCheckResult.getInstanceFromJsonMessage(name,
                             response);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     final String message = "IOException while parsing the health json message";
                     if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                                ex.getMessage());
                     }
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug(message + ", json message: " + response, e);
+                        LOG.debug(message + ", json message: " + response, ex);
                     }
                     healthCheckResult.setHealthy(false);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ex) {
             final String message = "IOException while calling the URL " + healthUrlStr;
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
 
             healthCheckResult.setHealthy(false);
         }
@@ -1190,10 +1190,10 @@ public final class CaClientImpl implements CaClient {
                 try {
                     java.security.cert.Certificate cert = getCertificate(entry.getCert());
                     certOrError = new CertOrError(cert);
-                } catch (CertificateException e) {
+                } catch (CertificateException ex) {
                     throw new CaClientException(String.format(
                             "CertificateParsingException for request (id=%s): %s",
-                            entry.getId(), e.getMessage()));
+                            entry.getId(), ex.getMessage()));
                 }
             } else if (resultEntry instanceof ErrorResultEntryType) {
                 certOrError = new CertOrError(((ErrorResultEntryType) resultEntry).getStatusInfo());
@@ -1214,13 +1214,13 @@ public final class CaClientImpl implements CaClient {
         for (CMPCertificate cmpCaPub : cmpCaPubs) {
             try {
                 caPubs.add(getCertificate(cmpCaPub));
-            } catch (CertificateException e) {
+            } catch (CertificateException ex) {
                 final String message = "could not extract the caPub from CMPCertificate";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
             }
         }
 
@@ -1280,12 +1280,12 @@ public final class CaClientImpl implements CaClient {
                 }
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
-            } catch (SAXException e) {
-                throw new InvalidConfException("parse profile failed, message: " + e.getMessage(),
-                        e);
-            } catch (JAXBException e) {
+            } catch (SAXException ex) {
+                throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(),
+                        ex);
+            } catch (JAXBException ex) {
                 throw new InvalidConfException("parse profile failed, message: "
-                        + XmlUtil.getMessage((JAXBException) e), e);
+                        + XmlUtil.getMessage((JAXBException) ex), ex);
             }
 
             if (root instanceof JAXBElement) {

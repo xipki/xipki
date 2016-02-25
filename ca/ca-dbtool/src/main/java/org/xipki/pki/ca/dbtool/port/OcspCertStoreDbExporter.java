@@ -139,8 +139,8 @@ class OcspCertStoreDbExporter extends DbPorter {
                 JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
                         unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CERTSTORE));
                 certstore = root.getValue();
-            } catch (JAXBException e) {
-                throw XmlUtil.convert(e);
+            } catch (JAXBException ex) {
+                throw XmlUtil.convert(ex);
             }
 
             if (certstore.getVersion() > VERSION) {
@@ -161,8 +161,8 @@ class OcspCertStoreDbExporter extends DbPorter {
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         try {
             marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CERTSTORE));
-        } catch (JAXBException e) {
-            throw XmlUtil.convert(e);
+        } catch (JAXBException ex) {
+            throw XmlUtil.convert(ex);
         }
 
         if (exception == null) {
@@ -216,8 +216,8 @@ class OcspCertStoreDbExporter extends DbPorter {
 
                 issuers.getIssuer().add(issuer);
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -237,13 +237,13 @@ class OcspCertStoreDbExporter extends DbPorter {
             certsFileOs = new FileOutputStream(certsListFile, true);
             doExportCert(certstore, processLogFile, certsFileOs);
             return null;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nexporting table CERT and CRAW has been cancelled due to error,\n"
                     + "please continue with the option '--resume'");
-            LOG.error("Exception", e);
-            return e;
+            LOG.error("Exception", ex);
+            return ex;
         } finally {
             IoUtil.closeStream(certsFileOs);
         }
@@ -428,8 +428,8 @@ class OcspCertStoreDbExporter extends DbPorter {
                 currentCertsZip.close();
                 currentCertsZipFile.delete();
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(certPs, null);
         }

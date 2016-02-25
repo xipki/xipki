@@ -86,7 +86,7 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
         X509CRL crl = null;
         try {
             crl = retrieveCrl();
-        } catch (PkiErrorException e) {
+        } catch (PkiErrorException ex) {
         }
 
         if (crl != null) {

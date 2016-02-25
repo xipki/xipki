@@ -136,11 +136,11 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
 
                 result = caClient.requestCerts(request, null,
                         userPrefix + System.currentTimeMillis(), null);
-            } catch (CaClientException | PkiErrorException e) {
-                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
+            } catch (CaClientException | PkiErrorException ex) {
+                LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
                 return false;
-            } catch (Throwable t) {
-                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+            } catch (Throwable th) {
+                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
                 return false;
             }
 
@@ -283,14 +283,14 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 }
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
-            } catch (SAXException e) {
+            } catch (SAXException ex) {
                 throw new InvalidConfException(
-                        "parse profile failed, message: " + e.getMessage(),
-                        e);
-            } catch (JAXBException e) {
+                        "parse profile failed, message: " + ex.getMessage(),
+                        ex);
+            } catch (JAXBException ex) {
                 throw new InvalidConfException(
-                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) e),
-                        e);
+                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex),
+                        ex);
             }
 
             if (root instanceof JAXBElement) {

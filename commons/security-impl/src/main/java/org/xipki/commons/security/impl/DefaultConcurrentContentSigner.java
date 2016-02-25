@@ -132,7 +132,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             } else {
                 signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ex) {
             LOG.info("interrupted");
         }
 
@@ -191,11 +191,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             X509Certificate cert = this.certificateChain[i];
             try {
                 this.certificateChainAsBCObjects[i] = new X509CertificateHolder(cert.getEncoded());
-            } catch (CertificateEncodingException | IOException e) {
+            } catch (CertificateEncodingException | IOException ex) {
                 throw new IllegalArgumentException(
                         String.format("%s occured while parsing certificate at index %d: %s",
-                                e.getClass().getName(), i, e.getMessage()),
-                        e);
+                                ex.getClass().getName(), i, ex.getMessage()),
+                        ex);
             }
         }
     }
@@ -248,13 +248,13 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             stream.write(new byte[]{1, 2, 3, 4});
             byte[] signature = signer.getSignature();
             return signature != null && signature.length > 0;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "isHealthy()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             return false;
         } finally {
             if (signer != null) {
