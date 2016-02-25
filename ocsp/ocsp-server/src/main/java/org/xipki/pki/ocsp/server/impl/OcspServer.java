@@ -96,7 +96,6 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -1026,13 +1025,6 @@ public class OcspServer {
                 concurrentSigner = signer.getFirstSigner();
             }
 
-            ContentSigner singleSigner;
-            try {
-                singleSigner = concurrentSigner.borrowContentSigner();
-            } catch (NoIdleSignerException ex) {
-                return createUnsuccessfulOCSPResp(OcspResponseStatus.tryLater);
-            }
-
             X509CertificateHolder[] certsInResp;
             EmbedCertsMode certsMode = responseOption.getEmbedCertsMode();
             if (certsMode == null || certsMode == EmbedCertsMode.SIGNER) {
@@ -1046,7 +1038,9 @@ public class OcspServer {
 
             BasicOCSPResp basicOcspResp;
             try {
-                basicOcspResp = basicOcspBuilder.build(singleSigner, certsInResp, new Date());
+                basicOcspResp = concurrentSigner.build(basicOcspBuilder, certsInResp, new Date());
+            } catch (NoIdleSignerException ex) {
+                return createUnsuccessfulOCSPResp(OcspResponseStatus.tryLater);
             } catch (OCSPException ex) {
                 final String message = "answer() basicOcspBuilder.build";
                 if (LOG.isErrorEnabled()) {
@@ -1059,8 +1053,6 @@ public class OcspServer {
                             "BasicOCSPRespBuilder.build() with OCSPException");
                 }
                 return createUnsuccessfulOCSPResp(OcspResponseStatus.internalError);
-            } finally {
-                concurrentSigner.returnContentSigner(singleSigner);
             }
 
             OCSPRespBuilder ocspRespBuilder = new OCSPRespBuilder();

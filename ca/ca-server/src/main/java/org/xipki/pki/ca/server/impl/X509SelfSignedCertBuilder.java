@@ -67,7 +67,6 @@ import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
@@ -300,15 +299,7 @@ class X509SelfSignedCertBuilder {
                     notBefore,
                     notAfter);
 
-            ContentSigner contentSigner = signer.borrowContentSigner();
-
-            Certificate bcCert;
-            try {
-                bcCert = certBuilder.build(contentSigner).toASN1Structure();
-            } finally {
-                signer.returnContentSigner(contentSigner);
-            }
-
+            Certificate bcCert = signer.build(certBuilder).toASN1Structure();
             byte[] encodedCert = bcCert.getEncoded();
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");

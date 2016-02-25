@@ -43,14 +43,12 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.KeyUtil;
 
@@ -63,27 +61,18 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     class Testor implements Runnable {
 
+        final byte[] data = new byte[] {1, 2, 3, 4};
+
         @Override
         public void run() {
-            ContentSigner singleSigner;
-            try {
-                singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException ex) {
-                account(1, 1);
-                return;
-            }
-
             while (!stop() && getErrorAccout() < 1) {
                 try {
-                    singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
-                    singleSigner.getSignature();
+                    signer.sign(data);
                     account(1, 0);
                 } catch (Exception ex) {
                     account(1, 1);
                 }
             }
-
-            signer.returnContentSigner(singleSigner);
         }
 
     } // class Testor

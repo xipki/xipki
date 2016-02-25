@@ -42,14 +42,30 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v2CRLBuilder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.cmp.CMPException;
+import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
+import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
+import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.BasicOCSPRespBuilder;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPReq;
+import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
@@ -116,13 +132,15 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         this.privateKey = privateKey;
     }
 
-    public ContentSigner borrowContentSigner()
+    private ContentSigner borrowContentSigner()
     throws NoIdleSignerException {
         return borrowContentSigner(defaultSignServiceTimeout);
     }
 
-    @Override
-    public ContentSigner borrowContentSigner(
+    /**
+     * @param timeout timeout in milliseconds, 0 for infinitely
+     */
+    private ContentSigner borrowContentSigner(
             final int soTimeout)
     throws NoIdleSignerException {
         ContentSigner signer = null;
@@ -144,8 +162,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         return signer;
     }
 
-    @Override
-    public void returnContentSigner(
+    private void returnContentSigner(
             final ContentSigner signer) {
         ParamUtil.assertNotNull("signer", signer);
 
@@ -270,6 +287,107 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public void shutdown() {
+    }
+
+    @Override
+    public POPOSigningKey build(
+            final ProofOfPossessionSigningKeyBuilder builder)
+    throws NoIdleSignerException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public ProtectedPKIMessage build(
+            final ProtectedPKIMessageBuilder builder)
+    throws NoIdleSignerException, CMPException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public X509CRLHolder build(
+            final X509v2CRLBuilder builder)
+    throws NoIdleSignerException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public X509CertificateHolder build(
+            final X509v3CertificateBuilder builder)
+    throws NoIdleSignerException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public OCSPReq build(
+            final OCSPReqBuilder builder,
+            final X509CertificateHolder[] chain)
+    throws NoIdleSignerException, OCSPException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner, chain);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public BasicOCSPResp build(
+            final BasicOCSPRespBuilder builder,
+            final X509CertificateHolder[] chain,
+            final Date producedAt)
+    throws NoIdleSignerException, OCSPException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner, chain, producedAt);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public PKCS10CertificationRequest build(
+            final PKCS10CertificationRequestBuilder builder)
+    throws NoIdleSignerException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            return builder.build(contentSigner);
+        } finally {
+            returnContentSigner(contentSigner);
+        }
+    }
+
+    @Override
+    public byte[] sign(
+            final byte[] data)
+    throws NoIdleSignerException, IOException {
+        ContentSigner contentSigner = borrowContentSigner();
+        try {
+            OutputStream signatureStream = contentSigner.getOutputStream();
+            signatureStream.write(data);
+            return contentSigner.getSignature();
+        } finally {
+            returnContentSigner(contentSigner);
+        }
     }
 
 }

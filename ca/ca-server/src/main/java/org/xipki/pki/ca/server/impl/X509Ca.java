@@ -97,7 +97,6 @@ import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.provider.asymmetric.x509.CertificateFactory;
 import org.bouncycastle.jce.provider.X509CRLObject;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
@@ -1003,19 +1002,12 @@ public class X509Ca {
                     ? caInfo.getSigner(null)
                     : localCrlSigner;
 
-            ContentSigner contentSigner;
+            X509CRLHolder crlHolder;
             try {
-                contentSigner = concurrentSigner.borrowContentSigner();
+                crlHolder = concurrentSigner.build(crlBuilder);
             } catch (NoIdleSignerException ex) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, "NoIdleSignerException: "
                         + ex.getMessage());
-            }
-
-            X509CRLHolder crlHolder;
-            try {
-                crlHolder = crlBuilder.build(contentSigner);
-            } finally {
-                concurrentSigner.returnContentSigner(contentSigner);
             }
 
             try {
@@ -2206,19 +2198,12 @@ public class X509Ca {
                     }
                 }
 
-                ContentSigner contentSigner;
+                Certificate bcCert;
                 try {
-                    contentSigner = signer.borrowContentSigner();
+                    bcCert = signer.build(certBuilder).toASN1Structure();
                 } catch (NoIdleSignerException ex) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "NoIdleSignerException: " + ex.getMessage());
-                }
-
-                Certificate bcCert;
-                try {
-                    bcCert = certBuilder.build(contentSigner).toASN1Structure();
-                } finally {
-                    signer.returnContentSigner(contentSigner);
                 }
 
                 byte[] encodedCert = bcCert.getEncoded();
