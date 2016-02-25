@@ -139,8 +139,8 @@ public class P11RSAPSSContentSigner implements ContentSigner {
         try {
             keyParam = P11RSAKeyParameter.getInstance(
                     cryptService, slot, keyId);
-        } catch (InvalidKeyException e) {
-            throw new OperatorCreationException(e.getMessage(), e);
+        } catch (InvalidKeyException ex) {
+            throw new OperatorCreationException(ex.getMessage(), ex);
         }
 
         this.pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
@@ -164,10 +164,10 @@ public class P11RSAPSSContentSigner implements ContentSigner {
     public byte[] getSignature() {
         try {
             return pssSigner.generateSignature();
-        } catch (CryptoException e) {
-            LOG.warn("SignerException: {}", e.getMessage());
-            LOG.debug("SignerException", e);
-            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
+        } catch (CryptoException ex) {
+            LOG.warn("SignerException: {}", ex.getMessage());
+            LOG.debug("SignerException", ex);
+            throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
     }
 

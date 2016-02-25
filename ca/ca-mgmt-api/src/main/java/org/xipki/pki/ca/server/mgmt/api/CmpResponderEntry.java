@@ -87,7 +87,7 @@ public class CmpResponderEntry implements Serializable {
 
         try {
             this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             this.certFaulty = true;
         }
     }
@@ -167,7 +167,7 @@ public class CmpResponderEntry implements Serializable {
                 sb.append("\tencoded: ");
                 try {
                     sb.append(Base64.toBase64String(certificate.getEncoded()));
-                } catch (CertificateEncodingException e) {
+                } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }
             }

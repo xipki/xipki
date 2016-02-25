@@ -58,7 +58,7 @@ public class NegProfileRemoveCmd extends ProfileRemoveCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

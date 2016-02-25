@@ -85,8 +85,8 @@ class IdentifiedX509CertPublisher {
             try {
                 Class<?> clazz = Class.forName(className);
                 realPublisher = (X509CertPublisher) clazz.newInstance();
-            } catch (Exception e) {
-                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
+            } catch (Exception ex) {
+                throw new CertPublisherException("invalid type " + type + ", " + ex.getMessage());
             }
         } else {
             throw new CertPublisherException("invalid type " + type);

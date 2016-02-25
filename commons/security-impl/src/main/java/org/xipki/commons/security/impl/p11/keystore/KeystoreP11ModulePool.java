@@ -77,13 +77,13 @@ public class KeystoreP11ModulePool {
             LOG.info("removed module {}", moduleName);
             module.close();
             LOG.info("finalized module {}", moduleName);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "could not finalize the module " + moduleName;
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message),
-                        t.getClass().getName(), t.getMessage());
+                        th.getClass().getName(), th.getMessage());
             }
-            LOG.debug(message, t);
+            LOG.debug(message, th);
         }
     }
 

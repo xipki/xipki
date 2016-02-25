@@ -123,8 +123,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     unmarshaller.unmarshal(
                             new File(baseDir + File.separator + FILENAME_OCSP_CERTSTORE));
             certstore = root.getValue();
-        } catch (JAXBException e) {
-            throw XmlUtil.convert(e);
+        } catch (JAXBException ex) {
+            throw XmlUtil.convert(ex);
         }
 
         if (certstore.getVersion() > VERSION) {
@@ -142,9 +142,9 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             importCert(certstore, processLogFile);
             recoverIndexes();
             processLogFile.delete();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             System.err.println("error while importing OCSP certstore to database");
-            throw e;
+            throw ex;
         }
         System.out.println(" imported OCSP certstore to database");
     } // method importToDB
@@ -180,13 +180,13 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             try {
                 c = Certificate.getInstance(encodedCert);
                 encodedName = c.getSubject().getEncoded("DER");
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 LOG.error("could not parse certificate of issuer {}", issuer.getId());
-                LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
-                if (e instanceof CertificateException) {
-                    throw (CertificateException) e;
+                LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
+                if (ex instanceof CertificateException) {
+                    throw (CertificateException) ex;
                 } else {
-                    throw new CertificateException(e.getMessage(), e);
+                    throw new CertificateException(ex.getMessage(), ex);
                 }
             }
             byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -216,12 +216,12 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             setLong(ps, idx++, issuer.getRevInvTime());
 
             ps.execute();
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             System.err.println("error while importing issuer with id=" + issuer.getId());
-            throw translate(SQL_ADD_ISSUER, e);
-        } catch (CertificateException e) {
+            throw translate(SQL_ADD_ISSUER, ex);
+        } catch (CertificateException ex) {
             System.err.println("error while importing issuer with id=" + issuer.getId());
-            throw e;
+            throw ex;
         }
     } // method doImportIssuer
 
@@ -273,7 +273,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                             // try next file
                             continue;
                         }
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         LOG.warn("invalid file name '{}', but will still be processed", certsFile);
                     }
                 } else {
@@ -284,11 +284,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     int lastId = doImportCert(psCert, psCerthash, psRawcert, certsFile, minId,
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     System.err.println("\nerror while importing certificates from file "
                             + certsFile + ".\nplease continue with the option '--resume'");
-                    LOG.error("Exception", e);
-                    throw e;
+                    LOG.error("Exception", ex);
+                    throw ex;
                 }
             } // end for
         } finally {
@@ -323,12 +323,12 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         OcspCertsReader certs;
         try {
             certs = new OcspCertsReader(zipFile.getInputStream(certsXmlEntry));
-        } catch (Exception e) {
+        } catch (Exception ex) {
             try {
                 zipFile.close();
             } catch (Exception e2) {
             }
-            throw e;
+            throw ex;
         }
 
         disableAutoCommit();
@@ -362,13 +362,13 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 try {
                     Certificate cc = Certificate.getInstance(encodedCert);
                     c = cc.getTBSCertificate();
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     LOG.error("could not parse certificate in file {}", filename);
-                    LOG.debug("could not parse certificate in file " + filename, e);
-                    if (e instanceof CertificateException) {
-                        throw (CertificateException) e;
+                    LOG.debug("could not parse certificate in file " + filename, ex);
+                    if (ex instanceof CertificateException) {
+                        throw (CertificateException) ex;
                     } else {
-                        throw new CertificateException(e.getMessage(), e);
+                        throw new CertificateException(ex.getMessage(), ex);
                     }
                 }
 
@@ -387,8 +387,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     setLong(psCert, idx++, cert.getRit());
                     psCert.setString(idx++, cert.getProfile());
                     psCert.addBatch();
-                } catch (SQLException e) {
-                    throw translate(SQL_ADD_CERT, e);
+                } catch (SQLException ex) {
+                    throw translate(SQL_ADD_CERT, ex);
                 }
 
                 // certhash
@@ -401,8 +401,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     psCerthash.setString(idx++, sha384(encodedCert));
                     psCerthash.setString(idx++, sha512(encodedCert));
                     psCerthash.addBatch();
-                } catch (SQLException e) {
-                    throw translate(SQL_ADD_CHASH, e);
+                } catch (SQLException ex) {
+                    throw translate(SQL_ADD_CHASH, ex);
                 }
 
                 // rawcert
@@ -413,8 +413,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                             X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
                     psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     psRawcert.addBatch();
-                } catch (SQLException e) {
-                    throw translate(SQL_ADD_CRAW, e);
+                } catch (SQLException ex) {
+                    throw translate(SQL_ADD_CRAW, ex);
                 }
 
                 boolean isLastBlock = !certs.hasNext();
@@ -439,15 +439,15 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
                             sql = null;
                             commit("(commit import cert to OCSP)");
-                        } catch (Throwable t) {
+                        } catch (Throwable th) {
                             rollback();
                             deleteCertGreatherThan(lastSuccessfulCertId, LOG);
-                            if (t instanceof SQLException) {
-                                throw translate(sql, (SQLException) t);
-                            } else if (t instanceof Exception) {
-                                throw (Exception) t;
+                            if (th instanceof SQLException) {
+                                throw translate(sql, (SQLException) th);
+                            } else if (th instanceof Exception) {
+                                throw (Exception) th;
                             } else {
-                                throw new Exception(t);
+                                throw new Exception(th);
                             }
                         }
                     }
@@ -466,7 +466,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         } finally {
             try {
                 recoverAutoCommit();
-            } catch (DataAccessException e) {
+            } catch (DataAccessException ex) {
             }
             zipFile.close();
         }

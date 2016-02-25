@@ -93,8 +93,8 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
                     content,
                     param.getSlot(),
                     param.getKeyId());
-        } catch (SignerException e) {
-            throw new InvalidCipherTextException(e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new InvalidCipherTextException(ex.getMessage(), ex);
         }
     }
 

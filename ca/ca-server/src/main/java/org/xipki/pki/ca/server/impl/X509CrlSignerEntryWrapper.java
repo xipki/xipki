@@ -123,8 +123,8 @@ class X509CrlSignerEntryWrapper {
         ASN1OctetString ski;
         try {
             ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
-        } catch (IOException e) {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+        } catch (IOException ex) {
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
         }
         this.subjectKeyIdentifier = ski.getOctets();
 

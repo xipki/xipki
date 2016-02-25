@@ -264,9 +264,9 @@ public class KeyUtil {
 
             try {
                 kf = KeyFactory.getInstance(algorithm, "BC");
-            } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
                 throw new InvalidKeySpecException("could not find KeyFactory for " + algorithm
-                        + ": " + e.getMessage());
+                        + ": " + ex.getMessage());
             }
             KEY_FACTORIES.put(algorithm, kf);
             return kf;
@@ -281,8 +281,8 @@ public class KeyUtil {
         X509EncodedKeySpec keyspec;
         try {
             keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
-        } catch (IOException e) {
-            throw new InvalidKeySpecException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new InvalidKeySpecException(ex.getMessage(), ex);
         }
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
 
@@ -416,7 +416,7 @@ public class KeyUtil {
 
         try {
             oid = new ASN1ObjectIdentifier(curveNameOrOid);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             oid = getCurveOidForName(curveNameOrOid);
         }
 
@@ -509,16 +509,16 @@ public class KeyUtil {
         } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new InvalidKeySpecException(ex.getMessage(), ex);
         }
-        
+
         ASN1Encodable algParams;
         if (encodedAlgorithmIdParameters.length < 50) {
-        	algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
+            algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
         } else {
-        	algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
+            algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
         }
         AlgorithmIdentifier algId = new AlgorithmIdentifier(
                 X9ObjectIdentifiers.id_ecPublicKey, algParams);
-        
+
         SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(algId, encodedPoint);
         X509EncodedKeySpec keySpec;
         try {
@@ -537,5 +537,5 @@ public class KeyUtil {
                 EC5Util.convertSpec(paramSpec, false);
         return ECUtil.getNamedCurveOid(bcParamSpec);
     }
-    
+
 }

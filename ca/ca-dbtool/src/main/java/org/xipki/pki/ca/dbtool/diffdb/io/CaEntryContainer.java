@@ -81,9 +81,9 @@ public class CaEntryContainer {
         for (CaEntry m : caEntryMap.values()) {
             try {
                 m.close();
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 sb.append("could not close CAEntry '").append(m.getCaId());
-                sb.append("': ").append(e.getMessage()).append(", ");
+                sb.append("': ").append(ex.getMessage()).append(", ");
             }
         }
 

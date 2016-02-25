@@ -130,8 +130,8 @@ public class OcspQaImpl implements OcspQa {
         BasicOCSPResp basicResp;
         try {
             basicResp = (BasicOCSPResp) response.getResponseObject();
-        } catch (OCSPException e) {
-            encodingIssue.setFailureMessage(e.getMessage());
+        } catch (OCSPException ex) {
+            encodingIssue.setFailureMessage(ex.getMessage());
             return new ValidationResult(resultIssues);
         }
 
@@ -176,7 +176,7 @@ public class OcspQaImpl implements OcspQa {
                         issue.setFailureMessage("is '" + sigAlgName + "', but expected '"
                                 + expectedSigalgo + "'");
                     }
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException ex) {
                     issue.setFailureMessage("could not extract the signature algorithm");
                 }
             } // end if (expectedSigalgo != null)
@@ -224,7 +224,7 @@ public class OcspQaImpl implements OcspQa {
                         } else {
                             issue.setFailureMessage("responder signer is not trusted");
                         }
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         issue.setFailureMessage("responder signer is not trusted");
                     }
                 }
@@ -238,7 +238,7 @@ public class OcspQaImpl implements OcspQa {
                     if (!sigValid) {
                         sigValIssue.setFailureMessage("signature is invalid");
                     }
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     sigValIssue.setFailureMessage("error while validating signature");
                 }
             } // end if
@@ -395,7 +395,7 @@ public class OcspQaImpl implements OcspQa {
                         issue.setFailureMessage(
                                 "certHash does not match the requested certificate");
                     }
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException ex) {
                     issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());
                 }
             } // end if(encodedCert != null)

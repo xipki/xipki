@@ -100,7 +100,7 @@ public class X509CrlSignerEntry implements Serializable {
         if (this.base64Cert != null) {
             try {
                 this.cert = X509Util.parseBase64EncodedCert(base64Cert);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 LOG.debug("could not parse the certificate of CRL signer '" + name + "'");
                 certFaulty = true;
             }
@@ -185,7 +185,7 @@ public class X509CrlSignerEntry implements Serializable {
                 sb.append("\tencoded: ");
                 try {
                     sb.append(Base64.toBase64String(cert.getEncoded()));
-                } catch (CertificateEncodingException e) {
+                } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }
             }

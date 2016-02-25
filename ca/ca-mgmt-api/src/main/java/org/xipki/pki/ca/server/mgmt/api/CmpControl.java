@@ -211,7 +211,7 @@ public class CmpControl {
         String name;
         try {
             name = AlgorithmUtil.getSignatureAlgoName(algId);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException ex) {
             return false;
         }
 
@@ -246,8 +246,8 @@ public class CmpControl {
         for (String m : algos) {
             try {
                 ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
-            } catch (NoSuchAlgorithmException e) {
-                throw new InvalidConfException(e.getMessage(), e);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new InvalidConfException(ex.getMessage(), ex);
             }
         }
         return Collections.unmodifiableSet(ret);

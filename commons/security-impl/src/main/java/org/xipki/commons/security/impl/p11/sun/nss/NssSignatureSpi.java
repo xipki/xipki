@@ -363,14 +363,14 @@ public class NssSignatureSpi extends SignatureSpi {
         try {
             AlgorithmIdentifier hashAlgId = new AlgorithmIdentifier(hashAlgOid, DERNull.INSTANCE);
             tbsHash = pkcs1padding(derEncode(hashAlgId, hash), blockSize);
-        } catch (IOException e) {
-            throw new SignatureException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new SignatureException(ex.getMessage(), ex);
         }
 
         try {
             return cipher.doFinal(tbsHash);
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            throw new SignatureException(e.getMessage(), e);
+        } catch (IllegalBlockSizeException | BadPaddingException ex) {
+            throw new SignatureException(ex.getMessage(), ex);
         }
     }
 
@@ -413,8 +413,8 @@ public class NssSignatureSpi extends SignatureSpi {
             try {
                 encodedHash = decodePkcs11Block(cipher.doFinal(sigBytes),
                         cipher.getOutputSize(1) - 1);
-            } catch (Exception e) {
-                throw new SignatureException(e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new SignatureException(ex.getMessage(), ex);
             }
 
             byte[] hash = md.digest();
@@ -432,13 +432,13 @@ public class NssSignatureSpi extends SignatureSpi {
                         }
                     }
                 }
-            } catch (IOException e) {
-                throw new SignatureException(e.getMessage(), e);
+            } catch (IOException ex) {
+                throw new SignatureException(ex.getMessage(), ex);
             } finally {
                 if (ain != null) {
                     try {
                         ain.close();
-                    } catch (IOException e) {
+                    } catch (IOException ex) {
                     }
                 }
             }
@@ -453,7 +453,7 @@ public class NssSignatureSpi extends SignatureSpi {
         if (XipkiNssProvider.nssProvider != null) {
             try {
                 service = Signature.getInstance(algorithm, XipkiNssProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException ex) {
                 try {
                     service = Signature.getInstance(algorithm, "SunEC");
                 } catch (NoSuchAlgorithmException | NoSuchProviderException e2) {
@@ -476,9 +476,9 @@ public class NssSignatureSpi extends SignatureSpi {
         if (XipkiNssProvider.nssProvider != null) {
             try {
                 service = Cipher.getInstance(algorithm, XipkiNssProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException ex) {
                 throw new ProviderException("cipher " + algorithm + " not supported");
-            } catch (NoSuchPaddingException e) {
+            } catch (NoSuchPaddingException ex) {
                 throw new ProviderException("cipher " + algorithm + " not supported");
             }
         }
@@ -496,7 +496,7 @@ public class NssSignatureSpi extends SignatureSpi {
         if (XipkiNssProvider.nssProvider != null) {
             try {
                 service = MessageDigest.getInstance(algorithm, XipkiNssProvider.nssProvider);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException ex) {
             }
         }
 
@@ -504,7 +504,7 @@ public class NssSignatureSpi extends SignatureSpi {
             final String errorMsg = "could not find any provider for algorithm " + algorithm;
             try {
                 service = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException ex) {
                 throw new ProviderException(errorMsg);
             }
         }

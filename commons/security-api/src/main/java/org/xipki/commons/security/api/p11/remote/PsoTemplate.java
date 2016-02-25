@@ -112,7 +112,7 @@ public class PsoTemplate extends ASN1Object {
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException ex) {
             throw new BadAsn1ObjectException("unable to parse encoded PSOTemplate");
         }
 

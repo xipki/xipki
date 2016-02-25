@@ -271,8 +271,8 @@ public class ExtensionsChecker {
                     String c14nAlgo;
                     try {
                         c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new CertprofileException(e.getMessage(), e);
+                    } catch (NoSuchAlgorithmException ex) {
+                        throw new CertprofileException(ex.getMessage(), ex);
                     }
                     this.signatureAlgorithms.add(c14nAlgo);
                 }
@@ -493,9 +493,9 @@ public class ExtensionsChecker {
                 if (extConf != null) {
                     try {
                         biometricInfo = new BiometricInfoOption(extConf);
-                    } catch (NoSuchAlgorithmException e) {
+                    } catch (NoSuchAlgorithmException ex) {
                         throw new CertprofileException(
-                                "NoSuchAlgorithmException: " + e.getMessage());
+                                "NoSuchAlgorithmException: " + ex.getMessage());
                     }
                 }
             }
@@ -550,23 +550,23 @@ public class ExtensionsChecker {
                 try {
                     smimeCapabilities = new QaExtensionValue(
                             extensionControls.get(type).isCritical(), extValue.getEncoded());
-                } catch (IOException e) {
+                } catch (IOException ex) {
                     throw new CertprofileException(
-                            "Cannot encode SMIMECapabilities: " + e.getMessage());
+                            "Cannot encode SMIMECapabilities: " + ex.getMessage());
                 }
             }
 
             // constant extensions
             this.constantExtensions = buildConstantExtesions(extensionsType);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ex) {
             final String message = "RuntimeException";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             throw new CertprofileException(
-                    "RuntimeException thrown while initializing certprofile: " + e.getMessage());
+                    "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
         }
     } // constructor
 
@@ -580,8 +580,8 @@ public class ExtensionsChecker {
         X509Certificate jceCert;
         try {
             jceCert = new X509CertificateObject(cert);
-        } catch (CertificateParsingException e) {
-            throw new IllegalArgumentException("invalid cert: " + e.getMessage());
+        } catch (CertificateParsingException ex) {
+            throw new IllegalArgumentException("invalid cert: " + ex.getMessage());
         }
 
         List<ValidationIssue> result = new LinkedList<>();
@@ -755,8 +755,8 @@ public class ExtensionsChecker {
 
             } catch (IllegalArgumentException
                     | ClassCastException
-                    | ArrayIndexOutOfBoundsException e) {
-                LOG.debug("extension value does not have correct syntax", e);
+                    | ArrayIndexOutOfBoundsException ex) {
+                LOG.debug("extension value does not have correct syntax", ex);
                 issue.setFailureMessage("extension value does not have correct syntax");
             }
         }
@@ -1752,11 +1752,11 @@ public class ExtensionsChecker {
         for (int i = 0; i < is.length; i++) {
             try {
                 expected[i] = createGeneralName(is[i], conf);
-            } catch (BadCertTemplateException e) {
+            } catch (BadCertTemplateException ex) {
                 failureMsg.append("error while processing ")
                     .append(i + 1)
                     .append("-th name: ")
-                    .append(e.getMessage());
+                    .append(ex.getMessage());
                 failureMsg.append("; ");
                 return;
             }
@@ -1867,9 +1867,9 @@ public class ExtensionsChecker {
             GeneralName accessLocation;
             try {
                 accessLocation = createGeneralName(ad.getAccessLocation(), generalNameModes);
-            } catch (BadCertTemplateException e) {
+            } catch (BadCertTemplateException ex) {
                 failureMsg.append("invalid requestExtension: ")
-                    .append(e.getMessage());
+                    .append(ex.getMessage());
                 failureMsg.append("; ");
                 continue;
             }
@@ -2257,7 +2257,7 @@ public class ExtensionsChecker {
         ASN1Primitive asn1;
         try {
             asn1 = ASN1Primitive.fromByteArray(extensionValue);
-        } catch (IOException e) {
+        } catch (IOException ex) {
             failureMsg.append("invalid syntax of extension value");
             failureMsg.append("; ");
             return;
@@ -2550,7 +2550,7 @@ public class ExtensionsChecker {
                 } else {
                     throw new RuntimeException("statementInfo[" + i + "]should not reach here");
                 }
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 failureMsg.append("statementInfo[")
                     .append(i)
                     .append("] has incorrect syntax");
@@ -2655,7 +2655,7 @@ public class ExtensionsChecker {
                             .append("'");
                         failureMsg.append("; ");
                     }
-                } catch (IOException e) {
+                } catch (IOException ex) {
                     failureMsg.append("biometricData[")
                         .append(i)
                         .append("].biometricDataHash.parameters has incorrect syntax");
@@ -2852,8 +2852,8 @@ public class ExtensionsChecker {
             ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
             try {
                 parser.readObject();
-            } catch (IOException e) {
-                throw new CertprofileException("could not parse the constant extension value", e);
+            } catch (IOException ex) {
+                throw new CertprofileException("could not parse the constant extension value", ex);
             }
             QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
             map.put(oid, extension);
@@ -2872,8 +2872,8 @@ public class ExtensionsChecker {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {
             return parser.readObject();
-        } catch (IOException e) {
-            throw new CertprofileException("could not parse the constant extension value", e);
+        } catch (IOException ex) {
+            throw new CertprofileException("could not parse the constant extension value", ex);
         }
     }
     private static String hex(

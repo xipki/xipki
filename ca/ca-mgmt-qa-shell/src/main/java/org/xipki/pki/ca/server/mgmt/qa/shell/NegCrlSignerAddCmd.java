@@ -58,7 +58,7 @@ public class NegCrlSignerAddCmd extends CrlSignerAddCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

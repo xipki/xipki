@@ -61,9 +61,9 @@ public class CollectionCertificateValidator implements CertificateValidator {
             String hash;
             try {
                 hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException ex) {
                 throw new IllegalArgumentException(
-                        "could not encode certificate: " + e.getMessage(), e);
+                        "could not encode certificate: " + ex.getMessage(), ex);
             }
             certHashes.add(hash);
         }
@@ -77,9 +77,9 @@ public class CollectionCertificateValidator implements CertificateValidator {
         String hash;
         try {
             hash = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             throw new IllegalArgumentException(
-                    "could not encode certificate: " + e.getMessage(), e);
+                    "could not encode certificate: " + ex.getMessage(), ex);
         }
         certHashes.add(hash);
     }
@@ -93,9 +93,9 @@ public class CollectionCertificateValidator implements CertificateValidator {
         String hash;
         try {
             hash = HashAlgoType.SHA256.hexDigest(signerCert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             throw new IllegalArgumentException(
-                    "could not encode certificate: " + e.getMessage(), e);
+                    "could not encode certificate: " + ex.getMessage(), ex);
         }
         return certHashes.contains(hash);
     }

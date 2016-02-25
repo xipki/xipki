@@ -168,8 +168,8 @@ public class Scep {
         this.caManager = caManager;
         try {
             this.control = new ScepControl(dbEntry.getControl());
-        } catch (InvalidConfException e) {
-            throw new CaMgmtException(e);
+        } catch (InvalidConfException ex) {
+            throw new CaMgmtException(ex);
         }
         LOG.info("SCEP {}: caCert.included={}, signerCert.included={}",
                 this.caName, this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
@@ -197,8 +197,8 @@ public class Scep {
             privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
                     dbEntry.getResponderType(), dbEntry.getResponderConf(),
                     dbEntry.getCertificate());
-        } catch (SignerException e) {
-            throw new CaMgmtException(e);
+        } catch (SignerException ex) {
+            throw new CaMgmtException(ex);
         }
 
         this.responderKey = privKeyAndCert.getPrivateKey();
@@ -226,12 +226,12 @@ public class Scep {
                     ca.getCaInfo().getCertificate().getEncodedCert());
             this.caCertRespBytes = new CaCertRespBytes(
                     ca.getCaInfo().getCertificate().getCert(), responderCert);
-        } catch (CertificateException e) {
-            throw new CaMgmtException(e);
-        } catch (CMSException e) {
-            throw new CaMgmtException(e);
-        } catch (IOException e) {
-            throw new CaMgmtException(e);
+        } catch (CertificateException ex) {
+            throw new CaMgmtException(ex);
+        } catch (CMSException ex) {
+            throw new CaMgmtException(ex);
+        } catch (IOException ex) {
+            throw new CaMgmtException(ex);
         }
 
         EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
@@ -413,14 +413,14 @@ public class Scep {
         X509Ca ca;
         try {
             ca = caManager.getX509Ca(caName);
-        } catch (CaMgmtException e) {
+        } catch (CaMgmtException ex) {
             final String message = tid + "=" + tid + ",could not get X509CA";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            LOG.debug(message, ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
 
         X500Name caX500Name = ca.getCaInfo().getCertificate().getSubjectAsX500Name();
@@ -591,9 +591,9 @@ public class Scep {
             ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
             rep.setMessageData(ci);
             rep.setPkiStatus(PkiStatus.SUCCESS);
-        } catch (FailInfoException e) {
+        } catch (FailInfoException ex) {
             rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(e.getFailInfo());
+            rep.setFailInfo(ex.getFailInfo());
         }
 
         return rep;
@@ -606,15 +606,15 @@ public class Scep {
         X509Certificate cert;
         try {
             cert = ca.getCertificate(serialNumber);
-        } catch (CertificateException e) {
+        } catch (CertificateException ex) {
             final String message = "could not get certificate (CA='" + caName
                     + "' and serialNumber='" + serialNumber + "')";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            LOG.debug(message, ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         if (cert == null) {
             throw FailInfoException.BAD_CERTID;
@@ -659,14 +659,14 @@ public class Scep {
             }
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             return (SignedData) signedData.toASN1Structure().getContent();
-        } catch (CMSException | IOException | CertificateEncodingException e) {
+        } catch (CMSException | IOException | CertificateEncodingException ex) {
             final String message = "error in buildSignedData";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            LOG.debug(message, ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     } // method buildSignedData
 
@@ -684,14 +684,14 @@ public class Scep {
         CMSSignedData signedData;
         try {
             signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-        } catch (CMSException e) {
+        } catch (CMSException ex) {
             final String message = "could not generate CMSSignedData";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            LOG.debug(message, ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         return (SignedData) signedData.toASN1Structure().getContent();
     } // method getCRL
@@ -714,14 +714,14 @@ public class Scep {
             ci = response.encode(responderKey,
                     signatureAlgorithm, responderCert, cmsCertSet,
                     request.getSignatureCert(), request.getContentEncryptionAlgorithm());
-        } catch (MessageEncodingException e) {
+        } catch (MessageEncodingException ex) {
             final String message = "could not encode response";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+            LOG.debug(message, ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         return ci;
     } // method encodeResponse
@@ -775,7 +775,7 @@ public class Scep {
                 cmsSignedDataGen.addCertificate(new X509CertificateHolder(cert.getEncoded()));
             }
             return cmsSignedDataGen.generate(new CMSAbsentContent());
-        } catch (IOException e) {
+        } catch (IOException ex) {
             throw new CMSException("could not build CMS SignedDta");
         }
     }
@@ -789,7 +789,7 @@ public class Scep {
 
         try {
             return Hex.decode(tid);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (n % 4 == 0) {
                 try {
                     return Base64.decode(tid);

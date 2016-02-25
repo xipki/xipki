@@ -58,7 +58,7 @@ public class NegResponderUpdateCmd extends ResponderUpdateCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

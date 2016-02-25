@@ -275,13 +275,13 @@ public class DbCertStatusStore extends CertStatusStore {
             } finally {
                 releaseDbResources(ps, rs);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "could not executing initializeStore()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             initializationFailed = true;
             initialized = true;
         }
@@ -307,7 +307,7 @@ public class DbCertStatusStore extends CertStatusStore {
         while (!initialized && (n-- > 0)) {
             try {
                 Thread.sleep(100);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
             }
         }
 
@@ -379,8 +379,8 @@ public class DbCertStatusStore extends CertStatusStore {
                         }
                     }
                 } // end if (rs.next())
-            } catch (SQLException e) {
-                throw dataSource.translate(coreSql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(coreSql, ex);
             } finally {
                 releaseDbResources(ps, rs);
             }
@@ -436,8 +436,8 @@ public class DbCertStatusStore extends CertStatusStore {
             } // end if
 
             return certStatusInfo;
-        } catch (DataAccessException e) {
-            throw new CertStatusStoreException(e.getMessage(), e);
+        } catch (DataAccessException ex) {
+            throw new CertStatusStoreException(ex.getMessage(), ex);
         }
     } // method getCertStatus
 
@@ -474,13 +474,13 @@ public class DbCertStatusStore extends CertStatusStore {
             } finally {
                 releaseDbResources(ps, rs);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "isHealthy()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             return false;
         }
     }

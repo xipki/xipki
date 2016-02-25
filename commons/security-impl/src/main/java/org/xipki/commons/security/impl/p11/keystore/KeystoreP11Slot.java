@@ -275,23 +275,23 @@ public class KeystoreP11Slot implements P11WritableSlot {
                         securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11KeyId);
                 currentIdentifies.add(identity);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException ex) {
                 final String message = "InvalidKeyException while initializing key with key-id "
                         + hexKeyId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 continue;
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message =
                         "unexpected exception while initializing key with key-id " + hexKeyId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
                 continue;
             }
         }
@@ -582,7 +582,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         byte[] keyLabelBytes;
         try {
             keyLabelBytes = keyLabel.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ex) {
             keyLabelBytes = keyLabel.getBytes();
         }
 
@@ -655,7 +655,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         sb.append("\t\t\tSHA1 Sum: ");
         try {
             sb.append(HashCalculator.hexSha1(cert.getEncoded()));
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             sb.append("ERROR");
         }
         sb.append("\n");
@@ -1026,7 +1026,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             if (stream != null) {
                 try {
                     stream.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
         }

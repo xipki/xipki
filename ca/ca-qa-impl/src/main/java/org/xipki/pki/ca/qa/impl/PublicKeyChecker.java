@@ -91,15 +91,15 @@ public class PublicKeyChecker {
                         conf.getKeyAlgorithms());
             }
 
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ex) {
             final String message = "RuntimeException";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             throw new CertprofileException(
-                    "RuntimeException thrown while initializing certprofile: " + e.getMessage());
+                    "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
         }
     }
 
@@ -113,8 +113,8 @@ public class PublicKeyChecker {
             resultIssues.add(issue);
             try {
                 checkPublicKey(publicKey);
-            } catch (BadCertTemplateException e) {
-                issue.setFailureMessage(e.getMessage());
+            } catch (BadCertTemplateException ex) {
+                issue.setFailureMessage(ex.getMessage());
             }
         }
 
@@ -128,7 +128,7 @@ public class PublicKeyChecker {
                 issue.setFailureMessage(
                         "public key in the certificate does not equal the requested one");
             }
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException ex) {
             issue.setFailureMessage("public key in request is invalid");
         }
 
@@ -183,11 +183,11 @@ public class PublicKeyChecker {
 
             try {
                 checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
-            } catch (BadCertTemplateException e) {
-                throw e;
-            } catch (Exception e) {
-                LOG.debug("populateFromPubKeyInfo", e);
-                throw new BadCertTemplateException("invalid public key: " + e.getMessage());
+            } catch (BadCertTemplateException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                LOG.debug("populateFromPubKeyInfo", ex);
+                throw new BadCertTemplateException("invalid public key: " + ex.getMessage());
             }
 
             return;
@@ -199,7 +199,7 @@ public class PublicKeyChecker {
                 ASN1Sequence seq = ASN1Sequence.getInstance(
                         publicKey.getPublicKeyData().getBytes());
                 modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
                 throw new BadCertTemplateException("invalid publicKeyData");
             }
 
@@ -223,7 +223,7 @@ public class PublicKeyChecker {
                 ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
                 pLength = p.getPositiveValue().bitLength();
                 qLength = q.getPositiveValue().bitLength();
-            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
                 throw new BadCertTemplateException("illegal Dss-Parms");
             }
 

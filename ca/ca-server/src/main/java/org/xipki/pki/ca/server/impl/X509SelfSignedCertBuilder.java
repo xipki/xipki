@@ -178,9 +178,9 @@ class X509SelfSignedCertBuilder {
 
             signer = securityFactory.createSigner(signerType, thisSignerConf,
                     (X509Certificate[]) null);
-        } catch (SignerException e) {
+        } catch (SignerException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    e.getClass().getName() + ": " + e.getMessage());
+                    ex.getClass().getName() + ": " + ex.getMessage());
         }
 
         SubjectPublicKeyInfo publicKeyInfo;
@@ -189,9 +189,9 @@ class X509SelfSignedCertBuilder {
             Certificate bcCert;
             try {
                 bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                        "could not reparse certificate: " + e.getMessage());
+                        "could not reparse certificate: " + ex.getMessage());
             }
             publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
         } else {
@@ -226,16 +226,16 @@ class X509SelfSignedCertBuilder {
         SubjectPublicKeyInfo localPublicKeyInfo;
         try {
             localPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
-        } catch (InvalidKeySpecException e) {
-            LOG.warn("SecurityUtil.toRfc3279Style", e);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        } catch (InvalidKeySpecException ex) {
+            LOG.warn("SecurityUtil.toRfc3279Style", ex);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         }
 
         try {
             certprofile.checkPublicKey(localPublicKeyInfo);
-        } catch (BadCertTemplateException e) {
-            LOG.warn("certprofile.checkPublicKey", e);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        } catch (BadCertTemplateException ex) {
+            LOG.warn("certprofile.checkPublicKey", ex);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         }
 
         X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
@@ -244,12 +244,12 @@ class X509SelfSignedCertBuilder {
         // subject
         try {
             subjectInfo = certprofile.getSubject(requestedSubject);
-        } catch (CertprofileException e) {
+        } catch (CertprofileException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "exception in cert profile " + certprofile.getName());
-        } catch (BadCertTemplateException e) {
-            LOG.warn("certprofile.getSubject", e);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        } catch (BadCertTemplateException ex) {
+            LOG.warn("certprofile.getSubject", ex);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         }
 
         Date notBefore = certprofile.getNotBefore(null);
@@ -313,12 +313,12 @@ class X509SelfSignedCertBuilder {
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
-        } catch (BadCertTemplateException e) {
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        } catch (BadCertTemplateException ex) {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         } catch (NoIdleSignerException | CertificateException | IOException
-                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException e) {
+                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    e.getClass().getName() + ": " + e.getMessage());
+                    ex.getClass().getName() + ": " + ex.getMessage());
         }
     } // method generateCertificate
 

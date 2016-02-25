@@ -118,18 +118,18 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
         byte[] hashValue = outputStream.digest();
         try {
             return CKM_SIGN(hashValue);
-        } catch (SignerException e) {
-            LOG.warn("SignerException: {}", e.getMessage());
-            LOG.debug("SignerException", e);
-            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-        } catch (Throwable t) {
+        } catch (SignerException ex) {
+            LOG.warn("SignerException: {}", ex.getMessage());
+            LOG.debug("SignerException", ex);
+            throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
+        } catch (Throwable th) {
             final String message = "Throwable";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                        th.getMessage());
             }
-            LOG.debug(message, t);
-            throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());
+            LOG.debug(message, th);
+            throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
         }
     }
 

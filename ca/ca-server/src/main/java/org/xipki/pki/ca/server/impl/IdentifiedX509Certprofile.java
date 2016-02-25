@@ -182,9 +182,9 @@ class IdentifiedX509Certprofile {
                 Class<?> clazz = Class.forName(className);
                 tmpCertprofile = (X509Certprofile) clazz.newInstance();
             } catch (ClassNotFoundException | InstantiationException
-                    | IllegalAccessException | ClassCastException e) {
+                    | IllegalAccessException | ClassCastException ex) {
                 throw new CertprofileException("invalid type " + type + ", "
-                        + e.getClass().getName() + ": " + e.getMessage());
+                        + ex.getClass().getName() + ": " + ex.getMessage());
             }
         } else {
             throw new CertprofileException("invalid type " + type);
@@ -208,7 +208,7 @@ class IdentifiedX509Certprofile {
             int i;
             try {
                 i = Integer.parseInt(s);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 throw new CertprofileException("invalid " + paramName + ": " + s);
             }
             if (i < 1) {
@@ -316,8 +316,8 @@ class IdentifiedX509Certprofile {
             MessageDigest sha1;
             try {
                 sha1 = MessageDigest.getInstance("SHA-1");
-            } catch (NoSuchAlgorithmException e) {
-                throw new CertprofileException(e.getMessage(), e);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new CertprofileException(ex.getMessage(), ex);
             }
             sha1.reset();
 
@@ -401,8 +401,8 @@ class IdentifiedX509Certprofile {
                 try {
                     value = X509CertUtil.createCrlDistributionPoints(publicCaInfo.getCrlUris(),
                             x500CaPrincipal, crlSignerSubject);
-                } catch (IOException e) {
-                    throw new CertprofileException(e.getMessage(), e);
+                } catch (IOException ex) {
+                    throw new CertprofileException(ex.getMessage(), ex);
                 }
                 addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
@@ -418,8 +418,8 @@ class IdentifiedX509Certprofile {
                     value = X509CertUtil.createCrlDistributionPoints(
                             publicCaInfo.getDeltaCrlUris(),
                             x500CaPrincipal, crlSignerSubject);
-                } catch (IOException e) {
-                    throw new CertprofileException(e.getMessage(), e);
+                } catch (IOException ex) {
+                    throw new CertprofileException(ex.getMessage(), ex);
                 }
                 addExtension(values, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);

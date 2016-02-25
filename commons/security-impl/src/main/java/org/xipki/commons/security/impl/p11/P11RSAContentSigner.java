@@ -127,22 +127,22 @@ public class P11RSAContentSigner implements ContentSigner {
 
         try {
             encodedDigestInfo = digestInfo.getEncoded();
-        } catch (IOException e) {
-            LOG.warn("IOException: {}", e.getMessage());
-            LOG.debug("IOException", e);
-            throw new RuntimeCryptoException("IOException: " + e.getMessage());
+        } catch (IOException ex) {
+            LOG.warn("IOException: {}", ex.getMessage());
+            LOG.debug("IOException", ex);
+            throw new RuntimeCryptoException("IOException: " + ex.getMessage());
         }
 
         try {
             return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException ex) {
             final String message = "SignerException";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
-            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
+            LOG.debug(message, ex);
+            throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
     }
 

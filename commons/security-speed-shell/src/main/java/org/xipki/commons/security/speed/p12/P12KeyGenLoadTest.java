@@ -57,7 +57,7 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
                 try {
                     generateKeypair(securityFactory.getRandom4Key());
                     account(1, 0);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     account(1, 1);
                 }
             }

@@ -177,12 +177,12 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             } else {
                 doDigestNoTableId(processLog, caEntryContainer, cas);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
             System.err.println("\ndigesting process has been cancelled due to error");
-            LOG.error("Exception", e);
-            exception = e;
+            LOG.error("Exception", ex);
+            exception = ex;
         } finally {
             caEntryContainer.close();
         }
@@ -233,8 +233,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 EjbcaCaInfo caInfo = new EjbcaCaInfo(caId, certBytes, caDir.getName());
                 cas.put(caInfo.getHexSha1(), caInfo);
             }
-        } catch (SQLException e) {
-            throw translate(selectSql, e);
+        } catch (SQLException ex) {
+            throw translate(selectSql, ex);
         } finally {
             releaseResources(stmt, rs);
         }
@@ -351,8 +351,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             if (interrupted) {
                 throw new InterruptedException("interrupted by the user");
             }
-        } catch (SQLException e) {
-            throw translate(localSql, e);
+        } catch (SQLException ex) {
+            throw translate(localSql, ex);
         } finally {
             releaseResources(ps, null);
             releaseResources(rawCertPs, null);

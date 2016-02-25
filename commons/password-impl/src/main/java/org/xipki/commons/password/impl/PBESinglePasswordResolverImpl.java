@@ -123,10 +123,10 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
                         + localMasterPasswordCallback);
             }
 
-        } catch (Exception e) {
+        } catch (Exception ex) {
             throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
                     + localMasterPasswordCallback
-                    + ", " + e.getClass().getName() + ": " + e.getMessage());
+                    + ", " + ex.getClass().getName() + ": " + ex.getMessage());
         }
     } // method setMasterPasswordCallback
 

@@ -74,9 +74,9 @@ public class XipkiDigestExportReader {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-            } catch (DataAccessException e) {
+            } catch (DataAccessException ex) {
                 datasource.returnConnection(conn);
-                throw e;
+                throw ex;
             }
         }
 
@@ -86,8 +86,8 @@ public class XipkiDigestExportReader {
                 try {
                     IdRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e) {
-                    LOG.error("InterruptedException", e);
+                } catch (InterruptedException ex) {
+                    LOG.error("InterruptedException", ex);
                 }
             }
 
@@ -134,11 +134,11 @@ public class XipkiDigestExportReader {
 
                     result.addEntry(idCert);
                 }
-            } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    e = datasource.translate(selectCertSql, (SQLException) e);
+            } catch (Exception ex) {
+                if (ex instanceof SQLException) {
+                    ex = datasource.translate(selectCertSql, (SQLException) ex);
                 }
-                result.setException(e);
+                result.setException(ex);
             } finally {
                 outQueue.add(result);
                 DbToolBase.releaseResources(null, rs);
@@ -204,8 +204,8 @@ public class XipkiDigestExportReader {
                 DigestDbEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
                 results.add(result);
-            } catch (InterruptedException e) {
-                throw new DataAccessException("InterruptedException " + e.getMessage(), e);
+            } catch (InterruptedException ex) {
+                throw new DataAccessException("InterruptedException " + ex.getMessage(), ex);
             }
         }
 

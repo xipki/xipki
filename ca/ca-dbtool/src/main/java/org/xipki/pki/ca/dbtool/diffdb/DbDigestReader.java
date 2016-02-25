@@ -165,8 +165,8 @@ abstract class DbDigestReader implements DigestReader {
                 for (int i = 0; i < n; i++) {
                     try {
                         results.add(outQueue.take());
-                    } catch (InterruptedException e) {
-                        exception = e;
+                    } catch (InterruptedException ex) {
+                        exception = ex;
                         return;
                     }
                 }
@@ -187,8 +187,8 @@ abstract class DbDigestReader implements DigestReader {
                     for (IdentifiedDbDigestEntry entry : result.getEntries()) {
                         try {
                             fixedSizedCerts.offer(entry, Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException e) {
-                            exception = e;
+                        } catch (InterruptedException ex) {
+                            exception = ex;
                             return;
                         }
                     }
@@ -199,8 +199,8 @@ abstract class DbDigestReader implements DigestReader {
             try {
                 fixedSizedCerts.offer(EndOfQueue.INSTANCE, Integer.MAX_VALUE,
                         TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                exception = e;
+            } catch (InterruptedException ex) {
+                exception = ex;
                 return;
             }
         }
@@ -223,8 +223,8 @@ abstract class DbDigestReader implements DigestReader {
 
             executor.execute(new Dispatcher());
             return true;
-        } catch (Exception e) {
-            LOG.error("could not initialize DbDigestReader", e);
+        } catch (Exception ex) {
+            LOG.error("could not initialize DbDigestReader", ex);
             close();
             return false;
         }

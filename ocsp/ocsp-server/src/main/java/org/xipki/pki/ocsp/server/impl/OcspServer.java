@@ -478,8 +478,8 @@ public class OcspServer {
                     dsStream = getInputStream(m.getConf());
                     datasource = dataSourceFactory.createDataSource(name,
                                     dsStream, securityFactory.getPasswordResolver());
-                } catch (IOException e) {
-                    throw new InvalidConfException(e.getMessage(), e);
+                } catch (IOException ex) {
+                    throw new InvalidConfException(ex.getMessage(), ex);
                 } finally {
                     close(dsStream);
                 }
@@ -631,13 +631,13 @@ public class OcspServer {
         for (CertStatusStore store : stores.values()) {
             try {
                 store.shutdown();
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 final String message = "shutdown store " + store.getName();
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
             }
         }
 
@@ -770,15 +770,15 @@ public class OcspServer {
                             answeredStore = store;
                             break;
                         }
-                    } catch (CertStatusStoreException e) {
+                    } catch (CertStatusStoreException ex) {
                         exceptionOccurs = true;
                         final String message =
                                 "getCertStatus() of CertStatusStore " + store.getName();
                         if (LOG.isErrorEnabled()) {
                             LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                    e.getClass().getName(), e.getMessage());
+                                    ex.getClass().getName(), ex.getMessage());
                         }
-                        LOG.debug(message, e);
+                        LOG.debug(message, ex);
                     } // end try
                 } // end for
 
@@ -914,13 +914,13 @@ public class OcspServer {
                     byte[] encodedCertHash;
                     try {
                         encodedCertHash = bcCertHash.getEncoded();
-                    } catch (IOException e) {
+                    } catch (IOException ex) {
                         final String message = "answer() bcCertHash.getEncoded";
                         if (LOG.isErrorEnabled()) {
                             LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                    e.getClass().getName(), e.getMessage());
+                                    ex.getClass().getName(), ex.getMessage());
                         }
-                        LOG.debug(message, e);
+                        LOG.debug(message, ex);
                         if (childAuditEvent != null) {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                     "CertHash.getEncoded() with IOException");
@@ -1029,7 +1029,7 @@ public class OcspServer {
             ContentSigner singleSigner;
             try {
                 singleSigner = concurrentSigner.borrowContentSigner();
-            } catch (NoIdleSignerException e) {
+            } catch (NoIdleSignerException ex) {
                 return createUnsuccessfulOCSPResp(OcspResponseStatus.tryLater);
             }
 
@@ -1047,13 +1047,13 @@ public class OcspServer {
             BasicOCSPResp basicOcspResp;
             try {
                 basicOcspResp = basicOcspBuilder.build(singleSigner, certsInResp, new Date());
-            } catch (OCSPException e) {
+            } catch (OCSPException ex) {
                 final String message = "answer() basicOcspBuilder.build";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 if (auditEvent != null) {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "BasicOCSPRespBuilder.build() with OCSPException");
@@ -1077,13 +1077,13 @@ public class OcspServer {
                 } else {
                     return new OcspRespWithCacheInfo(ocspResp, null);
                 }
-            } catch (OCSPException e) {
+            } catch (OCSPException ex) {
                 final String message = "answer() ocspRespBuilder.build";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 if (auditEvent != null) {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "OCSPRespBuilder.build() with OCSPException");
@@ -1091,13 +1091,13 @@ public class OcspServer {
                 return createUnsuccessfulOCSPResp(OcspResponseStatus.internalError);
             }
 
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "Throwable";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                        th.getMessage());
             }
-            LOG.debug(message, t);
+            LOG.debug(message, th);
 
             if (auditEvent != null) {
                 fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
@@ -1199,15 +1199,15 @@ public class OcspServer {
                         "algo=" + sigAlgo + "," + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
-            } catch (SignerException e) {
-                throw new InvalidConfException("SignerException: " + e.getMessage(), e);
+            } catch (SignerException ex) {
+                throw new InvalidConfException("SignerException: " + ex.getMessage(), ex);
             }
         }
 
         try {
             return new ResponderSigner(singleSigners);
-        } catch (CertificateEncodingException | IOException e) {
-            throw new InvalidConfException(e.getMessage(), e);
+        } catch (CertificateEncodingException | IOException ex) {
+            throw new InvalidConfException(ex.getMessage(), ex);
         }
     } // method initSigner
 
@@ -1245,8 +1245,8 @@ public class OcspServer {
                 }
 
                 issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
-            } catch (CertificateException e) {
-                throw new InvalidConfException(e.getMessage(), e);
+            } catch (CertificateException ex) {
+                throw new InvalidConfException(ex.getMessage(), ex);
             } // end try
             store = new DbCertStatusStore(name, issuerFilter);
 
@@ -1300,8 +1300,8 @@ public class OcspServer {
             try {
                 Class<?> clazz = Class.forName(className);
                 instance = clazz.newInstance();
-            } catch (Exception e) {
-                throw new InvalidConfException(e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new InvalidConfException(ex.getMessage(), ex);
             }
 
             if (instance instanceof CertStatusStore) {
@@ -1329,9 +1329,9 @@ public class OcspServer {
         }
         try {
             store.init(statusStoreConf, datasource);
-        } catch (CertStatusStoreException e) {
+        } catch (CertStatusStoreException ex) {
             throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
-                    + ":" + e.getMessage(), e);
+                    + ":" + ex.getMessage(), ex);
         }
 
         return store;
@@ -1373,11 +1373,11 @@ public class OcspServer {
         ContentVerifierProvider cvp;
         try {
             cvp = securityFactory.getContentVerifierProvider(certs[0]);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException ex) {
             LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}",
-                    e.getMessage());
+                    ex.getMessage());
             if (auditEvent != null) {
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, e.getMessage());
+                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, ex.getMessage());
             }
             return createUnsuccessfulOCSPResp(OcspResponseStatus.unauthorized);
         }
@@ -1413,7 +1413,7 @@ public class OcspServer {
         X509Certificate target;
         try {
             target = new X509CertificateObject(certsInReq[0].toASN1Structure());
-        } catch (CertificateParsingException e) {
+        } catch (CertificateParsingException ex) {
             return false;
         }
 
@@ -1430,7 +1430,7 @@ public class OcspServer {
                 Certificate c;
                 try {
                     c = new X509CertificateObject(certsInReq[i].toASN1Structure());
-                } catch (CertificateParsingException e) {
+                } catch (CertificateParsingException ex) {
                     continue;
                 }
                 certstore.add(c);
@@ -1556,8 +1556,8 @@ public class OcspServer {
         if (stream != null) {
             try {
                 stream.close();
-            } catch (IOException e) {
-                LOG.warn("could not close stream: {}", e.getMessage());
+            } catch (IOException ex) {
+                LOG.warn("could not close stream: {}", ex.getMessage());
             }
         }
     }
@@ -1569,7 +1569,7 @@ public class OcspServer {
         try {
             is = getInputStream(certConf);
             return X509Util.parseCert(is);
-        } catch (IOException | CertificateException e) {
+        } catch (IOException | CertificateException ex) {
             String msg = "could not parse certificate";
             if (certConf.getFile() != null) {
                 msg += " from file " + certConf.getFile();
@@ -1593,12 +1593,12 @@ public class OcspServer {
             unmarshaller.setSchema(schema);
             return (OCSPServer) unmarshaller.unmarshal(
                     new File(IoUtil.expandFilepath(confFilename)));
-        } catch (SAXException e) {
+        } catch (SAXException ex) {
             throw new InvalidConfException(
-                    "parse profile failed, message: " + e.getMessage(), e);
-        } catch (JAXBException e) {
+                    "parse profile failed, message: " + ex.getMessage(), ex);
+        } catch (JAXBException ex) {
             throw new InvalidConfException(
-                    "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) e), e);
+                    "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex), ex);
         }
     }
 

@@ -105,8 +105,8 @@ abstract class AbstractP11DSASigner implements Signer {
 
         try {
             return sign(digestValue);
-        } catch (SignerException e) {
-            throw new InvalidCipherTextException("SignerException: " + e.getMessage());
+        } catch (SignerException ex) {
+            throw new InvalidCipherTextException("SignerException: " + ex.getMessage());
         }
     }
 

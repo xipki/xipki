@@ -71,7 +71,7 @@ class CaCertRespBytes {
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
             CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             bytes = degenerateSignedData.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             throw new CMSException("could not build CMS SignedDta");
         }
     }

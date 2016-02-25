@@ -137,8 +137,8 @@ class OcspStoreQueryExecutor {
             }
 
             return new IssuerStore(caInfos);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -277,26 +277,26 @@ class OcspStoreQueryExecutor {
 
                     sql = "(commit add cert to OCSP)";
                     conn.commit();
-                } catch (Throwable t) {
+                } catch (Throwable th) {
                     conn.rollback();
                     // more secure
                     dataSource.deleteFromTable(null, "CRAW", "CID", certId);
                     dataSource.deleteFromTable(null, "CHASH", "CID", certId);
                     dataSource.deleteFromTable(null, "CERT", "ID", certId);
 
-                    if (t instanceof SQLException) {
-                        SQLException e = (SQLException) t;
-                        DataAccessException tEx = dataSource.translate(sql, e);
+                    if (th instanceof SQLException) {
+                        SQLException ex = (SQLException) th;
+                        DataAccessException tEx = dataSource.translate(sql, ex);
                         if (tEx instanceof DuplicateKeyException && i < tries - 1) {
                             continue;
                         }
                         LOG.error(
                             "datasource {} SQLException while adding certificate with id {}: {}",
-                            dataSource.getDatasourceName(), certId, t.getMessage());
-                        throw e;
+                            dataSource.getDatasourceName(), certId, th.getMessage());
+                        throw ex;
                     } else {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                t.getClass().getName() + ": " + t.getMessage());
+                                th.getClass().getName() + ": " + th.getMessage());
                     }
                 } finally {
                     conn.setAutoCommit(origAutoCommit);
@@ -304,14 +304,14 @@ class OcspStoreQueryExecutor {
 
                 break;
             } // end for
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         } finally {
             for (PreparedStatement ps : pss) {
                 try {
                     ps.close();
-                } catch (Throwable t) {
-                    LOG.warn("could not close PreparedStatement", t);
+                } catch (Throwable th) {
+                    LOG.warn("could not close PreparedStatement", th);
                 }
 
             }
@@ -355,8 +355,8 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, issuerId);
             ps.setLong(idx++, serialNumber.longValue());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, null);
         }
@@ -402,8 +402,8 @@ class OcspStoreQueryExecutor {
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(sql, ex);
             } finally {
                 dataSource.releaseResources(ps, null);
             }
@@ -416,8 +416,8 @@ class OcspStoreQueryExecutor {
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(sql, ex);
             } finally {
                 dataSource.releaseResources(ps, null);
             }
@@ -442,8 +442,8 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, issuerId);
             ps.setLong(idx++, cert.getCert().getSerialNumber().longValue());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, null);
         }
@@ -471,8 +471,8 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, revocationInfo.getReason().getCode());
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, null);
         }
@@ -493,8 +493,8 @@ class OcspStoreQueryExecutor {
             ps.setNull(idx++, Types.INTEGER);
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, null);
         }
@@ -524,8 +524,8 @@ class OcspStoreQueryExecutor {
         byte[] encodedName;
         try {
             encodedName = bcCert.getSubject().getEncoded("DER");
-        } catch (IOException e) {
-            throw new CertificateEncodingException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CertificateEncodingException(ex.getMessage(), ex);
         }
         byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
@@ -577,8 +577,8 @@ class OcspStoreQueryExecutor {
 
             IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, null);
         }
@@ -621,15 +621,15 @@ class OcspStoreQueryExecutor {
                 for (int j = 0; j < i; j++) {
                     try {
                         pss[j].close();
-                    } catch (Throwable t) {
-                        LOG.warn("could not close preparedStatement", t);
+                    } catch (Throwable th) {
+                        LOG.warn("could not close preparedStatement", th);
                     }
                 }
 
                 try {
                     c.close();
-                } catch (Throwable t) {
-                    LOG.warn("could not close connection", t);
+                } catch (Throwable th) {
+                    LOG.warn("could not close connection", th);
                 }
 
                 throw new DataAccessException(
@@ -658,8 +658,8 @@ class OcspStoreQueryExecutor {
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -680,13 +680,13 @@ class OcspStoreQueryExecutor {
                 dataSource.releaseResources(ps, rs);
             }
             return true;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "isHealthy()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             return false;
         }
     } // method isHealthy

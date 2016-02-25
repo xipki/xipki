@@ -160,7 +160,7 @@ class CmpResponder {
                 if (seq.size() > 1) {
                     reqValue = seq.getObjectAt(1);
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
                 final String statusMessage = "invalid value of the InfoTypeAndValue for "
                         + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
                 return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
@@ -194,7 +194,7 @@ class CmpResponder {
                     slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                     keyId = keyIdentifier.getKeyId();
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     final String statusMessage = "invalid PSOTemplate";
                     return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
@@ -230,7 +230,7 @@ class CmpResponder {
                     slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
                     keyId = keyIdentifier.getKeyId();
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException ex) {
                     final String statusMessage = "invalid SlotAndKeyIdentifier";
                     return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
@@ -283,15 +283,15 @@ class CmpResponder {
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);
-        } catch (BadAsn1ObjectException e) {
+        } catch (BadAsn1ObjectException ex) {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
-                    e.getMessage());
-        } catch (Throwable t) {
+                    ex.getMessage());
+        } catch (Throwable th) {
             LOG.error("error while processing CMP message {}, message: {}", tidStr,
-                    t.getMessage());
-            LOG.debug("error while processing CMP message " + tidStr, t);
+                    th.getMessage());
+            LOG.debug("error while processing CMP message " + tidStr, th);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
-                    t.getMessage());
+                    th.getMessage());
         }
     } // method processPkiMessage
 

@@ -58,7 +58,7 @@ public class NegCaPublishRcaCertCmd extends CaPublishRcaCertCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

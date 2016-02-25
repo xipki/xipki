@@ -109,19 +109,19 @@ public class QaSystemManagerImpl implements QaSystemManager {
         try {
             FileInputStream issuerConfStream = new FileInputStream(confFile);
             qaConf = parseQaConf(issuerConfStream);
-        } catch (IOException | JAXBException | SAXException e) {
+        } catch (IOException | JAXBException | SAXException ex) {
             final String message = "could not parse the QA configuration";
             String exceptionMessage;
-            if (e instanceof JAXBException) {
-                exceptionMessage = XmlUtil.getMessage((JAXBException) e);
+            if (ex instanceof JAXBException) {
+                exceptionMessage = XmlUtil.getMessage((JAXBException) ex);
             } else {
-                exceptionMessage = e.getMessage();
+                exceptionMessage = ex.getMessage();
             }
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         exceptionMessage);
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             return;
         }
 
@@ -131,14 +131,14 @@ public class QaSystemManagerImpl implements QaSystemManager {
                 byte[] certBytes;
                 try {
                     certBytes = readData(issuerType.getCert());
-                } catch (IOException e) {
+                } catch (IOException ex) {
                     final String message = "could not read the certificate bytes of issuer "
                             + issuerType.getName();
                     if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                                e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                                ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
                     continue;
                 }
 
@@ -148,14 +148,14 @@ public class QaSystemManagerImpl implements QaSystemManager {
                             issuerType.getOcspUrl(),
                             issuerType.getCrlUrl(),
                             issuerType.getDeltaCrlUrl(), certBytes);
-                } catch (CertificateException e) {
+                } catch (CertificateException ex) {
                     final String message =
                             "could not parse certificate of issuer " + issuerType.getName();
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
+                                ex.getClass().getName(), ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
                     continue;
                 }
 
@@ -173,13 +173,13 @@ public class QaSystemManagerImpl implements QaSystemManager {
                     byte[] content = readData(type);
                     x509ProfileMap.put(name, new X509CertprofileQaImpl(content));
                     LOG.info("configured X509 certificate profile {}", name);
-                } catch (IOException | CertprofileException e) {
+                } catch (IOException | CertprofileException ex) {
                     final String message = "could not parse QA certificate profile " + name;
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
+                                ex.getClass().getName(), ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
                     continue;
                 }
             }

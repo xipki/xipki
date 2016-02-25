@@ -83,12 +83,12 @@ public class TargetDigestRetriever {
                 singleSelectStmt = datasource.prepareStatement(conn, singleCertSql);
                 inArraySelectStmt = datasource.prepareStatement(conn, inArrayCertsSql);
                 rangeSelectStmt = datasource.prepareStatement(conn, rangeCertsSql);
-            } catch (DataAccessException e) {
+            } catch (DataAccessException ex) {
                 releaseResources(singleSelectStmt, null);
                 releaseResources(inArraySelectStmt, null);
                 releaseResources(rangeSelectStmt, null);
                 datasource.returnConnection(conn);
-                throw e;
+                throw ex;
             }
         }
 
@@ -98,8 +98,8 @@ public class TargetDigestRetriever {
                 CertsBundle bundle = null;
                 try {
                     bundle = reader.nextCerts(numPerSelect);
-                } catch (Exception e) {
-                    exception = e;
+                } catch (Exception ex) {
+                    exception = ex;
                     break;
                 }
 
@@ -130,8 +130,8 @@ public class TargetDigestRetriever {
                     }
                     processLog.addNumProcessed(n);
                     processLog.printStatus();
-                } catch (Exception e) {
-                    exception = e;
+                } catch (Exception ex) {
+                    exception = ex;
                     break;
                 }
             }
@@ -170,8 +170,8 @@ public class TargetDigestRetriever {
                     rs = rangeSelectStmt.executeQuery();
 
                     certsInB = buildResult(rs, serialNumbers);
-                } catch (SQLException e) {
-                    throw datasource.translate(inArrayCertsSql, e);
+                } catch (SQLException ex) {
+                    throw datasource.translate(inArrayCertsSql, ex);
                 } finally {
                     releaseResources(null, rs);
                 }
@@ -297,9 +297,9 @@ public class TargetDigestRetriever {
             for (Runnable runnable : retrievers) {
                 executor.execute(runnable);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             close();
-            throw e;
+            throw ex;
         }
     } // constructor
 
@@ -346,8 +346,8 @@ public class TargetDigestRetriever {
 
             rs = batchSelectStmt.executeQuery();
             return buildResult(rs, serialNumbers);
-        } catch (SQLException e) {
-            throw datasource.translate(inArrayCertsSql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(inArrayCertsSql, ex);
         } finally {
             releaseResources(null, rs);
         }
@@ -412,8 +412,8 @@ public class TargetDigestRetriever {
             String sha1Fp = rs.getString(dbControl.getColCerthash());
             return new DbDigestEntry(serialNumber,
                     revoked, revReason, revTime, revInvTime, sha1Fp);
-        } catch (SQLException e) {
-            throw datasource.translate(singleCertSql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(singleCertSql, ex);
         } finally {
             releaseResources(null, rs);
         }
@@ -425,14 +425,14 @@ public class TargetDigestRetriever {
         if (ps != null) {
             try {
                 ps.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
 
         if (rs != null) {
             try {
                 rs.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
     }

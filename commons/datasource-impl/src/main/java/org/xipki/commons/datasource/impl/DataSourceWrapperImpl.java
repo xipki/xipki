@@ -174,8 +174,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                     throw new DataAccessException(
                             "could not increment the sequence " + sequenceName);
                 }
-            } catch (SQLException e) {
-                throw translate(sqlUpdate, e);
+            } catch (SQLException ex) {
+                throw translate(sqlUpdate, ex);
             } finally {
                 if (newConn) {
                     releaseResources(stmt, rs);
@@ -697,18 +697,18 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     throws DataAccessException {
         try {
             return service.getConnection();
-        } catch (Exception e) {
-            Throwable cause = e.getCause();
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
             if (cause instanceof SQLException) {
-                e = (SQLException) cause;
+                ex = (SQLException) cause;
             }
-            LOG.error("could not create connection to database {}", e.getMessage());
-            LOG.debug("could not create connection to database", e);
-            if (e instanceof SQLException) {
-                throw translate(null, (SQLException) e);
+            LOG.error("could not create connection to database {}", ex.getMessage());
+            LOG.debug("could not create connection to database", ex);
+            if (ex instanceof SQLException) {
+                throw translate(null, (SQLException) ex);
             } else {
                 throw new DataAccessException("error occured while getting Connection: "
-                        + e.getMessage(), e);
+                        + ex.getMessage(), ex);
             }
         }
     }
@@ -722,13 +722,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         try {
             conn.close();
-        } catch (Exception e) {
-            Throwable cause = e.getCause();
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
             if (cause instanceof SQLException) {
-                e = (SQLException) cause;
+                ex = (SQLException) cause;
             }
-            LOG.error("could not close connection to database {}", e.getMessage());
-            LOG.debug("could not close connection to database", e);
+            LOG.error("could not close connection to database {}", ex.getMessage());
+            LOG.debug("could not close connection to database", ex);
         }
     }
 
@@ -736,9 +736,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public void shutdown() {
         try {
             service.close();
-        } catch (Exception e) {
-            LOG.warn("could not shutdown datasource: {}", e.getMessage());
-            LOG.debug("could not close datasource", e);
+        } catch (Exception ex) {
+            LOG.warn("could not shutdown datasource: {}", ex.getMessage());
+            LOG.debug("could not close datasource", ex);
         }
     }
 
@@ -753,8 +753,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     throws DataAccessException {
         try {
             return conn.createStatement();
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         }
     }
 
@@ -765,8 +765,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     throws DataAccessException {
         try {
             return conn.prepareStatement(sqlQuery);
-        } catch (SQLException e) {
-            throw translate(sqlQuery, e);
+        } catch (SQLException ex) {
+            throw translate(sqlQuery, ex);
         }
     }
 
@@ -777,8 +777,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (Throwable t) {
-                LOG.warn("could not close ResultSet", t);
+            } catch (Throwable th) {
+                LOG.warn("could not close ResultSet", th);
             }
         }
 
@@ -786,13 +786,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             Connection conn = null;
             try {
                 conn = ps.getConnection();
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
             }
 
             try {
                 ps.close();
-            } catch (Throwable t) {
-                LOG.warn("could not close statement", t);
+            } catch (Throwable th) {
+                LOG.warn("could not close statement", th);
             } finally {
                 if (conn != null) {
                     returnConnection(conn);
@@ -807,16 +807,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (Throwable t) {
-                LOG.warn("could not close ResultSet", t);
+            } catch (Throwable th) {
+                LOG.warn("could not close ResultSet", th);
             }
         }
 
         if (ps != null) {
             try {
                 ps.close();
-            } catch (Throwable t) {
-                LOG.warn("could not close statement", t);
+            } catch (Throwable th) {
+                LOG.warn("could not close statement", th);
             }
         }
     }
@@ -866,8 +866,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (conn == null) {
                 releaseResources(stmt, rs);
@@ -895,8 +895,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (conn == null) {
                 releaseResources(stmt, rs);
@@ -943,8 +943,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (conn == null) {
                 releaseResources(stmt, rs);
@@ -973,9 +973,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         if (localConn == null) {
             try {
                 localConn = getConnection();
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn("datasource {} could not get connection: {}", name, t.getMessage());
+                    LOG.warn("datasource {} could not get connection: {}", name, th.getMessage());
                 }
                 return false;
             }
@@ -985,10 +985,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         try {
             stmt = conn.createStatement();
             stmt.execute(sql);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("datasource {} could not deletefrom table {}: {}", name, table,
-                        t.getMessage());
+                        th.getMessage());
             }
             return false;
         } finally {
@@ -1035,8 +1035,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             }
             rs = stmt.executeQuery();
             return rs.next();
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (conn == null) {
                 releaseResources(stmt, rs);
@@ -1057,8 +1057,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         }
 
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
@@ -1068,7 +1068,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         try {
             stmt.execute(sql);
             return true;
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             return false;
         } finally {
             if (conn == null) {
@@ -1089,8 +1089,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             stmt = (conn != null)
                     ? conn.createStatement()
                     : getConnection().createStatement();
-        } catch (SQLException e) {
-            throw translate(null, e);
+        } catch (SQLException ex) {
+            throw translate(null, ex);
         }
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
@@ -1100,7 +1100,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         try {
             stmt.execute(sql);
             return true;
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             return false;
         } finally {
             if (conn == null) {
@@ -1132,7 +1132,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     throws DataAccessException {
         try {
             dropSequence(sequenceName);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException ex) {
         }
 
         createSequence(sequenceName, startValue);
@@ -1150,8 +1150,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, null);
         }
@@ -1170,8 +1170,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             releaseResources(stmt, null);
         }
@@ -1222,8 +1222,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                     releaseStatementAndResultSet(null, rs);
                 }
             }
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (newConn) {
                 releaseResources(stmt, null);
@@ -1572,8 +1572,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                     ? conn.createStatement()
                             : getConnection().createStatement();
             stmt.executeUpdate(sql);
-        } catch (SQLException e) {
-            throw translate(sql, e);
+        } catch (SQLException ex) {
+            throw translate(sql, ex);
         } finally {
             if (conn == null) {
                 releaseResources(stmt, null);

@@ -145,7 +145,7 @@ public class StringUtil {
         try {
             Integer.parseInt(s, radix);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             return false;
         }
     }

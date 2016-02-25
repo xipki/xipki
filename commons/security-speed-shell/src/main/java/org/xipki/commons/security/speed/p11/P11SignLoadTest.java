@@ -67,7 +67,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
             ContentSigner singleSigner;
             try {
                 singleSigner = signer.borrowContentSigner();
-            } catch (NoIdleSignerException e) {
+            } catch (NoIdleSignerException ex) {
                 account(1, 1);
                 return;
             }
@@ -77,7 +77,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
                     singleSigner.getOutputStream().write(new byte[]{1, 2, 3, 4});
                     singleSigner.getSignature();
                     account(1, 0);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     account(1, 1);
                 }
             }
@@ -122,7 +122,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     private void close() {
         try {
             slot.removeKeyAndCerts(keyId);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOG.error("could not delete PKCS#11 key {}", keyId);
         }
     }

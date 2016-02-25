@@ -60,7 +60,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         String hexFp;
         try {
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             throw new IllegalArgumentException(
                     "at least one of the certificate could not be encoded");
         }
@@ -75,7 +75,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
             String hexFp;
             try {
                 hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException ex) {
                 throw new IllegalArgumentException(
                         "at least one of the certificate could not be encoded");
             }
@@ -89,7 +89,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         String hextFp;
         try {
             hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             return false;
         }
         return fpOfCerts.contains(hextFp);

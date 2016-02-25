@@ -102,8 +102,8 @@ class PublicCaInfo {
         this.c14nSubject = X509Util.canonicalizName(x500Subject);
         try {
             this.subjectKeyIdentifier = X509Util.extractSki(caCertificate);
-        } catch (CertificateEncodingException e) {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+        } catch (CertificateEncodingException ex) {
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
         }
         this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
         this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
@@ -118,7 +118,7 @@ class PublicCaInfo {
             try {
                 subjectAltName = GeneralNames.getInstance(
                         X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 throw new OperationException(ErrorCode.INVALID_EXTENSION,
                         "invalid SubjectAltName extension in CA certificate");
             }
@@ -143,7 +143,7 @@ class PublicCaInfo {
         this.c14nSubject = X509Util.canonicalizName(subject);
         try {
             this.subject = new X500Principal(subject.getEncoded());
-        } catch (IOException e) {
+        } catch (IOException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "invalid SubjectAltName extension in CA certificate");
         }

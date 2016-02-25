@@ -98,9 +98,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-            } catch (DataAccessException e) {
+            } catch (DataAccessException ex) {
                 datasource.returnConnection(conn);
-                throw e;
+                throw ex;
             }
 
         }
@@ -111,7 +111,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
                 try {
                     IdRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ex) {
                 }
             }
 
@@ -154,11 +154,11 @@ public class XipkiDbDigestReader extends DbDigestReader {
                     int id = rs.getInt("ID");
                     result.addEntry(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    e = datasource.translate(selectCertSql, (SQLException) e);
+            } catch (Exception ex) {
+                if (ex instanceof SQLException) {
+                    ex = datasource.translate(selectCertSql, (SQLException) ex);
                 }
-                result.setException(e);
+                result.setException(ex);
             } finally {
                 releaseResources(null, rs);
             }
@@ -227,8 +227,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
             return (n < numCerts)
                     ? n - numCerts
                     : 0;
-        } catch (SQLException e) {
-            throw datasource.translate(numCertSql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(numCertSql, ex);
         } finally {
             releaseResources(null, rs);
         }
@@ -322,8 +322,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
                     totalAccount, minId, maxId, numThreads, numCertsToPredicate, stopMe);
             reader.init(dbSchemaType, caId);
             return reader;
-        } catch (SQLException e) {
-            throw datasource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
         }

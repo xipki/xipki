@@ -56,13 +56,13 @@ public class XipkiNssProviderRegister {
             try {
                 XipkiNssProvider provider = new XipkiNssProvider();
                 Security.addProvider(provider);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "could not add provider " + XipkiNssProvider.PROVIDER_NAME;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
             }
         }
     }

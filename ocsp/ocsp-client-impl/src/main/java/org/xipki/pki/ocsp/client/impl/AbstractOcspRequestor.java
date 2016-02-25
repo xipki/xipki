@@ -128,8 +128,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             if (!X509Util.issues(issuerCert, cert)) {
                 throw new IllegalArgumentException("cert and issuerCert do not match");
             }
-        } catch (CertificateEncodingException e) {
-            throw new OcspRequestorException(e.getMessage(), e);
+        } catch (CertificateEncodingException ex) {
+            throw new OcspRequestorException(ex.getMessage(), ex);
         }
 
         return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl,
@@ -152,8 +152,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                     throw new IllegalArgumentException(
                             "cert at index " + i + " and issuerCert do not match");
                 }
-            } catch (CertificateEncodingException e) {
-                throw new OcspRequestorException(e.getMessage(), e);
+            } catch (CertificateEncodingException ex) {
+                throw new OcspRequestorException(ex.getMessage(), ex);
             }
             serialNumbers[i] = cert.getSerialNumber();
         }
@@ -193,8 +193,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         byte[] encodedReq;
         try {
             encodedReq = ocspReq.getEncoded();
-        } catch (IOException e) {
-            throw new OcspRequestorException("could not encode OCSP request: " + e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(), ex);
         }
 
         RequestResponsePair msgPair = null;
@@ -207,8 +207,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         byte[] encodedResp;
         try {
             encodedResp = send(encodedReq, responderUrl, requestOptions);
-        } catch (IOException e) {
-            throw new ResponderUnreachableException("IOException: " + e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
         }
 
         if (debug != null) {
@@ -218,14 +218,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         OCSPResp ocspResp;
         try {
             ocspResp = new OCSPResp(encodedResp);
-        } catch (IOException e) {
-            throw new InvalidOcspResponseException("IOException: " + e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new InvalidOcspResponseException("IOException: " + ex.getMessage(), ex);
         }
 
         Object respObject;
         try {
             respObject = ocspResp.getResponseObject();
-        } catch (OCSPException e) {
+        } catch (OCSPException ex) {
             throw new InvalidOcspResponseException("responseObject is invalid");
         }
 
@@ -361,8 +361,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             try {
                 extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
                         new DEROctetString(extnValue));
-            } catch (IOException e) {
-                throw new OcspRequestorException(e.getMessage(), e);
+            } catch (IOException ex) {
+                throw new OcspRequestorException(ex.getMessage(), ex);
             }
             extensions.add(extn);
         }
@@ -397,18 +397,18 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                         if (StringUtil.isNotBlank(signerCertFile)) {
                             try {
                                 cert = X509Util.parseCert(signerCertFile);
-                            } catch (CertificateException e) {
+                            } catch (CertificateException ex) {
                                 throw new OcspRequestorException("could not parse certificate "
-                                        + signerCertFile + ": " + e.getMessage());
+                                        + signerCertFile + ": " + ex.getMessage());
                             }
                         }
 
                         try {
                             signer = getSecurityFactory().createSigner(
                                     signerType, signerConf, cert);
-                        } catch (Exception e) {
+                        } catch (Exception ex) {
                             throw new OcspRequestorException("could not create signer: "
-                                    + e.getMessage());
+                                    + ex.getMessage());
                         }
                     } // end if
                 } // end synchronized
@@ -416,8 +416,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                 ContentSigner singleSigner;
                 try {
                     singleSigner = signer.borrowContentSigner();
-                } catch (NoIdleSignerException e) {
-                    throw new OcspRequestorException("NoIdleSignerException: " + e.getMessage());
+                } catch (NoIdleSignerException ex) {
+                    throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
                 }
 
                 reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
@@ -429,8 +429,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             } else {
                 return reqBuilder.build();
             } // end if
-        } catch (OCSPException | CertificateEncodingException | IOException e) {
-            throw new OcspRequestorException(e.getMessage(), e);
+        } catch (OCSPException | CertificateEncodingException | IOException ex) {
+            throw new OcspRequestorException(ex.getMessage(), ex);
         }
     } // method buildRequest
 

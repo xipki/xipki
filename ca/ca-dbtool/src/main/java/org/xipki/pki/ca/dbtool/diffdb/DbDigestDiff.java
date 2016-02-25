@@ -196,8 +196,8 @@ public class DbDigestDiff {
                         int id = refRs.getInt(1);
                         refCaIds.add(id);
                     }
-                } catch (SQLException e) {
-                    throw refDatasource.translate(refSql, e);
+                } catch (SQLException ex) {
+                    throw refDatasource.translate(refSql, ex);
                 } finally {
                     refDatasource.releaseResources(refStmt, refRs);
                 }
@@ -283,12 +283,12 @@ public class DbDigestDiff {
 
             target.awaitTerminiation();
             processLog.printTrailer();
-        } catch (InterruptedException e) {
-            throw e;
-        } catch (Exception e) {
-            reporter.addError("Exception thrown: " + e.getClass().getName() + ": "
-                    + e.getMessage());
-            LOG.error("exception on doDiff", e);
+        } catch (InterruptedException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            reporter.addError("Exception thrown: " + ex.getClass().getName() + ": "
+                    + ex.getMessage());
+            LOG.error("exception on doDiff", ex);
         } finally {
             reporter.close();
             refReader.close();
@@ -358,8 +358,8 @@ public class DbDigestDiff {
                 String b64Cert = rs.getString("CERT");
                 caIdCertMap.put(id, Base64.decode(b64Cert));
             }
-        } catch (SQLException e) {
-            throw datasource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }

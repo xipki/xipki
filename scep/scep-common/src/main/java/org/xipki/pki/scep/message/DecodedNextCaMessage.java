@@ -208,12 +208,12 @@ public class DecodedNextCaMessage {
             try {
                 localDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 final String msg =
                         "could not extract digest algorithm from signerInfo.signatureAlgorithm: "
-                        + e.getMessage();
+                        + ex.getMessage();
                 LOG.error(msg);
-                LOG.debug(msg, e);
+                LOG.debug(msg, ex);
                 ret.setFailureMessage(msg);
                 return ret;
             }
@@ -229,10 +229,10 @@ public class DecodedNextCaMessage {
         X509Certificate signerCert;
         try {
             signerCert = new X509CertificateObject(localSignerCert.toASN1Structure());
-        } catch (CertificateParsingException e) {
-            final String msg = "could not construct X509CertificateObject: " + e.getMessage();
+        } catch (CertificateParsingException ex) {
+            final String msg = "could not construct X509CertificateObject: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -243,10 +243,10 @@ public class DecodedNextCaMessage {
         try {
             verifier = new JcaSimpleSignerInfoVerifierBuilder().build(
                     signerCert.getPublicKey());
-        } catch (OperatorCreationException e) {
-            final String msg = "could not build signature verifier: " + e.getMessage();
+        } catch (OperatorCreationException ex) {
+            final String msg = "could not build signature verifier: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -254,10 +254,10 @@ public class DecodedNextCaMessage {
         boolean signatureValid;
         try {
             signatureValid = signerInfo.verify(verifier);
-        } catch (CMSException e) {
-            final String msg = "could not verify the signature: " + e.getMessage();
+        } catch (CMSException ex) {
+            final String msg = "could not verify the signature: " + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }
@@ -285,11 +285,11 @@ public class DecodedNextCaMessage {
         List<X509Certificate> certs;
         try {
             certs = ScepUtil.getCertsFromSignedData(signedData);
-        } catch (CertificateException e) {
+        } catch (CertificateException ex) {
             final String msg = "error while extracting Certificates from the message: "
-                    + e.getMessage();
+                    + ex.getMessage();
             LOG.error(msg);
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             ret.setFailureMessage(msg);
             return ret;
         }

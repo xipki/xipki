@@ -265,7 +265,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     try {
                         int intValue = Integer.parseInt(currencyS);
                         currency = new Iso4217CurrencyCode(intValue);
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException ex) {
                         currency = new Iso4217CurrencyCode(currencyS);
                     }
 
@@ -276,7 +276,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
                     v.add(statment);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
             }

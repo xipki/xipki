@@ -154,8 +154,8 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
                     String c14nAlgo;
                     try {
                         c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new CertprofileException(e.getMessage(), e);
+                    } catch (NoSuchAlgorithmException ex) {
+                        throw new CertprofileException(ex.getMessage(), ex);
                     }
                     this.signatureAlgorithms.add(c14nAlgo);
                 }
@@ -166,15 +166,15 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
             this.publicKeyChecker = new PublicKeyChecker(conf);
             this.subjectChecker = new SubjectChecker(conf);
             this.extensionsChecker = new ExtensionsChecker(conf);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ex) {
             final String message = "RuntimeException";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             throw new CertprofileException(
-                    "RuntimeException thrown while initializing certprofile: " + e.getMessage());
+                    "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
         }
     } // constructor
 
@@ -216,7 +216,7 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
             bcCert = Certificate.getInstance(certBytes);
             tbsCert = bcCert.getTBSCertificate();
             cert = X509Util.parseCert(certBytes);
-        } catch (CertificateException | IOException e) {
+        } catch (CertificateException | IOException ex) {
             issue.setFailureMessage("certificate is not corrected encoded");
             return new ValidationResult(resultIssues);
         }
@@ -271,7 +271,7 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
                         issue.setFailureMessage("invalid parameters");
                     }
                 }
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException ex) {
                 issue.setFailureMessage("unsupported signature algorithm "
                         + sigAlgId.getAlgorithm().getId());
             }
@@ -330,7 +330,7 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
         resultIssues.add(issue);
         try {
             cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
-        } catch (Exception e) {
+        } catch (Exception ex) {
             issue.setFailureMessage("invalid signature");
         }
 
@@ -411,8 +411,8 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
             ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
             try {
                 parser.readObject();
-            } catch (IOException e) {
-                throw new CertprofileException("could not parse the constant extension value", e);
+            } catch (IOException ex) {
+                throw new CertprofileException("could not parse the constant extension value", ex);
             }
             QaExtensionValue extension = new QaExtensionValue(m.isCritical(), encodedValue);
             map.put(oid, extension);

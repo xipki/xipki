@@ -290,8 +290,8 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     throws SignatureException {
         try {
             return pss.generateSignature();
-        } catch (CryptoException e) {
-            throw new SignatureException(e.getMessage(), e);
+        } catch (CryptoException ex) {
+            throw new SignatureException(ex.getMessage(), ex);
         }
     }
 
@@ -358,8 +358,8 @@ class RSAPSSSignatureSpi extends SignatureSpi {
                     engineParams = AlgorithmParameters.getInstance("PSS",
                             BouncyCastleProvider.PROVIDER_NAME);
                     engineParams.init(paramSpec);
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage(), e);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex.getMessage(), ex);
                 }
             }
         }

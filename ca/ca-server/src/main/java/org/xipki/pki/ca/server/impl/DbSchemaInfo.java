@@ -79,8 +79,8 @@ public class DbSchemaInfo {
                 String value = rs.getString("VALUE2");
                 variables.put(name, value);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(stmt, rs);
         }

@@ -72,7 +72,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
         nextFilename = null;
         try {
             nextFilename = readNextFilenameLine();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             throw new RuntimeException("error while reading next file name");
         }
         return s;
@@ -86,7 +86,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
     public void close() {
         try {
             reader.close();
-        } catch (Throwable t) {
+        } catch (Throwable th) {
         }
     }
 

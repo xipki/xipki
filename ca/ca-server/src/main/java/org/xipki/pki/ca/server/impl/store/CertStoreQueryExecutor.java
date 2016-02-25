@@ -173,8 +173,8 @@ class CertStoreQueryExecutor {
             } // end while
 
             return new CertBasedIdentityStore(table, caInfos);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -198,8 +198,8 @@ class CertStoreQueryExecutor {
             }
 
             return new NameIdStore(tableName, entries);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -331,25 +331,25 @@ class CertStoreQueryExecutor {
 
                     sql = "(commit add cert to CA certstore)";
                     conn.commit();
-                } catch (Throwable t) {
+                } catch (Throwable th) {
                     conn.rollback();
                     // more secure
                     dataSource.deleteFromTable(null, "CRAW", "CID", certId);
                     dataSource.deleteFromTable(null, "CERT", "ID", certId);
 
-                    if (t instanceof SQLException) {
-                        SQLException e = (SQLException) t;
-                        DataAccessException tEx = dataSource.translate(sql, e);
+                    if (th instanceof SQLException) {
+                        SQLException ex = (SQLException) th;
+                        DataAccessException tEx = dataSource.translate(sql, ex);
                         if (tEx instanceof DuplicateKeyException && i < tries - 1) {
                             continue;
                         }
                         LOG.error(
                             "datasource {} SQLException while adding certificate with id {}: {}",
-                            dataSource.getDatasourceName(), certId, t.getMessage());
-                        throw e;
+                            dataSource.getDatasourceName(), certId, th.getMessage());
+                        throw ex;
                     } else {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                t.getClass().getName() + ": " + t.getMessage());
+                                th.getClass().getName() + ": " + th.getMessage());
                     }
                 } finally {
                     conn.setAutoCommit(origAutoCommit);
@@ -357,8 +357,8 @@ class CertStoreQueryExecutor {
 
                 break;
             } // end for
-        } catch (SQLException e) {
-            throw dataSource.translate(null, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(null, ex);
         } finally {
             try {
                 for (PreparedStatement ps : pss) {
@@ -385,8 +385,8 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, caId);
             ps.setInt(idx++, certId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -404,8 +404,8 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, publisherId);
             ps.setInt(idx++, certId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -427,8 +427,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getLong(1);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -446,8 +446,8 @@ class CertStoreQueryExecutor {
             int caId = getCaId(caCert);
             ps.setInt(2, caId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -488,8 +488,8 @@ class CertStoreQueryExecutor {
                 ps.setInt(idx++, publisherId);
             }
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -515,8 +515,8 @@ class CertStoreQueryExecutor {
             return (maxCrlNumber < 0)
                     ? 0
                     : maxCrlNumber;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -539,8 +539,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getLong(1);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -566,8 +566,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getInt(1) > 0;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -636,8 +636,8 @@ class CertStoreQueryExecutor {
             ps.setString(idx++, b64Crl);
 
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -708,8 +708,8 @@ class CertStoreQueryExecutor {
                 }
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(SQL_REVOKE_CERT, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(SQL_REVOKE_CERT, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -776,8 +776,8 @@ class CertStoreQueryExecutor {
                 }
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -806,8 +806,8 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, caId);
             ps.setLong(idx++, serialNumber.longValue());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -849,8 +849,8 @@ class CertStoreQueryExecutor {
                 }
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -872,8 +872,8 @@ class CertStoreQueryExecutor {
             rs = ps.executeQuery();
             rs.next();
             return rs.getLong(1);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -920,8 +920,8 @@ class CertStoreQueryExecutor {
             }
 
             return ret;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -953,8 +953,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getInt(1) > 0;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1014,8 +1014,8 @@ class CertStoreQueryExecutor {
             }
 
             return ret;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1053,8 +1053,8 @@ class CertStoreQueryExecutor {
             }
 
             return ret;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1098,8 +1098,8 @@ class CertStoreQueryExecutor {
                     currentThisUpdate = thisUpdate;
                 }
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1138,8 +1138,8 @@ class CertStoreQueryExecutor {
                 int crlNumber = rs.getInt("CRL_NO");
                 crlNumbers.add(crlNumber);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1161,8 +1161,8 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, caId);
             ps.setInt(idx++, crlNumber + 1);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -1206,8 +1206,8 @@ class CertStoreQueryExecutor {
                 revTime = rs.getLong("RT");
                 revInvTime = rs.getLong("RIT");
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1256,8 +1256,8 @@ class CertStoreQueryExecutor {
             }
 
             b64Cert = rs.getString("CERT");
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1269,12 +1269,12 @@ class CertStoreQueryExecutor {
         X509Certificate cert;
         try {
             cert = X509Util.parseCert(encodedCert);
-        } catch (CertificateException e) {
+        } catch (CertificateException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "CertificateException: " + e.getMessage());
-        } catch (IOException e) {
+                    "CertificateException: " + ex.getMessage());
+        } catch (IOException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "IOException: " + e.getMessage());
+                    "IOException: " + ex.getMessage());
         }
         return new X509CertWithDbId(cert, encodedCert);
     } // method getCertForId
@@ -1325,8 +1325,8 @@ class CertStoreQueryExecutor {
                 revTime = rs.getLong("RT");
                 revInvTime = rs.getLong("RIT");
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -1335,9 +1335,9 @@ class CertStoreQueryExecutor {
         X509Certificate cert;
         try {
             cert = X509Util.parseCert(certBytes);
-        } catch (CertificateException | IOException e) {
+        } catch (CertificateException | IOException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    e.getClass().getName() + ": " + e.getMessage());
+                    ex.getClass().getName() + ": " + ex.getMessage());
         }
 
         CertRevocationInfo revInfo = null;
@@ -1403,8 +1403,8 @@ class CertStoreQueryExecutor {
                 revTime = rs.getLong("RT");
                 revInvTime = rs.getLong("RIT");
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1433,10 +1433,10 @@ class CertStoreQueryExecutor {
                     new Date(revTime * 1000), invalidityTime);
             certInfo.setRevocationInfo(revInfo);
             return certInfo;
-        } catch (IOException e) {
-            LOG.warn("getCertificateInfo()", e);
+        } catch (IOException ex) {
+            LOG.warn("getCertificateInfo()", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "IOException: " + e.getMessage());
+                    "IOException: " + ex.getMessage());
         }
     } // method getCertificateInfo
 
@@ -1466,8 +1466,8 @@ class CertStoreQueryExecutor {
 
             int profileId = rs.getInt("PID");
             return certprofileStore.getName(profileId);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1511,8 +1511,8 @@ class CertStoreQueryExecutor {
                 int id = rs.getInt("ID");
                 certIds.add(id);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1552,8 +1552,8 @@ class CertStoreQueryExecutor {
             }
 
             expPasswordText = rs.getString("PASSWORD");
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1564,8 +1564,8 @@ class CertStoreQueryExecutor {
 
         try {
             return PasswordHash.validatePassword(password, expPasswordText);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, e.getMessage());
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     } // method authenticateUser
 
@@ -1586,8 +1586,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getString("CN_REGEX");
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1616,8 +1616,8 @@ class CertStoreQueryExecutor {
             }
 
             user = rs.getString("UNAME");
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1682,8 +1682,8 @@ class CertStoreQueryExecutor {
             }
 
             return ret;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1720,8 +1720,8 @@ class CertStoreQueryExecutor {
                 long serial = rs.getLong("SN");
                 serials.add(serial);
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1769,8 +1769,8 @@ class CertStoreQueryExecutor {
                             CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(sql, ex);
             } finally {
                 releaseDbResources(null, rs);
             }
@@ -1823,8 +1823,8 @@ class CertStoreQueryExecutor {
             return rs.getBoolean("REV")
                     ? CertStatus.Revoked
                     : CertStatus.Good;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1858,8 +1858,8 @@ class CertStoreQueryExecutor {
             }
 
             return rs.getInt(1) > 0;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1905,8 +1905,8 @@ class CertStoreQueryExecutor {
             int id = rs.getInt("ID");
             boolean revoked = rs.getBoolean("REV");
             return new SubjectKeyProfileBundle(id, subjectFp, keyFp, profile, revoked);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -1970,8 +1970,8 @@ class CertStoreQueryExecutor {
             rs = ps.executeQuery();
 
             return rs.next();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -2030,8 +2030,8 @@ class CertStoreQueryExecutor {
             ps.setString(idx++, b64Cert);
 
             ps.execute();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -2111,8 +2111,8 @@ class CertStoreQueryExecutor {
 
             ps.execute();
             store.addEntry(name, id);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -2138,15 +2138,15 @@ class CertStoreQueryExecutor {
             for (int j = 0; j < i; j++) {
                 try {
                     pss[j].close();
-                } catch (Throwable t) {
-                    LOG.warn("could not close preparedStatement", t);
+                } catch (Throwable th) {
+                    LOG.warn("could not close preparedStatement", th);
                 }
             }
 
             try {
                 c.close();
-            } catch (Throwable t) {
-                LOG.warn("could not close connection", t);
+            } catch (Throwable th) {
+                LOG.warn("could not close connection", th);
             }
 
             throw new DataAccessException(
@@ -2191,9 +2191,9 @@ class CertStoreQueryExecutor {
                 releaseDbResources(ps, rs);
             }
             return true;
-        } catch (Exception e) {
-            LOG.error("isHealthy(). {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("isHealthy()", e);
+        } catch (Exception ex) {
+            LOG.error("isHealthy(). {}: {}", ex.getClass().getName(), ex.getMessage());
+            LOG.debug("isHealthy()", ex);
             return false;
         }
     } // method isHealthy
@@ -2220,8 +2220,8 @@ class CertStoreQueryExecutor {
         PreparedStatement ps;
         try {
             ps = borrowPreparedStatement(sql);
-        } catch (DataAccessException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         }
 
         String subjectStr;
@@ -2234,8 +2234,8 @@ class CertStoreQueryExecutor {
             }
 
             subjectStr = rs.getString("SUBJECT");
-        } catch (SQLException e) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (SQLException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -2279,8 +2279,8 @@ class CertStoreQueryExecutor {
             return (notBefore == 0)
                     ? null
                     : notBefore;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
@@ -2308,8 +2308,8 @@ class CertStoreQueryExecutor {
                 return;
             }
             maxSerial = rs.getLong(1);
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -2335,8 +2335,8 @@ class CertStoreQueryExecutor {
                 rs = ps.executeQuery();
                 rs.next();
                 nextSerialInDB = rs.getLong("NEXT_SN");
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(sql, ex);
             } finally {
                 releaseStatement(ps);
 
@@ -2352,8 +2352,8 @@ class CertStoreQueryExecutor {
                     ps.setLong(1, nextSerial);
                     ps.setString(2, caName);
                     ps.executeUpdate();
-                } catch (SQLException e) {
-                    throw dataSource.translate(sql, e);
+                } catch (SQLException ex) {
+                    throw dataSource.translate(sql, ex);
                 }
             }
         } finally {
@@ -2378,8 +2378,8 @@ class CertStoreQueryExecutor {
                 rs = ps.executeQuery();
                 rs.next();
                 nextCrlNoInDB = rs.getInt("NEXT_CRLNO");
-            } catch (SQLException e) {
-                throw dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                throw dataSource.translate(sql, ex);
             } finally {
                 releaseStatement(ps);
                 if (rs != null) {
@@ -2394,8 +2394,8 @@ class CertStoreQueryExecutor {
                     ps.setInt(1, nextCrlNo);
                     ps.setString(2, caName);
                     ps.executeUpdate();
-                } catch (SQLException e) {
-                    throw dataSource.translate(updateSql, e);
+                } catch (SQLException ex) {
+                    throw dataSource.translate(updateSql, ex);
                 }
             }
         } finally {
@@ -2439,14 +2439,14 @@ class CertStoreQueryExecutor {
                     if(count < 1) {
                         return serial;
                     }
-                } catch (SQLException e) {
-                    throw dataSource.translate(sql, e);
+                } catch (SQLException ex) {
+                    throw dataSource.translate(sql, ex);
                 } finally {
                     dataSource.releaseResources(null, rs);
                 }
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             if (ps != null) {
                 dataSource.releaseResources(ps, null);
@@ -2497,8 +2497,8 @@ class CertStoreQueryExecutor {
             ps.setLong(1, fpKey);
             ps.setLong(2, fpSubject);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -2517,16 +2517,16 @@ class CertStoreQueryExecutor {
             ps.setLong(3, System.currentTimeMillis() / 1000);
             try {
                 ps.executeUpdate();
-            } catch (SQLException e) {
-                DataAccessException tEx = dataSource.translate(sql, e);
+            } catch (SQLException ex) {
+                DataAccessException tEx = dataSource.translate(sql, ex);
                 if (tEx instanceof DuplicateKeyException
                         || tEx instanceof DataIntegrityViolationException) {
                     return false;
                 }
             }
             return true;
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -2541,8 +2541,8 @@ class CertStoreQueryExecutor {
         try {
             ps.setLong(1, time.getTime() / 1000);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
@@ -2552,8 +2552,8 @@ class CertStoreQueryExecutor {
             Statement statment) {
         try {
             statment.close();
-        } catch (SQLException e) {
-            LOG.warn("could not close Statement", e);
+        } catch (SQLException ex) {
+            LOG.warn("could not close Statement", ex);
         }
     }
 
@@ -2561,8 +2561,8 @@ class CertStoreQueryExecutor {
             ResultSet resultSet) {
         try {
             resultSet.close();
-        } catch (SQLException e) {
-            LOG.warn("could not close ResultSet", e);
+        } catch (SQLException ex) {
+            LOG.warn("could not close ResultSet", ex);
         }
     }
 

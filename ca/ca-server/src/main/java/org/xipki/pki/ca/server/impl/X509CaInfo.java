@@ -123,7 +123,7 @@ public class X509CaInfo {
         try {
             byte[] encodedCert = cert.getEncoded();
             bcCert = Certificate.getInstance(encodedCert);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "could not encode the CA certificate");
         }
@@ -445,7 +445,7 @@ public class X509CaInfo {
                     dfltSigner = signer;
                 }
                 tSigners.put(algo, signer);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 for (ConcurrentContentSigner tSigner : tSigners.values()) {
                     tSigner.shutdown();
                 }

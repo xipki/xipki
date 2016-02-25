@@ -58,7 +58,7 @@ public class NegEnrollCertCmd extends EnrollCertCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

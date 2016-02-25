@@ -115,8 +115,8 @@ public class OcspFromCaDbImportWorker extends DbPortWorker {
         } finally {
             try {
                 dataSource.shutdown();
-            } catch (Throwable e) {
-                LOG.error("dataSource.shutdown()", e);
+            } catch (Throwable th) {
+                LOG.error("dataSource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

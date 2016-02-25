@@ -119,13 +119,13 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             this.dsaSignature = null;
             try {
                 this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
+                throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             try {
                 this.rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            } catch (InvalidKeyException e) {
-                throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
+            } catch (InvalidKeyException ex) {
+                throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
             }
         } else if (this.publicKey instanceof ECPublicKey
                 || this.publicKey instanceof DSAPublicKey) {
@@ -144,13 +144,13 @@ class SunP11Identity implements Comparable<SunP11Identity> {
 
             try {
                 this.dsaSignature = Signature.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException e) {
-                throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new SignerException("NoSuchAlgorithmException: " + ex.getMessage(), ex);
             }
             try {
                 this.dsaSignature.initSign(privateKey);
-            } catch (InvalidKeyException e) {
-                throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
+            } catch (InvalidKeyException ex) {
+                throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
             }
             this.rsaCipher = null;
         } else {
@@ -215,8 +215,8 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             try {
                 rsaCipher.update(hash);
                 return rsaCipher.doFinal();
-            } catch (IllegalBlockSizeException | BadPaddingException e) {
-                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+            } catch (IllegalBlockSizeException | BadPaddingException ex) {
+                throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }
     }
@@ -242,8 +242,8 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             try {
                 dsaSignature.update(truncatedDigest);
                 return dsaSignature.sign();
-            } catch (SignatureException e) {
-                throw new SignerException(e.getMessage(), e);
+            } catch (SignatureException ex) {
+                throw new SignerException(ex.getMessage(), ex);
             }
         }
     }
@@ -268,8 +268,8 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             try {
                 dsaSignature.update(truncatedDigest);
                 return dsaSignature.sign();
-            } catch (SignatureException e) {
-                throw new SignerException(e.getMessage(), e);
+            } catch (SignatureException ex) {
+                throw new SignerException(ex.getMessage(), ex);
             }
         }
     }

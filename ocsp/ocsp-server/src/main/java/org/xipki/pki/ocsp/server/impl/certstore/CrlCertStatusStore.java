@@ -322,8 +322,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                     : issuerCert;
             try {
                 crl.verify(crlSignerCert.getPublicKey());
-            } catch (Exception e) {
-                throw new CertStatusStoreException(e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new CertStatusStoreException(ex.getMessage(), ex);
             }
 
             X509CRL deltaCrl = null;
@@ -394,16 +394,16 @@ public class CrlCertStatusStore extends CertStatusStore {
             byte[] encodedCaCert;
             try {
                 encodedCaCert = caCert.getEncoded();
-            } catch (CertificateEncodingException e) {
-                throw new CertStatusStoreException(e.getMessage(), e);
+            } catch (CertificateEncodingException ex) {
+                throw new CertStatusStoreException(ex.getMessage(), ex);
             }
 
             Certificate bcCaCert = Certificate.getInstance(encodedCaCert);
             byte[] encodedName;
             try {
                 encodedName = bcCaCert.getSubject().getEncoded("DER");
-            } catch (IOException e) {
-                throw new CertStatusStoreException(e.getMessage(), e);
+            } catch (IOException ex) {
+                throw new CertStatusStoreException(ex.getMessage(), ex);
             }
 
             byte[] encodedKey = bcCaCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -577,8 +577,8 @@ public class CrlCertStatusStore extends CertStatusStore {
                         ASN1GeneralizedTime gTime = DERGeneralizedTime.getInstance(extnValue);
                         try {
                             invalidityTime = gTime.getDate();
-                        } catch (ParseException e) {
-                            throw new CertStatusStoreException(e.getMessage(), e);
+                        } catch (ParseException ex) {
+                            throw new CertStatusStoreException(ex.getMessage(), ex);
                         }
 
                         if (revTime.equals(invalidityTime)) {
@@ -646,13 +646,13 @@ public class CrlCertStatusStore extends CertStatusStore {
             this.initialized = true;
             updateCRLSuccessful = true;
             LOG.info("updated CertStore {}", getName());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             final String message = "could not execute initializeStore()";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(message, e);
+            LOG.debug(message, ex);
             initializationFailed = true;
             initialized = true;
         } finally {
@@ -688,7 +688,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         while (!initialized && (n-- > 0)) {
             try {
                 Thread.sleep(100);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
             }
         }
 
@@ -887,7 +887,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             try {
                 byte[] encoded = IoUtil.read(certFile);
                 bcCert = Certificate.getInstance(encoded);
-            } catch (IllegalArgumentException | IOException e) {
+            } catch (IllegalArgumentException | IOException ex) {
                 LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
                 continue;
             }
@@ -906,13 +906,13 @@ public class CrlCertStatusStore extends CertStatusStore {
                 byte[] aki = null;
                 try {
                     aki = X509Util.extractAki(bcCert);
-                } catch (CertificateEncodingException e) {
+                } catch (CertificateEncodingException ex) {
                     final String message = "could not extract AuthorityKeyIdentifier";
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                e.getClass().getName(), e.getMessage());
+                                ex.getClass().getName(), ex.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, ex);
                 }
 
                 if (aki == null || !Arrays.equals(issuerSKI, aki)) {
@@ -947,7 +947,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             } finally {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ex) {
                 }
             }
 
@@ -1005,8 +1005,8 @@ public class CrlCertStatusStore extends CertStatusStore {
         byte[] encodedCert;
         try {
             encodedCert = cert.getEncoded();
-        } catch (IOException e) {
-            throw new CertStatusStoreException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CertStatusStoreException(ex.getMessage(), ex);
         }
 
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();

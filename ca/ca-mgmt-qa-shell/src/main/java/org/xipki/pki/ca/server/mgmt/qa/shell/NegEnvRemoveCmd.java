@@ -58,7 +58,7 @@ public class NegEnvRemoveCmd extends EnvRemoveCmd {
 
         try {
             super.doExecute();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
 

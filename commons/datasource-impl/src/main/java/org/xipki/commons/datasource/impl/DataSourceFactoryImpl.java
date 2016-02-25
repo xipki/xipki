@@ -82,7 +82,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         } finally {
             try {
                 conf.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
 

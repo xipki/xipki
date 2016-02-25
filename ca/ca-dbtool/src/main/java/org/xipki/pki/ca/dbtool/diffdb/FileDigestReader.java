@@ -136,8 +136,8 @@ public class FileDigestReader implements DigestReader {
             DbDigestEntry line;
             try {
                 line = nextCert();
-            } catch (IOException e) {
-                throw new DataAccessException("IOException: " + e.getMessage());
+            } catch (IOException ex) {
+                throw new DataAccessException("IOException: " + ex.getMessage());
             }
             if (revokedOnly && !line.isRevoked()) {
                 numSkipped++;
@@ -209,7 +209,7 @@ public class FileDigestReader implements DigestReader {
 
         try {
             reader.close();
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
     }
 

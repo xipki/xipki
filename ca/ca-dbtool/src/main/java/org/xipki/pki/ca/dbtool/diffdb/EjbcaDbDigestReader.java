@@ -120,9 +120,9 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             try {
                 selectCertStmt = datasource.prepareStatement(connection, selectCertSql);
                 selectBase64CertStmt = datasource.prepareStatement(connection, selectBase64CertSql);
-            } catch (DataAccessException e) {
+            } catch (DataAccessException ex) {
                 datasource.returnConnection(connection);
-                throw e;
+                throw ex;
             }
         }
 
@@ -132,7 +132,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                 try {
                     IdRange idRange = inQueue.take();
                     query(idRange);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ex) {
                 }
             }
 
@@ -174,8 +174,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                                     .equals(caCert.getSubjectX500Principal())) {
                                 ofThisCA = true;
                             }
-                        } catch (SQLException e) {
-                            throw datasource.translate(selectBase64CertSql, e);
+                        } catch (SQLException ex) {
+                            throw datasource.translate(selectBase64CertSql, ex);
                         }
                     }
 
@@ -202,11 +202,11 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                             revInvTime, hash);
                     result.addEntry(new IdentifiedDbDigestEntry(cert, id));
                 }
-            } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    e = datasource.translate(selectCertSql, (SQLException) e);
+            } catch (Exception ex) {
+                if (ex instanceof SQLException) {
+                    ex = datasource.translate(selectCertSql, (SQLException) ex);
                 }
-                result.setException(e);
+                result.setException(ex);
             } finally {
                 releaseResources(null, rs);
             }
@@ -306,8 +306,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                     ? rs.getInt(1)
                     : 1;
 
-        } catch (SQLException e) {
-            throw datasource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
         } finally {
             releaseResources(stmt, rs);
             datasource.returnConnection(conn);
@@ -322,8 +322,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     throws DataAccessException {
         try {
             return X509Util.parseBase64EncodedCert(b64Cert);
-        } catch (Exception e) {
-            throw new DataAccessException("IOException", e);
+        } catch (Exception ex) {
+            throw new DataAccessException("IOException", ex);
         }
     }
 

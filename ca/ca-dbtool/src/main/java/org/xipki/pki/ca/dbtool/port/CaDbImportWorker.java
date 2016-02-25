@@ -169,8 +169,8 @@ public class CaDbImportWorker extends DbPortWorker {
         } finally {
             try {
                 dataSource.shutdown();
-            } catch (Throwable e) {
-                LOG.error("dataSource.shutdown()", e);
+            } catch (Throwable th) {
+                LOG.error("dataSource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
@@ -252,8 +252,8 @@ public class CaDbImportWorker extends DbPortWorker {
                     ps.executeUpdate();
                 }
             }
-        } catch (SQLException e) {
-            throw dataSource.translate(sql, e);
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
         } finally {
             dataSource.returnConnection(conn);
         }

@@ -82,7 +82,7 @@ public class CertWithEncoded {
             byte[] encodedCert;
             try {
                 encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException ex) {
                 return false;
             }
             return Arrays.equals(encoded, encodedCert);

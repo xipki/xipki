@@ -83,8 +83,8 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
         X509CRL crl = null;
         try {
             crl = retrieveCrl();
-        } catch (Exception e) {
-            throw new CmdFailure("received no CRL from server: " + e.getMessage());
+        } catch (Exception ex) {
+            throw new CmdFailure("received no CRL from server: " + ex.getMessage());
         }
 
         if (crl == null) {
