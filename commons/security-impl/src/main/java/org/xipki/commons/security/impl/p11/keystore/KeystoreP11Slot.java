@@ -38,11 +38,10 @@ package org.xipki.commons.security.impl.p11.keystore;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -79,11 +78,11 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -105,17 +104,28 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class KeystoreP11Slot implements P11WritableSlot {
 
+    private static class InfoFilenameFilter implements FilenameFilter {
+
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.endsWith(INFO_FILE_SUFFIX);
+        }
+
+    }
+
     // slotinfo
-    private static final String FILE_SLOTINFO = "slotinfo";
+    private static final String FILE_SLOTINFO = "slot.info";
     private static final String PROP_NAMED_CURVE_SUPPORTED = "namedCurveSupported";
 
     private static final String DIR_PRIV_KEY = "privkey";
     private static final String DIR_PUB_KEY = "pubkey";
     private static final String DIR_CERT = "cert";
 
+    private static final String INFO_FILE_SUFFIX = ".info";
+    private static final String VALUE_FILE_SUFFIX = ".value";
+
     private static final String PROP_ID = "id";
     private static final String PROP_LABEL = "label";
-    private static final String PROP_VALUE = "value";
     private static final String PROP_SHA1SUM = "sha1";
 
     private static final String PROP_ALGORITHM = "algorithm";
@@ -135,6 +145,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
     private static final String PROP_EC_EC_POINT = "ecPoint";
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
+
+    private static final InfoFilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
     private final String moduleName;
 
@@ -208,8 +220,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
     }
 
     public void refresh() {
-        File[] privKeyFiles = privKeyDir.listFiles();
-        if (privKeyFiles == null || privKeyFiles.length == 0) {
+        File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
+        if (privKeyInfoFiles == null || privKeyInfoFiles.length == 0) {
             this.identities.clear();
             return;
         }
@@ -218,12 +230,12 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
 
-        for (File privKeyFile : privKeyFiles) {
-            String hexKeyId = privKeyFile.getName();
-            byte[] keyId = Hex.decode(hexKeyId);
+        for (File privKeyInfoFile : privKeyInfoFiles) {
+            byte[] keyId = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
+            String hexKeyId = Hex.toHexString(keyId);
 
             try {
-                Properties props = loadProperties(privKeyFile);
+                Properties props = loadProperties(privKeyInfoFile);
                 String keyLabel = props.getProperty(PROP_LABEL);
 
                 P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId, keyLabel);
@@ -264,10 +276,10 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     }
                 }
 
-                String base64EncodedValue = props.getProperty(PROP_VALUE);
+                byte[] encodedValue = IoUtil.read(
+                        new File(privKeyDir, hexKeyId + VALUE_FILE_SUFFIX));
 
-                PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(
-                        Base64.decode(base64EncodedValue));
+                PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
                 PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
                 KeystoreP11Identity identity = new KeystoreP11Identity(slotId, p11KeyId, privateKey,
@@ -375,7 +387,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
         P11KeyIdentifier certKeyId = identity.getKeyId();
-        savePkcs11Cert(certKeyId.getKeyId(), certKeyId.getKeyLabel(), certChain[0]);
+        savePkcs11Cert(certKeyId.getKeyId(), certKeyId.getKeyLabel(), newCert);
         if (certChain.length < 2) {
             return;
         }
@@ -400,17 +412,17 @@ public class KeystoreP11Slot implements P11WritableSlot {
         String sha1sum = HashCalculator.hexSha1(encodedCert);
 
         // make sure that the certificate does not exist in the PKCS#11 module
-        File[] childFiles = certDir.listFiles();
-        if (childFiles != null) {
-            for (File cf : childFiles) {
-                Properties props = loadProperties(cf);
+        File[] infoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
+        if (infoFiles != null) {
+            for (File infoFile : infoFiles) {
+                Properties props = loadProperties(infoFile);
                 if (props == null) {
                     continue;
                 }
 
                 if (sha1sum.equals(props.getProperty(PROP_SHA1SUM))) {
                     String label = props.getProperty(PROP_LABEL);
-                    byte[] id = Hex.decode(cf.getName());
+                    byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
                     return new P11KeyIdentifier(id, label);
                 }
             }
@@ -577,19 +589,6 @@ public class KeystoreP11Slot implements P11WritableSlot {
         return slotId;
     }
 
-    public static byte[] deriveKeyIdFromLabel(
-            final String keyLabel) {
-        byte[] keyLabelBytes;
-        try {
-            keyLabelBytes = keyLabel.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            keyLabelBytes = keyLabel.getBytes();
-        }
-
-        byte[] sha1Fp = HashCalculator.sha1(keyLabelBytes);
-        return Arrays.copyOf(sha1Fp, 8);
-    }
-
     @Override
     public void showDetails(
             final OutputStream stream,
@@ -607,7 +606,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 .append(". ")
                 .append(p11KeyId.getKeyLabel())
                 .append(" (").append("id: ")
-                .append(Hex.toHexString(p11KeyId.getKeyId()).toUpperCase())
+                .append(Hex.toHexString(p11KeyId.getKeyId()).toLowerCase())
                 .append(")\n");
 
             sb.append("\t\tAlgorithm: ")
@@ -682,24 +681,25 @@ public class KeystoreP11Slot implements P11WritableSlot {
         byte[] id = keyId.getKeyId();
         String label = keyId.getKeyLabel();
         if (id != null) {
-            File f = new File(dir, Hex.toHexString(id));
-            if (!f.exists()) {
+            String hextId = Hex.toHexString(id);
+            File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+            if (!infoFile.exists()) {
                 return false;
             }
 
             if (StringUtil.isBlank(label)) {
-                return f.delete();
+                return deletePkcs11Entry(dir, id);
             } else {
                 Properties props;
                 try {
-                    props = loadProperties(f);
+                    props = loadProperties(infoFile);
                 } catch (IOException ex) {
-                    LOG.warn("error while removing " + f.getPath(), ex);
+                    LOG.warn("error while removing " + infoFile.getPath(), ex);
                     return false;
                 }
 
                 if (label.equals(props.getProperty("label"))) {
-                    return f.delete();
+                    return deletePkcs11Entry(dir, id);
                 } else {
                     return false;
                 }
@@ -708,28 +708,47 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         // id is null, delete all entries with the specified label
         boolean deleted = false;
-        File[] childFiles = dir.listFiles();
-        for (File cf : childFiles) {
-            if (!cf.isFile()) {
+        File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
+        for (File infoFile : infoFiles) {
+            if (!infoFile.isFile()) {
                 continue;
             }
 
             Properties props;
             try {
-                props = loadProperties(cf);
+                props = loadProperties(infoFile);
             } catch (IOException ex) {
-                LOG.warn("error while loading " + cf.getPath(), ex);
                 continue;
             }
 
             if (label.equals(props.getProperty("label"))) {
-                if (cf.delete()) {
+                if (deletePkcs11Entry(dir, getKeyIdFromInfoFilename(infoFile.getName()))) {
                     deleted = true;
                 }
             }
         }
 
         return deleted;
+    }
+
+    private static boolean deletePkcs11Entry(
+            final File dir,
+            final byte[] keyId)
+    {
+        String hextId = Hex.toHexString(keyId);
+        File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+        boolean b1 = true;
+        if (infoFile.exists()) {
+            b1 = infoFile.delete();
+        }
+
+        File valueFile = new File(dir, hextId + VALUE_FILE_SUFFIX);
+        boolean b2 = true;
+        if (valueFile.exists()) {
+            b2 = valueFile.delete();
+        }
+
+        return b1 || b2;
     }
 
     private void savePkcs11PrivateKey(
@@ -746,7 +765,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final String label,
             final PublicKey publicKey)
     throws IOException, InvalidKeyException {
-        String hexId = Hex.toHexString(id).toUpperCase();
+        String hexId = Hex.toHexString(id).toLowerCase();
 
         StringBuilder sb = new StringBuilder(100);
         sb.append(PROP_ID).append('=').append(hexId).append('\n');
@@ -852,10 +871,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     "unsupported public key " + publicKey.getClass().getName());
         }
 
-        File file = new File(pubKeyDir, hexId);
-        FileOutputStream out = new FileOutputStream(file);
-        out.write(sb.toString().getBytes());
-        out.close();
+        IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
     }
 
     private void savePkcs11Cert(
@@ -881,42 +897,27 @@ public class KeystoreP11Slot implements P11WritableSlot {
         ParamUtil.assertNotBlank("label", label);
         ParamUtil.assertNotNull("value", value);
 
-        String hexId = Hex.toHexString(id).toUpperCase();
-        File file = new File(dir, hexId);
-        FileOutputStream out = new FileOutputStream(file);
-        out.write(PROP_ID.getBytes());
-        out.write('=');
-        out.write(hexId.getBytes());
-        out.write('\n');
+        String hexId = Hex.toHexString(id).toLowerCase();
 
-        out.write(PROP_LABEL.getBytes());
-        out.write('=');
-        out.write(label.getBytes());
-        out.write('\n');
+        StringBuilder sb = new StringBuilder(200);
+        sb.append(PROP_ID).append('=').append(hexId).append('\n');
+        sb.append(PROP_LABEL).append('=').append(label).append('\n');
+        sb.append(PROP_SHA1SUM).append('=').append(HashCalculator.hexSha1(value)).append('\n');
 
-        String sha1sum = HashCalculator.hexSha1(value);
-        out.write(PROP_SHA1SUM.getBytes());
-        out.write('=');
-        out.write(sha1sum.getBytes());
-        out.write('\n');
-
-        out.write(PROP_VALUE.getBytes());
-        out.write('=');
-        Base64.encode(value, out);
-        out.write('\n');
-        out.close();
+        IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
+        IoUtil.save(new File(dir, hexId + VALUE_FILE_SUFFIX), value);
     }
 
     private Map<String, X509Certificate> getAllCertificates() {
-        File[] certFiles = certDir.listFiles();
-        if (certFiles == null) {
+        File[] infoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
+        if (infoFiles == null) {
             return Collections.emptyMap();
         }
 
         Map<String, X509Certificate> certs = new HashMap<>();
-        for (File cf : certFiles) {
-            String hexKeyId = cf.getName();
-            byte[] keyId = Hex.decode(hexKeyId);
+        for (File infoFile : infoFiles) {
+            byte[] keyId = getKeyIdFromInfoFilename(infoFile.getName());
+
             X509Certificate cert;
             try {
                 cert = readCertificate(keyId);
@@ -928,7 +929,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 continue;
             }
 
-            certs.put(hexKeyId, cert);
+            certs.put(Hex.toHexString(keyId), cert);
         }
 
         return certs;
@@ -938,7 +939,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final byte[] keyId)
     throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         String hexKeyId = Hex.toHexString(keyId);
-        File pubKeyFile = new File(pubKeyDir, hexKeyId);
+        File pubKeyFile = new File(pubKeyDir, hexKeyId + INFO_FILE_SUFFIX);
         Properties props = loadProperties(pubKeyFile);
 
         String algorithm = props.getProperty(PROP_ALGORITHM);
@@ -975,11 +976,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
     private X509Certificate readCertificate(
             final byte[] keyId)
     throws CertificateException, IOException {
-        String hexKeyId = Hex.toHexString(keyId);
-        File certFile = new File(certDir, hexKeyId);
-        Properties props = loadProperties(certFile);
-        String base64EncodedCert = props.getProperty(PROP_VALUE);
-        return X509Util.parseBase64EncodedCert(base64EncodedCert);
+        return X509Util.parseCert(new File(certDir, Hex.toHexString(keyId) + VALUE_FILE_SUFFIX));
     }
 
     private byte[] generateKeyId()
@@ -997,16 +994,16 @@ public class KeystoreP11Slot implements P11WritableSlot {
     private boolean idExists(
             final byte[] keyId)
     throws Exception {
-        String hexId = Hex.toHexString(keyId).toUpperCase();
-        if (new File(privKeyDir, hexId).exists()) {
+        String hexId = Hex.toHexString(keyId).toLowerCase();
+        if (new File(privKeyDir, hexId + INFO_FILE_SUFFIX).exists()) {
             return true;
         }
 
-        if (new File(pubKeyDir, hexId).exists()) {
+        if (new File(pubKeyDir, hexId + INFO_FILE_SUFFIX).exists()) {
             return true;
         }
 
-        if (new File(certDir, hexId).exists()) {
+        if (new File(certDir, hexId + INFO_FILE_SUFFIX).exists()) {
             return true;
         }
 
@@ -1030,5 +1027,11 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 }
             }
         }
+    }
+
+    private static byte[] getKeyIdFromInfoFilename(
+            final String fileName)
+    {
+        return Hex.decode(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
     }
 }
