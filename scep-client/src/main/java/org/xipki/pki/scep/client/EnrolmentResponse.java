@@ -94,8 +94,8 @@ public final class EnrolmentResponse {
         List<X509Certificate> certs;
         try {
             certs = ScepUtil.getCertsFromSignedData(sd);
-        } catch (CertificateException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (CertificateException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
         this.certificates = Collections.unmodifiableList(certs);
     }

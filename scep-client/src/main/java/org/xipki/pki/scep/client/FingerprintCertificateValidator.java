@@ -70,7 +70,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
         byte[] actual;
         try {
             actual = algo.digest(cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
             return false;
         }
 

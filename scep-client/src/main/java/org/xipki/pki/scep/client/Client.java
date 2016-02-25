@@ -170,8 +170,8 @@ public abstract class Client {
         if (pkiMessage != null) {
             try {
                 request = pkiMessage.getEncoded();
-            } catch (IOException e) {
-                throw new ScepClientException(e);
+            } catch (IOException ex) {
+                throw new ScepClientException(ex);
             }
         }
 
@@ -218,10 +218,10 @@ public abstract class Client {
         try {
             certHolder = new X509CertificateHolder(
                     this.authorityCertStore.getSignatureCert().getEncoded());
-        } catch (CertificateEncodingException e) {
-            throw new ScepClientException(e);
-        } catch (IOException e) {
-            throw new ScepClientException(e);
+        } catch (CertificateEncodingException ex) {
+            throw new ScepClientException(ex);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex);
         }
         this.responseSignerCerts = new CollectionStore<X509CertificateHolder>(
                 Arrays.asList(certHolder));
@@ -275,8 +275,8 @@ public abstract class Client {
         ContentInfo messageData = (ContentInfo) response.getMessageData();
         try {
             return ScepUtil.getCrlFromPkiMessage(SignedData.getInstance(messageData.getContent()));
-        } catch (CRLException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (CRLException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
     }
 
@@ -307,8 +307,8 @@ public abstract class Client {
         try {
             return ScepUtil.getCertsFromSignedData(
                     SignedData.getInstance(messageData.getContent()));
-        } catch (CertificateException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (CertificateException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
     }
 
@@ -324,8 +324,8 @@ public abstract class Client {
         try {
             tid = TransactionId.sha1TransactionId(
                     csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
-        } catch (InvalidKeySpecException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (InvalidKeySpecException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
 
         return scepCertPoll(identityKey, identityCert, tid, issuer,
@@ -458,8 +458,8 @@ public abstract class Client {
         try {
             tid = TransactionId.sha1TransactionId(
                     csr.getCertificationRequestInfo().getSubjectPublicKeyInfo());
-        } catch (InvalidKeySpecException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (InvalidKeySpecException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
         PkiMessage pkiMessage = new PkiMessage(tid, messageType);
 
@@ -516,8 +516,8 @@ public abstract class Client {
                     new X509Certificate[]{identityCert},
                     authorityCertStore.getEncryptionCert(),
                     encAlgId);
-        } catch (MessageEncodingException e) {
-            throw new ScepClientException(e);
+        } catch (MessageEncodingException ex) {
+            throw new ScepClientException(ex);
         }
     }
 
@@ -536,17 +536,17 @@ public abstract class Client {
         CMSSignedData cmsSignedData;
         try {
             cmsSignedData = new CMSSignedData(httpResp.getContentBytes());
-        } catch (CMSException e) {
-            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
+        } catch (CMSException ex) {
+            throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
+        } catch (IllegalArgumentException ex) {
+            throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
         }
 
         DecodedNextCaMessage resp;
         try {
             resp = DecodedNextCaMessage.decode(cmsSignedData, responseSignerCerts);
-        } catch (MessageDecodingException e) {
-            throw new ScepClientException("could not decode response: " + e.getMessage(), e);
+        } catch (MessageDecodingException ex) {
+            throw new ScepClientException("could not decode response: " + ex.getMessage(), ex);
         }
 
         if (resp.getFailureMessage() != null) {
@@ -598,8 +598,8 @@ public abstract class Client {
         try {
             resp = DecodedPkiMessage.decode(pkiMessage, recipientKey, recipientCert,
                     responseSignerCerts);
-        } catch (MessageDecodingException e) {
-            throw new ScepClientException(e);
+        } catch (MessageDecodingException ex) {
+            throw new ScepClientException(ex);
         }
 
         if (resp.getFailureMessage() != null) {
@@ -649,10 +649,10 @@ public abstract class Client {
     throws ScepClientException {
         try {
             return ScepUtil.parseCert(certBytes);
-        } catch (IOException e) {
-            throw new ScepClientException(e);
-        } catch (CertificateException e) {
-            throw new ScepClientException(e);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex);
+        } catch (CertificateException ex) {
+            throw new ScepClientException(ex);
         }
     }
 
@@ -661,8 +661,8 @@ public abstract class Client {
     throws ScepClientException {
         try {
             return new CMSSignedData(messageBytes);
-        } catch (CMSException e) {
-            throw new ScepClientException(e);
+        } catch (CMSException ex) {
+            throw new ScepClientException(ex);
         }
     }
 
@@ -683,15 +683,15 @@ public abstract class Client {
             SignedData signedData;
             try {
                 signedData = SignedData.getInstance(contentInfo.getContent());
-            } catch (IllegalArgumentException e) {
-                throw new ScepClientException("invalid SignedData message: " + e.getMessage(), e);
+            } catch (IllegalArgumentException ex) {
+                throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
             }
 
             List<X509Certificate> certs;
             try {
                 certs = ScepUtil.getCertsFromSignedData(signedData);
-            } catch (CertificateException e) {
-                throw new ScepClientException(e.getMessage(), e);
+            } catch (CertificateException ex) {
+                throw new ScepClientException(ex.getMessage(), ex);
             }
 
             final int n = certs.size();
@@ -743,8 +743,8 @@ public abstract class Client {
                             + rASignCert.getSubjectX500Principal()
                             + " is not issued by the CA");
                 }
-            } catch (CertificateException e) {
-                throw new ScepClientException("invalid certificate: " + e.getMessage(), e);
+            } catch (CertificateException ex) {
+                throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);
             }
             return cs;
         }

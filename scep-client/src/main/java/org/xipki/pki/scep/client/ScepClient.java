@@ -68,8 +68,8 @@ public class ScepClient extends Client {
             HttpURLConnection conn = (HttpURLConnection) localUrl.openConnection();
             conn.setRequestMethod("GET");
             return parseResponse(conn);
-        } catch (IOException e) {
-            throw new ScepClientException(e);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex);
         }
     }
 
@@ -98,8 +98,8 @@ public class ScepClient extends Client {
             }
 
             return parseResponse(conn);
-        } catch (IOException e) {
-            throw new ScepClientException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex.getMessage(), ex);
         }
     }
 
@@ -124,8 +124,8 @@ public class ScepClient extends Client {
                 resp.setContentEncoding(contentEncoding);
             }
             return resp;
-        } catch (IOException e) {
-            throw new ScepClientException(e);
+        } catch (IOException ex) {
+            throw new ScepClientException(ex);
         }
     }
 
