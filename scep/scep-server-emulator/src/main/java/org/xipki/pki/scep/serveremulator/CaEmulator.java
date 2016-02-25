@@ -114,8 +114,8 @@ public class CaEmulator {
         this.generateCrl = generateCrl;
         try {
             this.caCertBytes = caCert.getEncoded();
-        } catch (IOException e) {
-            throw new CertificateEncodingException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new CertificateEncodingException(ex.getMessage(), ex);
         }
     }
 

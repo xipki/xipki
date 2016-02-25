@@ -79,7 +79,7 @@ public class FpIdCalculator {
         byte[] encoded;
         try {
             encoded = data.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ex) {
             encoded = data.getBytes();
         }
         return hash(encoded);
@@ -97,7 +97,7 @@ public class FpIdCalculator {
             try {
                 md = MDS.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
             }
         }
 

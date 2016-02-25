@@ -83,13 +83,13 @@ public class IaikP11ModulePool {
             LOG.info("removed module {}", moduleName);
             module.close();
             LOG.info("finalized module {}", moduleName);
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "could not finalize the module " + moduleName;
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                        th.getMessage());
             }
-            LOG.debug(message, t);
+            LOG.debug(message, th);
         }
     }
 
@@ -116,28 +116,28 @@ public class IaikP11ModulePool {
 
         try {
             module = Module.getInstance(moduleConf.getNativeLibrary());
-        } catch (IOException e) {
+        } catch (IOException ex) {
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(),
-                        e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                        ex.getMessage());
             }
-            LOG.debug(msg, e);
+            LOG.debug(msg, ex);
             throw new SignerException(msg);
         }
 
         try {
             module.initialize(new DefaultInitializeArgs());
-        } catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception e) {
-            if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
+        } catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception ex) {
+            if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
                 final String message = "PKCS11Exception";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(),
-                            e.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
                 }
-                LOG.debug(message, e);
+                LOG.debug(message, ex);
                 close(module);
-                throw new SignerException(e.getMessage());
+                throw new SignerException(ex.getMessage());
             } else {
                 LOG.info("PKCS#11 module already initialized");
                 if (LOG.isInfoEnabled()) {
@@ -148,15 +148,15 @@ public class IaikP11ModulePool {
                     }
                 }
             }
-        } catch (Throwable t) {
+        } catch (Throwable th) {
             final String message = "unexpected Exception: ";
             if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                        t.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                        th.getMessage());
             }
-            LOG.debug(message, t);
+            LOG.debug(message, th);
             close(module);
-            throw new SignerException(t.getMessage());
+            throw new SignerException(th.getMessage());
         }
 
         extModule = new IaikP11Module(module, moduleConf);
@@ -201,13 +201,13 @@ public class IaikP11ModulePool {
             LOG.info("close", "close pkcs11 module: {}", module);
             try {
                 module.finalize(null);
-            } catch (Throwable t) {
+            } catch (Throwable th) {
                 final String message = "error while module.finalize()";
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(),
-                            t.getMessage());
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
                 }
-                LOG.debug(message, t);
+                LOG.debug(message, th);
             }
         }
     }

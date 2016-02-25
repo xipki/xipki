@@ -311,7 +311,7 @@ public class SecurityUtil {
         if (!isName) {
             try {
                 return new ASN1ObjectIdentifier(s);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
             }
         }
 
@@ -352,7 +352,7 @@ public class SecurityUtil {
                 pairs.putPair("password", "<sensitve>");
             }
             return pairs.getEncoded();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return conf;
         }
     }

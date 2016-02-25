@@ -152,7 +152,7 @@ public final class ECParameters extends AlgorithmParametersSpi {
 
                 namedCurve = spec;
                 return;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
             }
         }
 
@@ -171,8 +171,8 @@ public final class ECParameters extends AlgorithmParametersSpi {
                 ecNamedCurveSpec.getCofactor());
         try {
             engineInit(spec);
-        } catch (InvalidParameterSpecException e) {
-            throw new IOException("InvalidParameterSpecException: " + e.getMessage(), e);
+        } catch (InvalidParameterSpecException ex) {
+            throw new IOException("InvalidParameterSpecException: " + ex.getMessage(), ex);
         }
     } // method engineInit
 
@@ -228,8 +228,8 @@ public final class ECParameters extends AlgorithmParametersSpi {
             AlgorithmParameters params = AlgorithmParameters.getInstance("EC", "BC");
             params.init(spec);
             return params;
-        } catch (GeneralSecurityException e) {
-            throw new InvalidKeyException("EC parameters error", e);
+        } catch (GeneralSecurityException ex) {
+            throw new InvalidKeyException("EC parameters error", ex);
         }
     }
 

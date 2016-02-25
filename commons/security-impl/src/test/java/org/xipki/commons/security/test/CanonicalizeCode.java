@@ -110,8 +110,8 @@ public class CanonicalizeCode {
             CanonicalizeCode canonicalizer = new CanonicalizeCode(baseDir);
             canonicalizer.canonicalize();
             canonicalizer.checkWarnings();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 

@@ -119,8 +119,8 @@ public class NextCaMessage {
 
                 degenratedSignedDataBytes = degenerateSignedData.generate(
                         new CMSAbsentContent()).getEncoded();
-            } catch (CertificateEncodingException e) {
-                throw new MessageEncodingException(e.getMessage(), e);
+            } catch (CertificateEncodingException ex) {
+                throw new MessageEncodingException(ex.getMessage(), ex);
             }
 
             CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
@@ -146,14 +146,14 @@ public class NextCaMessage {
             // certificateSet
             ScepUtil.addCmsCertSet(generator, cmsCertSet);
             return generator.generate(cmsContent, true).toASN1Structure();
-        } catch (CMSException e) {
-            throw new MessageEncodingException(e);
-        } catch (CertificateEncodingException e) {
-            throw new MessageEncodingException(e);
-        } catch (IOException e) {
-            throw new MessageEncodingException(e);
-        } catch (OperatorCreationException e) {
-            throw new MessageEncodingException(e);
+        } catch (CMSException ex) {
+            throw new MessageEncodingException(ex);
+        } catch (CertificateEncodingException ex) {
+            throw new MessageEncodingException(ex);
+        } catch (IOException ex) {
+            throw new MessageEncodingException(ex);
+        } catch (OperatorCreationException ex) {
+            throw new MessageEncodingException(ex);
         }
     } // method encode
 

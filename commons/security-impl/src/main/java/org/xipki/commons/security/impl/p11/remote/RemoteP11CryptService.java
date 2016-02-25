@@ -127,7 +127,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         ASN1Integer derInt;
         try {
             derInt = ASN1Integer.getInstance(result);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new SignerException("the returned result is not INTEGER");
         }
 
@@ -224,8 +224,8 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
         try {
             return X509Util.parseCert(certBytes);
-        } catch (CertificateException | IOException e) {
-            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
+        } catch (CertificateException | IOException ex) {
+            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -253,8 +253,8 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         try {
             SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
             psoTemplate = new PsoTemplate(slotAndKeyIdentifier, message);
-        } catch (BadAsn1ObjectException e) {
-            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
+        } catch (BadAsn1ObjectException ex) {
+            throw new SignerException("BadASN1ObjectException: " + ex.getMessage(), ex);
         }
 
         ASN1Encodable result = send(action, psoTemplate);
@@ -262,7 +262,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         ASN1OctetString octetString;
         try {
             octetString = DEROctetString.getInstance(result);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new SignerException("the returned result is not OCTETSTRING");
         }
 
@@ -279,8 +279,8 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         SlotAndKeyIdentifer slotAndKeyIdentifier;
         try {
             slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-        } catch (BadAsn1ObjectException e) {
-            throw new SignerException("BadASN1ObjectException: " + e.getMessage(), e);
+        } catch (BadAsn1ObjectException ex) {
+            throw new SignerException("BadASN1ObjectException: " + ex.getMessage(), ex);
         }
 
         ASN1Encodable result = send(action, slotAndKeyIdentifier);
@@ -288,7 +288,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         ASN1OctetString octetString;
         try {
             octetString = DEROctetString.getInstance(result);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new SignerException("the returned result is not OCTETSTRING");
         }
 
@@ -326,26 +326,26 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         byte[] encodedRequest;
         try {
             encodedRequest = request.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             LOG.error("error while encode the PKI request {}", request);
-            throw new SignerException(e.getMessage(), e);
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         byte[] encodedResponse;
         try {
             encodedResponse = send(encodedRequest);
-        } catch (IOException e) {
+        } catch (IOException ex) {
             LOG.error("error while send the PKI request {} to server", request);
-            throw new SignerException(e.getMessage(), e);
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         GeneralPKIMessage response;
         try {
             response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException e) {
+        } catch (IOException ex) {
             LOG.error("error while decode the received PKI message: {}",
                     Hex.toHexString(encodedResponse));
-            throw new SignerException(e.getMessage(), e);
+            throw new SignerException(ex.getMessage(), ex);
         }
 
         PKIHeader respHeader = response.getHeader();
@@ -409,7 +409,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             return seq.size() > 1
                     ? seq.getObjectAt(1)
                     : null;
-        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
             throw new SignerException("value of response (type nfoTypeAndValue) '"
                     + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
@@ -460,8 +460,8 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             try {
                 ASN1Encodable obj = seq.getObjectAt(i);
                 asn1SlotId = SlotIdentifier.getInstance(obj);
-            } catch (Exception e) {
-                throw new SignerException(e.getMessage(), e);
+            } catch (Exception ex) {
+                throw new SignerException(ex.getMessage(), ex);
             }
 
             P11SlotIdentifier slotId = asn1SlotId.getSlotId();
@@ -535,14 +535,14 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             } else {
                 throw new SignerException("unsupported key algorithm: " + aid);
             }
-        } catch (NoSuchAlgorithmException e) {
-            throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SignerException("NoSuchAlgorithmException: " + ex.getMessage(), ex);
         }
 
         try {
             return kf.generatePublic(keyspec);
-        } catch (InvalidKeySpecException e) {
-            throw new SignerException("InvalidKeySpecException: " + e.getMessage(), e);
+        } catch (InvalidKeySpecException ex) {
+            throw new SignerException("InvalidKeySpecException: " + ex.getMessage(), ex);
         }
     }
 

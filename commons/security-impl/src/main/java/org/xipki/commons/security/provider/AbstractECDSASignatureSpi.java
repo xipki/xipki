@@ -114,10 +114,10 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
             } else {
                 return signingKey.CKM_ECDSA_Plain(hash);
             }
-        } catch (SignatureException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new SignatureException(e.getMessage(), e);
+        } catch (SignatureException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new SignatureException(ex.getMessage(), ex);
         }
     }
 

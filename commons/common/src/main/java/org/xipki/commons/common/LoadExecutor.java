@@ -91,8 +91,8 @@ public abstract class LoadExecutor {
             Runnable runnable;
             try {
                 runnable = getTestor();
-            } catch (Exception e) {
-                System.err.println("could not initialize Testor\nError message: " + e.getMessage());
+            } catch (Exception ex) {
+                System.err.println("could not initialize Testor\nError message: " + ex.getMessage());
                 return;
             }
 
@@ -127,7 +127,7 @@ public abstract class LoadExecutor {
                 if (terminated) {
                     break;
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ex) {
                 interrupted = true;
             }
         }

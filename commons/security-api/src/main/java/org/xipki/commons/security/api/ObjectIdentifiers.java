@@ -543,7 +543,7 @@ public class ObjectIdentifiers {
         if (StringUtil.isBlank(name)) {
             try {
                 name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ex) {
             }
         }
         return name;
@@ -559,7 +559,7 @@ public class ObjectIdentifiers {
 
         try {
             return RFC4519Style.INSTANCE.attrNameToOID(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             return null;
         }
     }

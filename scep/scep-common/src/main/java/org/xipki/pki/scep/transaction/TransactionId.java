@@ -91,7 +91,7 @@ public class TransactionId {
         byte[] encoded;
         try {
             encoded = spki.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException ex) {
             throw new InvalidKeySpecException("IO exception while ");
         }
 

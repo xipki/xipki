@@ -89,7 +89,7 @@ public final class EnvelopedDataDecryptor {
 
         try {
             return recipientInfo.getContent(decryptor.getRecipient());
-        } catch (CMSException e) {
+        } catch (CMSException ex) {
             throw new MessageDecodingException("could not decrypt the envelopedData");
         }
     }

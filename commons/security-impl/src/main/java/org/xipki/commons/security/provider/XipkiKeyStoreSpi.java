@@ -178,8 +178,8 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                     }
                 } // end for
             } // end for
-        } catch (SignerException | InvalidKeyException e) {
-            throw new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage(), e);
+        } catch (SignerException | InvalidKeyException ex) {
+            throw new IllegalArgumentException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     } // method engineLoad
 

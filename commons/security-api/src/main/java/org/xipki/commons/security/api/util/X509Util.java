@@ -251,8 +251,8 @@ public class X509Util {
             if (certFact == null) {
                 try {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException e) {
-                    throw new IOException("NoSuchProviderException: " + e.getMessage());
+                } catch (NoSuchProviderException ex) {
+                    throw new IOException("NoSuchProviderException: " + ex.getMessage());
                 }
             }
         }
@@ -274,8 +274,8 @@ public class X509Util {
                 certFact = CertificateFactory.getInstance("X.509", "BC");
             }
             return (X509CRL) certFact.generateCRL(crlStream);
-        } catch (NoSuchProviderException e) {
-            throw new IOException("NoSuchProviderException: " + e.getMessage());
+        } catch (NoSuchProviderException ex) {
+            throw new IOException("NoSuchProviderException: " + ex.getMessage());
         }
     }
 
@@ -305,7 +305,7 @@ public class X509Util {
         byte[] encoded;
         try {
             encoded = canonicalizedName.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ex) {
             encoded = canonicalizedName.getBytes();
         }
         return FpIdCalculator.hash(encoded);
@@ -379,8 +379,8 @@ public class X509Util {
 
         try {
             return ASN1OctetString.getInstance(extValue).getOctets();
-        } catch (IllegalArgumentException e) {
-            throw new CertificateEncodingException(e.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new CertificateEncodingException(ex.getMessage());
         }
     }
 
@@ -395,9 +395,9 @@ public class X509Util {
 
         try {
             return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension SubjectKeyIdentifier: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
@@ -412,9 +412,9 @@ public class X509Util {
         try {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
             return aki.getKeyIdentifier();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
@@ -458,9 +458,9 @@ public class X509Util {
             return (aki == null)
                     ? null
                     : aki.getKeyIdentifier();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
@@ -472,7 +472,7 @@ public class X509Util {
             try {
                 return "#" + bytesToString(
                         Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 throw new IllegalArgumentException("other value has no encoded form");
             }
         }
@@ -561,9 +561,9 @@ public class X509Util {
         }
         try {
             return ASN1OctetString.getInstance(fullExtValue).getOctets();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension " + type.getId() + ": "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
@@ -590,7 +590,7 @@ public class X509Util {
                     }
                 }
             }
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException ex) {
         }
 
         final int n = certChain.size();
@@ -648,7 +648,7 @@ public class X509Util {
             try {
                 cert.verify(x509CaCert.getPublicKey());
                 return x509CaCert;
-            } catch (Exception e) {
+            } catch (Exception ex) {
             }
         }
 
@@ -780,8 +780,8 @@ public class X509Util {
 
         try {
             return new Extension(Extension.subjectAlternativeName, critical, names.getEncoded());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
@@ -800,8 +800,8 @@ public class X509Util {
         ASN1Sequence seq = new DERSequence(vector);
         try {
             return new Extension(Extension.subjectInfoAccess, critical, seq.getEncoded());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
@@ -811,7 +811,7 @@ public class X509Util {
         ConfPairs pairs;
         try {
             pairs = new ConfPairs(accessMethodAndLocation);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ex) {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
         }
@@ -865,7 +865,7 @@ public class X509Util {
                 try {
                     tag = Integer.parseInt(tagS);
                     value = taggedValue.substring(idx + 1);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ex) {
                 }
             }
         }

@@ -140,12 +140,12 @@ public class SoftTokenContentSignerBuilder {
             NssPlainRSASigner plainRSASigner;
             try {
                 plainRSASigner = new NssPlainRSASigner();
-            } catch (NoSuchAlgorithmException e) {
-                throw new OperatorCreationException(e.getMessage(), e);
-            } catch (NoSuchProviderException e) {
-                throw new OperatorCreationException(e.getMessage(), e);
-            } catch (NoSuchPaddingException e) {
-                throw new OperatorCreationException(e.getMessage(), e);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
+            } catch (NoSuchProviderException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
+            } catch (NoSuchPaddingException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
             }
             return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
         }
@@ -257,9 +257,9 @@ public class SoftTokenContentSignerBuilder {
 
             try {
                 cipher.init(Cipher.ENCRYPT_MODE, signingKey);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException ex) {
                 throw new RuntimeCryptoException("could not initialize the cipher: "
-                        + e.getMessage());
+                        + ex.getMessage());
             }
         }
 
@@ -281,8 +281,8 @@ public class SoftTokenContentSignerBuilder {
         throws InvalidCipherTextException {
             try {
                 return cipher.doFinal(in, 0, in.length);
-            } catch (IllegalBlockSizeException | BadPaddingException e) {
-                throw new InvalidCipherTextException(e.getMessage(), e);
+            } catch (IllegalBlockSizeException | BadPaddingException ex) {
+                throw new InvalidCipherTextException(ex.getMessage(), ex);
             }
         }
 
@@ -388,8 +388,8 @@ public class SoftTokenContentSignerBuilder {
             this.certificateChain = X509Util.buildCertPath(cert, caCerts);
         } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
                 | CertificateException | IOException | UnrecoverableKeyException
-                | ClassCastException e) {
-            throw new SignerException(e.getMessage(), e);
+                | ClassCastException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
     }
 
@@ -413,8 +413,8 @@ public class SoftTokenContentSignerBuilder {
             String algoName;
             try {
                 algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
-            } catch (NoSuchAlgorithmException e) {
-                throw new OperatorCreationException(e.getMessage());
+            } catch (NoSuchAlgorithmException ex) {
+                throw new OperatorCreationException(ex.getMessage());
             }
 
             boolean useGivenProvider = true;
@@ -428,7 +428,7 @@ public class SoftTokenContentSignerBuilder {
                     }
                     ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
                     signers.add(signer);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     useGivenProvider = false;
                     signers.clear();
                     break;
@@ -461,10 +461,10 @@ public class SoftTokenContentSignerBuilder {
                     throw new OperatorCreationException("unsupported key "
                             + key.getClass().getName());
                 }
-            } catch (InvalidKeyException e) {
-                throw new OperatorCreationException("invalid key", e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new OperatorCreationException("no such algorithm", e);
+            } catch (InvalidKeyException ex) {
+                throw new OperatorCreationException("invalid key", ex);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new OperatorCreationException("no such algorithm", ex);
             }
 
             for (int i = 0; i < parallelism; i++) {

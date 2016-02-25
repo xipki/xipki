@@ -104,8 +104,8 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         RSAPublicKey key;
         try {
             key = (RSAPublicKey) p11CryptService.getPublicKey(slot, keyId);
-        } catch (SignerException e) {
-            throw new InvalidKeyException(e.getMessage(), e);
+        } catch (SignerException ex) {
+            throw new InvalidKeyException(ex.getMessage(), ex);
         }
 
         BigInteger modulus = key.getModulus();

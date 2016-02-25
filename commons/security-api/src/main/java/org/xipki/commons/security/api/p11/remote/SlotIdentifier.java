@@ -114,8 +114,8 @@ public class SlotIdentifier extends ASN1Object {
             }
 
             this.slotId = new P11SlotIdentifier(slotIndex, localSlotId);
-        } catch (IllegalArgumentException e) {
-            throw new BadAsn1ObjectException(e.getMessage(), e);
+        } catch (IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException(ex.getMessage(), ex);
         }
     } // constructor
 
@@ -154,7 +154,7 @@ public class SlotIdentifier extends ASN1Object {
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException ex) {
             throw new BadAsn1ObjectException("unable to parse encoded SlotIdentifier");
         }
 

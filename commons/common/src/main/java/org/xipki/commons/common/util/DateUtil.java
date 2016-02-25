@@ -66,9 +66,9 @@ public class DateUtil {
             LocalDateTime localDate = LocalDateTime.parse(utcTime, SDF);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
             return Date.from(instant);
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
-                    + e.getMessage());
+                    + ex.getMessage());
         }
     }
 
