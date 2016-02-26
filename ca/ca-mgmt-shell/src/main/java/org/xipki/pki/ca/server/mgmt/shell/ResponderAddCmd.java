@@ -96,7 +96,8 @@ public class ResponderAddCmd extends CaCommandSupport {
         }
 
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
+                    securityFactory);
         }
         CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
 

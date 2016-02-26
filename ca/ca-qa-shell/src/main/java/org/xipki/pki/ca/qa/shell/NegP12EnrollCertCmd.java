@@ -42,12 +42,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.util.SignerConfUtil;
 
 /**
  * @author Lijun Liao
@@ -78,20 +77,9 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
             password = new String(readPassword());
         }
 
-        String signerConfWithoutAlgo = getKeystoreSignerConfWithoutAlgo(p12File, password);
+        String signerConfWithoutAlgo = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File, password);
         return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);
     }
 
-    private static String getKeystoreSignerConfWithoutAlgo(
-            final String keystoreFile,
-            final String password) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", "1");
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return conf.getEncoded();
-    }
 }

@@ -110,7 +110,8 @@ public class ScepUpdateCmd extends CaCommandSupport {
             localRespType = entry.getResponderType();
         }
 
-        return ShellUtil.canonicalizeSignerConf(localRespType, responderConf, passwordResolver);
+        return ShellUtil.canonicalizeSignerConf(localRespType, responderConf, passwordResolver,
+                securityFactory);
     }
 
     @Override

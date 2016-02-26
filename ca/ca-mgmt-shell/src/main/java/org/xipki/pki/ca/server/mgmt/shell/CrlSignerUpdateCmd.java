@@ -114,8 +114,8 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
                 localSignerType = entry.getType();
             }
 
-            signerConf = ShellUtil.canonicalizeSignerConf(localSignerType,
-                    signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(localSignerType, signerConf,
+                    passwordResolver, securityFactory);
         }
 
         X509ChangeCrlSignerEntry dbEntry = new X509ChangeCrlSignerEntry(name);

@@ -102,7 +102,8 @@ public class ResponderUpdateCmd extends CaCommandSupport {
             localSignerType = entry.getType();
         }
 
-        return ShellUtil.canonicalizeSignerConf(localSignerType, signerConf, passwordResolver);
+        return ShellUtil.canonicalizeSignerConf(localSignerType, signerConf, passwordResolver,
+                securityFactory);
     }
 
     @Override

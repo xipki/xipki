@@ -82,7 +82,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.CmpFailureUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
@@ -339,7 +339,7 @@ public abstract class CmpRequestor {
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new CmpRequestorException(SecurityUtil.formatPkiStatusInfo(
+            throw new CmpRequestorException(CmpFailureUtil.formatPkiStatusInfo(
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(

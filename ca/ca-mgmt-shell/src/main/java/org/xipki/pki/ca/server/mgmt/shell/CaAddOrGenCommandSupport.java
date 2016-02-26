@@ -213,7 +213,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
 
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
-                    passwordResolver);
+                    passwordResolver, securityFactory);
         }
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);

@@ -103,7 +103,7 @@ public class CrlSignerAddCmd extends CaCommandSupport {
             if (signerConf != null) {
                 if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-                            signerConf, passwordResolver);
+                            signerConf, passwordResolver, securityFactory);
                 }
             }
         }

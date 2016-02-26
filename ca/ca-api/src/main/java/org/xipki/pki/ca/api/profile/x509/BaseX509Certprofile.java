@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -292,7 +292,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 if (!ecOption.allowsCurve(curveOid)) {
                     throw new BadCertTemplateException(String.format(
                             "EC curve %s (OID: %s) is not allowed",
-                            SecurityUtil.getCurveName(curveOid), curveOid.getId()));
+                            KeyUtil.getCurveName(curveOid), curveOid.getId()));
                 }
             } else {
                 throw new BadCertTemplateException(

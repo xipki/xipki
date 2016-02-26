@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.xipki.commons.security.api.util;
+package org.xipki.pki.ca.server.impl.util;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;

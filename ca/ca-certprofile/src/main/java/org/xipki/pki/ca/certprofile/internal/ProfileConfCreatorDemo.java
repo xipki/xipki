@@ -67,7 +67,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.TlsExtensionType;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
@@ -1674,7 +1674,7 @@ public class ProfileConfCreatorDemo {
         };
 
         for (ASN1ObjectIdentifier curveId : curveIds) {
-            String name = SecurityUtil.getCurveName(curveId);
+            String name = KeyUtil.getCurveName(curveId);
             curves.getCurve().add(createOidType(curveId, name));
         }
 

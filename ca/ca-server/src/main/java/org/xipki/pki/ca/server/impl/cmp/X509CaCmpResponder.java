@@ -131,6 +131,7 @@ import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.X509Ca;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
@@ -547,7 +548,7 @@ public class X509CaCmpResponder extends CmpResponder {
             }
         } else {
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
-            Extensions extensions = X509Util.getExtensions(certTemp);
+            Extensions extensions = CaUtil.getExtensions(certTemp);
 
             X500Name subject = certTemp.getSubject();
             if (childAuditEvent != null) {

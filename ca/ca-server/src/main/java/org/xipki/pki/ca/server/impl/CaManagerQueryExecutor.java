@@ -59,6 +59,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +73,7 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.util.PasswordHash;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.X509Cert;
@@ -80,6 +82,7 @@ import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
+import org.xipki.pki.ca.server.impl.util.PasswordHash;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -1337,7 +1340,7 @@ class CaManagerQueryExecutor {
 
             if (iSignerConf != null) {
                 m.append("signerConf: '");
-                m.append(SecurityUtil.signerConfToString(lSignerConf, false, true));
+                m.append(SignerConfUtil.signerConfToString(lSignerConf, false, true));
                 m.append("'; ");
                 ps.setString(iSignerConf, lSignerConf);
             }
@@ -1558,7 +1561,7 @@ class CaManagerQueryExecutor {
             String subject = null;
             if (b64Cert != null) {
                 try {
-                    subject = X509Util.canonicalizName(
+                    subject = canonicalizName(
                             X509Util.parseBase64EncodedCert(b64Cert).getSubjectX500Principal());
                 } catch (CertificateException | IOException ex) {
                     subject = "ERROR";
@@ -1632,7 +1635,7 @@ class CaManagerQueryExecutor {
 
             if (iConf != null) {
                 String txt = getRealString(localConf);
-                m.append("conf: '").append(SecurityUtil.signerConfToString(txt, false, true));
+                m.append("conf: '").append(SignerConfUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
@@ -1643,7 +1646,7 @@ class CaManagerQueryExecutor {
                     m.append("null");
                 } else {
                     try {
-                        String subject = X509Util.canonicalizName(
+                        String subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                         m.append(subject);
                     } catch (CertificateException | IOException ex) {
@@ -1755,7 +1758,7 @@ class CaManagerQueryExecutor {
             if (iSignerConf != null) {
                 String txt = getRealString(localSignerConf);
                 m.append("signerConf: '")
-                    .append(SecurityUtil.signerConfToString(txt, false, true))
+                    .append(SignerConfUtil.signerConfToString(txt, false, true))
                     .append("'; ");
                 ps.setString(iSignerConf, txt);
             }
@@ -1765,7 +1768,7 @@ class CaManagerQueryExecutor {
                 String subject = null;
                 if (txt != null) {
                     try {
-                        subject = X509Util.canonicalizName(
+                        subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                     } catch (CertificateException | IOException ex) {
                         subject = "ERROR";
@@ -1873,7 +1876,7 @@ class CaManagerQueryExecutor {
             if (iConf != null) {
                 String txt = getRealString(localResponderConf);
                 m.append("responder conf: '")
-                    .append(SecurityUtil.signerConfToString(txt, false, true));
+                    .append(SignerConfUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
@@ -1884,7 +1887,7 @@ class CaManagerQueryExecutor {
                     m.append("null");
                 } else {
                     try {
-                        String subject = X509Util.canonicalizName(
+                        String subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                         m.append(subject);
                     } catch (CertificateException | IOException ex) {
@@ -2544,6 +2547,12 @@ class CaManagerQueryExecutor {
         return CaManager.NULL.equalsIgnoreCase(s)
                 ? null
                 : s;
+    }
+
+    public static String canonicalizName(
+            final X500Principal prin) {
+        X500Name x500Name = X500Name.getInstance(prin.getEncoded());
+        return X509Util.canonicalizName(x500Name);
     }
 
 }

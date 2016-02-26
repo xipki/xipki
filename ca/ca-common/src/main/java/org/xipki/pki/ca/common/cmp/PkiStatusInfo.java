@@ -37,7 +37,7 @@
 package org.xipki.pki.ca.common.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.CmpFailureUtil;
 
 /**
  * @author Lijun Liao
@@ -96,7 +96,7 @@ public class PkiStatusInfo {
 
     @Override
     public String toString() {
-        return SecurityUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage);
+        return CmpFailureUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
 }

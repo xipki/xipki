@@ -41,7 +41,7 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -56,7 +56,8 @@ class ShellUtil {
     static String canonicalizeSignerConf(
             final String keystoreType,
             final String signerConf,
-            final PasswordResolver passwordResolver)
+            final PasswordResolver passwordResolver,
+            final SecurityFactory securityFactory)
     throws Exception {
         if (!signerConf.contains("file:") && !signerConf.contains("base64:")
                 && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
@@ -89,8 +90,8 @@ class ShellUtil {
             password = passwordResolver.resolvePassword(passwordHint);
         }
 
-        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel, password);
+        keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel, password, null);
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();

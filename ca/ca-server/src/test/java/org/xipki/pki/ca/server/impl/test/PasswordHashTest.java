@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api.util.test;
+package org.xipki.pki.ca.server.impl.test;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -46,7 +46,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xipki.commons.security.api.util.PasswordHash;
+import org.xipki.pki.ca.server.impl.util.PasswordHash;
 
 /**
  * @author Lijun Liao

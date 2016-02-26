@@ -55,7 +55,7 @@ import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -160,7 +160,7 @@ public class PublicKeyChecker {
                 curveOid = (ASN1ObjectIdentifier) algParam;
                 if (!ecOption.allowsCurve(curveOid)) {
                     throw new BadCertTemplateException("EC curve "
-                            + SecurityUtil.getCurveName(curveOid)
+                            + KeyUtil.getCurveName(curveOid)
                             + " (OID: " + curveOid.getId() + ") is not allowed");
                 }
             } else {

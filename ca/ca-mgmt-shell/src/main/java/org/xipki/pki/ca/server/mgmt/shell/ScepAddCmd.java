@@ -105,7 +105,7 @@ public class ScepAddCmd extends CaCommandSupport {
 
         if ("PKCS12".equalsIgnoreCase(responderType) || "JKS".equalsIgnoreCase(responderType)) {
             responderConf = ShellUtil.canonicalizeSignerConf(responderType, responderConf,
-                    passwordResolver);
+                    passwordResolver, securityFactory);
         }
 
         ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
