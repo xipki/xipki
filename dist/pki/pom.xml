@@ -252,6 +252,24 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-certprofiles</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/deploy</outputDirectory>
+              <!-- Define here the JDBC drivers -->
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>certprofile-demo</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
