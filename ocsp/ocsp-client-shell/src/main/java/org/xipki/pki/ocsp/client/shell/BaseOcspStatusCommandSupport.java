@@ -38,7 +38,10 @@ package org.xipki.pki.ocsp.client.shell;
 
 import java.math.BigInteger;
 import java.net.URL;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +50,13 @@ import java.util.Map;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
@@ -152,7 +161,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                 }
 
                 if (isBlank(serverURL)) {
-                    List<String> ocspUrls = X509Util.extractOcspUrls(cert);
+                    List<String> ocspUrls = extractOcspUrls(cert);
                     if (ocspUrls.size() > 0) {
                         String url = ocspUrls.get(0);
                         if (ocspUrl != null && !ocspUrl.equals(url)) {
@@ -226,5 +235,36 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
         return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
     } // method doExecute
+
+    public static List<String> extractOcspUrls(
+            final X509Certificate cert)
+    throws CertificateEncodingException {
+        byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
+        if (extValue == null) {
+            return Collections.emptyList();
+        }
+
+        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
+
+        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
+        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
+        for (AccessDescription iAccessDescription : iAccessDescriptions) {
+            if (iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp)) {
+                iOCSPAccessDescriptions.add(iAccessDescription);
+            }
+        }
+
+        int n = iOCSPAccessDescriptions.size();
+        List<String> ocspUris = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
+            if (iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
+                ocspUris.add(iOCSPUri);
+            }
+        }
+
+        return ocspUris;
+    }
 
 }
