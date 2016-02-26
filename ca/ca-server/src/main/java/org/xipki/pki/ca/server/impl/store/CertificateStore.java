@@ -62,7 +62,6 @@ import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
-import org.xipki.pki.ca.server.impl.SubjectKeyProfileBundle;
 
 /**
  * @author Lijun Liao
@@ -597,36 +596,12 @@ public class CertificateStore {
         return queryExecutor.isHealthy();
     }
 
-    public SubjectKeyProfileBundle getLatestCert(
-            final X509Cert caCert,
-            final long subjectFp,
-            final long keyFp,
-            final String profile)
-    throws OperationException {
-        try {
-            return queryExecutor.getLatestCert(caCert, subjectFp, keyFp, profile);
-        } catch (DataAccessException ex) {
-            LOG.debug("DataAccessException", ex);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
     public boolean isCertForSubjectIssued(
             final X509Cert caCert,
             final long subjectFp)
     throws OperationException {
-        return isCertForSubjectIssued(caCert, subjectFp, null);
-    }
-
-    public boolean isCertForSubjectIssued(
-            final X509Cert caCert,
-            final long subjectFp,
-            final String profile)
-    throws OperationException {
         try {
-            return queryExecutor.isCertForSubjectIssued(caCert, subjectFp, profile);
+            return queryExecutor.isCertForSubjectIssued(caCert, subjectFp);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
@@ -639,16 +614,8 @@ public class CertificateStore {
             final X509Cert caCert,
             final long keyFp)
     throws OperationException {
-        return isCertForKeyIssued(caCert, keyFp, null);
-    }
-
-    public boolean isCertForKeyIssued(
-            final X509Cert caCert,
-            final long keyFp,
-            final String profile)
-    throws OperationException {
         try {
-            return queryExecutor.isCertForKeyIssued(caCert, keyFp, profile);
+            return queryExecutor.isCertForKeyIssued(caCert, keyFp);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());

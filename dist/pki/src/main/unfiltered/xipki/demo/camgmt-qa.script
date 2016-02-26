@@ -346,8 +346,8 @@ xipki-caqa:ca-check \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject permitted \
-  --duplicate-key permitted
+  --duplicate-subject yes \
+  --duplicate-key yes
 
 xipki-caqa:ca-check --name RCA1 \
   --permission all \
@@ -359,8 +359,8 @@ xipki-caqa:ca-check --name RCA1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject permitted \
-  --duplicate-key permitted \
+  --duplicate-subject yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # change the CA configuration
@@ -371,8 +371,8 @@ xipki-ca:ca-up --name RCA1 \
   --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
-  --duplicate-subject forbidden \
-  --duplicate-key forbidden \
+  --duplicate-subject no \
+  --duplicate-key no \
   --validity-mode STRICT
 
 xipki-caqa:ca-check --name RCA1 \
@@ -386,8 +386,8 @@ xipki-caqa:ca-check --name RCA1 \
   --ca-cert-uri http://example.org/RCA1-2.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject forbidden \
-  --duplicate-key forbidden \
+  --duplicate-subject no \
+  --duplicate-key no \
   --validity-mode STRICT
 
 # for commands neg-gen-rca
@@ -409,8 +409,8 @@ xipki-caqa:neg-gen-rca \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # invalid signer conf (password invalid)
@@ -429,8 +429,8 @@ xipki-caqa:neg-gen-rca \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # invalid signer conf (key and algo do not match)
@@ -449,8 +449,8 @@ xipki-caqa:neg-gen-rca \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 xipki-ca:profile-rm RCA
@@ -469,8 +469,8 @@ xipki-caqa:neg-ca-add \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # CMP control name does not exist
@@ -487,8 +487,8 @@ xipki-caqa:neg-ca-add \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol2 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # CRL signer name does not exist
@@ -506,8 +506,8 @@ xipki-caqa:neg-ca-add \
   --crl-signer crlsigner2 \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 # responder name does not exist
@@ -524,8 +524,8 @@ xipki-caqa:neg-ca-add \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject  permitted \
-  --duplicate-key permitted \
+  --duplicate-subject  yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 #################################################################

@@ -62,7 +62,6 @@ import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
@@ -314,22 +313,22 @@ public class X509CaInfo {
         return caEntry.toString(verbose);
     }
 
-    public DuplicationMode getDuplicateKeyMode() {
-        return caEntry.getDuplicateKeyMode();
+    public boolean isDuplicateKeyPermitted() {
+        return caEntry.isDuplicateKeyPermitted();
     }
 
-    public void setDuplicateKeyMode(
-            final DuplicationMode mode) {
-        caEntry.setDuplicateKeyMode(mode);
+    public void setDuplicateKeyPermitted(
+            final boolean permitted) {
+        caEntry.setDuplicateKeyPermitted(permitted);
     }
 
-    public DuplicationMode getDuplicateSubjectMode() {
-        return caEntry.getDuplicateSubjectMode();
+    public boolean isDuplicateSubjectPermitted() {
+        return caEntry.isDuplicateSubjectPermitted();
     }
 
-    public void setDuplicateSubjectMode(
-            final DuplicationMode mode) {
-        caEntry.setDuplicateSubjectMode(mode);
+    public void setDuplicateSubjectPermitted(
+            final boolean permitted) {
+        caEntry.setDuplicateSubjectPermitted(permitted);
     }
 
     public ValidityMode getValidityMode() {

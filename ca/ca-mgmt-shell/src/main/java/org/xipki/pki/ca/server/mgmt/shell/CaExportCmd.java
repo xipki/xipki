@@ -180,10 +180,11 @@ public class CaExportCmd extends CaCommandSupport {
         propsput(props, KEY_CMPCONTROL_NAME, x509Entry.getCmpControlName());
 
         // DUPLICATE_KEY
-        propsput(props, KEY_DUPLICATE_KEY, x509Entry.getDuplicateKeyMode().name());
+        propsput(props, KEY_DUPLICATE_KEY, Boolean.toString(x509Entry.isDuplicateKeyPermitted()));
 
         // DUPLICATE_SUBJECT
-        propsput(props, KEY_DUPLICATE_SUBJECT, x509Entry.getDuplicateSubjectMode().name());
+        propsput(props, KEY_DUPLICATE_SUBJECT,
+                Boolean.toString(x509Entry.isDuplicateSubjectPermitted()));
 
         // VALIDITY_MODE
         propsput(props, KEY_VALIDITY_MODE, x509Entry.getValidityMode().name());

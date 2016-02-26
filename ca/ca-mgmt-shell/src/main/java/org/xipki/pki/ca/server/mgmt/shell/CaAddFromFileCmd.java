@@ -60,7 +60,6 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
@@ -212,16 +211,12 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         // DUPLICATE_KEY
         key = CaExportCmd.KEY_DUPLICATE_KEY;
         s = getStrProp(props, key, true);
-        DuplicationMode duplicateKey = DuplicationMode.valueOf(s);
-        assertNotNull(duplicateKey, key, s);
-        entry.setDuplicateKeyMode(duplicateKey);
+        entry.setDuplicateKeyPermitted(Boolean.parseBoolean(s));
 
         // DUPLICATE_SUBJECT
         key = CaExportCmd.KEY_DUPLICATE_SUBJECT;
         s = getStrProp(props, key, true);
-        DuplicationMode duplicateSubject = DuplicationMode.valueOf(s);
-        assertNotNull(duplicateSubject, key, s);
-        entry.setDuplicateSubjectMode(duplicateSubject);
+        entry.setDuplicateSubjectPermitted(Boolean.parseBoolean(s));
 
         // VALIDITY_MODE
         key = CaExportCmd.KEY_VALIDITY_MODE;

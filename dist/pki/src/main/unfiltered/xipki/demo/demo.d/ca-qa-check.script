@@ -85,12 +85,6 @@ xipki-qa:check-cert \
 
 xipki-qa:check-cert \
   --issuer SubCA \
-  --profile TLS_C \
-  --p10 output/TLS1.p10 \
-  --cert output/TLS1-TLS_C.der
-
-xipki-qa:check-cert \
-  --issuer SubCA \
   --profile TLSwithIncSN \
   --p10 output/TLSwithIncSN1.p10 \
   --cert output/TLSwithIncSN1.der

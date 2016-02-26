@@ -50,13 +50,13 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
@@ -64,7 +64,6 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter;
-import org.xipki.pki.ca.server.mgmt.shell.completer.DuplicationModeCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
@@ -168,13 +167,13 @@ public class CaUpdateCmd extends CaCommandSupport {
     private String signerConf;
 
     @Option(name = "--duplicate-key",
-            description = "mode of duplicate key")
-    @Completion(DuplicationModeCompleter.class)
+            description = "whether duplicate key is permitted")
+    @Completion(YesNoCompleter.class)
     private String duplicateKeyS;
 
     @Option(name = "--duplicate-subject",
-            description = "mode of duplicate subject")
-    @Completion(DuplicationModeCompleter.class)
+            description = "whether duplicate subject is permitted")
+    @Completion(YesNoCompleter.class)
     private String duplicateSubjectS;
 
     @Option(name = "--validity-mode",
@@ -226,19 +225,13 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (duplicateKeyS != null) {
-            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateKeyS);
-            if (duplicateMode == null) {
-                throw new IllegalCmdParamException("invalid duplication mode " + duplicateKeyS);
-            }
-            entry.setDuplicateKeyMode(duplicateMode);
+            boolean permitted = isEnabled(duplicateKeyS, true, "duplicate-key");
+            entry.setDuplicateKeyPermitted(permitted);
         }
 
         if (duplicateSubjectS != null) {
-            DuplicationMode duplicateMode = DuplicationMode.getInstance(duplicateSubjectS);
-            if (duplicateMode == null) {
-                throw new IllegalCmdParamException("invalid duplication mode " + duplicateSubjectS);
-            }
-            entry.setDuplicateSubjectMode(duplicateMode);
+            boolean permitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
+            entry.setDuplicateSubjectPermitted(permitted);
         }
 
         if (permissions != null && permissions.size() > 0) {

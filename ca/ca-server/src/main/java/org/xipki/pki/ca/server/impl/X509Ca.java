@@ -47,7 +47,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -146,7 +145,6 @@ import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl.HourMinute;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl.UpdateMode;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 
 /**
@@ -1951,15 +1949,14 @@ public class X509Ca {
                     "certificate with the same subject as CA is not allowed");
         }
 
-        DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
-        if (keyMode == DuplicationMode.PERMITTED && !certprofile.isDuplicateKeyPermitted()) {
-            keyMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
+        boolean duplicateKeyPermitted = caInfo.isDuplicateKeyPermitted();
+        if (duplicateKeyPermitted && !certprofile.isDuplicateKeyPermitted()) {
+            duplicateKeyPermitted = false;
         }
 
-        DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
-        if (subjectMode == DuplicationMode.PERMITTED
-                && !certprofile.isDuplicateSubjectPermitted()) {
-            subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
+        boolean duplicateSubjectPermitted = caInfo.isDuplicateSubjectPermitted();
+        if (duplicateSubjectPermitted && !certprofile.isDuplicateSubjectPermitted()) {
+            duplicateSubjectPermitted = false;
         }
 
         long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
@@ -1977,83 +1974,22 @@ public class X509Ca {
                 throw new OperationException(ErrorCode.UNKNOWN_CERT);
             }
         } else {
-            // try to get certificate with the same subject, key and certificate profile
-            SubjectKeyProfileBundle bundle = certstore.getLatestCert(caInfo.getCertificate(),
-                    fpSubject, fpPublicKey, certprofileName);
-
-            if (bundle != null) {
-                /*
-                 * If there exists a certificate whose public key, subject and profile match the
-                 * request, returns the certificate if it is not revoked, otherwise
-                 * OperationException with ErrorCode CERT_REVOKED will be thrown
-                 */
-                if (bundle.isRevoked()) {
-                    throw new OperationException(ErrorCode.CERT_REVOKED);
-                } else {
-                    X509CertWithDbId issuedCert = certstore.getCertForId(bundle.getCertId());
-                    if (issuedCert == null) {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "could not find certificate in table CRAW for CID "
-                                    + bundle.getCertId());
-                    } else {
-                        X509CertificateInfo certInfo;
-                        try {
-                            certInfo = new X509CertificateInfo(issuedCert,
-                                    caInfo.getCertificate(), subjectPublicKeyData, certprofileName);
-                            certInfo.setReqType(reqType);
-                            certInfo.setTransactionId(transactionId);
-                        } catch (CertificateEncodingException ex) {
-                            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                    "could not construct CertificateInfo: " + ex.getMessage());
-                        }
-                        certInfo.setAlreadyIssued(true);
-                        return certInfo;
-                    }
+            if (!duplicateKeyPermitted) {
+                if (certstore.isCertForKeyIssued(caInfo.getCertificate(), fpPublicKey)) {
+                    throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                            "certificate for the given public key already issued");
                 }
-            } // end if (bundle)
+            }
 
-            if (keyMode != DuplicationMode.PERMITTED) {
-                if (keyMode == DuplicationMode.FORBIDDEN) {
-                    if (certstore.isCertForKeyIssued(caInfo.getCertificate(), fpPublicKey)) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given public key already issued");
-                    }
-                } else if (keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE) {
-                    if (certstore.isCertForKeyIssued(caInfo.getCertificate(), fpPublicKey,
-                            certprofileName)) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given public key and profile "
-                                + certprofileName + " already issued");
-                    }
-                } else {
-                    throw new RuntimeException("should not reach here, unknown key DuplicationMode "
-                            + keyMode);
-                }
-            } // end if (keyMode)
-
-            if (subjectMode != DuplicationMode.PERMITTED) {
+            if (!duplicateSubjectPermitted) {
                 final boolean incSerial = certprofile.incSerialNumberIfSubjectExists();
-                final boolean certIssued;
-                if (subjectMode == DuplicationMode.FORBIDDEN) {
-                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(),
+                final boolean certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(),
                             fpSubject);
-                    if (certIssued && !incSerial) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given subject " + grandtedSubjectText
-                                + " already issued");
-                    }
-                } else if (subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE) {
-                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(),
-                            fpSubject, certprofileName);
-                    if (certIssued && !incSerial) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "certificate for the given subject " + grandtedSubjectText
-                                + " and profile " + certprofileName + " already issued");
-                    }
-                } else {
-                    throw new RuntimeException(
-                            "should not reach here, unknown subject DuplicationMode " + keyMode);
-                } // end if (subjectMode)
+                if (certIssued && !incSerial) {
+                    throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                            "certificate for the given subject " + grandtedSubjectText
+                            + " already issued");
+                }
 
                 if (certIssued) {
                     String latestSN;
@@ -2093,7 +2029,7 @@ public class X509Ca {
                     }
                 } // end if (certIssued)
             }
-        } // end if (subjectMode != DuplicationMode.PERMITTED)
+        } // end if(keyUpdate)
 
         try {
             boolean addedCertInProcess = certstore.addCertInProcess(fpPublicKey, fpSubject);

@@ -94,7 +94,6 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
@@ -549,8 +548,8 @@ class CaManagerQueryExecutor {
             String crlsignerName = rs.getString("CRLSIGNER_NAME");
             String responderName = rs.getString("RESPONDER_NAME");
             String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
-            int duplicateKeyI = rs.getInt("DUPLICATE_KEY");
-            int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT");
+            boolean duplicateKeyPermitted = (rs.getInt("DUPLICATE_KEY") != 0);
+            boolean duplicateSubjectPermitted = (rs.getInt("DUPLICATE_SUBJECT") != 0);
             int numCrls = rs.getInt("NUM_CRLS");
             int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
             int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
@@ -624,8 +623,8 @@ class CaManagerQueryExecutor {
                 entry.setCmpControlName(cmpcontrolName);
             }
 
-            entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
-            entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
+            entry.setDuplicateKeyPermitted(duplicateKeyPermitted);
+            entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
             entry.setPermissions(permissions);
             entry.setRevocationInfo(revocationInfo);
 
@@ -850,8 +849,8 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.getCrlSignerName());
             ps.setString(idx++, entry.getResponderName());
             ps.setString(idx++, entry.getCmpControlName());
-            ps.setInt(idx++, entry.getDuplicateKeyMode().getMode());
-            ps.setInt(idx++, entry.getDuplicateSubjectMode().getMode());
+            setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
+            setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
             ps.setString(idx++, Permission.toString(entry.getPermissions()));
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
@@ -1169,8 +1168,8 @@ class CaManagerQueryExecutor {
         String crlsignerName = entry.getCrlSignerName();
         String responderName = entry.getResponderName();
         String cmpcontrolName = entry.getCmpControlName();
-        DuplicationMode duplicateKey = entry.getDuplicateKeyMode();
-        DuplicationMode duplicateSubject = entry.getDuplicateSubjectMode();
+        Boolean duplicateKeyPermitted = entry.getDuplicateKeyPermitted();
+        Boolean duplicateSubjectPermitted = entry.getDuplicateSubjectPermitted();
         Set<Permission> permissions = entry.getPermissions();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
@@ -1256,9 +1255,9 @@ class CaManagerQueryExecutor {
         Integer iCmpcontrolName =
                 addToSqlIfNotNull(sqlBuilder, index, cmpcontrolName, "CMPCONTROL_NAME");
         Integer iDuplicateKey =
-                addToSqlIfNotNull(sqlBuilder, index, duplicateKey, "DUPLICATE_KEY");
+                addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted, "DUPLICATE_KEY");
         Integer iDuplicateSubject =
-                addToSqlIfNotNull(sqlBuilder, index, duplicateSubject, "DUPLICATE_SUBJECT");
+                addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted, "DUPLICATE_SUBJECT");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer iNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer iExpirationPeriod =
@@ -1362,15 +1361,13 @@ class CaManagerQueryExecutor {
             }
 
             if (iDuplicateKey != null) {
-                int mode = duplicateKey.getMode();
-                m.append("duplicateKey: '").append(mode).append("'; ");
-                ps.setInt(iDuplicateKey, mode);
+                m.append("duplicateKey: '").append(duplicateKeyPermitted).append("'; ");
+                setBoolean(ps, iDuplicateKey, duplicateKeyPermitted);
             }
 
             if (iDuplicateSubject != null) {
-                int mode = duplicateSubject.getMode();
-                m.append("duplicateSubject: '").append(mode).append("'; ");
-                ps.setInt(iDuplicateSubject, mode);
+                m.append("duplicateSubject: '").append(duplicateSubjectPermitted).append("'; ");
+                setBoolean(ps, iDuplicateSubject, duplicateSubjectPermitted);
             }
 
             if (iPermissions != null) {

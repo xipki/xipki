@@ -173,8 +173,8 @@ xipki-ca:ca-up --name RCA1 \
   --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
-  --duplicate-subject forbidden \
-  --duplicate-key forbidden \
+  --duplicate-subject no \
+  --duplicate-key no \
   --validity-mode STRICT
 
 xipki-ca:ca-up --name RCA1 \
@@ -183,7 +183,7 @@ xipki-ca:ca-up --name RCA1 \
   --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
-  --duplicate-subject permitted \
-  --duplicate-key permitted \
+  --duplicate-subject yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 

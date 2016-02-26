@@ -95,7 +95,6 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
-import org.xipki.pki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 
 /**
@@ -1865,74 +1864,24 @@ class CertStoreQueryExecutor {
         }
     } // method certIssuedForSubject
 
-    SubjectKeyProfileBundle getLatestCert(
-            final X509Cert caCert,
-            final long subjectFp,
-            final long keyFp,
-            final String profile)
-    throws DataAccessException {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
-
-        if (caId == null) {
-            return null;
-        }
-
-        Integer profileId = certprofileStore.getId(profile);
-        if (profileId == null) {
-            return null;
-        }
-
-        String sql =
-                "ID, REV FROM CERT WHERE FP_K=? AND FP_S=? AND CA_ID=? AND PID=?";
-        sql = dataSource.createFetchFirstSelectSql(sql, 1, "ID DESC");
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            int idx = 1;
-            ps.setLong(idx++, keyFp);
-            ps.setLong(idx++, subjectFp);
-            ps.setInt(idx++, caId);
-            ps.setInt(idx++, profileId);
-
-            rs = ps.executeQuery();
-
-            if (!rs.next()) {
-                return null;
-            }
-
-            int id = rs.getInt("ID");
-            boolean revoked = rs.getBoolean("REV");
-            return new SubjectKeyProfileBundle(id, subjectFp, keyFp, profile, revoked);
-        } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
-        } finally {
-            releaseDbResources(ps, rs);
-        }
-    } // method getLatestCert
-
     boolean isCertForSubjectIssued(
             final X509Cert caCert,
-            final long subjectFp,
-            final String profile)
+            final long subjectFp)
     throws DataAccessException {
-        return isCertIssuedForColumn("FP_S", caCert, subjectFp, profile);
+        return isCertIssuedForColumn("FP_S", caCert, subjectFp);
     }
 
     boolean isCertForKeyIssued(
             final X509Cert caCert,
-            final long keyFp,
-            final String profile)
+            final long keyFp)
     throws DataAccessException {
-        return isCertIssuedForColumn("FP_K", caCert, keyFp, profile);
+        return isCertIssuedForColumn("FP_K", caCert, keyFp);
     }
 
     private boolean isCertIssuedForColumn(
             final String fpColumnName,
             final X509Cert caCert,
-            final long columnValue,
-            final String profile)
+            final long columnValue)
     throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId = caInfoStore.getCaIdForCert(encodedCert);
@@ -1941,20 +1890,9 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        Integer profileId = null;
-        if (profile != null) {
-            profileId = certprofileStore.getId(profile);
-            if (profileId == null) {
-                return false;
-            }
-        }
-
         StringBuilder sb = new StringBuilder();
         sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
         sb.append(" AND CA_ID=?");
-        if (profile != null) {
-            sb.append(" AND PID=?");
-        }
         String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1963,9 +1901,6 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, columnValue);
             ps.setInt(idx++, caId);
-            if (profile != null) {
-                ps.setInt(idx++, profileId);
-            }
 
             rs = ps.executeQuery();
 

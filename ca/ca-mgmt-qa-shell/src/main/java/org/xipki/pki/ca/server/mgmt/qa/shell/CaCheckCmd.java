@@ -48,7 +48,6 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
@@ -128,20 +127,20 @@ public class CaCheckCmd extends CaUpdateCmd {
         }
 
         // Duplicate key mode
-        if (ey.getDuplicateKeyMode() != null) {
-            DuplicationMode ex = ey.getDuplicateKeyMode();
-            DuplicationMode is = ca.getDuplicateKeyMode();
-            if (!ex.equals(is)) {
-                throw new CmdFailure("Duplicate key mode: is '" + is
+        if (ey.getDuplicateKeyPermitted() != null) {
+            boolean ex = ey.getDuplicateKeyPermitted().booleanValue();
+            boolean is = ca.isDuplicateKeyPermitted();
+            if (ex != is) {
+                throw new CmdFailure("Duplicate key permitted: is '" + is
                         + "', but expected '" + ex + "'");
             }
         }
 
         // Duplicate subject mode
-        if (ey.getDuplicateSubjectMode() != null) {
-            DuplicationMode ex = ey.getDuplicateSubjectMode();
-            DuplicationMode is = ca.getDuplicateSubjectMode();
-            if (!ex.equals(is)) {
+        if (ey.getDuplicateSubjectPermitted() != null) {
+            boolean ex = ey.getDuplicateSubjectPermitted().booleanValue();
+            boolean is = ca.isDuplicateSubjectPermitted();
+            if (ex != is) {
                 throw new CmdFailure("Duplicate subject mode: is '" + is
                         + "', but expected '" + ex + "'");
             }

@@ -2653,8 +2653,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setCertificate(caCert);
         entry.setCmpControlName(caEntry.getCmpControlName());
         entry.setCrlSignerName(caEntry.getCrlSignerName());
-        entry.setDuplicateKeyMode(caEntry.getDuplicateKeyMode());
-        entry.setDuplicateSubjectMode(caEntry.getDuplicateSubjectMode());
+        entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
+        entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
         entry.setExtraControl(caEntry.getExtraControl());
         entry.setMaxValidity(caEntry.getMaxValidity());
         entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
