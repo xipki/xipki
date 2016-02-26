@@ -90,7 +90,7 @@ import org.xipki.commons.security.api.p11.remote.KeyIdentifier;
 import org.xipki.commons.security.api.p11.remote.PsoTemplate;
 import org.xipki.commons.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.CmpFailureUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -369,7 +369,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
             throw new SignerException("server answered with ERROR: "
-                    + SecurityUtil.formatPkiStatusInfo(statusInfo));
+                    + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new SignerException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP + ", "

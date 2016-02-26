@@ -34,31 +34,50 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p12;
-
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.ParamUtil;
+package org.xipki.commons.security.impl.util;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class P12Util {
+public class SecurityUtil {
 
-    private P12Util() {
+    private SecurityUtil() {
     }
 
-    public static String getKeystoreSignerConfWithoutAlgo(
-            final String keystoreFile,
-            final String password) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
+    public static byte[] leftmost(
+            final byte[] bytes,
+            final int bitCount) {
+        int byteLenKey = (bitCount + 7) / 8;
 
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", "1");
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return conf.getEncoded();
+        if (bitCount >= (bytes.length << 3)) {
+            return bytes;
+        }
+
+        byte[] truncatedBytes = new byte[byteLenKey];
+        System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
+
+        // shift the bits to the right
+        if (bitCount % 8 > 0) {
+            int shiftBits = 8 - (bitCount % 8);
+
+            for (int i = byteLenKey - 1; i > 0; i--) {
+                truncatedBytes[i] = (byte)
+                        ((byte2int(truncatedBytes[i]) >>> shiftBits)
+                        | ((byte2int(truncatedBytes[i - 1]) << (8 - shiftBits)) & 0xFF));
+            }
+            truncatedBytes[0] = (byte) (byte2int(truncatedBytes[0]) >>> shiftBits);
+        }
+
+        return truncatedBytes;
+    }
+
+    private static int byte2int(
+            final byte b) {
+        return (b >= 0)
+                ? b
+                : 256 + b;
     }
 
 }

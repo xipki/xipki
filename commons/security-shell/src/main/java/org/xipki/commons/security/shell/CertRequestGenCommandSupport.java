@@ -38,6 +38,7 @@ package org.xipki.commons.security.shell;
 
 import java.io.File;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -81,13 +82,13 @@ import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ExtensionExistence;
+import org.xipki.commons.security.api.InvalidOidOrNameException;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -244,7 +245,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         // ExtendedKeyusage
         if (isNotEmpty(extkeyusages)) {
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
-                    SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
+                    textToASN1ObjectIdentifers(extkeyusages));
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
@@ -328,8 +329,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
-                    SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
-                    SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
+                    textToASN1ObjectIdentifers(needExtensionTypes),
+                    textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
                     ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
                     ee.toASN1Primitive().getEncoded()));
@@ -371,6 +372,53 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     protected X500Name getSubject(
             final String subjectText) {
         return new X500Name(subjectText);
+    }
+
+    private static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
+            final List<String> oidTexts)
+    throws InvalidOidOrNameException {
+        if (oidTexts == null) {
+            return null;
+        }
+
+        List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
+        for (String oidText : oidTexts) {
+            if (oidText.isEmpty()) {
+                continue;
+            }
+
+            ASN1ObjectIdentifier oid = toOid(oidText);
+            if (!ret.contains(oid)) {
+                ret.add(oid);
+            }
+        }
+        return ret;
+    }
+
+    private static ASN1ObjectIdentifier toOid(
+            final String s)
+    throws InvalidOidOrNameException {
+        final int n = s.length();
+        boolean isName = false;
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
+            if (!((c >= '0' && c <= '1') || c == '.')) {
+                isName = true;
+            }
+        }
+
+        if (!isName) {
+            try {
+                return new ASN1ObjectIdentifier(s);
+            } catch (IllegalArgumentException ex) {
+            }
+        }
+
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(s);
+        if (oid == null) {
+            throw new InvalidOidOrNameException(s);
+        }
+        return oid;
     }
 
 }

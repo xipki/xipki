@@ -55,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -68,15 +67,12 @@ import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.DERUniversalString;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -86,16 +82,13 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.ConfPairs;
@@ -160,24 +153,11 @@ public class X509Util {
 
     public static X500Name sortX509Name(
             final X500Name name) {
-        return sortX500Name(name, false);
-    }
-
-    public static X500Name backwardSortX509Name(
-            final X500Name name) {
-        return sortX500Name(name, true);
-    }
-
-    private static X500Name sortX500Name(
-            final X500Name name,
-            final boolean backwards) {
         RDN[] requstedRDNs = name.getRDNs();
 
         List<RDN> rdns = new LinkedList<>();
 
-        List<ASN1ObjectIdentifier> sortedDNs = backwards
-                ? ObjectIdentifiers.getBackwardDNs()
-                : ObjectIdentifiers.getForwardDNs();
+        List<ASN1ObjectIdentifier> sortedDNs = ObjectIdentifiers.getForwardDNs();
         int size = sortedDNs.size();
         for (int i = 0; i < size; i++) {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
@@ -261,9 +241,9 @@ public class X509Util {
     }
 
     public static X509CRL parseCrl(
-            final String f)
+            final String file)
     throws IOException, CertificateException, CRLException {
-        return parseCrl(new FileInputStream(IoUtil.expandFilepath(f)));
+        return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
     }
 
     public static X509CRL parseCrl(
@@ -309,12 +289,6 @@ public class X509Util {
             encoded = canonicalizedName.getBytes();
         }
         return FpIdCalculator.hash(encoded);
-    }
-
-    public static String canonicalizName(
-            final X500Principal prin) {
-        X500Name x500Name = X500Name.getInstance(prin.getEncoded());
-        return canonicalizName(x500Name);
     }
 
     public static String canonicalizName(
@@ -416,37 +390,6 @@ public class X509Util {
             throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
                     + ex.getMessage());
         }
-    }
-
-    public static List<String> extractOcspUrls(
-            final X509Certificate cert)
-    throws CertificateEncodingException {
-        byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
-        if (extValue == null) {
-            return Collections.emptyList();
-        }
-
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
-
-        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
-        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-        for (AccessDescription iAccessDescription : iAccessDescriptions) {
-            if (iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp)) {
-                iOCSPAccessDescriptions.add(iAccessDescription);
-            }
-        }
-
-        int n = iOCSPAccessDescriptions.size();
-        List<String> ocspUris = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
-            if (iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
-                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                ocspUris.add(iOCSPUri);
-            }
-        }
-
-        return ocspUris;
     }
 
     public static byte[] extractAki(
@@ -551,7 +494,7 @@ public class X509Util {
         return false;
     }
 
-    private static byte[] getCoreExtValue(
+    public static byte[] getCoreExtValue(
             final X509Certificate cert,
             final ASN1ObjectIdentifier type)
     throws CertificateEncodingException {
@@ -616,18 +559,7 @@ public class X509Util {
         }
     } // method buildCertPath
 
-    public static X509Certificate[] buildCertPath(
-            final X509Certificate cert,
-            final Certificate[] certs) {
-        Set<Certificate> setOfCerts = new HashSet<>();
-        for (Certificate m : certs) {
-            setOfCerts.add(m);
-        }
-
-        return buildCertPath(cert, setOfCerts);
-    }
-
-    public static X509Certificate getCaCertOf(
+    private static X509Certificate getCaCertOf(
             final X509Certificate cert,
             final Set<? extends Certificate> caCerts)
     throws CertificateEncodingException {
@@ -716,31 +648,6 @@ public class X509Util {
         } else {
             return publicKeyInfo;
         }
-    }
-
-    public static Extensions getExtensions(
-            final CertificationRequestInfo p10Req) {
-        ASN1Set attrs = p10Req.getAttributes();
-        for (int i = 0; i < attrs.size(); i++) {
-            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
-                return Extensions.getInstance(attr.getAttributeValues()[0]);
-            }
-        }
-        return null;
-    }
-
-    public static String getChallengePassword(
-            final CertificationRequestInfo p10Req) {
-        ASN1Set attrs = p10Req.getAttributes();
-        for (int i = 0; i < attrs.size(); i++) {
-            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-            if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {
-                ASN1String str = (ASN1String) attr.getAttributeValues()[0];
-                return str.getString();
-            }
-        }
-        return null;
     }
 
     public static String cutText(
