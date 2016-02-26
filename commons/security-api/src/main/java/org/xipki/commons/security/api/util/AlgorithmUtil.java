@@ -41,7 +41,6 @@ import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +53,6 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.commons.common.util.ParamUtil;
@@ -70,26 +68,6 @@ public class AlgorithmUtil {
 
     private AlgorithmUtil() {
     }
-
-    public static SubjectPublicKeyInfo toRfc3279Style(
-            final SubjectPublicKeyInfo publicKeyInfo)
-    throws InvalidKeySpecException {
-        // TODO: add support of other algorithms
-        ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
-        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
-
-        if (PKCSObjectIdentifiers.rsaEncryption.equals(algOid)) {
-            if (DERNull.INSTANCE.equals(keyParameters)) {
-                return publicKeyInfo;
-            } else {
-                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-                return new SubjectPublicKeyInfo(keyAlgId,
-                        publicKeyInfo.getPublicKeyData().getBytes());
-            }
-        } else {
-            return publicKeyInfo;
-        }
-    } // method toRfc3279Style
 
     public static ASN1ObjectIdentifier getHashAlg(
             final String hashAlgName)

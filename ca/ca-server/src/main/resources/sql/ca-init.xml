@@ -148,12 +148,12 @@
         <constraints nullable="false"/>
       </column>
       <column name="RESPONDER_NAME" type="VARCHAR(45)"/>
-      <column defaultValueNumeric="3" name="DUPLICATE_KEY" type="SMALLINT"
-          remarks="whether duplicate public key is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
+      <column defaultValueNumeric="1" name="DUPLICATE_KEY" type="SMALLINT"
+          remarks="whether duplicate public key is allowed, default is true (1)">
         <constraints nullable="false"/>
       </column>
-      <column defaultValueNumeric="3" name="DUPLICATE_SUBJECT" type="SMALLINT"
-          remarks="whether duplicate subject is allowed: 1 for forbidden, 2 for forbiddenWithinProfile and 3 for permitted">
+      <column defaultValueNumeric="1" name="DUPLICATE_SUBJECT" type="SMALLINT"
+          remarks="whether duplicate subject key is allowed, default is true (1)">
         <constraints nullable="false"/>
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>

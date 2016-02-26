@@ -65,9 +65,9 @@ public class ChangeCaEntry implements Serializable {
 
     private String responderName;
 
-    private DuplicationMode duplicateKeyMode;
+    private Boolean duplicateKeyPermitted;
 
-    private DuplicationMode duplicateSubjectMode;
+    private Boolean duplicateSubjectPermitted;
 
     private ValidityMode validityMode;
 
@@ -142,22 +142,22 @@ public class ChangeCaEntry implements Serializable {
         this.responderName = responderName;
     }
 
-    public DuplicationMode getDuplicateKeyMode() {
-        return duplicateKeyMode;
+    public Boolean getDuplicateKeyPermitted() {
+        return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyMode(
-            final DuplicationMode duplicateKeyMode) {
-        this.duplicateKeyMode = duplicateKeyMode;
+    public void setDuplicateKeyPermitted(
+            final Boolean duplicateKeyPermitted) {
+        this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
-    public DuplicationMode getDuplicateSubjectMode() {
-        return duplicateSubjectMode;
+    public Boolean getDuplicateSubjectPermitted() {
+        return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectMode(
-            final DuplicationMode duplicateSubjectMode) {
-        this.duplicateSubjectMode = duplicateSubjectMode;
+    public void setDuplicateSubjectPermitted(
+            final Boolean duplicateSubjectPermitted) {
+        this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
     public ValidityMode getValidityMode() {

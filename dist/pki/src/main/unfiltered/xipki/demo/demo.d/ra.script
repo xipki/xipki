@@ -231,13 +231,6 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCA1.der \
   --ca-cert output/RCA1.der
  
-# Try to enroll with another profile
-xipki-cli:p10-enroll \
-  --p10 output/TLS1.p10 \
-  --out output/TLS1-TLS_C.der \
-  --profile TLS_C \
-  --user USER-T
-
 # Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
 # 1.
 

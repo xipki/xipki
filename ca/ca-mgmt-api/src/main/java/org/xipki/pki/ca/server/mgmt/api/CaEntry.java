@@ -65,9 +65,9 @@ public class CaEntry {
 
     private String responderName;
 
-    private DuplicationMode duplicateKeyMode;
+    private boolean duplicateKeyPermitted;
 
-    private DuplicationMode duplicateSubjectMode;
+    private boolean duplicateSubjectPermitted;
 
     private ValidityMode validityMode = ValidityMode.STRICT;
 
@@ -155,24 +155,22 @@ public class CaEntry {
         this.responderName = responderName;
     }
 
-    public DuplicationMode getDuplicateKeyMode() {
-        return duplicateKeyMode;
+    public boolean isDuplicateKeyPermitted() {
+        return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyMode(
-            final DuplicationMode mode) {
-        ParamUtil.assertNotNull("mode", mode);
-        this.duplicateKeyMode = mode;
+    public void setDuplicateKeyPermitted(
+            final boolean duplicateKeyPermitted) {
+        this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
-    public DuplicationMode getDuplicateSubjectMode() {
-        return duplicateSubjectMode;
+    public boolean isDuplicateSubjectPermitted() {
+        return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectMode(
-            final DuplicationMode mode) {
-        ParamUtil.assertNotNull("mode", mode);
-        this.duplicateSubjectMode = mode;
+    public void setDuplicateSubjectPermitted(
+            final boolean duplicateSubjectPermitted) {
+        this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
     public ValidityMode getValidityMode() {
@@ -244,18 +242,8 @@ public class CaEntry {
         sb.append('\n');
         sb.append("cmpcontrolName: ").append(cmpControlName).append('\n');
         sb.append("responderName: ").append(responderName).append('\n');
-        sb.append("duplicateKey: ");
-        sb.append(
-                (duplicateKeyMode == null)
-                        ? "null"
-                        : duplicateKeyMode.getDescription());
-        sb.append('\n');
-        sb.append("duplicateSubject: ");
-        sb.append(
-                (duplicateSubjectMode == null)
-                        ? "null"
-                        : duplicateSubjectMode.getDescription());
-        sb.append('\n');
+        sb.append("duplicateKey: ").append(duplicateKeyPermitted).append('\n');
+        sb.append("duplicateSubject: ").append(duplicateSubjectPermitted).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
         sb.append("keepExpiredCerts: ");

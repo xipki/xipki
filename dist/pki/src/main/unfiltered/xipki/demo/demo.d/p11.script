@@ -34,8 +34,8 @@ xipki-ca:gen-rca \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject permitted \
-  --duplicate-key permitted \
+  --duplicate-subject yes \
+  --duplicate-key yes \
   --validity-mode CUTOFF
 
 ## Update the certificate in the device
@@ -145,8 +145,8 @@ xipki-ca:ca-add \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject permitted \
-  --duplicate-key permitted
+  --duplicate-subject yes \
+  --duplicate-key yes
 
 xipki-ca:caalias-add \
   --ca SubCA1.complex-Name \
@@ -209,8 +209,8 @@ xipki-ca:ca-add \
   --crl-signer CASIGN.CRLSIGNER \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
-  --duplicate-subject permitted \
-  --duplicate-key permitted \
+  --duplicate-subject yes \
+  --duplicate-key yes \
   --validity-mode LAX
 
 xipki-ca:caalias-add \
