@@ -38,18 +38,16 @@ package org.xipki.commons.security.speed.p11;
 
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.util.SignerConfUtil;
 
 /**
  * @author Lijun Liao
@@ -103,7 +101,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
         this.slot = slot;
         this.keyId = keyId;
 
-        String signerConf = getPkcs11SignerConf(
+        String signerConf = SignerConfUtil.getPkcs11SignerConf(
                 slot.getModuleName(), slot.getSlotIdentifier(), keyId, signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
 
@@ -121,39 +119,6 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     protected Runnable getTestor()
     throws Exception {
         return new Testor();
-    }
-
-    private static String getPkcs11SignerConf(
-            final String pkcs11ModuleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
-            final String signatureAlgorithm,
-            final int parallelism) {
-        ParamUtil.assertNotNull("algo", signatureAlgorithm);
-        ParamUtil.assertNotNull("keyId", keyId);
-
-        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-
-        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-            conf.putPair("module", pkcs11ModuleName);
-        }
-
-        if (slotId.getSlotId() != null) {
-            conf.putPair("slot-id", slotId.getSlotId().toString());
-        } else {
-            conf.putPair("slot", slotId.getSlotIndex().toString());
-        }
-
-        if (keyId.getKeyId() != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
-        }
-
-        if (keyId.getKeyLabel() != null) {
-            conf.putPair("key-label", keyId.getKeyLabel());
-        }
-
-        return conf.getEncoded();
     }
 
 }

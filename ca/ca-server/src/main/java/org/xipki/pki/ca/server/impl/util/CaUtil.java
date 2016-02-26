@@ -34,69 +34,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.shell;
+package org.xipki.pki.ca.server.impl.util;
 
-import java.util.Collection;
-
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.pki.ca.server.mgmt.api.CaManager;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.Extensions;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class CaCommandSupport extends XipkiCommandSupport {
+public class CaUtil {
 
-    @Reference
-    protected CaManager caManager;
-
-    @Reference
-    protected SecurityFactory securityFactory;
-
-    protected static String getRealString(
-            final String s) {
-        return CaManager.NULL.equalsIgnoreCase(s)
-                ? null
-                : s;
-    }
-
-    protected static String toString(
-            final Collection<? extends Object> c) {
-        if (c == null) {
-            return "null";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        int n = c.size();
-
-        int i = 0;
-        for (Object o : c) {
-            sb.append(o);
-            if (i < n - 1) {
-                sb.append(", ");
+    public static Extensions getExtensions(
+            final CertificationRequestInfo p10Req) {
+        ASN1Set attrs = p10Req.getAttributes();
+        for (int i = 0; i < attrs.size(); i++) {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+                return Extensions.getInstance(attr.getAttributeValues()[0]);
             }
-            i++;
         }
-        sb.append("}");
-        return sb.toString();
+        return null;
     }
 
-    protected void output(
-            final boolean successful,
-            final String posPrefix,
-            final String negPrefix,
-            final String message)
-    throws CmdFailure {
-        if (successful) {
-            out(posPrefix + " " + message);
-        } else {
-            throw new CmdFailure(negPrefix + " " + message);
+    public static String getChallengePassword(
+            final CertificationRequestInfo p10Req) {
+        ASN1Set attrs = p10Req.getAttributes();
+        for (int i = 0; i < attrs.size(); i++) {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {
+                ASN1String str = (ASN1String) attr.getAttributeValues()[0];
+                return str.getString();
+            }
         }
+        return null;
     }
 
 }

@@ -220,7 +220,7 @@ public class CaUpdateCmd extends CaCommandSupport {
             }
 
             signerConf = ShellUtil.canonicalizeSignerConf(localSignerType, signerConf,
-                    passwordResolver);
+                    passwordResolver, securityFactory);
             entry.setSignerConf(signerConf);
         }
 

@@ -161,7 +161,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
-                    passwordResolver);
+                    passwordResolver, securityFactory);
         }
 
         // CRL_URIS

@@ -88,6 +88,7 @@ import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.X509Ca;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.ScepControl;
@@ -449,11 +450,8 @@ public class Scep {
                     }
 
                     CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
-
-                    Extensions extensions = X509Util.getExtensions(p10ReqInfo);
-
+                    Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
                     X509Certificate reqSignatureCert = req.getSignatureCert();
-
                     boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
                             reqSignatureCert.getIssuerX500Principal());
 
@@ -466,7 +464,7 @@ public class Scep {
                     String user = null;
                     boolean authenticatedByPwd = false;
 
-                    String challengePwd = X509Util.getChallengePassword(p10ReqInfo);
+                    String challengePwd = CaUtil.getChallengePassword(p10ReqInfo);
                     if (challengePwd != null) {
                         String[] strs = challengePwd.split(":");
                         if (strs != null && strs.length == 2) {

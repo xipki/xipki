@@ -37,6 +37,7 @@
 package org.xipki.commons.security.api;
 
 import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -139,6 +140,14 @@ public interface SecurityFactory {
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws InvalidKeyException;
+
+    byte[] extractMinimalKeyStore(
+            String keystoreType,
+            byte[] keystoreBytes,
+            String keyname,
+            char[] password,
+            X509Certificate[] newCertChain)
+    throws KeyStoreException;
 
     String getPkcs11Provider();
 

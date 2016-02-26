@@ -37,7 +37,7 @@
 package org.xipki.pki.ca.client.api;
 
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.CmpFailureUtil;
 
 /**
  * @author Lijun Liao
@@ -68,7 +68,7 @@ public class PkiErrorException extends Exception {
             final int status,
             final int pkiFailureInfo,
             final String statusMessage) {
-        super(SecurityUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
+        super(CmpFailureUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;

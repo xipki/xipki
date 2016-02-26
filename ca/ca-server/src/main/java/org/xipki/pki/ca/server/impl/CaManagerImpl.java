@@ -93,7 +93,6 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
@@ -101,7 +100,6 @@ import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.SecurityUtil;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
@@ -2638,8 +2636,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             try {
                 signerConf = canonicalizeSignerConf(signerType, signerConf,
-                        securityFactory.getPasswordResolver(),
-                        new X509Certificate[]{caCert});
+                        new X509Certificate[]{caCert}, securityFactory);
             } catch (Exception ex) {
                 throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
@@ -3026,8 +3023,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     private static String canonicalizeSignerConf(
             final String keystoreType,
             final String signerConf,
-            final PasswordResolver passwordResolver,
-            final X509Certificate[] certChain)
+            final X509Certificate[] certChain,
+            final SecurityFactory securityFactory)
     throws Exception {
         if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
             return signerConf;
@@ -3048,9 +3045,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return signerConf;
         }
 
-        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
+        keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType,
                 keystoreBytes, keyLabel,
-                passwordResolver.resolvePassword(passwordHint), certChain);
+                securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();

@@ -37,22 +37,28 @@
 package org.xipki.commons.security.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +90,6 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -889,181 +894,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
     } // method validateSigner
 
-    public static String getKeystoreSignerConf(
-            final String keystoreFile,
-            final String password,
-            final String signatureAlgorithm,
-            final int parallelism) {
-        return getKeystoreSignerConf(keystoreFile, password, signatureAlgorithm, parallelism,
-                null);
-    }
-
-    public static String getKeystoreSignerConf(
-            final InputStream keystoreStream,
-            final String password,
-            final String signatureAlgorithm,
-            final int parallelism)
-    throws IOException {
-        return getKeystoreSignerConf(keystoreStream, password, signatureAlgorithm, parallelism,
-                null);
-    }
-
-    public static String getKeystoreSignerConf(
-            final String keystoreFile,
-            final String password,
-            final String signatureAlgorithm,
-            final int parallelism,
-            final String keyLabel) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
-        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-        conf.putPair("keystore", "file:" + keystoreFile);
-
-        return conf.getEncoded();
-    }
-
-    public static String getKeystoreSignerConf(
-            final InputStream keystoreStream,
-            final String password,
-            final String signatureAlgorithm,
-            final int parallelism,
-            final String keyLabel)
-    throws IOException {
-        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
-        ParamUtil.assertNotBlank("password", password);
-        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
-        return conf.getEncoded();
-    }
-
-    public static String getKeystoreSignerConfWithoutAlgo(
-            final String keystoreFile,
-            final String password,
-            final int parallelism) {
-        return getKeystoreSignerConfWithoutAlgo(keystoreFile, password, parallelism, null);
-    }
-
-    public static String getKeystoreSignerConfWithoutAlgo(
-            final InputStream keystoreStream,
-            final String password,
-            final int parallelism)
-    throws IOException {
-        return getKeystoreSignerConfWithoutAlgo(keystoreStream, password, parallelism, null);
-    }
-
-    public static String getKeystoreSignerConfWithoutAlgo(
-            final String keystoreFile,
-            final String password,
-            final int parallelism,
-            final String keyLabel) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return conf.getEncoded();
-    }
-
-    public static String getKeystoreSignerConfWithoutAlgo(
-            final InputStream keystoreStream,
-            final String password,
-            final int parallelism,
-            final String keyLabel)
-    throws IOException {
-        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
-        ParamUtil.assertNotBlank("password", password);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-        if (keyLabel != null) {
-            conf.putPair("key-label", keyLabel);
-        }
-        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
-        return conf.getEncoded();
-    }
-
-    public static String getPkcs11SignerConf(
-            final String pkcs11ModuleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
-            final String signatureAlgorithm,
-            final int parallelism) {
-        ParamUtil.assertNotNull("algo", signatureAlgorithm);
-        ParamUtil.assertNotNull("keyId", keyId);
-
-        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
-        conf.putPair("parallelism", Integer.toString(parallelism));
-
-        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-            conf.putPair("module", pkcs11ModuleName);
-        }
-
-        if (slotId.getSlotId() != null) {
-            conf.putPair("slot-id", slotId.getSlotId().toString());
-        } else {
-            conf.putPair("slot", slotId.getSlotIndex().toString());
-        }
-
-        if (keyId.getKeyId() != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
-        }
-
-        if (keyId.getKeyLabel() != null) {
-            conf.putPair("key-label", keyId.getKeyLabel());
-        }
-
-        return conf.getEncoded();
-    }
-
-    public static String getPkcs11SignerConfWithoutAlgo(
-            final String pkcs11ModuleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
-            final int parallelism) {
-        ParamUtil.assertNotNull("keyId", keyId);
-
-        ConfPairs conf = new ConfPairs();
-        conf.putPair("parallelism", Integer.toString(parallelism));
-
-        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
-            conf.putPair("module", pkcs11ModuleName);
-        }
-
-        if (slotId.getSlotId() != null) {
-            conf.putPair("slot-id", slotId.getSlotId().toString());
-        } else {
-            conf.putPair("slot", slotId.getSlotIndex().toString());
-        }
-
-        if (keyId.getKeyId() != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
-        }
-
-        if (keyId.getKeyLabel() != null) {
-            conf.putPair("key-label", keyId.getKeyLabel());
-        }
-
-        return conf.getEncoded();
-    }
-
     private static Set<P11SlotIdentifier> getSlots(
             final SlotsType type)
     throws InvalidConfException {
@@ -1102,5 +932,79 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
         return ret;
     }
+
+    @Override
+    public byte[] extractMinimalKeyStore(
+            final String keystoreType,
+            final byte[] keystoreBytes,
+            final String keyname,
+            final char[] password,
+            final X509Certificate[] newCertChain)
+    throws KeyStoreException {
+        try {
+            KeyStore ks;
+            if ("JKS".equalsIgnoreCase(keystoreType)) {
+                ks = KeyStore.getInstance(keystoreType);
+            } else {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
+            ks.load(new ByteArrayInputStream(keystoreBytes), password);
+
+            String localKeyname = keyname;
+            if (localKeyname == null) {
+                Enumeration<String> aliases = ks.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    if (ks.isKeyEntry(alias)) {
+                        localKeyname = alias;
+                        break;
+                    }
+                }
+            } else {
+                if (!ks.isKeyEntry(localKeyname)) {
+                    throw new KeyStoreException("unknown key named " + localKeyname);
+                }
+            }
+
+            Enumeration<String> aliases = ks.aliases();
+            int numAliases = 0;
+            while (aliases.hasMoreElements()) {
+                aliases.nextElement();
+                numAliases++;
+            }
+
+            Certificate[] certs;
+            if (newCertChain == null || newCertChain.length < 1) {
+                if (numAliases == 1) {
+                    return keystoreBytes;
+                }
+                certs = ks.getCertificateChain(localKeyname);
+            } else {
+                certs = newCertChain;
+            }
+
+            PrivateKey key = (PrivateKey) ks.getKey(localKeyname, password);
+            ks = null;
+
+            if ("JKS".equalsIgnoreCase(keystoreType)) {
+                ks = KeyStore.getInstance(keystoreType);
+            } else {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
+            ks.load(null, password);
+            ks.setKeyEntry(localKeyname, key, password, certs);
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            ks.store(bout, password);
+            byte[] bytes = bout.toByteArray();
+            bout.close();
+            return bytes;
+        } catch (Exception ex) {
+            if (ex instanceof KeyStoreException) {
+                throw (KeyStoreException) ex;
+            } else {
+                throw new KeyStoreException(ex.getMessage(), ex);
+            }
+        }
+    } // method extractMinimalKeyStore
 
 }

@@ -82,7 +82,6 @@ import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.FpIdCalculator;
 import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.util.PasswordHash;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -95,6 +94,7 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.util.PasswordHash;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 
 /**

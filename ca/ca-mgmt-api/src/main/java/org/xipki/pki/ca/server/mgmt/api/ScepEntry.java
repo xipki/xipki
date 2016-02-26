@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.SecurityUtil;
+import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -166,7 +166,7 @@ public class ScepEntry implements Serializable {
         if (responderConf == null) {
             sb.append("null");
         } else {
-            sb.append(SecurityUtil.signerConfToString(responderConf, verbose, ignoreSensitiveInfo));
+            sb.append(SignerConfUtil.signerConfToString(responderConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("control: ").append(control).append("\n");
