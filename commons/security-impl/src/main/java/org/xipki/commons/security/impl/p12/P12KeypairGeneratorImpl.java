@@ -71,13 +71,13 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.commons.security.impl.bcext.ECDSAContentSignerBuilder;
 
 /**
  * @author Lijun Liao
@@ -303,7 +303,7 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
 
-            builder = new ECDSAContentSignerBuilder(new AlgorithmIdentifier(sigOid),
+            builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
                     buildAlgId(hashOid));
         } else {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
