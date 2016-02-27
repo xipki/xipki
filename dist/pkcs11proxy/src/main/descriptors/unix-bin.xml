@@ -24,7 +24,7 @@
       <excludes>
         <exclude>bin/*.bat</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
@@ -34,7 +34,7 @@
       <excludes>
         <exclude>bin/**</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
