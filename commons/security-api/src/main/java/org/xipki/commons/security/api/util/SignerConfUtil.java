@@ -55,6 +55,9 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class SignerConfUtil {
 
+    private SignerConfUtil() {
+    }
+
     public static String getPkcs11SignerConfWithoutAlgo(
             final String pkcs11ModuleName,
             final P11SlotIdentifier slotId,

@@ -661,7 +661,7 @@ public class X509Util {
                 }
                 return publicKeyInfo;
             }
-        } else if(X9ObjectIdentifiers.id_ecPublicKey.equals(algOid)) {
+        } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(algOid)) {
             if (keyParameters == null) {
                 throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
             }

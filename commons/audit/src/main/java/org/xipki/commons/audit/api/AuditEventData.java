@@ -50,13 +50,13 @@ public class AuditEventData {
     public AuditEventData(
             final String name,
             final String value) {
-        if(name == null) {
+        if (name == null) {
             throw new IllegalArgumentException("name could not be null");
         }
         if (name.isEmpty()) {
             throw new IllegalArgumentException("name could not be empty");
         }
-        if(value == null) {
+        if (value == null) {
             throw new IllegalArgumentException("value could not be null");
         }
 

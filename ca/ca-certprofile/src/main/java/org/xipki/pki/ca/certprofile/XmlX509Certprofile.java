@@ -929,7 +929,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
                 type, extensionsType, SMIMECapabilities.class);
-        if(extConf == null) {
+        if (extConf == null) {
             return;
         }
 
