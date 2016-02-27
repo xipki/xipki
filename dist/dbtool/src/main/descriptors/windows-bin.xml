@@ -14,7 +14,7 @@
         <exclude>bin/*.sh</exclude>
         <exclude>bin/setenv</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <lineEnding>dos</lineEnding>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -24,7 +24,7 @@
       <excludes>
         <exclude>bin/**</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
