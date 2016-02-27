@@ -1,10 +1,10 @@
-// #THIRDPARTY# android team
+// #THIRDPARTY# BouncyCastle
 
 /*
  * Copied from BouncyCastle under license MIT
  */
 
-package org.xipki.commons.security.bcext;
+package org.xipki.commons.security.impl.bcext;
 
 import java.io.IOException;
 

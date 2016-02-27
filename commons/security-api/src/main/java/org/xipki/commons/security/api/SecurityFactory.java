@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
@@ -124,6 +125,9 @@ public interface SecurityFactory {
             X509CertificateHolder cert)
     throws InvalidKeyException;
 
+    boolean verifyPopo(
+            final PKCS10CertificationRequest p10Request);
+
     PublicKey generatePublicKey(
             SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
@@ -148,8 +152,6 @@ public interface SecurityFactory {
             char[] password,
             X509Certificate[] newCertChain)
     throws KeyStoreException;
-
-    String getPkcs11Provider();
 
     SecureRandom getRandom4Sign();
 

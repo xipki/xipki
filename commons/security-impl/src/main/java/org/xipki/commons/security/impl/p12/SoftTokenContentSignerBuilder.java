@@ -97,11 +97,14 @@ import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.commons.security.bcext.BCRSAPrivateCrtKey;
-import org.xipki.commons.security.bcext.BCRSAPrivateKey;
-import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
+//import org.xipki.commons.security.bcext.BCRSAPrivateCrtKey;
+//import org.xipki.commons.security.bcext.BCRSAPrivateKey;
+//import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
 import org.xipki.commons.security.impl.DefaultConcurrentContentSigner;
 import org.xipki.commons.security.impl.SignatureSigner;
+import org.xipki.commons.security.impl.bcext.BCRSAPrivateCrtKey;
+import org.xipki.commons.security.impl.bcext.BCRSAPrivateKey;
+import org.xipki.commons.security.impl.bcext.DSAPlainDigestSigner;
 
 /**
  * @author Lijun Liao
