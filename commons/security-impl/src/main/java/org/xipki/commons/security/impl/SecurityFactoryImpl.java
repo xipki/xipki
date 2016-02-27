@@ -85,6 +85,7 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
@@ -121,7 +122,6 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.commons.security.impl.bcext.ECDSAContentVerifierProviderBuilder;
 import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
 import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
@@ -444,7 +444,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             } else if ("DSA".equals(keyAlg)) {
                 builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else if ("ECDSA".equals(keyAlg)) {
-                builder = new ECDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+                builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new InvalidKeyException("unknown key algorithm of the public key "
                         + keyAlg);
