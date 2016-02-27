@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -69,6 +70,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -82,6 +84,9 @@ import org.xipki.commons.security.api.util.X509Util;
         description = "request certificate status")
 @Service
 public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
+
+    @Reference
+    private SecurityFactory securityFactory;
 
     @Override
     protected void checkParameters(
@@ -145,7 +150,8 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             if (validOn) {
                 PublicKey responderPubKey = KeyUtil.generatePublicKey(
                         respSigner.getSubjectPublicKeyInfo());
-                ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
+                ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
+                        responderPubKey);
                 boolean sigValid = basicResp.isSignatureValid(cvp);
 
                 if (!sigValid) {

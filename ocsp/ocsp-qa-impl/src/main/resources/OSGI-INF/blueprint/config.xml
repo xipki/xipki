@@ -5,8 +5,10 @@
     default-activation="lazy">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="ocspQa" class="org.xipki.pki.ocsp.qa.impl.OcspQaImpl" init-method="init"
       destroy-method="shutdown">
+    <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <service ref="ocspQa" interface="org.xipki.pki.ocsp.qa.api.OcspQa"/>  
 </blueprint>

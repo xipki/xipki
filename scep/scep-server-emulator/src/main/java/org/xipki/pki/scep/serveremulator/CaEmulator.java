@@ -38,8 +38,12 @@ package org.xipki.pki.scep.serveremulator;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,11 +62,24 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.Arrays;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
@@ -77,6 +94,14 @@ public class CaEmulator {
     public static final long MIN_IN_MS = 60L * 1000;
 
     public static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaEmulator.class);
+
+    private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
+            new DefaultDigestAlgorithmIdentifierFinder();
+
+    private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
+        = new HashMap<>();
 
     private final PrivateKey caKey;
 
@@ -138,7 +163,7 @@ public class CaEmulator {
     public Certificate generateCert(
             final CertificationRequest p10ReqInfo)
     throws Exception {
-        if (!SignerUtil.verifyPopo(p10ReqInfo)) {
+        if (!verifyPopo(p10ReqInfo)) {
             throw new Exception("PKCS#10 request invalid");
         }
         CertificationRequestInfo reqInfo = p10ReqInfo.getCertificationRequestInfo();
@@ -233,6 +258,59 @@ public class CaEmulator {
         X509CRLHolder localCrl = crlBuilder.build(contentSigner);
         crl = localCrl.toASN1Structure();
         return crl;
+    }
+
+    private boolean verifyPopo(
+            final CertificationRequest p10Request) {
+        try {
+            PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
+            SubjectPublicKeyInfo pkInfo = p10Req.getSubjectPublicKeyInfo();
+            PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
+
+            ContentVerifierProvider cvp = getContentVerifierProvider(pk);
+            return p10Req.isSignatureValid(cvp);
+        } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
+                | InvalidKeySpecException ex) {
+            String message = "error while validating POPO of PKCS#10 request";
+            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                    ex.getMessage());
+            LOG.error(message, ex);
+            return false;
+        }
+    }
+
+    public ContentVerifierProvider getContentVerifierProvider(
+            final PublicKey publicKey)
+    throws InvalidKeyException {
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
+        String keyAlg = publicKey.getAlgorithm().toUpperCase();
+        if (keyAlg.equals("EC")) {
+            keyAlg = "ECDSA";
+        }
+
+        BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
+        if (builder == null) {
+            if ("RSA".equals(keyAlg)) {
+                builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else if ("DSA".equals(keyAlg)) {
+                builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else if ("ECDSA".equals(keyAlg)) {
+                builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else {
+                throw new InvalidKeyException("unknown key algorithm of the public key "
+                        + keyAlg);
+            }
+            VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
+        }
+
+        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
+        try {
+            return builder.build(keyParam);
+        } catch (OperatorCreationException ex) {
+            throw new InvalidKeyException("error while building ContentVerifierProvider: "
+                    + ex.getMessage(), ex);
+        }
     }
 
 }

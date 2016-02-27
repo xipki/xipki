@@ -96,14 +96,7 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.bcext.BcRSAContentVerifierProviderBuilder;
-import org.xipki.commons.security.bcext.ECDSAContentVerifierProviderBuilder;
 
 /**
  * @author Lijun Liao
@@ -111,12 +104,6 @@ import org.xipki.commons.security.bcext.ECDSAContentVerifierProviderBuilder;
  */
 
 public class KeyUtil {
-
-    private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
-            new DefaultDigestAlgorithmIdentifierFinder();
-
-    private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
-        = new HashMap<>();
 
     private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
 
@@ -140,35 +127,6 @@ public class KeyUtil {
     }
 
     private KeyUtil() {
-    }
-
-    public static ContentVerifierProvider getContentVerifierProvider(
-            final PublicKey publicKey)
-    throws OperatorCreationException, InvalidKeyException {
-        ParamUtil.assertNotNull("publicKey", publicKey);
-
-        String keyAlg = publicKey.getAlgorithm().toUpperCase();
-        if (keyAlg.equals("EC")) {
-            keyAlg = "ECDSA";
-        }
-
-        BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
-        if (builder == null) {
-            if ("RSA".equals(keyAlg)) {
-                builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-            } else if ("DSA".equals(keyAlg)) {
-                builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-            } else if ("ECDSA".equals(keyAlg)) {
-                builder = new ECDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-            } else {
-                throw new OperatorCreationException("unknown key algorithm of the public key "
-                        + keyAlg);
-            }
-            VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
-        }
-
-        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
-        return builder.build(keyParam);
     }
 
     public static KeyPair generateRSAKeypair(

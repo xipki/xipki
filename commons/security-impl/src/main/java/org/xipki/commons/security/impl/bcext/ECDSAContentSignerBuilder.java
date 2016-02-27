@@ -1,10 +1,10 @@
-// #THIRDPARTY# android team
+// #THIRDPARTY# BouncyCastle
 
 /*
  * Copied from BouncyCastle under license MIT
  */
 
-package org.xipki.commons.security.bcext;
+package org.xipki.commons.security.impl.bcext;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
