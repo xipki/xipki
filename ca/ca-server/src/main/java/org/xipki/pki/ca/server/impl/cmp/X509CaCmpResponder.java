@@ -97,6 +97,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
@@ -484,8 +485,22 @@ public class X509CaCmpResponder extends CmpResponder {
                 }
 
                 checkPermission(localRequestor, certprofileName);
+
+                Date notBefore = null;
+                Date notAfter = null;
+                if (validity != null) {
+                    Time t = validity.getNotBefore();
+                    if (t != null) {
+                        notBefore = t.getDate();
+                    }
+                    t = validity.getNotAfter();
+                    if (t != null) {
+                        notAfter = t.getDate();
+                    }
+                }
+
                 CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-                        validity, extensions, certprofileName);
+                        notBefore, notAfter, extensions, certprofileName);
                 certResponses[i] = generateCertificate(certTemplateData, localRequestor, user, tid,
                         certReqId, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
@@ -576,7 +591,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 checkPermission(requestor, certprofileName);
 
                 CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-                        null, extensions, certprofileName);
+                        null, null, extensions, certprofileName);
                 certResp = generateCertificate(certTemplateData, requestor, user, tid, certReqId,
                     false, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {

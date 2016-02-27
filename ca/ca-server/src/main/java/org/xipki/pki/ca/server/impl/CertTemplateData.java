@@ -38,11 +38,9 @@ package org.xipki.pki.ca.server.impl;
 
 import java.util.Date;
 
-import org.bouncycastle.asn1.crmf.OptionalValidity;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -58,37 +56,6 @@ public class CertTemplateData {
     private final Date notAfter;
     private final String certprofileName;
     private final Extensions extensions;
-
-    public CertTemplateData(
-            final X500Name subject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final OptionalValidity validity,
-            final Extensions extensions,
-            final String certprofileName) {
-        ParamUtil.assertNotNull("subject", subject);
-        ParamUtil.assertNotNull("publicKeyInfo", publicKeyInfo);
-        ParamUtil.assertNotBlank("certprofileName", certprofileName);
-
-        this.subject = subject;
-        this.publicKeyInfo = publicKeyInfo;
-        this.extensions = extensions;
-        this.certprofileName = certprofileName;
-
-        Date lNotBefore = null;
-        Date lNotAfter = null;
-        if (validity != null) {
-            Time t = validity.getNotBefore();
-            if (t != null) {
-                lNotBefore = t.getDate();
-            }
-            t = validity.getNotAfter();
-            if (t != null) {
-                lNotAfter = t.getDate();
-            }
-        }
-        this.notBefore = lNotBefore;
-        this.notAfter = lNotAfter;
-    }
 
     public CertTemplateData(
             final X500Name subject,

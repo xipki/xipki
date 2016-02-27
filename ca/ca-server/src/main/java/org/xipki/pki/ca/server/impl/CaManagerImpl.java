@@ -823,6 +823,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 LOG.info("Exception while calling CAInfo.commitNextSerial for CA '{}': {}",
                         caName, th.getMessage());
             }
+
+            try {
+                ca.shutdown();
+            } catch (Throwable th) {
+                LOG.info("Exception while calling ca.shutdown() for CA '{}': {}",
+                        caName, th.getMessage());
+            }
         }
 
         if (caLockedByMe) {
