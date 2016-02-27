@@ -56,7 +56,7 @@ import org.xipki.commons.security.impl.SecurityFactoryImpl;
 
 public abstract class Pkcs12RSATest {
 
-    private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
+    private static final SecurityFactoryImpl SECURITY_FACTORY = new SecurityFactoryImpl();
 
     private ConcurrentContentSigner signer;
 
@@ -94,7 +94,7 @@ public abstract class Pkcs12RSATest {
             X509Certificate cert = X509Util.parseCert(certFile);
 
             String signerConf = getSignerConf();
-            signer = securityFactory.createSigner("PKCS12", signerConf, cert);
+            signer = SECURITY_FACTORY.createSigner("PKCS12", signerConf, cert);
         }
         return signer;
     }

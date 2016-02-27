@@ -152,6 +152,7 @@ public class ObjectIdentifiers {
      * locality name - StringType(SIZE(1..64))
      */
     public static final ASN1ObjectIdentifier DN_L = new ASN1ObjectIdentifier("2.5.4.7");
+
     public static final ASN1ObjectIdentifier DN_LOCALITYNAME = DN_L;
 
     /**
@@ -163,10 +164,15 @@ public class ObjectIdentifiers {
      * Naming attributes of type X520name
      */
     public static final ASN1ObjectIdentifier DN_SURNAME = new ASN1ObjectIdentifier("2.5.4.4");
+
     public static final ASN1ObjectIdentifier DN_GIVENNAME = new ASN1ObjectIdentifier("2.5.4.42");
+
     public static final ASN1ObjectIdentifier DN_INITIALS = new ASN1ObjectIdentifier("2.5.4.43");
+
     public static final ASN1ObjectIdentifier DN_GENERATION = new ASN1ObjectIdentifier("2.5.4.44");
+
     public static final ASN1ObjectIdentifier DN_GENERATION_QUALIFIER = DN_GENERATION;
+
     public static final ASN1ObjectIdentifier DN_UNIQUE_IDENTIFIER
             = new ASN1ObjectIdentifier("2.5.4.45");
 
@@ -267,6 +273,7 @@ public class ObjectIdentifiers {
      */
     public static final ASN1ObjectIdentifier DN_UnstructuredName
         = PKCSObjectIdentifiers.pkcs_9_at_unstructuredName;
+
     public static final ASN1ObjectIdentifier DN_UnstructuredAddress
         = PKCSObjectIdentifiers.pkcs_9_at_unstructuredAddress;
 
@@ -290,10 +297,9 @@ public class ObjectIdentifiers {
     /**
      * Extended key usages
      */
-    private static final ASN1ObjectIdentifier id_pkix
-        = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
-    private static final ASN1ObjectIdentifier id_kp
-        = id_pkix.branch("3");
+    private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
+
+    private static final ASN1ObjectIdentifier id_kp = id_pkix.branch("3");
 
     public static final ASN1ObjectIdentifier id_anyExtendedKeyUsage
         = Extension.extendedKeyUsage.branch("0");
@@ -362,6 +368,7 @@ public class ObjectIdentifiers {
     // OCSP
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs
         = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke
         = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
@@ -370,12 +377,16 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_kp_ocsp
         = id_pkix.branch("1.48.1");
+
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck
         = id_pkix.branch("48.1.5");
+
     public static final ASN1ObjectIdentifier id_extension_restriction
         = new ASN1ObjectIdentifier("1.3.36.8.3.8");
+
     public static final ASN1ObjectIdentifier id_extension_additionalInformation
         = new ASN1ObjectIdentifier("1.3.36.8.3.15");
+
     public static final ASN1ObjectIdentifier id_extension_validityModel
         = new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5");
 
@@ -383,26 +394,38 @@ public class ObjectIdentifiers {
         = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
     private static final ASN1ObjectIdentifier id_ad = id_pkix.branch("48");
+
     public static final ASN1ObjectIdentifier id_ad_timeStamping = id_ad.branch("3");
+
     public static final ASN1ObjectIdentifier id_ad_caRepository = id_ad.branch("5");
 
     private static final ASN1ObjectIdentifier id_qcs = id_pkix.branch("11");
+
     public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v1 = id_qcs.branch("1");
+
     public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v2 = id_qcs.branch("2");
+
     private static final ASN1ObjectIdentifier id_etsi_qcs
         = new ASN1ObjectIdentifier("0.4.0.1862.1");
+
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcCompliance = id_etsi_qcs.branch("1");
+
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcLimitValue = id_etsi_qcs.branch("2");
+
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcRetentionPeriod
         = id_etsi_qcs.branch("3");
+
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
 
     // RFC 7633: X.509v3 Transport Layer Security (TLS) Feature Extension
     private static final ASN1ObjectIdentifier id_pe = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.1");
+
     public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
 
     private static final List<ASN1ObjectIdentifier> forwardDNs;
+
     private static final List<ASN1ObjectIdentifier> backwardDNs;
+
     private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
     // RFC 4262: SMIMECapatibilities

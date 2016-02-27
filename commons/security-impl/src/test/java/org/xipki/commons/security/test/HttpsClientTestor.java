@@ -70,14 +70,14 @@ public class HttpsClientTestor {
         }
 
     private void testIt() {
-        String https_url = "https://localhost:9443";
+        String httpsUrl = "https://localhost:9443";
         URL url;
         try {
-            url = new URL(https_url);
+            url = new URL(httpsUrl);
             HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
 
             //dumpl all cert info
-            print_https_cert(con);
+            printHttpsCert(con);
 
             //dump all the content
             //print_content(con);
@@ -89,9 +89,9 @@ public class HttpsClientTestor {
         }
     }
 
-    private void print_https_cert(
+    private void printHttpsCert(
             final HttpsURLConnection con) {
-        if (con!=null) {
+        if (con != null) {
             try {
                 System.out.println("Response Code : " + con.getResponseCode());
                 System.out.println("Cipher Suite : " + con.getCipherSuite());
@@ -119,9 +119,9 @@ public class HttpsClientTestor {
     }
 
     @SuppressWarnings("unused")
-    private void print_content(
+    private void printContent(
             final HttpsURLConnection con) {
-        if (con!=null) {
+        if (con != null) {
             try {
                 System.out.println("****** Content of the URL ********");
                 BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));

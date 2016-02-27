@@ -751,7 +751,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
 
         P11Module module;
-        String pkcs11Provider = getPkcs11Provider();
         if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
             // the returned object could not be null
             module = IaikP11ModulePool.getInstance().getModule(moduleName);
@@ -885,6 +884,94 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return getSecureRandom(strongRandom4SignEnabled);
     }
 
+    @Override
+    public byte[] extractMinimalKeyStore(
+            final String keystoreType,
+            final byte[] keystoreBytes,
+            final String keyname,
+            final char[] password,
+            final X509Certificate[] newCertChain)
+    throws KeyStoreException {
+        try {
+            KeyStore ks;
+            if ("JKS".equalsIgnoreCase(keystoreType)) {
+                ks = KeyStore.getInstance(keystoreType);
+            } else {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
+            ks.load(new ByteArrayInputStream(keystoreBytes), password);
+
+            String localKeyname = keyname;
+            if (localKeyname == null) {
+                Enumeration<String> aliases = ks.aliases();
+                while (aliases.hasMoreElements()) {
+                    String alias = aliases.nextElement();
+                    if (ks.isKeyEntry(alias)) {
+                        localKeyname = alias;
+                        break;
+                    }
+                }
+            } else {
+                if (!ks.isKeyEntry(localKeyname)) {
+                    throw new KeyStoreException("unknown key named " + localKeyname);
+                }
+            }
+
+            Enumeration<String> aliases = ks.aliases();
+            int numAliases = 0;
+            while (aliases.hasMoreElements()) {
+                aliases.nextElement();
+                numAliases++;
+            }
+
+            Certificate[] certs;
+            if (newCertChain == null || newCertChain.length < 1) {
+                if (numAliases == 1) {
+                    return keystoreBytes;
+                }
+                certs = ks.getCertificateChain(localKeyname);
+            } else {
+                certs = newCertChain;
+            }
+
+            PrivateKey key = (PrivateKey) ks.getKey(localKeyname, password);
+            ks = null;
+
+            if ("JKS".equalsIgnoreCase(keystoreType)) {
+                ks = KeyStore.getInstance(keystoreType);
+            } else {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
+            ks.load(null, password);
+            ks.setKeyEntry(localKeyname, key, password, certs);
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            ks.store(bout, password);
+            byte[] bytes = bout.toByteArray();
+            bout.close();
+            return bytes;
+        } catch (Exception ex) {
+            if (ex instanceof KeyStoreException) {
+                throw (KeyStoreException) ex;
+            } else {
+                throw new KeyStoreException(ex.getMessage(), ex);
+            }
+        }
+    } // method extractMinimalKeyStore
+
+    public void shutdown() {
+        try {
+            KeystoreP11ModulePool.getInstance().shutdown();
+        } catch (Throwable th) {
+            LOG.error("error while shutdowning KeyStoreP11ModulePool: " + th.getMessage(), th);
+        }
+
+        try {
+            IaikP11ModulePool.getInstance().shutdown();
+        } catch (Throwable th) {
+            LOG.error("error while shutdowning IaikP11ModulePool: " + th.getMessage(), th);
+        }
+    }
+
     private static SecureRandom getSecureRandom(
             final boolean strong) {
         if (!strong) {
@@ -988,79 +1075,5 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
         return ret;
     }
-
-    @Override
-    public byte[] extractMinimalKeyStore(
-            final String keystoreType,
-            final byte[] keystoreBytes,
-            final String keyname,
-            final char[] password,
-            final X509Certificate[] newCertChain)
-    throws KeyStoreException {
-        try {
-            KeyStore ks;
-            if ("JKS".equalsIgnoreCase(keystoreType)) {
-                ks = KeyStore.getInstance(keystoreType);
-            } else {
-                ks = KeyStore.getInstance(keystoreType, "BC");
-            }
-            ks.load(new ByteArrayInputStream(keystoreBytes), password);
-
-            String localKeyname = keyname;
-            if (localKeyname == null) {
-                Enumeration<String> aliases = ks.aliases();
-                while (aliases.hasMoreElements()) {
-                    String alias = aliases.nextElement();
-                    if (ks.isKeyEntry(alias)) {
-                        localKeyname = alias;
-                        break;
-                    }
-                }
-            } else {
-                if (!ks.isKeyEntry(localKeyname)) {
-                    throw new KeyStoreException("unknown key named " + localKeyname);
-                }
-            }
-
-            Enumeration<String> aliases = ks.aliases();
-            int numAliases = 0;
-            while (aliases.hasMoreElements()) {
-                aliases.nextElement();
-                numAliases++;
-            }
-
-            Certificate[] certs;
-            if (newCertChain == null || newCertChain.length < 1) {
-                if (numAliases == 1) {
-                    return keystoreBytes;
-                }
-                certs = ks.getCertificateChain(localKeyname);
-            } else {
-                certs = newCertChain;
-            }
-
-            PrivateKey key = (PrivateKey) ks.getKey(localKeyname, password);
-            ks = null;
-
-            if ("JKS".equalsIgnoreCase(keystoreType)) {
-                ks = KeyStore.getInstance(keystoreType);
-            } else {
-                ks = KeyStore.getInstance(keystoreType, "BC");
-            }
-            ks.load(null, password);
-            ks.setKeyEntry(localKeyname, key, password, certs);
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ks.store(bout, password);
-            byte[] bytes = bout.toByteArray();
-            bout.close();
-            return bytes;
-        } catch (Exception ex) {
-            if (ex instanceof KeyStoreException) {
-                throw (KeyStoreException) ex;
-            } else {
-                throw new KeyStoreException(ex.getMessage(), ex);
-            }
-        }
-    } // method extractMinimalKeyStore
 
 }

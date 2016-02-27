@@ -2371,7 +2371,7 @@ class CertStoreQueryExecutor {
                         count = rs.getInt(1);
                     }
 
-                    if(count < 1) {
+                    if (count < 1) {
                         return serial;
                     }
                 } catch (SQLException ex) {

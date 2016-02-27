@@ -110,19 +110,14 @@ public class KeystoreP11ModulePool {
         return extModule;
     }
 
-    @Override
-    protected void finalize()
-    throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            shutdown();
-        }
-    }
-
     public synchronized void shutdown() {
         for (String pk11Lib : modules.keySet()) {
-            modules.get(pk11Lib).close();
+            try {
+                modules.get(pk11Lib).close();
+            } catch (Throwable th) {
+                LOG.error("error while closing PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                        th);
+            }
         }
         modules.clear();
     }

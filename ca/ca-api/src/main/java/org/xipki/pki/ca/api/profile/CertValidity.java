@@ -75,7 +75,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
     private static final long HOUR = 60L * 60 * SECOND;
 
-    private static final long DAY = 24L* HOUR;
+    private static final long DAY = 24L * HOUR;
 
     private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 

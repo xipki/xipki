@@ -92,7 +92,7 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
             final char[] masterPassword,
             final char[] password)
     throws PasswordResolverException {
-        if(iterationCount < 1 | iterationCount > 65535) {
+        if (iterationCount < 1 | iterationCount > 65535) {
             throw new IllegalArgumentException("iterationCount is not between 1 and 65535");
         }
         byte[] iterationCountBytes = new byte[2];

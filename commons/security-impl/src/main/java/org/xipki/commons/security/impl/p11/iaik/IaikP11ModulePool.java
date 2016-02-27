@@ -61,11 +61,11 @@ public class IaikP11ModulePool {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
+    private static final IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
+
     private final Map<String, IaikP11Module> modules = new HashMap<>();
 
     private String defaultModuleName;
-
-    private static IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
 
     public synchronized void removeModule(
             final String moduleName) {
@@ -165,19 +165,14 @@ public class IaikP11ModulePool {
         return extModule;
     } // nmethod getModule
 
-    @Override
-    protected void finalize()
-    throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            shutdown();
-        }
-    }
-
     public synchronized void shutdown() {
         for (String pk11Lib : modules.keySet()) {
-            modules.get(pk11Lib).close();
+            try {
+                modules.get(pk11Lib).close();
+            } catch (Throwable th) {
+                LOG.error("error while closing PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                        th);
+            }
         }
         modules.clear();
     }
