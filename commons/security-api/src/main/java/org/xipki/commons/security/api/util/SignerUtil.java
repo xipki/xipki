@@ -38,38 +38,27 @@ package org.xipki.commons.security.api.util;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -81,7 +70,6 @@ import org.xipki.commons.security.api.SignerException;
  */
 
 public class SignerUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(SignerUtil.class);
 
     private SignerUtil() {
     }
@@ -154,29 +142,6 @@ public class SignerUtil {
         }
 
         throw new IllegalArgumentException("unknown trailer field");
-    }
-
-    public static boolean verifyPopo(
-            final CertificationRequest p10Request) {
-        PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
-        return verifyPopo(p10Req);
-    }
-
-    public static boolean verifyPopo(
-            final PKCS10CertificationRequest p10Request) {
-        try {
-            SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
-            PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
-
-            ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
-            return p10Request.isSignatureValid(cvp);
-        } catch (OperatorCreationException | InvalidKeyException | PKCSException
-                | NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            String message = "error while validating POPO of PKCS#10 request";
-            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(), ex.getMessage());
-            LOG.error(message, ex);
-            return false;
-        }
     }
 
     public static byte[] pkcs1padding(
