@@ -83,12 +83,14 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.ConfPairs;
@@ -633,7 +635,6 @@ public class X509Util {
     public static SubjectPublicKeyInfo toRfc3279Style(
             final SubjectPublicKeyInfo publicKeyInfo)
     throws InvalidKeySpecException {
-        // TODO: add support of other algorithms
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
 
@@ -645,6 +646,31 @@ public class X509Util {
                 return new SubjectPublicKeyInfo(keyAlgId,
                         publicKeyInfo.getPublicKeyData().getBytes());
             }
+        } else if (X9ObjectIdentifiers.id_dsa.equals(algOid)) {
+            if (keyParameters == null) {
+                return publicKeyInfo;
+            } else if (DERNull.INSTANCE.equals(keyParameters)) {
+                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid);
+                return new SubjectPublicKeyInfo(keyAlgId,
+                        publicKeyInfo.getPublicKeyData().getBytes());
+            } else {
+                try {
+                    DSAParameter.getInstance(keyParameters);
+                } catch (IllegalArgumentException ex) {
+                    throw new InvalidKeySpecException("keyParameters is not null and Dss-Parms");
+                }
+                return publicKeyInfo;
+            }
+        } else if(X9ObjectIdentifiers.id_ecPublicKey.equals(algOid)) {
+            if (keyParameters == null) {
+                throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
+            }
+            try {
+                ASN1ObjectIdentifier.getInstance(keyParameters);
+            } catch (IllegalArgumentException ex) {
+                throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
+            }
+            return publicKeyInfo;
         } else {
             return publicKeyInfo;
         }
