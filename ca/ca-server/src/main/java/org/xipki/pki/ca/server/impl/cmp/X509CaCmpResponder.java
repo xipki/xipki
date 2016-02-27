@@ -97,7 +97,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
@@ -130,6 +129,7 @@ import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
+import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
@@ -484,9 +484,10 @@ public class X509CaCmpResponder extends CmpResponder {
                 }
 
                 checkPermission(localRequestor, certprofileName);
-                certResponses[i] = generateCertificate(localRequestor, user, tid, certReqId,
-                        subject, publicKeyInfo, validity, extensions,
-                        certprofileName, keyUpdate, confirmWaitTime, childAuditEvent);
+                CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+                        validity, extensions, certprofileName);
+                certResponses[i] = generateCertificate(certTemplateData, localRequestor, user, tid,
+                        certReqId, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
                 final String message = "generateCertificate";
                 if (LOG.isWarnEnabled()) {
@@ -574,8 +575,9 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 checkPermission(requestor, certprofileName);
 
-                certResp = generateCertificate(requestor, user, tid, certReqId,
-                    subject, publicKeyInfo, null, extensions, certprofileName,
+                CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+                        null, extensions, certprofileName);
+                certResp = generateCertificate(certTemplateData, requestor, user, tid, certReqId,
                     false, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
                 certResp = new CertResponse(certReqId,
@@ -597,46 +599,26 @@ public class X509CaCmpResponder extends CmpResponder {
     } // method processP10cr
 
     private CertResponse generateCertificate(
+            final CertTemplateData certTemplate,
             final CmpRequestorInfo requestor,
             final String user,
             final ASN1OctetString tid,
             final ASN1Integer certReqId,
-            final X500Name subject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final OptionalValidity validity,
-            final Extensions extensions,
-            final String certprofileName,
             final boolean keyUpdate,
             final long confirmWaitTime,
             final AuditChildEvent childAuditEvent)
     throws InsuffientPermissionException {
-        checkPermission(requestor, certprofileName);
-
-        Date notBefore = null;
-        Date notAfter = null;
-        if (validity != null) {
-            Time t = validity.getNotBefore();
-            if (t != null) {
-                notBefore = t.getDate();
-            }
-            t = validity.getNotAfter();
-            if (t != null) {
-                notAfter = t.getDate();
-            }
-        }
+        checkPermission(requestor, certTemplate.getCertprofileName());
 
         try {
             X509Ca ca = getCa();
             X509CertificateInfo certInfo;
             if (keyUpdate) {
-                certInfo = ca.regenerateCertificate(requestor.isRa(), requestor,
-                        certprofileName, user,
-                        subject, publicKeyInfo,
-                        notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
+                certInfo = ca.regenerateCertificate(certTemplate, requestor.isRa(), requestor,
+                        user, RequestType.CMP, tid.getOctets());
             } else {
-                certInfo = ca.generateCertificate(requestor.isRa(), requestor, certprofileName,
-                        user, subject, publicKeyInfo,
-                        notBefore, notAfter, extensions, RequestType.CMP, tid.getOctets());
+                certInfo = ca.generateCertificate(certTemplate, requestor.isRa(), requestor,
+                        user, RequestType.CMP, tid.getOctets());
             }
             certInfo.setRequestor(requestor);
             certInfo.setUser(user);

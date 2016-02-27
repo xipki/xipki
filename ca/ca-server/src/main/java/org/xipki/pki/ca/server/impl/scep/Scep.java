@@ -86,6 +86,7 @@ import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
+import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
@@ -534,14 +535,14 @@ public class Scep {
 
                     byte[] tidBytes = getTransactionIdBytes(tid);
 
+                    CertTemplateData certTemplateData = new CertTemplateData(
+                            p10ReqInfo.getSubject(), p10ReqInfo.getSubjectPublicKeyInfo(),
+                            (Date) null, (Date) null, extensions, certProfileName);
                     X509CertificateInfo cert = ca.generateCertificate(
+                            certTemplateData,
                             true,
                             null,
-                            certProfileName,
                             user,
-                            p10ReqInfo.getSubject(),
-                            p10ReqInfo.getSubjectPublicKeyInfo(),
-                            extensions,
                             RequestType.SCEP,
                             tidBytes);
 
