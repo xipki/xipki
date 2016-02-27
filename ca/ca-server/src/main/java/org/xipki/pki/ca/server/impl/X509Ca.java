@@ -2098,13 +2098,7 @@ public class X509Ca {
                     }
                 }
 
-                Certificate bcCert;
-                try {
-                    bcCert = signer.build(certBuilder).toASN1Structure();
-                } catch (NoIdleSignerException ex) {
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "NoIdleSignerException: " + ex.getMessage());
-                }
+                Certificate bcCert = buildCert(signer, certBuilder);
 
                 byte[] encodedCert = bcCert.getEncoded();
                 int maxCertSize = certprofile.getMaxCertSize();
@@ -2164,6 +2158,18 @@ public class X509Ca {
             }
         }
     } // method doGenerateCertificate
+
+    private Certificate buildCert(
+            final ConcurrentContentSigner signer,
+            final X509v3CertificateBuilder certBuilder)
+    throws OperationException {
+        try {
+            return signer.build(certBuilder).toASN1Structure();
+        } catch (NoIdleSignerException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                    "NoIdleSignerException: " + ex.getMessage());
+        }
+    }
 
     public IdentifiedX509Certprofile getX509Certprofile(
             final String certprofileLocalName) {
@@ -2440,16 +2446,6 @@ public class X509Ca {
                 ? null
                 : caManager.getCrlSignerWrapper(crlSignerName);
         return crlSigner;
-    }
-
-    @Override
-    public void finalize()
-    throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            shutdown();
-        }
     }
 
     void shutdown() {
