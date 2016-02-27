@@ -61,24 +61,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
@@ -97,14 +87,8 @@ import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
-//import org.xipki.commons.security.bcext.BCRSAPrivateCrtKey;
-//import org.xipki.commons.security.bcext.BCRSAPrivateKey;
-//import org.xipki.commons.security.bcext.DSAPlainDigestSigner;
 import org.xipki.commons.security.impl.DefaultConcurrentContentSigner;
 import org.xipki.commons.security.impl.SignatureSigner;
-import org.xipki.commons.security.impl.bcext.BCRSAPrivateCrtKey;
-import org.xipki.commons.security.impl.bcext.BCRSAPrivateKey;
-import org.xipki.commons.security.impl.bcext.DSAPlainDigestSigner;
 
 /**
  * @author Lijun Liao
@@ -221,75 +205,6 @@ public class SoftTokenContentSignerBuilder {
         }
 
     } // class ECDSAContentSignerBuilder
-
-    public static class NssPlainRSASigner implements AsymmetricBlockCipher {
-
-        private static final String ALGORITHM = "RSA/ECB/NoPadding";
-
-        private Cipher cipher;
-
-        private RSAKeyParameters key;
-
-        public NssPlainRSASigner()
-        throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-            cipher = Cipher.getInstance(ALGORITHM, "SunPKCS11-XipkiNSS");
-        }
-
-        @Override
-        public void init(
-                final boolean forEncryption,
-                final CipherParameters param) {
-            if (!forEncryption) {
-                throw new RuntimeCryptoException("verification mode not supported.");
-            }
-
-            if (param instanceof ParametersWithRandom) {
-                ParametersWithRandom rParam = (ParametersWithRandom) param;
-
-                key = (RSAKeyParameters) rParam.getParameters();
-            } else {
-                key = (RSAKeyParameters) param;
-            }
-
-            RSAPrivateKey signingKey;
-            if (key instanceof RSAPrivateCrtKeyParameters) {
-                signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
-            } else {
-                signingKey = new BCRSAPrivateKey(key);
-            }
-
-            try {
-                cipher.init(Cipher.ENCRYPT_MODE, signingKey);
-            } catch (InvalidKeyException ex) {
-                throw new RuntimeCryptoException("could not initialize the cipher: "
-                        + ex.getMessage());
-            }
-        }
-
-        @Override
-        public int getInputBlockSize() {
-            return (key.getModulus().bitLength() + 7) / 8;
-        }
-
-        @Override
-        public int getOutputBlockSize() {
-            return (key.getModulus().bitLength() + 7) / 8;
-        }
-
-        @Override
-        public byte[] processBlock(
-                final byte[] in,
-                final int inOff,
-                final int len)
-        throws InvalidCipherTextException {
-            try {
-                return cipher.doFinal(in, 0, in.length);
-            } catch (IllegalBlockSizeException | BadPaddingException ex) {
-                throw new InvalidCipherTextException(ex.getMessage(), ex);
-            }
-        }
-
-    } // class NssPlainRSASigner
 
     public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
 
