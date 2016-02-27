@@ -68,6 +68,7 @@ import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -84,6 +85,8 @@ import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
 
 public class OcspQaImpl implements OcspQa {
 
+    private SecurityFactory securityFactory;
+
     public OcspQaImpl() {
     }
 
@@ -91,6 +94,11 @@ public class OcspQaImpl implements OcspQa {
     }
 
     public void shutdown() {
+    }
+
+    public void setSecurityFactory(
+            final SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
     }
 
     @Override
@@ -232,7 +240,7 @@ public class OcspQaImpl implements OcspQa {
                 try {
                     PublicKey responderPubKey = KeyUtil.generatePublicKey(
                             respSigner.getSubjectPublicKeyInfo());
-                    ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(
+                    ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
                             responderPubKey);
                     boolean sigValid = basicResp.isSignatureValid(cvp);
                     if (!sigValid) {

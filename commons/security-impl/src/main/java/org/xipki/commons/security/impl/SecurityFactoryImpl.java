@@ -78,9 +78,16 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -90,6 +97,7 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -112,8 +120,8 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.impl.bcext.ECDSAContentVerifierProviderBuilder;
 import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
 import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
@@ -141,6 +149,12 @@ import org.xml.sax.SAXException;
 public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
+
+    private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
+            new DefaultDigestAlgorithmIdentifierFinder();
+
+    private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
+        = new HashMap<>();
 
     private String pkcs11Provider;
 
@@ -416,10 +430,34 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     public ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)
     throws InvalidKeyException {
+        ParamUtil.assertNotNull("publicKey", publicKey);
+
+        String keyAlg = publicKey.getAlgorithm().toUpperCase();
+        if (keyAlg.equals("EC")) {
+            keyAlg = "ECDSA";
+        }
+
+        BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
+        if (builder == null) {
+            if ("RSA".equals(keyAlg)) {
+                builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else if ("DSA".equals(keyAlg)) {
+                builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else if ("ECDSA".equals(keyAlg)) {
+                builder = new ECDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+            } else {
+                throw new InvalidKeyException("unknown key algorithm of the public key "
+                        + keyAlg);
+            }
+            VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
+        }
+
+        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
         try {
-            return KeyUtil.getContentVerifierProvider(publicKey);
+            return builder.build(keyParam);
         } catch (OperatorCreationException ex) {
-            throw new InvalidKeyException(ex.getMessage(), ex);
+            throw new InvalidKeyException("error while building ContentVerifierProvider: "
+                    + ex.getMessage(), ex);
         }
     }
 
@@ -437,7 +475,26 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public boolean verifyPopo(
             final CertificationRequest p10Req) {
-        return SignerUtil.verifyPopo(p10Req);
+        return verifyPopo(new PKCS10CertificationRequest(p10Req));
+    }
+
+    @Override
+    public boolean verifyPopo(
+            final PKCS10CertificationRequest p10Request) {
+        try {
+            SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
+            PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
+
+            ContentVerifierProvider cvp = getContentVerifierProvider(pk);
+            return p10Request.isSignatureValid(cvp);
+        } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
+                | InvalidKeySpecException ex) {
+            String message = "error while validating POPO of PKCS#10 request";
+            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                    ex.getMessage());
+            LOG.error(message, ex);
+            return false;
+        }
     }
 
     public void setPkcs11Provider(
@@ -445,7 +502,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         this.pkcs11Provider = pkcs11Provider;
     }
 
-    @Override
     public String getPkcs11Provider() {
         return pkcs11Provider;
     }

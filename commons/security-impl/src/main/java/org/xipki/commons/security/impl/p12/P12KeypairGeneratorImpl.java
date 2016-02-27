@@ -77,7 +77,7 @@ import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.commons.security.bcext.ECDSAContentSignerBuilder;
+import org.xipki.commons.security.impl.bcext.ECDSAContentSignerBuilder;
 
 /**
  * @author Lijun Liao
