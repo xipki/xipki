@@ -2512,10 +2512,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X500Name subject = certTemp.getSubject();
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
+        CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+                (Date) null, (Date) null, extensions, profileName);
+
         X509CertificateInfo certInfo;
         try {
-            certInfo = ca.generateCertificate(false, null, profileName, user, subject,
-                    publicKeyInfo, extensions, RequestType.CA, null);
+            certInfo = ca.generateCertificate(certTemplateData, false, null, user, RequestType.CA,
+                    (byte[]) null);
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }

@@ -1035,48 +1035,22 @@ public class X509Ca {
     } // method generateCrl
 
     public X509CertificateInfo generateCertificate(
+            final CertTemplateData certTemplate,
             final boolean requestedByRa,
             final RequestorInfo requestor,
-            final String certprofileName,
             final String user,
-            final X500Name subject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final Extensions extensions,
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
-        return generateCertificate(requestedByRa, requestor, certprofileName, user, subject,
-                publicKeyInfo,
-                (Date) null, // notBefore
-                (Date) null, // notAfter
-                extensions, reqType, transactionId);
-    }
-
-    public X509CertificateInfo generateCertificate(
-            final boolean requestedByRa,
-            final RequestorInfo requestor,
-            final String certprofileName,
-            final String user,
-            final X500Name subject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final Date notBefore,
-            final Date notAfter,
-            final Extensions extensions,
-            final RequestType reqType,
-            final byte[] transactionId)
-    throws OperationException {
-        final String subjectText = X509Util.getRfc4519Name(subject);
+        final String certprofileName = certTemplate.getCertprofileName();
+        final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
         LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successful = false;
         try {
-            X509CertificateInfo ret = doGenerateCertificate(
-                    requestedByRa, requestor,
-                    certprofileName, user,
-                    subject, publicKeyInfo,
-                    notBefore, notAfter, extensions, false,
-                    reqType, transactionId);
+            X509CertificateInfo ret = doGenerateCertificate(certTemplate, requestedByRa, requestor,
+                    user, false, reqType, transactionId);
             successful = true;
 
             String prefix = ret.isAlreadyIssued()
@@ -1105,29 +1079,23 @@ public class X509Ca {
     } // method generateCertificate
 
     public X509CertificateInfo regenerateCertificate(
+            final CertTemplateData certTemplate,
             final boolean requestedByRa,
             final RequestorInfo requestor,
-            final String certprofileName,
             final String user,
-            final X500Name subject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final Date notBefore,
-            final Date notAfter,
-            final Extensions extensions,
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
-        final String subjectText = X509Util.getRfc4519Name(subject);
+        final String certprofileName = certTemplate.getCertprofileName();
+        final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
         LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successful = false;
 
         try {
-            X509CertificateInfo ret = doGenerateCertificate(
-                    requestedByRa, requestor, certprofileName, user,
-                    subject, publicKeyInfo, notBefore, notAfter, extensions, false,
-                    reqType, transactionId);
+            X509CertificateInfo ret = doGenerateCertificate(certTemplate, requestedByRa, requestor,
+                    user, false, reqType, transactionId);
             successful = true;
             LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
@@ -1801,15 +1769,10 @@ public class X509Ca {
     }
 
     private X509CertificateInfo doGenerateCertificate(
+            final CertTemplateData certTemplate,
             final boolean requestedByRA,
             final RequestorInfo requestor,
-            final String certprofileLocalName,
             final String user,
-            final X500Name requestedSubject,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final Date notBefore,
-            final Date notAfter,
-            final Extensions extensions,
             final boolean keyUpdate,
             final RequestType reqType,
             final byte[] transactionId)
@@ -1818,11 +1781,12 @@ public class X509Ca {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
 
-        IdentifiedX509Certprofile certprofile = getX509Certprofile(certprofileLocalName);
+        IdentifiedX509Certprofile certprofile = getX509Certprofile(
+                certTemplate.getCertprofileName());
 
         if (certprofile == null) {
             throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
-                    "unknown cert profile " + certprofileLocalName);
+                    "unknown cert profile " + certTemplate.getCertprofileName());
         }
 
         ConcurrentContentSigner signer = caInfo.getSigner(certprofile.getSignatureAlgorithms());
@@ -1842,42 +1806,42 @@ public class X509Ca {
                     "profile " + certprofileName + " not applied to non-RA");
         }
 
-        X500Name localRequestedSubject = removeEmptyRdns(requestedSubject);
+        X500Name requestedSubject = removeEmptyRdns(certTemplate.getSubject());
 
         if (!certprofile.isSerialNumberInReqPermitted()) {
-            RDN[] rdns = localRequestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
+            RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
             if (rdns != null && rdns.length > 0) {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                         "subjectDN SerialNumber in request is not permitted");
             }
         }
 
-        Date localNotBefore = certprofile.getNotBefore(notBefore);
-        if (localNotBefore == null) {
-            localNotBefore = new Date();
+        Date grantedNotBefore = certprofile.getNotBefore(certTemplate.getNotBefore());
+        if (grantedNotBefore == null) {
+            grantedNotBefore = new Date();
         }
 
         if (certprofile.hasMidnightNotBefore()) {
-            localNotBefore = setToMidnight(localNotBefore, certprofile.getTimezone());
+            grantedNotBefore = setToMidnight(grantedNotBefore, certprofile.getTimezone());
         }
 
-        if (localNotBefore.before(caInfo.getNotBefore())) {
-            localNotBefore = caInfo.getNotBefore();
+        if (grantedNotBefore.before(caInfo.getNotBefore())) {
+            grantedNotBefore = caInfo.getNotBefore();
             if (certprofile.hasMidnightNotBefore()) {
-                localNotBefore = setToMidnight(new Date(localNotBefore.getTime() + DAY_IN_MS),
+                grantedNotBefore = setToMidnight(new Date(grantedNotBefore.getTime() + DAY_IN_MS),
                         certprofile.getTimezone());
             }
         }
 
         long t = caInfo.getNoNewCertificateAfter();
-        if (localNotBefore.getTime() > t) {
+        if (grantedNotBefore.getTime() > t) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "CA is not permitted to issue certifate after " + new Date(t));
         }
 
-        SubjectPublicKeyInfo localPublicKeyInfo;
+        SubjectPublicKeyInfo grantedPublicKeyInfo;
         try {
-            localPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+            grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.getPublicKeyInfo());
         } catch (InvalidKeySpecException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                     "invalid SubjectPublicKeyInfo");
@@ -1885,7 +1849,7 @@ public class X509Ca {
 
         // public key
         try {
-            localPublicKeyInfo = certprofile.checkPublicKey(localPublicKeyInfo);
+            grantedPublicKeyInfo = certprofile.checkPublicKey(grantedPublicKeyInfo);
         } catch (BadCertTemplateException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         }
@@ -1893,9 +1857,9 @@ public class X509Ca {
         Date gsmckFirstNotBefore = null;
         if (certprofile.getSpecialCertprofileBehavior()
                 == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-            gsmckFirstNotBefore = localNotBefore;
+            gsmckFirstNotBefore = grantedNotBefore;
 
-            RDN[] cnRDNs = localRequestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
+            RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if (cnRDNs != null && cnRDNs.length > 0) {
                 String requestedCN = X509Util.rdnValueToString(cnRDNs[0].getFirst().getValue());
                 Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCommonName(
@@ -1911,21 +1875,21 @@ public class X509Ca {
                 String suffix = "-" + yyyyMMdd;
 
                 // append the -yyyyMMdd to the commonName
-                RDN[] rdns = localRequestedSubject.getRDNs();
+                RDN[] rdns = requestedSubject.getRDNs();
                 for (int i = 0; i < rdns.length; i++) {
                     if (ObjectIdentifiers.DN_CN.equals(rdns[i].getFirst().getType())) {
                         rdns[i] = new RDN(ObjectIdentifiers.DN_CN,
                                 new DERUTF8String(requestedCN + suffix));
                     }
                 }
-                localRequestedSubject = new X500Name(rdns);
+                requestedSubject = new X500Name(rdns);
             } // end if
         } // end if
 
         // subject
         SubjectInfo subjectInfo;
         try {
-            subjectInfo = certprofile.getSubject(localRequestedSubject);
+            subjectInfo = certprofile.getSubject(requestedSubject);
         } catch (CertprofileException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "exception in cert profile " + certprofileName);
@@ -1962,7 +1926,7 @@ public class X509Ca {
         long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
         String grandtedSubjectText = X509Util.getRfc4519Name(grantedSubject);
 
-        byte[] subjectPublicKeyData = localPublicKeyInfo.getPublicKeyData().getBytes();
+        byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
         long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
         if (keyUpdate) {
@@ -2053,7 +2017,7 @@ public class X509Ca {
                 validity = caInfo.getMaxValidity();
             }
 
-            Date maxNotAfter = validity.add(localNotBefore);
+            Date maxNotAfter = validity.add(grantedNotBefore);
             if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
                 maxNotAfter = new Date(MAX_CERT_TIME_MS);
             }
@@ -2071,20 +2035,20 @@ public class X509Ca {
                 }
             }
 
-            Date localNotAfter = notAfter;
-            if (localNotAfter != null) {
-                if (localNotAfter.after(maxNotAfter)) {
-                    localNotAfter = maxNotAfter;
+            Date grantedNotAfter = certTemplate.getNotAfter();
+            if (grantedNotAfter != null) {
+                if (grantedNotAfter.after(maxNotAfter)) {
+                    grantedNotAfter = maxNotAfter;
                     msgBuilder.append(", NotAfter modified");
                 }
             } else {
-                localNotAfter = maxNotAfter;
+                grantedNotAfter = maxNotAfter;
             }
 
-            if (localNotAfter.after(caInfo.getNotAfter())) {
+            if (grantedNotAfter.after(caInfo.getNotAfter())) {
                 ValidityMode mode = caInfo.getValidityMode();
                 if (mode == ValidityMode.CUTOFF) {
-                    localNotAfter = caInfo.getNotAfter();
+                    grantedNotAfter = caInfo.getNotAfter();
                 } else if (mode == ValidityMode.STRICT) {
                     throw new OperationException(ErrorCode.NOT_PERMITTED,
                             "notAfter outside of CA's validity is not permitted");
@@ -2098,21 +2062,21 @@ public class X509Ca {
 
             if (certprofile.hasMidnightNotBefore() && !maxNotAfter.equals(origMaxNotAfter)) {
                 Calendar c = Calendar.getInstance(certprofile.getTimezone());
-                c.setTime(new Date(localNotAfter.getTime() - DAY_IN_MS));
+                c.setTime(new Date(grantedNotAfter.getTime() - DAY_IN_MS));
                 c.set(Calendar.HOUR_OF_DAY, 23);
                 c.set(Calendar.MINUTE, 59);
                 c.set(Calendar.SECOND, 59);
                 c.set(Calendar.MILLISECOND, 0);
-                localNotAfter = c.getTime();
+                grantedNotAfter = c.getTime();
             }
 
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caInfo.getPublicCaInfo().getX500Subject(),
                     caInfo.nextSerial(),
-                    localNotBefore,
-                    localNotAfter,
+                    grantedNotBefore,
+                    grantedNotAfter,
                     grantedSubject,
-                    localPublicKeyInfo);
+                    grantedPublicKeyInfo);
 
             X509CertificateInfo ret;
 
@@ -2123,9 +2087,9 @@ public class X509Ca {
                         : crlSigner.getCert();
 
                 ExtensionValues extensionTuples = certprofile.getExtensions(
-                        localRequestedSubject, extensions,
-                        localPublicKeyInfo, caInfo.getPublicCaInfo(), crlSignerCert,
-                        localNotBefore, localNotAfter);
+                        requestedSubject, certTemplate.getExtensions(),
+                        grantedPublicKeyInfo, caInfo.getPublicCaInfo(), crlSignerCert,
+                        grantedNotBefore, grantedNotAfter);
                 if (extensionTuples != null) {
                     for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
                         ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
@@ -2168,7 +2132,7 @@ public class X509Ca {
                 ret.setRequestor(requestor);
                 ret.setReqType(reqType);
                 ret.setTransactionId(transactionId);
-                ret.setRequestedSubject(localRequestedSubject);
+                ret.setRequestedSubject(requestedSubject);
 
                 if (doPublishCertificate(ret) == 1) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
