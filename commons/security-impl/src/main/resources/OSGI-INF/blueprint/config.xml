@@ -23,7 +23,8 @@
       class="org.xipki.commons.security.impl.p11.sun.nss.XipkiNssProviderRegister"
       init-method="regist" destroy-method="unregist"/>
 
-  <bean id="securityFactoryImpl" class="org.xipki.commons.security.impl.SecurityFactoryImpl">
+  <bean id="securityFactoryImpl" class="org.xipki.commons.security.impl.SecurityFactoryImpl"
+      destroy-method="shutdown">
     <property name="strongRandom4KeyEnabled" value="${key.strongrandom.enabled}"/>
     <property name="strongRandom4SignEnabled" value="${sign.strongrandom.enabled}"/>
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>

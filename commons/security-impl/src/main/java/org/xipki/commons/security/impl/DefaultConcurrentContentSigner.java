@@ -85,6 +85,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
+    private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
+
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
     private final String name;
@@ -102,8 +104,6 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private X509Certificate[] certificateChain;
 
     private X509CertificateHolder[] certificateChainAsBCObjects;
-
-    private static final AtomicInteger nameIndex = new AtomicInteger(1);
 
     static {
         String v = System.getProperty("org.xipki.signservice.timeout");
@@ -135,7 +135,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
 
         this.privateKey = privateKey;
-        this.name = "defaultSigner-" + nameIndex.getAndIncrement();
+        this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
     }
 
     public String getName() {

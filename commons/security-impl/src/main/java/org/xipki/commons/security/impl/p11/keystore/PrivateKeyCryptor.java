@@ -73,10 +73,9 @@ class PrivateKeyCryptor {
     private OutputEncryptor encryptor;
     private InputDecryptorProvider decryptorProvider;
 
-    public PrivateKeyCryptor(
+    PrivateKeyCryptor(
             final char[] password)
-    throws SignerException
-    {
+    throws SignerException {
         JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
         eb.setIterationCount(ITERATION_COUNT);
         try {

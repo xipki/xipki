@@ -691,7 +691,7 @@ class IdentifiedX509Certprofile {
                 }
             }
 
-            if(ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
+            if (ca && CA_CRITICAL_ONLY_EXTENSION_TYPES.contains(type)) {
                 if (!control.isCritical()) {
                     set.add(type);
                 }

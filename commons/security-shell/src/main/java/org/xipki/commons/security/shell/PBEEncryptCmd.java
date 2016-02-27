@@ -68,7 +68,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if(iterationCount < 1 | iterationCount > 65535) {
+        if (iterationCount < 1 | iterationCount > 65535) {
             throw new IllegalCmdParamException("iterationCount is not between 1 and 65535");
         }
 

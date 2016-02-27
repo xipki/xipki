@@ -423,12 +423,12 @@ public class KeyUtil {
 
             java.security.spec.ECPoint w = ecPubKey.getW();
             BigInteger wx = w.getAffineX();
-            if(wx.signum() != 1) {
+            if (wx.signum() != 1) {
                 throw new InvalidKeyException("Wx is not positive");
             }
 
             BigInteger wy = w.getAffineY();
-            if(wy.signum() != 1) {
+            if (wy.signum() != 1) {
                 throw new InvalidKeyException("Wy is not positive");
             }
 
@@ -489,8 +489,7 @@ public class KeyUtil {
     }
 
     private static ASN1ObjectIdentifier detectCurveOid(
-            final ECParameterSpec paramSpec)
-    {
+            final ECParameterSpec paramSpec) {
         org.bouncycastle.jce.spec.ECParameterSpec bcParamSpec =
                 EC5Util.convertSpec(paramSpec, false);
         return ECUtil.getNamedCurveOid(bcParamSpec);

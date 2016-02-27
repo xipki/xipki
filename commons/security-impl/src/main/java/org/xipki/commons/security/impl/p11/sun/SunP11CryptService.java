@@ -164,11 +164,11 @@ public final class SunP11CryptService implements P11CryptService {
                 List<char[]> password = moduleConf.getPasswordRetriever().getPassword(slotId);
 
                 for (char[] singlePassword : password) {
-                    if (singlePassword == null) { // keystore does not allow empty password
-                        singlePassword = "dummy".toCharArray();
-                    }
                     try {
-                        keystore.load(null, singlePassword);
+                        keystore.load(null,
+                            (singlePassword == null)
+                                ? "dummy".toCharArray() // keystore does not allow empty password
+                                : singlePassword);
                     } catch (Exception ex) {
                         throw new SignerException(ex.getMessage(), ex);
                     }

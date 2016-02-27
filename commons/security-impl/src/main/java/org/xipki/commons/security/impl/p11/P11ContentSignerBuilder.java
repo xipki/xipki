@@ -232,7 +232,7 @@ public class P11ContentSignerBuilder {
 
         DefaultConcurrentContentSigner concurrentSigner =
                 new DefaultConcurrentContentSigner(signers, privateKey);
-        if(certificateChain != null) {
+        if (certificateChain != null) {
             concurrentSigner.setCertificateChain(certificateChain);
         } else {
             concurrentSigner.setPublicKey(publicKey);

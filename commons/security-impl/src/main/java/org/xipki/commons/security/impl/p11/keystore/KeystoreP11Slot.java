@@ -243,7 +243,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 X509Certificate cert = certs.get(hexKeyId);
                 java.security.PublicKey publicKey = null;
 
-                if(cert != null) {
+                if (cert != null) {
                     publicKey = cert.getPublicKey();
                 } else {
                     publicKey = readPublicKey(keyId);
@@ -372,7 +372,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final P11KeyIdentifier keyIdentifier,
             final X509Certificate newCert,
             final Set<X509Certificate> caCerts,
-            final SecurityFactory securityFactory)
+            final SecurityFactory pSecurityFactory)
     throws Exception {
         ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
         ParamUtil.assertNotNull("newCert", newCert);
@@ -382,7 +382,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             throw new SignerException("could not find identity " + keyIdentifier);
         }
 
-        assertMatch(newCert, keyIdentifier, securityFactory);
+        assertMatch(newCert, keyIdentifier);
 
         X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
@@ -553,8 +553,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private void assertMatch(
             final X509Certificate cert,
-            final P11KeyIdentifier keyId,
-            final SecurityFactory securityFactory)
+            final P11KeyIdentifier keyId)
     throws SignerException, PasswordResolverException {
         ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getSlotIndex()));
         if (keyId.getKeyId() != null) {
@@ -594,11 +593,11 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final OutputStream stream,
             final boolean verbose)
     throws IOException, SignerException {
-        List<? extends P11Identity> identities = getP11Identities();
+        List<? extends P11Identity> p11Identities = getP11Identities();
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < identities.size(); i++) {
-            P11Identity identity = identities.get(i);
+        for (int i = 0; i < p11Identities.size(); i++) {
+            P11Identity identity = p11Identities.get(i);
             P11KeyIdentifier p11KeyId = identity.getKeyId();
 
             sb.append("\t")
@@ -733,8 +732,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private static boolean deletePkcs11Entry(
             final File dir,
-            final byte[] keyId)
-    {
+            final byte[] keyId) {
         String hextId = Hex.toHexString(keyId);
         File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
         boolean b1 = true;
@@ -838,12 +836,12 @@ public class KeystoreP11Slot implements P11WritableSlot {
             // EC point
             java.security.spec.ECPoint w = ecKey.getW();
             BigInteger wx = w.getAffineX();
-            if(wx.signum() != 1) {
+            if (wx.signum() != 1) {
                 throw new InvalidKeyException("Wx is not positive");
             }
 
             BigInteger wy = w.getAffineY();
-            if(wy.signum() != 1) {
+            if (wy.signum() != 1) {
                 throw new InvalidKeyException("Wy is not positive");
             }
 
@@ -964,7 +962,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
             KeyFactory keyFactory = KeyFactory.getInstance("DSA");
             return keyFactory.generatePublic(keySpec);
-        } else if(X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
+        } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
             byte[] ecdsaParams = Hex.decode(props.getProperty(PROP_EC_ECDSA_PARAMS));
             byte[] ecPoint = Hex.decode(props.getProperty(PROP_EC_EC_POINT));
             return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
@@ -1030,8 +1028,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
     }
 
     private static byte[] getKeyIdFromInfoFilename(
-            final String fileName)
-    {
+            final String fileName) {
         return Hex.decode(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
     }
 }

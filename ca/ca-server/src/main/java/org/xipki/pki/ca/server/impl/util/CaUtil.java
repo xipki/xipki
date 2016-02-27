@@ -50,6 +50,9 @@ import org.bouncycastle.asn1.x509.Extensions;
 
 public class CaUtil {
 
+    private CaUtil() {
+    }
+
     public static Extensions getExtensions(
             final CertificationRequestInfo p10Req) {
         ASN1Set attrs = p10Req.getAttributes();
