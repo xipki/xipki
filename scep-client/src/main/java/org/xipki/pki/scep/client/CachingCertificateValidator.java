@@ -69,8 +69,10 @@ public final class CachingCertificateValidator implements CaCertValidator {
             return false;
         }
 
-        if (cachedAnswers.containsKey(hexFp)) {
-            return cachedAnswers.get(cert);
+        Boolean bo = cachedAnswers.get(hexFp);
+
+        if (bo != null) {
+            return bo.booleanValue();
         } else {
             boolean answer = delegate.isTrusted(cert);
             cachedAnswers.put(hexFp, answer);
