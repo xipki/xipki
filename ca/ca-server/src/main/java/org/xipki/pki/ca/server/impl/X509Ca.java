@@ -1977,7 +1977,7 @@ public class X509Ca {
                                     "BadFormatException: " + ex.getMessage());
                         }
 
-                        foundUniqueSubject = !certstore.certIssuedForSubject(
+                        foundUniqueSubject = !certstore.isCertForSubjectIssued(
                                 caInfo.getCertificate(),
                                 X509Util.fpCanonicalizedName(grantedSubject));
                         if (foundUniqueSubject) {
