@@ -1781,7 +1781,7 @@ class CertStoreQueryExecutor
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
+        sb.append("COUNT(ID) FROM CERT WHERE ").append(fpColumnName).append("=?");
         sb.append(" AND CAINFO_ID=?");
         if(profile != null)
         {
@@ -1803,7 +1803,8 @@ class CertStoreQueryExecutor
 
             rs = ps.executeQuery();
 
-            return rs.next();
+            rs.next();
+            return rs.getInt(1) > 0;
         }finally
         {
             releaseDbResources(ps, rs);
