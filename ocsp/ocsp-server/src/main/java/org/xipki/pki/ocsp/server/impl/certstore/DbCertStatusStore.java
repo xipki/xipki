@@ -119,11 +119,26 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String SQL_CS = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+    private static final String SQL_CS_SINGLE_ISSUER =
+            "REV,RR,RT,RIT,PN FROM CERT WHERE SN=?";
+
+    private static final String SQL_CS =
+            "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+
+    private static final Map<HashAlgoType, String> SQL_CS_HASHMAP_SINGLE_ISSUER = new HashMap<>();
 
     private static final Map<HashAlgoType, String> SQL_CS_HASHMAP = new HashMap<>();
 
     static {
+        for (HashAlgoType h : HashAlgoType.values()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID,REV,RR,RT,RIT,PN,");
+            sb.append(h.getShortName()).append(" ");
+            sb.append(" FROM CERT INNER JOIN CHASH ON ");
+            sb.append(" CERT.SN=? AND CERT.ID=CHASH.CID");
+            SQL_CS_HASHMAP_SINGLE_ISSUER.put(h, sb.toString());
+        }
+
         for (HashAlgoType h : HashAlgoType.values()) {
             StringBuilder sb = new StringBuilder();
             sb.append("ID,REV,RR,RT,RIT,PN,");
@@ -319,15 +334,20 @@ public class DbCertStatusStore extends CertStatusStore {
             throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
+        boolean onlySingleIssuer = (issuerStore.getSize() == 1);
         String coreSql;
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
             certHashAlgo = (certHashAlg == null)
                     ? hashAlgo
                     : certHashAlg;
-            coreSql = SQL_CS_HASHMAP.get(certHashAlgo);
+            coreSql = onlySingleIssuer
+                    ? SQL_CS_HASHMAP_SINGLE_ISSUER.get(certHashAlgo)
+                    : SQL_CS_HASHMAP.get(certHashAlgo);
         } else {
-            coreSql = SQL_CS;
+            coreSql = onlySingleIssuer
+                    ? SQL_CS_SINGLE_ISSUER
+                    : SQL_CS;
         }
 
         try {
@@ -355,8 +375,11 @@ public class DbCertStatusStore extends CertStatusStore {
                     dataSource.createFetchFirstSelectSQL(coreSql, 1));
 
             try {
-                ps.setInt(1, issuer.getId());
-                ps.setLong(2, serialNumber.longValue());
+                int idx = 1;
+                if (!onlySingleIssuer) {
+                    ps.setInt(idx++, issuer.getId());
+                }
+                ps.setLong(idx++, serialNumber.longValue());
 
                 rs = ps.executeQuery();
 

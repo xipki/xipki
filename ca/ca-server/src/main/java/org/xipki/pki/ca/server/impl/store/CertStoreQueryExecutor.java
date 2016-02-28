@@ -176,13 +176,13 @@ class CertStoreQueryExecutor {
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA =
             "ID FROM CERT WHERE FP_S=?";
 
-    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_MULTIPLE_CAS =
+    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
             "ID FROM CERT WHERE FP_S=? AND CA_ID=?";
 
     private static final String CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA =
             "ID FROM CERT WHERE FP_K=?";
 
-    private static final String CORESQL_CERT_FOR_KEY_ISSUED_MULTIPLE_CAS =
+    private static final String CORESQL_CERT_FOR_KEY_ISSUED =
             "ID FROM CERT WHERE FP_K=? AND CA_ID=?";
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
@@ -1868,10 +1868,10 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        boolean isOnlySingleCA = (getNumberOfCas() == 1);
-        String coreSql = isOnlySingleCA
+        boolean onlySingleCA = (getNumberOfCas() == 1);
+        String coreSql = onlySingleCA
                 ? CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA
-                : CORESQL_CERT_FOR_SUBJECT_ISSUED_MULTIPLE_CAS;
+                : CORESQL_CERT_FOR_SUBJECT_ISSUED;
         String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1879,7 +1879,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, subjectFp);
-            if (!isOnlySingleCA) {
+            if (!onlySingleCA) {
                 ps.setInt(idx++, caId);
             }
             rs = ps.executeQuery();
@@ -1901,10 +1901,10 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        boolean isOnlySingleCA = (getNumberOfCas() == 1);
-        String coreSql = isOnlySingleCA
+        boolean onlySingleCA = (getNumberOfCas() == 1);
+        String coreSql = onlySingleCA
                 ? CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA
-                : CORESQL_CERT_FOR_KEY_ISSUED_MULTIPLE_CAS;
+                : CORESQL_CERT_FOR_KEY_ISSUED;
         String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1912,7 +1912,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, keyFp);
-            if (!isOnlySingleCA) {
+            if (!onlySingleCA) {
                 ps.setInt(idx++, caId);
             }
             rs = ps.executeQuery();
