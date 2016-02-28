@@ -75,6 +75,10 @@ public class IssuerStore {
         this.ids = Collections.unmodifiableSet(idSet);
     }
 
+    public int getSize() {
+        return ids.size();
+    }
+
     public Set<Integer> getIds() {
         return ids;
     }
