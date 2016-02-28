@@ -193,7 +193,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         try {
             encodedReq = ocspReq.getEncoded();
         } catch (IOException ex) {
-            throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(), ex);
+            throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(),
+                    ex);
         }
 
         RequestResponsePair msgPair = null;

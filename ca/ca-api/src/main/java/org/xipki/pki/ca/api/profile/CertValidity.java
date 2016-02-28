@@ -171,15 +171,15 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
     private int getApproxHours() {
         switch (unit) {
-            case HOUR:
-                return validity;
-            case DAY:
-                return 24 * validity;
-            case YEAR:
-                return (365 * validity + validity / 4) * 24;
-            default:
-                throw new RuntimeException(String.format(
-                        "should not reach here, unknown CertValidity.Unit %s", unit));
+        case HOUR:
+            return validity;
+        case DAY:
+            return 24 * validity;
+        case YEAR:
+            return (365 * validity + validity / 4) * 24;
+        default:
+            throw new RuntimeException(String.format(
+                    "should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 
@@ -226,15 +226,15 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     @Override
     public String toString() {
         switch (unit) {
-            case HOUR:
-                return validity + "h";
-            case DAY:
-                return validity + "d";
-            case YEAR:
-                return validity + "y";
-            default:
-                throw new RuntimeException(String.format(
-                        "should not reach here, unknown CertValidity.Unit %s", unit));
+        case HOUR:
+            return validity + "h";
+        case DAY:
+            return validity + "d";
+        case YEAR:
+            return validity + "y";
+        default:
+            throw new RuntimeException(String.format(
+                    "should not reach here, unknown CertValidity.Unit %s", unit));
         }
     }
 

@@ -92,7 +92,8 @@ public abstract class LoadExecutor {
             try {
                 runnable = getTestor();
             } catch (Exception ex) {
-                System.err.println("could not initialize Testor\nError message: " + ex.getMessage());
+                System.err.println(
+                        "could not initialize Testor\nError message: " + ex.getMessage());
                 return;
             }
 

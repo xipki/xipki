@@ -77,8 +77,8 @@ public class CaLoadTestRevoke extends LoadExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(CaLoadTestRevoke.class);
 
     private static final CrlReason[] REASONS = {CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
-            CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
-            CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN};
+        CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED, CrlReason.CESSATION_OF_OPERATION,
+        CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN};
 
     private final CaClient caClient;
 

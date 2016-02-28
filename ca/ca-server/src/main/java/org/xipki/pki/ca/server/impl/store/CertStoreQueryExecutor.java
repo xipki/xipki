@@ -605,7 +605,8 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        final String sql = dataSource.createFetchFirstSelectSQL("COUNT(ID) FROM CRL WHERE CA_ID = ?", 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(
+                "COUNT(ID) FROM CRL WHERE CA_ID = ?", 1);
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {

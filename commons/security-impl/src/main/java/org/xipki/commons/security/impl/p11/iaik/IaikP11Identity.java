@@ -63,10 +63,12 @@ class IaikP11Identity extends P11Identity {
         super(slotId, keyId, certificateChain, publicKey);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_PKCS(
             final IaikP11Module module,
             final byte[] encodedDigestInfo)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -80,10 +82,12 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_X509(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -97,10 +101,12 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_RSA_X509(hash, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_ECDSA(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -116,10 +122,12 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_ECDSA(truncatedDigest, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_DSA(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");

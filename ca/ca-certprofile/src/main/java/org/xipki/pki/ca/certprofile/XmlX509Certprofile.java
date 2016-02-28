@@ -1317,19 +1317,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
                 DERIA5String sourceDataUri = m.getSourceDataUri();
                 switch (biometricDataOption.getSourceDataUriOccurrence()) {
-                    case FORBIDDEN:
-                        sourceDataUri = null;
-                        break;
-                    case REQUIRED:
-                        if (sourceDataUri == null) {
-                            throw new BadCertTemplateException("biometricInfo[" + i
-                                + "].sourceDataUri is not specified in request but is required");
-                        }
-                        break;
-                    case OPTIONAL:
-                        break;
-                    default:
-                        throw new BadCertTemplateException(
+                case FORBIDDEN:
+                    sourceDataUri = null;
+                    break;
+                case REQUIRED:
+                    if (sourceDataUri == null) {
+                        throw new BadCertTemplateException("biometricInfo[" + i
+                            + "].sourceDataUri is not specified in request but is required");
+                    }
+                    break;
+                case OPTIONAL:
+                    break;
+                default:
+                    throw new BadCertTemplateException(
                             "could not reach here, unknown tripleState");
                 }
 

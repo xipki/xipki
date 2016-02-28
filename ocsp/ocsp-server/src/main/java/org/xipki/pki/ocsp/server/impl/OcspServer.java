@@ -855,51 +855,51 @@ public class OcspServer {
                 boolean unknownAsRevoked = false;
                 CertificateStatus bcCertStatus = null;
                 switch (certStatusInfo.getCertStatus()) {
-                    case GOOD:
-                        bcCertStatus = null;
-                        break;
+                case GOOD:
+                    bcCertStatus = null;
+                    break;
 
-                    case ISSUER_UNKNOWN:
-                        couldCacheInfo = false;
+                case ISSUER_UNKNOWN:
+                    couldCacheInfo = false;
+                    bcCertStatus = new UnknownStatus();
+                    break;
+
+                case UNKNOWN:
+                case IGNORE:
+                    couldCacheInfo = false;
+                    if (responderOption.getMode() == OcspMode.RFC2560) {
                         bcCertStatus = new UnknownStatus();
-                        break;
+                    } else { // (ocspMode == OCSPMode.RFC6960)
+                        unknownAsRevoked = true;
+                        includeExtendedRevokeExtension = true;
+                        bcCertStatus = new RevokedStatus(new Date(0L),
+                                CrlReason.CERTIFICATE_HOLD.getCode());
+                    }
+                    break;
+                case REVOKED:
+                    CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
+                    ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
+                            revInfo.getRevocationTime());
+                    org.bouncycastle.asn1.x509.CRLReason localReason = null;
+                    if (responseOption.isIncludeRevReason()) {
+                        localReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
+                                revInfo.getReason().getCode());
+                    }
+                    RevokedInfo localRevInfo = new RevokedInfo(revTime, localReason);
+                    bcCertStatus = new RevokedStatus(localRevInfo);
 
-                    case UNKNOWN:
-                    case IGNORE:
-                        couldCacheInfo = false;
-                        if (responderOption.getMode() == OcspMode.RFC2560) {
-                            bcCertStatus = new UnknownStatus();
-                        } else { // (ocspMode == OCSPMode.RFC6960)
-                            unknownAsRevoked = true;
-                            includeExtendedRevokeExtension = true;
-                            bcCertStatus = new RevokedStatus(new Date(0L),
-                                    CrlReason.CERTIFICATE_HOLD.getCode());
-                        }
-                        break;
-                    case REVOKED:
-                        CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
-                        ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
-                                revInfo.getRevocationTime());
-                        org.bouncycastle.asn1.x509.CRLReason localReason = null;
-                        if (responseOption.isIncludeRevReason()) {
-                            localReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
-                                    revInfo.getReason().getCode());
-                        }
-                        RevokedInfo localRevInfo = new RevokedInfo(revTime, localReason);
-                        bcCertStatus = new RevokedStatus(localRevInfo);
-
-                        Date invalidityDate = revInfo.getInvalidityTime();
-                        if (responseOption.isIncludeInvalidityDate()
-                                && invalidityDate != null
-                                && !invalidityDate.equals(revTime)) {
-                            Extension extension = new Extension(Extension.invalidityDate,
-                                    false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
-                            extensions.add(extension);
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException(
-                                "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
+                    Date invalidityDate = revInfo.getInvalidityTime();
+                    if (responseOption.isIncludeInvalidityDate()
+                            && invalidityDate != null
+                            && !invalidityDate.equals(revTime)) {
+                        Extension extension = new Extension(Extension.invalidityDate,
+                                false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
+                        extensions.add(extension);
+                    }
+                    break;
+                default:
+                    throw new RuntimeException(
+                            "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
                 } // end switch
 
                 byte[] certHash = certStatusInfo.getCertHash();

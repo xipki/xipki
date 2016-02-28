@@ -166,7 +166,8 @@ public class ScepEntry implements Serializable {
         if (responderConf == null) {
             sb.append("null");
         } else {
-            sb.append(SignerConfUtil.signerConfToString(responderConf, verbose, ignoreSensitiveInfo));
+            sb.append(SignerConfUtil.signerConfToString(
+                    responderConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("control: ").append(control).append("\n");

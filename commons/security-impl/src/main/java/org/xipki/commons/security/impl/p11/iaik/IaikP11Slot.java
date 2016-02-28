@@ -353,39 +353,49 @@ public class IaikP11Slot implements P11WritableSlot {
         currentIdentifies.clear();
     } // method refresh
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_ECDSA(
             final byte[] hash,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         return CKM_SIGN(PKCS11Constants.CKM_ECDSA, hash, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_DSA(
             final byte[] hash,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         return CKM_SIGN(PKCS11Constants.CKM_DSA, hash, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         return CKM_SIGN(PKCS11Constants.CKM_RSA_PKCS, encodedDigestInfo, keyId);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_X509(
             final byte[] hash,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         return CKM_SIGN(PKCS11Constants.CKM_RSA_X_509, hash, keyId);
     }
 
+    // CHECKSTYLE:OFF
     private byte[] CKM_SIGN(
             final long mech,
             final byte[] hash,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         PrivateKey signingKey;
         synchronized (keyId) {
             if (keyId.getKeyId() != null) {

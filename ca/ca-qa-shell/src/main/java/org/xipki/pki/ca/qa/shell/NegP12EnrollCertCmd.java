@@ -77,7 +77,8 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
             password = new String(readPassword());
         }
 
-        String signerConfWithoutAlgo = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File, password);
+        String signerConfWithoutAlgo = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(
+                p12File, password);
         return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);
     }

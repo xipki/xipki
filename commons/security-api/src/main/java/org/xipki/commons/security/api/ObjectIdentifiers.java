@@ -56,7 +56,7 @@ import org.xipki.commons.common.util.StringUtil;
  */
 
 public class ObjectIdentifiers {
-
+    // CHECKSTYLE:OFF
     /**
      * registered PEN for xipki.org: 45522
      */
@@ -431,6 +431,7 @@ public class ObjectIdentifiers {
     // RFC 4262: SMIMECapatibilities
     public static final ASN1ObjectIdentifier id_smimeCapabilities = new ASN1ObjectIdentifier(
             "1.2.840.113549.1.9.15");
+    // CHECKSTYLE:ON
 
     static {
         List<ASN1ObjectIdentifier> localForwardDNs = new ArrayList<>(25);

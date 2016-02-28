@@ -235,7 +235,7 @@ public class DbCertStatusStore extends CertStatusStore {
             } // end if(initialized)
 
             HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224,
-                    HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
+                HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
 
             final String sql = "SELECT ID,NBEFORE,REV,RT,S1C,S1S,S1K,S224S,S224K,S256S,S256K,"
                     + "S384S,S384K,S512S,S512K FROM ISSUER";

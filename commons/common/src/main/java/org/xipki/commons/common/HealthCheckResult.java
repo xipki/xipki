@@ -247,7 +247,7 @@ public class HealthCheckResult {
         String s = jsonMsg.substring(startIdx, endIdx);
 
         boolean healthy;
-        if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false")) {
+        if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
             healthy = Boolean.parseBoolean(s);
         } else {
             throw new IllegalArgumentException("invalid healthcheck message");

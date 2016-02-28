@@ -98,9 +98,11 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
         this.outputStream = new DigestOutputStream(digest);
     }
 
+    // CHECKSTYLE:OFF
     protected abstract byte[] CKM_SIGN(
             final byte[] hashValue)
     throws SignerException;
+    // CHECKSTYLE:ON
 
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {

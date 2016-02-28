@@ -86,7 +86,7 @@ public abstract class KeyEntry {
             BigInteger n = BigInteger.valueOf(0);
             n = n.setBit(keysize - 1);
             for (int i = 32; i < keysize - 1; i += 2) {
-            n = n.setBit(i);
+                n = n.setBit(i);
             }
             this.baseN = n;
         }
