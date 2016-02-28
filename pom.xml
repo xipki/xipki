@@ -254,6 +254,7 @@
             </execution>
           </executions>
           <configuration>
+            <locale>en</locale>
             <schemaDirectory>src/main/resources/xsd</schemaDirectory>
             <schemaIncludes>
               <include>*.xsd</include>
