@@ -179,15 +179,6 @@ public abstract class XipkiCommandSupport implements Action {
         return new BigInteger(1, bytes).toString(16);
     }
 
-    protected static Boolean isEnabled(
-            final String enabledS,
-            final String optionName) {
-        if (enabledS == null) {
-            return null;
-        }
-        return internIsEnabled(enabledS, optionName);
-    }
-
     protected static boolean isEnabled(
             final String enabledS,
             final boolean defaultEnabled,

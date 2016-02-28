@@ -85,7 +85,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
         }
 
         digest.reset();
-        this.signingKey = (P11PrivateKey) signingKey;
+        this.signingKey = (P11PrivateKey) privateKey;
     }
 
     protected void engineUpdate(
