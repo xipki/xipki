@@ -115,4 +115,8 @@ class CertBasedIdentityStore {
         return table;
     }
 
+    int getSize() {
+        return entries.size();
+    }
+
 }
