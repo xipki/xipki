@@ -156,7 +156,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private IssuerStore issuerStore;
 
-    private boolean additionIssuersIgnored;
+    private boolean multiplCasContained;
 
     private boolean initialized;
 
@@ -245,11 +245,11 @@ public class DbCertStatusStore extends CertStatusStore {
             try {
                 rs = ps.executeQuery();
                 List<IssuerEntry> caInfos = new LinkedList<>();
-                boolean issuersIgnored = false;
+                int numCas = 0;
                 while (rs.next()) {
                     String sha1Fp = rs.getString("S1C");
+                    numCas++;
                     if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
-                        issuersIgnored = true;
                         continue;
                     }
 
@@ -289,7 +289,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
-                this.additionIssuersIgnored = issuersIgnored;
+                this.multiplCasContained = (numCas > 1);
                 LOG.info("Updated CertStore: {}", getName());
                 initializationFailed = false;
                 initialized = true;
@@ -340,20 +340,19 @@ public class DbCertStatusStore extends CertStatusStore {
             throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
-        boolean onlySingleIssuer = !additionIssuersIgnored && (issuerStore.getSize() == 1);
         String coreSql;
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
             certHashAlgo = (certHashAlg == null)
                     ? hashAlgo
                     : certHashAlg;
-            coreSql = onlySingleIssuer
-                    ? SQL_CS_HASHMAP_SINGLE_ISSUER.get(certHashAlgo)
-                    : SQL_CS_HASHMAP.get(certHashAlgo);
+            coreSql = multiplCasContained
+                    ? SQL_CS_HASHMAP.get(certHashAlgo)
+                    : SQL_CS_HASHMAP_SINGLE_ISSUER.get(certHashAlgo);
         } else {
-            coreSql = onlySingleIssuer
-                    ? SQL_CS_SINGLE_ISSUER
-                    : SQL_CS;
+            coreSql = multiplCasContained
+                    ? SQL_CS
+                    : SQL_CS_SINGLE_ISSUER;
         }
 
         try {
@@ -382,7 +381,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
             try {
                 int idx = 1;
-                if (!onlySingleIssuer) {
+                if (multiplCasContained) {
                     ps.setInt(idx++, issuer.getId());
                 }
                 ps.setLong(idx++, serialNumber.longValue());
