@@ -470,7 +470,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                             throw new CertStatusStoreException(
                                     "serialNumber not match (serial=" + serialNumber
                                     + ") in CRL Extension Xipki-CertSet");
-                            }
+                        }
                     }
 
                     if (profileName == null) {

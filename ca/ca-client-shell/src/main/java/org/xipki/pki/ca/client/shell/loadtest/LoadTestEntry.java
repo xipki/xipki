@@ -87,30 +87,30 @@ public class LoadTestEntry {
             this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
             switch (randomDN) {
-                case GIVENNAME:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
-                    break;
-                case SURNAME:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_SURNAME;
-                    break;
-                case STREET:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_STREET;
-                    break;
-                case POSTALCODE:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
-                    break;
-                case O:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
-                    break;
-                case OU:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
-                    break;
-                case CN:
-                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
-                    break;
-                default:
-                    throw new RuntimeException("should not reach here, unknown RandomDN "
-                            + randomDN);
+            case GIVENNAME:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
+                break;
+            case SURNAME:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_SURNAME;
+                break;
+            case STREET:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_STREET;
+                break;
+            case POSTALCODE:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
+                break;
+            case O:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
+                break;
+            case OU:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
+                break;
+            case CN:
+                this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown RandomDN "
+                        + randomDN);
             }
 
             if (this.subjectRDNForIncrement != null

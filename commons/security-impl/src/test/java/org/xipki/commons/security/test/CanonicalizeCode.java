@@ -125,21 +125,20 @@ public class CanonicalizeCode {
     throws Exception {
         File[] files = dir.listFiles();
         for (File file : files) {
+            String filename = file.getName();
             if (file.isDirectory()) {
-                if (!file.getName().equals("target")
-                        && !file.getName().equals("tbd")) {
+                if (!"target".equals(filename)
+                        && !"tbd".equals(filename)) {
                     canonicalizeDir(file);
                 }
             } else {
-                String filename = file.getName();
-
                 int idx = filename.lastIndexOf('.');
                 String extension = (idx == -1)
                         ? filename
                         : filename.substring(idx + 1);
                 extension = extension.toLowerCase();
 
-                if (extension.equals("java")) {
+                if ("java".equals(extension)) {
                     canonicalizeFile(file);
                 }
             }
@@ -240,7 +239,7 @@ public class CanonicalizeCode {
                         : filename.substring(idx + 1);
                 extension = extension.toLowerCase();
 
-                if (extension.equals("java")) {
+                if ("java".equals(extension)) {
                     checkWarningsInFile(file);
                 }
             }
@@ -322,7 +321,7 @@ public class CanonicalizeCode {
 
                 if (!prefix.equals(THROWS_PREFIX)) {
                     // consider inner-class
-                    if (prefix.equals(THROWS_PREFIX + THROWS_PREFIX)) {
+                    if ((THROWS_PREFIX + THROWS_PREFIX).equals(prefix)) {
                         if (lastLine != null) {
                             String trimmedLastLine = lastLine.trim();
                             int idx2 = lastLine.indexOf(trimmedLastLine);

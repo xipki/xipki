@@ -152,8 +152,7 @@ public class XipkiNssProvider extends Provider {
 
         init();
 
-        AccessController.doPrivileged(
-        new PrivilegedAction<Object>() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 Iterator<Descriptor> it = DESCRIPTORS.values().iterator();
                 while (it.hasNext()) {

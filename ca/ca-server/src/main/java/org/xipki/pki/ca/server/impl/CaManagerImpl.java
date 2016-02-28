@@ -424,9 +424,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         String caModeStr = caConfProps.getProperty("ca.mode");
         if (caModeStr != null) {
-            if (caModeStr.equalsIgnoreCase("slave")) {
+            if ("slave".equalsIgnoreCase(caModeStr)) {
                 masterMode = false;
-            } else if (caModeStr.equalsIgnoreCase("master")) {
+            } else if ("master".equalsIgnoreCase(caModeStr)) {
                 masterMode = true;
             } else {
                 throw new CaMgmtException("invalid ca.mode '" + caModeStr + "'");

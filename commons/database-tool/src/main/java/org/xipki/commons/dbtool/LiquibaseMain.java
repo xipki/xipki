@@ -139,10 +139,10 @@ public class LiquibaseMain {
 
             CompareControl.SchemaComparison[] finalSchemaComparisons;
             finalSchemaComparisons = new CompareControl.SchemaComparison[] {
-                        new CompareControl.SchemaComparison(
-                            new CatalogAndSchema(null, defaultSchemaName),
-                            new CatalogAndSchema(null, defaultSchemaName))
-                    };
+                new CompareControl.SchemaComparison(
+                        new CatalogAndSchema(null, defaultSchemaName),
+                        new CatalogAndSchema(null, defaultSchemaName))
+                };
 
             for (CompareControl.SchemaComparison schema : finalSchemaComparisons) {
                 diffOutputControl.addIncludedSchema(schema.getReferenceSchema());

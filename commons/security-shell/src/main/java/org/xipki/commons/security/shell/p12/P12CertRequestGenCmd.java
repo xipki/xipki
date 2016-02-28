@@ -102,7 +102,8 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
         char[] pwd = getPassword();
-        String signerConf = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File, new String(pwd));
+        String signerConf = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File,
+                new String(pwd));
         return securityFactory.createSigner(
                 "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
     }

@@ -1631,18 +1631,18 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
             switch (databaseType) {
-                case DB2:
-                    return new DB2(name, service);
-                case H2:
-                    return new H2(name, service);
-                case HSQL:
-                    return new HSQL(name, service);
-                case MYSQL:
-                    return new MySQL(name, service);
-                case ORACLE:
-                    return new Oracle(name, service);
-                default: // POSTGRESQL:
-                    return new PostgreSQL(name, service);
+            case DB2:
+                return new DB2(name, service);
+            case H2:
+                return new H2(name, service);
+            case HSQL:
+                return new HSQL(name, service);
+            case MYSQL:
+                return new MySQL(name, service);
+            case ORACLE:
+                return new Oracle(name, service);
+            default: // POSTGRESQL:
+                return new PostgreSQL(name, service);
             }
         } else {
             throw new IllegalArgumentException("unknown datasource type " + databaseType);

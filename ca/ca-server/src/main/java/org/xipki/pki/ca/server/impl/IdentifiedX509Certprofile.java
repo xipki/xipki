@@ -174,7 +174,7 @@ class IdentifiedX509Certprofile {
                 ? dbEntry.getType()
                 : realType;
         String className;
-        if (type.equalsIgnoreCase("xml")) {
+        if ("xml".equalsIgnoreCase(type)) {
             tmpCertprofile = new XmlX509Certprofile();
         } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
             className = type.substring("java:".length());
@@ -734,7 +734,7 @@ class IdentifiedX509Certprofile {
 
         if (b) {
             ASN1ObjectIdentifier[] types = new ASN1ObjectIdentifier[] {
-                    Extension.basicConstraints, Extension.keyUsage};
+                Extension.basicConstraints, Extension.keyUsage};
 
             set.clear();
             for (ASN1ObjectIdentifier type : types) {

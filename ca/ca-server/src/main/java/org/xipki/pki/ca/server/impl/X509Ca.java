@@ -1620,7 +1620,7 @@ public class X509Ca {
         LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={},"
                 + " invalidityTime={}, revocationResult={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getDescription(),
-                        invalidityTime, resultText});
+                    invalidityTime, resultText});
 
         return revokedCert;
     } // method doRevokeCertificate
@@ -1862,8 +1862,9 @@ public class X509Ca {
             RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if (cnRDNs != null && cnRDNs.length > 0) {
                 String requestedCN = X509Util.rdnValueToString(cnRDNs[0].getFirst().getValue());
-                Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCommonName(
-                        requestedCN, certprofileName);
+                Long gsmckFirstNotBeforeInSecond =
+                        certstore.getNotBeforeOfFirstCertStartsWithCommonName(
+                                requestedCN, certprofileName);
                 if (gsmckFirstNotBeforeInSecond != null) {
                     gsmckFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * MS_PER_SECOND);
                 }

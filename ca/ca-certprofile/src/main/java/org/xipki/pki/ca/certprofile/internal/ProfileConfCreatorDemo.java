@@ -668,7 +668,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -681,7 +681,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - tlsFeature
         extensionValue = createTlsFeature(
                 new TlsExtensionType[]{TlsExtensionType.STATUS_REQUEST,
-                        TlsExtensionType.CLIENT_CERTIFICATE_URL});
+                    TlsExtensionType.CLIENT_CERTIFICATE_URL});
         list.add(createExtension(ObjectIdentifiers.id_pe_tlsfeature, true, true, extensionValue));
 
         // Extensions - SMIMECapabilities
@@ -738,7 +738,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -797,7 +797,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -1054,7 +1054,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -1149,7 +1149,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
-                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                    KeyUsageEnum.KEY_ENCIPHERMENT},
                 null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -1592,7 +1592,7 @@ public class ProfileConfCreatorDemo {
 
             List<String> l = sigAlgosType.getAlgorithm();
             String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA",
-                    "withPlainECDSA", "withRSAandMGF1"};
+                "withPlainECDSA", "withRSAandMGF1"};
             for (String part2 : algoPart2s) {
                 for (String hashAlgo : sigHashAlgos) {
                     l.add(hashAlgo + part2);

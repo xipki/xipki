@@ -51,41 +51,53 @@ public interface P11CryptService {
     void refresh()
     throws SignerException;
 
+    // CHECKSTYLE:OFF
     byte[] CKM_RSA_PKCS(
             byte[] encodedDigestInfo,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:OFF
     byte[] CKM_RSA_X509(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:OFF
     byte[] CKM_ECDSA_Plain(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:OFF
     byte[] CKM_ECDSA_X962(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:OFF
     byte[] CKM_DSA_Plain(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
+    // CHECKSTYLE:OFF
     byte[] CKM_DSA_X962(
             byte[] hash,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId)
     throws SignerException;
+    // CHECKSTYLE:ON
 
     PublicKey getPublicKey(
             P11SlotIdentifier slotId,

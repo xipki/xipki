@@ -436,155 +436,155 @@ public class Scep {
             }
 
             switch (mt) {
-                case PKCSReq:
-                case RenewalReq:
-                case UpdateReq:
-                    CertificationRequest p10Req = (CertificationRequest) req.getMessageData();
-                    X500Name reqSubject = p10Req.getCertificationRequestInfo().getSubject();
-                    String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
-                    audit(auditEvent, "req-subject", reqSubjectText);
-                    LOG.info("tid={}, subject={}", tid, reqSubjectText);
+            case PKCSReq:
+            case RenewalReq:
+            case UpdateReq:
+                CertificationRequest p10Req = (CertificationRequest) req.getMessageData();
+                X500Name reqSubject = p10Req.getCertificationRequestInfo().getSubject();
+                String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
+                audit(auditEvent, "req-subject", reqSubjectText);
+                LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                    if (!caManager.getSecurityFactory().verifyPopo(p10Req)) {
-                        LOG.warn("tid={}, POPO verification failed", tid);
-                        throw FailInfoException.BAD_MESSAGE_CHECK;
-                    }
+                if (!caManager.getSecurityFactory().verifyPopo(p10Req)) {
+                    LOG.warn("tid={}, POPO verification failed", tid);
+                    throw FailInfoException.BAD_MESSAGE_CHECK;
+                }
 
-                    CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
-                    Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
-                    X509Certificate reqSignatureCert = req.getSignatureCert();
-                    boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
-                            reqSignatureCert.getIssuerX500Principal());
+                CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
+                Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
+                X509Certificate reqSignatureCert = req.getSignatureCert();
+                boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
+                        reqSignatureCert.getIssuerX500Principal());
 
-                    String cn = X509Util.getCommonName(p10ReqInfo.getSubject());
-                    if (cn == null) {
-                        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                                "tid=" + tid + ": no CommonName in requested subject");
-                    }
+                String cn = X509Util.getCommonName(p10ReqInfo.getSubject());
+                if (cn == null) {
+                    throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                            "tid=" + tid + ": no CommonName in requested subject");
+                }
 
-                    String user = null;
-                    boolean authenticatedByPwd = false;
+                String user = null;
+                boolean authenticatedByPwd = false;
 
-                    String challengePwd = CaUtil.getChallengePassword(p10ReqInfo);
-                    if (challengePwd != null) {
-                        String[] strs = challengePwd.split(":");
-                        if (strs != null && strs.length == 2) {
-                            user = strs[0];
-                            audit(auditEvent, "user", user);
-                            String password = strs[1];
-                            authenticatedByPwd = ca.authenticateUser(user, password.getBytes());
+                String challengePwd = CaUtil.getChallengePassword(p10ReqInfo);
+                if (challengePwd != null) {
+                    String[] strs = challengePwd.split(":");
+                    if (strs != null && strs.length == 2) {
+                        user = strs[0];
+                        audit(auditEvent, "user", user);
+                        String password = strs[1];
+                        authenticatedByPwd = ca.authenticateUser(user, password.getBytes());
 
-                            if (!authenticatedByPwd) {
-                                LOG.warn("tid={}: could not verify the challengePassword", tid);
-                                throw FailInfoException.BAD_REQUEST;
-                            }
-                        } else {
-                            LOG.warn("tid={}: ignore challengePassword since it does not has the"
-                                    + " format <user>:<password>",
-                                    tid);
-                        }
-                    } // end if
-
-                    if (selfSigned) {
-                        if (MessageType.PKCSReq != mt) {
-                            LOG.warn("tid={}: self-signed certificate is not permitted for"
-                                    + " messageType {}", tid, mt);
+                        if (!authenticatedByPwd) {
+                            LOG.warn("tid={}: could not verify the challengePassword", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
-                        if (user == null) {
-                            LOG.warn("tid={}: could not extract user and password from"
-                                    + " challengePassword, which are required for self-signed"
-                                    + " signature certificate",
-                                tid);
-                            throw FailInfoException.BAD_REQUEST;
-                        }
-                        checkCommonName(ca, user, cn);
                     } else {
-                        if (user == null) {
-                            // up to draft-nourse-scep-23 the client sends all messages to enroll
-                            // certificate via MessageType PKCSReq
-                            KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
-                            if (!knowCertRes.isKnown()) {
-                                LOG.warn("tid={}: signature certiciate is not trusted by the CA",
-                                        tid);
-                                throw FailInfoException.BAD_REQUEST;
-                            }
-                            user = knowCertRes.getUser();
-                            audit(auditEvent,
-                                    "user",
-                                    (user == null)
-                                        ? "null"
-                                        : user);
-                        } // end if
+                        LOG.warn("tid={}: ignore challengePassword since it does not has the"
+                                + " format <user>:<password>",
+                                tid);
+                    }
+                } // end if
 
-                        // only the same subject is permitted
-                        String cnInSignatureCert = X509Util.getCommonName(
-                                X500Name.getInstance(
-                                        reqSignatureCert.getSubjectX500Principal().getEncoded()));
-                        boolean b2 = cn.equals(cnInSignatureCert);
-                        if (!b2) {
-                            if (user != null) {
-                                checkCommonName(ca, user, cn);
-                            } else {
-                                LOG.warn("tid={}: signature certificate is not trusted and {}",
-                                        tid, "no challengePassword is contained in the request");
-                                throw FailInfoException.BAD_REQUEST;
-                            }
-                        } // end if
+                if (selfSigned) {
+                    if (MessageType.PKCSReq != mt) {
+                        LOG.warn("tid={}: self-signed certificate is not permitted for"
+                                + " messageType {}", tid, mt);
+                        throw FailInfoException.BAD_REQUEST;
+                    }
+                    if (user == null) {
+                        LOG.warn("tid={}: could not extract user and password from"
+                                + " challengePassword, which are required for self-signed"
+                                + " signature certificate",
+                            tid);
+                        throw FailInfoException.BAD_REQUEST;
+                    }
+                    checkCommonName(ca, user, cn);
+                } else {
+                    if (user == null) {
+                        // up to draft-nourse-scep-23 the client sends all messages to enroll
+                        // certificate via MessageType PKCSReq
+                        KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
+                        if (!knowCertRes.isKnown()) {
+                            LOG.warn("tid={}: signature certiciate is not trusted by the CA",
+                                    tid);
+                            throw FailInfoException.BAD_REQUEST;
+                        }
+                        user = knowCertRes.getUser();
+                        audit(auditEvent,
+                                "user",
+                                (user == null)
+                                    ? "null"
+                                    : user);
                     } // end if
 
-                    byte[] tidBytes = getTransactionIdBytes(tid);
+                    // only the same subject is permitted
+                    String cnInSignatureCert = X509Util.getCommonName(
+                            X500Name.getInstance(
+                                    reqSignatureCert.getSubjectX500Principal().getEncoded()));
+                    boolean b2 = cn.equals(cnInSignatureCert);
+                    if (!b2) {
+                        if (user != null) {
+                            checkCommonName(ca, user, cn);
+                        } else {
+                            LOG.warn("tid={}: signature certificate is not trusted and {}",
+                                    tid, "no challengePassword is contained in the request");
+                            throw FailInfoException.BAD_REQUEST;
+                        }
+                    } // end if
+                } // end if
 
-                    CertTemplateData certTemplateData = new CertTemplateData(
-                            p10ReqInfo.getSubject(), p10ReqInfo.getSubjectPublicKeyInfo(),
-                            (Date) null, (Date) null, extensions, certProfileName);
-                    X509CertificateInfo cert = ca.generateCertificate(
-                            certTemplateData,
-                            true,
-                            null,
-                            user,
-                            RequestType.SCEP,
-                            tidBytes);
+                byte[] tidBytes = getTransactionIdBytes(tid);
 
-                    if (auditEvent != null) {
-                        audit(auditEvent, "subject", cert.getCert().getSubject());
-                    }
+                CertTemplateData certTemplateData = new CertTemplateData(
+                        p10ReqInfo.getSubject(), p10ReqInfo.getSubjectPublicKeyInfo(),
+                        (Date) null, (Date) null, extensions, certProfileName);
+                X509CertificateInfo cert = ca.generateCertificate(
+                        certTemplateData,
+                        true,
+                        null,
+                        user,
+                        RequestType.SCEP,
+                        tidBytes);
 
-                    signedData = buildSignedData(cert.getCert().getCert());
-                    break;
-                case CertPoll:
-                    IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
-                    if (auditEvent != null) {
-                        audit(auditEvent, "isser", X509Util.getRfc4519Name(is.getIssuer()));
-                        audit(auditEvent, "subject", X509Util.getRfc4519Name(is.getSubject()));
-                    }
+                if (auditEvent != null) {
+                    audit(auditEvent, "subject", cert.getCert().getSubject());
+                }
 
-                    ensureIssuedByThisCa(caX500Name, is.getIssuer());
-                    signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
-                    break;
-                case GetCert:
-                    IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
-                    BigInteger serial = isn.getSerialNumber().getPositiveValue();
-                    if (auditEvent != null) {
-                        audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                        audit(auditEvent, "serialNumber", serial.toString());
-                    }
-                    ensureIssuedByThisCa(caX500Name, isn.getName());
-                    signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
-                    break;
-                case GetCRL:
-                    isn = (IssuerAndSerialNumber) req.getMessageData();
-                    serial = isn.getSerialNumber().getPositiveValue();
-                    if (auditEvent != null) {
-                        audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                        audit(auditEvent, "serialNumber", serial.toString());
-                    }
-                    ensureIssuedByThisCa(caX500Name, isn.getName());
-                    signedData = getCrl(ca, serial);
-                    break;
-                default:
-                    LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
-                    throw FailInfoException.BAD_REQUEST;
+                signedData = buildSignedData(cert.getCert().getCert());
+                break;
+            case CertPoll:
+                IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
+                if (auditEvent != null) {
+                    audit(auditEvent, "isser", X509Util.getRfc4519Name(is.getIssuer()));
+                    audit(auditEvent, "subject", X509Util.getRfc4519Name(is.getSubject()));
+                }
+
+                ensureIssuedByThisCa(caX500Name, is.getIssuer());
+                signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
+                break;
+            case GetCert:
+                IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
+                BigInteger serial = isn.getSerialNumber().getPositiveValue();
+                if (auditEvent != null) {
+                    audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
+                    audit(auditEvent, "serialNumber", serial.toString());
+                }
+                ensureIssuedByThisCa(caX500Name, isn.getName());
+                signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
+                break;
+            case GetCRL:
+                isn = (IssuerAndSerialNumber) req.getMessageData();
+                serial = isn.getSerialNumber().getPositiveValue();
+                if (auditEvent != null) {
+                    audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
+                    audit(auditEvent, "serialNumber", serial.toString());
+                }
+                ensureIssuedByThisCa(caX500Name, isn.getName());
+                signedData = getCrl(ca, serial);
+                break;
+            default:
+                LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
+                throw FailInfoException.BAD_REQUEST;
             } // end switch
 
             ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);

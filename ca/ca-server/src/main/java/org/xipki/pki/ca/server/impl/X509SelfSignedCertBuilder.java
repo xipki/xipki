@@ -184,7 +184,7 @@ class X509SelfSignedCertBuilder {
 
         SubjectPublicKeyInfo publicKeyInfo;
         if (signer.getCertificate() != null) {
-            // this certificate is the dummy one which can be considered only as public key container
+            // this cert is the dummy one which can be considered only as public key container
             Certificate bcCert;
             try {
                 bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());

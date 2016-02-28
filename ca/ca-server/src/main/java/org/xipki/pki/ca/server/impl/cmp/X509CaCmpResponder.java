@@ -512,7 +512,8 @@ public class X509CaCmpResponder extends CmpResponder {
                 LOG.debug(message, ex);
 
                 certResponses[i] = new CertResponse(certReqId,
-                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, ex.getMessage()));
+                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
+                                ex.getMessage()));
 
                 if (childAuditEvent != null) {
                     childAuditEvent.setStatus(AuditStatus.FAILED);

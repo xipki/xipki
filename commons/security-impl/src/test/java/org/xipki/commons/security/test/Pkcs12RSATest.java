@@ -60,13 +60,13 @@ public abstract class Pkcs12RSATest {
 
     private ConcurrentContentSigner signer;
 
-    protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
-
     protected Pkcs12RSATest() {
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
     }
+
+    protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     protected String getPkcs12File() {
         return "src/test/resources/C.TSL.SIG1.p12";

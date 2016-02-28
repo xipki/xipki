@@ -195,17 +195,21 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         return this.slotId.equals(pSlotId) && this.keyLabel.equals(pKeyLabel);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
     throws SignerException {
+        // CHECKSTYLE:ON
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
                 (signatureKeyBitLength + 7) / 8);
         return CKM_RSA_X509(padded);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_X509(
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -221,6 +225,7 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         }
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_ECDSA(
             final byte[] hash)
     throws SignerException {
@@ -228,9 +233,11 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -248,16 +255,20 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         }
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_DSA(
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         byte[] x962Sig = CKM_DSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
     }
 
+    // CHECKSTYLE:OFF
     public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignerException {
+        // CHECKSTYLE:ON
         if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
