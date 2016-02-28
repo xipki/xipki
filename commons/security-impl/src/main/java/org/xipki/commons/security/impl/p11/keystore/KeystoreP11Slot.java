@@ -708,21 +708,23 @@ public class KeystoreP11Slot implements P11WritableSlot {
         // id is null, delete all entries with the specified label
         boolean deleted = false;
         File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
-        for (File infoFile : infoFiles) {
-            if (!infoFile.isFile()) {
-                continue;
-            }
+        if (infoFiles != null) {
+            for (File infoFile : infoFiles) {
+                if (!infoFile.isFile()) {
+                    continue;
+                }
 
-            Properties props;
-            try {
-                props = loadProperties(infoFile);
-            } catch (IOException ex) {
-                continue;
-            }
+                Properties props;
+                try {
+                    props = loadProperties(infoFile);
+                } catch (IOException ex) {
+                    continue;
+                }
 
-            if (label.equals(props.getProperty("label"))) {
-                if (deletePkcs11Entry(dir, getKeyIdFromInfoFilename(infoFile.getName()))) {
-                    deleted = true;
+                if (label.equals(props.getProperty("label"))) {
+                    if (deletePkcs11Entry(dir, getKeyIdFromInfoFilename(infoFile.getName()))) {
+                        deleted = true;
+                    }
                 }
             }
         }

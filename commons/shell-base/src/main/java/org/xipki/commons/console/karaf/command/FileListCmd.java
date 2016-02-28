@@ -83,13 +83,16 @@ public class FileListCmd extends XipkiCommandSupport {
         List<String> l = new LinkedList<>();
         File[] children = target.listFiles();
         int maxLen = -1;
-        for (File child : children) {
-            String name = child.getName();
-            if (child.isDirectory()) {
-                name += File.separator;
+
+        if (children != null) {
+            for (File child : children) {
+                String name = child.getName();
+                if (child.isDirectory()) {
+                    name += File.separator;
+                }
+                l.add(name);
+                maxLen = Math.max(maxLen, name.length());
             }
-            l.add(name);
-            maxLen = Math.max(maxLen, name.length());
         }
 
         if (isEmpty(l)) {

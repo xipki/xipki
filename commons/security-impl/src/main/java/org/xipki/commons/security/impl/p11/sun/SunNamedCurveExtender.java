@@ -135,6 +135,8 @@ public class SunNamedCurveExtender {
 
     private static final Pattern SPLIT_PATTERN = Pattern.compile(",|\\[|\\]");
 
+    private static Object executedLock = new Object();
+
     private static Boolean executed = Boolean.FALSE;
 
     private static Class<?> classNamedCurve;
@@ -208,7 +210,7 @@ public class SunNamedCurveExtender {
     }*/
 
     public static void addNamedCurves() {
-        synchronized (executed) {
+        synchronized (executedLock) {
             if (!successful) {
                 LOG.warn("could not initialize");
                 return;

@@ -36,6 +36,7 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -118,7 +119,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
     public int hashCode() {
         int hashCode = 0;
         if (keyId != null) {
-            hashCode = keyId.hashCode();
+            hashCode = new BigInteger(1, keyId).hashCode();
         }
 
         if (keyLabel != null) {
