@@ -109,7 +109,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 public class X509Util {
 
     private static CertificateFactory certFact;
-    private static final Object CERTFACT_LOCK = new Object();
+    private static Object certFactLock = new Object();
 
     private X509Util() {
     }
@@ -229,7 +229,7 @@ public class X509Util {
     public static X509Certificate parseCert(
             final InputStream certStream)
     throws IOException, CertificateException {
-        synchronized (CERTFACT_LOCK) {
+        synchronized (certFactLock) {
             if (certFact == null) {
                 try {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
@@ -252,10 +252,12 @@ public class X509Util {
             final InputStream crlStream)
     throws IOException, CertificateException, CRLException {
         try {
-            if (certFact == null) {
-                certFact = CertificateFactory.getInstance("X.509", "BC");
+            synchronized (certFactLock) {
+                if (certFact == null) {
+                    certFact = CertificateFactory.getInstance("X.509", "BC");
+                }
+                return (X509CRL) certFact.generateCRL(crlStream);
             }
-            return (X509CRL) certFact.generateCRL(crlStream);
         } catch (NoSuchProviderException ex) {
             throw new IOException("NoSuchProviderException: " + ex.getMessage());
         }

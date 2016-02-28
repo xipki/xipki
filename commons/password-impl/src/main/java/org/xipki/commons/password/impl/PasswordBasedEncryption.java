@@ -57,13 +57,15 @@ public class PasswordBasedEncryption {
 
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
+    private static Object initializedLock = new Object();
+
     private static AtomicBoolean initialized = new AtomicBoolean(false);
 
     private PasswordBasedEncryption() {
     }
 
     private static void init() {
-        synchronized (initialized) {
+        synchronized (initializedLock) {
             if (initialized.get()) {
                 return;
             }

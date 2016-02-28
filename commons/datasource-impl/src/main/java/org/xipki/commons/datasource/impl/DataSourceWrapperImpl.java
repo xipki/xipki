@@ -664,6 +664,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
     protected final String name;
 
+    private final Object lastUsedSeqValuesLock = new Object();
+
     private final ConcurrentHashMap<String, Long> lastUsedSeqValues
             = new ConcurrentHashMap<String, Long>();
 
@@ -969,8 +971,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             .append(id);
         final String sql = sb.toString();
 
-        Connection localConn = conn;
-        if (localConn == null) {
+        Connection localConn;
+        if (conn != null) {
+            localConn = conn;
+        } else{
             try {
                 localConn = getConnection();
             } catch (Throwable th) {
@@ -983,7 +987,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         Statement stmt = null;
         try {
-            stmt = conn.createStatement();
+            stmt = localConn.createStatement();
             stmt.execute(sql);
         } catch (Throwable th) {
             if (LOG.isWarnEnabled()) {
@@ -1205,7 +1209,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 try {
                     if (rs.next()) {
                         next = rs.getLong(1);
-                        synchronized (lastUsedSeqValues) {
+                        synchronized (lastUsedSeqValuesLock) {
                             Long lastValue = lastUsedSeqValues.get(sequenceName);
                             if (lastValue == null || next > lastValue) {
                                 lastUsedSeqValues.put(sequenceName, next);
@@ -1526,7 +1530,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         // We couldn't identify it more precisely
         if (LOG.isDebugEnabled()) {
             String codes;
-            if (sqlErrorCodes != null && sqlErrorCodes.isUseSqlStateForTranslation()) {
+            if (sqlErrorCodes.isUseSqlStateForTranslation()) {
                 codes = new StringBuilder(60)
                         .append("SQL state '")
                         .append(sqlEx.getSQLState())

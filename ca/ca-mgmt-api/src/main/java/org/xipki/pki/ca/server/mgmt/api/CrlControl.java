@@ -140,7 +140,9 @@ public class CrlControl implements Serializable {
 
     } // enum UpdateMode
 
-    public static class HourMinute {
+    public static class HourMinute implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private final int hour;
 

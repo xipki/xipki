@@ -184,7 +184,7 @@ class PublicCaInfo {
 
     public void setCrlSignerCertificate(
             final X509Certificate crlSignerCert) {
-        if (caCertificate.equals(crlSignerCert)) {
+        if (caCertificate.getCert().equals(crlSignerCert)) {
             this.crlSignerCertificate = null;
         } else {
             this.crlSignerCertificate = crlSignerCert;

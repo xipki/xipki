@@ -316,9 +316,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
         if (statuses == null || statuses.length != reqEntries.size()) {
+            int statusesLen = 0;
+            if (statuses != null) {
+                statusesLen = statuses.length;
+            }
+
             throw new CmpRequestorException(String.format(
                 "incorrect number of status entries in response '%s' instead the exceptected '%s'",
-                statuses.length, reqEntries.size()));
+                statusesLen, reqEntries.size()));
         }
 
         CertId[] revCerts = content.getRevCerts();
@@ -417,7 +422,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         checkProtection(response);
 
         PKIBody respBody = response.getPkiMessage().getBody();
-        int bodyType = respBody.getType();
+        final int bodyType = respBody.getType();
 
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
@@ -527,11 +532,6 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         response = signAndSend(confirmRequest, debug);
         checkProtection(response);
-
-        if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new PkiErrorException(content.getPKIStatusInfo());
-        }
 
         return result;
     } // method internRequestCertificate

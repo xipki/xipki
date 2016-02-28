@@ -130,9 +130,7 @@ public class DbDigestDiff {
             LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
         }
 
-        this.numTargetThreads = (targetDatasource == null)
-                ? 1
-                : Math.min(numThreads.getNumTargetThreads(),
+        this.numTargetThreads = Math.min(numThreads.getNumTargetThreads(),
                         targetDatasource.getMaximumPoolSize() - 1);
 
         if (this.numTargetThreads != numThreads.getNumTargetThreads()) {
@@ -157,14 +155,16 @@ public class DbDigestDiff {
         if (refDirname != null) {
             File refDir = new File(this.refDirname);
             File[] childFiles = refDir.listFiles();
-            for (File caDir : childFiles) {
-                if (!caDir.isDirectory() || !caDir.getName().startsWith("ca-")) {
-                    continue;
-                }
+            if (childFiles != null) {
+                for (File caDir : childFiles) {
+                    if (!caDir.isDirectory() || !caDir.getName().startsWith("ca-")) {
+                        continue;
+                    }
 
-                String caDirPath = caDir.getPath();
-                DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
-                diffSingleCa(refReader, caIdCertMap);
+                    String caDirPath = caDir.getPath();
+                    DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
+                    diffSingleCa(refReader, caIdCertMap);
+                }
             }
         } else {
             DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);

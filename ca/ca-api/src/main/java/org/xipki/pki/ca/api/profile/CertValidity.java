@@ -103,10 +103,10 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         if (suffix == 'y' || suffix == 'Y') {
             unit = Unit.YEAR;
             numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'd' || suffix == 'd') {
+        } else if (suffix == 'd' || suffix == 'D') {
             unit = Unit.DAY;
             numValdityS = validityS.substring(0, len - 1);
-        } else if (suffix == 'h' || suffix == 'h') {
+        } else if (suffix == 'h' || suffix == 'H') {
             unit = Unit.HOUR;
             numValdityS = validityS.substring(0, len - 1);
         } else if (suffix >= '0' && suffix <= '9') {

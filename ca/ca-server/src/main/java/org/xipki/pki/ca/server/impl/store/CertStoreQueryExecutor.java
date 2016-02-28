@@ -2464,6 +2464,9 @@ class CertStoreQueryExecutor {
 
     private static void releaseStatement(
             Statement statment) {
+        if (statment == null) {
+            return;
+        }
         try {
             statment.close();
         } catch (SQLException ex) {

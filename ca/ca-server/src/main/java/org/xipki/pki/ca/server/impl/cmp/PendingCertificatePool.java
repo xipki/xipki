@@ -147,7 +147,9 @@ class PendingCertificatePool {
             map.remove(hexTid);
         }
 
-        return retEntry.certInfo;
+        return (retEntry == null)
+                ? null
+                : retEntry.certInfo;
     }
 
     synchronized Set<X509CertificateInfo> removeCertificates(

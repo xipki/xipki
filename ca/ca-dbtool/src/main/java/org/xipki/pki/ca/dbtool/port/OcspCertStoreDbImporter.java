@@ -362,14 +362,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 try {
                     Certificate cc = Certificate.getInstance(encodedCert);
                     c = cc.getTBSCertificate();
-                } catch (Exception ex) {
+                } catch (RuntimeException ex) {
                     LOG.error("could not parse certificate in file {}", filename);
                     LOG.debug("could not parse certificate in file " + filename, ex);
-                    if (ex instanceof CertificateException) {
-                        throw (CertificateException) ex;
-                    } else {
-                        throw new CertificateException(ex.getMessage(), ex);
-                    }
+                    throw new CertificateException(ex.getMessage(), ex);
                 }
 
                 // cert

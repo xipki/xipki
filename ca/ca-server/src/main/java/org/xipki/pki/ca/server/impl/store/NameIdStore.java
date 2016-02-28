@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.impl.store;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -85,7 +86,7 @@ class NameIdStore {
     String getName(
             final Integer id) {
         for (String name : entries.keySet()) {
-            if (id == entries.get(name)) {
+            if (CompareUtil.equalsObject(id, entries.get(name))) {
                 return name;
             }
         }

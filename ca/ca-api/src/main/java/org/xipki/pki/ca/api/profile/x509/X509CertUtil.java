@@ -90,7 +90,7 @@ public class X509CertUtil {
     public static AuthorityInformationAccess createAuthorityInformationAccess(
             final List<String> caIssuerUris,
             final List<String> ocspUris) {
-        if (CollectionUtil.isEmpty(ocspUris) && CollectionUtil.isEmpty(ocspUris)) {
+        if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
             return null;
         }
 

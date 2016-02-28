@@ -813,11 +813,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
                 msg.append("\tlabel: ");
                 CharArrayAttribute label = privKey.getLabel();
-                char[] chars = null;
-                if (label != null) {
-                    chars = label.getCharArrayValue();
-                }
-                msg.append(chars).append("\n");
+                msg.append(toString(label)).append("\n");
             }
             return msg.toString();
         } catch (Throwable th) {
@@ -1024,11 +1020,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
                 msg.append("\tlabel: ");
                 CharArrayAttribute label = cert.getLabel();
-                char[] chars = null;
-                if (label != null) {
-                    chars = label.getCharArrayValue();
-                }
-                msg.append(chars).append("\n");
+                msg.append(toString(label)).append("\n");
             }
             return msg.toString();
         } catch (Throwable th) {
@@ -1266,11 +1258,7 @@ public class IaikP11Slot implements P11WritableSlot {
 
                 msg.append("\tlabel: ");
                 CharArrayAttribute label = pubKey.getLabel();
-                char[] chars = null;
-                if (label != null) {
-                    chars = label.getCharArrayValue();
-                }
-                msg.append(chars).append("\n");
+                msg.append(toString(label)).append("\n");
             } // end for
             return msg.toString();
         } catch (Throwable th) {
@@ -1984,6 +1972,18 @@ public class IaikP11Slot implements P11WritableSlot {
         sb.append("\t\t\tSHA1 Sum: ")
             .append(HashCalculator.hexSha1(certBytes))
             .append("\n");
+    }
+
+    private static String toString(
+            final CharArrayAttribute charArrayAttr) {
+        String labelStr = null;
+        if (charArrayAttr != null) {
+            char[] chars = charArrayAttr.getCharArrayValue();
+            if (chars != null) {
+                labelStr = new String(chars);
+            }
+        }
+        return labelStr;
     }
 
 }

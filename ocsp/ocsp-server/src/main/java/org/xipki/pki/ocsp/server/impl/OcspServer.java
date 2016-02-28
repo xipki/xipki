@@ -336,7 +336,7 @@ public class OcspServer {
         // Duplication name check: responder
         for (ResponderType m : conf.getResponders().getResponder()) {
             String name = m.getName();
-            if (c.contains(m)) {
+            if (c.contains(name)) {
                 throw new InvalidConfException(
                         "responder named '" + name + "' defined duplicatedly");
             }
@@ -353,36 +353,40 @@ public class OcspServer {
                     throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
                 }
             } // end for
+            c.add(name);
         } // end for
 
         // Duplication name check: signer
         c.clear();
         for (SignerType m : conf.getSigners().getSigner()) {
             String name = m.getName();
-            if (c.contains(m)) {
+            if (c.contains(name)) {
                 throw new InvalidConfException(
                         "signer option named '" + name + "' defined duplicatedly");
             }
+            c.add(name);
         }
 
         // Duplication name check: requests
         c.clear();
         for (RequestOptionType m : conf.getRequestOptions().getRequestOption()) {
             String name = m.getName();
-            if (c.contains(m)) {
+            if (c.contains(name)) {
                 throw new InvalidConfException(
                         "request option named '" + name + "' defined duplicatedly");
             }
+            c.add(name);
         }
 
         // Duplication name check: response
         c.clear();
         for (ResponseOptionType m : conf.getResponseOptions().getResponseOption()) {
             String name = m.getName();
-            if (c.contains(m)) {
+            if (c.contains(name)) {
                 throw new InvalidConfException(
                         "response option named '" + name + "' defined duplicatedly");
             }
+            c.add(name);
         }
 
         // Duplication name check: audit
@@ -390,10 +394,11 @@ public class OcspServer {
         if (conf.getAuditOptions() != null) {
             for (AuditOptionType m : conf.getAuditOptions().getAuditOption()) {
                 String name = m.getName();
-                if (c.contains(m)) {
+                if (c.contains(name)) {
                     throw new InvalidConfException(
                             "audit option named '" + name + "' defined duplicatedly");
                 }
+                c.add(name);
             }
         }
 
@@ -401,7 +406,7 @@ public class OcspServer {
         c.clear();
         for (StoreType m : conf.getStores().getStore()) {
             String name = m.getName();
-            if (c.contains(m)) {
+            if (c.contains(name)) {
                 throw new InvalidConfException("store named '" + name + "' defined duplicatedly");
             }
         }
@@ -411,10 +416,11 @@ public class OcspServer {
         if (conf.getCertprofileOptions() != null) {
             for (CertprofileOptionType m : conf.getCertprofileOptions().getCertprofileOption()) {
                 String name = m.getName();
-                if (c.contains(m)) {
+                if (c.contains(name)) {
                     throw new InvalidConfException(
                             "certprofile option named '" + name + "' defined duplicatedly");
                 }
+                c.add(name);
             }
         }
 
@@ -423,10 +429,11 @@ public class OcspServer {
         if (conf.getDatasources() != null) {
             for (DatasourceType m : conf.getDatasources().getDatasource()) {
                 String name = m.getName();
-                if (c.contains(m)) {
+                if (c.contains(name)) {
                     throw new InvalidConfException(
                             "datasource named '" + name + "' defined duplicatedly");
                 }
+                c.add(name);
             }
         }
 
@@ -891,7 +898,7 @@ public class OcspServer {
                     Date invalidityDate = revInfo.getInvalidityTime();
                     if (responseOption.isIncludeInvalidityDate()
                             && invalidityDate != null
-                            && !invalidityDate.equals(revTime)) {
+                            && !invalidityDate.equals(revInfo.getRevocationTime())) {
                         Extension extension = new Extension(Extension.invalidityDate,
                                 false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
                         extensions.add(extension);

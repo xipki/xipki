@@ -791,8 +791,7 @@ class CaManagerQueryExecutor {
         Statement stmt = null;
         try {
             stmt = createStatement();
-            stmt.executeQuery(sql);
-            return true;
+            return stmt.executeUpdate(sql) > 0;
         } catch (SQLException ex) {
             DataAccessException tEx = dataSource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
