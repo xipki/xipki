@@ -173,6 +173,18 @@ class CertStoreQueryExecutor {
     private static final String CORESQL_ID_FOR_SN_IN_CERT =
             "SELECT ID FROM CERT WHERE CA_ID=? AND SN=?";
 
+    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA =
+            "ID FROM CERT WHERE FP_S=?";
+
+    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_MULTIPLE_CAS =
+            "ID FROM CERT WHERE FP_S=? AND CA_ID=?";
+
+    private static final String CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA =
+            "ID FROM CERT WHERE FP_K=?";
+
+    private static final String CORESQL_CERT_FOR_KEY_ISSUED_MULTIPLE_CAS =
+            "ID FROM CERT WHERE FP_K=? AND CA_ID=?";
+
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private final DataSourceWrapper dataSource;
@@ -1850,39 +1862,26 @@ class CertStoreQueryExecutor {
             final X509Cert caCert,
             final long subjectFp)
     throws DataAccessException {
-        return isCertIssuedForColumn("FP_S", caCert, subjectFp);
-    }
-
-    boolean isCertForKeyIssued(
-            final X509Cert caCert,
-            final long keyFp)
-    throws DataAccessException {
-        return isCertIssuedForColumn("FP_K", caCert, keyFp);
-    }
-
-    private boolean isCertIssuedForColumn(
-            final String fpColumnName,
-            final X509Cert caCert,
-            final long columnValue)
-    throws DataAccessException {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId = caInfoStore.getCaIdForCert(encodedCert);
-
         if (caId == null) {
             return false;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
-        sb.append(" AND CA_ID=?");
-        String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), 1);
+        boolean isOnlySingleCA = (getNumberOfCas() == 1);
+        String coreSql = isOnlySingleCA
+                ? CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA
+                : CORESQL_CERT_FOR_SUBJECT_ISSUED_MULTIPLE_CAS;
+        String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
-            ps.setLong(idx++, columnValue);
-            ps.setInt(idx++, caId);
+            ps.setLong(idx++, subjectFp);
+            if (!isOnlySingleCA) {
+                ps.setInt(idx++, caId);
+            }
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException ex) {
@@ -1890,7 +1889,40 @@ class CertStoreQueryExecutor {
         } finally {
             releaseDbResources(ps, rs);
         }
-    } // method isCertIssuedForColumn
+    }
+
+    boolean isCertForKeyIssued(
+            final X509Cert caCert,
+            final long keyFp)
+    throws DataAccessException {
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
+        if (caId == null) {
+            return false;
+        }
+
+        boolean isOnlySingleCA = (getNumberOfCas() == 1);
+        String coreSql = isOnlySingleCA
+                ? CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA
+                : CORESQL_CERT_FOR_KEY_ISSUED_MULTIPLE_CAS;
+        String sql = dataSource.createFetchFirstSelectSQL(coreSql, 1);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setLong(idx++, keyFp);
+            if (!isOnlySingleCA) {
+                ps.setInt(idx++, caId);
+            }
+            rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException ex) {
+            throw dataSource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    }
 
     private String base64Fp(
             final byte[] data) {
@@ -1910,6 +1942,10 @@ class CertStoreQueryExecutor {
                 "could not find CA with subject '%s' in table %s, please start XiPKI in master mode"
                 + " first, then restart this XiPKI system",
                 caCert.getSubject(), caInfoStore.getTable()));
+    }
+
+    private int getNumberOfCas() {
+        return caInfoStore.getSize();
     }
 
     void addCa(
