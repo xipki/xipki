@@ -75,7 +75,8 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
         char[] masterPassword = readPassword("Please enter the master password");
         char[] password = readPassword("Please enter the password");
 
-        String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword, password);
+        String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword,
+                password);
         out("the encrypted password is: '" + passwordHint + "'");
         return null;
     }

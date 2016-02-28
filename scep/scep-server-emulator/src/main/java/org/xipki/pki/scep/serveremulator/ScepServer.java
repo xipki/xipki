@@ -124,11 +124,11 @@ public class ScepServer {
         }
 
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
-        X500Name rCASubject;
-            kpGen.initialize(2048);
-            KeyPair keypair = kpGen.generateKeyPair();
-            PrivateKey rCAKey = keypair.getPrivate();
-            rCASubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
+        X500Name rcaSubject;
+        kpGen.initialize(2048);
+        KeyPair keypair = kpGen.generateKeyPair();
+        PrivateKey rcaKey = keypair.getPrivate();
+        rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
 
         kpGen.initialize(2048);
         keypair = kpGen.generateKeyPair();
@@ -136,8 +136,8 @@ public class ScepServer {
         SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
         X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
         this.caCert = issueSubCaCert(
-                rCAKey,
-                rCASubject,
+                rcaKey,
+                rcaSubject,
                 pkInfo,
                 subject,
                 BigInteger.valueOf(2),
@@ -165,8 +165,8 @@ public class ScepServer {
 
             Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
             this.nextCaCert = issueSubCaCert(
-                    rCAKey,
-                    rCASubject,
+                    rcaKey,
+                    rcaSubject,
                     pkInfo,
                     subject,
                     BigInteger.valueOf(2),

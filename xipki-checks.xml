@@ -42,9 +42,9 @@ limitations under the License.
 
   <!-- Checks for whitespace -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-<!--   <module name="FileTabCharacter"> -->
-<!--       <property name="fileExtensions" value="java" /> -->
-<!--   </module> -->
+   <module name="FileTabCharacter">
+       <property name="fileExtensions" value="java" />
+   </module>
 
   <!-- allow usage of CHECKSTYLE:OFF and CHECKSTYLE:ON -->
   <module name="SuppressionCommentFilter" />
@@ -98,12 +98,13 @@ limitations under the License.
     </module>
 
     <!-- Disabled, not compatible with Eclipse formatter -->
-    <!-- <module name="LineLength"> <property name="max" value="100" /> <property 
-      name="ignorePattern" value="@version|@see|http://"/> </module> -->
+    <module name="LineLength"> <property name="max" value="100" />
+	   <property name="ignorePattern" value="@version|@see|http://"/>
+    </module>
 
 
     <!-- Disabled, not compatible with Eclipse formatter -->
-    <!-- <module name="Indentation"> <property name="caseIndent" value="0"/> </module> -->
+    <module name="Indentation"> <property name="caseIndent" value="0"/> </module>
       
       
     <module name="MethodLength">
@@ -173,10 +174,10 @@ limitations under the License.
     <module name="NoFinalizer" />
     <module name="MissingOverride" />
     <module name="HideUtilityClassConstructor" />
-    <!-- module name="EqualsAvoidNull"/ -->
+    <module name="EqualsAvoidNull"/>
     <module name="ModifiedControlVariable" />
     <module name="DeclarationOrder" />
-    <!--module name="MultipleStringLiterals"/ -->
+    <!--module name="MultipleStringLiterals"/-->
     <module name="OneStatementPerLine" />
     <module name="ExplicitInitialization" />
     <module name="ModifierOrder" />

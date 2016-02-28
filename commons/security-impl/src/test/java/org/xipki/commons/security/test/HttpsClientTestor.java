@@ -66,8 +66,9 @@ public class HttpsClientTestor {
                     public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
                         return true;
                     }
-                });
-        }
+                }
+        );
+    }
 
     private void testIt() {
         String httpsUrl = "https://localhost:9443";

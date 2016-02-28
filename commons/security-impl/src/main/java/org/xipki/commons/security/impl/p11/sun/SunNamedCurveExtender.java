@@ -354,6 +354,7 @@ public class SunNamedCurveExtender {
         return true; // if error occurs, just return true
     }
 
+    // CHECKSTYLE:OFF
     private static boolean curveDBAdd(
             final Method methodAdd,
             final String name,
@@ -366,9 +367,10 @@ public class SunNamedCurveExtender {
             final String y,
             final String n,
             final int h) {
+        // CHECKSTYLE:ON
         try {
             methodAdd.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h,
-                    SPLIT_PATTERN});
+                SPLIT_PATTERN});
         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
             LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
             return false;
