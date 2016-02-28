@@ -341,20 +341,6 @@ public class CertificateStore {
         }
     }
 
-    public boolean certIssuedForSubject(
-            final X509Cert caCert,
-            final long fpSubject)
-    throws OperationException {
-        try {
-            return queryExecutor.certIssuedForSubject(caCert, fpSubject);
-        } catch (DataAccessException ex) {
-            LOG.debug("DataAccessException", ex);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
     public CertStatus getCertStatusForSubject(
             final X509Cert caCert,
             final X500Principal subject) {

@@ -1010,12 +1010,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Object value)
     throws DataAccessException {
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
-        sb.append(column)
-            .append(" FROM ")
-            .append(table)
-            .append(" WHERE ")
-            .append(column)
-            .append("=?");
+        sb.append("COUNT(").append(column).append(")");
+        sb.append(" FROM ").append(table);
+        sb.append(" WHERE ").append(column).append("=?");
         String sql = createFetchFirstSelectSQL(sb.toString(), 1);
 
         PreparedStatement stmt = null;
@@ -1034,7 +1031,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 stmt.setString(1, value.toString());
             }
             rs = stmt.executeQuery();
-            return rs.next();
+            rs.next();
+            return rs.getInt(1) > 0;
         } catch (SQLException ex) {
             throw translate(sql, ex);
         } finally {

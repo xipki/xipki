@@ -171,19 +171,19 @@ class CertStoreQueryExecutor {
             "DELETE FROM CERT_IN_PROCESS WHERE TIME2 < ?";
 
     private static final String CORESQL_ID_FOR_SN_IN_CERT =
-            "SELECT ID FROM CERT WHERE CA_ID=? AND SN=?";
+            "SELECT COUNT(ID) FROM CERT WHERE CA_ID=? AND SN=?";
 
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA =
-            "ID FROM CERT WHERE FP_S=?";
+            "COUNT(ID) FROM CERT WHERE FP_S=?";
 
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-            "ID FROM CERT WHERE FP_S=? AND CA_ID=?";
+            "COUNT(ID) FROM CERT WHERE FP_S=? AND CA_ID=?";
 
     private static final String CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA =
-            "ID FROM CERT WHERE FP_K=?";
+            "COUNT(ID) FROM CERT WHERE FP_K=?";
 
     private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-            "ID FROM CERT WHERE FP_K=? AND CA_ID=?";
+            "COUNT(ID) FROM CERT WHERE FP_K=? AND CA_ID=?";
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
@@ -605,14 +605,15 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        final String sql = dataSource.createFetchFirstSelectSQL("ID FROM CRL WHERE CA_ID = ?", 1);
+        final String sql = dataSource.createFetchFirstSelectSQL("COUNT(ID) FROM CRL WHERE CA_ID = ?", 1);
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = borrowPreparedStatement(sql);
             ps.setInt(1, caId);
             rs = ps.executeQuery();
-            return rs.next();
+            rs.next();
+            return rs.getInt(1) > 0;
         } catch (SQLException ex) {
             throw dataSource.translate(sql, ex);
         } finally {
@@ -1823,41 +1824,6 @@ class CertStoreQueryExecutor {
         }
     } // method getCertStatusForSubjectFp
 
-    boolean certIssuedForSubject(
-            final X509Cert caCert,
-            final long fpSubject)
-    throws OperationException, DataAccessException {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
-
-        if (caId == null) {
-            return false;
-        }
-
-        final String sql = dataSource.createFetchFirstSelectSQL(
-                "COUNT(ID) FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
-
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try {
-            int idx = 1;
-            ps.setLong(idx++, fpSubject);
-            ps.setInt(idx++, caId);
-
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                return false;
-            }
-
-            return rs.getInt(1) > 0;
-        } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
-        } finally {
-            releaseDbResources(ps, rs);
-        }
-    } // method certIssuedForSubject
-
     boolean isCertForSubjectIssued(
             final X509Cert caCert,
             final long subjectFp)
@@ -1883,7 +1849,8 @@ class CertStoreQueryExecutor {
                 ps.setInt(idx++, caId);
             }
             rs = ps.executeQuery();
-            return rs.next();
+            rs.next();
+            return rs.getInt(1) > 0;
         } catch (SQLException ex) {
             throw dataSource.translate(sql, ex);
         } finally {
@@ -1916,7 +1883,8 @@ class CertStoreQueryExecutor {
                 ps.setInt(idx++, caId);
             }
             rs = ps.executeQuery();
-            return rs.next();
+            rs.next();
+            return rs.getInt(1) > 0;
         } catch (SQLException ex) {
             throw dataSource.translate(sql, ex);
         } finally {
@@ -2380,8 +2348,8 @@ class CertStoreQueryExecutor {
                 try {
                     ps.setLong(2, serial);
                     rs = ps.executeQuery();
-
-                    if (!rs.next()) {
+                    rs.next();
+                    if (rs.getInt(1) == 0) {
                         return serial;
                     }
                 } catch (SQLException ex) {

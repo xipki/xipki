@@ -97,13 +97,14 @@ public class DbCertStatusStore extends CertStatusStore {
 
             if (revocationTimeMs == null) {
                 return issuer.getRevocationInfo() == null;
+            } else {
+                if (issuer.getRevocationInfo() == null) {
+                    return false;
+                } else {
+                    return revocationTimeMs ==
+                            issuer.getRevocationInfo().getRevocationTime().getTime();
+                }
             }
-
-            if (issuer.getRevocationInfo() == null) {
-                return false;
-            }
-
-            return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
         }
 
     } // class SimpleIssuerEntry
@@ -154,6 +155,8 @@ public class DbCertStatusStore extends CertStatusStore {
     private final IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
+
+    private boolean additionIssuersIgnored;
 
     private boolean initialized;
 
@@ -242,9 +245,11 @@ public class DbCertStatusStore extends CertStatusStore {
             try {
                 rs = ps.executeQuery();
                 List<IssuerEntry> caInfos = new LinkedList<>();
+                boolean issuersIgnored = false;
                 while (rs.next()) {
                     String sha1Fp = rs.getString("S1C");
                     if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
+                        issuersIgnored = true;
                         continue;
                     }
 
@@ -284,6 +289,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
+                this.additionIssuersIgnored = issuersIgnored;
                 LOG.info("Updated CertStore: {}", getName());
                 initializationFailed = false;
                 initialized = true;
@@ -334,7 +340,7 @@ public class DbCertStatusStore extends CertStatusStore {
             throw new CertStatusStoreException("initialization of CertStore failed");
         }
 
-        boolean onlySingleIssuer = (issuerStore.getSize() == 1);
+        boolean onlySingleIssuer = !additionIssuersIgnored && (issuerStore.getSize() == 1);
         String coreSql;
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
