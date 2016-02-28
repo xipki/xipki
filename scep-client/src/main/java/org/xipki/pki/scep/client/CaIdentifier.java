@@ -62,8 +62,8 @@ public class CaIdentifier {
     throws MalformedURLException {
         URL localUrl = new URL(serverUrl);
         final String protocol = localUrl.getProtocol();
-        if (!protocol.equalsIgnoreCase("http")
-                && !protocol.equalsIgnoreCase("https")) {
+        if (!"http".equalsIgnoreCase(protocol)
+                && !"https".equalsIgnoreCase(protocol)) {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }
