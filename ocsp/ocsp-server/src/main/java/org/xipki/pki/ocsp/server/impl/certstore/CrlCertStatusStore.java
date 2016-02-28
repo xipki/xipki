@@ -270,7 +270,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             boolean deltaCrlFileChanged =
                     !Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile);
 
-            if (!crlFileChanged && !deltaCrlFileChanged) {
+            if (!deltaCrlFileChanged) {
                 return;
             }
 
@@ -355,10 +355,6 @@ public class CrlCertStatusStore extends CertStatusStore {
                     }
                 } // end if(octetString == null)
             } // end if(deltaCrlExists)
-
-            if (!crlFileChanged && deltaCrl == null) {
-                return;
-            }
 
             Date newThisUpdate;
             Date newNextUpdate;

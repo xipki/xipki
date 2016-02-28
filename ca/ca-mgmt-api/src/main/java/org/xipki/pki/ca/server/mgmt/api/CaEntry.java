@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -49,7 +50,9 @@ import org.xipki.pki.ca.api.profile.CertValidity;
  * @since 2.0.0
  */
 
-public class CaEntry {
+public class CaEntry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
 

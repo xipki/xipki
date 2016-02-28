@@ -184,7 +184,7 @@ abstract class CmpResponder {
 
         GeneralName recipient = reqHeader.getRecipient();
         boolean intentMe = (recipient == null)
-                ? null
+                ? true
                 : intendsMe(recipient);
         if (!intentMe) {
             LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid,

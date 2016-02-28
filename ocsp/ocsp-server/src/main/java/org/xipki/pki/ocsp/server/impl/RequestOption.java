@@ -304,9 +304,11 @@ class RequestOption {
         } else if (conf.getDir() != null) {
             File dir = new File(conf.getDir());
             File[] files = dir.listFiles();
-            for (File file : files) {
-                if (file.exists() && file.isFile()) {
-                    localCerts.add(X509Util.parseCert(file));
+            if (files != null) {
+                for (File file : files) {
+                    if (file.exists() && file.isFile()) {
+                        localCerts.add(X509Util.parseCert(file));
+                    }
                 }
             }
         } else {

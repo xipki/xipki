@@ -109,6 +109,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ExtensionExistence;
@@ -1221,7 +1222,7 @@ public class ExtensionsChecker {
                     ? null
                     : bigInt.intValue();
             Integer eMaximum = eSubtree.getMaximum();
-            if (iMaximum != eMaximum) {
+            if (!CompareUtil.equalsObject(iMaximum, eMaximum)) {
                 failureMsg.append("maxmum of ")
                     .append(desc)
                     .append(" is '")

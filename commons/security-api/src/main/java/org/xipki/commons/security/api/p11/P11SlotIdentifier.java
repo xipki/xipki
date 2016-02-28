@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.api.p11;
 
+import org.xipki.commons.common.util.CompareUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -82,7 +84,8 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
         }
 
         P11SlotIdentifier another = (P11SlotIdentifier) b;
-        return (this.slotIndex == another.slotIndex || this.slotId == another.slotId);
+        return CompareUtil.equalsObject(this.slotIndex, another.slotIndex)
+                || CompareUtil.equalsObject(this.slotId, another.slotId);
     }
 
     @Override

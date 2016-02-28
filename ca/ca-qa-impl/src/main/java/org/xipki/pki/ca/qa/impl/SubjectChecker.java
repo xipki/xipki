@@ -262,7 +262,10 @@ public class SubjectChecker {
         StringBuilder failureMsg = new StringBuilder();
 
         // check the encoding
-        StringType stringType = rdnControl.getStringType();
+        StringType stringType = null;
+        if (rdnControl != null) {
+            stringType = rdnControl.getStringType();
+        }
 
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if (requestedRdns != null) {
@@ -346,7 +349,10 @@ public class SubjectChecker {
         }
 
         // check the encoding
-        StringType stringType = rdnControl.getStringType();
+        StringType stringType = null;
+        if (rdnControl != null) {
+            stringType = rdnControl.getStringType();
+        }
         List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if (requestedRdns != null) {
             for (RDN requestedRdn : requestedRdns) {

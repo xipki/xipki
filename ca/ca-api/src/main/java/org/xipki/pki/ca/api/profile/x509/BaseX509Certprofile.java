@@ -530,7 +530,10 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     throws BadCertTemplateException {
         String ttext = text.trim();
 
+        StringType stringType = null;
+
         if (option != null) {
+            stringType = option.getStringType();
             String prefix = option.getPrefix();
             String suffix = option.getSuffix();
 
@@ -589,7 +592,6 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
         }
 
-        StringType stringType = option.getStringType();
         if (stringType == null) {
             stringType = StringType.utf8String;
         }

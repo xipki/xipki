@@ -159,7 +159,6 @@ class IdentifiedX509Certprofile {
     private final String name;
     private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
-    private EnvParameterResolver envParameterResolver;
 
     IdentifiedX509Certprofile(
             final CertprofileEntry dbEntry,
@@ -191,10 +190,6 @@ class IdentifiedX509Certprofile {
         }
 
         tmpCertprofile.initialize(dbEntry.getConf());
-
-        if (envParameterResolver != null) {
-            tmpCertprofile.setEnvParameterResolver(envParameterResolver);
-        }
 
         if (tmpCertprofile.getSpecialCertprofileBehavior()
                 == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
@@ -241,7 +236,6 @@ class IdentifiedX509Certprofile {
 
     public void setEnvParameterResolver(
             final EnvParameterResolver envParameterResolver) {
-        this.envParameterResolver = envParameterResolver;
         if (certprofile != null) {
             certprofile.setEnvParameterResolver(envParameterResolver);
         }

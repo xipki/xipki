@@ -116,12 +116,12 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
         EjbcaDbRetriever()
         throws DataAccessException {
-            Connection connection = datasource.getConnection();
+            this.conn = datasource.getConnection();
             try {
-                selectCertStmt = datasource.prepareStatement(connection, selectCertSql);
-                selectBase64CertStmt = datasource.prepareStatement(connection, selectBase64CertSql);
+                selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
+                selectBase64CertStmt = datasource.prepareStatement(conn, selectBase64CertSql);
             } catch (DataAccessException ex) {
-                datasource.returnConnection(connection);
+                datasource.returnConnection(conn);
                 throw ex;
             }
         }

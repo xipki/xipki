@@ -47,6 +47,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -153,7 +154,8 @@ public class KeystoreP11Module implements P11Module {
 
         P11SlotIdentifier localSlotId = null;
         for (P11SlotIdentifier s : slotIds) {
-            if (s.getSlotIndex() == slotId.getSlotIndex() || s.getSlotId() == slotId.getSlotId()) {
+            if (CompareUtil.equalsObject(s.getSlotIndex(), slotId.getSlotIndex())
+                    || CompareUtil.equalsObject(s.getSlotId(), slotId.getSlotId())) {
                 localSlotId = s;
                 break;
             }
@@ -192,7 +194,16 @@ public class KeystoreP11Module implements P11Module {
 
     public void destroySlot(
             final long slotId) {
-        slots.remove(slotId);
+        P11SlotIdentifier p11SlotId = null;
+        for (P11SlotIdentifier si : slots.keySet()) {
+            if (CompareUtil.equalsObject(si.getSlotId(), slotId)) {
+                p11SlotId = si;
+                break;
+            }
+        }
+        if (p11SlotId != null) {
+            slots.remove(p11SlotId);
+        }
     }
 
     public void close() {

@@ -124,6 +124,10 @@ public class CanonicalizeCode {
             final File dir)
     throws Exception {
         File[] files = dir.listFiles();
+        if (files == null) {
+            return;
+        }
+
         for (File file : files) {
             String filename = file.getName();
             if (file.isDirectory()) {
@@ -222,6 +226,10 @@ public class CanonicalizeCode {
             final File dir)
     throws Exception {
         File[] files = dir.listFiles();
+        if (files == null) {
+            return;
+        }
+
         for (File file : files) {
             if (file.isDirectory()) {
                 if (!file.getName().equals("target")

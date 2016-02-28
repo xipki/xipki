@@ -87,7 +87,7 @@ public final class EnrolmentResponse {
         ContentInfo ci = (ContentInfo) messageData;
         SignedData sd = SignedData.getInstance(ci.getContent());
         ASN1Set asn1Certs = sd.getCertificates();
-        if (asn1Certs == null | asn1Certs.size() == 0) {
+        if (asn1Certs == null || asn1Certs.size() == 0) {
             throw new ScepClientException("no certificate is embedded in pkcsRep");
         }
 
