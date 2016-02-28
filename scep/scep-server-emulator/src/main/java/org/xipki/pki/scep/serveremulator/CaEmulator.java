@@ -285,7 +285,7 @@ public class CaEmulator {
         ParamUtil.assertNotNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
-        if (keyAlg.equals("EC")) {
+        if ("EC".equals(keyAlg)) {
             keyAlg = "ECDSA";
         }
 

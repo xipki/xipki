@@ -1134,7 +1134,7 @@ public final class CaClientImpl implements CaClient {
             String responseContentType = httpUrlConnection.getContentType();
             boolean isValidContentType = false;
             if (responseContentType != null) {
-                if (responseContentType.equalsIgnoreCase("application/json")) {
+                if ("application/json".equalsIgnoreCase(responseContentType)) {
                     isValidContentType = true;
                 }
             }

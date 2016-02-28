@@ -68,7 +68,9 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
+// CHECKSTYLE:OFF
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+// CHECKSTYLE:ON
 
 /**
  * @author Lijun Liao
