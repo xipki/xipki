@@ -857,7 +857,7 @@ class CertStoreQueryExecutor
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
-        String sql = "COUNT(*) FROM CERT WHERE CAINFO_ID=? AND EE=?";
+        String sql = "ID FROM CERT WHERE CAINFO_ID=? AND EE=?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         int caId = getCaId(caCert);
 
@@ -870,15 +870,7 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, caId);
             ps.setInt(2, ee ? 1 : 0);
             rs = ps.executeQuery();
-
-            if(rs.next())
-            {
-                return rs.getInt(1) > 0;
-            }
-            else
-            {
-                return false;
-            }
+            return rs.next();
         }finally
         {
             releaseDbResources(ps, rs);
@@ -1662,42 +1654,6 @@ class CertStoreQueryExecutor
         }
     }
 
-    boolean certIssuedForSubject(X509CertificateWithMetaInfo caCert, String sha1FpSubject)
-    throws OperationException, SQLException
-    {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
-
-        if(caId == null)
-        {
-            return false;
-        }
-
-        String sql = "COUNT(ID) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
-
-        ResultSet rs = null;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        try
-        {
-            int idx = 1;
-            ps.setString(idx++, sha1FpSubject);
-            ps.setInt(idx++, caId);
-
-            rs = ps.executeQuery();
-            if(rs.next())
-            {
-                return rs.getInt(1) > 0;
-            }
-        }finally
-        {
-            releaseDbResources(ps, rs);
-        }
-
-        return false;
-    }
-
     SubjectKeyProfileTriple getLatestCert(X509CertificateWithMetaInfo caCert, String subjectFp,
             String keyFp, String profile)
     throws SQLException
@@ -1781,7 +1737,7 @@ class CertStoreQueryExecutor
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("COUNT(ID) FROM CERT WHERE ").append(fpColumnName).append("=?");
+        sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
         sb.append(" AND CAINFO_ID=?");
         if(profile != null)
         {
@@ -1802,9 +1758,7 @@ class CertStoreQueryExecutor
             }
 
             rs = ps.executeQuery();
-
-            rs.next();
-            return rs.getInt(1) > 0;
+            return rs.next();
         }finally
         {
             releaseDbResources(ps, rs);

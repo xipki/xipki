@@ -2267,8 +2267,9 @@ public class X509CA
                             throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
                         }
 
-                        foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                    IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
+                        foundUniqueSubject = (certstore.isCertForSubjectIssued(
+                                        caInfo.getCertificate(),
+                                        IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
                         if(foundUniqueSubject)
                         {
                             break;

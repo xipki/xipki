@@ -575,7 +575,7 @@ class OCSPStoreQueryExecutor
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
     throws SQLException
     {
-        String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
+        String sql = "ID FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -587,16 +587,11 @@ class OCSPStoreQueryExecutor
             ps.setLong(idx++, serialNumber.longValue());
 
             rs = ps.executeQuery();
-            if(rs.next())
-            {
-                return rs.getInt(1) > 0;
-            }
+            return rs.next();
         }finally
         {
             releaseDbResources(ps, rs);
         }
-
-        return false;
     }
 
     boolean isHealthy()

@@ -303,20 +303,6 @@ public class CertificateStore
         }
     }
 
-    public boolean certIssuedForSubject(X509CertificateWithMetaInfo caCert,
-            String sha1FpSubject)
-    throws OperationException
-    {
-        try
-        {
-            return queryExecutor.certIssuedForSubject(caCert, sha1FpSubject);
-        } catch (SQLException e)
-        {
-            LOG.debug("SQLException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        }
-    }
-
     public CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
     {
         try
