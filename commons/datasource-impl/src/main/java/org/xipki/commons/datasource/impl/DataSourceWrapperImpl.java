@@ -974,7 +974,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         Connection localConn;
         if (conn != null) {
             localConn = conn;
-        } else{
+        } else {
             try {
                 localConn = getConnection();
             } catch (Throwable th) {
@@ -1014,7 +1014,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Object value)
     throws DataAccessException {
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
-        sb.append("COUNT(").append(column).append(")");
+        sb.append(column);
         sb.append(" FROM ").append(table);
         sb.append(" WHERE ").append(column).append("=?");
         String sql = createFetchFirstSelectSQL(sb.toString(), 1);
@@ -1035,8 +1035,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 stmt.setString(1, value.toString());
             }
             rs = stmt.executeQuery();
-            rs.next();
-            return rs.getInt(1) > 0;
+            return rs.next();
         } catch (SQLException ex) {
             throw translate(sql, ex);
         } finally {
