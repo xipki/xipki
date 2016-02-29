@@ -645,7 +645,7 @@ class OcspStoreQueryExecutor {
             final BigInteger serialNumber)
     throws DataAccessException {
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "COUNT(*) FROM CERT WHERE IID=? AND SN=?", 1);
+                "ID FROM CERT WHERE IID=? AND SN=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -655,16 +655,12 @@ class OcspStoreQueryExecutor {
             ps.setLong(idx++, serialNumber.longValue());
 
             rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
+            return rs.next();
         } catch (SQLException ex) {
             throw dataSource.translate(sql, ex);
         } finally {
             dataSource.releaseResources(ps, rs);
         }
-
-        return false;
     } // method certRegistered
 
     boolean isHealthy() {
