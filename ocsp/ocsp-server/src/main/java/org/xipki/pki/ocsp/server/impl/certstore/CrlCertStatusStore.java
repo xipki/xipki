@@ -240,17 +240,14 @@ public class CrlCertStatusStore extends CertStatusStore {
 
             if (!force) {
                 long now = System.currentTimeMillis();
-                if (newLastModifed != lastmodifiedOfCrlFile) {
-                    if (now - newLastModifed < 5000) {
-                        return; // still in copy process
-                    }
+                if (newLastModifed != lastmodifiedOfCrlFile && now - newLastModifed < 5000) {
+                    return; // still in copy process
                 }
 
                 if (deltaCrlExists) {
-                    if (newLastModifedOfDeltaCrl != lastModifiedOfDeltaCrlFile) {
-                        if (now - newLastModifed < 5000) {
-                            return; // still in copy process
-                        }
+                    if (newLastModifedOfDeltaCrl != lastModifiedOfDeltaCrlFile
+                            && now - newLastModifed < 5000) {
+                        return; // still in copy process
                     }
                 }
             } // end if (force)
@@ -258,19 +255,13 @@ public class CrlCertStatusStore extends CertStatusStore {
             byte[] newFp = sha1Fp(fullCrlFile);
             boolean crlFileChanged = !Arrays.equals(newFp, fpOfCrlFile);
 
-            if (!crlFileChanged) {
-                auditPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE",
-                        "current CRL is still up-to-date");
-                return;
-            }
-
             byte[] newFpOfDeltaCrl = deltaCrlExists
                     ? sha1Fp(deltaCrlFile)
                     : null;
             boolean deltaCrlFileChanged =
                     !Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile);
 
-            if (!deltaCrlFileChanged) {
+            if (!crlFileChanged && !deltaCrlFileChanged) {
                 return;
             }
 
@@ -298,9 +289,9 @@ public class CrlCertStatusStore extends CertStatusStore {
                     .getPositiveValue();
 
             if (crlNumber != null && newCrlNumber.compareTo(crlNumber) <= 0) {
-                throw new CertStatusStoreException(
-                        String.format("CRLNumber of new CRL (%s) <= current CRL (%s)",
-                            newCrlNumber, crlNumber));
+                throw new CertStatusStoreException(String.format(
+                        "CRLNumber of new CRL (%s) <= current CRL (%s)",
+                        newCrlNumber, crlNumber));
             }
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -336,8 +327,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                 }
 
                 deltaCrl = X509Util.parseCrl(deltaCrlFilename);
-                octetString =
-                        deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+                octetString = deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if (octetString == null) {
                     deltaCrl = null;
                     LOG.warn("{} is a full CRL instead of delta CRL, ignore it", deltaCrlFilename);
@@ -417,70 +407,18 @@ public class CrlCertStatusStore extends CertStatusStore {
             X500Name caName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
             // extract the certificate, only in full CRL, not in delta CRL
-            boolean certsConsidered = false;
-            Map<BigInteger, CertWithInfo> certsMap = new HashMap<>();
             String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
 
+            boolean certsConsidered = false;
+            Map<BigInteger, CertWithInfo> certsMap;
             if (extnValue != null) {
                 extnValue = removeTagAndLenFromExtensionValue(extnValue);
                 certsConsidered = true;
-                ASN1Set asn1Set = DERSet.getInstance(extnValue);
-                int n = asn1Set.size();
-                for (int i = 0; i < n; i++) {
-                    ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-
-                    ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                    BigInteger serialNumber = ASN1Integer.getInstance(
-                            seq.getObjectAt(0)).getValue();
-
-                    Certificate bcCert = null;
-                    String profileName = null;
-
-                    final int size = seq.size();
-                    for (int j = 1; j < size; j++) {
-                        ASN1TaggedObject taggedObj = DERTaggedObject.getInstance(
-                                seq.getObjectAt(j));
-                        int tagNo = taggedObj.getTagNo();
-                        switch (tagNo) {
-                        case 0:
-                            bcCert = Certificate.getInstance(taggedObj.getObject());
-                            break;
-                        case 1:
-                            profileName = DERUTF8String.getInstance(
-                                    taggedObj.getObject()).getString();
-                            break;
-                        default:
-                            break;
-                        }
-                    }
-
-                    if (bcCert != null) {
-                        if (!caName.equals(bcCert.getIssuer())) {
-                            throw new CertStatusStoreException(
-                                "issuer not match (serial=" + serialNumber
-                                + ") in CRL Extension Xipki-CertSet");
-                        }
-
-                        if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
-                            throw new CertStatusStoreException(
-                                    "serialNumber not match (serial=" + serialNumber
-                                    + ") in CRL Extension Xipki-CertSet");
-                        }
-                    }
-
-                    if (profileName == null) {
-                        profileName = "UNKNOWN";
-                    }
-
-                    CertWithInfo entry = new CertWithInfo(serialNumber);
-                    entry.setProfileName(profileName);
-                    if (!certHashAlgos.isEmpty()) {
-                        entry.setCert(bcCert);
-                    }
-                    certsMap.put(serialNumber, entry);
-                } // end for
-            } // end if (extnValue != null)
+                certsMap = extractCertsFromExtCrlCertSet(extnValue, caName);
+            } else {
+                certsMap = new HashMap<>();
+            }
 
             if (certsDirname != null) {
                 if (extnValue != null) {
@@ -668,6 +606,71 @@ public class CrlCertStatusStore extends CertStatusStore {
             }
         }
     } // method initializeStore
+
+    private Map<BigInteger, CertWithInfo> extractCertsFromExtCrlCertSet(
+            final byte[] encodedExtCrlCertSet,
+            final X500Name caName)
+    throws CertStatusStoreException {
+        Map<BigInteger, CertWithInfo> certsMap = new HashMap<>();
+        ASN1Set asn1Set = DERSet.getInstance(encodedExtCrlCertSet);
+        int n = asn1Set.size();
+
+        for (int i = 0; i < n; i++) {
+            ASN1Encodable asn1 = asn1Set.getObjectAt(i);
+
+            ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+            BigInteger serialNumber = ASN1Integer.getInstance(
+                    seq.getObjectAt(0)).getValue();
+
+            Certificate bcCert = null;
+            String profileName = null;
+
+            final int size = seq.size();
+            for (int j = 1; j < size; j++) {
+                ASN1TaggedObject taggedObj = DERTaggedObject.getInstance(
+                        seq.getObjectAt(j));
+                int tagNo = taggedObj.getTagNo();
+                switch (tagNo) {
+                case 0:
+                    bcCert = Certificate.getInstance(taggedObj.getObject());
+                    break;
+                case 1:
+                    profileName = DERUTF8String.getInstance(
+                            taggedObj.getObject()).getString();
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            if (bcCert != null) {
+                if (!caName.equals(bcCert.getIssuer())) {
+                    throw new CertStatusStoreException(
+                        "issuer not match (serial=" + serialNumber
+                        + ") in CRL Extension Xipki-CertSet");
+                }
+
+                if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
+                    throw new CertStatusStoreException(
+                            "serialNumber not match (serial=" + serialNumber
+                            + ") in CRL Extension Xipki-CertSet");
+                }
+            }
+
+            if (profileName == null) {
+                profileName = "UNKNOWN";
+            }
+
+            CertWithInfo entry = new CertWithInfo(serialNumber);
+            entry.setProfileName(profileName);
+            if (!certHashAlgos.isEmpty()) {
+                entry.setCert(bcCert);
+            }
+            certsMap.put(serialNumber, entry);
+        }
+
+        return certsMap;
+    }
 
     @Override
     public CertStatusInfo getCertStatus(
