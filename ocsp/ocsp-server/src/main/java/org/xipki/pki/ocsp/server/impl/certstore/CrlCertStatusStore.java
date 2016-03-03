@@ -193,21 +193,17 @@ public class CrlCertStatusStore extends CertStatusStore {
             final String certsDirname,
             final Set<HashAlgoType> certHashAlgos) {
         super(name);
-        ParamUtil.assertNotBlank("crlFile", crlFilename);
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("certHashAlgos", certHashAlgos);
-
+        ParamUtil.requireNonBlank("crlFilename", crlFilename);
+        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
+        this.certHashAlgos = ParamUtil.requireNonNull("certHashAlgos", certHashAlgos);
         this.crlFilename = IoUtil.expandFilepath(crlFilename);
         this.deltaCrlFilename = (deltaCrlFilename == null)
                 ? null
                 : IoUtil.expandFilepath(deltaCrlFilename);
-        this.caCert = caCert;
         this.issuerCert = issuerCert;
         this.crlUrl = crlUrl;
         this.caNotBefore = caCert.getNotBefore();
         this.certsDirname = certsDirname;
-
-        this.certHashAlgos = certHashAlgos;
         this.sha1 = new SHA1Digest();
     }
 
@@ -300,7 +296,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             if (!caCert.getSubjectX500Principal().equals(issuer)) {
                 caAsCrlIssuer = false;
                 if (issuerCert == null) {
-                    throw new IllegalArgumentException("issuerCert could not be null");
+                    throw new IllegalArgumentException("issuerCert must not be null");
                 }
 
                 if (!issuerCert.getSubjectX500Principal().equals(issuer)) {
@@ -461,7 +457,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             Map<BigInteger, X509CRLEntry> revokedCertMap = null;
 
             // merge the revoked list
-            if (CollectionUtil.isNotEmpty(revokedCertListInDeltaCRL)) {
+            if (CollectionUtil.isNonEmpty(revokedCertListInDeltaCRL)) {
                 revokedCertMap = new HashMap<BigInteger, X509CRLEntry>();
                 for (X509CRLEntry entry : revokedCertListInFullCRL) {
                     revokedCertMap.put(entry.getSerialNumber(), entry);
@@ -857,7 +853,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         if (!certsDir.canRead()) {
-            LOG.warn("the folder " + pCertsDirname + " could not be read, ignore it");
+            LOG.warn("the folder " + pCertsDirname + " must not be read, ignore it");
             return;
         }
 
@@ -978,7 +974,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     public void setCaRevocationInfo(
             final Date revocationTime) {
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
+        ParamUtil.requireNonNull("revocationTime", revocationTime);
         this.caRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
     }
 

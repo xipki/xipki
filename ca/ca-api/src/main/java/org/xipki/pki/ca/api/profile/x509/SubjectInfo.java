@@ -53,9 +53,7 @@ public class SubjectInfo {
     public SubjectInfo(
             final X500Name grantedSubject,
             final String warning) {
-        ParamUtil.assertNotNull("grantedSubject", grantedSubject);
-
-        this.grantedSubject = grantedSubject;
+        this.grantedSubject = ParamUtil.requireNonNull("grantedSubject", grantedSubject);
         this.warning = warning;
     }
 

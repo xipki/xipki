@@ -1121,7 +1121,7 @@ public class X509CaCmpResponder extends CmpResponder {
         StringBuilder sb = new StringBuilder(2000);
         // current maximal support version is 2
         int version = 2;
-        if (CollectionUtil.isNotEmpty(acceptVersions) && !acceptVersions.contains(version)) {
+        if (CollectionUtil.isNonEmpty(acceptVersions) && !acceptVersions.contains(version)) {
             Integer v = null;
             for (Integer m : acceptVersions) {
                 if (m < version) {
@@ -1158,7 +1158,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 }
             }
 
-            if (CollectionUtil.isNotEmpty(supportedLocalProfileNames)) {
+            if (CollectionUtil.isNonEmpty(supportedLocalProfileNames)) {
                 sb.append("<certprofiles>");
                 for (String localname : supportedLocalProfileNames) {
                     String name = caProfileNames.get(localname);

@@ -47,6 +47,7 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -93,6 +94,12 @@ public class DbDigestDiffWorker extends DbPortWorker {
             final NumThreads numThreads,
             final Set<byte[]> includeCaCerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
+        this.numThreads = ParamUtil.requireNonNull("numThreads", numThreads);
+
+        this.numCertsPerSelect = numCertsPerSelect;
+
         boolean validRef = false;
         if (refDirname == null) {
             validRef = (refDbConfFile != null);
@@ -140,10 +147,6 @@ public class DbDigestDiffWorker extends DbPortWorker {
             this.refDatasource = dataSourceFactory.createDataSource(
                     null, refProps, passwordResolver);
         }
-
-        this.reportDir = reportDirName;
-        this.numCertsPerSelect = numCertsPerSelect;
-        this.numThreads = numThreads;
     } // constructor DbDigestDiffWorker
 
     @Override

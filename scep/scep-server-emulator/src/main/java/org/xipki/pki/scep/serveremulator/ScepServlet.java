@@ -66,12 +66,12 @@ import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.NextCaMessage;
 import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.Operation;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepConstants;
 import org.xipki.pki.scep.util.ScepUtil;
 
@@ -96,8 +96,7 @@ public class ScepServlet extends HttpServlet {
 
     public ScepServlet(
             final ScepResponder responder) {
-        ParamUtil.assertNotNull("responder", responder);
-        this.responder = responder;
+        this.responder = ParamUtil.requireNonNull("responder", responder);
     }
 
     public AuditService getAuditService() {

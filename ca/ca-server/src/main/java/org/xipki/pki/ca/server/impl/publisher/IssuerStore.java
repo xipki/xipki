@@ -61,7 +61,7 @@ class IssuerStore {
 
     void addIdentityEntry(
             final IssuerEntry entry) {
-        ParamUtil.assertNotNull("entry", entry);
+        ParamUtil.requireNonNull("entry", entry);
 
         for (IssuerEntry existingEntry : entries) {
             if (existingEntry.getId() == entry.getId()) {

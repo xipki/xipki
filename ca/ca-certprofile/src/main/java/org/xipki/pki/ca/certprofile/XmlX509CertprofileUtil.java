@@ -63,14 +63,19 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyMappings;
+import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
+import org.bouncycastle.asn1.x509.UserNotice;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.util.X509Util;
@@ -134,6 +139,7 @@ public class XmlX509CertprofileUtil {
     public static X509ProfileType parse(
             final InputStream xmlConfStream)
     throws CertprofileException {
+        ParamUtil.requireNonNull("xmlConfStream", xmlConfStream);
         synchronized (JAXB_LOCK) {
             JAXBElement<?> rootElement;
             try {
@@ -213,6 +219,7 @@ public class XmlX509CertprofileUtil {
 
     public static PolicyMappings buildPolicyMappings(
             final org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings type) {
+        ParamUtil.requireNonNull("type", type);
         List<PolicyIdMappingType> mappings = type.getMapping();
         final int n = mappings.size();
 
@@ -235,6 +242,7 @@ public class XmlX509CertprofileUtil {
     public static NameConstraints buildNameConstrains(
             final org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints type)
     throws CertprofileException {
+        ParamUtil.requireNonNull("type", type);
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
         if (permitted == null && excluded == null) {
@@ -246,6 +254,7 @@ public class XmlX509CertprofileUtil {
     private static GeneralSubtree[] buildGeneralSubtrees(
             final GeneralSubtreesType subtrees)
     throws CertprofileException {
+        ParamUtil.requireNonNull("subtrees", subtrees);
         if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
             return null;
         }
@@ -263,6 +272,7 @@ public class XmlX509CertprofileUtil {
     private static GeneralSubtree buildGeneralSubtree(
             final GeneralSubtreeBaseType type)
     throws CertprofileException {
+        ParamUtil.requireNonNull("type", type);
         GeneralName base = null;
         if (type.getDirectoryName() != null) {
             base = new GeneralName(X509Util.reverse(
@@ -304,6 +314,7 @@ public class XmlX509CertprofileUtil {
     public static ASN1Sequence buildPolicyConstrains(
             final PolicyConstraints type)
     throws CertprofileException {
+        ParamUtil.requireNonNull("type", type);
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
         if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
             throw new CertprofileException(
@@ -337,6 +348,8 @@ public class XmlX509CertprofileUtil {
 
     public static Set<GeneralNameMode> buildGeneralNameMode(
             final GeneralNameType name) {
+        ParamUtil.requireNonNull("name", name);
+
         Set<GeneralNameMode> ret = new HashSet<>();
         if (name.getOtherName() != null) {
             List<OidWithDescType> list = name.getOtherName().getType();
@@ -396,6 +409,7 @@ public class XmlX509CertprofileUtil {
     public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
             final KeyAlgorithms keyAlgos)
     throws CertprofileException {
+        ParamUtil.requireNonNull("keyAlgos", keyAlgos);
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
         for (AlgorithmType type : keyAlgos.getAlgorithm()) {
             List<OidWithDescType> algIds = type.getAlgorithm();
@@ -414,12 +428,13 @@ public class XmlX509CertprofileUtil {
                 keyAlgorithms.put(oid, keyParamsOption);
             }
         }
-        return CollectionUtil.unmodifiableMap(keyAlgorithms, false, true);
+        return CollectionUtil.unmodifiableMap(keyAlgorithms);
     } // method buildKeyAlgorithms
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
             final ExtensionsType extensionsType)
     throws CertprofileException {
+        ParamUtil.requireNonNull("extensionsType", extensionsType);
         // Extension controls
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
         for (ExtensionType m : extensionsType.getExtension()) {
@@ -451,6 +466,7 @@ public class XmlX509CertprofileUtil {
 
     public static Set<KeyUsageControl> buildKeyUsageOptions(
             final org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf) {
+        ParamUtil.requireNonNull("extConf", extConf);
         List<UsageType> usages = extConf.getUsage();
         Set<KeyUsageControl> controls = new HashSet<>();
 
@@ -495,6 +511,7 @@ public class XmlX509CertprofileUtil {
 
     public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
             final ExtendedKeyUsage extConf) {
+        ParamUtil.requireNonNull("extConf", extConf);
         List<Usage> usages = extConf.getUsage();
         Set<ExtKeyUsageControl> controls = new HashSet<>();
 
@@ -565,6 +582,7 @@ public class XmlX509CertprofileUtil {
     private static KeyParametersOption convertKeyParametersOption(
             final AlgorithmType type)
     throws CertprofileException {
+        ParamUtil.requireNonNull("type", type);
         if (type.getParameters() == null || type.getParameters().getAny() == null) {
             return KeyParametersOption.ALLOW_ALL;
         }
@@ -692,6 +710,61 @@ public class XmlX509CertprofileUtil {
         default:
             throw new RuntimeException("should not reach here, undefined StringType " + jaxbType);
         }
+    }
+
+    public static org.bouncycastle.asn1.x509.CertificatePolicies createCertificatePolicies(
+            final List<CertificatePolicyInformation> policyInfos)
+    throws CertprofileException {
+        ParamUtil.requireNonEmpty("policyInfos", policyInfos);
+
+        int n = policyInfos.size();
+        PolicyInformation[] pInfos = new PolicyInformation[n];
+
+        int i = 0;
+        for (CertificatePolicyInformation policyInfo : policyInfos) {
+            String policyId = policyInfo.getCertPolicyId();
+            List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+
+            ASN1Sequence policyQualifiers = null;
+            if (CollectionUtil.isNonEmpty(qualifiers)) {
+                policyQualifiers = createPolicyQualifiers(qualifiers);
+            }
+
+            ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
+            if (policyQualifiers == null) {
+                pInfos[i] = new PolicyInformation(policyOid);
+            } else {
+                pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
+            }
+            i++;
+        }
+
+        return new org.bouncycastle.asn1.x509.CertificatePolicies(pInfos);
+    }
+
+    private static ASN1Sequence createPolicyQualifiers(
+            final List<CertificatePolicyQualifier> qualifiers) {
+        ParamUtil.requireNonNull("qualifiers", qualifiers);
+        List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
+        for (CertificatePolicyQualifier qualifier : qualifiers) {
+            PolicyQualifierInfo qualifierInfo;
+            if (qualifier.getCpsUri() != null) {
+                qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
+            } else if (qualifier.getUserNotice() != null) {
+                UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+                qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
+                        userNotice);
+            } else {
+                qualifierInfo = null;
+            }
+
+            if (qualifierInfo != null) {
+                qualifierInfos.add(qualifierInfo);
+            }
+            //PolicyQualifierId qualifierId
+        }
+
+        return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
     }
 
 }

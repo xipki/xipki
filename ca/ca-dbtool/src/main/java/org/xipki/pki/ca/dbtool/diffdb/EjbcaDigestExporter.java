@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
@@ -98,15 +99,11 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             final int numThreads)
     throws Exception {
         super(datasource, baseDir, stopMe);
-        if (numCertsPerSelect < 1) {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
-                    + numCertsPerSelect);
-        }
+        this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
 
         if (dbSchemaType != DbSchemaType.EJBCA_CA_v3) {
             throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
         }
-        this.numCertsPerSelect = numCertsPerSelect;
 
         // detect whether the table CertificateData has the column id
         if (dataSource.tableHasColumn(connection, "CertificateData", "id")) {

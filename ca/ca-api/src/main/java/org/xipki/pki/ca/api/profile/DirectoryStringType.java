@@ -41,6 +41,7 @@ import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,6 +57,8 @@ public enum DirectoryStringType {
 
     public ASN1Encodable createDirectoryString(
             final String text) {
+        ParamUtil.requireNonNull("text", text);
+
         if (teletexString == this) {
             return new DERT61String(text);
         } else if (printableString == this) {

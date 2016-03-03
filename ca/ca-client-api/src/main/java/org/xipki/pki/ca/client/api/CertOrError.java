@@ -54,18 +54,14 @@ public class CertOrError {
 
     public CertOrError(
             final Certificate certificate) {
-        ParamUtil.assertNotNull("certificate", certificate);
-
-        this.certificate = certificate;
+        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
         this.error = null;
     }
 
     public CertOrError(
             final PkiStatusInfo error) {
-        ParamUtil.assertNotNull("error", error);
-
         this.certificate = null;
-        this.error = error;
+        this.error = ParamUtil.requireNonNull("error", error);
     }
 
     public Certificate getCertificate() {

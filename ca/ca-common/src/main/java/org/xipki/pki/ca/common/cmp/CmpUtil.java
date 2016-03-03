@@ -82,8 +82,8 @@ public class CmpUtil {
             final GeneralName signerName,
             final boolean addSignerCert)
     throws CMPException, NoIdleSignerException {
-        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
-        ParamUtil.assertNotNull("signer", signer);
+        ParamUtil.requireNonNull("pkiMessage", pkiMessage);
+        ParamUtil.requireNonNull("signer", signer);
 
         final GeneralName localSignerName;
         if (signerName != null) {
@@ -152,6 +152,8 @@ public class CmpUtil {
 
     public static boolean isImplictConfirm(
             final PKIHeader header) {
+        ParamUtil.requireNonNull("header", header);
+
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
         if (regInfos == null) {
             return false;
@@ -203,12 +205,14 @@ public class CmpUtil {
 
     public static InfoTypeAndValue buildInfoTypeAndValue(
             final CmpUtf8Pairs utf8Pairs) {
+        ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }
 
     public static AttributeTypeAndValue buildAttributeTypeAndValue(
             final CmpUtf8Pairs utf8Pairs) {
+        ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }

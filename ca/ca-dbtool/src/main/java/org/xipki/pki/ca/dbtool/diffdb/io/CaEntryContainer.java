@@ -55,7 +55,7 @@ public class CaEntryContainer {
 
     public CaEntryContainer(
             final Set<CaEntry> caEntries) {
-        ParamUtil.assertNotEmpty("caEntries", caEntries);
+        ParamUtil.requireNonEmpty("caEntries", caEntries);
         caEntryMap = new HashMap<>(caEntries.size());
         for (CaEntry m : caEntries) {
             caEntryMap.put(m.getCaId(), m);

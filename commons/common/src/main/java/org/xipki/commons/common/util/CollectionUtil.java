@@ -36,11 +36,8 @@
 
 package org.xipki.commons.common.util;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +57,7 @@ public class CollectionUtil {
         return c == null || c.isEmpty();
     }
 
-    public static boolean isNotEmpty(
+    public static boolean isNonEmpty(
             final Collection<?> c) {
         return c != null && !c.isEmpty();
     }
@@ -70,7 +67,7 @@ public class CollectionUtil {
         return m == null || m.isEmpty();
     }
 
-    public static boolean isNotEmpty(
+    public static boolean isNonEmpty(
             final Map<?, ?> m) {
         return m != null && !m.isEmpty();
     }
@@ -78,75 +75,25 @@ public class CollectionUtil {
     public static <K, V> Map<K, V> unmodifiableMap(
             final Map<? extends K, ? extends V> m) {
         if (m == null) {
-            return null;
+            return Collections.emptyMap();
         }
 
         return Collections.unmodifiableMap(m);
     }
 
-    public static <K, V> Map<K, V> unmodifiableMap(
-            final Map<? extends K, ? extends V> m,
-            final boolean newMap,
-            final boolean emptyAsNull) {
-        if (m == null) {
-            return null;
-        }
-
-        if (emptyAsNull && m.isEmpty()) {
-            return null;
-        }
-
-        return Collections.unmodifiableMap(
-                newMap
-                        ? new HashMap<K, V>(m)
-                        : m);
-    }
-
     public static <T> Set<T> unmodifiableSet(
             final Set<? extends T> s) {
         if (s == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         return Collections.unmodifiableSet(s);
     }
 
-    public static <T> Set<T> unmodifiableSet(
-            final Set<? extends T> s,
-            final boolean newSet,
-            final boolean emptyAsNull) {
-        if (s == null) {
-            return null;
-        }
-
-        if (emptyAsNull && s.isEmpty()) {
-            return null;
-        }
-
-        return Collections.unmodifiableSet(
-                newSet
-                        ? new HashSet<T>(s)
-                        : s);
-    }
-
     public static <T> Collection<T> unmodifiableCollection(
             final Collection<? extends T> c) {
         if (c == null) {
-            return null;
-        }
-
-        return Collections.unmodifiableCollection(c);
-    }
-
-    public static <T> Collection<T> unmodifiableCollection(
-            final Collection<? extends T> c,
-            final boolean emptyAsNull) {
-        if (c == null) {
-            return null;
-        }
-
-        if (emptyAsNull && c.isEmpty()) {
-            return null;
+            return Collections.emptySet();
         }
 
         return Collections.unmodifiableCollection(c);
@@ -155,28 +102,10 @@ public class CollectionUtil {
     public static <T> List<T> unmodifiableList(
             final List<? extends T> l) {
         if (l == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         return Collections.unmodifiableList(l);
-    }
-
-    public static <T> List<T> unmodifiableList(
-            final List<? extends T> l,
-            final boolean newList,
-            final boolean emptyAsNull) {
-        if (l == null) {
-            return null;
-        }
-
-        if (emptyAsNull && l.isEmpty()) {
-            return null;
-        }
-
-        return Collections.unmodifiableList(
-                newList
-                        ? new ArrayList<T>(l)
-                        : l);
     }
 
 }

@@ -47,6 +47,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbSchemaInfo;
@@ -124,6 +125,8 @@ public class DbPorter extends DbToolBase {
             return null;
         }
 
+        ParamUtil.requireNonNull("fileName", fileName);
+
         FileOrValueType ret = new FileOrValueType();
         if (content.length() < 256) {
             ret.setValue(content);
@@ -184,6 +187,8 @@ public class DbPorter extends DbToolBase {
     public static final Schema retrieveSchema(
             final String schemaPath)
     throws JAXBException {
+        ParamUtil.requireNonNull("schemaPath", schemaPath);
+
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
         final SchemaFactory schemaFact = SchemaFactory.newInstance(
                 javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -200,6 +205,9 @@ public class DbPorter extends DbToolBase {
             final String content,
             final File file)
     throws IOException {
+        ParamUtil.requireNonNull("content", content);
+        ParamUtil.requireNonNull("file", file);
+
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(file);

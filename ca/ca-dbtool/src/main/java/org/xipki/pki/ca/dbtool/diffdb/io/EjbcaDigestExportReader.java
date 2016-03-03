@@ -56,6 +56,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
@@ -226,9 +227,9 @@ public class EjbcaDigestExportReader {
             final Map<String, EjbcaCaInfo> fpCaInfoMap,
             final int numThreads)
     throws Exception {
-        this.datasource = datasource;
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.numThreads = numThreads;
-        this.fpCaInfoMap = fpCaInfoMap;
+        this.fpCaInfoMap = ParamUtil.requireNonNull("fpCaInfoMap", fpCaInfoMap);
 
         selectCertSql = "SELECT id, fingerprint, serialNumber, cAFingerprint, status,"
                 + " revocationReason, revocationDate"
@@ -252,6 +253,8 @@ public class EjbcaDigestExportReader {
     public List<IdentifiedDbDigestEntry> readCerts(
             final List<IdRange> idRanges)
     throws DataAccessException {
+        ParamUtil.requireNonNull("idRanges", idRanges);
+
         int n = idRanges.size();
         for (IdRange range : idRanges) {
             inQueue.add(range);

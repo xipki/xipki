@@ -63,8 +63,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
     public X509ChangeCrlSignerEntry(
             final String name)
     throws InvalidConfException {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
     public String getName() {

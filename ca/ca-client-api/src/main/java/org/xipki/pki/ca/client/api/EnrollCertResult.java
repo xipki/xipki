@@ -40,6 +40,8 @@ import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -54,8 +56,9 @@ public class EnrollCertResult {
     public EnrollCertResult(
             final Certificate caCertificate,
             final Map<String, CertOrError> certificatesOrErrors) {
+        this.certificatesOrErrors = ParamUtil.requireNonEmpty("certificatesOrErrors",
+                certificatesOrErrors);
         this.caCertificate = caCertificate;
-        this.certificatesOrErrors = certificatesOrErrors;
     }
 
     public Certificate getCaCertificate() {
@@ -64,6 +67,7 @@ public class EnrollCertResult {
 
     public CertOrError getCertificateOrError(
             final String id) {
+        ParamUtil.requireNonBlank("id", id);
         return certificatesOrErrors.get(id);
     }
 

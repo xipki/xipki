@@ -124,19 +124,17 @@ abstract class DbDigestReader implements DigestReader {
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws DataAccessException, CertificateException, IOException {
-        ParamUtil.assertNotNull("datasource", datasource);
-
-        this.datasource = datasource;
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.totalAccount = totalAccount;
         this.revokedOnly = revokedOnly;
         this.numThreads = numThreads;
-        this.caCert = caCert;
+        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.caSubjectName = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
         this.minId = minId;
         this.maxId = maxId;
         this.nextId = minId;
 
-        this.stopMe = stopMe;
+        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
         this.inQueue = new LinkedBlockingDeque<>();
         this.outQueue = new LinkedBlockingDeque<>();
         this.fixedSizedCerts = new ArrayBlockingQueue<>(numCertsToPredicate);

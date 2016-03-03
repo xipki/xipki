@@ -60,13 +60,9 @@ public class AddUserEntry implements Serializable {
             final String password,
             final String cnRegex)
     throws CaMgmtException {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("password", password);
-        ParamUtil.assertNotBlank("cnRegex", cnRegex);
-
-        this.name = name;
-        this.password = password;
-        this.cnRegex = cnRegex;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.password = ParamUtil.requireNonBlank("password", password);
+        this.cnRegex = ParamUtil.requireNonBlank("cnRegex", cnRegex);
     }
 
     public String getName() {

@@ -52,6 +52,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -131,10 +132,7 @@ public class RequestOptions {
 
     public void setNonceLen(
             final int nonceLen) {
-        if (nonceLen < 1) {
-            throw new IllegalArgumentException("invalid nonceLen " + nonceLen);
-        }
-        this.nonceLen = nonceLen;
+        this.nonceLen = ParamUtil.requireMin("nonceLen", nonceLen, 1);
     }
 
     public ASN1ObjectIdentifier getHashAlgorithmId() {

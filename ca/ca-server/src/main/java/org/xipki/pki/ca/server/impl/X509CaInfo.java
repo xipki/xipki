@@ -107,10 +107,8 @@ public class X509CaInfo {
             final X509CaEntry caEntry,
             final CertificateStore certStore)
     throws OperationException {
-        ParamUtil.assertNotNull("caEntry", caEntry);
-        ParamUtil.assertNotNull("certStore", certStore);
-        this.caEntry = caEntry;
-        this.certStore = certStore;
+        this.caEntry = ParamUtil.requireNonNull("caEntry", caEntry);
+        this.certStore = ParamUtil.requireNonNull("certStore", certStore);
 
         X509Certificate cert = caEntry.getCertificate();
         this.notBefore = cert.getNotBefore();

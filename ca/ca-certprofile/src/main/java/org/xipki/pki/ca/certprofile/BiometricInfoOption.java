@@ -66,7 +66,8 @@ public class BiometricInfoOption {
     public BiometricInfoOption(
             final BiometricInfo jaxb)
     throws NoSuchAlgorithmException {
-        ParamUtil.assertNotNull("jaxb", jaxb);
+        ParamUtil.requireNonNull("jaxb", jaxb);
+
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();
         this.hashAlgorithms = XmlX509CertprofileUtil.toOidSet(jaxb.getHashAlgorithm());
 
@@ -89,6 +90,8 @@ public class BiometricInfoOption {
 
     public boolean isTypePermitted(
             final TypeOfBiometricData type) {
+        ParamUtil.requireNonNull("type", type);
+
         if (type.isPredefined()) {
             return predefinedTypes.contains(type.getPredefinedBiometricType());
         } else {
@@ -98,6 +101,7 @@ public class BiometricInfoOption {
 
     public boolean isHashAlgorithmPermitted(
             final ASN1ObjectIdentifier hashAlgorithm) {
+        ParamUtil.requireNonNull("hashAlgorithm", hashAlgorithm);
         return hashAlgorithms.contains(hashAlgorithm);
     }
 

@@ -62,8 +62,7 @@ public class CaHasRequestorEntry implements Serializable {
 
     public CaHasRequestorEntry(
             final String requestorName) {
-        ParamUtil.assertNotBlank("requestorName", requestorName);
-        this.requestorName = requestorName;
+        this.requestorName = ParamUtil.requireNonBlank("requestorName", requestorName);
     }
 
     public boolean isRa() {

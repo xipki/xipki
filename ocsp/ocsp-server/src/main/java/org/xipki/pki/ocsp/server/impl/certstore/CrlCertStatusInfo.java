@@ -121,7 +121,7 @@ class CrlCertStatusInfo {
     static CrlCertStatusInfo getGoodCertStatusInfo(
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes) {
-        ParamUtil.assertNotBlank("certprofile", certprofile);
+        ParamUtil.requireNonBlank("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 
@@ -129,7 +129,7 @@ class CrlCertStatusInfo {
             final CertRevocationInfo revocationInfo,
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes) {
-        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
+        ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }
 

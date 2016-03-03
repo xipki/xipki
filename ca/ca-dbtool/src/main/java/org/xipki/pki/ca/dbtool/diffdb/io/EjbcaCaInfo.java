@@ -38,6 +38,7 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashCalculator;
 
 /**
@@ -59,10 +60,12 @@ public class EjbcaCaInfo {
             final int caId,
             final byte[] certBytes,
             final String caDirname) {
+        ParamUtil.requireNonNull("certBytes", certBytes);
+
         this.caId = caId;
         this.hexSha1 = HashCalculator.hexSha1(certBytes).toLowerCase();
         this.subject = Certificate.getInstance(certBytes).getSubject();
-        this.caDirname = caDirname;
+        this.caDirname = ParamUtil.requireNonNull("caDirname", caDirname);
     }
 
     public int getCaId() {

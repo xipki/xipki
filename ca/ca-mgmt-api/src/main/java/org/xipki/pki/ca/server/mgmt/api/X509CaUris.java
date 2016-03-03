@@ -63,19 +63,19 @@ public class X509CaUris {
     }
 
     public List<String> getCacertUris() {
-        return CollectionUtil.unmodifiableList(cacertUris, true, true);
+        return CollectionUtil.unmodifiableList(cacertUris);
     }
 
     public List<String> getOcspUris() {
-        return CollectionUtil.unmodifiableList(ocspUris, true, true);
+        return CollectionUtil.unmodifiableList(ocspUris);
     }
 
     public List<String> getCrlUris() {
-        return CollectionUtil.unmodifiableList(crlUris, true, true);
+        return CollectionUtil.unmodifiableList(crlUris);
     }
 
     public List<String> getDeltaCrlUris() {
-        return CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+        return CollectionUtil.unmodifiableList(deltaCrlUris);
     }
 
 }

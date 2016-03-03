@@ -58,10 +58,8 @@ public class CmpControlEntry implements Serializable {
     public CmpControlEntry(
             final String name,
             final String conf) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("conf", conf);
-        this.name = name;
-        this.conf = conf;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.conf = ParamUtil.requireNonBlank("conf", conf);
     }
 
     public boolean isFaulty() {

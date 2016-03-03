@@ -76,8 +76,7 @@ public abstract class LoadExecutor {
 
     public LoadExecutor(
             final String description) {
-        ParamUtil.assertNotNull("description", description);
-        this.description = description;
+        this.description = ParamUtil.requireNonNull("description", description);
         this.processLog = new ProcessLog(0);
     }
 

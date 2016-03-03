@@ -82,14 +82,9 @@ public class ScepEntry implements Serializable {
             final String base64Cert,
             final String control)
     throws InvalidConfException {
-        ParamUtil.assertNotBlank("caName", caName);
-        ParamUtil.assertNotBlank("responderType", responderType);
-        ParamUtil.assertNotNull("responderConf", responderConf);
-
+        this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+        this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
         this.base64Cert = base64Cert;
-
-        this.caName = caName.toUpperCase();
-        this.responderType = responderType;
         this.responderConf = responderConf;
         this.control = control;
 

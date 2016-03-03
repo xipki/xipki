@@ -89,7 +89,7 @@ public class CaEntry {
             final int caId,
             final String caDir)
     throws IOException {
-        ParamUtil.assertNotNull("caDir", caDir);
+        ParamUtil.requireNonNull("caDir", caDir);
 
         this.caId = caId;
         this.caDir = new File(caDir);
@@ -109,6 +109,8 @@ public class CaEntry {
             final int id,
             final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException {
+        ParamUtil.requireNonNull("reportEntry", reportEntry);
+
         if (minIdInCsvFile == 0) {
             minIdInCsvFile = id;
         } else if (minIdInCsvFile > id) {

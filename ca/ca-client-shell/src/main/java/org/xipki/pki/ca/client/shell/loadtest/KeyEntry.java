@@ -60,6 +60,7 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 
@@ -278,6 +279,8 @@ public abstract class KeyEntry {
         public ECKeyEntry(
                 final String curveNameOrOid)
         throws Exception {
+            ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
+
             ASN1ObjectIdentifier curveOid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
             if (curveOid == null) {
                 throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid

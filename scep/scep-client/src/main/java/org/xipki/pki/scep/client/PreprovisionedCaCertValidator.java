@@ -41,8 +41,8 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
 
     public PreprovisionedCaCertValidator(
             final X509Certificate cert) {
-        ParamUtil.assertNotNull("cert", cert);
+        ParamUtil.requireNonNull("cert", cert);
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
         try {
@@ -69,7 +69,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
 
     public PreprovisionedCaCertValidator(
             final Set<X509Certificate> certs) {
-        ParamUtil.assertNotEmpty("certs", certs);
+        ParamUtil.requireNonNull("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
         for (X509Certificate m : certs) {
             String hexFp;

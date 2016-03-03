@@ -56,8 +56,7 @@ public class RevokeCertResultType {
 
     public void addResultEntry(
             final ResultEntryType resultEntry) {
-        ParamUtil.assertNotNull("resultEntry", resultEntry);
-
+        ParamUtil.requireNonNull("resultEntry", resultEntry);
         if (!(resultEntry instanceof RevokeCertResultEntryType
                 || resultEntry instanceof ErrorResultEntryType)) {
             throw new IllegalArgumentException("unaccepted parameter of class "

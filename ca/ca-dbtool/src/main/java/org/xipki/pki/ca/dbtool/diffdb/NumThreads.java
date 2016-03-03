@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.dbtool.diffdb;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -50,15 +52,8 @@ public class NumThreads {
     public NumThreads(
             final int numRefThreads,
             final int numTargetThreads) {
-        if (numRefThreads < 1) {
-            throw new IllegalArgumentException("invalid numRefThreads: " + numRefThreads);
-        }
-        if (numTargetThreads < 1) {
-            throw new IllegalArgumentException("invalid numTargetThreads: " + numTargetThreads);
-        }
-
-        this.numRefThreads = numRefThreads;
-        this.numTargetThreads = numTargetThreads;
+        this.numRefThreads = ParamUtil.requireMin("numRefThreads", numRefThreads, 1);
+        this.numTargetThreads = ParamUtil.requireMin("numTargetThreads", numTargetThreads, 1);
     }
 
     public int getNumRefThreads() {

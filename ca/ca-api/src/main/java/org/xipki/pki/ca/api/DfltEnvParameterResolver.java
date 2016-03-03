@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -55,6 +57,7 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
     @Override
     public String getParameterValue(
             final String parameterName) {
+        ParamUtil.requireNonNull("parameterName", parameterName);
         return envParameters.get(parameterName);
     }
 
@@ -65,12 +68,14 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
 
     public String getEnvParam(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         return envParameters.get(name);
     }
 
     public void addEnvParam(
             final String name,
             final String value) {
+        ParamUtil.requireNonNull("name", name);
         envParameters.put(name, value);
     }
 
@@ -80,6 +85,7 @@ public class DfltEnvParameterResolver implements EnvParameterResolver {
 
     public String removeEnvParam(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         return envParameters.remove(name);
     }
 

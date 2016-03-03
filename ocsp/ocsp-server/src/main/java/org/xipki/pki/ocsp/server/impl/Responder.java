@@ -71,19 +71,13 @@ class Responder {
             final CertprofileOption certprofileOption,
             final ResponderSigner signer,
             final List<CertStatusStore> stores) {
-        ParamUtil.assertNotNull("responderOption", responderOption);
-        ParamUtil.assertNotNull("requestOption", requestOption);
-        ParamUtil.assertNotNull("responseOption", responseOption);
-        ParamUtil.assertNotNull("signer", signer);
-        ParamUtil.assertNotEmpty("stores", stores);
-
-        this.responderOption = responderOption;
-        this.requestOption = requestOption;
-        this.responseOption = responseOption;
+        this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
+        this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
+        this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
+        this.signer = ParamUtil.requireNonNull("signer", signer);
+        this.stores = ParamUtil.requireNonEmpty("stores", stores);
         this.auditOption = auditOption;
         this.certprofileOption = certprofileOption;
-        this.signer = signer;
-        this.stores = stores;
     }
 
     public ResponderOption getResponderOption() {

@@ -72,9 +72,9 @@ public class AlgorithmUtil {
     public static ASN1ObjectIdentifier getHashAlg(
             final String hashAlgName)
     throws NoSuchAlgorithmException {
-        String localHashAlgName = hashAlgName;
-        localHashAlgName = localHashAlgName.trim();
-        ParamUtil.assertNotBlank("hashAlgName", localHashAlgName);
+        ParamUtil.requireNonNull("hashAlgName", hashAlgName);
+        String localHashAlgName = hashAlgName.trim();
+        ParamUtil.requireNonBlank("hashAlgName", localHashAlgName);
         localHashAlgName = localHashAlgName.replace("-", "").toUpperCase();
 
         if ("SHA1".equalsIgnoreCase(localHashAlgName)) {
@@ -322,7 +322,7 @@ public class AlgorithmUtil {
 
     public static boolean isRSASignatureAlgoId(
             final AlgorithmIdentifier algId) {
-        ParamUtil.assertNotNull("algId", algId);
+        ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
@@ -344,7 +344,7 @@ public class AlgorithmUtil {
 
     public static boolean isECDSASigAlg(
             final AlgorithmIdentifier algId) {
-        ParamUtil.assertNotNull("algId", algId);
+        ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(oid)
@@ -360,7 +360,7 @@ public class AlgorithmUtil {
 
     public static boolean isPlainECDSASigAlg(
             final AlgorithmIdentifier algId) {
-        ParamUtil.assertNotNull("algId", algId);
+        ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(oid)
@@ -376,7 +376,7 @@ public class AlgorithmUtil {
 
     public static boolean isDSASigAlg(
             final AlgorithmIdentifier algId) {
-        ParamUtil.assertNotNull("algId", algId);
+        ParamUtil.requireNonNull("algId", algId);
 
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(oid)
@@ -395,7 +395,8 @@ public class AlgorithmUtil {
             final String hashAlgo,
             final SignatureAlgoControl algoControl)
     throws NoSuchAlgorithmException {
-        ParamUtil.assertNotNull("pubKey", pubKey);
+        ParamUtil.requireNonNull("pubKey", pubKey);
+
         boolean rsaMgf1 = (algoControl == null)
                 ? false
                 : algoControl.isRsaMgf1();

@@ -61,10 +61,8 @@ public class PublisherEntry implements Serializable {
             final String name,
             final String type,
             final String conf) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("type", type);
-        this.name = name;
-        this.type = type;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
     }
 

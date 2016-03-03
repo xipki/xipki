@@ -80,8 +80,7 @@ public class ChangeCaEntry implements Serializable {
     public ChangeCaEntry(
             final String name)
     throws CaMgmtException {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
     public String getName() {

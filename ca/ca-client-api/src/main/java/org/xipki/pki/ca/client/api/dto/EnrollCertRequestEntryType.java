@@ -59,10 +59,9 @@ public class EnrollCertRequestEntryType extends IdentifiedObject {
             final CertRequest certReq,
             final ProofOfPossession popo) {
         super(id);
-        ParamUtil.assertNotNull("certReq", certReq);
 
         this.certprofile = certprofile;
-        this.certReq = certReq;
+        this.certReq = ParamUtil.requireNonNull("certReq", certReq);
         this.popo = popo;
     }
 

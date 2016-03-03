@@ -38,6 +38,7 @@ package org.xipki.commons.common.util;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Lijun Liao
@@ -48,48 +49,109 @@ public class ParamUtil {
 
     private ParamUtil() {
     }
-    public static void assertNotNull(
-            final String parameterName,
-            final Object parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+
+    public static int requireMin(
+            final String objName,
+            final int obj,
+            final int min) {
+        if (obj < min) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be less than %d: %d", objName, min, obj));
         }
+        return obj;
     }
 
-    public static void assertNotBlank(
-            final String parameterName,
-            final String parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+    public static int requireMax(
+            final String objName,
+            final int obj,
+            final int max) {
+        if (obj > max) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be greater than %d: %d", objName, max, obj));
         }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be blank");
-        }
+        return obj;
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Collection<?> parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+    public static int requireRange(
+            final String objName,
+            final int obj,
+            final int min,
+            final int max) {
+        if (obj < min || obj > max) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be out of the range [%d, %d]: %d", objName, min, max, obj));
         }
-
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+        return obj;
     }
 
-    public static void assertNotEmpty(
-            final String parameterName,
-            final Map<?, ?> parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+    public static long requireMin(
+            final String objName,
+            final long obj,
+            final long min) {
+        if (obj < min) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be less than %d: %d", objName, min, obj));
+        }
+        return obj;
+    }
+
+    public static long requireMax(
+            final String objName,
+            final long obj,
+            final long max) {
+        if (obj > max) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be greater than %d: %d", objName, max, obj));
+        }
+        return obj;
+    }
+
+    public static long requireRange(
+            final String objName,
+            final long obj,
+            final long min,
+            final long max) {
+        if (obj < min || obj > max) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be out of the range [%d, %d]: %d", objName, min, max, obj));
+        }
+        return obj;
+    }
+
+    public static <T> T requireNonNull(
+            final String objName,
+            final T obj) {
+        return Objects.requireNonNull(obj, objName + " must not be null");
+    }
+
+    public static String requireNonBlank(
+            final String objName,
+            final String obj) {
+        requireNonNull(objName, obj);
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be blank");
+        }
+        return obj;
+    }
+
+    public static <T> T requireNonEmpty(
+            final String objName,
+            final T obj) {
+        requireNonNull(objName, obj);
+        if (obj instanceof Collection<?>) {
+            if (((Collection<?>) obj).isEmpty()) {
+                throw new IllegalArgumentException(objName + " must not be empty");
+            }
+        } else if (obj instanceof Map<?, ?>) {
+            if (((Map<?, ?>) obj).isEmpty()) {
+                throw new IllegalArgumentException(objName + " must not be empty");
+            }
+        } else {
+            throw new IllegalArgumentException("unknown parameter type "
+                    + obj.getClass().getName());
         }
 
-        if (parameter.isEmpty()) {
-            throw new IllegalArgumentException(parameterName + " could not be empty");
-        }
+        return obj;
     }
 
 }

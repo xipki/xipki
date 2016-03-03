@@ -36,10 +36,12 @@
 
 package org.xipki.pki.ca.api.profile;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,15 +57,17 @@ public class GeneralNameMode {
 
     public GeneralNameMode(
             final GeneralNameTag tag) {
-        this.tag = tag;
+        this.tag = ParamUtil.requireNonNull("tag", tag);
         this.allowedTypes = null;
     }
 
     public GeneralNameMode(
             final GeneralNameTag tag,
             final Set<ASN1ObjectIdentifier> allowedTypes) {
-        this.tag = tag;
-        this.allowedTypes = CollectionUtil.unmodifiableSet(allowedTypes);
+        this.tag = ParamUtil.requireNonNull("tag", tag);
+        this.allowedTypes = CollectionUtil.isEmpty(allowedTypes)
+                ? Collections.emptySet()
+                : CollectionUtil.unmodifiableSet(allowedTypes);
     }
 
     public GeneralNameTag getTag() {

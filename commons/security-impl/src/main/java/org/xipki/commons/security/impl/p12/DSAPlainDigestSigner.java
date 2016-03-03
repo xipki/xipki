@@ -86,7 +86,7 @@ class DSAPlainDigestSigner implements Signer {
             k = (AsymmetricKeyParameter) parameters;
         }
 
-        ParamUtil.assertNotNull("k", k);
+        ParamUtil.requireNonNull("k", k);
         if (k instanceof ECPublicKeyParameters) {
             keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
         } else if (k instanceof ECPrivateKeyParameters) {

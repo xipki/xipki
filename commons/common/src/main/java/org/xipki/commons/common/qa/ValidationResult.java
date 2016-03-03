@@ -63,7 +63,7 @@ public class ValidationResult {
 
     public ValidationResult(
             final List<ValidationIssue> validationIssues) {
-        ParamUtil.assertNotEmpty("validationIssues", validationIssues);
+        this.validationIssues = ParamUtil.requireNonEmpty("validationIssues", validationIssues);
 
         List<ValidationIssue> failedIssues = new LinkedList<>();
         List<ValidationIssue> successfulIssues = new LinkedList<>();
@@ -75,7 +75,6 @@ public class ValidationResult {
             }
         }
 
-        this.validationIssues = validationIssues;
         this.failedValidationIssues = failedIssues;
         this.successfulValidationIssues = successfulIssues;
     }

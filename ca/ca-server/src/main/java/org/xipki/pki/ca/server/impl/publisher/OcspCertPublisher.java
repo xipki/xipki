@@ -92,8 +92,8 @@ public class OcspCertPublisher extends X509CertPublisher {
             final PasswordResolver passwordResolver,
             final Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException {
-        ParamUtil.assertNotNull("conf", conf);
-        ParamUtil.assertNotEmpty("dataSources", dataSources);
+        ParamUtil.requireNonNull("conf", conf);
+        ParamUtil.requireNonEmpty("dataSources", dataSources);
 
         ConfPairs utf8pairs = new ConfPairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");

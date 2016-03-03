@@ -99,7 +99,7 @@ public class XmlUtil {
             final String localPart,
             final String value) {
         if (document == null) {
-            throw new RuntimeException("XMLDocumentBuilder could not be initialized");
+            throw new RuntimeException("XMLDocumentBuilder must not be initialized");
         }
 
         Element element = document.createElementNS(namespace, "ns:" + localPart);

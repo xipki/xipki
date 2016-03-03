@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.common.cmp;
 
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -51,7 +52,7 @@ public class PkiResponse {
 
     public PkiResponse(
             final GeneralPKIMessage pkiMessage) {
-        this.pkiMessage = pkiMessage;
+        this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
     }
 
     public boolean hasProtection() {

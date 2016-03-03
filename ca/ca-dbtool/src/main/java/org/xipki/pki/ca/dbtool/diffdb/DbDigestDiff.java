@@ -107,20 +107,29 @@ public class DbDigestDiff {
             final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
-        this.revokedOnly = revokedOnly;
+        if (refDir == null) {
+            if (refDatasource == null) {
+                throw new IllegalArgumentException(
+                        "refDir and refDataSource must not be both null");
+            }
+        } else if (refDatasource != null) {
+            throw new IllegalArgumentException(
+                    "refDir and refDataSource must not be both non-null");
+        }
 
+        this.revokedOnly = revokedOnly;
         this.refDirname = (refDir == null)
                 ? null
                 : IoUtil.expandFilepath(refDir);
 
         this.refDatasource = refDatasource;
-        this.targetDatasource = targetDatasource;
+        this.targetDatasource = ParamUtil.requireNonNull("targetDatasource", targetDatasource);
+        this.reportDirName = ParamUtil.requireNonNull("reportDirName", reportDirName);
+        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
+        this.numPerSelect = ParamUtil.requireMin("numPerSelect", numPerSelect, 1);
+
         DbSchemaType dbSchemaType = DbDigestExportWorker.detectDbSchemaType(targetDatasource);
         this.targetDbControl = new XipkiDbControl(dbSchemaType);
-
-        this.reportDirName = reportDirName;
-        this.stopMe = stopMe;
-        this.numPerSelect = numPerSelect;
 
         // number of threads
         this.numRefThreads = (refDatasource == null)
@@ -307,14 +316,6 @@ public class DbDigestDiff {
             final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
-        ParamUtil.assertNotBlank("refDirname", refDirname);
-        ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
-        ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1) {
-            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
-        }
-
         return new DbDigestDiff(refDirname, null,
                 targetDatasource, reportDirName, revokedOnly, stopMe,
                 numPerSelect, numThreads);
@@ -329,14 +330,6 @@ public class DbDigestDiff {
             final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
-        ParamUtil.assertNotNull("refDatasource", refDatasource);
-        ParamUtil.assertNotBlank("reportDirName", reportDirName);
-        ParamUtil.assertNotNull("targetDatasource", targetDatasource);
-        ParamUtil.assertNotNull("stopMe", stopMe);
-        if (numPerSelect < 1) {
-            throw new IllegalArgumentException("invalid numPerSelect: " + numPerSelect);
-        }
-
         return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
                 stopMe, numPerSelect, numThreads);
     }

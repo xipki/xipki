@@ -64,14 +64,10 @@ public class CertTemplateData {
             final Date notAfter,
             final Extensions extensions,
             final String certprofileName) {
-        ParamUtil.assertNotNull("subject", subject);
-        ParamUtil.assertNotNull("publicKeyInfo", publicKeyInfo);
-        ParamUtil.assertNotBlank("certprofileName", certprofileName);
-
-        this.subject = subject;
-        this.publicKeyInfo = publicKeyInfo;
+        this.subject = ParamUtil.requireNonNull("subject", subject);
+        this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
+        this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName);
         this.extensions = extensions;
-        this.certprofileName = certprofileName;
         this.notBefore = notBefore;
         this.notAfter = notAfter;
     }

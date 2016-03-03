@@ -67,8 +67,8 @@ class NameIdStore {
     void addEntry(
             final String name,
             final Integer id) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotNull("id", id);
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("id", id);
 
         if (entries.containsKey(name)) {
             throw new IllegalArgumentException(

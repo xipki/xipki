@@ -40,6 +40,8 @@ import java.io.IOException;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -55,6 +57,7 @@ public class CaCrlsWriter extends DbiXmlWriter {
     public void add(
             final CaCrlType crl)
     throws InvalidDataObjectException, XMLStreamException {
+        ParamUtil.requireNonNull("crl", crl);
         crl.validate();
         crl.writeTo(this);
     }

@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.api.profile.x509;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -60,6 +62,8 @@ public enum X509CertVersion {
 
     public static X509CertVersion getInstance(
             final String version) {
+        ParamUtil.requireNonNull("version", version);
+
         for (X509CertVersion m : values()) {
             if (m.name().equalsIgnoreCase(version)) {
                 return m;

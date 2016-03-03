@@ -74,11 +74,11 @@ public class LiquibaseMain {
             final LiquibaseDatabaseConf dbConf,
             final String changeLogFile) {
         if (dbConf == null) {
-            throw new IllegalArgumentException("dbConf could not be null");
+            throw new IllegalArgumentException("dbConf must not be null");
         }
 
         if (changeLogFile == null | changeLogFile.isEmpty()) {
-            throw new IllegalArgumentException("changeLogFile could not be empty");
+            throw new IllegalArgumentException("changeLogFile must not be empty");
         }
 
         this.dbConf = dbConf;
@@ -165,19 +165,19 @@ public class LiquibaseMain {
     throws Exception {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
-        System.out.println("successfully released the database");
+        System.out.println("successfully released the database"); // XIPKI-CODECHECK:IGNORE
     }
 
     public void dropAll()
     throws Exception {
         liquibase.dropAll();
-        System.out.println("successfully  dropped the database");
+        System.out.println("successfully  dropped the database"); // XIPKI-CODECHECK:IGNORE
     }
 
     public void update()
     throws Exception {
         liquibase.update((String) null);
-        System.out.println("successfully  updated the database");
+        System.out.println("successfully  updated the database"); // XIPKI-CODECHECK:IGNORE
     }
 
     public void shutdown() {

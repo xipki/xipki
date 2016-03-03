@@ -139,16 +139,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             final boolean evaluateOnly)
     throws Exception {
         super(dataSource, srcDir, stopMe, evaluateOnly);
-        if (numCertsPerCommit < 1) {
-            throw new IllegalArgumentException("numCertsPerCommit could not be less than 1: "
-                    + numCertsPerCommit);
-        }
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        this.unmarshaller = unmarshaller;
-        this.numCertsPerCommit = numCertsPerCommit;
+
+        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+        this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
         this.numUsersPerCommit = numCertsPerCommit * 10;
         this.numCrlsPerCommit = Math.max(1, numCertsPerCommit / 10);
-
         this.resume = resume;
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);

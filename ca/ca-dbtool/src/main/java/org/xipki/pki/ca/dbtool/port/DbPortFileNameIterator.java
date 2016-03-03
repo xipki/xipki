@@ -41,6 +41,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 
 /**
@@ -57,6 +58,8 @@ public class DbPortFileNameIterator implements Iterator<String> {
     public DbPortFileNameIterator(
             final String filename)
     throws IOException {
+        ParamUtil.requireNonNull("filename", filename);
+
         this.reader = new BufferedReader(new FileReader(filename));
         this.nextFilename = readNextFilenameLine();
     }

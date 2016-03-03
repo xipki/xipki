@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -69,6 +71,8 @@ public class XipkiDbControl {
 
     public XipkiDbControl(
             final DbSchemaType dbSchemaType) {
+        ParamUtil.requireNonNull("dbSchemaType", dbSchemaType);
+
         if (dbSchemaType == DbSchemaType.XIPKI_CA_v1
                 || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1) {
             if (dbSchemaType == DbSchemaType.XIPKI_CA_v1) { // CA

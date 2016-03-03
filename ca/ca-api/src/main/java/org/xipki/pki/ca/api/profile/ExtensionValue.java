@@ -53,10 +53,8 @@ public class ExtensionValue {
     public ExtensionValue(
             final boolean critical,
             final ASN1Encodable value) {
-        ParamUtil.assertNotNull("value", value);
-
         this.critical = critical;
-        this.value = value;
+        this.value = ParamUtil.requireNonNull("value", value);
     }
 
     public boolean isCritical() {

@@ -70,9 +70,7 @@ public class SubjectControl {
     public SubjectControl(
             final boolean backwardsSubject,
             final Map<ASN1ObjectIdentifier, RdnControl> controls) {
-        ParamUtil.assertNotEmpty("controls", controls);
-
-        this.controls = controls;
+        this.controls = ParamUtil.requireNonEmpty("controls", controls);
         this.typeGroups = new HashMap<>();
         Set<ASN1ObjectIdentifier> oidSet = controls.keySet();
         List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
@@ -117,6 +115,8 @@ public class SubjectControl {
 
     public RdnControl getControl(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
+
         return controls.isEmpty()
                 ? SubjectDnSpec.getRdnControl(type)
                 : controls.get(type);
@@ -124,11 +124,13 @@ public class SubjectControl {
 
     public String getGroup(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         return typeGroups.get(type);
     }
 
     public Set<ASN1ObjectIdentifier> getTypesForGroup(
             final String group) {
+        ParamUtil.requireNonNull("group", group);
         return groupTypes.get(group);
     }
 

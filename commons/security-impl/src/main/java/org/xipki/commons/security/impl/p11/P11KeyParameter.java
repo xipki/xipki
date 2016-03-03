@@ -63,9 +63,9 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
             final P11KeyIdentifier keyId) {
         super(true);
 
-        this.p11CryptService = p11CryptService;
-        this.slot = slot;
-        this.keyId = keyId;
+        this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
     }
 
     public P11CryptService getP11CryptService() {
@@ -85,10 +85,6 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
             final P11SlotIdentifier slot,
             final P11KeyIdentifier keyId)
     throws InvalidKeyException {
-        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("keyId", keyId);
-
         return new P11KeyParameter(p11CryptService, slot, keyId);
     }
 

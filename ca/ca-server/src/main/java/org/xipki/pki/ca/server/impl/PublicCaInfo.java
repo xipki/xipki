@@ -94,7 +94,7 @@ class PublicCaInfo {
             final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
-        ParamUtil.assertNotNull("caCertificate", caCertificate);
+        ParamUtil.requireNonNull("caCertificate", caCertificate);
         this.caCertificate = new X509Cert(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
@@ -105,10 +105,10 @@ class PublicCaInfo {
         } catch (CertificateEncodingException ex) {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
         }
-        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
-        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
-        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
-        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
 
         byte[] encodedSubjectAltName = caCertificate.getExtensionValue(
                 Extension.subjectAlternativeName.getId());
@@ -135,11 +135,10 @@ class PublicCaInfo {
             final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
-        ParamUtil.assertNotNull("subject", subject);
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
+        this.x500Subject = ParamUtil.requireNonNull("subject", subject);
+        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
 
         this.caCertificate = null;
-        this.x500Subject = subject;
         this.c14nSubject = X509Util.canonicalizName(subject);
         try {
             this.subject = new X500Principal(subject.getEncoded());
@@ -154,12 +153,11 @@ class PublicCaInfo {
             this.subjectKeyIdentifier = Arrays.clone(subjectKeyIdentifier);
         }
 
-        this.serialNumber = serialNumber;
         this.subjectAltName = subjectAltName;
-        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris, true, true);
-        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris, true, true);
-        this.crlUris = CollectionUtil.unmodifiableList(crlUris, true, true);
-        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris, true, true);
+        this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
+        this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);
+        this.crlUris = CollectionUtil.unmodifiableList(crlUris);
+        this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
     } // constructor
 
     public List<String> getCaCertUris() {

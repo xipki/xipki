@@ -64,8 +64,9 @@ public abstract class DbiXmlReader {
             final String rootElementName,
             final InputStream xmlStream)
     throws XMLStreamException, InvalidDataObjectException {
-        ParamUtil.assertNotBlank("rootElementName", rootElementName);
-        this.rootElementName = rootElementName;
+        this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
+        ParamUtil.requireNonNull("xmlStream", xmlStream);
+
         synchronized (factory) {
             reader = factory.createXMLStreamReader(xmlStream);
         }

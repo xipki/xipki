@@ -69,8 +69,7 @@ public abstract class CertStatusStore {
 
     protected CertStatusStore(
             final String name) {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();

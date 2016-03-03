@@ -91,7 +91,7 @@ public class CaInfoCmd extends CaCommandSupport {
             for (String paramName : sorted) {
                 sb.append("\t").append(paramName);
                 Set<String> aliases = caManager.getAliasesForCa(paramName);
-                if (CollectionUtil.isNotEmpty(aliases)) {
+                if (CollectionUtil.isNonEmpty(aliases)) {
                     sb.append(" (aliases: ").append(toString(aliases)).append(")");
                 }
                 sb.append("\n");

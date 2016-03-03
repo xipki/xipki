@@ -185,10 +185,10 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
             final X500Name requestedSubject,
             final SubjectPublicKeyInfo requestedPublicKey,
             final Extensions requestedExtensions) {
-        ParamUtil.assertNotNull("certBytes", certBytes);
-        ParamUtil.assertNotNull("issuerInfo", issuerInfo);
-        ParamUtil.assertNotNull("requestedSubject", requestedSubject);
-        ParamUtil.assertNotNull("requestedPublicKey", requestedPublicKey);
+        ParamUtil.requireNonNull("certBytes", certBytes);
+        ParamUtil.requireNonNull("issuerInfo", issuerInfo);
+        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+        ParamUtil.requireNonNull("requestedPublicKey", requestedPublicKey);
 
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
@@ -243,7 +243,7 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
         }
 
         // signatureAlgorithm
-        if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
+        if (CollectionUtil.isNonEmpty(signatureAlgorithms)) {
             issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
 
@@ -306,7 +306,7 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
         resultIssues.add(issue);
 
         if (cert.getNotAfter().before(cert.getNotBefore())) {
-            issue.setFailureMessage("notAfter could not be before notBefore");
+            issue.setFailureMessage("notAfter must not be before notBefore");
         }
 
         if (!issue.isFailed()) {

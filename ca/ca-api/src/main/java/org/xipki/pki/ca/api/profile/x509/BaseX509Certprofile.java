@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -102,6 +103,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected String[] sortRdns(
             final RdnControl control,
             final String[] values) {
+        ParamUtil.requireNonNull("values", values);
+
         if (control == null) {
             return values;
         }
@@ -131,7 +134,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     /**
      * Get the SubjectControl.
      *
-     * @return the subjectControl, could not be null.
+     * @return the subjectControl, must not be null.
      */
     protected abstract SubjectControl getSubjectControl();
 
@@ -150,6 +153,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     public SubjectInfo getSubject(
             final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException {
+        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+
         verifySubjectDnOccurence(requestedSubject);
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
@@ -218,7 +223,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         } // for
 
         Set<String> subjectDNGroups = scontrol.getGroups();
-        if (CollectionUtil.isNotEmpty(subjectDNGroups)) {
+        if (CollectionUtil.isNonEmpty(subjectDNGroups)) {
             Set<String> consideredGroups = new HashSet<>();
             final int n = rdns.size();
 
@@ -268,6 +273,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     public SubjectPublicKeyInfo checkPublicKey(
             final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("publicKey", publicKey);
+
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
         if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return publicKey;
@@ -385,6 +392,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected void verifySubjectDnOccurence(
             final X500Name requestedSubject)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+
         SubjectControl occurences = getSubjectControl();
         if (occurences == null) {
             return;
@@ -448,6 +457,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             final ASN1ObjectIdentifier type,
             final ASN1Encodable rdnValue)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("type", type);
+
         String text;
         ASN1Encodable newRdnValue = null;
         if (rdnValue instanceof ASN1GeneralizedTime) {
@@ -477,8 +488,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             final RdnControl control,
             final int index)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("type", type);
+
         if (!(rdnValue instanceof ASN1Sequence)) {
-            throw new BadCertTemplateException("Value of RDN postalAddress has incorrect syntax");
+            throw new BadCertTemplateException(
+                    "rdnValue of RDN postalAddress has incorrect syntax");
         }
 
         ASN1Sequence seq = (ASN1Sequence) rdnValue;
@@ -509,6 +523,9 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     private static RDN[] getRdns(
             final RDN[] rdns,
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("rdns", rdns);
+        ParamUtil.requireNonNull("type", type);
+
         List<RDN> ret = new ArrayList<>(1);
         for (int i = 0; i < rdns.length; i++) {
             RDN rdn = rdns[i];
@@ -528,6 +545,9 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             final RdnControl option,
             final int index)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("text", text);
+        ParamUtil.requireNonNull("type", type);
+
         String ttext = text.trim();
 
         StringType stringType = null;
@@ -608,6 +628,10 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("curveOid", curveOid);
+        ParamUtil.requireNonNull("encoded", encoded);
+        ParamUtil.requireMin("encoded.length", encoded.length, 1);
+
         Integer expectedLength = ecCurveFieldSizes.get(curveOid);
         if (expectedLength == null) {
             X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);

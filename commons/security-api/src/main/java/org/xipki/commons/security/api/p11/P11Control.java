@@ -61,9 +61,7 @@ public class P11Control {
     public P11Control(
             final String defaultModuleName,
             final Set<P11ModuleConf> moduleConfs) {
-        ParamUtil.assertNotBlank("defaultModuleName", defaultModuleName);
-
-        this.defaultModuleName = defaultModuleName;
+        this.defaultModuleName = ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
         if (CollectionUtil.isEmpty(moduleConfs)) {
             this.moduleConfs = Collections.emptyMap();
             this.moduleNames = Collections.emptySet();

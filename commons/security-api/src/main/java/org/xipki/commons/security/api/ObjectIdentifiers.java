@@ -48,6 +48,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 
 /**
@@ -554,6 +555,7 @@ public class ObjectIdentifiers {
 
     public static String oidToDisplayName(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         String name = getName(type);
         return name == null
                 ? type.getId()

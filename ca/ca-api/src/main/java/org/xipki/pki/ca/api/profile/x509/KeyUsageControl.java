@@ -53,9 +53,7 @@ public class KeyUsageControl {
     public KeyUsageControl(
             final KeyUsage keyUsage,
             final boolean required) {
-        ParamUtil.assertNotNull("keyUsage", keyUsage);
-
-        this.keyUsage = keyUsage;
+        this.keyUsage = ParamUtil.requireNonNull("keyUsage", keyUsage);
         this.required = required;
     }
 

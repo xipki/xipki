@@ -52,10 +52,8 @@ class ResponderAndRelativeUri {
     ResponderAndRelativeUri(
             final Responder responder,
             final String relativeUri) {
-        ParamUtil.assertNotNull("responder", responder);
-        ParamUtil.assertNotNull("relativeUri", relativeUri);
-        this.responder = responder;
-        this.relativeUri = relativeUri;
+        this.responder = ParamUtil.requireNonNull("responder", responder);
+        this.relativeUri = ParamUtil.requireNonNull("relativeUri", relativeUri);
     }
 
     public Responder getResponder() {

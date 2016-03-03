@@ -39,6 +39,7 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 import java.io.ByteArrayInputStream;
 import java.security.cert.X509Certificate;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -54,6 +55,8 @@ public class EjbcaCaCertExtractor {
     public static X509Certificate extractCaCert(
             final String caData)
     throws Exception {
+        ParamUtil.requireNonNull("caData", caData);
+
         XmlDocumentReader cadataReader = new XmlDocumentReader(
                 new ByteArrayInputStream(caData.getBytes()), false);
         final String xpathCert =

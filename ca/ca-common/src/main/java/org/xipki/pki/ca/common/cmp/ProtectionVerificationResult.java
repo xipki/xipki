@@ -52,10 +52,8 @@ public class ProtectionVerificationResult {
     public ProtectionVerificationResult(
             final Object requestor,
             final ProtectionResult protectionResult) {
-        ParamUtil.assertNotNull("protectionResult", protectionResult);
-
         this.requestor = requestor;
-        this.protectionResult = protectionResult;
+        this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
     }
 
     public Object getRequestor() {

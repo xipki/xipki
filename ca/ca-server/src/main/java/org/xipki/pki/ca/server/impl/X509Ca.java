@@ -480,13 +480,9 @@ public class X509Ca {
             final SecurityFactory securityFactory,
             final boolean masterMode)
     throws OperationException {
-        ParamUtil.assertNotNull("caManager", caManager);
-        ParamUtil.assertNotNull("caInfo", caInfo);
-        ParamUtil.assertNotNull("certstore", certstore);
-
-        this.caManager = caManager;
-        this.caInfo = caInfo;
-        this.certstore = certstore;
+        this.caManager = ParamUtil.requireNonNull("caManager", caManager);
+        this.caInfo = ParamUtil.requireNonNull("caInfo", caInfo);
+        this.certstore = ParamUtil.requireNonNull("certstore", certstore);
         this.masterMode = masterMode;
 
         if (caInfo.isSignerRequired()) {
@@ -1128,7 +1124,7 @@ public class X509Ca {
     /**
      *
      * @param certInfo
-     * @return 0 for published successfuly, 1 if could not be published to CA certstore and
+     * @return 0 for published successfuly, 1 if must not be published to CA certstore and
      *    any publishers,
      *    2 if could be published to CA certstore but not to all publishers.
      */
@@ -1708,7 +1704,7 @@ public class X509Ca {
     public void revoke(
             final CertRevocationInfo revocationInfo)
     throws OperationException {
-        ParamUtil.assertNotNull("revocationInfo", revocationInfo);
+        ParamUtil.requireNonNull("revocationInfo", revocationInfo);
 
         caInfo.setRevocationInfo(revocationInfo);
         if (caInfo.isSelfSigned()) {
@@ -2188,7 +2184,7 @@ public class X509Ca {
 
     public boolean supportsCertProfile(
             final String certprofileLocalName) {
-        ParamUtil.assertNotNull("certprofileLocalName", certprofileLocalName);
+        ParamUtil.requireNonNull("certprofileLocalName", certprofileLocalName);
 
         Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
         return profileNames.containsKey(certprofileLocalName);

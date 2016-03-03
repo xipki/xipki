@@ -82,20 +82,16 @@ public class X509CrlSignerEntry implements Serializable {
             final String base64Cert,
             final String crlControl)
     throws InvalidConfException {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("type", signerType);
-        ParamUtil.assertNotNull("crlControl", crlControl);
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
+        this.signerConf = signerConf;
+        this.crlControl = ParamUtil.requireNonNull("crlControl", crlControl);
 
         if ("CA".equalsIgnoreCase(name)) {
             this.base64Cert = null;
         } else {
             this.base64Cert = base64Cert;
         }
-
-        this.name = name;
-        this.signerType = signerType;
-        this.signerConf = signerConf;
-        this.crlControl = crlControl;
 
         if (this.base64Cert != null) {
             try {

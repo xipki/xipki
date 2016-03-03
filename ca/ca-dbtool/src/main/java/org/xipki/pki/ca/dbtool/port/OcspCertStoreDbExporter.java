@@ -104,21 +104,11 @@ class OcspCertStoreDbExporter extends DbPorter {
             final boolean evaluateOnly)
     throws Exception {
         super(dataSource, baseDir, stopMe, evaluateOnly);
-        ParamUtil.assertNotNull("marshaller", marshaller);
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        if (numCertsInBundle < 1) {
-            throw new IllegalArgumentException("numCertsInBundle could not be less than 1: "
-                    + numCertsInBundle);
-        }
-        if (numCertsPerSelect < 1) {
-            throw new IllegalArgumentException("numCertsPerSelect could not be less than 1: "
-                    + numCertsPerSelect);
-        }
 
-        this.numCertsInBundle = numCertsInBundle;
-        this.numCertsPerSelect = numCertsInBundle;
-        this.marshaller = marshaller;
-        this.unmarshaller = unmarshaller;
+        this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
+        this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
+        this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
+        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         if (resume) {
             File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
             if (!processLogFile.exists()) {

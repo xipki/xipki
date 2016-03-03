@@ -162,12 +162,9 @@ public class Scep {
             final ScepEntry dbEntry,
             final CaManagerImpl caManager)
     throws CaMgmtException {
-        ParamUtil.assertNotNull("caManager", caManager);
-        ParamUtil.assertNotNull("dbEntry", dbEntry);
-
+        this.caManager = ParamUtil.requireNonNull("caManager", caManager);
+        this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         this.caName = dbEntry.getCaName();
-        this.dbEntry = dbEntry;
-        this.caManager = caManager;
         try {
             this.control = new ScepControl(dbEntry.getControl());
         } catch (InvalidConfException ex) {
@@ -255,8 +252,7 @@ public class Scep {
 
     public void setCaCaps(
             final CaCaps caCaps) {
-        ParamUtil.assertNotNull("caCaps", caCaps);
-        this.caCaps = caCaps;
+        this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
     }
 
     public CaCertRespBytes getCaCertResp() {

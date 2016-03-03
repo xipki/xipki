@@ -55,10 +55,8 @@ public class CmpRequestorInfo implements RequestorInfo {
     public CmpRequestorInfo(
             final CaHasRequestorEntry caHasRequestor,
             final X509CertWithDbId cert) {
-        ParamUtil.assertNotNull("caHasRequestor", caHasRequestor);
-        ParamUtil.assertNotNull("cert", cert);
-        this.caHasRequestor = caHasRequestor;
-        this.cert = cert;
+        this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
+        this.cert = ParamUtil.requireNonNull("cert", cert);
     }
 
     public CaHasRequestorEntry getCaHasRequestor() {

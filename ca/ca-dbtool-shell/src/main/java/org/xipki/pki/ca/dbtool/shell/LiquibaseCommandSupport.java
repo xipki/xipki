@@ -50,6 +50,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
@@ -95,6 +96,9 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             final LiquibaseDatabaseConf dbConf,
             final String schemaFile)
     throws Exception {
+        ParamUtil.requireNonNull("dbConf", dbConf);
+        ParamUtil.requireNonNull("schemaFile", schemaFile);
+
         printDatabaseInfo(dbConf, schemaFile);
         if (!quiet) {
             if (!confirm("reset and initialize")) {
@@ -127,6 +131,9 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             final LiquibaseDatabaseConf dbConf,
             final String schemaFile)
     throws Exception {
+        ParamUtil.requireNonNull("dbConf", dbConf);
+        ParamUtil.requireNonNull("schemaFile", schemaFile);
+
         printDatabaseInfo(dbConf, schemaFile);
         if (!quiet) {
             if (!confirm("update")) {

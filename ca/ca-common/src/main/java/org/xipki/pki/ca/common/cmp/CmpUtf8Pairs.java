@@ -72,38 +72,34 @@ public class CmpUtf8Pairs {
     }
 
     public CmpUtf8Pairs(
-            final String string) {
-        if (string == null || string.length() < 2) {
-            return;
-        }
-
-        String localString = string;
+            final String encodedCmpUtf8Pairs) {
+        String encoded = ParamUtil.requireNonBlank("encodedCmpUtf8Pairs", encodedCmpUtf8Pairs);
         // remove the ending '%'-symbols
-        while (localString.charAt(localString.length() - 1) == TOKEN_TERM) {
-            localString = localString.substring(0, localString.length() - 1);
+        while (encoded.charAt(encoded.length() - 1) == TOKEN_TERM) {
+            encoded = encoded.substring(0, encoded.length() - 1);
         }
 
         // find the position of terminators
         List<Integer> positions = new LinkedList<>();
 
         int idx = 1;
-        int n = localString.length();
+        int n = encoded.length();
         while (idx < n) {
-            char c = localString.charAt(idx++);
+            char c = encoded.charAt(idx++);
             if (c == TOKEN_TERM) {
-                char b = localString.charAt(idx);
+                char b = encoded.charAt(idx);
                 if (b < '0' || b > '9') {
                     positions.add(idx - 1);
                 }
             }
         }
-        positions.add(localString.length());
+        positions.add(encoded.length());
 
         // parse the token
         int beginIndex = 0;
         for (int i = 0; i < positions.size(); i++) {
             int endIndex = positions.get(i);
-            String token = localString.substring(beginIndex, endIndex);
+            String token = encoded.substring(beginIndex, endIndex);
 
             int sepIdx = token.indexOf(NAME_TERM);
             if (sepIdx == -1 || sepIdx == token.length() - 1) {
@@ -122,8 +118,8 @@ public class CmpUtf8Pairs {
     public void putUtf8Pair(
             final String name,
             final String value) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotNull("value", value);
+        ParamUtil.requireNonNull("name", name);
+        ParamUtil.requireNonNull("value", value);
 
         char c = name.charAt(0);
         if (c >= '0' && c <= '9') {
@@ -134,11 +130,13 @@ public class CmpUtf8Pairs {
 
     public void removeUtf8Pair(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         pairs.remove(name);
     }
 
     public String getValue(
             final String name) {
+        ParamUtil.requireNonNull(name, name);
         return pairs.get(name);
     }
 

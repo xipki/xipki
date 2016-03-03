@@ -97,9 +97,7 @@ abstract class CmpResponder {
 
     protected CmpResponder(
             final SecurityFactory securityFactory) {
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-
-        this.securityFactory = securityFactory;
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
     protected abstract ConcurrentContentSigner getSigner()

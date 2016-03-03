@@ -49,9 +49,7 @@ public class IdentifiedObject {
 
     public IdentifiedObject(
             final String id) {
-        ParamUtil.assertNotBlank("id", id);
-
-        this.id = id;
+        this.id = ParamUtil.requireNonBlank("id", id);
     }
 
     public String getId() {

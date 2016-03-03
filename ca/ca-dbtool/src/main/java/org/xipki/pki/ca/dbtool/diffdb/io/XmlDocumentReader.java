@@ -52,6 +52,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -71,6 +72,8 @@ public class XmlDocumentReader {
             final InputStream xmlStream,
             final boolean namespaceAware)
     throws ParserConfigurationException, SAXException, IOException {
+        ParamUtil.requireNonNull("xmlStream", xmlStream);
+
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(namespaceAware);
         DocumentBuilder newDocumentBuilder = builderFactory.newDocumentBuilder();
@@ -87,7 +90,7 @@ public class XmlDocumentReader {
             public InputSource resolveEntity(
                     final String publicId,
                     final String systemId)
-            throws SAXException, IOException {
+            throws SAXException, IOException { // XIPKI-CODECHECK:IGNORE
                 return new InputSource(new StringReader(""));
             }
         });
@@ -96,6 +99,8 @@ public class XmlDocumentReader {
     public String getValue(
             final String xpathExpression)
     throws XPathExpressionException {
+        ParamUtil.requireNonNull("xpathExpression", xpathExpression);
+
         Node n = getNode(xpathExpression);
         return (n != null)
                 ? n.getFirstChild().getTextContent()

@@ -67,10 +67,8 @@ public class CmpRequestorEntry implements Serializable {
     public CmpRequestorEntry(
             final String name,
             final String base64Cert) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("base64Cert", base64Cert);
-        this.name = name;
-        this.base64Cert = base64Cert;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.base64Cert = ParamUtil.requireNonBlank("base64Cert", base64Cert);
         try {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
         } catch (Throwable th) {
