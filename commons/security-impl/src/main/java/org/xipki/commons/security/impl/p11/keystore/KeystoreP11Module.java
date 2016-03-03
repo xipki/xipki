@@ -73,10 +73,7 @@ public class KeystoreP11Module implements P11Module {
 
     public KeystoreP11Module(
             final P11ModuleConf moduleConf) {
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
-
-        this.moduleConf = moduleConf;
-
+        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
         final String nativeLib = moduleConf.getNativeLibrary();
 
         File baseDir = new File(IoUtil.expandFilepath(nativeLib));

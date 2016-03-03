@@ -92,9 +92,7 @@ public final class SunP11CryptService implements P11CryptService {
     private SunP11CryptService(
             final P11ModuleConf moduleConf)
     throws SignerException {
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
-        this.moduleConf = moduleConf;
-
+        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
         int idxSunec = -1;
         int idxXipki = -1;
 
@@ -185,7 +183,7 @@ public final class SunP11CryptService implements P11CryptService {
                         }
 
                         char[] keyPwd = null;
-                        if (CollectionUtil.isNotEmpty(password)) {
+                        if (CollectionUtil.isNonEmpty(password)) {
                             keyPwd = password.get(0);
                         }
                         if (keyPwd == null) { // keystore does not allow empty password
@@ -386,6 +384,8 @@ public final class SunP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("keyId", keyId);
         if (keyId.getKeyLabel() == null) {
             throw new SignerException("only key referencing by key-label is supported");
         }

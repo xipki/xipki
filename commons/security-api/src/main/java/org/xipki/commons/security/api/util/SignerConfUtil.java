@@ -63,7 +63,7 @@ public class SignerConfUtil {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final int parallelism) {
-        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.requireNonNull("keyId", keyId);
 
         ConfPairs conf = new ConfPairs();
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -93,8 +93,8 @@ public class SignerConfUtil {
             final String keystoreFile,
             final String password,
             final int parallelism) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+        ParamUtil.requireNonBlank("password", password);
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -105,8 +105,8 @@ public class SignerConfUtil {
     public static String getKeystoreSignerConfWithoutAlgo(
             final String keystoreFile,
             final String password) {
-        ParamUtil.assertNotBlank("keystoreFile", keystoreFile);
-        ParamUtil.assertNotBlank("password", password);
+        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+        ParamUtil.requireNonBlank("password", password);
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", "1");
@@ -137,8 +137,8 @@ public class SignerConfUtil {
             final P11KeyIdentifier keyId,
             final String signatureAlgorithm,
             final int parallelism) {
-        ParamUtil.assertNotNull("algo", signatureAlgorithm);
-        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.requireNonNull("algo", signatureAlgorithm);
+        ParamUtil.requireNonNull("keyId", keyId);
 
         ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -170,9 +170,9 @@ public class SignerConfUtil {
             final String signatureAlgorithm,
             final int parallelism)
     throws IOException {
-        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
-        ParamUtil.assertNotBlank("password", password);
-        ParamUtil.assertNotNull("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+        ParamUtil.requireNonBlank("password", password);
+        ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("algo", signatureAlgorithm);

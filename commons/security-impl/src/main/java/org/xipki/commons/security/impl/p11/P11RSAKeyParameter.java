@@ -70,9 +70,12 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
             final BigInteger publicExponent) {
         super(true, modulus, publicExponent);
 
-        this.p11CryptService = p11CryptService;
-        this.slot = slot;
-        this.keyId = keyId;
+        ParamUtil.requireNonNull("modulus", modulus);
+        ParamUtil.requireNonNull("publicExponent", publicExponent);
+
+        this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
         this.keysize = modulus.bitLength();
     }
 
@@ -94,23 +97,21 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
     public static P11RSAKeyParameter getInstance(
             final P11CryptService p11CryptService,
-            final P11SlotIdentifier slot,
+            final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws InvalidKeyException {
-        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.requireNonNull("p11CryptService", p11CryptService);
 
         RSAPublicKey key;
         try {
-            key = (RSAPublicKey) p11CryptService.getPublicKey(slot, keyId);
+            key = (RSAPublicKey) p11CryptService.getPublicKey(slotId, keyId);
         } catch (SignerException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }
 
         BigInteger modulus = key.getModulus();
         BigInteger publicExponent = key.getPublicExponent();
-        return new P11RSAKeyParameter(p11CryptService, slot, keyId, modulus, publicExponent);
+        return new P11RSAKeyParameter(p11CryptService, slotId, keyId, modulus, publicExponent);
     }
 
 }

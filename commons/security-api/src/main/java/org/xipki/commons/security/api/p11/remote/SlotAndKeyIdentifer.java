@@ -68,11 +68,11 @@ public class SlotAndKeyIdentifer extends ASN1Object {
             final SlotIdentifier slotIdentifier,
             final KeyIdentifier keyIdentifier) {
         if (slotIdentifier == null) {
-            throw new IllegalArgumentException("slotIdentifier could not be null");
+            throw new IllegalArgumentException("slotIdentifier must not be null");
         }
 
         if (keyIdentifier == null) {
-            throw new IllegalArgumentException("keyIdentifier could not be null");
+            throw new IllegalArgumentException("keyIdentifier must not be null");
         }
 
         this.slotIdentifier = slotIdentifier;

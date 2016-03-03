@@ -130,7 +130,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             final String parameterName,
             final Object parameter) {
         if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " could not be null");
+            throw new IllegalArgumentException(parameterName + " must not be null");
         }
     }
 

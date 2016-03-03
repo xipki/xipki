@@ -430,7 +430,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     public ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)
     throws InvalidKeyException {
-        ParamUtil.assertNotNull("publicKey", publicKey);
+        ParamUtil.requireNonNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
         if ("EC".equals(keyAlg)) {
@@ -752,7 +752,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
         P11Module module;
         if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-            // the returned object could not be null
+            // the returned object must not be null
             module = IaikP11ModulePool.getInstance().getModule(moduleName);
         } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
             module = KeystoreP11ModulePool.getInstance().getModule(moduleName);

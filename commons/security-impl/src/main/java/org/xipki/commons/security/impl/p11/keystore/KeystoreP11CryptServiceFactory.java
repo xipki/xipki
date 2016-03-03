@@ -56,8 +56,7 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public void init(
             final P11Control pP11Control) {
-        ParamUtil.assertNotNull("pP11Control", pP11Control);
-        this.p11Control = pP11Control;
+        this.p11Control = ParamUtil.requireNonNull("pP11Control", pP11Control);
         KeystoreP11ModulePool.getInstance().setDefaultModuleName(
                 pP11Control.getDefaultModuleName());
     }
@@ -66,7 +65,7 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
     public P11CryptService createP11CryptService(
             final String moduleName)
     throws SignerException {
-        ParamUtil.assertNotNull("moduleName", moduleName);
+        ParamUtil.requireNonNull("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }

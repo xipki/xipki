@@ -270,7 +270,7 @@ public abstract class XipkiCommandSupport implements Action {
 
     protected static boolean isNotEmpty(
             final Collection<?> c) {
-        return CollectionUtil.isNotEmpty(c);
+        return CollectionUtil.isNonEmpty(c);
     }
 
     protected static List<String> split(

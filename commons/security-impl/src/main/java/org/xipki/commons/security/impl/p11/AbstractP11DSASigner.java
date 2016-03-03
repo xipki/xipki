@@ -59,8 +59,7 @@ abstract class AbstractP11DSASigner implements Signer {
 
     AbstractP11DSASigner(
             final Digest digest) {
-        ParamUtil.assertNotNull("digest", digest);
-        this.digest = digest;
+        this.digest = ParamUtil.requireNonNull("digest", digest);
     }
 
     protected abstract byte[] sign(

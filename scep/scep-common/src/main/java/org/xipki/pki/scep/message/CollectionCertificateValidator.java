@@ -41,8 +41,8 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
 
     public CollectionCertificateValidator(
             final Collection<X509Certificate> certs) {
-        ParamUtil.assertNotEmpty("certs", certs);
+        ParamUtil.requireNonEmpty("certs", certs);
         certHashes = new HashSet<String>(certs.size());
         for (X509Certificate cert : certs) {
             String hash;
@@ -71,7 +71,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
 
     public CollectionCertificateValidator(
             final X509Certificate cert) {
-        ParamUtil.assertNotNull("cert", cert);
+        ParamUtil.requireNonNull("cert", cert);
 
         certHashes = new HashSet<String>(1);
         String hash;
@@ -88,7 +88,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     public boolean trustCertificate(
             final X509Certificate signerCert,
             final X509Certificate[] signerCaCerts) {
-        ParamUtil.assertNotNull("signerCert", signerCert);
+        ParamUtil.requireNonNull("signerCert", signerCert);
 
         String hash;
         try {

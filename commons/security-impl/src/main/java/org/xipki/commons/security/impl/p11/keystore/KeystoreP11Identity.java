@@ -93,10 +93,8 @@ public class KeystoreP11Identity extends P11Identity {
             final SecureRandom random4Sign)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slotId, keyId, certificateChain, publicKey);
-        ParamUtil.assertNotNull("privateKey", privateKey);
-        ParamUtil.assertNotNull("random4Sign", random4Sign);
-
-        this.privateKey = privateKey;
+        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+        ParamUtil.requireNonNull("random4Sign", random4Sign);
 
         if (this.publicKey instanceof RSAPublicKey) {
             String providerName;

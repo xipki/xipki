@@ -186,7 +186,7 @@ public class SimpleXpath {
             final List<SimpleXpathStep> steps,
             final int stepIndex,
             final boolean onlyFirst) {
-        if (onlyFirst && CollectionUtil.isNotEmpty(results)) {
+        if (onlyFirst && CollectionUtil.isNonEmpty(results)) {
             return;
         }
 

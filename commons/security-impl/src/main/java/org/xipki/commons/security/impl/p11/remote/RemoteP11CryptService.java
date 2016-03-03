@@ -112,8 +112,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     public RemoteP11CryptService(
             final P11ModuleConf moduleConf) {
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
-        this.moduleConf = moduleConf;
+        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
     }
 
     protected abstract byte[] send(
@@ -276,6 +275,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("keyId", keyId);
+
         SlotAndKeyIdentifer slotAndKeyIdentifier;
         try {
             slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
@@ -505,6 +507,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     private void checkSlotId(
             final P11SlotIdentifier slotId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
         if (!moduleConf.isSlotIncluded(slotId)) {
             throw new SignerException("cound not find slot (" + slotId.toString() + ")");
         }

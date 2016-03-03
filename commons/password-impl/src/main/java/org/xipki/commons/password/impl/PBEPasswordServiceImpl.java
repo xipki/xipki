@@ -42,6 +42,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PBEPasswordService;
 import org.xipki.commons.password.api.PasswordResolverException;
 
@@ -92,9 +93,7 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
             final char[] masterPassword,
             final char[] password)
     throws PasswordResolverException {
-        if (iterationCount < 1 | iterationCount > 65535) {
-            throw new IllegalArgumentException("iterationCount is not between 1 and 65535");
-        }
+        ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
         byte[] iterationCountBytes = new byte[2];
         iterationCountBytes[0] = (byte) (iterationCount >>> 8);
         iterationCountBytes[1] = (byte) (iterationCount & 0xFF);

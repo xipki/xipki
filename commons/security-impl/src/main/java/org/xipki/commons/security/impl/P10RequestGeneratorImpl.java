@@ -97,7 +97,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
     throws SignerException {
         PKCS10CertificationRequestBuilder p10ReqBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-        if (CollectionUtil.isNotEmpty(attributes)) {
+        if (CollectionUtil.isNonEmpty(attributes)) {
             for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
             }

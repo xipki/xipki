@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -114,6 +115,7 @@ public class PciAuditEvent {
 
     public PciAuditEvent(
             final Date date) {
+        Objects.requireNonNull(date, "date must not be null");
         LocalDateTime lDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
         this.date = DATE_FORMATTER.format(lDate);
         this.time = TIME_FORMATTER.format(lDate);
@@ -126,7 +128,7 @@ public class PciAuditEvent {
 
     public void setLevel(
             final AuditLevel level) {
-        this.level = level;
+        this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
     public String getUserId() {

@@ -55,10 +55,8 @@ public class KeyCertPair {
     public KeyCertPair(
             final PrivateKey privateKey,
             final X509Certificate certificate) {
-        ParamUtil.assertNotNull("privateKey", privateKey);
-        ParamUtil.assertNotNull("certificate", certificate);
-        this.privateKey = privateKey;
-        this.certificate = certificate;
+        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
     }
 
     public PrivateKey getPrivateKey() {

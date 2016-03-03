@@ -40,6 +40,7 @@ import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,7 +301,7 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     public void setHost(
             final String host) {
-        this.host = host;
+        this.host = Objects.requireNonNull(host, "host must not be null");
     }
 
     public void setPort(
@@ -310,7 +311,7 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     public void setProtocol(
             final String protocol) {
-        this.protocol = protocol;
+        this.protocol = Objects.requireNonNull(protocol, "protocol must not be null");
     }
 
     public void setLocalname(
@@ -320,7 +321,8 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     public void setMessageFormat(
             final String messageFormat) {
-        this.messageFormat = messageFormat;
+        this.messageFormat = Objects.requireNonNull(messageFormat,
+                "messageFormat must not be null");
     }
 
     public void setWriteRetries(

@@ -66,15 +66,14 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public void init(
             final P11Control pP11Control) {
-        ParamUtil.assertNotNull("pP11Control", pP11Control);
-        this.p11Control = pP11Control;
+        this.p11Control = ParamUtil.requireNonNull("pP11Control", pP11Control);
     }
 
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
     throws SignerException {
-        ParamUtil.assertNotNull("moduleName", moduleName);
+        ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }

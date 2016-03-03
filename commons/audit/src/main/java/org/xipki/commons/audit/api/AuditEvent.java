@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Lijun Liao
@@ -113,7 +114,8 @@ public class AuditEvent {
 
     public void setApplicationName(
             final String applicationName) {
-        this.applicationName = applicationName;
+        this.applicationName = Objects.requireNonNull(applicationName,
+                "applicationName must not be null");
     }
 
     public Date getTimestamp() {
@@ -126,6 +128,8 @@ public class AuditEvent {
 
     public AuditEventData addEventData(
             final AuditEventData eventData) {
+        Objects.requireNonNull(eventData, "eventData must not be null");
+
         int idx = -1;
         for (int i = 0; i < eventDatas.size(); i++) {
             AuditEventData ed = eventDatas.get(i);
@@ -154,11 +158,12 @@ public class AuditEvent {
 
     public void setStatus(
             final AuditStatus status) {
-        this.status = status;
+        this.status = Objects.requireNonNull(status, "status must not be null");
     }
 
     public void addChildAuditEvent(
             final AuditChildEvent childAuditEvent) {
+        Objects.requireNonNull(childAuditEvent, "childAuditEvent must not be null");
         childAuditEvents.add(childAuditEvent);
     }
 

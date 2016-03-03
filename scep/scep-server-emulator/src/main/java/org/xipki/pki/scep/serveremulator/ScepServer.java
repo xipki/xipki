@@ -54,9 +54,9 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.message.CaCaps;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -97,15 +97,12 @@ public class ScepServer {
             final boolean withNextCa,
             final boolean generateCrl,
             final ScepControl control) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotNull("caCaps", caCaps);
-        ParamUtil.assertNotNull("control", control);
-        this.name = name;
-        this.caCaps = caCaps;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
+        this.control = ParamUtil.requireNonNull("control", control);
         this.withRa = withRa;
         this.withNextCa = withNextCa;
         this.generateCrl = generateCrl;
-        this.control = control;
     }
 
     public String getName() {

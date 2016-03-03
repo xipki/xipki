@@ -49,6 +49,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -383,6 +384,9 @@ public final class IaikP11CryptService implements P11CryptService {
     private IaikP11Identity getIdentity2(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId) {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("keyId", keyId);
+
         for (IaikP11Identity identity : identities) {
             if (identity.match(slotId, keyId)) {
                 return identity;

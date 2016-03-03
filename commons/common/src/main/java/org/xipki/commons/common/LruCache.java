@@ -39,6 +39,8 @@ package org.xipki.commons.common;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * Static library version of {@link android.util.LruCache}. Used to write apps
  * that run on API levels prior to 12. When running on API level 12 or above,
@@ -76,10 +78,7 @@ public class LruCache<K, V> {
      */
     public LruCache(
             final int maxSize) {
-        if (maxSize <= 0) {
-            throw new IllegalArgumentException("maxSize <= 0");
-        }
-        this.maxSize = maxSize;
+        this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
         this.map = new LinkedHashMap<>(0, 0.75f, true);
     }
 
@@ -90,12 +89,8 @@ public class LruCache<K, V> {
      */
     public void resize(
             final int pMaxSize) {
-        if (pMaxSize <= 0) {
-            throw new IllegalArgumentException("maxSize <= 0");
-        }
-
         synchronized (this) {
-            this.maxSize = pMaxSize;
+            this.maxSize = ParamUtil.requireMin("pMaxSize", pMaxSize, 1);
         }
         trimToSize(pMaxSize);
     }
