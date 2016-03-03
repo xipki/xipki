@@ -43,7 +43,7 @@ import org.bouncycastle.cms.KeyTransRecipient;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
-import org.xipki.pki.scep.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -59,8 +59,8 @@ public final class EnvelopedDataDecryptorInstance {
     public EnvelopedDataDecryptorInstance(
         final X509Certificate recipientCert,
         final PrivateKey privKey) {
-        ParamUtil.assertNotNull("recipientCert", recipientCert);
-        ParamUtil.assertNotNull("privKey", privKey);
+        ParamUtil.requireNonNull("recipientCert", recipientCert);
+        ParamUtil.requireNonNull("privKey", privKey);
 
         this.recipientId = new JceKeyTransRecipientId(recipientCert);
         this.recipient = new JceKeyTransEnvelopedRecipient(privKey);

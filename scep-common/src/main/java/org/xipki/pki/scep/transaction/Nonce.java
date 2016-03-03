@@ -39,7 +39,7 @@ package org.xipki.pki.scep.transaction;
 import java.security.SecureRandom;
 
 import org.bouncycastle.util.Arrays;
-import org.xipki.pki.scep.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class Nonce {
     private Nonce(
             final byte[] bytes,
             final boolean cloneBytes) {
-        ParamUtil.assertNotNull("bytes", bytes);
+        ParamUtil.requireNonNull("bytes", bytes);
         if (bytes.length != 16) {
             throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
         }

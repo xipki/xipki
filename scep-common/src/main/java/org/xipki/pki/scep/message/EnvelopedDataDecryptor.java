@@ -43,8 +43,8 @@ import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.RecipientInformationStore;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
-import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -57,13 +57,13 @@ public final class EnvelopedDataDecryptor {
 
     public EnvelopedDataDecryptor(
             final List<EnvelopedDataDecryptorInstance> decryptors) {
-        ParamUtil.assertNotEmpty("decryptors", decryptors);
+        ParamUtil.requireNonEmpty("decryptors", decryptors);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
     public EnvelopedDataDecryptor(
             final EnvelopedDataDecryptorInstance decryptor) {
-        ParamUtil.assertNotNull("decryptor", decryptor);
+        ParamUtil.requireNonNull("decryptor", decryptor);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
         this.decryptors.add(decryptor);
     }
