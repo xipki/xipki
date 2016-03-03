@@ -88,17 +88,9 @@ public class CaEntry implements Serializable {
             final String signerConf,
             final int expirationPeriod)
     throws CaMgmtException {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("signerType", signerType);
-
-        if (expirationPeriod < 0) {
-            throw new IllegalArgumentException(
-                    "expirationPeriod is negative (" + expirationPeriod + " < 0)");
-        }
-        this.expirationPeriod = expirationPeriod;
-
-        this.name = name.toUpperCase();
-        this.signerType = signerType;
+        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
+        this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
         this.signerConf = signerConf;
     }
 
@@ -182,8 +174,7 @@ public class CaEntry implements Serializable {
 
     public void setValidityMode(
             final ValidityMode mode) {
-        ParamUtil.assertNotNull("mode", mode);
-        this.validityMode = mode;
+        this.validityMode = ParamUtil.requireNonNull("mode", mode);
     }
 
     public Set<Permission> getPermissions() {

@@ -58,8 +58,7 @@ public class CertWithEncoded {
     public CertWithEncoded(
             final X509Certificate cert)
     throws CertificateEncodingException {
-        ParamUtil.assertNotNull("cert", cert);
-        this.certificate = cert;
+        this.certificate = ParamUtil.requireNonNull("cert", cert);
         this.className = cert.getClass().getName();
         this.encoded = cert.getEncoded();
     }

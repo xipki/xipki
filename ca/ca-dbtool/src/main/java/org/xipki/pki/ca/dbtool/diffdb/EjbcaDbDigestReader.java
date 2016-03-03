@@ -85,7 +85,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     throws Exception {
         super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
-        ParamUtil.assertNotNull("datasource", datasource);
 
         this.caId = caId;
 
@@ -244,7 +243,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws Exception {
-        ParamUtil.assertNotNull("datasource", datasource);
+        ParamUtil.requireNonNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();
 

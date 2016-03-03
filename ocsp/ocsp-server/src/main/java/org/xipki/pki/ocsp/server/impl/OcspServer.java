@@ -177,11 +177,8 @@ public class OcspServer {
         ServletPathResponderName(
                 final String path,
                 final String responderName) {
-            ParamUtil.assertNotNull("path", path);
-            ParamUtil.assertNotBlank("responderName", responderName);
-
-            this.path = path;
-            this.responderName = responderName;
+            this.path = ParamUtil.requireNonNull("path", path);
+            this.responderName = ParamUtil.requireNonBlank("responderName", responderName);
         }
 
         public String getPath() {
@@ -342,7 +339,7 @@ public class OcspServer {
             }
 
             if (StringUtil.isBlank(name)) {
-                throw new InvalidConfException("responder name could not be empty");
+                throw new InvalidConfException("responder name must not be empty");
             }
 
             for (int i = 0; i < name.length(); i++) {
@@ -850,7 +847,7 @@ public class OcspServer {
                     childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
                 }
 
-                // certStatusInfo could not be null in any case, since at least one store
+                // certStatusInfo must not be null in any case, since at least one store
                 // is configured
                 Date thisUpdate = certStatusInfo.getThisUpdate();
                 if (thisUpdate == null) {
@@ -991,7 +988,7 @@ public class OcspServer {
                 }
 
                 Extensions extns = null;
-                if (CollectionUtil.isNotEmpty(extensions)) {
+                if (CollectionUtil.isNonEmpty(extensions)) {
                     extns = new Extensions(extensions.toArray(new Extension[0]));
                 }
                 basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate, extns);
@@ -1007,7 +1004,7 @@ public class OcspServer {
                                 DERNull.INSTANCE.getEncoded()));
             }
 
-            if (CollectionUtil.isNotEmpty(responseExtensions)) {
+            if (CollectionUtil.isNonEmpty(responseExtensions)) {
                 basicOcspBuilder.setResponseExtensions(
                         new Extensions(responseExtensions.toArray(new Extension[0])));
             }
@@ -1024,7 +1021,7 @@ public class OcspServer {
                 }
             }
 
-            if (CollectionUtil.isNotEmpty(criticalExtensionOIDs)) {
+            if (CollectionUtil.isNonEmpty(criticalExtensionOIDs)) {
                 return createUnsuccessfulOCSPResp(OcspResponseStatus.malformedRequest);
             }
 
@@ -1437,7 +1434,7 @@ public class OcspServer {
         }
 
         Set<X509Certificate> configuredCerts = requestOption.getCerts();
-        if (CollectionUtil.isNotEmpty(configuredCerts)) {
+        if (CollectionUtil.isNonEmpty(configuredCerts)) {
             certstore.addAll(requestOption.getCerts());
         }
 

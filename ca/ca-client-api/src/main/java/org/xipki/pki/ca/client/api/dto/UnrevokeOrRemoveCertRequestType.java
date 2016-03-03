@@ -53,8 +53,7 @@ public class UnrevokeOrRemoveCertRequestType {
 
     public boolean addRequestEntry(
             final IssuerSerialEntryType requestEntry) {
-        ParamUtil.assertNotNull("requestEntry", requestEntry);
-
+        ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (IssuerSerialEntryType re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {
                 return false;

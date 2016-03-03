@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -69,6 +70,8 @@ public enum Permission {
 
     public static Permission getPermission(
             final String permission) {
+        ParamUtil.requireNonNull("permission", permission);
+
         for (Permission p : values()) {
             if (p.permission.equalsIgnoreCase(permission)) {
                 return p;

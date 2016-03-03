@@ -47,16 +47,15 @@ public abstract class QaPolicyQualifierInfo {
 
     public static class QaCpsUriPolicyQualifier extends QaPolicyQualifierInfo {
 
-        private final String cPSUri;
+        private final String cpsUri;
 
         public QaCpsUriPolicyQualifier(
-                final String cPSUri) {
-            ParamUtil.assertNotBlank("cPSUri", cPSUri);
-            this.cPSUri = cPSUri;
+                final String cpsUri) {
+            this.cpsUri = ParamUtil.requireNonBlank("cpsUri", cpsUri);
         }
 
-        public String getCPSUri() {
-            return cPSUri;
+        public String getCpsUri() {
+            return cpsUri;
         }
 
     } // class QaCPSUriPolicyQualifier
@@ -67,8 +66,7 @@ public abstract class QaPolicyQualifierInfo {
 
         public QaUserNoticePolicyQualifierInfo(
                 final String userNotice) {
-            ParamUtil.assertNotBlank("userNotice", userNotice);
-            this.userNotice = userNotice;
+            this.userNotice = ParamUtil.requireNonBlank("userNotice", userNotice);
         }
 
         public String getUserNotice() {

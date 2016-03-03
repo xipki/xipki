@@ -38,6 +38,8 @@ package org.xipki.pki.ca.dbtool;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,7 +51,7 @@ public class StopMe {
 
     public StopMe(
             final AtomicBoolean stopMe) {
-        this.stopMe = stopMe;
+        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
     }
 
     public boolean stopMe() {

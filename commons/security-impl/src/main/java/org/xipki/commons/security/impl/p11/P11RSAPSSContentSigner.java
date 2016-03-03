@@ -120,18 +120,13 @@ public class P11RSAPSSContentSigner implements ContentSigner {
             final AlgorithmIdentifier signatureAlgId,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("cryptService", cryptService);
-        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
-        ParamUtil.assertNotNull("keyId", keyId);
-        ParamUtil.assertNotNull("random", random);
+        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+        ParamUtil.requireNonNull("random", random);
 
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
             throw new IllegalArgumentException("unsupported signature algorithm "
                     + signatureAlgId.getAlgorithm());
         }
-
-        this.algorithmIdentifier = signatureAlgId;
 
         AsymmetricBlockCipher cipher = new P11PlainRSASigner();
 

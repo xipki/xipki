@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
@@ -171,9 +172,9 @@ public class XipkiDigestExportReader {
             final XipkiDbControl dbControl,
             final int numThreads)
     throws Exception {
-        this.datasource = datasource;
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.numThreads = numThreads;
-        this.dbControl = dbControl;
+        this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
         this.selectCertSql = dbControl.getCertSql();
 
         retrievers = new ArrayList<>(numThreads);
@@ -192,6 +193,8 @@ public class XipkiDigestExportReader {
     public List<IdentifiedDbDigestEntry> readCerts(
             final List<IdRange> idRanges)
     throws DataAccessException {
+        ParamUtil.requireNonNull("idRanges", idRanges);
+
         int n = idRanges.size();
         for (IdRange range : idRanges) {
             inQueue.add(range);

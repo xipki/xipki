@@ -174,8 +174,8 @@ public class ConfPairs {
     public void putPair(
             final String name,
             final String value) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotNull("value", value);
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("value", value);
 
         char c = name.charAt(0);
         if (c >= '0' && c <= '9') {

@@ -66,7 +66,7 @@ public class EnrollCertResultType {
 
     public void addResultEntry(
             final ResultEntryType resultEntry) {
-        ParamUtil.assertNotNull("resultEntry", resultEntry);
+        ParamUtil.requireNonNull("resultEntry", resultEntry);
 
         if (!(resultEntry instanceof EnrollCertResultEntryType
                 || resultEntry instanceof ErrorResultEntryType)) {

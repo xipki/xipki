@@ -575,8 +575,8 @@ public class ExtensionsChecker {
             final Certificate cert,
             final X509IssuerInfo issuerInfo,
             final Extensions requestExtensions) {
-        ParamUtil.assertNotNull("cert", cert);
-        ParamUtil.assertNotNull("issuerInfo", issuerInfo);
+        ParamUtil.requireNonNull("cert", cert);
+        ParamUtil.requireNonNull("issuerInfo", issuerInfo);
 
         X509Certificate jceCert;
         try {
@@ -834,7 +834,7 @@ public class ExtensionsChecker {
 
             if (!required) {
                 Set<KeyUsageControl> requiredKeyusage = getKeyusage(true);
-                if (CollectionUtil.isNotEmpty(requiredKeyusage)) {
+                if (CollectionUtil.isNonEmpty(requiredKeyusage)) {
                     required = true;
                 }
             }
@@ -909,7 +909,7 @@ public class ExtensionsChecker {
 
             if (!required) {
                 Set<ExtKeyUsageControl> requiredExtKeyusage = getExtKeyusage(true);
-                if (CollectionUtil.isNotEmpty(requiredExtKeyusage)) {
+                if (CollectionUtil.isNonEmpty(requiredExtKeyusage)) {
                     required = true;
                 }
             }
@@ -1365,7 +1365,7 @@ public class ExtensionsChecker {
 
         Set<KeyUsageControl> optionalKeyusage = getKeyusage(false);
         if (extControl.isRequest() && requestExtensions != null
-                && CollectionUtil.isNotEmpty(optionalKeyusage)) {
+                && CollectionUtil.isNonEmpty(optionalKeyusage)) {
             Extension extension = requestExtensions.getExtension(Extension.keyUsage);
             if (extension != null) {
                 org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
@@ -1386,7 +1386,7 @@ public class ExtensionsChecker {
         }
 
         Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
                 .append(" are present but not expected");
@@ -1394,7 +1394,7 @@ public class ExtensionsChecker {
         }
 
         diffs = strInBnotInA(isUsages, expectedUsages);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
                 .append(" are absent but are required");
@@ -1427,7 +1427,7 @@ public class ExtensionsChecker {
 
         Set<ExtKeyUsageControl> optionalExtKeyusage = getExtKeyusage(false);
         if (extControl.isRequest() && requestExtensions != null
-                && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
+                && CollectionUtil.isNonEmpty(optionalExtKeyusage)) {
             Extension extension = requestExtensions.getExtension(Extension.extendedKeyUsage);
             if (extension != null) {
                 org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
@@ -1449,7 +1449,7 @@ public class ExtensionsChecker {
         }
 
         Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
                 .append(" are present but not expected");
@@ -1457,7 +1457,7 @@ public class ExtensionsChecker {
         }
 
         diffs = strInBnotInA(isUsages, expectedUsages);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("usages ")
                 .append(diffs.toString())
                 .append(" are absent but are required");
@@ -1502,7 +1502,7 @@ public class ExtensionsChecker {
         }
 
         Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("features ")
                 .append(diffs.toString())
                 .append(" are present but not expected");
@@ -1510,7 +1510,7 @@ public class ExtensionsChecker {
         }
 
         diffs = strInBnotInA(isFeatures, expFeatures);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("features ")
                 .append(diffs.toString())
                 .append(" are absent but are required");
@@ -1585,7 +1585,7 @@ public class ExtensionsChecker {
             List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
             for (QaPolicyQualifierInfo qualifierInfo : qualifierInfos) {
                 if (qualifierInfo instanceof QaCpsUriPolicyQualifier) {
-                    String value = ((QaCpsUriPolicyQualifier) qualifierInfo).getCPSUri();
+                    String value = ((QaCpsUriPolicyQualifier) qualifierInfo).getCpsUri();
                     if (!iCpsUris.contains(value)) {
                         failureMsg.append("CPSUri '")
                             .append(value)
@@ -1680,7 +1680,7 @@ public class ExtensionsChecker {
             }
         }
 
-        if (CollectionUtil.isNotEmpty(iMap)) {
+        if (CollectionUtil.isNonEmpty(iMap)) {
             failureMsg.append("issuerDomainPolicies '")
                 .append(iMap.keySet())
                 .append("' are present but not expected");
@@ -1956,7 +1956,7 @@ public class ExtensionsChecker {
 
             Set<String> eCRLUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
-            if (CollectionUtil.isNotEmpty(diffs)) {
+            if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
                     .append(" are present but not expected");
@@ -1964,7 +1964,7 @@ public class ExtensionsChecker {
             }
 
             diffs = strInBnotInA(iCrlURLs, eCRLUrls);
-            if (CollectionUtil.isNotEmpty(diffs)) {
+            if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
                     .append(" are absent but are required");
@@ -2025,7 +2025,7 @@ public class ExtensionsChecker {
 
             Set<String> eCRLUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
-            if (CollectionUtil.isNotEmpty(diffs)) {
+            if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
                     .append(" are present but not expected");
@@ -2033,7 +2033,7 @@ public class ExtensionsChecker {
             }
 
             diffs = strInBnotInA(iCrlURLs, eCRLUrls);
-            if (CollectionUtil.isNotEmpty(diffs)) {
+            if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
                     .append(" are absent but are required");
@@ -2139,14 +2139,14 @@ public class ExtensionsChecker {
         }
 
         Set<String> diffs = strInBnotInA(eProfessionOids, iProfessionOids);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = strInBnotInA(iProfessionOids, eProfessionOids);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are absent but are required");
             failureMsg.append("; ");
@@ -2162,14 +2162,14 @@ public class ExtensionsChecker {
         }
 
         diffs = strInBnotInA(eProfessionItems, iProfessionItems);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
         diffs = strInBnotInA(iProfessionItems, eProfessionItems);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are absent but are required");
             failureMsg.append("; ");
@@ -3060,7 +3060,7 @@ public class ExtensionsChecker {
         }
 
         Set<String> diffs = strInBnotInA(expectedUris, iUris);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")
                 .append(diffs.toString())
@@ -3069,7 +3069,7 @@ public class ExtensionsChecker {
         }
 
         diffs = strInBnotInA(iUris, expectedUris);
-        if (CollectionUtil.isNotEmpty(diffs)) {
+        if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")
                 .append(diffs.toString())

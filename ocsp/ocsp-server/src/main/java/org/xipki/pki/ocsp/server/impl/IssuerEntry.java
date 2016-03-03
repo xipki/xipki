@@ -66,12 +66,9 @@ public class IssuerEntry {
             final int id,
             final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
             final Date caNotBefore) {
-        ParamUtil.assertNotEmpty("issuerHashMap", issuerHashMap);
-        ParamUtil.assertNotNull("caNotBefore", caNotBefore);
-
+        this.issuerHashMap = ParamUtil.requireNonEmpty("issuerHashMap", issuerHashMap);
+        this.notBefore = ParamUtil.requireNonNull("caNotBefore", caNotBefore);
         this.id = id;
-        this.issuerHashMap = issuerHashMap;
-        this.notBefore = caNotBefore;
     }
 
     public int getId() {
@@ -90,7 +87,7 @@ public class IssuerEntry {
 
     public void setRevocationInfo(
             final Date revocationTime) {
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
+        ParamUtil.requireNonNull("revocationTime", revocationTime);
         this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
     }
 

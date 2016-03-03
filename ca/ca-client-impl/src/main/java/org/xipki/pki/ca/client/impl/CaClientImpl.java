@@ -198,7 +198,7 @@ public final class CaClientImpl implements CaClient {
 
     /**
      *
-     * @return names of CAs which could not been configured
+     * @return names of CAs which must not been configured
      */
     private Set<String> autoConfCas(
             final Set<String> caNamesToBeConfigured) {
@@ -237,7 +237,7 @@ public final class CaClientImpl implements CaClient {
             }
         }
 
-        if (CollectionUtil.isNotEmpty(errorCANames)) {
+        if (CollectionUtil.isNonEmpty(errorCANames)) {
             for (String caName : errorCANames) {
                 casMap.remove(caName);
             }
@@ -248,8 +248,8 @@ public final class CaClientImpl implements CaClient {
 
     public void init()
     throws InvalidConfException, IOException {
-        ParamUtil.assertNotNull("confFile", confFile);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
+        ParamUtil.requireNonNull("confFile", confFile);
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
 
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -452,7 +452,7 @@ public final class CaClientImpl implements CaClient {
             LOG.info(sb.toString());
             caNames = autoConfCas(caNames);
 
-            if (CollectionUtil.isNotEmpty(caNames)) {
+            if (CollectionUtil.isNonEmpty(caNames)) {
                 final String msg = "could not configured following CAs " + caNames;
                 if (devMode) {
                     LOG.warn(msg);
@@ -491,6 +491,8 @@ public final class CaClientImpl implements CaClient {
             final String username,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("p10Request", p10Request);
+
         String localCaName = caName;
         if (localCaName == null) {
             localCaName = getCANameForProfile(profile);
@@ -524,7 +526,7 @@ public final class CaClientImpl implements CaClient {
             final String username,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("request", request);
+        ParamUtil.requireNonNull("request", request);
 
         List<EnrollCertRequestEntryType> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
@@ -612,6 +614,8 @@ public final class CaClientImpl implements CaClient {
             final Date invalidityDate,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("cert", cert);
+
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate, debug);
     }
@@ -624,6 +628,9 @@ public final class CaClientImpl implements CaClient {
             final Date invalidityDate,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("serial", serial);
+
         final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, invalidityDate);
@@ -640,7 +647,7 @@ public final class CaClientImpl implements CaClient {
             final RevokeCertRequestType request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("request", request);
+        ParamUtil.requireNonNull("request", request);
 
         List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
@@ -696,6 +703,7 @@ public final class CaClientImpl implements CaClient {
             final String caName,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("caName", caName);
         return downloadCrl(caName, (BigInteger) null, debug);
     }
 
@@ -705,7 +713,7 @@ public final class CaClientImpl implements CaClient {
             final BigInteger crlNumber,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("caName", caName);
+        ParamUtil.requireNonNull("caName", caName);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
@@ -732,7 +740,7 @@ public final class CaClientImpl implements CaClient {
             final String caName,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("caName", caName);
+        ParamUtil.requireNonNull("caName", caName);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
@@ -752,9 +760,7 @@ public final class CaClientImpl implements CaClient {
     public String getCaNameByIssuer(
             final X500Name issuer)
     throws CaClientException {
-        if (issuer == null) {
-            throw new CaClientException("invalid issuer");
-        }
+        ParamUtil.requireNonNull("issuer", issuer);
 
         for (String name : casMap.keySet()) {
             final CaConf ca = casMap.get(name);
@@ -808,7 +814,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     public void setConfFile(String confFile) {
-        this.confFile = confFile;
+        this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
     }
 
     @Override
@@ -824,6 +830,10 @@ public final class CaClientImpl implements CaClient {
             final String caName,
             final String username)
     throws CaClientException {
+        ParamUtil.requireNonNull("certRequest", certRequest);
+        ParamUtil.requireNonNull("pop", pop);
+        ParamUtil.requireNonNull("profileName", profileName);
+
         String localCaName = caName;
         if (localCaName == null) {
             // detect the CA name
@@ -932,6 +942,7 @@ public final class CaClientImpl implements CaClient {
             final BigInteger serial,
             final int reason)
     throws CaClientException {
+        ParamUtil.requireNonNull("issuer", issuer);
         final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
@@ -954,6 +965,7 @@ public final class CaClientImpl implements CaClient {
             final X509Certificate cert,
             final int reason)
     throws CaClientException {
+        ParamUtil.requireNonNull("cert", cert);
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return envelopeRevocation(issuer, cert.getSerialNumber(), reason);
     }
@@ -964,6 +976,8 @@ public final class CaClientImpl implements CaClient {
             final BigInteger serial,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
         IssuerSerialEntryType entry =
                 new IssuerSerialEntryType(id, issuer, serial);
@@ -980,6 +994,7 @@ public final class CaClientImpl implements CaClient {
             final X509Certificate cert,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("cert", cert);
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return unrevokeCert(issuer, cert.getSerialNumber(), debug);
     }
@@ -989,7 +1004,7 @@ public final class CaClientImpl implements CaClient {
             final UnrevokeOrRemoveCertRequestType request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("request", request);
+        ParamUtil.requireNonNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
@@ -1023,6 +1038,8 @@ public final class CaClientImpl implements CaClient {
             final BigInteger serial,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
         IssuerSerialEntryType entry = new IssuerSerialEntryType(id, issuer, serial);
         UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
@@ -1038,6 +1055,7 @@ public final class CaClientImpl implements CaClient {
             final X509Certificate cert,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
+        ParamUtil.requireNonNull("cert", cert);
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return removeCert(issuer, cert.getSerialNumber(), debug);
     }
@@ -1047,7 +1065,7 @@ public final class CaClientImpl implements CaClient {
             final UnrevokeOrRemoveCertRequestType request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
-        ParamUtil.assertNotNull("request", request);
+        ParamUtil.requireNonNull("request", request);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
@@ -1078,6 +1096,8 @@ public final class CaClientImpl implements CaClient {
     @Override
     public Set<CertprofileInfo> getCertprofiles(
             final String caName) {
+        ParamUtil.requireNonNull("caName", caName);
+
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
             return Collections.emptySet();
@@ -1099,7 +1119,7 @@ public final class CaClientImpl implements CaClient {
     public HealthCheckResult getHealthCheckResult(
             final String caName)
     throws CaClientException {
-        ParamUtil.assertNotNull("caName", caName);
+        ParamUtil.requireNonNull("caName", caName);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {

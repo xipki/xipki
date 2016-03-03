@@ -152,7 +152,7 @@ public class FileUtils {
      * The difference between File.delete() and this method are:
      * <ul>
      * <li>A directory to be deleted does not have to be empty.</li>
-     * <li>You get exceptions when a file or directory could not be deleted.
+     * <li>You get exceptions when a file or directory must not be deleted.
      *        (java.io.File methods returns a boolean)</li>
      * </ul>
      *

@@ -41,6 +41,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -262,6 +263,7 @@ public class KeyParametersOption {
 
         public boolean allowsCurve(
                 final ASN1ObjectIdentifier curveOid) {
+            ParamUtil.requireNonNull("curveOid", curveOid);
             return curveOids.contains(curveOid);
         }
 
@@ -315,6 +317,7 @@ public class KeyParametersOption {
             if (publicKeyParamSets == null) {
                 return true;
             }
+            ParamUtil.requireNonNull("oid", oid);
             return publicKeyParamSets.contains(oid);
         }
 
@@ -323,6 +326,7 @@ public class KeyParametersOption {
             if (digestParamSets == null) {
                 return true;
             }
+            ParamUtil.requireNonNull("oid", oid);
             return digestParamSets.contains(oid);
         }
 
@@ -331,6 +335,7 @@ public class KeyParametersOption {
             if (encryptionParamSets == null) {
                 return true;
             }
+            ParamUtil.requireNonNull("oid", oid);
             return encryptionParamSets.contains(oid);
         }
 

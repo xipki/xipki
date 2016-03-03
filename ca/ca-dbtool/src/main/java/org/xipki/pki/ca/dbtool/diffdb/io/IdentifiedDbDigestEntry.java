@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.dbtool.QueueEntry;
 
 /**
@@ -54,7 +55,7 @@ public class IdentifiedDbDigestEntry implements QueueEntry {
     public IdentifiedDbDigestEntry(
             final DbDigestEntry content,
             final int id) {
-        this.content = content;
+        this.content = ParamUtil.requireNonNull("content", content);
         this.id = id;
     }
 

@@ -84,9 +84,7 @@ public class FileDigestReader implements DigestReader {
             final String caDirname,
             final boolean revokedOnly)
     throws IOException, CertificateException {
-        ParamUtil.assertNotBlank("caDirname", caDirname);
-
-        this.caDirname = caDirname;
+        this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
         this.revokedOnly = revokedOnly;
 
         this.caCert = X509Util.parseCert(new File(caDirname, "ca.der"));

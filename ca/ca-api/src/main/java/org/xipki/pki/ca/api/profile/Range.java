@@ -65,11 +65,11 @@ public class Range {
             final Integer pMin,
             final Integer pMax) {
         if (pMin == null && pMax == null) {
-            throw new IllegalArgumentException("pMin and pMax cannot be both null");
+            throw new IllegalArgumentException("pMin and pMax must not be both null");
         }
         if (pMin != null && pMax != null && pMin > pMax) {
             throw new IllegalArgumentException(String.format(
-                    "pMin cannot be greater than pMax: %d > %d", pMin, pMax));
+                    "pMin must not be greater than pMax: %d > %d", pMin, pMax));
         }
         this.min = pMin;
         this.max = pMax;

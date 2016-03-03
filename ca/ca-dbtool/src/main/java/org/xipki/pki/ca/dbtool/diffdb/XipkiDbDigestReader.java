@@ -260,7 +260,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws Exception {
-        ParamUtil.assertNotNull("datasource", datasource);
+        ParamUtil.requireNonNull("datasource", datasource);
+
         Connection conn = datasource.getConnection();
 
         XipkiDbControl dbControl = new XipkiDbControl(dbSchemaType);

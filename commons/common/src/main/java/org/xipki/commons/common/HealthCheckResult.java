@@ -68,8 +68,7 @@ public class HealthCheckResult {
      */
     public HealthCheckResult(
             final String name) {
-        ParamUtil.assertNotBlank("name", name);
-        this.name = name;
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
     public void setHealthy(
@@ -128,10 +127,10 @@ public class HealthCheckResult {
         sb.append("{");
 
         boolean lastElement = true;
-        if (lastElement && CollectionUtil.isNotEmpty(statuses)) {
+        if (lastElement && CollectionUtil.isNonEmpty(statuses)) {
             lastElement = false;
         }
-        if (lastElement && CollectionUtil.isNotEmpty(childChecks)) {
+        if (lastElement && CollectionUtil.isNonEmpty(childChecks)) {
             lastElement = false;
         }
         append(sb, "healthy", healthy, level + 1, pretty, lastElement);
@@ -145,7 +144,7 @@ public class HealthCheckResult {
                     CollectionUtil.isEmpty(childChecks) && count == size);
         }
 
-        if (CollectionUtil.isNotEmpty(childChecks)) {
+        if (CollectionUtil.isNonEmpty(childChecks)) {
             if (pretty) {
                 sb.append("\n");
                 addIndent(sb, level + 1);

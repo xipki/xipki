@@ -48,6 +48,7 @@ import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -87,6 +88,9 @@ public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport
             final X509Certificate cert,
             final X509Certificate caCert)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
+        ParamUtil.requireNonNull("caCert", caCert);
+
         if (!cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
             return "the given certificate is not issued by the given issuer";
         }

@@ -40,6 +40,7 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -64,8 +65,8 @@ public class IssuerSerialEntryType extends ResultEntryType {
             final X500Name issuer,
             final BigInteger serialNumber) {
         super(id);
-        this.serialNumber = serialNumber;
-        this.issuer = issuer;
+        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
     }
 
     public X500Name getIssuer() {

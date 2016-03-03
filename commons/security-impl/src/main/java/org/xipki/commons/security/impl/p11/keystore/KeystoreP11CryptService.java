@@ -78,8 +78,7 @@ public class KeystoreP11CryptService implements P11CryptService {
     public KeystoreP11CryptService(
             final P11ModuleConf moduleConf)
     throws SignerException {
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
-        this.moduleConf = moduleConf;
+        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
         refresh();
     }
 
@@ -307,6 +306,9 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("keyId", keyId);
+
         if (keyId.getKeyLabel() == null) {
             throw new SignerException("only key referencing by key-label is supported");
         }

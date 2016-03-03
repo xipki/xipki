@@ -87,15 +87,9 @@ public class CaLoadTestEnroll extends LoadExecutor {
             final int n,
             final String description) {
         super(description);
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("loadtestEntry", loadtestEntry);
-        if (n < 1) {
-            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
-        }
-        this.n = n;
-        this.loadtestEntry = loadtestEntry;
-        this.caClient = caClient;
-
+        this.n = ParamUtil.requireMin("n", n, 1);
+        this.loadtestEntry = ParamUtil.requireNonNull("loadtestEntry", loadtestEntry);
+        this.caClient = ParamUtil.requireNonNull("caClient", caClient);
         this.index = new AtomicLong(getSecureIndex());
     }
 

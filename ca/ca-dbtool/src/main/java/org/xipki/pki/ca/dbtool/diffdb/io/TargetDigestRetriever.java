@@ -51,6 +51,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.xipki.commons.common.ProcessLog;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.DatabaseType;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
@@ -228,13 +229,13 @@ public class TargetDigestRetriever {
             final int numThreads,
             final StopMe stopMe)
     throws DataAccessException {
-        this.processLog = processLog;
+        this.processLog = ParamUtil.requireNonNull("processLog", processLog);
         this.numPerSelect = numPerSelect;
-        this.datasource = datasource;
-        this.dbControl = dbControl;
-        this.reader = reader;
-        this.reporter = reporter;
-        this.stopMe = stopMe;
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+        this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
+        this.reader = ParamUtil.requireNonNull("reader", reader);
+        this.reporter = ParamUtil.requireNonNull("reporter", reporter);
+        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
 
         StringBuilder buffer = new StringBuilder(200);
         buffer.append(dbControl.getColRevoked()).append(',');

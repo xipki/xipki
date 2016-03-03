@@ -85,17 +85,14 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     public CertValidity(
             final int validity,
             final Unit unit) {
-        if (validity < 1) {
-            throw new IllegalArgumentException("validity could not be less than 1");
-        }
-        ParamUtil.assertNotNull("unit", unit);
-        this.validity = validity;
-        this.unit = unit;
+        this.validity = ParamUtil.requireMin("validity", validity, 1);
+        this.unit = ParamUtil.requireNonNull("unit", unit);
     }
 
     public static CertValidity getInstance(
             final String validityS) {
-        ParamUtil.assertNotBlank("validityS", validityS);
+        ParamUtil.requireNonBlank("validityS", validityS);
+
         final int len = validityS.length();
         final char suffix = validityS.charAt(len - 1);
         Unit unit;
@@ -191,6 +188,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     @Override
     public int compareTo(
             final CertValidity obj) {
+        ParamUtil.requireNonNull("obj", obj);
         if (unit == obj.unit) {
             if (validity == obj.validity) {
                 return 0;

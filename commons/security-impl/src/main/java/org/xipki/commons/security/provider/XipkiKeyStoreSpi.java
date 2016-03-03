@@ -102,13 +102,11 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         KeyCertEntry(
                 final PrivateKey key,
                 final Certificate[] chain) {
-            ParamUtil.assertNotNull("key", key);
-            ParamUtil.assertNotNull("chain", chain);
+            this.key = ParamUtil.requireNonNull("key", key);
+            this.chain = ParamUtil.requireNonNull("chain", chain);
             if (chain.length < 1) {
                 throw new IllegalArgumentException("chain does not contain any certificate");
             }
-            this.key = key;
-            this.chain = chain;
         }
 
         PrivateKey getKey() {

@@ -69,10 +69,7 @@ class IdentifiedX509CertPublisher {
             final PublisherEntry entry,
             final String realType)
     throws CertPublisherException {
-        ParamUtil.assertNotNull("entry", entry);
-
-        this.entry = entry;
-
+        this.entry = ParamUtil.requireNonNull("entry", entry);
         final String type = (realType == null)
                 ? entry.getType()
                 : realType;

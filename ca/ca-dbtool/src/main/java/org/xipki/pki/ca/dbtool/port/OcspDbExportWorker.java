@@ -50,6 +50,7 @@ import javax.xml.validation.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -93,6 +94,9 @@ public class OcspDbExportWorker extends DbPortWorker {
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);
+
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
@@ -128,7 +132,6 @@ public class OcspDbExportWorker extends DbPortWorker {
             }
         }
         this.resume = resume;
-        this.destFolder = destFolder;
         this.numCertsInBundle = numCertsInBundle;
         this.numCertsPerSelect = numCertsPerSelect;
     } // constructor

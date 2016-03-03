@@ -36,6 +36,8 @@
 
 package org.xipki.commons.audit.api;
 
+import java.util.Objects;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,9 +51,7 @@ public enum AuditStatus {
 
     public static final AuditStatus getAuditStatus(
             final String name) {
-        if (name == null) {
-            return null;
-        }
+        Objects.requireNonNull(name, "name must not be null");
 
         for (AuditStatus v : values()) {
             if (v.name().equals(name)) {

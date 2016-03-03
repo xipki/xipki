@@ -69,10 +69,10 @@ public class DbDigestEntry {
             final Long revTime,
             final Long revInvTime,
             final String sha1Fp) {
-        ParamUtil.assertNotBlank("sha1Fp", sha1Fp);
+        ParamUtil.requireNonNull("sha1Fp", sha1Fp);
         if (revoked) {
-            ParamUtil.assertNotNull("revReason", revReason);
-            ParamUtil.assertNotNull("revTime", revTime);
+            ParamUtil.requireNonNull("revReason", revReason);
+            ParamUtil.requireNonNull("revTime", revTime);
         }
 
         if (sha1Fp.length() == 28) {
@@ -190,6 +190,8 @@ public class DbDigestEntry {
 
     public static DbDigestEntry decode(
             final String encoded) {
+        ParamUtil.requireNonNull("encoded", encoded);
+
         List<Integer> indexes = getIndexes(encoded);
         if (indexes.size() != 5) {
             throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);

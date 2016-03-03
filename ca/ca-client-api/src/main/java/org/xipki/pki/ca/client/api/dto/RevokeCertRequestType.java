@@ -53,8 +53,7 @@ public class RevokeCertRequestType {
 
     public boolean addRequestEntry(
             final RevokeCertRequestEntryType requestEntry) {
-        ParamUtil.assertNotNull("requestEntry", requestEntry);
-
+        ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (RevokeCertRequestEntryType re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {
                 return false;

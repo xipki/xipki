@@ -168,8 +168,7 @@ public class DbCertStatusStore extends CertStatusStore {
             final String name,
             final IssuerFilter issuerFilter) {
         super(name);
-        ParamUtil.assertNotNull("issuerFilter", issuerFilter);
-        this.issuerFilter = issuerFilter;
+        this.issuerFilter = ParamUtil.requireNonNull("issuerFilter", issuerFilter);
     }
 
     private synchronized void initIssuerStore() {
@@ -524,8 +523,7 @@ public class DbCertStatusStore extends CertStatusStore {
             final String conf,
             final DataSourceWrapper datasource)
     throws CertStatusStoreException {
-        ParamUtil.assertNotNull("datasource", datasource);
-        this.dataSource = datasource;
+        this.dataSource = ParamUtil.requireNonNull("datasource", datasource);
         initIssuerStore();
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();

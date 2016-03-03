@@ -39,6 +39,7 @@ package org.xipki.commons.audit.api;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Lijun Liao
@@ -69,7 +70,7 @@ public class AuditChildEvent {
 
     public void setLevel(
             AuditLevel level) {
-        this.level = level;
+        this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
     public List<AuditEventData> getEventDatas() {
@@ -78,6 +79,8 @@ public class AuditChildEvent {
 
     public AuditEventData removeEventData(
             final String eventDataName) {
+        Objects.requireNonNull(eventDataName, "eventDataName must not be null");
+
         AuditEventData tbr = null;
         for (AuditEventData ed : eventDatas) {
             if (ed.getName().equals(eventDataName)) {
@@ -94,6 +97,8 @@ public class AuditChildEvent {
 
     public AuditEventData addEventData(
             final AuditEventData eventData) {
+        Objects.requireNonNull(eventData, "eventData must not be null");
+
         int idx = -1;
         for (int i = 0; i < eventDatas.size(); i++) {
             AuditEventData ed = eventDatas.get(i);
@@ -117,7 +122,7 @@ public class AuditChildEvent {
 
     public void setStatus(
             final AuditStatus status) {
-        this.status = status;
+        this.status = Objects.requireNonNull(status, "status must not be null");
     }
 
 }

@@ -37,7 +37,7 @@
 package org.xipki.pki.scep.serveremulator;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.pki.scep.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -53,9 +53,7 @@ public class NextCaAndRa {
     public NextCaAndRa(
             final Certificate caCert,
             final Certificate raCert) {
-        ParamUtil.assertNotNull("caCert", caCert);
-
-        this.caCert = caCert;
+        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.raCert = raCert;
     }
 

@@ -163,7 +163,7 @@ public class CertStatusInfo {
             final Date nextUpdate,
             final String certprofile) {
         if (revocationInfo == null) {
-            throw new IllegalArgumentException("revocationInfo could not be null");
+            throw new IllegalArgumentException("revocationInfo must not be null");
         }
         CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate,
                 certprofile);

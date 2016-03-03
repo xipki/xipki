@@ -38,6 +38,8 @@ package org.xipki.pki.ca.dbtool.xmlio;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -221,6 +223,8 @@ public class OcspCertType extends DbDataObject {
     public void writeTo(
             final DbiXmlWriter writer)
     throws InvalidDataObjectException, XMLStreamException {
+        ParamUtil.requireNonNull("writer", writer);
+
         validate();
 
         writer.writeStartElement(TAG_ROOT);

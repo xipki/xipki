@@ -38,6 +38,8 @@ package org.xipki.pki.ca.dbtool.xmlio;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.xipki.commons.common.util.StringUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -52,8 +54,8 @@ public abstract class DbDataObject {
             final String name,
             final String value)
     throws InvalidDataObjectException {
-        if (value == null || value.isEmpty()) {
-            throw new InvalidDataObjectException(name + " could not be blank");
+        if (StringUtil.isBlank(value)) {
+            throw new InvalidDataObjectException(name + " must not be blank");
         }
     }
 
@@ -62,7 +64,7 @@ public abstract class DbDataObject {
             final Object value)
     throws InvalidDataObjectException {
         if (value == null) {
-            throw new InvalidDataObjectException(name + " could not be null");
+            throw new InvalidDataObjectException(name + " must not be null");
         }
     }
 

@@ -39,6 +39,7 @@ package org.xipki.pki.ca.client.impl;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 /**
@@ -55,8 +56,8 @@ class CaInfo {
     CaInfo(
             final X509Certificate cert,
             final Set<CertprofileInfo> certprofiles) {
-        this.cert = cert;
-        this.certprofiles = certprofiles;
+        this.cert = ParamUtil.requireNonNull("cert", cert);
+        this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
     }
 
     X509Certificate getCert() {

@@ -78,13 +78,9 @@ public class P11ModuleConf {
             final Set<P11SlotIdentifier> includeSlots,
             final Set<P11SlotIdentifier> excludeSlots,
             final SecurityFactory securityFactory) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("nativeLibrary", nativeLibrary);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-
-        this.name = name.toLowerCase();
-        this.nativeLibrary = nativeLibrary;
-        this.securityFactory = securityFactory;
+        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
+        this.nativeLibrary = ParamUtil.requireNonBlank("nativeLibrary", nativeLibrary);
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.passwordRetriever = (passwordRetriever == null)
                 ? P11NullPasswordRetriever.INSTANCE
                 : passwordRetriever;

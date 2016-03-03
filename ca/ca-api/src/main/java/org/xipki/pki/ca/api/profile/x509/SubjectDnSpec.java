@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.profile.Range;
@@ -354,21 +355,25 @@ public class SubjectDnSpec {
 
     public static Range getStringLengthRange(
             final ASN1ObjectIdentifier rdnType) {
+        ParamUtil.requireNonNull("rdnType", rdnType);
         return RANGES.get(rdnType);
     }
 
     public static Pattern getPattern(
             final ASN1ObjectIdentifier rdnType) {
+        ParamUtil.requireNonNull("rdnType", rdnType);
         return PATTERNS.get(rdnType);
     }
 
     public static StringType getStringType(
             final ASN1ObjectIdentifier rdnType) {
+        ParamUtil.requireNonNull("rdnType", rdnType);
         return DFLT_STRING_TYPES.get(rdnType);
     }
 
     public static RdnControl getRdnControl(
             final ASN1ObjectIdentifier rdnType) {
+        ParamUtil.requireNonNull("rdnType", rdnType);
         RdnControl control = CONTROLS.get(rdnType);
         if (control == null) {
             control = new RdnControl(rdnType,
@@ -383,8 +388,9 @@ public class SubjectDnSpec {
     public static void fixRdnControl(
             final RdnControl control)
     throws CertprofileException {
-        ASN1ObjectIdentifier type = control.getType();
+        ParamUtil.requireNonNull("control", control);
 
+        ASN1ObjectIdentifier type = control.getType();
         StringType stringType = control.getStringType();
         if (stringType != null) {
             if (STRING_TYPE_SET.containsKey(type)

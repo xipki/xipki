@@ -66,16 +66,13 @@ public class P11Identity implements Comparable<P11Identity> {
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey) {
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("keyId", keyId);
-
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null) {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
-        this.slotId = slotId;
-        this.keyId = keyId;
         this.certificateChain =
                 (certificateChain != null && certificateChain.length > 0)
                         ? certificateChain

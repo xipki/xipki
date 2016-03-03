@@ -71,8 +71,7 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
             final String description,
             final SecurityFactory securityFactory) {
         super(description);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        this.securityFactory = securityFactory;
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
     protected abstract void generateKeypair(

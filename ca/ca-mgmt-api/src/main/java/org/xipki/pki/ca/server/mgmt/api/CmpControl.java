@@ -95,7 +95,7 @@ public class CmpControl {
     public CmpControl(
             final CmpControlEntry dbEntry)
     throws InvalidConfException {
-        ParamUtil.assertNotNull("dbEntry", dbEntry);
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
 
         ConfPairs pairs = new ConfPairs(dbEntry.getConf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
@@ -111,7 +111,7 @@ public class CmpControl {
         } else {
             Set<String> set = StringUtil.splitAsSet(s, ALGO_DELIMITER);
             this.sigAlgos = canonicalizeAlgos(set);
-            if (CollectionUtil.isNotEmpty(this.sigAlgos)) {
+            if (CollectionUtil.isNonEmpty(this.sigAlgos)) {
                 pairs.putPair(KEY_PROTECTION_SIGALGO,
                         StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
             }
@@ -130,7 +130,8 @@ public class CmpControl {
             final Integer confirmWaitTime,
             final Set<String> sigAlgos)
     throws InvalidConfException {
-        ParamUtil.assertNotBlank("name", name);
+        ParamUtil.requireNonBlank("name", name);
+
         ConfPairs pairs = new ConfPairs();
 
         this.confirmCert = (confirmCert == null)
@@ -204,6 +205,8 @@ public class CmpControl {
 
     public boolean isSigAlgoPermitted(
             final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+
         if (sigAlgos == null) {
             return true;
         }

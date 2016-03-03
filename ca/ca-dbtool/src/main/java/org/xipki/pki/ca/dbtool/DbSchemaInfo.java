@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
@@ -60,6 +61,8 @@ public class DbSchemaInfo {
     public DbSchemaInfo(
             final DataSourceWrapper dataSource)
     throws DataAccessException {
+        ParamUtil.requireNonNull("dataSource", dataSource);
+
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
         Connection c = dataSource.getConnection();
         if (c == null) {
@@ -94,6 +97,7 @@ public class DbSchemaInfo {
 
     public String getVariableValue(
             final String variableName) {
+        ParamUtil.requireNonNull("variableName", variableName);
         return variables.get(variableName);
     }
 

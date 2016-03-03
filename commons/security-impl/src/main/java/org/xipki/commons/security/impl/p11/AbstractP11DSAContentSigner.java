@@ -80,15 +80,10 @@ abstract class AbstractP11DSAContentSigner implements ContentSigner {
             final P11KeyIdentifier keyId,
             final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, OperatorCreationException {
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("cryptService", cryptService);
-        ParamUtil.assertNotNull("keyId", keyId);
-        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
-
-        this.slot = slot;
-        this.algorithmIdentifier = signatureAlgId;
-        this.keyId = keyId;
-        this.cryptService = cryptService;
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
 
         AlgorithmIdentifier digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(
                 signatureAlgId);

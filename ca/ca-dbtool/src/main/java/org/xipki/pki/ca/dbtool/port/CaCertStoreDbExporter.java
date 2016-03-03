@@ -133,26 +133,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             final boolean evaluateOnly)
     throws DataAccessException {
         super(dataSource, baseDir, stopMe, evaluateOnly);
-        ParamUtil.assertNotNull("marshaller", marshaller);
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        if (numCertsInBundle < 1) {
-            throw new IllegalArgumentException(
-                    "numCertsInBundle could not be less than 1: " + numCertsInBundle);
-        }
-        if (numCertsPerSelect < 1) {
-            throw new IllegalArgumentException(
-                    "numCertsPerSelect could not be less than 1: " + numCertsPerSelect);
-        }
-
-        this.numCertsInBundle = numCertsInBundle;
+        this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
+        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+        this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
         this.numUsersInBundle = numCertsInBundle * 10;
         this.numCrlsInBundle = Math.max(1, numCertsInBundle / 10);
-        this.numCertsPerSelect = numCertsPerSelect;
+        this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
         this.numUsersPerSelect = numCertsInBundle * 10;
         this.numCrlsPerSelect = Math.max(1, numCertsPerSelect / 10);
-
-        this.marshaller = marshaller;
-        this.unmarshaller = unmarshaller;
         this.resume = resume;
     }
 

@@ -286,13 +286,13 @@ public class CanonicalizeCode {
                 if (idx == -1) {
                     lastLine = line;
 
-                    if (line.length() > 120 || line.endsWith("+") || line.endsWith("|")
+                    if (line.endsWith("+") || line.endsWith("|")
                             || line.endsWith("&")) {
-                        lineNumbers.add(lineNumber);
+                        addLineNumber(line, lineNumber, lineNumbers);
                         continue;
                     } else if (line.contains("?")
                             && line.contains(" :")) {
-                        lineNumbers.add(lineNumber);
+                        addLineNumber(line, lineNumber, lineNumbers);
                         continue;
                     } else {
                         // check whether the number of leading spaces is multiple of 4
@@ -308,19 +308,32 @@ public class CanonicalizeCode {
                         }
 
                         if (c != '*' && numLeadingSpaces % 4 != 0) {
-                            lineNumbers.add(lineNumber);
+                            addLineNumber(line, lineNumber, lineNumbers);
                         }
                     }
 
                     String trimmedLine = line.trim();
                     if (trimmedLine.startsWith("extends") || trimmedLine.startsWith("implements")) {
-                        lineNumbers.add(lineNumber);
+                        addLineNumber(line, lineNumber, lineNumbers);
+                    } else if (trimmedLine.endsWith(";;")) {
+                        addLineNumber(line, lineNumber, lineNumbers);
+
+                    } else {
+                        int idxSpaces = trimmedLine.indexOf("  ");
+                        if (idxSpaces != -1) {
+                            char pc = trimmedLine.charAt(idxSpaces - 1);
+                            if (pc != '"' && pc != '*') {
+                                addLineNumber(line, lineNumber, lineNumbers);
+
+                            }
+                        }
                     }
 
                     continue;
                 } // end if (idx == -1)
 
-                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"') {
+                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"'
+                        || line.endsWith("XIPKI-CODECHECK:IGNORE")) {
                     lastLine = line;
                     continue;
                 }
@@ -343,7 +356,7 @@ public class CanonicalizeCode {
                             }
                         }
                     }
-                    lineNumbers.add(lineNumber);
+                    addLineNumber(line, lineNumber, lineNumbers);
                 }
 
                 lastLine = line;
@@ -420,5 +433,14 @@ public class CanonicalizeCode {
             return line.substring(0, i + 1);
         }
     } // method removeTrailingSpaces
+
+    private void addLineNumber(
+            final String line,
+            final int lineNumber,
+            final List<Integer> lineNumbers) {
+        if (!line.endsWith("XIPKI-CODECHECK:IGNORE")) {
+            lineNumbers.add(lineNumber);
+        }
+    }
 
 }

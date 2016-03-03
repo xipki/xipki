@@ -76,13 +76,12 @@ public class RdnControl {
             final ASN1ObjectIdentifier type,
             final int minOccurs,
             final int maxOccurs) {
-        ParamUtil.assertNotNull("type", type);
         if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
             throw new IllegalArgumentException(
                     String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
         }
 
-        this.type = type;
+        this.type = ParamUtil.requireNonNull("type", type);
         this.minOccurs = minOccurs;
         this.maxOccurs = maxOccurs;
     }

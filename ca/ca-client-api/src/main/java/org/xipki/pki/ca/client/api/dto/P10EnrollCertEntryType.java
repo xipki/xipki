@@ -53,11 +53,8 @@ public class P10EnrollCertEntryType {
     public P10EnrollCertEntryType(
             final CertificationRequest p10Request,
             final String profile) {
-        ParamUtil.assertNotNull("p10Request", p10Request);
-        ParamUtil.assertNotBlank("profile", profile);
-
-        this.p10Request = p10Request;
-        this.profile = profile;
+        this.p10Request = ParamUtil.requireNonNull("p10Request", p10Request);
+        this.profile = ParamUtil.requireNonNull("profile", profile);
     }
 
     public CertificationRequest getP10Request() {

@@ -65,7 +65,7 @@ class CertBasedIdentityStore {
 
     void addIdentityEntry(
             final CertBasedIdentityEntry entry) {
-        ParamUtil.assertNotNull("entry", entry);
+        ParamUtil.requireNonNull("entry", entry);
 
         for (CertBasedIdentityEntry existingEntry : entries) {
             if (existingEntry.getId() == entry.getId()) {

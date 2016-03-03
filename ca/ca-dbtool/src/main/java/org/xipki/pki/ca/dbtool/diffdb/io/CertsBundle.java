@@ -58,14 +58,9 @@ public class CertsBundle {
             final int numSkipped,
             final Map<Long, DbDigestEntry> certs,
             final List<Long> serialNumbers) {
-        if (numSkipped < 0) {
-            throw new IllegalArgumentException("numSkipped could not be negative: " + numSkipped);
-        }
-        ParamUtil.assertNotEmpty("certs", certs);
-        ParamUtil.assertNotEmpty("serialNumbers", serialNumbers);
-
-        this.certs = certs;
-        this.serialNumbers = serialNumbers;
+        this.numSkipped = ParamUtil.requireMin("numSkipped", numSkipped, 0);
+        this.certs = ParamUtil.requireNonEmpty("certs", certs);
+        this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
     }
 
     public int getNumSkipped() {

@@ -36,12 +36,30 @@
 
 package org.xipki.pki.ca.server.impl.util;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.CertprofileException;
 
 /**
  * @author Lijun Liao
@@ -67,6 +85,7 @@ public class CaUtil {
 
     public static String getChallengePassword(
             final CertificationRequestInfo p10Req) {
+        ParamUtil.requireNonNull("p10Req", p10Req);
         ASN1Set attrs = p10Req.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
@@ -76,6 +95,78 @@ public class CaUtil {
             }
         }
         return null;
+    }
+
+    public static BasicConstraints createBasicConstraints(
+            final boolean isCa,
+            final Integer pathLen) {
+        BasicConstraints basicConstraints;
+        if (isCa) {
+            if (pathLen != null) {
+                basicConstraints = new BasicConstraints(pathLen);
+            } else {
+                basicConstraints = new BasicConstraints(true);
+            }
+        } else {
+            basicConstraints = new BasicConstraints(false);
+        }
+        return basicConstraints;
+    }
+
+    public static AuthorityInformationAccess createAuthorityInformationAccess(
+            final List<String> caIssuerUris,
+            final List<String> ocspUris) {
+        if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
+            throw new IllegalArgumentException("caIssuerUris and ospUris must not be both empty");
+        }
+
+        List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
+
+        if (CollectionUtil.isNonEmpty(caIssuerUris)) {
+            for (String uri : caIssuerUris) {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(
+                        new AccessDescription(X509ObjectIdentifiers.id_ad_caIssuers, gn));
+            }
+        }
+
+        if (CollectionUtil.isNonEmpty(ocspUris)) {
+            for (String uri : ocspUris) {
+                GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+                accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
+            }
+        }
+
+        DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
+        return AuthorityInformationAccess.getInstance(seq);
+    }
+
+    public static CRLDistPoint createCrlDistributionPoints(
+            final List<String> crlUris,
+            final X500Name caSubject,
+            final X500Name crlSignerSubject)
+    throws IOException, CertprofileException {
+        ParamUtil.requireNonEmpty("crlUris", crlUris);
+        int n = crlUris.size();
+        DistributionPoint[] points = new DistributionPoint[1];
+
+        GeneralName[] names = new GeneralName[n];
+        for (int i = 0; i < n; i++) {
+            names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
+        }
+        // Distribution Point
+        GeneralNames gns = new GeneralNames(names);
+        DistributionPointName pointName = new DistributionPointName(gns);
+
+        GeneralNames crlIssuer = null;
+        if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
+            GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
+            crlIssuer = new GeneralNames(crlIssuerName);
+        }
+
+        points[0] = new DistributionPoint(pointName, null, crlIssuer);
+
+        return new CRLDistPoint(points);
     }
 
 }

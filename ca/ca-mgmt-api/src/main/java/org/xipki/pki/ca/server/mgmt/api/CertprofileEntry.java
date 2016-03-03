@@ -61,16 +61,13 @@ public class CertprofileEntry implements Serializable {
             final String name,
             final String type,
             final String conf) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("type", type);
-
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.type = ParamUtil.requireNonBlank("type", type);
+        this.conf = conf;
         if ("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name)) {
             throw new IllegalArgumentException(
-                    "certificate profile name could not be 'all' and 'null'");
+                    "certificate profile name must not be 'all' and 'null'");
         }
-        this.name = name;
-        this.type = type;
-        this.conf = conf;
     }
 
     public String getName() {

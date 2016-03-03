@@ -67,9 +67,9 @@ public class DbiXmlWriter {
             final String rootElementName,
             final String version)
     throws XMLStreamException {
-        ParamUtil.assertNotBlank("rootElementName", rootElementName);
-        ParamUtil.assertNotBlank("version", version);
-        this.rootElementName = rootElementName;
+        this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
+        ParamUtil.requireNonBlank("version", version);
+
         stream = new ByteArrayOutputStream();
 
         synchronized (FACTORY) {
@@ -89,6 +89,7 @@ public class DbiXmlWriter {
     public void writeStartElement(
             final String localName)
     throws XMLStreamException {
+        ParamUtil.requireNonNull("localName", localName);
         writer.writeStartElement(localName);
     }
 
@@ -101,6 +102,8 @@ public class DbiXmlWriter {
             final String localName,
             final String value)
     throws XMLStreamException {
+        ParamUtil.requireNonNull("localName", localName);
+        ParamUtil.requireNonNull("value", value);
         writer.writeStartElement(localName);
         writer.writeCharacters(value);
         writer.writeEndElement();
@@ -127,6 +130,7 @@ public class DbiXmlWriter {
     public void rewriteToZipStream(
             final ZipOutputStream zipStream)
     throws IOException, XMLStreamException {
+        ParamUtil.requireNonNull("zipStream", zipStream);
         flush();
         zipStream.write(stream.toByteArray());
     }

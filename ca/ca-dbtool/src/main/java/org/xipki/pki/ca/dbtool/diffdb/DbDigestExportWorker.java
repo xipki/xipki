@@ -47,6 +47,7 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -82,6 +83,10 @@ public class DbDigestExportWorker extends DbPortWorker {
             final int numCertsPerSelect,
             final int numThreads)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("dbConfFile", dbConfFile);
+        this.destFolder = ParamUtil.requireNonNull("destFolder", destFolder);
+
         File f = new File(destFolder);
         if (!f.exists()) {
             f.mkdirs();
@@ -103,7 +108,6 @@ public class DbDigestExportWorker extends DbPortWorker {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
-        this.destFolder = destFolder;
         this.numCertsPerSelect = numCertsPerSelect;
         this.numThreads = numThreads;
     } // constructor

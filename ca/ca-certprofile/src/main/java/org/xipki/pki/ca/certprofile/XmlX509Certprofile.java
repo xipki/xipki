@@ -107,7 +107,6 @@ import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
-import org.xipki.pki.ca.api.profile.x509.X509CertUtil;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.internal.MonetaryValueOption;
 import org.xipki.pki.ca.certprofile.internal.QcStatementOption;
@@ -287,7 +286,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     public void initialize(
             final String data)
     throws CertprofileException {
-        ParamUtil.assertNotBlank("data", data);
+        ParamUtil.requireNonBlank("data", data);
+
         reset();
         try {
             doInitialize(data);
@@ -393,7 +393,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
 
             List<Pattern> patterns = null;
-            if (CollectionUtil.isNotEmpty(t.getRegex())) {
+            if (CollectionUtil.isNonEmpty(t.getRegex())) {
                 patterns = new LinkedList<>();
                 for (String regex : t.getRegex()) {
                     Pattern pattern = Pattern.compile(regex);
@@ -544,7 +544,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         List<String> items = (type == null)
                 ? null
                 : extConf.getProfessionItem();
-        professionItems = CollectionUtil.unmodifiableList(items, true, true);
+        professionItems = CollectionUtil.unmodifiableList(items);
 
         List<OidWithDescType> oidWithDescs = (type == null)
                 ? null
@@ -670,8 +670,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         List<CertificatePolicyInformation> policyInfos =
                 XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
-        org.bouncycastle.asn1.x509.CertificatePolicies value =
-                X509CertUtil.createCertificatePolicies(policyInfos);
+        org.bouncycastle.asn1.x509.CertificatePolicies value = CollectionUtil.isEmpty(policyInfos)
+                ? null
+                : XmlX509CertprofileUtil.createCertificatePolicies(policyInfos);
         this.certificatePolicies =
                 new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
@@ -1074,6 +1075,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return values;
         }
 
+        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
+        ParamUtil.requireNonNull("notBefore", notBefore);
+        ParamUtil.requireNonNull("notAfter", notAfter);
+
         Map<ASN1ObjectIdentifier, ExtensionControl> occurences = new HashMap<>(extensionOccurences);
 
         // AuthorityKeyIdentifier
@@ -1458,7 +1463,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         DirectoryString[] localProfessionItems = null;
-        if (professionItems != null && professionItems.size() > 0) {
+        if (CollectionUtil.isNonEmpty(professionItems)) {
             int n = professionItems.size();
             localProfessionItems = new DirectoryString[n];
             for (int i = 0; i < n; i++) {
@@ -1467,7 +1472,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         ASN1ObjectIdentifier[] localProfessionOIDs = null;
-        if (professionOIDs != null && professionOIDs.size() > 0) {
+        if (CollectionUtil.isNonEmpty(professionOIDs)) {
             localProfessionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
         }
 

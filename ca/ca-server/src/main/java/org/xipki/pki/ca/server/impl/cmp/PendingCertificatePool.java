@@ -67,12 +67,9 @@ class PendingCertificatePool {
                 final long waitForConfirmTill,
                 final X509CertificateInfo certInfo) {
             super();
-            ParamUtil.assertNotNull("certReqId", certReqId);
-            ParamUtil.assertNotNull("certInfo", certInfo);
-
-            this.certReqId = certReqId;
+            this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
+            this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
             this.waitForConfirmTill = waitForConfirmTill;
-            this.certInfo = certInfo;
         }
 
         @Override

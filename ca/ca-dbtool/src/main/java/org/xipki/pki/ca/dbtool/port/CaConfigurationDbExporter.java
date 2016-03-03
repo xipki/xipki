@@ -98,8 +98,7 @@ class CaConfigurationDbExporter extends DbPorter {
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException {
         super(dataSource, destDir, stopMe, evaluateOnly);
-        ParamUtil.assertNotNull("marshaller", marshaller);
-        this.marshaller = marshaller;
+        this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
     }
 
     public void export()

@@ -208,6 +208,8 @@ public class IoUtil {
 
     public static String expandFilepath(
             final String path) {
+        ParamUtil.requireNonBlank("path", path);
+
         if (path.startsWith("~" + File.separator)) {
             return System.getProperty("user.home") + path.substring(1);
         } else {

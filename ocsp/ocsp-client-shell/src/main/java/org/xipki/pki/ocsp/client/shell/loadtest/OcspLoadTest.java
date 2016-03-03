@@ -165,19 +165,12 @@ public class OcspLoadTest extends LoadExecutor {
             final RequestOptions options,
             final String description) {
         super(description);
-        ParamUtil.assertNotNull("requestor", requestor);
-        ParamUtil.assertNotEmpty("serials", serials);
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("serverUrl", serverUrl);
-        ParamUtil.assertNotNull("options", options);
-
-        this.requestor = requestor;
-        this.serials = serials;
+        this.requestor = ParamUtil.requireNonNull("requestor", requestor);
+        this.serials = ParamUtil.requireNonEmpty("serials", serials);
+        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
+        this.serverUrl = ParamUtil.requireNonNull("serverUrl", serverUrl);
+        this.options = ParamUtil.requireNonNull("options", options);
         this.numSerials = serials.size();
-        this.caCert = caCert;
-        this.serverUrl = serverUrl;
-        this.options = options;
-
         this.serialIndex = 0;
     }
 

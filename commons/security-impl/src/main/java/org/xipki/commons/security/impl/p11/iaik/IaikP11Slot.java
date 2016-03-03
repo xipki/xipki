@@ -161,13 +161,9 @@ public class IaikP11Slot implements P11WritableSlot {
             final Slot slot,
             final List<char[]> password)
     throws SignerException {
-        ParamUtil.assertNotBlank("moduleName", moduleName);
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("slot", slot);
-
-        this.moduleName = moduleName;
-        this.slotId = slotId;
-        this.slot = slot;
+        this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.slot = ParamUtil.requireNonNull("slot", slot);
         this.password = password;
 
         Session session;
@@ -298,7 +294,7 @@ public class IaikP11Slot implements P11WritableSlot {
                                 }
                             }
 
-                            if (CollectionUtil.isNotEmpty(issuerCerts)) {
+                            if (CollectionUtil.isNonEmpty(issuerCerts)) {
                                 allCerts.put(issuerSubject, issuerCerts);
                             }
                         }
@@ -593,7 +589,17 @@ public class IaikP11Slot implements P11WritableSlot {
             if (isSessionLoggedIn) {
                 return;
             }
-            boolean loginRequired = session.getToken().getTokenInfo().isLoginRequired();
+
+            boolean loginRequired;
+            try {
+                loginRequired = session.getToken().getTokenInfo().isLoginRequired();
+            } catch (TokenException ex) {
+                String msg = "error while checking whether LoginRequired of token";
+                LOG.error(LogUtil.buildExceptionLogFormat(msg),
+                        ex.getClass().getName(), ex.getMessage());
+                LOG.debug(msg, ex);
+                loginRequired = true;
+            }
 
             LOG.debug("loginRequired: {}", loginRequired);
             if (!loginRequired) {
@@ -1035,8 +1041,8 @@ public class IaikP11Slot implements P11WritableSlot {
             final Set<X509Certificate> caCerts,
             final SecurityFactory securityFactory)
     throws Exception {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
-        ParamUtil.assertNotNull("newCert", newCert);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("newCert", newCert);
 
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
 
@@ -1132,7 +1138,7 @@ public class IaikP11Slot implements P11WritableSlot {
     private boolean doRemoveKeyAndCerts(
             final P11KeyIdentifier keyIdentifier, boolean removeCerts)
     throws Exception {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
         if (privKey == null) {
@@ -1189,7 +1195,7 @@ public class IaikP11Slot implements P11WritableSlot {
     public void removeCerts(
             final P11KeyIdentifier keyIdentifier)
     throws Exception {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         String keyLabel = keyIdentifier.getKeyLabel();
         char[] keyLabelChars = (keyLabel == null)
@@ -1336,11 +1342,8 @@ public class IaikP11Slot implements P11WritableSlot {
             final BigInteger publicExponent,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (keySize < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + keySize);
-        }
+        ParamUtil.requireNonBlank("label", label);
+        ParamUtil.requireMin("keySize", keySize, 1024);
 
         if (keySize % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
@@ -1371,11 +1374,8 @@ public class IaikP11Slot implements P11WritableSlot {
             final int qLength,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (pLength < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + pLength);
-        }
+        ParamUtil.requireNonBlank("label", label);
+        ParamUtil.requireMin("pLength", pLength, 1024);
 
         if (pLength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
@@ -1401,8 +1401,8 @@ public class IaikP11Slot implements P11WritableSlot {
             final String curveNameOrOid,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
-        ParamUtil.assertNotBlank("label", label);
+        ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
+        ParamUtil.requireNonBlank("label", label);
 
         ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
         if (curveId == null) {
@@ -1659,7 +1659,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final char[] label)
     throws Exception {
         if (label == null || label.length == 0) {
-            throw new IllegalArgumentException("label could not be null or empty");
+            throw new IllegalArgumentException("label must not be null or empty");
         }
 
         byte[] localEncodedCert = encodedCert;

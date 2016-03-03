@@ -102,8 +102,7 @@ class CaConfigurationDbImporter extends DbPorter {
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException {
         super(dataSource, srcDir, stopMe, evaluateOnly);
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        this.unmarshaller = unmarshaller;
+        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     }
 
     public void importToDb()
@@ -152,7 +151,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println("importing table CMPCONTROL");
         final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
 
-        if (controls != null && CollectionUtil.isNotEmpty(controls.getCmpcontrol())) {
+        if (controls != null && CollectionUtil.isNonEmpty(controls.getCmpcontrol())) {
             PreparedStatement ps = null;
             try {
                 ps = prepareStatement(sql);

@@ -74,13 +74,10 @@ public class P11PrivateKey implements PrivateKey {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws InvalidKeyException {
-        ParamUtil.assertNotNull("p11CryptService", p11CryptService);
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("keyId", keyId);
+        this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
 
-        this.p11CryptService = p11CryptService;
-        this.slotId = slotId;
-        this.keyId = keyId;
         PublicKey publicKey;
         try {
             publicKey = p11CryptService.getPublicKey(slotId, keyId);

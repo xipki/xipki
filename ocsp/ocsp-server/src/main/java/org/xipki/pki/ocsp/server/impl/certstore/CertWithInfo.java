@@ -57,8 +57,7 @@ class CertWithInfo {
 
     CertWithInfo(
             final BigInteger serialNumber) {
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
-        this.serialNumber = serialNumber;
+        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
     }
 
     public void setProfileName(

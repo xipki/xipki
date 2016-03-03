@@ -86,13 +86,10 @@ public class DbToolBase {
             final AtomicBoolean stopMe)
     throws DataAccessException {
         super();
-        ParamUtil.assertNotNull("dataSource", dataSource);
-        ParamUtil.assertNotBlank("baseDir", baseDir);
-        ParamUtil.assertNotNull("stopMe", stopMe);
-
-        this.stopMe = stopMe;
-        this.dataSource = dataSource;
-        this.connection = this.dataSource.getConnection();
+        ParamUtil.requireNonBlank("baseDir", baseDir);
+        this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
+        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
+        this.connection = dataSource.getConnection();
         try {
             this.connectionAutoCommit = connection.getAutoCommit();
         } catch (SQLException ex) {
@@ -113,6 +110,8 @@ public class DbToolBase {
     protected PreparedStatement prepareStatement(
             final String sql)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("sql", sql);
+
         try {
             return connection.prepareStatement(sql);
         } catch (SQLException ex) {
@@ -125,6 +124,9 @@ public class DbToolBase {
             final String idColumn,
             final int id,
             final Logger log) {
+        ParamUtil.requireNonBlank("tableName", tableName);
+        ParamUtil.requireNonBlank("idColumn", idColumn);
+
         StringBuilder sb = new StringBuilder(50);
         sb.append("DELETE FROM ").append(tableName).append(" WHERE ")
             .append(idColumn).append(" > ").append(id);
@@ -159,6 +161,9 @@ public class DbToolBase {
             final String table,
             final String column)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
+
         return dataSource.getMin(connection, table, column);
     }
 
@@ -167,6 +172,8 @@ public class DbToolBase {
             final String column,
             final String condition)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
         return dataSource.getMin(connection, table, column, condition);
     }
 
@@ -174,6 +181,8 @@ public class DbToolBase {
             final String table,
             final String column)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
         return dataSource.getMax(connection, table, column);
     }
 
@@ -182,12 +191,15 @@ public class DbToolBase {
             final String column,
             final String condition)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
         return dataSource.getMax(connection, table, column, condition);
     }
 
     public int getCount(
             final String table)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
         return dataSource.getCount(connection, table);
     }
 
@@ -195,12 +207,15 @@ public class DbToolBase {
             final String table,
             final String column)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
         return dataSource.tableHasColumn(connection, table, column);
     }
 
     public boolean tableExists(
             final String table)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
         return dataSource.tableExists(connection, table);
     }
 
@@ -225,6 +240,8 @@ public class DbToolBase {
     protected DataAccessException translate(
             final String sql,
             final SQLException ex) {
+        ParamUtil.requireNonBlank("sql", sql);
+        ParamUtil.requireNonNull("ex", ex);
         return dataSource.translate(sql, ex);
     }
 
@@ -249,6 +266,7 @@ public class DbToolBase {
     protected void commit(
             final String task)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("task", task);
         try {
             connection.commit();
         } catch (SQLException ex) {
@@ -261,6 +279,7 @@ public class DbToolBase {
             final int index,
             final Long i)
     throws SQLException {
+        ParamUtil.requireNonNull("ps", ps);
         if (i != null) {
             ps.setLong(index, i.longValue());
         } else {
@@ -273,6 +292,7 @@ public class DbToolBase {
             final int index,
             final Integer i)
     throws SQLException {
+        ParamUtil.requireNonNull("ps", ps);
         if (i != null) {
             ps.setInt(index, i.intValue());
         } else {
@@ -285,6 +305,8 @@ public class DbToolBase {
             final int index,
             final boolean b)
     throws SQLException {
+        ParamUtil.requireNonNull("ps", ps);
+
         int i = b
                 ? 1
                 : 0;
@@ -294,6 +316,8 @@ public class DbToolBase {
     public static Properties getDbConfProperties(
             final InputStream is)
     throws IOException {
+        ParamUtil.requireNonNull("is", is);
+
         Properties props = new Properties();
         try {
             props.load(is);
@@ -319,6 +343,9 @@ public class DbToolBase {
     public static void deleteTmpFiles(
             final String dirName,
             final String prefix) {
+        ParamUtil.requireNonBlank("dirName", dirName);
+        ParamUtil.requireNonBlank("prefix", prefix);
+
         // delete the temporary files
         File dir = new File(dirName);
         File[] children = dir.listFiles();
@@ -335,6 +362,9 @@ public class DbToolBase {
             final OutputStream os,
             final String text)
     throws IOException {
+        ParamUtil.requireNonNull("os", os);
+        ParamUtil.requireNonNull("text", text);
+
         os.write(text.getBytes());
         os.write('\n');
     }
@@ -345,6 +375,9 @@ public class DbToolBase {
             final int minIdOfCurrentFile,
             final int maxIdOfCurrentFile,
             final int maxId) {
+        ParamUtil.requireNonNull("prefix", prefix);
+        ParamUtil.requireNonNull("suffix", suffix);
+
         StringBuilder sb = new StringBuilder();
         sb.append(prefix);
 
@@ -369,6 +402,8 @@ public class DbToolBase {
     public static ZipOutputStream getZipOutputStream(
             final File zipFile)
     throws FileNotFoundException {
+        ParamUtil.requireNonNull("zipFile", zipFile);
+
         BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(zipFile), STREAM_BUFFER_SIZE);
         ZipOutputStream zipOutStream = new ZipOutputStream(out);

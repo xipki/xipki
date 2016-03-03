@@ -222,11 +222,8 @@ public class SoftTokenContentSignerBuilder {
             final PrivateKey privateKey,
             final PublicKey publicKey)
     throws SignerException {
-        ParamUtil.assertNotNull("privateKey", privateKey);
-        ParamUtil.assertNotNull("publicKey", publicKey);
-
-        this.key = privateKey;
-        this.publicKey = publicKey;
+        this.key = ParamUtil.requireNonNull("privateKey", privateKey);
+        this.publicKey = ParamUtil.requireNonNull("publicKey", publicKey);
         this.certificateChain = null;
     }
 
@@ -241,10 +238,9 @@ public class SoftTokenContentSignerBuilder {
         if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
-
-        ParamUtil.assertNotNull("keystoreStream", keystoreStream);
-        ParamUtil.assertNotNull("keystorePassword", keystorePassword);
-        ParamUtil.assertNotNull("keyPassword", keyPassword);
+        ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+        ParamUtil.requireNonNull("keystorePassword", keystorePassword);
+        ParamUtil.requireNonNull("keyPassword", keyPassword);
 
         try {
             KeyStore ks;
@@ -316,10 +312,7 @@ public class SoftTokenContentSignerBuilder {
             final int parallelism,
             final SecureRandom random)
     throws OperatorCreationException, NoSuchPaddingException {
-        if (parallelism < 1) {
-            throw new IllegalArgumentException("non-positive parallelism is not allowed: "
-                    + parallelism);
-        }
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
 

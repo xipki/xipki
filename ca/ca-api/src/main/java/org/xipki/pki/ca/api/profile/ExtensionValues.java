@@ -58,8 +58,8 @@ public class ExtensionValues {
             final ASN1ObjectIdentifier type,
             final boolean critical,
             final ASN1Encodable value) {
-        ParamUtil.assertNotNull("type", type);
-        ParamUtil.assertNotNull("value", value);
+        ParamUtil.requireNonNull("type", type);
+        ParamUtil.requireNonNull("value", value);
 
         if (extensions.containsKey(type)) {
             return false;
@@ -71,8 +71,8 @@ public class ExtensionValues {
     public boolean addExtension(
             final ASN1ObjectIdentifier type,
             final ExtensionValue value) {
-        ParamUtil.assertNotNull("type", type);
-        ParamUtil.assertNotNull("value", value);
+        ParamUtil.requireNonNull("type", type);
+        ParamUtil.requireNonNull("value", value);
 
         if (extensions.containsKey(type)) {
             return false;
@@ -87,16 +87,19 @@ public class ExtensionValues {
 
     public ExtensionValue getExtensionValue(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         return extensions.get(type);
     }
 
     public boolean removeExtensionTuple(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         return extensions.remove(type) != null;
     }
 
     public boolean containsExtension(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         return extensions.containsKey(type);
     }
 

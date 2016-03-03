@@ -38,6 +38,7 @@ package org.xipki.commons.audit.slf4j.impl;
 
 import java.io.CharArrayWriter;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
 
     private static String createMessage(
             final AuditEvent event) {
+        Objects.requireNonNull(event, "event must not be null");
         String applicationName = event.getApplicationName();
         if (applicationName == null) {
             applicationName = "undefined";

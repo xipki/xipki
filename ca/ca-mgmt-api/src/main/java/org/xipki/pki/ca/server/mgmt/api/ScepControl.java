@@ -40,7 +40,6 @@ import java.io.Serializable;
 
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 
 /**
@@ -76,7 +75,7 @@ public class ScepControl implements Serializable {
         if (StringUtil.isBlank(conf)) {
             return;
         }
-        ParamUtil.assertNotBlank("conf", conf);
+
         ConfPairs props;
         try {
             props = new ConfPairs(conf);

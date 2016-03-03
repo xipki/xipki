@@ -127,15 +127,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             final boolean evaluateOnly)
     throws Exception {
         super(dataSource, srcDir, stopMe, evaluateOnly);
-        if (numCertsPerCommit < 1) {
-            throw new IllegalArgumentException(
-                    "numCertsPerCommit could not be less than 1: " + numCertsPerCommit);
-        }
-        ParamUtil.assertNotNull("unmarshaller", unmarshaller);
-        ParamUtil.assertNotBlank("publisherName", publisherName);
-        this.unmarshaller = unmarshaller;
-        this.publisherName = publisherName;
-        this.numCertsPerCommit = numCertsPerCommit;
+
+        this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
+        this.publisherName = ParamUtil.requireNonBlank("publisherName", publisherName);
+        this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
 
         File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
         if (resume) {

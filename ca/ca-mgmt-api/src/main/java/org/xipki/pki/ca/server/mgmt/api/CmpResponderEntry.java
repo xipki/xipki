@@ -73,11 +73,8 @@ public class CmpResponderEntry implements Serializable {
             final String type,
             final String conf,
             final String base64Cert) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("type", type);
-
-        this.name = name;
-        this.type = type;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
         this.base64Cert = base64Cert;
 

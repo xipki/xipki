@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -56,13 +58,15 @@ public enum TripleState {
         return value;
     }
 
-    public static TripleState fromValue(String v) {
-        for (TripleState c: TripleState.values()) {
-            if (c.value.equalsIgnoreCase(v)) {
-                return c;
+    public static TripleState fromValue(String textValue) {
+        ParamUtil.requireNonNull("textValue", textValue);
+
+        for (TripleState ts : TripleState.values()) {
+            if (ts.value.equalsIgnoreCase(textValue)) {
+                return ts;
             }
         }
-        throw new IllegalArgumentException(v);
+        throw new IllegalArgumentException(textValue);
     }
 
 }

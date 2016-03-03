@@ -52,9 +52,8 @@ public class ErrorResultEntryType extends ResultEntryType {
             final String id,
             final PkiStatusInfo statusInfo) {
         super(id);
-        ParamUtil.assertNotNull("statusInfo", statusInfo);
 
-        this.statusInfo = statusInfo;
+        this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
     }
 
     public ErrorResultEntryType(

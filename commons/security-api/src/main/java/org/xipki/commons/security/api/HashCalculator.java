@@ -157,8 +157,8 @@ public class HashCalculator {
     public static byte[] hash(
             final HashAlgoType hashAlgoType,
             final byte[] data) {
-        ParamUtil.assertNotNull("hashAlgoType", hashAlgoType);
-        ParamUtil.assertNotNull("data", data);
+        ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
+        ParamUtil.requireNonNull("data", data);
         if (!MDS_MAP.containsKey(hashAlgoType)) {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }

@@ -83,16 +83,10 @@ public class X509CertificateInfo {
             final byte[] subjectPublicKey,
             final String profileName)
     throws CertificateEncodingException {
-        ParamUtil.assertNotNull("cert", cert);
-        ParamUtil.assertNotNull("issuerCert", issuerCert);
-        ParamUtil.assertNotBlank("profileName", profileName);
-        ParamUtil.assertNotNull("subjectPublicKey", subjectPublicKey);
-
-        this.cert = cert;
-        this.subjectPublicKey = subjectPublicKey;
-
-        this.issuerCert = issuerCert;
-        this.profileName = profileName;
+        this.profileName = ParamUtil.requireNonBlank("profileName", profileName);
+        this.cert = ParamUtil.requireNonNull("cert", cert);
+        this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
+        this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
     }
 
     public byte[] getSubjectPublicKey() {

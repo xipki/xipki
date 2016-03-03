@@ -44,6 +44,7 @@ import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.util.X509Util;
@@ -101,24 +102,10 @@ public class X509CaEntry extends CaEntry implements Serializable {
             final X509CaUris caUris,
             final int pNumCrls)
     throws CaMgmtException {
-        if (pNextSerial < 0) {
-            throw new IllegalArgumentException("pNextSerial is negative (" + pNextSerial + " < 0)");
-        }
-
-        if (pNextCRLNumber < 0) {
-            throw new IllegalArgumentException(
-
-                    "pNextCRLNumber is not positive (" + pNextCRLNumber + " < 1)");
-        }
-
-        if (pNumCrls < 0) {
-            throw new IllegalArgumentException("pNumCrls could not be negative: " + pNumCrls);
-        }
-        this.numCrls = pNumCrls;
-
+        this.numCrls = ParamUtil.requireMin("pNumCrls", pNumCrls, 0);
         this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
-        this.nextSerial = pNextSerial;
-        this.nextCrlNumber = pNextCRLNumber;
+        this.nextSerial = ParamUtil.requireMin("pNextSerial", pNextSerial, 0);
+        this.nextCrlNumber = ParamUtil.requireMin("pNextCRLNumber", pNextCRLNumber, 0);
 
         this.cacertUris = caUris.getCacertUris();
         this.ocspUris = caUris.getOcspUris();

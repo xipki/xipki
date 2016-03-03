@@ -94,7 +94,9 @@ public class CaDbExportWorker extends DbPortWorker {
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.assertNotBlank("destFolder", destFolder);
+        ParamUtil.requireNonBlank("destFolder", destFolder);
+        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
         this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         this.marshaller = getMarshaller();

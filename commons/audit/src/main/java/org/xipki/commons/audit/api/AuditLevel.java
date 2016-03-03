@@ -43,10 +43,10 @@ package org.xipki.commons.audit.api;
 
 public enum AuditLevel {
 
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
+    ERROR(3, "ERROR    "), // XIPKI-CODECHECK:IGNORE
+    WARN(4, "WARN     "), // XIPKI-CODECHECK:IGNORE
+    INFO(6, "INFO     "), // XIPKI-CODECHECK:IGNORE
+    DEBUG(7, "DEBUG    "); // XIPKI-CODECHECK:IGNORE
 
     private final int value;
 

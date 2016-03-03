@@ -129,6 +129,7 @@ public class CrlControl implements Serializable {
 
         public static UpdateMode getUpdateMode(
                 final String mode) {
+            ParamUtil.requireNonNull("mode", mode);
             for (UpdateMode v : values()) {
                 if (v.name().equalsIgnoreCase(mode)) {
                     return v;
@@ -150,18 +151,9 @@ public class CrlControl implements Serializable {
 
         public HourMinute(
                 final int hour,
-                final int minute)
-        throws IllegalArgumentException {
-            if (hour < 0 | hour > 23) {
-                throw new IllegalArgumentException("invalid hour " + hour);
-            }
-
-            if (minute < 0 | minute > 59) {
-                throw new IllegalArgumentException("invalid minute " + minute);
-            }
-
-            this.hour = hour;
-            this.minute = minute;
+                final int minute) {
+            this.hour = ParamUtil.requireRange("hour", hour, 0, 23);
+            this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
         }
 
         public int getHour() {
@@ -273,7 +265,6 @@ public class CrlControl implements Serializable {
     public CrlControl(
             final String conf)
     throws InvalidConfException {
-        ParamUtil.assertNotBlank("conf", conf);
         ConfPairs props;
         try {
             props = new ConfPairs(conf);
@@ -384,7 +375,7 @@ public class CrlControl implements Serializable {
             }
         }
 
-        if (CollectionUtil.isNotEmpty(extensionOids)) {
+        if (CollectionUtil.isNonEmpty(extensionOids)) {
             StringBuilder extensionsSb = new StringBuilder(200);
             for (String oid : extensionOids) {
                 extensionsSb.append(oid).append(",");
@@ -478,18 +469,18 @@ public class CrlControl implements Serializable {
 
         if (fullCrlIntervals < deltaCrlIntervals) {
             throw new InvalidConfException(
-                    "fullCRLIntervals could not be less than deltaCRLIntervals "
+                    "fullCRLIntervals must not be less than deltaCRLIntervals "
                     + fullCrlIntervals + " < " + deltaCrlIntervals);
         }
 
         if (fullCrlIntervals < 1) {
             throw new InvalidConfException(
-                    "fullCRLIntervals could not be less than 1: " + fullCrlIntervals);
+                    "fullCRLIntervals must not be less than 1: " + fullCrlIntervals);
         }
 
         if (deltaCrlIntervals < 0) {
             throw new InvalidConfException(
-                    "deltaCRLIntervals could not be less than 0: " + deltaCrlIntervals);
+                    "deltaCRLIntervals must not be less than 0: " + deltaCrlIntervals);
         }
     }
 

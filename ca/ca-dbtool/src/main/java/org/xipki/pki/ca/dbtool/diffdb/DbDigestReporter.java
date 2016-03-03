@@ -80,9 +80,7 @@ public class DbDigestReporter {
             final String reportDirname,
             final byte[] caCertBytes)
     throws IOException {
-        ParamUtil.assertNotBlank("reportDirname", reportDirname);
-
-        this.reportDirname = reportDirname;
+        this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
         dir.mkdirs();
 
@@ -126,6 +124,9 @@ public class DbDigestReporter {
             final DbDigestEntry refCert,
             final DbDigestEntry targetCert)
     throws IOException {
+        ParamUtil.requireNonNull("refCert", refCert);
+        ParamUtil.requireNonNull("targetCert", targetCert);
+
         if (refCert.getSerialNumber() != targetCert.getSerialNumber()) {
             throw new IllegalArgumentException(
                     "refCert and targetCert do not have the same serialNumber");
@@ -145,6 +146,8 @@ public class DbDigestReporter {
     public void addError(
             final String errorMessage)
     throws IOException {
+        ParamUtil.requireNonNull("errorMessage", errorMessage);
+
         numError.incrementAndGet();
         StringBuilder sb = new StringBuilder(errorMessage);
         sb.append('\n');

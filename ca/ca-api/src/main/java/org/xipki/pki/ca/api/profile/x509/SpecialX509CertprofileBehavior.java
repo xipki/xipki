@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.api.profile.x509;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,6 +51,7 @@ public enum SpecialX509CertprofileBehavior {
 
     public static SpecialX509CertprofileBehavior getInstance(
             final String behavior) {
+        ParamUtil.requireNonNull("behavior", behavior);
         for (SpecialX509CertprofileBehavior b : values()) {
             if (b.name().equalsIgnoreCase(behavior)) {
                 return b;

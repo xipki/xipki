@@ -120,8 +120,7 @@ class CaManagerQueryExecutor {
 
     CaManagerQueryExecutor(
             final DataSourceWrapper dataSource) {
-        ParamUtil.assertNotNull("dataSource", dataSource);
-        this.dataSource = dataSource;
+        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
     }
 
     private X509Certificate generateCert(
@@ -2514,7 +2513,7 @@ class CaManagerQueryExecutor {
     private static Set<Permission> getPermissions(
             final String permissionsText)
     throws CaMgmtException {
-        ParamUtil.assertNotBlank("permissionsText", permissionsText);
+        ParamUtil.requireNonBlank("permissionsText", permissionsText);
 
         List<String> l = StringUtil.split(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();

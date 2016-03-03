@@ -101,7 +101,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     public void init() {
         if (StringUtil.isBlank(confFile)) {
-            LOG.error("confFile could not be null and empty");
+            LOG.error("confFile must not be null and empty");
             return;
         }
 

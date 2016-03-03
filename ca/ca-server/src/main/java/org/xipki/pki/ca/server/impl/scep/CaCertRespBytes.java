@@ -62,8 +62,8 @@ class CaCertRespBytes {
             final X509Certificate cACert,
             final X509Certificate responderCert)
     throws CMSException, CertificateException {
-        ParamUtil.assertNotNull("cACert", cACert);
-        ParamUtil.assertNotNull("responderCert", responderCert);
+        ParamUtil.requireNonNull("cACert", cACert);
+        ParamUtil.requireNonNull("responderCert", responderCert);
 
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {

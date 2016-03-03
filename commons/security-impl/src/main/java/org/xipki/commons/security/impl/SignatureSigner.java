@@ -111,13 +111,9 @@ public class SignatureSigner implements ContentSigner {
             final AlgorithmIdentifier sigAlgId,
             final Signature signer,
             final PrivateKey key) {
-        ParamUtil.assertNotNull("sigAlgId", sigAlgId);
-        ParamUtil.assertNotNull("signer", signer);
-        ParamUtil.assertNotNull("key", key);
-
-        this.sigAlgId = sigAlgId;
-        this.signer = signer;
-        this.key = key;
+        this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
+        this.signer = ParamUtil.requireNonNull("signer", signer);
+        this.key = ParamUtil.requireNonNull("key", key);
     }
 
     @Override

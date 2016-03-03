@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -48,6 +50,8 @@ public enum ValidityMode {
 
     public static ValidityMode getInstance(
             final String text) {
+        ParamUtil.requireNonNull("text", text);
+
         for (ValidityMode value : values()) {
             if (value.name().equalsIgnoreCase(text)) {
                 return value;

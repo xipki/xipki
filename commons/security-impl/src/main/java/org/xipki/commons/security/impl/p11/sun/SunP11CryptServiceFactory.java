@@ -56,20 +56,18 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public void init(
             final P11Control pP11Control) {
-        ParamUtil.assertNotNull("pP11Control", pP11Control);
-        this.p11Control = pP11Control;
+        this.p11Control = ParamUtil.requireNonNull("pP11Control", pP11Control);
     }
 
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
     throws SignerException {
-        ParamUtil.assertNotNull("moduleName", moduleName);
+        String localModuleName = ParamUtil.requireNonNull("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        String localModuleName = moduleName;
         if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(localModuleName)) {
             localModuleName = p11Control.getDefaultModuleName();
         }

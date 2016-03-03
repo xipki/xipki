@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -59,6 +61,7 @@ public enum CaStatus {
 
     public static CaStatus getCAStatus(
             final String status) {
+        ParamUtil.requireNonNull("status", status);
         for (CaStatus value : values()) {
             if (value.status.equalsIgnoreCase(status)) {
                 return value;

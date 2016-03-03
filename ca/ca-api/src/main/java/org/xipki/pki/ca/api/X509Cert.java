@@ -71,9 +71,8 @@ public class X509Cert {
     public X509Cert(
             final X509Certificate cert,
             final byte[] encodedCert) {
-        ParamUtil.assertNotNull("cert", cert);
+        this.cert = ParamUtil.requireNonNull("cert", cert);
 
-        this.cert = cert;
         X500Principal x500Subject = cert.getSubjectX500Principal();
         this.subject = X509Util.getRfc4519Name(x500Subject);
         this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
