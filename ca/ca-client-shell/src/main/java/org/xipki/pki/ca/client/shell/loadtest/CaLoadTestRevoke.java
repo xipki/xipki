@@ -115,18 +115,13 @@ public class CaLoadTestRevoke extends LoadExecutor {
             final String description)
     throws Exception {
         super(description);
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("caCert", caCert);
-        ParamUtil.assertNotNull("caDataSource", caDataSource);
-        if (n < 1) {
-            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
-        }
-
-        this.n = n;
-        this.caClient = caClient;
-        this.caDataSource = caDataSource;
+        ParamUtil.requireNonNull("caCert", caCert);
+        this.n = ParamUtil.requireMin("n", n, 1);
+        this.caClient = ParamUtil.requireNonNull("caClient", caClient);
+        this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
         this.caSubject = caCert.getSubject();
         this.maxCerts = maxCerts;
+
         if (caCert.getIssuer().equals(caCert.getSubject())) {
             this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }

@@ -85,10 +85,8 @@ public class CertRevocationInfo implements Serializable {
             final CrlReason reason,
             final Date revocationTime,
             final Date invalidityTime) {
-        ParamUtil.assertNotNull("reason", reason);
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
-        this.reason = reason;
-        this.revocationTime = revocationTime;
+        this.reason = ParamUtil.requireNonNull("reason", reason);
+        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
         this.invalidityTime = invalidityTime;
         this.serialVersion = SERIAL_VERSION;
     }
@@ -97,21 +95,19 @@ public class CertRevocationInfo implements Serializable {
             final int reasonCode,
             final Date revocationTime,
             final Date invalidityTime) {
-        ParamUtil.assertNotNull("revocationTime", revocationTime);
+        this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
 
         this.reason = CrlReason.forReasonCode(reasonCode);
         if (this.reason == null) {
             throw new IllegalArgumentException("invalid reason " + reasonCode);
         }
-        this.revocationTime = revocationTime;
         this.invalidityTime = invalidityTime;
         this.serialVersion = SERIAL_VERSION;
     }
 
     public void setReason(
             final CrlReason reason) {
-        ParamUtil.assertNotNull("reason", reason);
-        this.reason = reason;
+        this.reason = ParamUtil.requireNonNull("reason", reason);
     }
 
     public CrlReason getReason() {

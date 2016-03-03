@@ -56,10 +56,8 @@ public class ValidationIssue {
     public ValidationIssue(
             final String code,
             final String description) {
-        ParamUtil.assertNotBlank("code", code);
-        ParamUtil.assertNotBlank("description", description);
-        this.code = code;
-        this.description = description;
+        this.code = ParamUtil.requireNonBlank("code", code);
+        this.description = ParamUtil.requireNonBlank("description", description);
         this.failed = false;
     }
 

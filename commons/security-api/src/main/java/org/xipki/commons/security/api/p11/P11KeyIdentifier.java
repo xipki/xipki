@@ -71,7 +71,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
     public P11KeyIdentifier(
             final byte[] keyId) {
         if (keyId == null) {
-            throw new IllegalArgumentException("keyId could not be null");
+            throw new IllegalArgumentException("keyId must not be null");
         }
         this.keyId = keyId;
         this.keyIdHex = new String(Hex.encode(keyId)).toUpperCase();
@@ -81,7 +81,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
     public P11KeyIdentifier(
             final String keyLabel) {
         if (keyLabel == null) {
-            throw new IllegalArgumentException("keyLabel could not be null");
+            throw new IllegalArgumentException("keyLabel must not be null");
         }
         this.keyId = null;
         this.keyIdHex = null;

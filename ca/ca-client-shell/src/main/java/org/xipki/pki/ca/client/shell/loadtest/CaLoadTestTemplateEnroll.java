@@ -190,10 +190,8 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     throws Exception {
         super(description);
 
-        ParamUtil.assertNotNull("caClient", caClient);
-        ParamUtil.assertNotNull("template", template);
-
-        this.caClient = caClient;
+        ParamUtil.requireNonNull("template", template);
+        this.caClient = ParamUtil.requireNonNull("caClient", caClient);
 
         Calendar baseTime = Calendar.getInstance(Locale.UK);
         baseTime.set(Calendar.YEAR, 2014);
@@ -269,6 +267,8 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     public static EnrollTemplateType parse(
             final InputStream configStream)
     throws InvalidConfException {
+        ParamUtil.requireNonNull("configStream", configStream);
+
         synchronized (jaxbUnmarshallerLock) {
             Object root;
             try {

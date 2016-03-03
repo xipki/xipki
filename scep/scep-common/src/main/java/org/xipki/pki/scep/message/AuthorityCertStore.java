@@ -38,8 +38,8 @@ package org.xipki.pki.scep.message;
 
 import java.security.cert.X509Certificate;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.KeyUsage;
-import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -78,7 +78,7 @@ public class AuthorityCertStore {
     public static AuthorityCertStore getInstance(
             final X509Certificate caCert,
             final X509Certificate... raCerts) {
-        ParamUtil.assertNotNull("cACert", caCert);
+        ParamUtil.requireNonNull("caCert", caCert);
 
         X509Certificate encryptionCert = null;
         X509Certificate signatureCert = null;

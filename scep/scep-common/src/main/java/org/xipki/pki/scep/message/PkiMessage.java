@@ -76,13 +76,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.transaction.FailInfo;
 import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Nonce;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.transaction.TransactionId;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -128,11 +128,8 @@ public class PkiMessage {
     public PkiMessage(
             final TransactionId transactionId,
             final MessageType messageType) {
-        ParamUtil.assertNotNull("transactionId", transactionId);
-        ParamUtil.assertNotNull("messageType", messageType);
-
-        this.transactionId = transactionId;
-        this.messageType = messageType;
+        this.transactionId = ParamUtil.requireNonNull("transactionId", transactionId);
+        this.messageType = ParamUtil.requireNonNull("messageType", messageType);
         this.senderNonce = Nonce.randomNonce();
     }
 
@@ -140,13 +137,9 @@ public class PkiMessage {
             final TransactionId transactionId,
             final MessageType messageType,
             final Nonce senderNonce) {
-        ParamUtil.assertNotNull("transactionId", transactionId);
-        ParamUtil.assertNotNull("messageType", messageType);
-        ParamUtil.assertNotNull("senderNonce", senderNonce);
-
-        this.transactionId = transactionId;
-        this.messageType = messageType;
-        this.senderNonce = senderNonce;
+        this.transactionId = ParamUtil.requireNonNull("transactionId", transactionId);
+        this.messageType = ParamUtil.requireNonNull("messageType", messageType);
+        this.senderNonce = ParamUtil.requireNonNull("senderNonce", senderNonce);
     }
 
     public TransactionId getTransactionId() {

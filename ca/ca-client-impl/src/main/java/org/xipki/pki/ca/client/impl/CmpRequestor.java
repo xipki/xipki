@@ -122,19 +122,16 @@ public abstract class CmpRequestor {
             final X509Certificate requestorCert,
             final X509Certificate responderCert,
             final SecurityFactory securityFactory) {
-        ParamUtil.assertNotNull("requestorCert", requestorCert);
-        ParamUtil.assertNotNull("responderCert", responderCert);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-
+        ParamUtil.requireNonNull("requestorCert", requestorCert);
+        this.responderCert = ParamUtil.requireNonNull("responderCert", responderCert);
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.requestor = null;
-        this.securityFactory = securityFactory;
         this.signRequest = false;
 
         X500Name x500Name = X500Name.getInstance(
                 requestorCert.getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
 
-        this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
@@ -152,23 +149,18 @@ public abstract class CmpRequestor {
             final X509Certificate responderCert,
             final SecurityFactory securityFactory,
             final boolean signRequest) {
-        ParamUtil.assertNotNull("requestor", requestor);
-        ParamUtil.assertNotNull("responderCert", responderCert);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-
+        this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
             throw new IllegalArgumentException("requestor without certifiate is not allowed");
         }
-
-        this.requestor = requestor;
-        this.securityFactory = securityFactory;
+        this.responderCert = ParamUtil.requireNonNull("responderCert", responderCert);
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.signRequest = signRequest;
 
         X500Name x500Name = X500Name.getInstance(
                 requestor.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
 
-        this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
@@ -182,12 +174,9 @@ public abstract class CmpRequestor {
     protected PKIMessage sign(
             final PKIMessage request)
     throws CmpRequestorException {
+        ParamUtil.requireNonNull("request", request);
         if (requestor == null) {
             throw new CmpRequestorException("no request signer is configured");
-        }
-
-        if (responderCert == null) {
-            throw new CmpRequestorException("CMP responder is not configured");
         }
 
         try {
@@ -201,9 +190,7 @@ public abstract class CmpRequestor {
             final PKIMessage request,
             final RequestResponseDebug debug)
     throws CmpRequestorException {
-        if (responderCert == null) {
-            throw new CmpRequestorException("CMP responder is not configured");
-        }
+        ParamUtil.requireNonNull("request", request);
 
         PKIMessage localRequest;
         if (signRequest) {
@@ -279,15 +266,18 @@ public abstract class CmpRequestor {
 
     protected ASN1Encodable extractGeneralRepContent(
             final PkiResponse response,
-            final String exepectedType)
+            final String expectedType)
     throws CmpRequestorException, PkiErrorException {
-        return extractGeneralRepContent(response, exepectedType, true);
+        ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonNull("expectedType", expectedType);
+        return extractGeneralRepContent(response, expectedType, true);
     }
 
     protected ASN1Encodable extractXipkiActionRepContent(
             final PkiResponse response,
             final int action)
     throws CmpRequestorException, PkiErrorException {
+        ParamUtil.requireNonNull("response", response);
         ASN1Encodable itvValue = extractGeneralRepContent(response,
                 ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
         return extractXipkiActionContent(itvValue, action);
@@ -297,6 +287,7 @@ public abstract class CmpRequestor {
             final ASN1Encodable itvValue,
             final int action)
     throws CmpRequestorException {
+        ParamUtil.requireNonNull("itvValue", itvValue);
         ASN1Sequence seq;
         try {
             seq = ASN1Sequence.getInstance(itvValue);
@@ -441,7 +432,7 @@ public abstract class CmpRequestor {
             }
         }
 
-        if (CollectionUtil.isNotEmpty(itvs)) {
+        if (CollectionUtil.isNonEmpty(itvs)) {
             hBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
         }
 
@@ -450,6 +441,8 @@ public abstract class CmpRequestor {
 
     protected PkiErrorException buildErrorResult(
             final ErrorMsgContent bodyContent) {
+        ParamUtil.requireNonNull("bodyContent", bodyContent);
+
         org.xipki.pki.ca.common.cmp.PkiStatusInfo statusInfo =
                 new org.xipki.pki.ca.common.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
         return new PkiErrorException(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(),
@@ -531,6 +524,8 @@ public abstract class CmpRequestor {
             final ASN1ObjectIdentifier type,
             final ASN1Encodable value)
     throws CmpRequestorException {
+        ParamUtil.requireNonNull("type", type);
+
         PKIHeader header = buildPkiHeader(null);
         InfoTypeAndValue itv;
         if (value != null) {
@@ -548,6 +543,8 @@ public abstract class CmpRequestor {
     protected void checkProtection(
             final PkiResponse response)
     throws PkiErrorException {
+        ParamUtil.requireNonNull("response", response);
+
         if (!response.hasProtection()) {
             return;
         }

@@ -68,7 +68,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
             final String serverUrl,
             final SecurityFactory securityFactory) {
         super(requestorCert, responderCert, securityFactory);
-        ParamUtil.assertNotBlank("serverUrl", serverUrl);
+        ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
         try {
             this.serverUrl = new URL(serverUrl);
@@ -84,7 +84,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
             final SecurityFactory securityFactory,
             final boolean signRequest) {
         super(requestor, responderCert, securityFactory, signRequest);
-        ParamUtil.assertNotBlank("serverUrl", serverUrl);
+        ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
         try {
             this.serverUrl = new URL(serverUrl);
@@ -97,6 +97,8 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
     public byte[] send(
             final byte[] request)
     throws IOException {
+        ParamUtil.requireNonNull("request", request);
+
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);

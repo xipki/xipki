@@ -223,7 +223,7 @@ public class SqlErrorCodes {
 
     public static SqlErrorCodes newInstance(
             final DatabaseType dbType) {
-        ParamUtil.assertNotNull("dbType", dbType);
+        ParamUtil.requireNonNull("dbType", dbType);
         switch (dbType) {
         case DB2:
             return new DB2();

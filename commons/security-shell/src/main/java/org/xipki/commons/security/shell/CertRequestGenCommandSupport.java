@@ -341,7 +341,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         X500Name subjectDN = getSubject(subject);
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
-        if (CollectionUtil.isNotEmpty(extensions)) {
+        if (CollectionUtil.isNonEmpty(extensions)) {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
                     new Extensions(extensions.toArray(new Extension[0])));
         }

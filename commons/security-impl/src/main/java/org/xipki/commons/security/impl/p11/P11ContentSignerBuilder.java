@@ -94,12 +94,10 @@ public class P11ContentSignerBuilder {
             final P11KeyIdentifier keyId,
             final X509Certificate[] certificateChain)
     throws SignerException {
-        ParamUtil.assertNotNull("cryptService", cryptService);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("keyId", keyId);
-
-        this.securityFactory = securityFactory;
+        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
 
         X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
         PublicKey publicKeyInP11;
@@ -112,10 +110,6 @@ public class P11ContentSignerBuilder {
         if (publicKeyInP11 == null) {
             throw new SignerException("public key with " + keyId + " does not exist");
         }
-
-        this.cryptService = cryptService;
-        this.keyId = keyId;
-        this.slot = slot;
 
         Set<Certificate> caCerts = new HashSet<>();
 
@@ -155,10 +149,7 @@ public class P11ContentSignerBuilder {
             final AlgorithmIdentifier signatureAlgId,
             final int parallelism)
     throws OperatorCreationException, NoSuchPaddingException {
-        if (parallelism < 1) {
-            throw new IllegalArgumentException("non-positive parallelism is not allowed: "
-                    + parallelism);
-        }
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         if (publicKey instanceof RSAPublicKey) {
             if (!AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId)) {

@@ -42,8 +42,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -59,8 +59,8 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
     public PreprovisionedHashCaCertValidator(
         final HashAlgoType hashAlgo,
         final Set<byte[]> hashValues) {
-        ParamUtil.assertNotNull("hashAlgo", hashAlgo);
-        ParamUtil.assertNotEmpty("hashValues", hashValues);
+        this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+        ParamUtil.requireNonEmpty("hashValues", hashValues);
 
         final int hLen = hashAlgo.getLength();
         for (byte[] m : hashValues) {
@@ -70,7 +70,6 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
             }
         }
 
-        this.hashAlgo = hashAlgo;
         this.hashValues = new HashSet<byte[]>(hashValues.size());
         for (byte[] m : hashValues) {
             this.hashValues.add(Arrays.copyOf(m, m.length));

@@ -73,8 +73,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
             final P11WritableSlot slot,
             final String description) {
         super(description);
-        ParamUtil.assertNotNull("slot", slot);
-        this.slot = slot;
+        this.slot = ParamUtil.requireNonNull("slot", slot);
     }
 
     protected abstract void genKeypair()

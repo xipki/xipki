@@ -64,7 +64,7 @@ public class LoadTestEntry {
 
         public static RandomDN getInstance(
                 final String text) {
-            ParamUtil.assertNotNull("text", text);
+            ParamUtil.requireNonNull("text", text);
             for (RandomDN value : values()) {
                 if (value.name().equalsIgnoreCase(text)) {
                     return value;
@@ -84,6 +84,9 @@ public class LoadTestEntry {
         private IncreasableSubject(
                 final String subjectTemplate,
                 final RandomDN randomDN) {
+            ParamUtil.requireNonEmpty("subjectTemplate", subjectTemplate);
+            ParamUtil.requireNonNull("randomDN", randomDN);
+
             this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
             switch (randomDN) {
@@ -156,13 +159,8 @@ public class LoadTestEntry {
             final KeyEntry keyEntry,
             final String subjectTemplate,
             final RandomDN randomDN) {
-        ParamUtil.assertNotBlank("certprofile", certprofile);
-        ParamUtil.assertNotNull("keyEntry", keyEntry);
-        ParamUtil.assertNotNull("subjectTemplate", subjectTemplate);
-        ParamUtil.assertNotNull("randomDN", randomDN);
-
-        this.certprofile = certprofile;
-        this.keyEntry = keyEntry;
+        this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+        this.keyEntry = ParamUtil.requireNonNull("keyEntry", keyEntry);
         this.subject = new IncreasableSubject(subjectTemplate, randomDN);
     }
 

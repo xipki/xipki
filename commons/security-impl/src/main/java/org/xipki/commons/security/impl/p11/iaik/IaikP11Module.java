@@ -80,11 +80,8 @@ public class IaikP11Module implements P11Module {
             final Module module,
             final P11ModuleConf moduleConf)
     throws SignerException {
-        ParamUtil.assertNotNull("module", module);
-        ParamUtil.assertNotNull("moduleConf", moduleConf);
-
-        this.module = module;
-        this.moduleConf = moduleConf;
+        this.module = ParamUtil.requireNonNull("module", module);
+        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
 
         Slot[] slotList;
         try {

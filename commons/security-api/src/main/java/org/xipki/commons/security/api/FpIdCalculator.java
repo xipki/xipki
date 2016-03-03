@@ -75,7 +75,7 @@ public class FpIdCalculator {
      */
     public static long hash(
             final String data) {
-        ParamUtil.assertNotNull("data", data);
+        ParamUtil.requireNonNull("data", data);
         byte[] encoded;
         try {
             encoded = data.getBytes("UTF-8");
@@ -90,7 +90,7 @@ public class FpIdCalculator {
      */
     public static long hash(
             final byte[] data) {
-        ParamUtil.assertNotNull("data", data);
+        ParamUtil.requireNonNull("data", data);
 
         Digest md = null;
         for (int i = 0; i < 3; i++) {

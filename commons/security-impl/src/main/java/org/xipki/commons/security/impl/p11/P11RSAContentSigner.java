@@ -87,24 +87,18 @@ public class P11RSAContentSigner implements ContentSigner {
             final P11KeyIdentifier keyId,
             final AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotNull("cryptService", cryptService);
-        ParamUtil.assertNotNull("keyId", keyId);
-        ParamUtil.assertNotNull("signatureAlgId", signatureAlgId);
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
 
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
             throw new IllegalArgumentException("unsupported signature algorithm "
                     + signatureAlgId.getAlgorithm());
         }
 
-        this.slot = slot;
-        this.algorithmIdentifier = signatureAlgId;
-        this.keyId = keyId;
-
         this.digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
         Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
-
-        this.cryptService = cryptService;
         this.outputStream = new DigestOutputStream(digest);
     }
 

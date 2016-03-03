@@ -78,7 +78,7 @@ public class X509IssuerInfo {
             final List<String> deltaCrlUrls,
             final byte[] certBytes)
     throws CertificateException {
-        ParamUtil.assertNotNull("certBytes", certBytes);
+        ParamUtil.requireNonNull("certBytes", certBytes);
 
         if (CollectionUtil.isEmpty(caIssuerUrls)) {
             this.caIssuerUrls = null;

@@ -677,9 +677,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String name,
             final HikariDataSource service,
             final DatabaseType dbType) {
-        ParamUtil.assertNotNull("service", service);
+        this.service = ParamUtil.requireNonNull("service", service);
         this.name = name;
-        this.service = service;
         this.sqlErrorCodes = SqlErrorCodes.newInstance(dbType);
         this.sqlStateCodes = SqlStateCodes.newInstance(dbType);
     }
@@ -1432,7 +1431,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public DataAccessException translate(
             final String sql,
             final SQLException ex) {
-        ParamUtil.assertNotNull("ex", ex);
+        ParamUtil.requireNonNull("ex", ex);
 
         String localSql = sql;
         if (localSql == null) {
@@ -1588,8 +1587,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String name,
             final Properties props,
             final DatabaseType databaseType) {
-        ParamUtil.assertNotEmpty("props", props);
-        ParamUtil.assertNotNull("databaseType", databaseType);
+        ParamUtil.requireNonEmpty("props", props);
+        ParamUtil.requireNonNull("databaseType", databaseType);
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
         String dataSourceClassName = props.getProperty("dataSourceClassName");

@@ -67,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
@@ -82,7 +83,6 @@ import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Nonce;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.transaction.TransactionId;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -130,21 +130,18 @@ public class ScepResponder {
             final NextCaAndRa nextCaAndRa,
             final ScepControl control)
     throws Exception {
-        ParamUtil.assertNotNull("caCaps", caCaps);
-        ParamUtil.assertNotNull("caEmulator", caEmulator);
-        ParamUtil.assertNotNull("control", control);
+        this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
+        this.caEmulator = ParamUtil.requireNonNull("caEmulator", caEmulator);
+        this.control = ParamUtil.requireNonNull("control", control);
 
-        this.caEmulator = caEmulator;
         this.raEmulator = raEmulator;
         this.nextCaAndRa = nextCaAndRa;
-        this.control = control;
         CaCaps caps = caCaps;
         if (nextCaAndRa == null) {
             caps.removeCapability(CaCapability.GetNextCACert);
         } else {
             caps.addCapability(CaCapability.GetNextCACert);
         }
-        this.caCaps = caps;
     }
 
     /**

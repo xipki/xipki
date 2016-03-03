@@ -66,6 +66,7 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 
 /**
@@ -516,9 +517,7 @@ public class NssSignatureSpi extends SignatureSpi {
             final byte[] in,
             final int blockSize) {
         int inLen = in.length;
-        if (inLen > blockSize) {
-            throw new IllegalArgumentException("input data too large");
-        }
+        ParamUtil.requireMax("in.length", inLen, blockSize);
 
         byte[] block = new byte[blockSize];
 

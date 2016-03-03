@@ -63,6 +63,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 import org.xipki.pki.scep.crypto.HashAlgoType;
@@ -78,7 +79,6 @@ import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.transaction.TransactionId;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepConstants;
 import org.xipki.pki.scep.util.ScepUtil;
 
@@ -114,11 +114,8 @@ public abstract class Client {
             final CaIdentifier caId,
             final CaCertValidator caCertValidator)
     throws MalformedURLException {
-        ParamUtil.assertNotNull("caId", caId);
-        ParamUtil.assertNotNull("caCertValidator", caCertValidator);
-
-        this.caId = caId;
-        this.caCertValidator = caCertValidator;
+        this.caId = ParamUtil.requireNonNull("caId", caId);
+        this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
     protected abstract ScepHttpResponse httpPost(
@@ -257,10 +254,10 @@ public abstract class Client {
             final X500Name issuer,
             final BigInteger serialNumber)
     throws ScepClientException {
-        ParamUtil.assertNotNull("identityKey", identityKey);
-        ParamUtil.assertNotNull("identityCert", identityCert);
-        ParamUtil.assertNotNull("issuer", issuer);
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
+        ParamUtil.requireNonNull("identityKey", identityKey);
+        ParamUtil.requireNonNull("identityCert", identityCert);
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -286,10 +283,10 @@ public abstract class Client {
             final X500Name issuer,
             final BigInteger serialNumber)
     throws ScepClientException {
-        ParamUtil.assertNotNull("identityKey", identityKey);
-        ParamUtil.assertNotNull("identityCert", identityCert);
-        ParamUtil.assertNotNull("issuer", issuer);
-        ParamUtil.assertNotNull("serialNumber", serialNumber);
+        ParamUtil.requireNonNull("identityKey", identityKey);
+        ParamUtil.requireNonNull("identityCert", identityCert);
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -318,7 +315,7 @@ public abstract class Client {
             final CertificationRequest csr,
             final X500Name issuer)
     throws ScepClientException {
-        ParamUtil.assertNotNull("csr", csr);
+        ParamUtil.requireNonNull("csr", csr);
 
         TransactionId tid;
         try {
@@ -339,10 +336,10 @@ public abstract class Client {
             final X500Name issuer,
             final X500Name subject)
     throws ScepClientException {
-        ParamUtil.assertNotNull("identityKey", identityKey);
-        ParamUtil.assertNotNull("identityCert", identityCert);
-        ParamUtil.assertNotNull("issuer", issuer);
-        ParamUtil.assertNotNull("transactionId", transactionId);
+        ParamUtil.requireNonNull("identityKey", identityKey);
+        ParamUtil.requireNonNull("identityCert", identityCert);
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("transactionId", transactionId);
 
         initIfNotInited();
 
@@ -363,9 +360,9 @@ public abstract class Client {
             final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
-        ParamUtil.assertNotNull("csr", csr);
-        ParamUtil.assertNotNull("identityKey", identityKey);
-        ParamUtil.assertNotNull("identityCert", identityCert);
+        ParamUtil.requireNonNull("csr", csr);
+        ParamUtil.requireNonNull("identityKey", identityKey);
+        ParamUtil.requireNonNull("identityCert", identityCert);
 
         initIfNotInited();
 
@@ -396,9 +393,9 @@ public abstract class Client {
             final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
-        ParamUtil.assertNotNull("csr", csr);
-        ParamUtil.assertNotNull("identityKey", identityKey);
-        ParamUtil.assertNotNull("identityCert", identityCert);
+        ParamUtil.requireNonNull("csr", csr);
+        ParamUtil.requireNonNull("identityKey", identityKey);
+        ParamUtil.requireNonNull("identityCert", identityCert);
 
         initIfNotInited();
 
@@ -423,7 +420,7 @@ public abstract class Client {
         }
         boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
         if (selfSigned) {
-            throw new IllegalArgumentException("identityCert could not be self-signed");
+            throw new IllegalArgumentException("identityCert must not be self-signed");
         }
 
         return doEnrol(MessageType.RenewalReq, csr, identityKey, identityCert);
@@ -442,7 +439,7 @@ public abstract class Client {
         }
         boolean selfSigned = ScepUtil.isSelfSigned(identityCert);
         if (selfSigned) {
-            throw new IllegalArgumentException("identityCert could not be self-signed");
+            throw new IllegalArgumentException("identityCert must not be self-signed");
         }
 
         return doEnrol(MessageType.UpdateReq, csr, identityKey, identityCert);
@@ -576,7 +573,7 @@ public abstract class Client {
         }
 
         if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
-            throw new ScepClientException("the signature certificate could not be trusted");
+            throw new ScepClientException("the signature certificate must not be trusted");
         }
 
         return resp.getAuthorityCertStore();
@@ -634,7 +631,7 @@ public abstract class Client {
         }
 
         if (!resp.getSignatureCert().equals(authorityCertStore.getSignatureCert())) {
-            throw new ScepClientException("the signature certificate could not be trusted");
+            throw new ScepClientException("the signature certificate must not be trusted");
         }
         return resp;
     } // method decode

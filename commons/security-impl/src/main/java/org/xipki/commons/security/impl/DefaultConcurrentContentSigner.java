@@ -127,7 +127,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     public DefaultConcurrentContentSigner(
             final List<ContentSigner> signers,
             final PrivateKey privateKey) {
-        ParamUtil.assertNotEmpty("signers", signers);
+        ParamUtil.requireNonEmpty("signers", signers);
 
         this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
         for (ContentSigner signer : signers) {
@@ -174,7 +174,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private void returnContentSigner(
             final ContentSigner signer) {
-        ParamUtil.assertNotNull("signer", signer);
+        ParamUtil.requireNonNull("signer", signer);
 
         boolean isBusySigner = busySigners.remove(signer);
         if (isBusySigner) {

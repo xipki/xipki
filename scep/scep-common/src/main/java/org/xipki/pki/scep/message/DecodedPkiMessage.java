@@ -72,13 +72,13 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.transaction.FailInfo;
 import org.xipki.pki.scep.transaction.MessageType;
 import org.xipki.pki.scep.transaction.Nonce;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.transaction.TransactionId;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -205,8 +205,8 @@ public class DecodedPkiMessage extends PkiMessage {
             final EnvelopedDataDecryptor recipient,
             final CollectionStore<X509CertificateHolder> certStore)
     throws MessageDecodingException {
-        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
-        ParamUtil.assertNotNull("recipient", recipient);
+        ParamUtil.requireNonNull("pkiMessage", pkiMessage);
+        ParamUtil.requireNonNull("recipient", recipient);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();

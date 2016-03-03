@@ -88,9 +88,9 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     throws Exception {
         super(description);
 
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.assertNotNull("keystore", keystore);
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.requireNonNull("keystore", keystore);
 
         String signerConf = SignerConfUtil.getKeystoreSignerConf(
                 new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);

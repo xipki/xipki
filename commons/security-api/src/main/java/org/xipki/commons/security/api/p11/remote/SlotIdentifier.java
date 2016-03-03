@@ -71,7 +71,7 @@ public class SlotIdentifier extends ASN1Object {
     public SlotIdentifier(
             final P11SlotIdentifier slotId) {
         if (slotId == null) {
-            throw new IllegalArgumentException("slotId could not be null");
+            throw new IllegalArgumentException("slotId must not be null");
         }
 
         this.slotId = slotId;

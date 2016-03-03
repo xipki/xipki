@@ -101,7 +101,7 @@ public class SubjectChecker {
             ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
 
             List<Pattern> patterns = null;
-            if (CollectionUtil.isNotEmpty(t.getRegex())) {
+            if (CollectionUtil.isNonEmpty(t.getRegex())) {
                 patterns = new LinkedList<>();
                 for (String regex : t.getRegex()) {
                     Pattern pattern = Pattern.compile(regex);
@@ -141,8 +141,8 @@ public class SubjectChecker {
     public List<ValidationIssue> checkSubject(
             final X500Name subject,
             final X500Name requestedSubject) {
-        ParamUtil.assertNotNull("subject", subject);
-        ParamUtil.assertNotNull("requestedSubject", requestedSubject);
+        ParamUtil.requireNonNull("subject", subject);
+        ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
         // collect subject attribute types to check
         Set<ASN1ObjectIdentifier> oids = new HashSet<>();
@@ -159,7 +159,7 @@ public class SubjectChecker {
 
         ValidationIssue issue = new ValidationIssue("X509.SUBJECT.group", "X509 subject RDN group");
         result.add(issue);
-        if (CollectionUtil.isNotEmpty(subjectControl.getGroups())) {
+        if (CollectionUtil.isNonEmpty(subjectControl.getGroups())) {
             Set<String> groups = new HashSet<>(subjectControl.getGroups());
             for (String g : groups) {
                 boolean toBreak = false;

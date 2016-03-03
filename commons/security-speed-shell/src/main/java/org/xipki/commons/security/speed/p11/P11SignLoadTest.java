@@ -93,10 +93,10 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     throws SignerException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        ParamUtil.assertNotNull("slot", slot);
-        ParamUtil.assertNotBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.assertNotNull("keyId", keyId);
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        ParamUtil.requireNonNull("slot", slot);
+        ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.requireNonNull("keyId", keyId);
 
         this.slot = slot;
         this.keyId = keyId;

@@ -36,6 +36,8 @@
 
 package org.xipki.commons.audit.api;
 
+import java.util.Objects;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -50,18 +52,12 @@ public class AuditEventData {
     public AuditEventData(
             final String name,
             final String value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name could not be null");
-        }
+        Objects.requireNonNull(name, "name must not be null");
         if (name.isEmpty()) {
-            throw new IllegalArgumentException("name could not be empty");
+            throw new IllegalArgumentException("name must not be empty");
         }
-        if (value == null) {
-            throw new IllegalArgumentException("value could not be null");
-        }
-
         this.name = name;
-        this.value = value;
+        this.value = Objects.requireNonNull(value, "value must not be null");
     }
 
     public String getName() {

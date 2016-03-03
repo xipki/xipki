@@ -92,10 +92,10 @@ class SunP11Identity implements Comparable<SunP11Identity> {
     throws SignerException {
         super();
 
-        ParamUtil.assertNotNull("p11Provider", p11Provider);
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("privateKey", privateKey);
-        ParamUtil.assertNotNull("keyLabel", keyLabel);
+        ParamUtil.requireNonNull("p11Provider", p11Provider);
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+        this.keyLabel = ParamUtil.requireNonNull("keyLabel", keyLabel);
 
         if ((certificateChain == null
                 || certificateChain.length == 0
@@ -104,14 +104,10 @@ class SunP11Identity implements Comparable<SunP11Identity> {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
-        this.slotId = slotId;
-        this.privateKey = privateKey;
         this.publicKey = (publicKey == null)
                 ? certificateChain[0].getPublicKey()
                 : publicKey;
         this.certificateChain = certificateChain;
-
-        this.keyLabel = keyLabel;
 
         if (this.publicKey instanceof RSAPublicKey) {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();

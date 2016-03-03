@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.common.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.CmpFailureUtil;
 
 /**
@@ -70,6 +71,8 @@ public class PkiStatusInfo {
 
     public PkiStatusInfo(
             final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
+        ParamUtil.requireNonNull("bcPKIStatusInfo", bcPKIStatusInfo);
+
         this.status = bcPKIStatusInfo.getStatus().intValue();
         if (bcPKIStatusInfo.getFailInfo() != null) {
             this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();

@@ -101,7 +101,7 @@ public class FilePasswordCallback implements PasswordCallback {
             final String conf)
     throws PasswordResolverException {
         if (StringUtil.isBlank(conf)) {
-            throw new PasswordResolverException("conf could not be null or empty");
+            throw new PasswordResolverException("conf must not be null or empty");
         }
         passwordFile = expandFilepath(conf);
     }

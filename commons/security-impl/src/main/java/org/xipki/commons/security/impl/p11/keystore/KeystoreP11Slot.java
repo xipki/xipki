@@ -175,17 +175,11 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final PrivateKeyCryptor privateKeyCryptor,
             final SecurityFactory securityFactory)
     throws SignerException {
-        ParamUtil.assertNotBlank("moduleName", moduleName);
-        ParamUtil.assertNotNull("slotDir", slotDir);
-        ParamUtil.assertNotNull("slotId", slotId);
-        ParamUtil.assertNotNull("securityFactory", securityFactory);
-        ParamUtil.assertNotNull("privateKeyCryptor", privateKeyCryptor);
-
-        this.moduleName = moduleName;
-        this.slotDir = slotDir;
-        this.slotId = slotId;
-        this.securityFactory = securityFactory;
-        this.privateKeyCryptor = privateKeyCryptor;
+        this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
+        this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
+        this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
 
         this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
         if (!this.privKeyDir.exists()) {
@@ -339,7 +333,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
     public boolean removeKey(
             final P11KeyIdentifier keyIdentifier)
     throws SignerException {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if (identity != null) {
@@ -354,7 +348,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
     public boolean removeKeyAndCerts(
             final P11KeyIdentifier keyIdentifier)
     throws SignerException {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if (identity != null) {
@@ -374,8 +368,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final Set<X509Certificate> caCerts,
             final SecurityFactory pSecurityFactory)
     throws Exception {
-        ParamUtil.assertNotNull("keyIdentifier", keyIdentifier);
-        ParamUtil.assertNotNull("newCert", newCert);
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
+        ParamUtil.requireNonNull("newCert", newCert);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if (identity == null) {
@@ -446,11 +440,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final BigInteger publicExponent,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (keySize < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + keySize);
-        }
+        ParamUtil.requireNonBlank("label", label);
+        ParamUtil.requireMin("keySize", keySize, 1024);
 
         if (keySize % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
@@ -476,11 +467,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final int qLength,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("label", label);
-
-        if (pLength < 1024) {
-            throw new IllegalArgumentException("keysize not allowed: " + pLength);
-        }
+        ParamUtil.requireNonBlank("label", label);
+        ParamUtil.requireMax("pLength", pLength, 1024);
 
         if (pLength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
@@ -504,8 +492,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final String curveNameOrOid,
             final String label)
     throws Exception {
-        ParamUtil.assertNotBlank("curveNameOrOid", curveNameOrOid);
-        ParamUtil.assertNotBlank("label", label);
+        ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
+        ParamUtil.requireNonBlank("label", label);
 
         if (privKeyLabelExists(label)) {
             throw new IllegalArgumentException("label " + label
@@ -892,10 +880,10 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final String label,
             final byte[] value)
     throws IOException {
-        ParamUtil.assertNotNull("dir", dir);
-        ParamUtil.assertNotNull("id", id);
-        ParamUtil.assertNotBlank("label", label);
-        ParamUtil.assertNotNull("value", value);
+        ParamUtil.requireNonNull("dir", dir);
+        ParamUtil.requireNonNull("id", id);
+        ParamUtil.requireNonBlank("label", label);
+        ParamUtil.requireNonNull("value", value);
 
         String hexId = Hex.toHexString(id).toLowerCase();
 

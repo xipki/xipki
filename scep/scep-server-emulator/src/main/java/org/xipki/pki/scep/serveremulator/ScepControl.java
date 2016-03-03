@@ -36,7 +36,7 @@
 
 package org.xipki.pki.scep.serveremulator;
 
-import org.xipki.pki.scep.util.ParamUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -61,12 +61,11 @@ public class ScepControl {
             final boolean sendSignerCert,
             final boolean useInsecureAlg,
             final String secret) {
-        ParamUtil.assertNotBlank("secret", secret);
+        this.secret = ParamUtil.requireNonBlank("secret", secret);
         this.sendCaCert = sendCaCert;
         this.pendingCert = pendingCert;
         this.sendSignerCert = sendSignerCert;
         this.useInsecureAlg = useInsecureAlg;
-        this.secret = secret;
     }
 
     public boolean isSendCaCert() {

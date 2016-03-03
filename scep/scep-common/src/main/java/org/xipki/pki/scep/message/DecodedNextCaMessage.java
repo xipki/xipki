@@ -67,8 +67,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -154,7 +154,7 @@ public class DecodedNextCaMessage {
             final CMSSignedData pkiMessage,
             final CollectionStore<X509CertificateHolder> certStore)
     throws MessageDecodingException {
-        ParamUtil.assertNotNull("pkiMessage", pkiMessage);
+        ParamUtil.requireNonNull("pkiMessage", pkiMessage);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();
         Collection<SignerInformation> signerInfos = signerStore.getSigners();

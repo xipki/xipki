@@ -82,15 +82,11 @@ class CaConf {
             final String healthUrl,
             final String requestorName,
             final X509Certificate responder) {
-        ParamUtil.assertNotBlank("name", name);
-        ParamUtil.assertNotBlank("url", url);
-        ParamUtil.assertNotNull("requestorName", requestorName);
-        ParamUtil.assertNotNull("responder", responder);
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.url = ParamUtil.requireNonBlank("url", url);
+        this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
+        this.responder = ParamUtil.requireNonNull("responder", responder);
 
-        this.name = name;
-        this.url = url;
-        this.requestorName = requestorName;
-        this.responder = responder;
         if (StringUtil.isBlank(healthUrl)) {
             this.healthUrl = url.replace("cmp", "health");
         } else {
@@ -146,11 +142,13 @@ class CaConf {
 
     public boolean supportsProfile(
             final String profileName) {
+        ParamUtil.requireNonNull("profileName", profileName);
         return profiles.containsKey(profileName);
     }
 
     public CertprofileInfo getProfile(
             final String profileName) {
+        ParamUtil.requireNonNull("profileName", profileName);
         return profiles.get(profileName);
     }
 

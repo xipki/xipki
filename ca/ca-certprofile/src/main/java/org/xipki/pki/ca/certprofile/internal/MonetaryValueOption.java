@@ -59,13 +59,9 @@ public class MonetaryValueOption {
             final Iso4217CurrencyCode currency,
             final Range2Type amountRange,
             final Range2Type exponentRange) {
-        ParamUtil.assertNotNull("currency", currency);
-        ParamUtil.assertNotNull("amountRange", amountRange);
-        ParamUtil.assertNotNull("exponentRange", exponentRange);
-
-        this.currency = currency;
-        this.amountRange = amountRange;
-        this.exponentRange = exponentRange;
+        this.currency = ParamUtil.requireNonNull("currency", currency);
+        this.amountRange = ParamUtil.requireNonNull("amountRange", amountRange);
+        this.exponentRange = ParamUtil.requireNonNull("exponentRange", exponentRange);
 
         this.currencyString = currency.isAlphabetic()
                 ? currency.getAlphabetic().toUpperCase()

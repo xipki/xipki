@@ -56,8 +56,7 @@ public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
         super(slot,
                 "PKCS#11 EC key generation\n"
                         + "curve: " + curveNameOrOid);
-        ParamUtil.assertNotNull("curveNameOrOid", curveNameOrOid);
-        this.curveNameOrOid = curveNameOrOid;
+        this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
     }
 
     @Override

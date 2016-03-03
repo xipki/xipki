@@ -87,10 +87,10 @@ public class PsoTemplate extends ASN1Object {
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
             final byte[] message) {
         if (slotAndKeyIdentifier == null) {
-            throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
+            throw new IllegalArgumentException("slotAndKeyIdentifier must not be null");
         }
         if (message == null) {
-            throw new IllegalArgumentException("message could not be null");
+            throw new IllegalArgumentException("message must not be null");
         }
 
         this.slotAndKeyIdentifier = slotAndKeyIdentifier;

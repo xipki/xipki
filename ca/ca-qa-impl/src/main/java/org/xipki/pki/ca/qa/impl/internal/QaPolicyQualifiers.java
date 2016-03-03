@@ -58,7 +58,7 @@ public class QaPolicyQualifiers {
 
     public QaPolicyQualifiers(
             final PolicyQualifiers jaxb) {
-        ParamUtil.assertNotNull("jaxb", jaxb);
+        ParamUtil.requireNonNull("jaxb", jaxb);
 
         List<QaPolicyQualifierInfo> list = new LinkedList<>();
 

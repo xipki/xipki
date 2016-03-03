@@ -180,7 +180,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             final RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException {
         if (requestOptions == null) {
-            throw new IllegalArgumentException("requestOptions could not be null");
+            throw new IllegalArgumentException("requestOptions must not be null");
         }
 
         byte[] nonce = null;
@@ -367,7 +367,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             extensions.add(extn);
         }
 
-        if (CollectionUtil.isNotEmpty(extensions)) {
+        if (CollectionUtil.isNonEmpty(extensions)) {
             reqBuilder.setRequestExtensions(
                     new Extensions(extensions.toArray(new Extension[0])));
         }

@@ -67,7 +67,7 @@ public class KeyIdentifier extends ASN1Object {
     public KeyIdentifier(
             final P11KeyIdentifier keyId) {
         if (keyId == null) {
-            throw new IllegalArgumentException("keyId could not be null");
+            throw new IllegalArgumentException("keyId must not be null");
         }
 
         this.keyId = keyId;

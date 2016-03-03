@@ -50,18 +50,16 @@ public class QaGeneralSubtree {
 
     public QaGeneralSubtree(
             final GeneralSubtreeBaseType jaxb) {
-        ParamUtil.assertNotNull("jaxb", jaxb);
+        this.jaxb = ParamUtil.requireNonNull("jaxb", jaxb);
         Integer i = jaxb.getMinimum();
-        if (i != null && i < 0) {
-            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+        if (i != null) {
+            ParamUtil.requireMin("jaxb.getMinimum()", i.intValue(), 0);
         }
 
         i = jaxb.getMaximum();
-        if (i != null && i < 0) {
-            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        if (i != null) {
+            ParamUtil.requireMin("jaxb.getMaximum()", i.intValue(), 0);
         }
-
-        this.jaxb = jaxb;
     }
 
     public String getRfc822Name() {

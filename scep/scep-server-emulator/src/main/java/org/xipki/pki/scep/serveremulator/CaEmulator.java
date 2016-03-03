@@ -79,9 +79,9 @@ import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
-import org.xipki.pki.scep.util.ParamUtil;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -130,11 +130,8 @@ public class CaEmulator {
             final Certificate caCert,
             final boolean generateCrl)
     throws CertificateEncodingException {
-        ParamUtil.assertNotNull("caKey", caKey);
-        ParamUtil.assertNotNull("caCert", caCert);
-
-        this.caKey = caKey;
-        this.caCert = caCert;
+        this.caKey = ParamUtil.requireNonNull("caKey", caKey);
+        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.caSubject = caCert.getSubject();
         this.generateCrl = generateCrl;
         try {
@@ -282,7 +279,7 @@ public class CaEmulator {
     public ContentVerifierProvider getContentVerifierProvider(
             final PublicKey publicKey)
     throws InvalidKeyException {
-        ParamUtil.assertNotNull("publicKey", publicKey);
+        ParamUtil.requireNonNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
         if ("EC".equals(keyAlg)) {
