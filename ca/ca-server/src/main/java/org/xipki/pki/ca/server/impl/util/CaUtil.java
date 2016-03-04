@@ -73,6 +73,7 @@ public class CaUtil {
 
     public static Extensions getExtensions(
             final CertificationRequestInfo p10Req) {
+        ParamUtil.requireNonNull("p10Req", p10Req);
         ASN1Set attrs = p10Req.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));

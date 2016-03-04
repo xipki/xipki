@@ -59,15 +59,15 @@ class CaCertRespBytes {
     private final byte[] bytes;
 
     CaCertRespBytes(
-            final X509Certificate cACert,
+            final X509Certificate caCert,
             final X509Certificate responderCert)
     throws CMSException, CertificateException {
-        ParamUtil.requireNonNull("cACert", cACert);
+        ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("responderCert", responderCert);
 
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
-            cmsSignedDataGen.addCertificate(new X509CertificateHolder(cACert.getEncoded()));
+            cmsSignedDataGen.addCertificate(new X509CertificateHolder(caCert.getEncoded()));
             cmsSignedDataGen.addCertificate(new X509CertificateHolder(responderCert.getEncoded()));
             CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             bytes = degenerateSignedData.getEncoded();

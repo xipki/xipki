@@ -272,6 +272,7 @@ class IdentifiedX509Certprofile {
             final Date notBefore,
             final Date notAfter)
     throws CertprofileException, BadCertTemplateException {
+        ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls
@@ -583,6 +584,7 @@ class IdentifiedX509Certprofile {
     public SubjectPublicKeyInfo checkPublicKey(
             final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException {
+        ParamUtil.requireNonNull("publicKey", publicKey);
         return certprofile.checkPublicKey(publicKey);
     }
 

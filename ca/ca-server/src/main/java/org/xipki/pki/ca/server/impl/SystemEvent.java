@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.server.impl;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -54,8 +56,8 @@ class SystemEvent {
             final String owner,
             final long eventTime) {
         super();
-        this.name = name;
-        this.owner = owner;
+        this.name = ParamUtil.requireNonBlank("name", name);
+        this.owner = ParamUtil.requireNonBlank("owner", owner);
         this.eventTime = eventTime;
     }
 

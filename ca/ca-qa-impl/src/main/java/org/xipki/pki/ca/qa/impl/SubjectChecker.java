@@ -89,6 +89,7 @@ public class SubjectChecker {
     public SubjectChecker(
             final X509ProfileType conf)
     throws CertprofileException {
+        ParamUtil.requireNonNull("conf", conf);
         this.specialBehavior = conf.getSpecialBehavior();
 
         Subject subject = conf.getSubject();

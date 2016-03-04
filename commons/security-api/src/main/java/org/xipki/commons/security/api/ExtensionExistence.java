@@ -50,6 +50,7 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  *
@@ -101,21 +102,18 @@ public class ExtensionExistence extends ASN1Object {
         for (int i = 0; i < size; i++) {
             ASN1TaggedObject tagObject = ASN1TaggedObject.getInstance(seq.getObjectAt(i));
             int tag = tagObject.getTagNo();
-            if (tag == 0 || tag == 1) {
-                ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
-                List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-                int subSize = subSeq.size();
-                for (int j = 0; j < subSize; j++) {
-                    oids.add(ASN1ObjectIdentifier.getInstance(subSeq.getObjectAt(j)));
-                }
+            ParamUtil.requireRange("tag", tag, 0, 1);
+            ASN1Sequence subSeq = ASN1Sequence.getInstance(tagObject.getObject());
+            List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+            int subSize = subSeq.size();
+            for (int j = 0; j < subSize; j++) {
+                oids.add(ASN1ObjectIdentifier.getInstance(subSeq.getObjectAt(j)));
+            }
 
-                if (tag == 0) {
-                    needExtensions = Collections.unmodifiableList(oids);
-                } else {
-                    wantExtensions = Collections.unmodifiableList(oids);
-                }
+            if (tag == 0) {
+                needExtensions = Collections.unmodifiableList(oids);
             } else {
-                throw new IllegalArgumentException("tag " + tag + " is not permitted");
+                wantExtensions = Collections.unmodifiableList(oids);
             }
         }
 

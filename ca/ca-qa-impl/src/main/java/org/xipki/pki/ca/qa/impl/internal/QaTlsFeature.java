@@ -39,6 +39,7 @@ package org.xipki.pki.ca.qa.impl.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.IntWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 
@@ -53,6 +54,7 @@ public class QaTlsFeature extends QaExtension {
 
     public QaTlsFeature(
             final TlsFeature jaxb) {
+        ParamUtil.requireNonNull("jaxb", jaxb);
         this.features = new HashSet<>();
         for (IntWithDescType m : jaxb.getFeature()) {
             features.add(m.getValue());

@@ -95,6 +95,7 @@ class PublicCaInfo {
             final List<String> deltaCrlUris)
     throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
+
         this.caCertificate = new X509Cert(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();

@@ -55,6 +55,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyException;
@@ -106,7 +107,7 @@ class OcspStoreQueryExecutor {
             final DataSourceWrapper dataSource,
             final boolean publishGoodCerts)
     throws DataAccessException, NoSuchAlgorithmException {
-        this.dataSource = dataSource;
+        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
 
@@ -172,7 +173,10 @@ class OcspStoreQueryExecutor {
             final String certprofile,
             final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException, OperationException {
-        boolean revoked = revInfo != null;
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("revInfo", revInfo);
+
+        boolean revoked = (revInfo != null);
         int issuerId = getIssuerId(issuer);
 
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
@@ -324,8 +328,9 @@ class OcspStoreQueryExecutor {
             final X509CertWithDbId certificate,
             final CertRevocationInfo revInfo)
     throws CertificateEncodingException, DataAccessException {
+        ParamUtil.requireNonNull("certificate", certificate);
 
-        boolean revoked = revInfo != null;
+        boolean revoked = (revInfo != null);
         int issuerId = getIssuerId(issuer);
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
 
@@ -375,6 +380,9 @@ class OcspStoreQueryExecutor {
             final X509Cert issuer,
             final X509CertWithDbId cert)
     throws DataAccessException {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("cert", cert);
+
         Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
         if (issuerId == null) {
             return;
@@ -429,6 +437,9 @@ class OcspStoreQueryExecutor {
             final X509Cert issuer,
             final X509CertWithDbId cert)
     throws DataAccessException {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("cert", cert);
+
         Integer issuerId = issuerStore.getIdForCert(issuer.getEncodedCert());
         if (issuerId == null) {
             return;
@@ -451,10 +462,13 @@ class OcspStoreQueryExecutor {
 
     void revokeCa(
             final X509Cert caCert,
-            final CertRevocationInfo revocationInfo)
+            final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException {
-        Date revocationTime = revocationInfo.getRevocationTime();
-        Date invalidityTime = revocationInfo.getInvalidityTime();
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireNonNull("revInfo", revInfo);
+
+        Date revocationTime = revInfo.getRevocationTime();
+        Date invalidityTime = revInfo.getInvalidityTime();
         if (invalidityTime == null) {
             invalidityTime = revocationTime;
         }
@@ -468,7 +482,7 @@ class OcspStoreQueryExecutor {
             setBoolean(ps, idx++, true);
             ps.setLong(idx++, revocationTime.getTime() / 1000);
             ps.setLong(idx++, invalidityTime.getTime() / 1000);
-            ps.setInt(idx++, revocationInfo.getReason().getCode());
+            ps.setInt(idx++, revInfo.getReason().getCode());
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -503,6 +517,7 @@ class OcspStoreQueryExecutor {
     private int getIssuerId(
             final X509Cert issuerCert)
     throws DataAccessException, CertificateEncodingException {
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
         if (id == null) {
             throw new IllegalStateException("could not find issuer, "

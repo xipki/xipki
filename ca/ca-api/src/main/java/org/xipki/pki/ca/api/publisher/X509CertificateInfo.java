@@ -36,11 +36,18 @@
 
 package org.xipki.pki.ca.api.publisher;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509Cert;
@@ -60,6 +67,8 @@ public class X509CertificateInfo {
     private final X509Cert issuerCert;
 
     private final String profileName;
+
+    private final HashAlgoType hashAlgo;
 
     private RequestType reqType;
 
@@ -87,6 +96,28 @@ public class X509CertificateInfo {
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(cert.getCert().getSigAlgOID());
+        byte[] params = cert.getCert().getSigAlgParams();
+
+        try {
+            AlgorithmIdentifier algId;
+            if (params == null) {
+                algId = new AlgorithmIdentifier(oid);
+            } else {
+                algId = new AlgorithmIdentifier(oid, new ASN1StreamParser(params).readObject());
+            }
+            AlgorithmIdentifier hashId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(algId);
+            this.hashAlgo = HashAlgoType.getHashAlgoType(hashId.getAlgorithm().getId());
+
+            if (this.hashAlgo == null) {
+                throw new CertificateEncodingException(
+                        "unknown hash algorithm " + hashId.getAlgorithm().getId());
+            }
+        } catch (IllegalArgumentException | IOException | NoSuchAlgorithmException ex) {
+            throw new CertificateEncodingException(
+                    "error while retrieving hash algorithm used to sign the certifiate: "
+                            + ex.getMessage(), ex);
+        }
     }
 
     public byte[] getSubjectPublicKey() {
@@ -179,6 +210,10 @@ public class X509CertificateInfo {
     public void setRequestedSubject(
             final X500Name requestedSubject) {
         this.requestedSubject = requestedSubject;
+    }
+
+    public HashAlgoType getHashAlgo() {
+        return hashAlgo;
     }
 
 }

@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -134,6 +135,12 @@ class X509SelfSignedCertBuilder {
             final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException, InvalidConfException {
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        ParamUtil.requireNonBlank("signerType", signerType);
+        ParamUtil.requireNonNull("certprofile", certprofile);
+        ParamUtil.requireNonNull("p10Request", p10Request);
+        ParamUtil.requireMin("serialNumber", serialNumber, 1);
+
         if (!securityFactory.verifyPopo(p10Request)) {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
         }
@@ -339,6 +346,7 @@ class X509SelfSignedCertBuilder {
     public static AsymmetricKeyParameter generatePublicKeyParameter(
             final PublicKey key)
     throws InvalidKeyException {
+        ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPublicKey) {
             RSAPublicKey k = (RSAPublicKey) key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());

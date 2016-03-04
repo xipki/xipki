@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.server.impl.cmp;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 
 /**
@@ -62,14 +64,17 @@ class PendingCertificatePool {
 
         private final X509CertificateInfo certInfo;
 
+        private final byte[] certHash;
+
         MyEntry(
                 final BigInteger certReqId,
                 final long waitForConfirmTill,
                 final X509CertificateInfo certInfo) {
-            super();
             this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
             this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
             this.waitForConfirmTill = waitForConfirmTill;
+            this.certHash = HashCalculator.hash(certInfo.getHashAlgo(),
+                    certInfo.getCert().getEncodedCert());
         }
 
         @Override
@@ -99,15 +104,17 @@ class PendingCertificatePool {
     }
 
     synchronized void addCertificate(
-            final byte[] tid,
+            final byte[] transactionId,
             final BigInteger certReqId,
             final X509CertificateInfo certInfo,
             final long waitForConfirmTill) {
+        ParamUtil.requireNonNull("transactionId", transactionId);
+        ParamUtil.requireNonNull("certInfo", certInfo);
         if (certInfo.isAlreadyIssued()) {
             return;
         }
 
-        String hexTid = Hex.toHexString(tid);
+        String hexTid = Hex.toHexString(transactionId);
         Set<MyEntry> entries = map.get(hexTid);
         if (entries == null) {
             entries = new HashSet<>();
@@ -122,6 +129,10 @@ class PendingCertificatePool {
             final byte[] transactionId,
             final BigInteger certReqId,
             final byte[] certHash) {
+        ParamUtil.requireNonNull("transactionId", transactionId);
+        ParamUtil.requireNonNull("certReqId", certReqId);
+        ParamUtil.requireNonNull("certHash", certHash);
+
         String hexTid = Hex.toHexString(transactionId);
         Set<MyEntry> entries = map.get(hexTid);
         if (entries == null) {
@@ -137,11 +148,13 @@ class PendingCertificatePool {
         }
 
         if (retEntry != null) {
-            entries.remove(retEntry);
-        }
+            if (Arrays.equals(certHash, retEntry.certHash)) {
+                entries.remove(retEntry);
 
-        if (CollectionUtil.isEmpty(entries)) {
-            map.remove(hexTid);
+                if (CollectionUtil.isEmpty(entries)) {
+                    map.remove(hexTid);
+                }
+            }
         }
 
         return (retEntry == null)
@@ -151,6 +164,7 @@ class PendingCertificatePool {
 
     synchronized Set<X509CertificateInfo> removeCertificates(
             final byte[] transactionId) {
+        ParamUtil.requireNonNull("transactionId", transactionId);
         Set<MyEntry> entries = map.remove(Hex.toHexString(transactionId));
         if (entries == null) {
             return null;

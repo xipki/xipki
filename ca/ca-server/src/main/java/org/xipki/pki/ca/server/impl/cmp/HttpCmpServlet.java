@@ -64,6 +64,7 @@ import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -240,6 +241,7 @@ public class HttpCmpServlet extends HttpServlet {
     protected PKIMessage generatePKIMessage(
             final InputStream is)
     throws IOException {
+        ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
         try {

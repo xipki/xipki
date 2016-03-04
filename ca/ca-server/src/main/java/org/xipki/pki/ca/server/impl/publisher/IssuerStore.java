@@ -52,6 +52,7 @@ class IssuerStore {
 
     IssuerStore(
             final List<IssuerEntry> entries) {
+        ParamUtil.requireNonNull("entries", entries);
         this.entries = new ArrayList<>(entries.size());
 
         for (IssuerEntry entry : entries) {
@@ -62,7 +63,6 @@ class IssuerStore {
     void addIdentityEntry(
             final IssuerEntry entry) {
         ParamUtil.requireNonNull("entry", entry);
-
         for (IssuerEntry existingEntry : entries) {
             if (existingEntry.getId() == entry.getId()) {
                 throw new IllegalArgumentException(
@@ -75,6 +75,7 @@ class IssuerStore {
 
     Integer getIdForSubject(
             final String subject) {
+        ParamUtil.requireNonBlank("subject", subject);
         for (IssuerEntry entry : entries) {
             if (entry.getSubject().equals(subject)) {
                 return entry.getId();
@@ -86,6 +87,7 @@ class IssuerStore {
 
     Integer getIdForSha1Fp(
             final byte[] sha1FpCert) {
+        ParamUtil.requireNonNull("sha1FpCert", sha1FpCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchSha1Fp(sha1FpCert)) {
                 return entry.getId();
@@ -97,6 +99,7 @@ class IssuerStore {
 
     Integer getIdForCert(
             final byte[] encodedCert) {
+        ParamUtil.requireNonNull("encodedCert", encodedCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchCert(encodedCert)) {
                 return entry.getId();

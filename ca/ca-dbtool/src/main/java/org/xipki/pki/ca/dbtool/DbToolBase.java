@@ -174,6 +174,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
+
         return dataSource.getMin(connection, table, column, condition);
     }
 
@@ -183,6 +184,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
+
         return dataSource.getMax(connection, table, column);
     }
 
@@ -193,6 +195,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
+
         return dataSource.getMax(connection, table, column, condition);
     }
 
@@ -200,6 +203,7 @@ public class DbToolBase {
             final String table)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
+
         return dataSource.getCount(connection, table);
     }
 
@@ -209,6 +213,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
+
         return dataSource.tableHasColumn(connection, table, column);
     }
 
@@ -216,6 +221,7 @@ public class DbToolBase {
             final String table)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
+
         return dataSource.tableExists(connection, table);
     }
 
@@ -280,6 +286,7 @@ public class DbToolBase {
             final Long i)
     throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
+
         if (i != null) {
             ps.setLong(index, i.longValue());
         } else {
@@ -293,6 +300,7 @@ public class DbToolBase {
             final Integer i)
     throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
+
         if (i != null) {
             ps.setInt(index, i.intValue());
         } else {
@@ -331,10 +339,6 @@ public class DbToolBase {
         // adapt the configuration
         if (props.getProperty("minimumIdle") != null) {
             props.setProperty("minimumIdle", "1");
-        }
-
-        if (props.getProperty("db.minIdle") != null) {
-            props.setProperty("db.minIdle", "1");
         }
 
         return props;

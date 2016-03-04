@@ -50,9 +50,4 @@ public abstract class MgmtNameCompleter extends AbstractDynamicEnumCompleter {
     @Reference
     protected CaManager caManager;
 
-    public void setCaManager(
-            final CaManager caManager) {
-        this.caManager = caManager;
-    }
-
 }

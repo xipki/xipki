@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.impl.store;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
@@ -52,7 +53,7 @@ public class X509CertWithRevokedInfo {
     public X509CertWithRevokedInfo(
             final X509CertWithDbId cert,
             final boolean revoked) {
-        this.cert = cert;
+        this.cert = ParamUtil.requireNonNull("cert", cert);
         this.revoked = revoked;
     }
 

@@ -40,6 +40,7 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
@@ -65,7 +66,7 @@ public class CmpResponderEntryWrapper {
 
     public void setDbEntry(
             final CmpResponderEntry dbEntry) {
-        this.dbEntry = dbEntry;
+        this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         signer = null;
         if (dbEntry.getCertificate() != null) {
             subjectAsX500Name = X500Name.getInstance(
@@ -81,6 +82,7 @@ public class CmpResponderEntryWrapper {
     public void initSigner(
             final SecurityFactory securityFactory)
     throws SignerException {
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;
         }

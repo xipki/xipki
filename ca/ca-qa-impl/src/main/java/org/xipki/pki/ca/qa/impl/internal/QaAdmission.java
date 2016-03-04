@@ -42,6 +42,7 @@ import java.util.List;
 
 import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 
@@ -62,6 +63,8 @@ public class QaAdmission extends QaExtension {
 
     public QaAdmission(
             final Admission jaxb) {
+        ParamUtil.requireNonNull("jaxb", jaxb);
+
         this.registrationNumber = jaxb.getRegistrationNumber();
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 

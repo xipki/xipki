@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.qa.impl.internal;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 
 /**
@@ -51,6 +52,7 @@ public class QaAuthorizationTemplate extends QaExtension {
 
     public QaAuthorizationTemplate(
             final AuthorizationTemplate jaxb) {
+        ParamUtil.requireNonNull("jaxb", jaxb);
         this.type = jaxb.getType().getValue();
         this.accessRights = jaxb.getAccessRights().getValue();
     }

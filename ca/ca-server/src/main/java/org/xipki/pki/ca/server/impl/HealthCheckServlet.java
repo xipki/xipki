@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
 
@@ -151,7 +152,7 @@ public class HealthCheckServlet extends HttpServlet {
 
     public void setResponderManager(
             final CmpResponderManager responderManager) {
-        this.responderManager = responderManager;
+        this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
     }
 
 }
