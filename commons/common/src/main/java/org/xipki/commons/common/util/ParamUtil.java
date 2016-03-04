@@ -37,6 +37,7 @@
 package org.xipki.commons.common.util;
 
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.Map;
 import java.util.Objects;
 
@@ -144,6 +145,10 @@ public class ParamUtil {
             }
         } else if (obj instanceof Map<?, ?>) {
             if (((Map<?, ?>) obj).isEmpty()) {
+                throw new IllegalArgumentException(objName + " must not be empty");
+            }
+        } else if (obj instanceof Dictionary<?, ?>) {
+            if (((Dictionary<?, ?>) obj).isEmpty()) {
                 throw new IllegalArgumentException(objName + " must not be empty");
             }
         } else {

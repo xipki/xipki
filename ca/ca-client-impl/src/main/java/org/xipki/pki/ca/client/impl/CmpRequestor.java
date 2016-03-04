@@ -321,6 +321,8 @@ public abstract class CmpRequestor {
             final String exepectedType,
             final boolean requireProtectionCheck)
     throws CmpRequestorException, PkiErrorException {
+        ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonNull("exepectedType", exepectedType);
         if (requireProtectionCheck) {
             checkProtection(response);
         }
@@ -389,29 +391,23 @@ public abstract class CmpRequestor {
             for (InfoTypeAndValue itv : additionalGeneralInfos) {
                 ASN1ObjectIdentifier type = itv.getInfoType();
                 if (CMPObjectIdentifiers.it_implicitConfirm.equals(type)) {
-                    throw new IllegalArgumentException(""
-                            + "additionGeneralInfos contains unpermitted ITV implicitConfirm");
+                    throw new IllegalArgumentException(
+                            "additionGeneralInfos contains unpermitted ITV implicitConfirm");
                 }
 
                 if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(type)) {
-                    throw new IllegalArgumentException(""
-                            + "additionGeneralInfos contains unpermitted ITV utf8Pairs");
+                    throw new IllegalArgumentException(
+                            "additionGeneralInfos contains unpermitted ITV utf8Pairs");
                 }
             }
         }
 
-        PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
-                PKIHeader.CMP_2000,
-                sender,
-                recipient);
+        PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-        ASN1OctetString localTid;
-        if (tid == null) {
-            localTid = new DEROctetString(randomTransactionId());
-        } else {
-            localTid = tid;
-        }
+        ASN1OctetString localTid = (tid == null)
+                ? new DEROctetString(randomTransactionId())
+                : tid;
 
         hBuilder.setTransactionID(localTid);
 

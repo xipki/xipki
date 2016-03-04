@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.qa.impl.internal;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 
 /**
@@ -49,6 +50,7 @@ public class QaInhibitAnyPolicy extends QaExtension {
 
     public QaInhibitAnyPolicy(
             final InhibitAnyPolicy jaxb) {
+        ParamUtil.requireNonNull("jaxb", jaxb);
         this.skipCerts = jaxb.getSkipCerts();
     }
 

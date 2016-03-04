@@ -126,12 +126,13 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
     public X509CertprofileQaImpl(
             final String data)
     throws CertprofileException {
-        this(data.getBytes());
+        this(ParamUtil.requireNonNull("data", data).getBytes());
     }
 
     public X509CertprofileQaImpl(
             final byte[] dataBytes)
     throws CertprofileException {
+        ParamUtil.requireNonNull("dataBytes", dataBytes);
         try {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
                     new ByteArrayInputStream(dataBytes));
