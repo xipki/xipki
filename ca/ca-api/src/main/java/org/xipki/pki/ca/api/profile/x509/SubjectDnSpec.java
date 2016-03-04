@@ -230,6 +230,13 @@ public class SubjectDnSpec {
         STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
         DFLT_STRING_TYPES.put(id, StringType.utf8String);
 
+        // organizationIdentifier
+        id = ObjectIdentifiers.DN_organizationIdentifier;
+        ids.add(id);
+        RANGES.put(id, RANGE_64);
+        STRING_TYPE_SET.put(id, DIRECTORY_STRINGS);
+        DFLT_STRING_TYPES.put(id, StringType.utf8String);
+
         // organizationalUnitName
         id = ObjectIdentifiers.DN_OU;
         ids.add(id);
