@@ -456,15 +456,8 @@ public class KeyUtil {
             byte[] encodedAlgorithmIdParameters,
             byte[] encodedPoint)
     throws InvalidKeySpecException {
-        KeyFactory kf;
-        try {
-            kf = KeyFactory.getInstance("EC", "BC");
-        } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
-            throw new InvalidKeySpecException(ex.getMessage(), ex);
-        }
-
         ASN1Encodable algParams;
-        if (encodedAlgorithmIdParameters.length < 50) {
+        if (encodedAlgorithmIdParameters[0] == 6) {
             algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);
         } else {
             algParams = X962Parameters.getInstance(encodedAlgorithmIdParameters);
@@ -480,6 +473,12 @@ public class KeyUtil {
             throw new InvalidKeySpecException(ex.getMessage(), ex);
         }
 
+        KeyFactory kf;
+        try {
+            kf = KeyFactory.getInstance("EC", "BC");
+        } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
+            throw new InvalidKeySpecException(ex.getMessage(), ex);
+        }
         return (ECPublicKey) kf.generatePublic(keySpec);
     }
 
