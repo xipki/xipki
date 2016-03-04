@@ -47,7 +47,7 @@ xipki-tk:req-p12 \
   --p12 output/OCSP1.p12 \
   --password 1234 \
   --out output/OCSP1.p10 \
-  --subject "CN=OCSP1,O=xipki,C=DE" \
+  --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
 xipki-cli:enroll-p12 \
@@ -56,7 +56,7 @@ xipki-cli:enroll-p12 \
   --out output/OCSP1.der \
   --profile OCSP \
   --user USER-O \
-  --subject "CN=OCSP1,O=xipki,C=DE" \
+  --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
 xipki-tk:update-cert-p12 \
@@ -73,7 +73,7 @@ xipki-tk:req-p12 \
   --p12 output/OCSP2.p12 \
   --password 1234 \
   --out output/OCSP2.p10 \
-  --subject "CN=OCSP2,O=xipki,C=DE" \
+  --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
 xipki-cli:enroll-p12 \
@@ -82,7 +82,7 @@ xipki-cli:enroll-p12 \
   --out output/OCSP2.der \
   --profile OCSP \
   --user USER-O \
-  --subject "CN=OCSP2,O=xipki,C=DE" \
+  --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
 xipki-tk:update-cert-p12 \

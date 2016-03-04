@@ -120,6 +120,12 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier DN_O = new ASN1ObjectIdentifier("2.5.4.10");
 
     /**
+     * organizationIdentifier - StringType(SIZE(1..64))
+     */
+    public static final ASN1ObjectIdentifier DN_organizationIdentifier
+            = new ASN1ObjectIdentifier("2.5.4.97");
+
+    /**
      * organizational unit name - StringType(SIZE(1..64))
      */
     public static final ASN1ObjectIdentifier DN_OU = new ASN1ObjectIdentifier("2.5.4.11");
@@ -442,6 +448,7 @@ public class ObjectIdentifiers {
         localForwardDNs.add(DN_ST);
         localForwardDNs.add(DN_L);
         localForwardDNs.add(DN_O);
+        localForwardDNs.add(DN_organizationIdentifier);
         localForwardDNs.add(DN_OU);
         localForwardDNs.add(DN_T);
         localForwardDNs.add(DN_SURNAME);
@@ -480,6 +487,7 @@ public class ObjectIdentifiers {
         oidNameMap.put(DN_COUNTRY_OF_CITIZENSHIP, "countryOfCitizenship");
         oidNameMap.put(DN_COUNTRY_OF_RESIDENCE, "countryOfResidence");
         oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
+        oidNameMap.put(DN_organizationIdentifier, "organizationIdentifier");
 
         oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
         oidNameMap.put(id_xipki_ext_cmpRequestExtensions, "xipki-cmpRequestExtensions");

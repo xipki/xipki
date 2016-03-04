@@ -63,6 +63,7 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
@@ -532,6 +533,7 @@ public class ProfileConfCreatorDemo {
         rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
                 new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
                 new String[]{REGEX_SN}, null, null));
@@ -1187,10 +1189,7 @@ public class ProfileConfCreatorDemo {
         ret.setMaxOccurs(max);
 
         if (regexArrays != null) {
-            if (regexArrays.length != max) {
-                throw new IllegalArgumentException("regexArrays.length "
-                        + regexArrays.length + " != max " + max);
-            }
+            ParamUtil.requireRange("regexArrays.length", regexArrays.length, max, max);
             for (String regex : regexArrays) {
                 ret.getRegex().add(regex);
             }

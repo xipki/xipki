@@ -74,6 +74,9 @@
       <type description="o">2.5.4.10</type>
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
+      <type description="organizationIdentifier">2.5.4.97</type>
+    </rdn>
+    <rdn minOccurs="0" maxOccurs="1">
       <type description="ou">2.5.4.11</type>
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
