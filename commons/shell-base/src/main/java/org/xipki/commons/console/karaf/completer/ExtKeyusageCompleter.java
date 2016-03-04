@@ -55,17 +55,16 @@ public class ExtKeyusageCompleter extends AbstractDynamicEnumCompleter {
     private static final Set<String> USAGES;
 
     static {
-        Set<String> set = new HashSet<>();
-        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
-        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
-        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
-        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
-        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
-
-        USAGES = Collections.unmodifiableSet(set);
+        Set<String> oids = new HashSet<>();
+        oids.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+        oids.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+        oids.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+        oids.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+        oids.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+        oids.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+        oids.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+        oids.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+        USAGES = Collections.unmodifiableSet(oids);
     }
 
     @Override

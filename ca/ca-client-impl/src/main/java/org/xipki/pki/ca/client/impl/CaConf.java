@@ -109,11 +109,9 @@ class CaConf {
     public void setCert(
             final X509Certificate cert) {
         this.cert = cert;
-        if (cert != null) {
-            this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        } else {
-            this.subject = null;
-        }
+        this.subject = (cert == null)
+                ? null
+                : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
     }
 
     public void setCertprofiles(

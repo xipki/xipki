@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.IoUtil;
@@ -88,12 +89,8 @@ public class ScepAddCmd extends CaCommandSupport {
             description = "SCEP control")
     private String scepControl;
 
+    @Reference
     private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     @Override
     protected Object doExecute()

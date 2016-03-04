@@ -87,9 +87,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                 numCertsToPredicate, stopMe);
 
         this.caId = caId;
-
         this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
-
         this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
 
         StringBuilder sb = new StringBuilder();

@@ -802,6 +802,7 @@ class CaManagerQueryExecutor {
     void addCa(
             final CaEntry caEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("caEntry", caEntry);
         if (!(caEntry instanceof X509CaEntry)) {
             throw new CaMgmtException("unsupported CAEntry " + caEntry.getClass().getName());
         }
@@ -884,6 +885,9 @@ class CaManagerQueryExecutor {
             final String aliasName,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("aliasName", aliasName);
+        ParamUtil.requireNonNull("caName", caName);
+
         final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
 
         PreparedStatement ps = null;
@@ -904,6 +908,7 @@ class CaManagerQueryExecutor {
     void addCertprofile(
             final CertprofileEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
         final String name = dbEntry.getName();
 
@@ -932,6 +937,10 @@ class CaManagerQueryExecutor {
             final String profileLocalName,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("profileName", profileName);
+        ParamUtil.requireNonNull("profileLocalName", profileLocalName);
+        ParamUtil.requireNonNull("caName", caName);
+
         final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
                 + " VALUES (?, ?, ?)";
         PreparedStatement ps = null;
@@ -954,10 +963,9 @@ class CaManagerQueryExecutor {
     void addCmpControl(
             final CmpControlEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         final String name = dbEntry.getName();
-
         final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
-
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -978,8 +986,8 @@ class CaManagerQueryExecutor {
     void addCmpRequestor(
             final CmpRequestorEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         String name = dbEntry.getName();
-
         final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
         PreparedStatement ps = null;
         try {
@@ -1005,6 +1013,9 @@ class CaManagerQueryExecutor {
             final CaHasRequestorEntry requestor,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("requestor", requestor);
+        ParamUtil.requireNonBlank("caName", caName);
+
         final String requestorName = requestor.getRequestorName();
 
         PreparedStatement ps = null;
@@ -1039,6 +1050,7 @@ class CaManagerQueryExecutor {
     void addCrlSigner(
             final X509CrlSignerEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         String crlControl = dbEntry.getCrlControl();
         // validate crlControl
         if (crlControl != null) {
@@ -1085,6 +1097,8 @@ class CaManagerQueryExecutor {
             final String name,
             final String value)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("value", value);
         final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
 
         PreparedStatement ps = null;
@@ -1105,6 +1119,7 @@ class CaManagerQueryExecutor {
     void addPublisher(
             final PublisherEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         String name = dbEntry.getName();
         final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
 
@@ -1147,15 +1162,17 @@ class CaManagerQueryExecutor {
     } // method addPublisherToCa
 
     boolean changeCa(
-            final ChangeCaEntry changeCAEntry,
+            final ChangeCaEntry changeCaEntry,
             final SecurityFactory securityFactory)
     throws CaMgmtException {
-        if (!(changeCAEntry instanceof X509ChangeCaEntry)) {
+        ParamUtil.requireNonNull("changeCaEntry", changeCaEntry);
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        if (!(changeCaEntry instanceof X509ChangeCaEntry)) {
             throw new CaMgmtException(
-                    "unsupported ChangeCAEntry " + changeCAEntry.getClass().getName());
+                    "unsupported ChangeCAEntry " + changeCaEntry.getClass().getName());
         }
 
-        X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCAEntry;
+        X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCaEntry;
         String name = entry.getName();
         CaStatus status = entry.getStatus();
         X509Certificate cert = entry.getCert();
@@ -1428,6 +1445,9 @@ class CaManagerQueryExecutor {
             final String conf,
             final CaManagerImpl caManager)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("caManager", caManager);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PROFILE SET ");
 
@@ -1509,6 +1529,7 @@ class CaManagerQueryExecutor {
             final String name,
             final String conf)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
         if (conf == null) {
             return null;
         }
@@ -1543,6 +1564,8 @@ class CaManagerQueryExecutor {
             final String name,
             final String base64Cert)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+
         CmpRequestorEntry newDbEntry = new CmpRequestorEntry(name, base64Cert);
         CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
         requestor.setDbEntry(newDbEntry);
@@ -1582,6 +1605,9 @@ class CaManagerQueryExecutor {
             final String base64Cert,
             final CaManagerImpl caManager)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("caManager", caManager);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
@@ -1679,6 +1705,9 @@ class CaManagerQueryExecutor {
             final String crlControl,
             final CaManagerImpl caManager)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("caManager", caManager);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
@@ -1805,6 +1834,9 @@ class CaManagerQueryExecutor {
             final String control,
             final CaManagerImpl caManager)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonNull("caManager", caManager);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE SCEP SET ");
 
@@ -1922,6 +1954,8 @@ class CaManagerQueryExecutor {
             final String name,
             final String value)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+
         if (value == null) {
             return false;
         }
@@ -1950,6 +1984,9 @@ class CaManagerQueryExecutor {
             final String conf,
             final CaManagerImpl caManager)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("caManager", caManager);
+
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PUBLISHER SET ");
 
@@ -2017,6 +2054,7 @@ class CaManagerQueryExecutor {
     boolean removeCa(
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
         final String sql = "DELETE FROM CA WHERE NAME=?";
 
         PreparedStatement ps = null;
@@ -2035,6 +2073,7 @@ class CaManagerQueryExecutor {
     boolean removeCaAlias(
             final String aliasName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("aliasName", aliasName);
         final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
 
         PreparedStatement ps = null;
@@ -2058,6 +2097,9 @@ class CaManagerQueryExecutor {
             final String profileLocalName,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("profileLocalName", profileLocalName);
+        ParamUtil.requireNonBlank("caName", caName);
+
         final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_LOCALNAME=?";
         PreparedStatement ps = null;
         try {
@@ -2081,6 +2123,9 @@ class CaManagerQueryExecutor {
             final String requestorName,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("requestorName", requestorName);
+        ParamUtil.requireNonBlank("caName", caName);
+
         final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
         PreparedStatement ps = null;
         try {
@@ -2104,6 +2149,8 @@ class CaManagerQueryExecutor {
             final String publisherName,
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("publisherName", publisherName);
+        ParamUtil.requireNonBlank("caName", caName);
         final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
         PreparedStatement ps = null;
         try {
@@ -2127,6 +2174,8 @@ class CaManagerQueryExecutor {
             final String caName,
             final CertRevocationInfo revocationInfo)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try {
@@ -2157,6 +2206,7 @@ class CaManagerQueryExecutor {
     void addCmpResponder(
             final CmpResponderEntry dbEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("dbEntry", dbEntry);
         final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
@@ -2204,6 +2254,7 @@ class CaManagerQueryExecutor {
     boolean unrevokeCa(
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
         LOG.info("Unrevoking of CA '{}'", caName);
 
         final String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
@@ -2228,6 +2279,7 @@ class CaManagerQueryExecutor {
     boolean addUser(
             final AddUserEntry userEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("userEntry", userEntry);
         final String name = userEntry.getName();
         Integer existingId = executeGetUserIdSql(name);
         if (existingId != null) {
@@ -2257,6 +2309,7 @@ class CaManagerQueryExecutor {
     private Integer executeGetUserIdSql(
             final String user)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("user", user);
         final String sql = dataSource.createFetchFirstSelectSQL("ID FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -2281,7 +2334,7 @@ class CaManagerQueryExecutor {
             final int id,
             final UserEntry userEntry)
     throws DataAccessException, CaMgmtException {
-
+        ParamUtil.requireNonNull("userEntry", userEntry);
         final String sql =
                 "INSERT INTO USERNAME (ID, NAME, PASSWORD, CN_REGEX) VALUES (?, ?, ?, ?)";
 
@@ -2305,6 +2358,7 @@ class CaManagerQueryExecutor {
     boolean removeUser(
             final String userName)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("userName", userName);
         final String sql = "DELETE FROM USERNAME WHERE NAME=?";
 
         PreparedStatement ps = null;
@@ -2381,6 +2435,7 @@ class CaManagerQueryExecutor {
     UserEntry getUser(
             final String username)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("username", username);
         final String sql = dataSource.createFetchFirstSelectSQL(
                 "PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
@@ -2408,6 +2463,7 @@ class CaManagerQueryExecutor {
     boolean addScep(
             final ScepEntry scepEntry)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("scepEntry", scepEntry);
         final String sql = "INSERT INTO SCEP (CA_NAME, CONTROL, RESPONDER_TYPE, "
                 + "RESPONDER_CERT, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = null;
@@ -2435,6 +2491,7 @@ class CaManagerQueryExecutor {
     boolean removeScep(
             final String name)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("name", name);
         final String sql = "DELETE FROM SCEP WHERE CA_NAME=?";
 
         PreparedStatement ps = null;
@@ -2453,6 +2510,7 @@ class CaManagerQueryExecutor {
     ScepEntry getScep(
             final String caName)
     throws CaMgmtException {
+        ParamUtil.requireNonNull("caName", caName);
         final String sql = dataSource.createFetchFirstSelectSQL(
             "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
             1);
@@ -2549,6 +2607,7 @@ class CaManagerQueryExecutor {
 
     public static String canonicalizName(
             final X500Principal prin) {
+        ParamUtil.requireNonNull("prin", prin);
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
         return X509Util.canonicalizName(x500Name);
     }

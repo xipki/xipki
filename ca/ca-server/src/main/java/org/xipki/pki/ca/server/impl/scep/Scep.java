@@ -296,6 +296,8 @@ public class Scep {
             final String certProfileName,
             final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException {
+        ParamUtil.requireNonNull("req", req);
+
         String tid = req.getTransactionId().getId();
         // verify and decrypt the request
         if (auditEvent != null) {
@@ -695,6 +697,9 @@ public class Scep {
             final PkiMessage response,
             final DecodedPkiMessage request)
     throws OperationException {
+        ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonNull("request", request);
+
         String signatureAlgorithm = getSignatureAlgorithm(responderKey,
                 request.getDigestAlgorithm());
         ContentInfo ci;

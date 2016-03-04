@@ -123,7 +123,7 @@ public class CmpUtf8Pairs {
 
         char c = name.charAt(0);
         if (c >= '0' && c <= '9') {
-            throw new IllegalArgumentException("name begin with " + c);
+            throw new IllegalArgumentException("name must not begin with " + c);
         }
         pairs.put(name, value);
     }

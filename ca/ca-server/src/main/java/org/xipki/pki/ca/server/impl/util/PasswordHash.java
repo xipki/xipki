@@ -39,6 +39,7 @@ import java.security.spec.InvalidKeySpecException;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * PBKDF2 salted password hashing.
@@ -48,7 +49,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 public class PasswordHash {
 
     // see 'http://stackoverflow.com/questions/22580853/reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
-    //public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
+    // public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
 
     // The following constants may be changed without breaking existing hashes.
     public static final int SALT_BYTE_SIZE = 24;
@@ -77,6 +78,7 @@ public class PasswordHash {
     public static String createHash(
             final String password)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
+        ParamUtil.requireNonBlank("password", password);
         return createHash(password.getBytes());
     }
 
@@ -104,6 +106,7 @@ public class PasswordHash {
             final int iterations,
             final int dkSize)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
+        ParamUtil.requireNonNull("password", password);
         // Generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[saltSize];
@@ -126,6 +129,7 @@ public class PasswordHash {
             final String password,
             final String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
+        ParamUtil.requireNonBlank("password", password);
         return validatePassword(password.getBytes(), correctHash);
     }
 
@@ -140,6 +144,7 @@ public class PasswordHash {
             final byte[] password,
             final String correctHash)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
+        ParamUtil.requireNonNull("password", password);
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");
         int iterations = Integer.parseInt(params[ITERATION_INDEX]);

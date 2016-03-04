@@ -55,11 +55,11 @@ public class KeyusageCompleter extends AbstractDynamicEnumCompleter {
     private static final Set<String> USAGES;
 
     static {
-        Set<String> set = new HashSet<>();
+        Set<String> usages = new HashSet<>();
         for (KeyUsage usage : KeyUsage.values()) {
-            set.add(usage.getName());
+            usages.add(usage.getName());
         }
-        USAGES = Collections.unmodifiableSet(set);
+        USAGES = Collections.unmodifiableSet(usages);
     }
 
     @Override

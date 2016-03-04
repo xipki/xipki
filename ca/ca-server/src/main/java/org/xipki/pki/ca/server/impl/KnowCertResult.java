@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.server.impl;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -53,7 +55,7 @@ public class KnowCertResult {
             final boolean known,
             final String user) {
         this.known = known;
-        this.user = user;
+        this.user = ParamUtil.requireNonBlank("user", user);
     }
 
     public boolean isKnown() {

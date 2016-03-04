@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
@@ -89,12 +90,8 @@ public class ScepUpdateCmd extends CaCommandSupport {
             description = "SCEP control or 'NULL'")
     private String control;
 
+    @Reference
     private PasswordResolver passwordResolver;
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
-    }
 
     private String getResponderConf()
     throws Exception {

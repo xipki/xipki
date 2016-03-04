@@ -571,6 +571,7 @@ public class X509Ca {
     public KnowCertResult knowsCertificate(
             final X509Certificate cert)
     throws OperationException {
+        ParamUtil.requireNonNull("cert", cert);
         if (!caInfo.getSubject().equals(
                 X509Util.getRfc4519Name(cert.getIssuerX500Principal()))) {
             return KnowCertResult.UNKNOWN;
@@ -1038,6 +1039,7 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
+        ParamUtil.requireNonNull("certTemplate", certTemplate);
         final String certprofileName = certTemplate.getCertprofileName();
         final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
         LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
@@ -1082,6 +1084,7 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
+        ParamUtil.requireNonNull("certTemplate", certTemplate);
         final String certprofileName = certTemplate.getCertprofileName();
         final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
         LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
@@ -1124,12 +1127,13 @@ public class X509Ca {
     /**
      *
      * @param certInfo
-     * @return 0 for published successfuly, 1 if must not be published to CA certstore and
+     * @return 0 for published successfuly, 1 if could not be published to CA certstore and
      *    any publishers,
      *    2 if could be published to CA certstore but not to all publishers.
      */
     private int doPublishCertificate(
             final X509CertificateInfo certInfo) {
+        ParamUtil.requireNonNull("certInfo", certInfo);
         if (certInfo.isAlreadyIssued()) {
             return 0;
         }
@@ -1358,6 +1362,7 @@ public class X509Ca {
 
     private boolean publishCertsInQueue(
             final IdentifiedX509CertPublisher publisher) {
+        ParamUtil.requireNonNull("publisher", publisher);
         X509Cert caCert = caInfo.getCertificate();
 
         final int numEntries = 500;
@@ -1558,6 +1563,7 @@ public class X509Ca {
             final Date invalidityTime,
             final boolean force)
     throws OperationException {
+        ParamUtil.requireNonNull("reason", reason);
         LOG.info(
             "     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
             new Object[]{caInfo.getName(), serialNumber, reason.getDescription(), invalidityTime});
@@ -1773,6 +1779,7 @@ public class X509Ca {
             final RequestType reqType,
             final byte[] transactionId)
     throws OperationException {
+        ParamUtil.requireNonNull("certTemplate", certTemplate);
         if (caInfo.getRevocationInfo() != null) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
@@ -2160,6 +2167,7 @@ public class X509Ca {
             final ConcurrentContentSigner signer,
             final X509v3CertificateBuilder certBuilder)
     throws OperationException {
+        ParamUtil.requireNonNull("signer",signer);
         try {
             return signer.build(certBuilder).toASN1Structure();
         } catch (NoIdleSignerException ex) {
@@ -2185,7 +2193,6 @@ public class X509Ca {
     public boolean supportsCertProfile(
             final String certprofileLocalName) {
         ParamUtil.requireNonNull("certprofileLocalName", certprofileLocalName);
-
         Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
         return profileNames.containsKey(certprofileLocalName);
     }
@@ -2218,6 +2225,7 @@ public class X509Ca {
 
     private Date getCrlNextUpdate(
             final Date thisUpdate) {
+        ParamUtil.requireNonNull("thisUpdate", thisUpdate);
         CrlControl control = getCrlSigner().getCrlControl();
         if (control.getUpdateMode() != UpdateMode.interval) {
             return null;
@@ -2259,6 +2267,7 @@ public class X509Ca {
 
     private int removeExpirtedCerts(Date expiredAtTime)
     throws OperationException {
+        ParamUtil.requireNonNull("expiredtime", expiredAtTime);
         if (!masterMode) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "CA could not remove expired certificates at slave mode");
@@ -2387,6 +2396,7 @@ public class X509Ca {
 
     private boolean verifySignature(
             final X509Certificate cert) {
+        ParamUtil.requireNonNull("cert", cert);
         PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
         try {
             final String provider = "XipkiNSS";

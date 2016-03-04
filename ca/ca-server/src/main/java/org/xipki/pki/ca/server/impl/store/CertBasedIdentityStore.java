@@ -55,7 +55,8 @@ class CertBasedIdentityStore {
     CertBasedIdentityStore(
             final String table,
             final List<CertBasedIdentityEntry> entries) {
-        this.table = table;
+        this.table = ParamUtil.requireNonNull("table", table);
+        ParamUtil.requireNonEmpty("entries", entries);
         this.entries = new ArrayList<>(entries.size());
 
         for (CertBasedIdentityEntry entry : entries) {

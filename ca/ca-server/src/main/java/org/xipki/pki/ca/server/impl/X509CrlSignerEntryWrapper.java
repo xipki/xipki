@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -86,6 +87,7 @@ class X509CrlSignerEntryWrapper {
     public void initSigner(
             final SecurityFactory securityFactory)
     throws SignerException, OperationException, InvalidConfException {
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;
         }

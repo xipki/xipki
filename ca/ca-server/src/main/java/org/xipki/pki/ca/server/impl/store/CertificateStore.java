@@ -83,6 +83,7 @@ public class CertificateStore {
 
     public boolean addCertificate(
             final X509CertificateInfo certInfo) {
+        ParamUtil.requireNonNull("certInfo", certInfo);
         try {
             queryExecutor.addCert(certInfo.getIssuerCert(),
                     certInfo.getCert(),

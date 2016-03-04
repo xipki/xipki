@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -59,6 +60,10 @@ class ShellUtil {
             final PasswordResolver passwordResolver,
             final SecurityFactory securityFactory)
     throws Exception {
+        ParamUtil.requireNonBlank("keystoreType", keystoreType);
+        ParamUtil.requireNonBlank("signerConf", signerConf);
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+
         if (!signerConf.contains("file:") && !signerConf.contains("base64:")
                 && !signerConf.contains("FILE:") && !signerConf.contains("BASE64:")) {
             return signerConf;

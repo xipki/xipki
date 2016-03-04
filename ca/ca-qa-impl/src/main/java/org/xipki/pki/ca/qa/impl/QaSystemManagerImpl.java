@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -96,7 +97,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     public void setConfFile(
             final String confFile) {
-        this.confFile = confFile;
+        this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
     }
 
     public void init() {
@@ -197,6 +198,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     @Override
     public X509IssuerInfo getIssuer(
             final String issuerName) {
+        ParamUtil.requireNonNull("issuerName", issuerName);
         return x509IssuerInfoMap.get(issuerName);
     }
 
@@ -208,6 +210,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     @Override
     public X509CertprofileQa getCertprofile(
             final String certprofileName) {
+        ParamUtil.requireNonNull("certprofileName", certprofileName);
         return x509ProfileMap.get(certprofileName);
     }
 

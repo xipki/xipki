@@ -102,7 +102,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
 
         if (dbSchemaType != DbSchemaType.EJBCA_CA_v3) {
-            throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
+            throw new IllegalArgumentException("unsupported DbSchemaType " + dbSchemaType);
         }
 
         // detect whether the table CertificateData has the column id

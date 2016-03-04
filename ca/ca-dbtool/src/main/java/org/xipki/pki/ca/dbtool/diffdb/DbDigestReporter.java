@@ -83,7 +83,6 @@ public class DbDigestReporter {
         this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
         dir.mkdirs();
-
         IoUtil.save(new File(dir, "ca.der"), caCertBytes);
 
         this.missingWriter = new BufferedWriter(

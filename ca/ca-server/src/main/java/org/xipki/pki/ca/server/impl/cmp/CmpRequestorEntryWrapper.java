@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
@@ -55,9 +56,8 @@ public class CmpRequestorEntryWrapper {
 
     public void setDbEntry(
             final CmpRequestorEntry dbEntry) {
-        this.dbEntry = dbEntry;
-        cert = null;
-        cert = new X509CertWithDbId(dbEntry.getCert());
+        this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
+        this.cert = new X509CertWithDbId(dbEntry.getCert());
     }
 
     public X509CertWithDbId getCert() {

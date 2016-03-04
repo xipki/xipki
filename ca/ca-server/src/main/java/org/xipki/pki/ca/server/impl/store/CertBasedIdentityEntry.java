@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.impl.store;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -60,7 +61,8 @@ class CertBasedIdentityEntry {
             final String subject,
             final String b64Sha1Fp,
             final String b64Cert) {
-        super();
+        ParamUtil.requireNonBlank("b64Sha1Fp", b64Sha1Fp);
+        ParamUtil.requireNonBlank("b64Cert", b64Cert);
         this.id = id;
         this.subject = subject;
         this.sha1Fp = Base64.decode(b64Sha1Fp);

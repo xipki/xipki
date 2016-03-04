@@ -146,6 +146,7 @@ abstract class CmpResponder {
             final X509Certificate tlsClientCert,
             final AuditEvent auditEvent)
     throws InvalidConfException {
+        ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
         PKIHeader reqHeader = message.getHeader();
