@@ -58,9 +58,7 @@ public class Nonce {
             final byte[] bytes,
             final boolean cloneBytes) {
         ParamUtil.requireNonNull("bytes", bytes);
-        if (bytes.length != 16) {
-            throw new IllegalArgumentException("bytes.len is not 16: " + bytes.length);
-        }
+        ParamUtil.requireRange("bytes.length", bytes.length, 16, 16);
         this.bytes = cloneBytes
                 ? Arrays.clone(bytes)
                 : bytes;
