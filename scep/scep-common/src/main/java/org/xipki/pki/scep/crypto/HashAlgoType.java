@@ -42,6 +42,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -92,6 +93,7 @@ public enum HashAlgoType {
 
     public byte[] digest(
             final byte[] content) {
+        ParamUtil.requireNonNull("content", content);
         Digest digest;
         if (this == SHA1) {
             digest = new SHA1Digest();

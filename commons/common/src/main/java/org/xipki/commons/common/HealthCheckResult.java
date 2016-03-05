@@ -93,6 +93,7 @@ public class HealthCheckResult {
 
     public void addChildCheck(
             final HealthCheckResult childCheck) {
+        ParamUtil.requireNonNull("childCheck", childCheck);
         this.childChecks.add(childCheck);
     }
 

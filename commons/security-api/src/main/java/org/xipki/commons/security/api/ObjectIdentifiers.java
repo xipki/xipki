@@ -572,6 +572,7 @@ public class ObjectIdentifiers {
 
     public static String getName(
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("type", type);
         String name = oidNameMap.get(type);
 
         if (StringUtil.isBlank(name)) {
@@ -585,6 +586,7 @@ public class ObjectIdentifiers {
 
     public static ASN1ObjectIdentifier nameToOid(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         for (ASN1ObjectIdentifier oid : oidNameMap.keySet()) {
             if (oidNameMap.get(oid).equalsIgnoreCase(name)) {
                 return oid;

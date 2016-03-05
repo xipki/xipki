@@ -65,7 +65,7 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
     public P11CryptService createP11CryptService(
             final String moduleName)
     throws SignerException {
-        ParamUtil.requireNonNull("moduleName", moduleName);
+        ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }

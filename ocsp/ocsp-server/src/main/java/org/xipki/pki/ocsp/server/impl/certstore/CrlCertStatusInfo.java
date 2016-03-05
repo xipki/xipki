@@ -65,7 +65,7 @@ class CrlCertStatusInfo {
             final CertRevocationInfo revocationInfo,
             final String certprofile,
             final Map<HashAlgoType, byte[]> certHashes) {
-        this.certStatus = certStatus;
+        this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
         this.revocationInfo = revocationInfo;
         this.certprofile = certprofile;
         this.certHashes = certHashes;

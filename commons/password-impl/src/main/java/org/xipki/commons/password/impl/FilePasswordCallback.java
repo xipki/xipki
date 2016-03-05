@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -100,9 +101,7 @@ public class FilePasswordCallback implements PasswordCallback {
     public void init(
             final String conf)
     throws PasswordResolverException {
-        if (StringUtil.isBlank(conf)) {
-            throw new PasswordResolverException("conf must not be null or empty");
-        }
+        ParamUtil.requireNonBlank("conf", conf);
         passwordFile = expandFilepath(conf);
     }
 

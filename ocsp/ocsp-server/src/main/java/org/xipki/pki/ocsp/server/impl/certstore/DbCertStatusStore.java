@@ -317,6 +317,9 @@ public class DbCertStatusStore extends CertStatusStore {
             final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption)
     throws CertStatusStoreException {
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+
         // our database supports up to 63 bit (8 byte positive) serialNumber
         if (serialNumber.bitLength() > 63) {
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);

@@ -57,7 +57,6 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
     public void init(
             final P11Control pP11Control) {
         this.p11Control = ParamUtil.requireNonNull("pP11Control", pP11Control);
-        this.p11Control = pP11Control;
         IaikP11ModulePool.getInstance().setDefaultModuleName(pP11Control.getDefaultModuleName());
     }
 

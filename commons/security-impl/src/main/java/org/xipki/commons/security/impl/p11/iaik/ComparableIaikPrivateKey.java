@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.impl.p11.iaik;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -56,18 +58,19 @@ class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey> {
 
     @Override
     public int compareTo(
-            final ComparableIaikPrivateKey o) {
+            final ComparableIaikPrivateKey obj) {
+        ParamUtil.requireNonNull("obj", obj);
         if (keyLabel == null) {
-            if (o.keyLabel == null) {
+            if (obj.keyLabel == null) {
                 return 0;
             } else {
                 return 1;
             }
         } else {
-            if (o.keyLabel == null) {
+            if (obj.keyLabel == null) {
                 return -1;
             } else {
-                return new String(keyLabel).compareTo(new String(o.keyLabel));
+                return new String(keyLabel).compareTo(new String(obj.keyLabel));
             }
         }
     }

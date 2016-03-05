@@ -43,6 +43,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
@@ -69,6 +70,7 @@ public class IaikP11ModulePool {
 
     public synchronized void removeModule(
             final String moduleName) {
+        ParamUtil.requireNonNull("moduleName", moduleName);
         IaikP11Module module = modules.remove(moduleName);
         if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
@@ -96,6 +98,7 @@ public class IaikP11ModulePool {
     public IaikP11Module getModule(
             final String moduleName)
     throws SignerException {
+        ParamUtil.requireNonNull("moduleName", moduleName);
         IaikP11Module module = modules.get(moduleName);
         if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
@@ -107,6 +110,7 @@ public class IaikP11ModulePool {
     public synchronized IaikP11Module getModule(
             final P11ModuleConf moduleConf)
     throws SignerException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
         IaikP11Module extModule = modules.get(moduleConf.getName());
         if (extModule != null) {
             return extModule;
@@ -183,7 +187,7 @@ public class IaikP11ModulePool {
 
     public void setDefaultModuleName(
             final String defaultModuleName) {
-        this.defaultModuleName = defaultModuleName;
+        this.defaultModuleName = ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
     }
 
     public static IaikP11ModulePool getInstance() {

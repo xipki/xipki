@@ -68,18 +68,15 @@ public class ConfPairs {
     }
 
     public ConfPairs(
-            final String string) {
-        if (string == null || string.length() < 2) {
-            return;
-        }
-
-        int n = string.length();
+            final String confPairs) {
+        ParamUtil.requireNonBlank("encodedConfPairs", confPairs);
+        int n = confPairs.length();
         List<String> tokens = new LinkedList<>();
 
         StringBuilder tokenBuilder = new StringBuilder();
 
         for (int i = 0; i < n;) {
-            char c = string.charAt(i);
+            char c = confPairs.charAt(i);
             if (TOKEN_TERM == c) {
                 if (tokenBuilder.length() > 0) {
                     tokens.add(tokenBuilder.toString());
@@ -92,11 +89,11 @@ public class ConfPairs {
 
             if ('\\' == c) {
                 if (i == n - 1) {
-                    throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                    throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
                 }
 
                 tokenBuilder.append(c);
-                c = string.charAt(i + 1);
+                c = confPairs.charAt(i + 1);
                 i++;
             }
 
@@ -120,7 +117,7 @@ public class ConfPairs {
 
                 if ('\\' == c) {
                     if (i == n - 1) {
-                        throw new IllegalArgumentException("invalid ConfPairs '" + string + "'");
+                        throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
                     }
 
                     i += 2;
@@ -138,7 +135,7 @@ public class ConfPairs {
                 char c = token.charAt(i);
                 if ('\\' == c) {
                     if (i == termPosition - 1) {
-                        throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
+                        throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
                     }
 
                     i += 2;
@@ -155,7 +152,7 @@ public class ConfPairs {
                 char c = token.charAt(i);
                 if ('\\' == c) {
                     if (i == n - 1) {
-                        throw new IllegalArgumentException("invalid ConfPair '" + string + "'");
+                        throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
                     }
 
                     c = token.charAt(i + 1);
@@ -186,11 +183,13 @@ public class ConfPairs {
 
     public void removePair(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         pairs.remove(name);
     }
 
     public String getValue(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         return pairs.get(name);
     }
 

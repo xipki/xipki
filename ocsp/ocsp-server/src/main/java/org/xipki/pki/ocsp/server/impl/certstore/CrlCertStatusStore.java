@@ -957,6 +957,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             final HashAlgoType hashAlgo,
             final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         IssuerHashNameAndKey hashes = issuerHashMap.get(hashAlgo);
         if (hashes == null) {
             return false;
@@ -993,6 +994,7 @@ public class CrlCertStatusStore extends CertStatusStore {
     private Map<HashAlgoType, byte[]> getCertHashes(
             final Certificate cert)
     throws CertStatusStoreException {
+        ParamUtil.requireNonNull("cert", cert);
         if (certHashAlgos.isEmpty()) {
             return null;
         }

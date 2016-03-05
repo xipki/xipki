@@ -37,6 +37,7 @@
 package org.xipki.pki.ocsp.client.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,6 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -149,17 +149,18 @@ public class RequestOptions {
     }
 
     public void setPreferredSignatureAlgorithms(
-            final List<AlgorithmIdentifier> preferredSignatureAlgorithms) {
-        this.preferredSignatureAlgorithms = preferredSignatureAlgorithms;
+            final AlgorithmIdentifier[] preferredSignatureAlgorithms) {
+        this.preferredSignatureAlgorithms = Arrays.asList(preferredSignatureAlgorithms);
     }
 
-    public void setPreferredSignatureAlgorithms2(
-            final List<String> preferredSignatureAlgorithmNames) {
-        if (CollectionUtil.isEmpty(preferredSignatureAlgorithmNames)) {
+    public void setPreferredSignatureAlgorithms(
+            final String[] preferredSignatureAlgoNames) {
+        if (preferredSignatureAlgoNames == null || preferredSignatureAlgoNames.length == 0) {
             this.preferredSignatureAlgorithms = null;
+            return;
         }
 
-        for (String algoName : preferredSignatureAlgorithmNames) {
+        for (String algoName : preferredSignatureAlgoNames) {
             AlgorithmIdentifier sigAlgId = SIGALGS_MAP.get(algoName.toUpperCase());
             if (sigAlgId == null) {
                 // ignore it
@@ -168,7 +169,7 @@ public class RequestOptions {
 
             if (this.preferredSignatureAlgorithms == null) {
                 this.preferredSignatureAlgorithms = new ArrayList<>(
-                        preferredSignatureAlgorithmNames.size());
+                        preferredSignatureAlgoNames.length);
             }
             this.preferredSignatureAlgorithms.add(sigAlgId);
         }

@@ -42,6 +42,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
@@ -69,6 +70,9 @@ class IaikP11Identity extends P11Identity {
             final byte[] encodedDigestInfo)
     throws SignerException {
         // CHECKSTYLE:ON
+        ParamUtil.requireNonNull("module", module);
+        ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
+
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -88,6 +92,9 @@ class IaikP11Identity extends P11Identity {
             final byte[] hash)
     throws SignerException {
         // CHECKSTYLE:ON
+        ParamUtil.requireNonNull("module", module);
+        ParamUtil.requireNonNull("hash", hash);
+
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -107,6 +114,9 @@ class IaikP11Identity extends P11Identity {
             final byte[] hash)
     throws SignerException {
         // CHECKSTYLE:ON
+        ParamUtil.requireNonNull("module", module);
+        ParamUtil.requireNonNull("hash", hash);
+
         if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -128,6 +138,9 @@ class IaikP11Identity extends P11Identity {
             final byte[] hash)
     throws SignerException {
         // CHECKSTYLE:ON
+        ParamUtil.requireNonNull("module", module);
+        ParamUtil.requireNonNull("hash", hash);
+
         if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");

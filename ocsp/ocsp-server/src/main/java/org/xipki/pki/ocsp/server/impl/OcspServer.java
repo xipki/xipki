@@ -191,13 +191,13 @@ public class OcspServer {
 
         @Override
         public int compareTo(
-                final ServletPathResponderName o) {
-            int d = o.path.length() - path.length();
-            if (d == 0) {
+                final ServletPathResponderName obj) {
+            int diff = obj.path.length() - path.length();
+            if (diff == 0) {
                 return 0;
             }
 
-            return (d > 0)
+            return (diff > 0)
                     ? 1
                     : -1;
         }
@@ -253,6 +253,7 @@ public class OcspServer {
     public ResponderAndRelativeUri getResponderAndRelativeUri(
             final HttpServletRequest request)
     throws UnsupportedEncodingException {
+        ParamUtil.requireNonNull("request", request);
         String requestURI = request.getRequestURI();
         String servletPath = request.getServletPath();
 
@@ -290,6 +291,7 @@ public class OcspServer {
 
     public Responder getResponder(
             final String name) {
+        ParamUtil.requireNonBlank("name", name);
         return responders.get(name);
     }
 
@@ -652,6 +654,9 @@ public class OcspServer {
             final OCSPReq request,
             final AuditEvent auditEvent,
             final boolean viaGet) {
+        ParamUtil.requireNonNull("responder", responder);
+        ParamUtil.requireNonNull("request", request);
+
         ResponderOption responderOption = responder.getResponderOption();
         RequestOption requestOption = responder.getRequestOption();
         ResponseOption responseOption = responder.getResponseOption();

@@ -108,7 +108,7 @@ public abstract class OcspStatusCommandSupport extends XipkiCommandSupport {
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
         if (isNotEmpty(prefSigAlgs)) {
-            options.setPreferredSignatureAlgorithms2(prefSigAlgs);
+            options.setPreferredSignatureAlgorithms(prefSigAlgs.toArray(new String[0]));
         }
         return options;
     }

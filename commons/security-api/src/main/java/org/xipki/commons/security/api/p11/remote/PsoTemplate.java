@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 /**
@@ -86,15 +87,9 @@ public class PsoTemplate extends ASN1Object {
     public PsoTemplate(
             final SlotAndKeyIdentifer slotAndKeyIdentifier,
             final byte[] message) {
-        if (slotAndKeyIdentifier == null) {
-            throw new IllegalArgumentException("slotAndKeyIdentifier must not be null");
-        }
-        if (message == null) {
-            throw new IllegalArgumentException("message must not be null");
-        }
-
-        this.slotAndKeyIdentifier = slotAndKeyIdentifier;
-        this.message = message;
+        this.slotAndKeyIdentifier = ParamUtil.requireNonNull("slotAndKeyIdentifier",
+                slotAndKeyIdentifier);
+        this.message = ParamUtil.requireNonNull("message", message);
     }
 
     public static PsoTemplate getInstance(

@@ -60,6 +60,9 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
             final char[] masterPassword,
             final String passwordHint)
     throws PasswordResolverException {
+        ParamUtil.requireNonNull("masterPassword", masterPassword);
+        ParamUtil.requireNonNull("passwordHint", passwordHint);
+
         byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
         int n = bytes.length;
         if (n <= 16 && n != 0) {
@@ -94,6 +97,9 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
             final char[] password)
     throws PasswordResolverException {
         ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
+        ParamUtil.requireNonNull("masterPassword", masterPassword);
+        ParamUtil.requireNonNull("password", password);
+
         byte[] iterationCountBytes = new byte[2];
         iterationCountBytes[0] = (byte) (iterationCount >>> 8);
         iterationCountBytes[1] = (byte) (iterationCount & 0xFF);

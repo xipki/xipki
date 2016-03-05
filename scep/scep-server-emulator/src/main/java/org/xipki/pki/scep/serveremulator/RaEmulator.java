@@ -39,6 +39,7 @@ package org.xipki.pki.scep.serveremulator;
 import java.security.PrivateKey;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -54,8 +55,8 @@ public class RaEmulator {
     public RaEmulator(
             final PrivateKey raKey,
             final Certificate raCert) {
-        this.raKey = raKey;
-        this.raCert = raCert;
+        this.raKey = ParamUtil.requireNonNull("raKey", raKey);
+        this.raCert = ParamUtil.requireNonNull("raCert", raCert);
     }
 
     public PrivateKey getRaKey() {

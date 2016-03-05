@@ -82,6 +82,7 @@ public class P11Control {
 
     public P11ModuleConf getModuleConf(
             final String moduleName) {
+        ParamUtil.requireNonBlank("moduleName", moduleName);
         return (moduleConfs == null)
                 ? null
                 : moduleConfs.get(moduleName);

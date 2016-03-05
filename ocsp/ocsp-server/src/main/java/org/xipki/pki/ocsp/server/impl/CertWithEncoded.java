@@ -69,6 +69,9 @@ public class CertWithEncoded {
 
     public boolean equalsCert(
             final X509Certificate cert) {
+        if (cert == null) {
+            return false;
+        }
         if (certificate == cert) {
             return true;
         }

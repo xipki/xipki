@@ -42,6 +42,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,6 +57,7 @@ public class IssuerAndSubject extends ASN1Object {
 
     private IssuerAndSubject(
             final ASN1Sequence seq) {
+        ParamUtil.requireNonNull("seq", seq);
         this.issuer = X500Name.getInstance(seq.getObjectAt(0));
         this.subject = X500Name.getInstance(seq.getObjectAt(1));
     }
@@ -63,8 +65,8 @@ public class IssuerAndSubject extends ASN1Object {
     public IssuerAndSubject(
             final X500Name issuer,
             final X500Name subject) {
-        this.issuer = issuer;
-        this.subject = subject;
+        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
+        this.subject = ParamUtil.requireNonNull("subject", subject);
     }
 
     public X500Name getIssuer() {
@@ -77,10 +79,8 @@ public class IssuerAndSubject extends ASN1Object {
 
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector v = new ASN1EncodableVector();
-
         v.add(issuer);
         v.add(subject);
-
         return new DERSequence(v);
     }
 

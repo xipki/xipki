@@ -44,6 +44,7 @@ import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.bouncycastle.crypto.Digest;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -61,7 +62,7 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     AbstractECDSASignatureSpi(
             final Digest digest,
             final boolean x962) {
-        this.digest = digest;
+        this.digest = ParamUtil.requireNonNull("digest", digest);
         this.x962 = x962;
     }
 

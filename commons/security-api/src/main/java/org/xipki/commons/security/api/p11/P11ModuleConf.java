@@ -124,6 +124,7 @@ public class P11ModuleConf {
 
     public boolean isSlotIncluded(
             final P11SlotIdentifier slot) {
+        ParamUtil.requireNonNull("slit", slot);
         boolean included;
         if (CollectionUtil.isEmpty(includeSlots)) {
             included = true;

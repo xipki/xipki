@@ -37,6 +37,7 @@
 package org.xipki.pki.ocsp.server.impl;
 
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ocsp.server.impl.jaxb.CacheType;
@@ -65,6 +66,7 @@ class ResponseOption {
     ResponseOption(
             final ResponseOptionType conf)
     throws InvalidConfException {
+        ParamUtil.requireNonNull("conf", conf);
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
         this.embedCertsMode = conf.getEmbedCertsMode();

@@ -1001,10 +1001,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         List<String> names = queryExecutor.getNamesFromTable("PROFILE");
         for (String name : names) {
             CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
-            if (dbEntry != null) {
-                dbEntry.setFaulty(true);
-                certprofileDbEntries.put(name, dbEntry);
+            if (dbEntry == null) {
+                LOG.error("could not initialize CertificateEntry '{}'", name);
+                continue;
             }
+
+            dbEntry.setFaulty(true);
+            certprofileDbEntries.put(name, dbEntry);
 
             IdentifiedX509Certprofile profile = createCertprofile(dbEntry);
             if (profile != null) {

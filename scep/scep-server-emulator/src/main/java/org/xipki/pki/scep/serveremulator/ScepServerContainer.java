@@ -42,6 +42,7 @@ import java.util.List;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,13 +57,14 @@ public class ScepServerContainer {
             final int port,
             final ScepServer scepServer)
     throws Exception {
-        this(port, Arrays.asList(scepServer));
+        this(port, Arrays.asList(ParamUtil.requireNonNull("scepServer", scepServer)));
     }
 
     public ScepServerContainer(
             final int port,
             final List<ScepServer> scepServers)
     throws Exception {
+        ParamUtil.requireNonEmpty("scepServers", scepServers);
         Server localServer = new Server(port);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);

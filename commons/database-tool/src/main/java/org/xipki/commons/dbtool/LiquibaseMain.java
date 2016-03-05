@@ -36,6 +36,8 @@
 
 package org.xipki.commons.dbtool;
 
+import java.util.Objects;
+
 import liquibase.CatalogAndSchema;
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -73,10 +75,7 @@ public class LiquibaseMain {
     public LiquibaseMain(
             final LiquibaseDatabaseConf dbConf,
             final String changeLogFile) {
-        if (dbConf == null) {
-            throw new IllegalArgumentException("dbConf must not be null");
-        }
-
+        Objects.requireNonNull(dbConf, "dbConf must not be null");
         if (changeLogFile == null | changeLogFile.isEmpty()) {
             throw new IllegalArgumentException("changeLogFile must not be empty");
         }
@@ -88,6 +87,7 @@ public class LiquibaseMain {
     public void changeLogLevel(
             final String logLevel, String logFile)
     throws CommandLineParsingException {
+        Objects.requireNonNull(logLevel, "logLevel must not be null");
         try {
             Logger log = LogFactory.getInstance().getLog();
             if (logFile != null && logFile.length() > 0) {

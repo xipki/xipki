@@ -96,6 +96,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadInputException;
 import org.xipki.commons.security.api.FpIdCalculator;
 import org.xipki.commons.security.api.KeyUsage;
@@ -116,11 +117,13 @@ public class X509Util {
 
     public static String getCommonName(
             final X500Principal name) {
+        ParamUtil.requireNonNull("name", name);
         return getCommonName(X500Name.getInstance(name.getEncoded()));
     }
 
     public static String getCommonName(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
         if (rdns != null && rdns.length > 0) {
             RDN rdn = rdns[0];
@@ -144,6 +147,7 @@ public class X509Util {
 
     public static X500Name reverse(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         RDN[] orig = name.getRDNs();
         int n = orig.length;
         RDN[] newRDN = new RDN[n];
@@ -155,6 +159,7 @@ public class X509Util {
 
     public static X500Name sortX509Name(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         RDN[] requstedRDNs = name.getRDNs();
 
         List<RDN> rdns = new LinkedList<>();
@@ -182,6 +187,8 @@ public class X509Util {
     private static RDN[] getRDNs(
             final RDN[] rdns,
             final ASN1ObjectIdentifier type) {
+        ParamUtil.requireNonNull("rdns", rdns);
+        ParamUtil.requireNonNull("type", type);
         List<RDN> ret = new ArrayList<>(1);
         for (int i = 0; i < rdns.length; i++) {
             RDN rdn = rdns[i];
@@ -200,12 +207,14 @@ public class X509Util {
     public static X509Certificate parseCert(
             final String fileName)
     throws IOException, CertificateException {
+        ParamUtil.requireNonNull("fileName", fileName);
         return parseCert(new File(IoUtil.expandFilepath(fileName)));
     }
 
     public static X509Certificate parseCert(
             final File file)
     throws IOException, CertificateException {
+        ParamUtil.requireNonNull("file", file);
         FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
         try {
             return parseCert(in);
@@ -217,18 +226,21 @@ public class X509Util {
     public static X509Certificate parseCert(
             final byte[] certBytes)
     throws IOException, CertificateException {
+        ParamUtil.requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
     public static X509Certificate parseBase64EncodedCert(
             final String base64EncodedCert)
     throws IOException, CertificateException {
+        ParamUtil.requireNonNull("base64EncodedCert", base64EncodedCert);
         return parseCert(Base64.decode(base64EncodedCert));
     }
 
     public static X509Certificate parseCert(
             final InputStream certStream)
     throws IOException, CertificateException {
+        ParamUtil.requireNonNull("certStream", certStream);
         synchronized (certFactLock) {
             if (certFact == null) {
                 try {
@@ -245,12 +257,14 @@ public class X509Util {
     public static X509CRL parseCrl(
             final String file)
     throws IOException, CertificateException, CRLException {
+        ParamUtil.requireNonBlank("file", file);
         return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
     }
 
     public static X509CRL parseCrl(
             final InputStream crlStream)
     throws IOException, CertificateException, CRLException {
+        ParamUtil.requireNonNull("crlStream", crlStream);
         try {
             synchronized (certFactLock) {
                 if (certFact == null) {
@@ -265,11 +279,13 @@ public class X509Util {
 
     public static String getRfc4519Name(
             final X500Principal name) {
+        ParamUtil.requireNonNull("name", name);
         return getRfc4519Name(X500Name.getInstance(name.getEncoded()));
     }
 
     public static String getRfc4519Name(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         return RFC4519Style.INSTANCE.toString(name);
     }
 
@@ -279,12 +295,14 @@ public class X509Util {
      */
     public static long fpCanonicalizedName(
             final X500Principal prin) {
+        ParamUtil.requireNonNull("prin", prin);
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
         return fpCanonicalizedName(x500Name);
     }
 
     public static long fpCanonicalizedName(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         String canonicalizedName = canonicalizName(name);
         byte[] encoded;
         try {
@@ -297,6 +315,7 @@ public class X509Util {
 
     public static String canonicalizName(
             final X500Name name) {
+        ParamUtil.requireNonNull("name", name);
         ASN1ObjectIdentifier[] localTypes = name.getAttributeTypes();
         int n = localTypes.length;
         List<String> types = new ArrayList<>(n);
@@ -365,6 +384,7 @@ public class X509Util {
     public static byte[] extractSki(
             final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
         Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectKeyIdentifier);
         if (encodedSkiValue == null) {
@@ -399,6 +419,7 @@ public class X509Util {
     public static byte[] extractAki(
             final org.bouncycastle.asn1.x509.Certificate cert)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
         try {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
                     cert.getTBSCertificate().getExtensions());
@@ -413,6 +434,7 @@ public class X509Util {
 
     public static String rdnValueToString(
             final ASN1Encodable value) {
+        ParamUtil.requireNonNull("value", value);
         if (value instanceof ASN1String && !(value instanceof DERUniversalString)) {
             return ((ASN1String) value).getString();
         } else {
@@ -471,6 +493,7 @@ public class X509Util {
     // sort the list and remove duplicated OID.
     public static List<ASN1ObjectIdentifier> sortOidList(
             List<ASN1ObjectIdentifier> oids) {
+        ParamUtil.requireNonNull("oids", oids);
         List<String> l = new ArrayList<>(oids.size());
         for (ASN1ObjectIdentifier m : oids) {
             l.add(m.getId());
@@ -491,6 +514,7 @@ public class X509Util {
     public static boolean hasKeyusage(
             final X509Certificate cert,
             final KeyUsage usage) {
+        ParamUtil.requireNonNull("cert", cert);
         boolean[] keyusage = cert.getKeyUsage();
         if (keyusage != null && keyusage.length > usage.getBit()) {
             return keyusage[usage.getBit()];
@@ -502,6 +526,8 @@ public class X509Util {
             final X509Certificate cert,
             final ASN1ObjectIdentifier type)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
+        ParamUtil.requireNonNull("type", type);
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
         if (fullExtValue == null) {
             return null;
@@ -520,6 +546,7 @@ public class X509Util {
     public static X509Certificate[] buildCertPath(
             final X509Certificate cert,
             final Set<? extends Certificate> certs) {
+        ParamUtil.requireNonNull("cert", cert);
         List<X509Certificate> certChain = new LinkedList<>();
         certChain.add(cert);
         try {
@@ -567,6 +594,7 @@ public class X509Util {
             final X509Certificate cert,
             final Set<? extends Certificate> caCerts)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
         if (isSelfSigned(cert)) {
             return null;
         }
@@ -594,6 +622,7 @@ public class X509Util {
     public static boolean isSelfSigned(
             final X509Certificate cert)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (equals) {
             byte[] ski = extractSki(cert);
@@ -609,6 +638,8 @@ public class X509Util {
             final X509Certificate issuerCert,
             final X509Certificate cert)
     throws CertificateEncodingException {
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("cert", cert);
         boolean isCA = issuerCert.getBasicConstraints() >= 0;
         if (!isCA) {
             return false;
@@ -637,6 +668,7 @@ public class X509Util {
     public static SubjectPublicKeyInfo toRfc3279Style(
             final SubjectPublicKeyInfo publicKeyInfo)
     throws InvalidKeySpecException {
+        ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
 
@@ -681,6 +713,7 @@ public class X509Util {
     public static String cutText(
             final String text,
             final int maxLen) {
+        ParamUtil.requireNonNull("text", text);
         if (text.length() <= maxLen) {
             return text;
         }
@@ -743,6 +776,7 @@ public class X509Util {
     public static AccessDescription createAccessDescription(
             final String accessMethodAndLocation)
     throws BadInputException {
+        ParamUtil.requireNonNull("accessMethodAndLocation", accessMethodAndLocation);
         ConfPairs pairs;
         try {
             pairs = new ConfPairs(accessMethodAndLocation);
@@ -791,6 +825,8 @@ public class X509Util {
     public static GeneralName createGeneralName(
             final String taggedValue)
     throws BadInputException {
+        ParamUtil.requireNonBlank("taggedValue", taggedValue);
+
         int tag = -1;
         String value = null;
         if (taggedValue.charAt(0) == '[') {

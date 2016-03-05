@@ -180,16 +180,18 @@ public final class IaikP11CryptService implements P11CryptService {
         LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     } // method refresh
 
+    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         checkState();
 
         try {
-            return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+            return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
         } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_RSA_PKCS()";
             if (LOG.isWarnEnabled()) {
@@ -212,19 +214,21 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         // CHECKSTYLE:ON
-        return getIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
     }
 
     @Override
+    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_X509(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        // CHECKSTYLE:ON
         checkState();
 
         try {
-            return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
+            return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_RSA_X_509()";
             if (LOG.isWarnEnabled()) {
@@ -247,7 +251,7 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         // CHECKSTYLE:ON
-        return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
     }
 
     // CHECKSTYLE:OFF
@@ -273,7 +277,7 @@ public final class IaikP11CryptService implements P11CryptService {
         checkState();
 
         try {
-            return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
+            return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_ECDSA()";
             if (LOG.isWarnEnabled()) {
@@ -296,7 +300,7 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         // CHECKSTYLE:ON
-        return getIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
+        return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
     }
 
     // CHECKSTYLE:OFF
@@ -322,7 +326,7 @@ public final class IaikP11CryptService implements P11CryptService {
         checkState();
 
         try {
-            return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
+            return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
             final String message = "error while calling identity.CKM_DSA()";
             if (LOG.isWarnEnabled()) {
@@ -345,7 +349,7 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         // CHECKSTYLE:ON
-        return getIdentity(slotId, keyId).CKM_DSA(extModule, hash);
+        return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
     }
 
     @Override
@@ -353,7 +357,7 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
+        IaikP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
                 : identity.getPublicKey();
@@ -364,24 +368,24 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
+        IaikP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
                 : identity.getCertificate();
     }
 
-    private IaikP11Identity getIdentity(
+    private IaikP11Identity getNonNullIdentity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
+        IaikP11Identity identity = getIdentity(slotId, keyId);
         if (identity == null) {
             throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
         }
         return identity;
     }
 
-    private IaikP11Identity getIdentity2(
+    private IaikP11Identity getIdentity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId) {
         ParamUtil.requireNonNull("slotId", slotId);
@@ -419,7 +423,7 @@ public final class IaikP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity2(slotId, keyId);
+        IaikP11Identity identity = getIdentity(slotId, keyId);
         return (identity == null)
                 ? null
                 : identity.getCertificateChain();

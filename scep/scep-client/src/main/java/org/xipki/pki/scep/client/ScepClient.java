@@ -43,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
@@ -63,6 +64,7 @@ public class ScepClient extends Client {
     protected ScepHttpResponse httpGet(
             final String url)
     throws ScepClientException {
+        ParamUtil.requireNonNull("url", url);
         try {
             URL localUrl = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) localUrl.openConnection();
@@ -79,6 +81,7 @@ public class ScepClient extends Client {
             final String requestContentType,
             final byte[] request)
     throws ScepClientException {
+        ParamUtil.requireNonNull("url", url);
         try {
             URL localUrl = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) localUrl.openConnection();
@@ -106,6 +109,7 @@ public class ScepClient extends Client {
     protected ScepHttpResponse parseResponse(
             final HttpURLConnection conn)
     throws ScepClientException {
+        ParamUtil.requireNonNull("conn", conn);
         try {
             InputStream inputstream = conn.getInputStream();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
