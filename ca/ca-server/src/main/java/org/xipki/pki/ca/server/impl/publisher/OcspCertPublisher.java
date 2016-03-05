@@ -90,10 +90,10 @@ public class OcspCertPublisher extends X509CertPublisher {
     public void initialize(
             final String conf,
             final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> dataSources)
+            final Map<String, DataSourceWrapper> datasources)
     throws CertPublisherException {
         ParamUtil.requireNonNull("conf", conf);
-        ParamUtil.requireNonEmpty("dataSources", dataSources);
+        ParamUtil.requireNonEmpty("datasources", datasources);
 
         ConfPairs utf8pairs = new ConfPairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
@@ -114,18 +114,18 @@ public class OcspCertPublisher extends X509CertPublisher {
         } catch (Exception ex) {
         }
 
-        DataSourceWrapper dataSource = null;
+        DataSourceWrapper datasource = null;
         if (datasourceName != null) {
-            dataSource = dataSources.get(datasourceName);
+            datasource = datasources.get(datasourceName);
         }
 
-        if (dataSource == null) {
+        if (datasource == null) {
             throw new CertPublisherException(
                     "no datasource named '" + datasourceName + "' is specified");
         }
 
         try {
-            queryExecutor = new OcspStoreQueryExecutor(dataSource, this.publishsGoodCert);
+            queryExecutor = new OcspStoreQueryExecutor(datasource, this.publishsGoodCert);
         } catch (NoSuchAlgorithmException | DataAccessException ex) {
             throw new CertPublisherException(ex.getMessage(), ex);
         }

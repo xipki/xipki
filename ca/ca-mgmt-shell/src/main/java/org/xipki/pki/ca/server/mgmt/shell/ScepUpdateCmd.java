@@ -98,16 +98,16 @@ public class ScepUpdateCmd extends CaCommandSupport {
         if (responderConf == null) {
             return responderConf;
         }
-        String localRespType = responderType;
-        if (localRespType == null) {
+        String tmpRespType = responderType;
+        if (tmpRespType == null) {
             ScepEntry entry = caManager.getScepEntry(caName);
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the responderType");
             }
-            localRespType = entry.getResponderType();
+            tmpRespType = entry.getResponderType();
         }
 
-        return ShellUtil.canonicalizeSignerConf(localRespType, responderConf, passwordResolver,
+        return ShellUtil.canonicalizeSignerConf(tmpRespType, responderConf, passwordResolver,
                 securityFactory);
     }
 

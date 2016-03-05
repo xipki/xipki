@@ -55,7 +55,7 @@ import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 public abstract class DbPortCommandSupport extends XipkiCommandSupport {
 
     @Reference
-    protected DataSourceFactory dataSourceFactory;
+    protected DataSourceFactory datasourceFactory;
 
     @Reference
     protected PasswordResolver passwordResolver;

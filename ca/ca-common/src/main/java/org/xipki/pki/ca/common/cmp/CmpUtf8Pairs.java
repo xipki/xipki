@@ -191,22 +191,22 @@ public class CmpUtf8Pairs {
             return false;
         }
 
-        CmpUtf8Pairs b = (CmpUtf8Pairs) obj;
-        return pairs.equals(b.pairs);
+        CmpUtf8Pairs objB = (CmpUtf8Pairs) obj;
+        return pairs.equals(objB.pairs);
     }
 
     private static String encodeNameOrValue(
-            final String s) {
-        String localS = s;
-        if (localS.indexOf("%") != -1) {
-            localS = localS.replaceAll("%", "%25");
+            final String str) {
+        String tmpStr = str;
+        if (tmpStr.indexOf("%") != -1) {
+            tmpStr = tmpStr.replaceAll("%", "%25");
         }
 
-        if (localS.indexOf("?") != -1) {
-            localS = localS.replaceAll("\\?", "%3f");
+        if (tmpStr.indexOf("?") != -1) {
+            tmpStr = tmpStr.replaceAll("\\?", "%3f");
         }
 
-        return localS;
+        return tmpStr;
     }
 
     private static String decodeNameOrValue(

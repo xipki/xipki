@@ -208,7 +208,7 @@ public class OcspServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
-    private DataSourceFactory dataSourceFactory;
+    private DataSourceFactory datasourceFactory;
 
     private SecurityFactory securityFactory;
 
@@ -241,8 +241,8 @@ public class OcspServer {
     }
 
     public void setDataSourceFactory(
-            final DataSourceFactory dataSourceFactory) {
-        this.dataSourceFactory = dataSourceFactory;
+            final DataSourceFactory datasourceFactory) {
+        this.datasourceFactory = datasourceFactory;
     }
 
     public void setConfFile(
@@ -316,8 +316,8 @@ public class OcspServer {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
-        if (dataSourceFactory == null) {
-            throw new IllegalStateException("dataSourceFactory is not set");
+        if (datasourceFactory == null) {
+            throw new IllegalStateException("datasourceFactory is not set");
         }
         if (securityFactory == null) {
             throw new IllegalStateException("securityFactory is not set");
@@ -481,7 +481,7 @@ public class OcspServer {
                 InputStream dsStream = null;
                 try {
                     dsStream = getInputStream(m.getConf());
-                    datasource = dataSourceFactory.createDataSource(name,
+                    datasource = datasourceFactory.createDataSource(name,
                                     dsStream, securityFactory.getPasswordResolver());
                 } catch (IOException ex) {
                     throw new InvalidConfException(ex.getMessage(), ex);
@@ -889,13 +889,13 @@ public class OcspServer {
                     CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
                     ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
                             revInfo.getRevocationTime());
-                    org.bouncycastle.asn1.x509.CRLReason localReason = null;
+                    org.bouncycastle.asn1.x509.CRLReason tmpReason = null;
                     if (responseOption.isIncludeRevReason()) {
-                        localReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
+                        tmpReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
                                 revInfo.getReason().getCode());
                     }
-                    RevokedInfo localRevInfo = new RevokedInfo(revTime, localReason);
-                    bcCertStatus = new RevokedStatus(localRevInfo);
+                    RevokedInfo tmpRevInfo = new RevokedInfo(revTime, tmpReason);
+                    bcCertStatus = new RevokedStatus(tmpRevInfo);
 
                     Date invalidityDate = revInfo.getInvalidityTime();
                     if (responseOption.isIncludeInvalidityDate()

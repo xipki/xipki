@@ -83,7 +83,7 @@ public class ImportOcspCmd extends DbPortCommandSupport {
     @Override
     protected DbPortWorker getDbPortWorker()
     throws Exception {
-        return new OcspDbImportWorker(dataSourceFactory, passwordResolver, dbconfFile, resume,
+        return new OcspDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume,
                 indir, numCertsPerCommit.intValue(), testOnly);
     }
 

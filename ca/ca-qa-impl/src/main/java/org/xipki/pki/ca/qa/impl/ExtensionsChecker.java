@@ -1012,21 +1012,21 @@ public class ExtensionsChecker {
         }
 
         if (bc.isCA()) {
-            BigInteger localPathLen = bc.getPathLenConstraint();
+            BigInteger tmpPathLen = bc.getPathLenConstraint();
             if (pathLen == null) {
-                if (localPathLen != null) {
-                    failureMsg.append("pathLen is '").append(localPathLen);
+                if (tmpPathLen != null) {
+                    failureMsg.append("pathLen is '").append(tmpPathLen);
                     failureMsg.append("' but expected 'absent'");
                     failureMsg.append("; ");
                 }
             } else {
-                if (localPathLen == null) {
+                if (tmpPathLen == null) {
                     failureMsg.append("pathLen is 'null' but expected '")
                         .append(pathLen)
                         .append("'");
                     failureMsg.append("; ");
-                } else if (!BigInteger.valueOf(pathLen).equals(localPathLen)) {
-                    failureMsg.append("pathLen is '").append(localPathLen);
+                } else if (!BigInteger.valueOf(pathLen).equals(tmpPathLen)) {
+                    failureMsg.append("pathLen is '").append(tmpPathLen);
                     failureMsg.append("' but expected '").append(pathLen).append("'");
                     failureMsg.append("; ");
                 }
@@ -2131,10 +2131,10 @@ public class ExtensionsChecker {
         }
 
         List<String> eProfessionOids = conf.getProfessionOids();
-        ASN1ObjectIdentifier[] localIProfessionOids = iProfessionInfo.getProfessionOIDs();
+        ASN1ObjectIdentifier[] tmpIProfessionOids = iProfessionInfo.getProfessionOIDs();
         List<String> iProfessionOids = new LinkedList<>();
-        if (localIProfessionOids != null) {
-            for (ASN1ObjectIdentifier entry : localIProfessionOids) {
+        if (tmpIProfessionOids != null) {
+            for (ASN1ObjectIdentifier entry : tmpIProfessionOids) {
                 iProfessionOids.add(entry.getId());
             }
         }

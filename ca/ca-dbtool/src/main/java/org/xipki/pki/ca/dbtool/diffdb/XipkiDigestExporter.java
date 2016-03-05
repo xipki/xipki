@@ -119,7 +119,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         }
 
         CaEntryContainer caEntryContainer = new CaEntryContainer(caEntries);
-        XipkiDigestExportReader certsReader = new XipkiDigestExportReader(dataSource, dbControl,
+        XipkiDigestExportReader certsReader = new XipkiDigestExportReader(datasource, dbControl,
                 numThreads);
 
         Exception exception = null;

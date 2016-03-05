@@ -87,7 +87,7 @@ public class ExportCaCmd extends DbPortCommandSupport {
     @Override
     protected DbPortWorker getDbPortWorker()
     throws Exception {
-        return new CaDbExportWorker(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume,
+        return new CaDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir, resume,
                 numCertsInBundle, numCertsPerCommit, onlyTest);
     }
 

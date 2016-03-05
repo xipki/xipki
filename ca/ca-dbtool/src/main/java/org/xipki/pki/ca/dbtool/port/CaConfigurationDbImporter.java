@@ -95,13 +95,13 @@ class CaConfigurationDbImporter extends DbPorter {
     private final Unmarshaller unmarshaller;
 
     CaConfigurationDbImporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Unmarshaller unmarshaller,
             final String srcDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
+        super(datasource, srcDir, stopMe, evaluateOnly);
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     }
 

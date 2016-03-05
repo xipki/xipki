@@ -121,15 +121,15 @@ public class SignerConfUtil {
             final String signerConf,
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        String localSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+        String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
         if (ignoreSensitiveInfo) {
-            localSignerConf = eraseSensitiveData(localSignerConf);
+            tmpSignerConf = eraseSensitiveData(tmpSignerConf);
         }
 
-        if (verbose || localSignerConf.length() < 101) {
-            return localSignerConf;
+        if (verbose || tmpSignerConf.length() < 101) {
+            return tmpSignerConf;
         } else {
-            return new StringBuilder().append(localSignerConf.substring(0, 97))
+            return new StringBuilder().append(tmpSignerConf.substring(0, 97))
                     .append("...").toString();
         }
     }

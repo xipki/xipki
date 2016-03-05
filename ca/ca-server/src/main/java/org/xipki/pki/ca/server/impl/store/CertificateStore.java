@@ -75,10 +75,10 @@ public class CertificateStore {
     private final CertStoreQueryExecutor queryExecutor;
 
     public CertificateStore(
-            final DataSourceWrapper dataSource)
+            final DataSourceWrapper datasource)
     throws DataAccessException {
-        ParamUtil.requireNonNull("dataSource", dataSource);
-        this.queryExecutor = new CertStoreQueryExecutor(dataSource);
+        ParamUtil.requireNonNull("datasource", datasource);
+        this.queryExecutor = new CertStoreQueryExecutor(datasource);
     }
 
     public boolean addCertificate(

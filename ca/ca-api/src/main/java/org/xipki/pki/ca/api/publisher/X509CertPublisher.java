@@ -58,7 +58,7 @@ public abstract class X509CertPublisher {
     public abstract void initialize(
             String conf,
             PasswordResolver passwordResolver,
-            Map<String, DataSourceWrapper> dataSources)
+            Map<String, DataSourceWrapper> datasources)
     throws CertPublisherException;
 
     public void shutdown() {

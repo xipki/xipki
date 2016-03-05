@@ -83,7 +83,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        List<Long> localSerialNumbers = new LinkedList<>();
+        List<Long> tmpSerialNumbers = new LinkedList<>();
 
         try {
             List<String> tokens = split(this.serialNumbers, ",");
@@ -91,7 +91,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                 List<String> subtokens = split(token.trim(), "- ");
                 int countTokens = subtokens.size();
                 if (countTokens == 1) {
-                    localSerialNumbers.add(Long.parseLong(subtokens.get(0)));
+                    tmpSerialNumbers.add(Long.parseLong(subtokens.get(0)));
                 } else if (countTokens == 2) {
                     int startSerial = Integer.parseInt(subtokens.get(0).trim());
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
@@ -100,7 +100,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                                 "invalid serial number " + this.serialNumbers);
                     }
                     for (long i = startSerial; i <= endSerial; i++) {
-                        localSerialNumbers.add(i);
+                        tmpSerialNumbers.add(i);
                     }
                 } else {
                     throw new IllegalCmdParamException(
@@ -132,7 +132,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         RequestOptions options = getRequestOptions();
 
-        OcspLoadTest loadTest = new OcspLoadTest(requestor, localSerialNumbers,
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, tmpSerialNumbers,
                 issuerCert, serverUrl, options, description.toString());
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

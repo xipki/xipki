@@ -760,17 +760,17 @@ public class X509Ca {
         boolean successful = false;
 
         try {
-            ConcurrentContentSigner localCrlSigner = crlSigner.getSigner();
+            ConcurrentContentSigner tmpCrlSigner = crlSigner.getSigner();
 
             CrlControl control = crlSigner.getCrlControl();
 
-            boolean directCrl = (localCrlSigner == null);
+            boolean directCrl = (tmpCrlSigner == null);
             X500Name crlIssuer;
             if (directCrl) {
                 crlIssuer = caInfo.getPublicCaInfo().getX500Subject();
             } else {
                 crlIssuer = X500Name.getInstance(
-                        localCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
+                        tmpCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
             }
 
             X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
@@ -993,9 +993,9 @@ public class X509Ca {
                 }
             }
 
-            ConcurrentContentSigner concurrentSigner = (localCrlSigner == null)
+            ConcurrentContentSigner concurrentSigner = (tmpCrlSigner == null)
                     ? caInfo.getSigner(null)
-                    : localCrlSigner;
+                    : tmpCrlSigner;
 
             X509CRLHolder crlHolder;
             try {
@@ -1458,18 +1458,18 @@ public class X509Ca {
                     "insufficient permission to revoke CA certificate");
         }
 
-        CrlReason localReason = reason;
-        if (localReason == null) {
-            localReason = CrlReason.UNSPECIFIED;
+        CrlReason tmpReason = reason;
+        if (tmpReason == null) {
+            tmpReason = CrlReason.UNSPECIFIED;
         }
 
-        switch (localReason) {
+        switch (tmpReason) {
         case CA_COMPROMISE:
         case AA_COMPROMISE:
         case REMOVE_FROM_CRL:
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "Insufficient permission revoke certificate with reason "
-                    + localReason.getDescription());
+                    + tmpReason.getDescription());
         case UNSPECIFIED:
         case KEY_COMPROMISE:
         case AFFILIATION_CHANGED:
@@ -1479,7 +1479,7 @@ public class X509Ca {
         case PRIVILEGE_WITHDRAWN:
             break;
         default:
-            throw new RuntimeException("unknown CRL reason " + localReason);
+            throw new RuntimeException("unknown CRL reason " + tmpReason);
         } // switch (reason)
 
         return doRevokeCertificate(serialNumber, reason, invalidityTime, false);

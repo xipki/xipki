@@ -105,16 +105,16 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
         }
 
         if (signerConf != null) {
-            String localSignerType = signerType;
-            if (localSignerType == null) {
+            String tmpSignerType = signerType;
+            if (tmpSignerType == null) {
                 X509CrlSignerEntry entry = caManager.getCrlSigner(name);
                 if (entry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
-                localSignerType = entry.getType();
+                tmpSignerType = entry.getType();
             }
 
-            signerConf = ShellUtil.canonicalizeSignerConf(localSignerType, signerConf,
+            signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,
                     passwordResolver, securityFactory);
         }
 

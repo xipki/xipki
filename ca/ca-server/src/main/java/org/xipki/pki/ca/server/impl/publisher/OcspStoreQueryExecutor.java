@@ -92,7 +92,7 @@ class OcspStoreQueryExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final IssuerStore issuerStore;
 
@@ -104,14 +104,14 @@ class OcspStoreQueryExecutor {
     private final int maxX500nameLen;
 
     OcspStoreQueryExecutor(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final boolean publishGoodCerts)
     throws DataAccessException, NoSuchAlgorithmException {
-        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
 
-        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
+        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String s = dbSchemaInfo.getVariableValue("VERSION");
         this.dbSchemaVersion = Integer.parseInt(s);
         s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
@@ -139,9 +139,9 @@ class OcspStoreQueryExecutor {
 
             return new IssuerStore(caInfos);
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method initIssuerStore
 
@@ -284,19 +284,19 @@ class OcspStoreQueryExecutor {
                 } catch (Throwable th) {
                     conn.rollback();
                     // more secure
-                    dataSource.deleteFromTable(null, "CRAW", "CID", certId);
-                    dataSource.deleteFromTable(null, "CHASH", "CID", certId);
-                    dataSource.deleteFromTable(null, "CERT", "ID", certId);
+                    datasource.deleteFromTable(null, "CRAW", "CID", certId);
+                    datasource.deleteFromTable(null, "CHASH", "CID", certId);
+                    datasource.deleteFromTable(null, "CERT", "ID", certId);
 
                     if (th instanceof SQLException) {
                         SQLException ex = (SQLException) th;
-                        DataAccessException tEx = dataSource.translate(sql, ex);
+                        DataAccessException tEx = datasource.translate(sql, ex);
                         if (tEx instanceof DuplicateKeyException && i < tries - 1) {
                             continue;
                         }
                         LOG.error(
                             "datasource {} SQLException while adding certificate with id {}: {}",
-                            dataSource.getDatasourceName(), certId, th.getMessage());
+                            datasource.getDatasourceName(), certId, th.getMessage());
                         throw ex;
                     } else {
                         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
@@ -309,7 +309,7 @@ class OcspStoreQueryExecutor {
                 break;
             } // end for
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         } finally {
             for (PreparedStatement ps : pss) {
                 try {
@@ -319,7 +319,7 @@ class OcspStoreQueryExecutor {
                 }
 
             }
-            dataSource.returnConnection(conn);
+            datasource.returnConnection(conn);
         }
     } // method addOrUpdateCert
 
@@ -361,9 +361,9 @@ class OcspStoreQueryExecutor {
             ps.setLong(idx++, serialNumber.longValue());
             ps.executeUpdate();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     }
 
@@ -411,9 +411,9 @@ class OcspStoreQueryExecutor {
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
             } catch (SQLException ex) {
-                throw dataSource.translate(sql, ex);
+                throw datasource.translate(sql, ex);
             } finally {
-                dataSource.releaseResources(ps, null);
+                datasource.releaseResources(ps, null);
             }
         } else {
             final String sql = "DELETE FROM CERT WHERE IID=? AND SN=?";
@@ -425,9 +425,9 @@ class OcspStoreQueryExecutor {
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
             } catch (SQLException ex) {
-                throw dataSource.translate(sql, ex);
+                throw datasource.translate(sql, ex);
             } finally {
-                dataSource.releaseResources(ps, null);
+                datasource.releaseResources(ps, null);
             }
         }
 
@@ -454,9 +454,9 @@ class OcspStoreQueryExecutor {
             ps.setLong(idx++, cert.getCert().getSerialNumber().longValue());
             ps.executeUpdate();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeCert
 
@@ -486,9 +486,9 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method revokeCa
 
@@ -508,9 +508,9 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method unrevokeCa
 
@@ -544,7 +544,7 @@ class OcspStoreQueryExecutor {
         }
         byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-        long maxId = dataSource.getMax(null, "ISSUER", "ID");
+        long maxId = datasource.getMax(null, "ISSUER", "ID");
         int id = (int) maxId + 1;
 
         byte[] encodedCert = issuerCert.getEncodedCert();
@@ -593,9 +593,9 @@ class OcspStoreQueryExecutor {
             IssuerEntry newInfo = new IssuerEntry(id, subject, sha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addIssuer
 
@@ -609,9 +609,9 @@ class OcspStoreQueryExecutor {
             final String sqlQuery)
     throws DataAccessException {
         PreparedStatement ps = null;
-        Connection c = dataSource.getConnection();
+        Connection c = datasource.getConnection();
         if (c != null) {
-            ps = dataSource.prepareStatement(c, sqlQuery);
+            ps = datasource.prepareStatement(c, sqlQuery);
         }
         if (ps == null) {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);
@@ -624,11 +624,11 @@ class OcspStoreQueryExecutor {
     throws DataAccessException {
         PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
 
-        Connection c = dataSource.getConnection();
+        Connection c = datasource.getConnection();
         if (c != null) {
             final int n = sqlQueries.length;
             for (int i = 0; i < n; i++) {
-                pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
+                pss[i] = datasource.prepareStatement(c, sqlQueries[i]);
                 if (pss[i] != null) {
                     continue;
                 }
@@ -659,7 +659,7 @@ class OcspStoreQueryExecutor {
             final int issuerId,
             final BigInteger serialNumber)
     throws DataAccessException {
-        final String sql = dataSource.createFetchFirstSelectSQL(
+        final String sql = datasource.createFetchFirstSelectSQL(
                 "ID FROM CERT WHERE IID=? AND SN=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -672,9 +672,9 @@ class OcspStoreQueryExecutor {
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method certRegistered
 
@@ -688,7 +688,7 @@ class OcspStoreQueryExecutor {
             try {
                 rs = ps.executeQuery();
             } finally {
-                dataSource.releaseResources(ps, rs);
+                datasource.releaseResources(ps, rs);
             }
             return true;
         } catch (Exception ex) {
@@ -704,16 +704,16 @@ class OcspStoreQueryExecutor {
 
     private int nextCertId()
     throws DataAccessException {
-        Connection conn = dataSource.getConnection();
+        Connection conn = datasource.getConnection();
         try {
             while (true) {
-                int certId = (int) dataSource.nextSeqValue(conn, "CID");
-                if (!dataSource.columnExists(conn, "CERT", "ID", certId)) {
+                int certId = (int) datasource.nextSeqValue(conn, "CID");
+                if (!datasource.columnExists(conn, "CERT", "ID", certId)) {
                     return certId;
                 }
             }
         } finally {
-            dataSource.returnConnection(conn);
+            datasource.returnConnection(conn);
         }
     } // method nextCertId
 

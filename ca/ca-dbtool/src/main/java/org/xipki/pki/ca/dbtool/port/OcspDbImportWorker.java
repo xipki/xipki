@@ -65,7 +65,7 @@ public class OcspDbImportWorker extends DbPortWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final Unmarshaller unmarshaller;
 
@@ -78,7 +78,7 @@ public class OcspDbImportWorker extends DbPortWorker {
     private final boolean evaluateOnly;
 
     public OcspDbImportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final boolean resume,
@@ -86,11 +86,11 @@ public class OcspDbImportWorker extends DbPortWorker {
             final int batchEntriesPerCommit,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
@@ -107,15 +107,15 @@ public class OcspDbImportWorker extends DbPortWorker {
         // CertStore
         try {
             OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
+                    datasource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
                     evaluateOnly);
             certStoreImporter.importToDb();
             certStoreImporter.shutdown();
         } finally {
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

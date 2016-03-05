@@ -78,20 +78,20 @@ class ResponseOption {
             this.cacheMaxAge = null;
         }
 
-        HashAlgoType localCertHashAlgo = null;
+        HashAlgoType tmpCertHashAlgo = null;
         String s = conf.getCerthashAlgorithm();
         if (s != null) {
             String token = s.trim();
             if (StringUtil.isNotBlank(token)) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
                 if (algo != null && RequestOption.SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
-                    localCertHashAlgo = algo;
+                    tmpCertHashAlgo = algo;
                 } else {
                     throw new InvalidConfException("hash algorithm " + token + " is unsupported");
                 }
             }
         }
-        this.certHashAlgo = localCertHashAlgo;
+        this.certHashAlgo = tmpCertHashAlgo;
     }
 
     public boolean isIncludeInvalidityDate() {

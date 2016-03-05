@@ -185,10 +185,10 @@ public class CaEmulator {
         ParamUtil.requireNonNull("notBefore", notBefore);
 
         Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
-        BigInteger localSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
+        BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
                 caSubject,
-                localSerialNumber,
+                tmpSerialNumber,
                 notBefore,
                 notAfter,
                 subjectDn,
@@ -207,7 +207,7 @@ public class CaEmulator {
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
 
-        serialCertMap.put(localSerialNumber, asn1Cert);
+        serialCertMap.put(tmpSerialNumber, asn1Cert);
         reqSubjectCertMap.put(subjectDn, asn1Cert);
         return asn1Cert;
     }
@@ -257,8 +257,8 @@ public class CaEmulator {
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
-        X509CRLHolder localCrl = crlBuilder.build(contentSigner);
-        crl = localCrl.toASN1Structure();
+        X509CRLHolder tmpCrl = crlBuilder.build(contentSigner);
+        crl = tmpCrl.toASN1Structure();
         return crl;
     }
 

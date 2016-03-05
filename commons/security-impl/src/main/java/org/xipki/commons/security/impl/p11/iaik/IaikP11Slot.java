@@ -707,10 +707,10 @@ public class IaikP11Slot implements P11WritableSlot {
             final PrivateKey privateKey) {
         Boolean b = privateKey.getSign().getBooleanValue();
         byte[] id = privateKey.getId().getByteArrayValue();
-        char[] localLabel = privateKey.getLabel().getCharArrayValue();
-        String label = (localLabel == null)
+        char[] tmpLabel = privateKey.getLabel().getCharArrayValue();
+        String label = (tmpLabel == null)
                 ? null
-                : new String(localLabel);
+                : new String(tmpLabel);
 
         if (b == null || !b.booleanValue()) {
             LOG.warn("key {} is not for signing", new P11KeyIdentifier(id, label));
@@ -732,10 +732,10 @@ public class IaikP11Slot implements P11WritableSlot {
             final Boolean forDecrypting,
             final P11KeyIdentifier keyIdentifier)
     throws SignerException {
-        String localKeyLabel = keyIdentifier.getKeyLabel();
-        char[] keyLabel = (localKeyLabel == null)
+        String tmpKeyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabel = (tmpKeyLabel == null)
                 ? null
-                : localKeyLabel.toCharArray();
+                : tmpKeyLabel.toCharArray();
         byte[] keyId = keyIdentifier.getKeyId();
 
         Session session = borrowIdleSession();
@@ -1468,9 +1468,9 @@ public class IaikP11Slot implements P11WritableSlot {
             final String label)
     throws Exception {
 
-        BigInteger localPublicExponent = publicExponent;
-        if (localPublicExponent == null) {
-            localPublicExponent = BigInteger.valueOf(65537);
+        BigInteger tmpPublicExponent = publicExponent;
+        if (tmpPublicExponent == null) {
+            tmpPublicExponent = BigInteger.valueOf(65537);
         }
 
         RSAPrivateKey privateKey = new RSAPrivateKey();
@@ -1479,7 +1479,7 @@ public class IaikP11Slot implements P11WritableSlot {
         setKeyAttributes(id, label, PKCS11Constants.CKK_RSA, privateKey, publicKey);
 
         publicKey.getModulusBits().setLongValue((long) keySize);
-        publicKey.getPublicExponent().setByteArrayValue(localPublicExponent.toByteArray());
+        publicKey.getPublicExponent().setByteArrayValue(tmpPublicExponent.toByteArray());
 
         session.generateKeyPair(
                 Mechanism.get(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN), publicKey, privateKey);
@@ -1665,9 +1665,9 @@ public class IaikP11Slot implements P11WritableSlot {
             throw new IllegalArgumentException("label must not be null or empty");
         }
 
-        byte[] localEncodedCert = encodedCert;
-        if (localEncodedCert == null) {
-            localEncodedCert = cert.getEncoded();
+        byte[] tmpEncodedCert = encodedCert;
+        if (tmpEncodedCert == null) {
+            tmpEncodedCert = cert.getEncoded();
         }
 
         X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
@@ -1683,7 +1683,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 cert.getIssuerX500Principal().getEncoded());
         newCertTemp.getSerialNumber().setByteArrayValue(
                 cert.getSerialNumber().toByteArray());
-        newCertTemp.getValue().setByteArrayValue(localEncodedCert);
+        newCertTemp.getValue().setByteArrayValue(tmpEncodedCert);
         return newCertTemp;
     }
 

@@ -261,15 +261,15 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         key = CaExportCmd.KEY_PERMISSIONS;
         s = getStrProp(props, key, true);
         Set<String> permissions = StringUtil.splitAsSet(s, ", ");
-        Set<Permission> localPermissions = new HashSet<>();
+        Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission localPermission = Permission.getPermission(permission);
-            if (localPermission == null) {
+            Permission tmpPermission = Permission.getPermission(permission);
+            if (tmpPermission == null) {
                 throw new IllegalCmdParamException("invalid permission: " + permission);
             }
-            localPermissions.add(localPermission);
+            tmpPermissions.add(tmpPermission);
         }
-        entry.setPermissions(localPermissions);
+        entry.setPermissions(tmpPermissions);
 
         // REVOKED
         key = CaExportCmd.KEY_REVOKED;

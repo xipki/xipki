@@ -60,9 +60,9 @@ public enum DatabaseType {
     }
 
     public static DatabaseType getDataSourceForDataSource(
-            final String dataSourceClass) {
-        Objects.requireNonNull(dataSourceClass, "dataSourceClass must not be null");
-        return getDatabaseType(dataSourceClass);
+            final String datasourceClass) {
+        Objects.requireNonNull(datasourceClass, "datasourceClass must not be null");
+        return getDatabaseType(datasourceClass);
     }
 
     private static DatabaseType getDatabaseType(

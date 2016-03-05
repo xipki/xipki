@@ -106,7 +106,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         }
 
         // detect whether the table CertificateData has the column id
-        if (dataSource.tableHasColumn(connection, "CertificateData", "id")) {
+        if (datasource.tableHasColumn(connection, "CertificateData", "id")) {
             tblCertHasId = true;
             sql = null;
             certSql = null;
@@ -134,7 +134,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             tblCertHasId = false;
             String coreSql = "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
                     + "revocationDate FROM CertificateData WHERE fingerprint > ?";
-            sql = dataSource.createFetchFirstSelectSql(coreSql, numCertsPerSelect,
+            sql = datasource.createFetchFirstSelectSql(coreSql, numCertsPerSelect,
                     "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
 
@@ -168,7 +168,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         Exception exception = null;
         try {
             if (tblCertHasId) {
-                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(dataSource,
+                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(datasource,
                         cas, numThreads);
                 doDigestWithTableId(certsReader, processLog, caEntryContainer, cas);
             } else {
@@ -256,7 +256,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
         processLog.printHeader();
 
-        String localSql = null;
+        String tmpSql = null;
         int id = 0;
 
         try {
@@ -349,7 +349,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 throw new InterruptedException("interrupted by the user");
             }
         } catch (SQLException ex) {
-            throw translate(localSql, ex);
+            throw translate(tmpSql, ex);
         } finally {
             releaseResources(ps, null);
             releaseResources(rawCertPs, null);

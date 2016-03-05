@@ -68,7 +68,7 @@ public class OcspDbExportWorker extends DbPortWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final Marshaller marshaller;
 
@@ -85,7 +85,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     private final boolean evaluateOnly;
 
     public OcspDbExportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
@@ -94,12 +94,12 @@ public class OcspDbExportWorker extends DbPortWorker {
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         marshaller = jaxbContext.createMarshaller();
@@ -143,15 +143,15 @@ public class OcspDbExportWorker extends DbPortWorker {
         try {
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder,
+                    datasource, marshaller, unmarshaller, destFolder,
                     numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally {
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

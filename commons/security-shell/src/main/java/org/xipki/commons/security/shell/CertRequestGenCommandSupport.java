@@ -290,29 +290,29 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         // biometricInfo
         if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
-            TypeOfBiometricData localBiometricType;
+            TypeOfBiometricData tmpBiometricType;
             if (StringUtil.isNumber(biometricType)) {
-                localBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
+                tmpBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
             } else {
-                localBiometricType = new TypeOfBiometricData(
+                tmpBiometricType = new TypeOfBiometricData(
                         new ASN1ObjectIdentifier(biometricType));
             }
 
-            ASN1ObjectIdentifier localBiometricHashAlgo
+            ASN1ObjectIdentifier tmpBiometricHashAlgo
                     = AlgorithmUtil.getHashAlg(biometricHashAlgo);
             byte[] biometricBytes = IoUtil.read(biometricFile);
-            MessageDigest md = MessageDigest.getInstance(localBiometricHashAlgo.getId());
+            MessageDigest md = MessageDigest.getInstance(tmpBiometricHashAlgo.getId());
             md.reset();
-            byte[] localBiometricDataHash = md.digest(biometricBytes);
+            byte[] tmpBiometricDataHash = md.digest(biometricBytes);
 
-            DERIA5String localSourceDataUri = null;
+            DERIA5String tmpSourceDataUri = null;
             if (biometricUri != null) {
-                localSourceDataUri = new DERIA5String(biometricUri);
+                tmpSourceDataUri = new DERIA5String(biometricUri);
             }
-            BiometricData biometricData = new BiometricData(localBiometricType,
-                    new AlgorithmIdentifier(localBiometricHashAlgo),
-                    new DEROctetString(localBiometricDataHash),
-                    localSourceDataUri);
+            BiometricData biometricData = new BiometricData(tmpBiometricType,
+                    new AlgorithmIdentifier(tmpBiometricHashAlgo),
+                    new DEROctetString(tmpBiometricDataHash),
+                    tmpSourceDataUri);
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(biometricData);

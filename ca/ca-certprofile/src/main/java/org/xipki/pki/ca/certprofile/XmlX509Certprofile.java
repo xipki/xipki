@@ -1177,19 +1177,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // PrivateKeyUsagePeriod
         type = Extension.privateKeyUsagePeriod;
         if (occurences.remove(type) != null) {
-            Date localNotAfter;
+            Date tmpNotAfter;
             if (privateKeyUsagePeriod == null) {
-                localNotAfter = notAfter;
+                tmpNotAfter = notAfter;
             } else {
-                localNotAfter = privateKeyUsagePeriod.add(notBefore);
-                if (localNotAfter.after(notAfter)) {
-                    localNotAfter = notAfter;
+                tmpNotAfter = privateKeyUsagePeriod.add(notBefore);
+                if (tmpNotAfter.after(notAfter)) {
+                    tmpNotAfter = notAfter;
                 }
             }
 
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
-            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(localNotAfter)));
+            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(tmpNotAfter)));
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     new DERSequence(v));
             values.addExtension(type, extValue);
@@ -1462,28 +1462,28 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return null;
         }
 
-        DirectoryString[] localProfessionItems = null;
+        DirectoryString[] tmpProfessionItems = null;
         if (CollectionUtil.isNonEmpty(professionItems)) {
             int n = professionItems.size();
-            localProfessionItems = new DirectoryString[n];
+            tmpProfessionItems = new DirectoryString[n];
             for (int i = 0; i < n; i++) {
-                localProfessionItems[i] = new DirectoryString(professionItems.get(i));
+                tmpProfessionItems[i] = new DirectoryString(professionItems.get(i));
             }
         }
 
-        ASN1ObjectIdentifier[] localProfessionOIDs = null;
+        ASN1ObjectIdentifier[] tmpProfessionOIDs = null;
         if (CollectionUtil.isNonEmpty(professionOIDs)) {
-            localProfessionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
+            tmpProfessionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
         }
 
-        ASN1OctetString localAddProfessionInfo = null;
+        ASN1OctetString tmpAddProfessionInfo = null;
         if (addProfessionInfo != null && addProfessionInfo.length > 0) {
-            localAddProfessionInfo = new DEROctetString(addProfessionInfo);
+            tmpAddProfessionInfo = new DEROctetString(addProfessionInfo);
         }
 
         ProfessionInfo professionInfo = new ProfessionInfo(
-                null, localProfessionItems, localProfessionOIDs, registrationNumber,
-                localAddProfessionInfo);
+                null, tmpProfessionItems, tmpProfessionOIDs, registrationNumber,
+                tmpAddProfessionInfo);
 
         Admissions admissions = new Admissions(null, null,
                 new ProfessionInfo[]{professionInfo});

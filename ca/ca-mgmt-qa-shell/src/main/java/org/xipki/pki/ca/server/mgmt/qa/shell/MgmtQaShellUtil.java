@@ -57,20 +57,20 @@ public class MgmtQaShellUtil {
             final String is)
     throws CmdFailure {
 
-        String localEx = ex;
-        if (CaManager.NULL.equals(localEx)) {
-            localEx = null;
+        String tmpEx = ex;
+        if (CaManager.NULL.equals(tmpEx)) {
+            tmpEx = null;
         }
 
         boolean b;
-        if (localEx == null) {
+        if (tmpEx == null) {
             b = (is == null);
         } else {
-            b = localEx.equals(is);
+            b = tmpEx.equals(is);
         }
 
         if (!b) {
-            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + localEx + "'");
+            throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
         }
     }
 

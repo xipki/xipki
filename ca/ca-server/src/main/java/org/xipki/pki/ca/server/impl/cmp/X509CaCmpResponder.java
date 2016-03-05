@@ -266,10 +266,10 @@ public class X509CaCmpResponder extends CmpResponder {
                     "unknown requestor type " + requestor.getClass().getName());
         }
 
-        CmpRequestorInfo localRequestor = (CmpRequestorInfo) requestor;
-        if (localRequestor != null && auditEvent != null) {
+        CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
+        if (tmpRequestor != null && auditEvent != null) {
             auditEvent.addEventData(new AuditEventData("requestor",
-                    localRequestor.getCert().getSubject()));
+                    tmpRequestor.getCert().getSubject()));
         }
 
         PKIHeader reqHeader = message.getHeader();
@@ -292,7 +292,7 @@ public class X509CaCmpResponder extends CmpResponder {
             case PKIBody.TYPE_P10_CERT_REQ:
             case PKIBody.TYPE_CROSS_CERT_REQ:
                 respBody = cmpEnrollCert(respHeader, cmpControl, reqHeader, reqBody,
-                        localRequestor, user, tid, auditEvent);
+                        tmpRequestor, user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CERT_CONFIRM:
                 addAutitEventType(auditEvent, "CERT_CONFIRM");
@@ -302,7 +302,7 @@ public class X509CaCmpResponder extends CmpResponder {
             case PKIBody.TYPE_REVOCATION_REQ:
                 respBody = cmpRevokeOrUnrevokeOrRemoveCertificates(respHeader, cmpControl,
                         reqHeader, reqBody,
-                        localRequestor, user, tid, auditEvent);
+                        tmpRequestor, user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CONFIRM:
                 addAutitEventType(auditEvent, "CONFIRM");
@@ -314,7 +314,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
                 break;
             case PKIBody.TYPE_GEN_MSG:
-                respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, localRequestor,
+                respBody = cmpGeneralMsg(respHeader, cmpControl, reqHeader, reqBody, tmpRequestor,
                         user, tid, auditEvent);
                 break;
             default:
@@ -422,7 +422,7 @@ public class X509CaCmpResponder extends CmpResponder {
             final boolean sendCaCert,
             final AuditEvent auditEvent)
     throws InsuffientPermissionException {
-        CmpRequestorInfo localRequestor = (CmpRequestorInfo) requestor;
+        CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
 
         CertReqMsg[] certReqMsgs = kur.toCertReqMsgArray();
         CertResponse[] certResponses = new CertResponse[certReqMsgs.length];
@@ -453,7 +453,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 continue;
             }
 
-            if (!verifyPopo(req, localRequestor.isRa())) {
+            if (!verifyPopo(req, tmpRequestor.isRa())) {
                 LOG.warn("could not validate POP for requst {}", certReqId.getValue());
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses[i] = new CertResponse(certReqId, status);
@@ -484,7 +484,7 @@ public class X509CaCmpResponder extends CmpResponder {
                             new AuditEventData("certprofile", certprofileName));
                 }
 
-                checkPermission(localRequestor, certprofileName);
+                checkPermission(tmpRequestor, certprofileName);
 
                 Date notBefore = null;
                 Date notAfter = null;
@@ -501,7 +501,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
                         notBefore, notAfter, extensions, certprofileName);
-                certResponses[i] = generateCertificate(certTemplateData, localRequestor, user, tid,
+                certResponses[i] = generateCertificate(certTemplateData, tmpRequestor, user, tid,
                         certReqId, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
                 final String message = "generateCertificate";
@@ -1456,13 +1456,13 @@ public class X509CaCmpResponder extends CmpResponder {
                 case XipkiCmpConstants.ACTION_GEN_CRL:
                     addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
                     checkPermission(requestor, Permission.GEN_CRL);
-                    X509CRL localCrl = ca.generateCrlOnDemand(auditEvent);
-                    if (localCrl == null) {
+                    X509CRL tmpCrl = ca.generateCrlOnDemand(auditEvent);
+                    if (tmpCrl == null) {
                         String statusMessage = "CRL generation is not activated";
                         return createErrorMsgPKIBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     } else {
-                        respValue = CertificateList.getInstance(localCrl.getEncoded());
+                        respValue = CertificateList.getInstance(tmpCrl.getEncoded());
                     }
                     break;
                 case XipkiCmpConstants.ACTION_GET_CRL_WITH_SN:

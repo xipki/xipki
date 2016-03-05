@@ -150,7 +150,7 @@ public class DbCertStatusStore extends CertStatusStore {
         }
     }
 
-    private DataSourceWrapper dataSource;
+    private DataSourceWrapper datasource;
 
     private final IssuerFilter issuerFilter;
 
@@ -379,7 +379,7 @@ public class DbCertStatusStore extends CertStatusStore {
             long invalidatityTime = 0;
 
             PreparedStatement ps = borrowPreparedStatement(
-                    dataSource.createFetchFirstSelectSQL(coreSql, 1));
+                    datasource.createFetchFirstSelectSQL(coreSql, 1));
 
             try {
                 int idx = 1;
@@ -410,7 +410,7 @@ public class DbCertStatusStore extends CertStatusStore {
                     }
                 } // end if (rs.next())
             } catch (SQLException ex) {
-                throw dataSource.translate(coreSql, ex);
+                throw datasource.translate(coreSql, ex);
             } finally {
                 releaseDbResources(ps, rs);
             }
@@ -481,9 +481,9 @@ public class DbCertStatusStore extends CertStatusStore {
             final String sqlQuery)
     throws DataAccessException {
         PreparedStatement ps = null;
-        Connection c = dataSource.getConnection();
+        Connection c = datasource.getConnection();
         if (c != null) {
-            ps = dataSource.prepareStatement(c, sqlQuery);
+            ps = datasource.prepareStatement(c, sqlQuery);
         }
         if (ps == null) {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);
@@ -518,7 +518,7 @@ public class DbCertStatusStore extends CertStatusStore {
     private void releaseDbResources(
             final Statement ps,
             final ResultSet rs) {
-        dataSource.releaseResources(ps, rs);
+        datasource.releaseResources(ps, rs);
     }
 
     @Override
@@ -526,7 +526,7 @@ public class DbCertStatusStore extends CertStatusStore {
             final String conf,
             final DataSourceWrapper datasource)
     throws CertStatusStoreException {
-        this.dataSource = ParamUtil.requireNonNull("datasource", datasource);
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         initIssuerStore();
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();

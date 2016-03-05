@@ -130,7 +130,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     private final int numCrlsPerCommit;
 
     CaCertStoreDbImporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Unmarshaller unmarshaller,
             final String srcDir,
             final int numCertsPerCommit,
@@ -138,7 +138,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws Exception {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
+        super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
@@ -517,7 +517,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         long maxId = getMax("DELTACRL_CACHE", "ID");
-        dataSource.dropAndCreateSequence("DCC_ID", maxId + 1);
+        datasource.dropAndCreateSequence("DCC_ID", maxId + 1);
 
         System.out.println(" imported table DELTACRL_CACHE");
     } // method importDeltaCRLCache
@@ -773,7 +773,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
 
         long maxId = getMax("CERT", "ID");
-        dataSource.dropAndCreateSequence("CID", maxId + 1);
+        datasource.dropAndCreateSequence("CID", maxId + 1);
 
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
@@ -978,18 +978,18 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException {
         long start = System.currentTimeMillis();
 
-        dataSource.dropIndex(null, "CERT", "IDX_FPK");
-        dataSource.dropIndex(null, "CERT", "IDX_FPS");
-        dataSource.dropIndex(null, "CERT", "IDX_FPRS");
+        datasource.dropIndex(null, "CERT", "IDX_FPK");
+        datasource.dropIndex(null, "CERT", "IDX_FPS");
+        datasource.dropIndex(null, "CERT", "IDX_FPRS");
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT");
-        dataSource.dropUniqueConstrain(null, "CONST_CA_SN", "CERT");
+        datasource.dropForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT");
+        datasource.dropUniqueConstrain(null, "CONST_CA_SN", "CERT");
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
-        dataSource.dropForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE");
+        datasource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
+        datasource.dropForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE");
 
-        dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
-        dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
+        datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
+        datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
@@ -999,22 +999,22 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException {
         long start = System.currentTimeMillis();
 
-        dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-        dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
+        datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
+        datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
 
-        dataSource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
+        datasource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
                 "CID", "CERT", "ID", "CASCADE", "NO ACTION");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW",
+        datasource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW",
                 "CID", "CERT", "ID", "CASCADE", "NO ACTION");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT",
+        datasource.addForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT",
                 "CA_ID", "CS_CA", "ID", "CASCADE", "NO ACTION");
-        dataSource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
+        datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
 
-        dataSource.createIndex(null, "IDX_FPK", "CERT", "FP_K");
-        dataSource.createIndex(null, "IDX_FPS", "CERT", "FP_S");
-        dataSource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
+        datasource.createIndex(null, "IDX_FPK", "CERT", "FP_K");
+        datasource.createIndex(null, "IDX_FPS", "CERT", "FP_S");
+        datasource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));

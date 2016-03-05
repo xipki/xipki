@@ -95,20 +95,20 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
             return;
         }
 
-        String localMasterPasswordCallback = masterPasswordCallback.trim();
-        if (StringUtil.isBlank(localMasterPasswordCallback)) {
+        String tmpMasterPasswordCallback = masterPasswordCallback.trim();
+        if (StringUtil.isBlank(tmpMasterPasswordCallback)) {
             return;
         }
 
         String className;
         String conf = null;
 
-        int delimIndex = localMasterPasswordCallback.indexOf(' ');
+        int delimIndex = tmpMasterPasswordCallback.indexOf(' ');
         if (delimIndex == -1) {
-            className = localMasterPasswordCallback;
+            className = tmpMasterPasswordCallback;
         } else {
-            className = localMasterPasswordCallback.substring(0, delimIndex);
-            conf = localMasterPasswordCallback.substring(delimIndex + 1);
+            className = tmpMasterPasswordCallback.substring(0, delimIndex);
+            conf = tmpMasterPasswordCallback.substring(delimIndex + 1);
         }
 
         try {
@@ -120,12 +120,12 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
             } else {
                 throw new IllegalArgumentException(
                         "invalid masterPasswordCallback configuration "
-                        + localMasterPasswordCallback);
+                        + tmpMasterPasswordCallback);
             }
 
         } catch (Exception ex) {
             throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-                    + localMasterPasswordCallback
+                    + tmpMasterPasswordCallback
                     + ", " + ex.getClass().getName() + ": " + ex.getMessage());
         }
     } // method setMasterPasswordCallback
