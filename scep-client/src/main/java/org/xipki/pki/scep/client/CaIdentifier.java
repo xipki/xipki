@@ -41,6 +41,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.transaction.TransactionException;
 import org.xipki.pki.scep.util.ScepUtil;
@@ -60,6 +61,7 @@ public class CaIdentifier {
             final String serverUrl,
             final String profile)
     throws MalformedURLException {
+        ParamUtil.requireNonBlank("serverUrl", serverUrl);
         URL localUrl = new URL(serverUrl);
         final String protocol = localUrl.getProtocol();
         if (!"http".equalsIgnoreCase(protocol)
@@ -94,6 +96,7 @@ public class CaIdentifier {
     public String buildGetUrl(
             final Operation operation,
             final String message) {
+        ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
         if (!ScepUtil.isBlank(message)) {
@@ -110,6 +113,7 @@ public class CaIdentifier {
 
     public String buildPostUrl(
             final Operation operation) {
+        ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
         return ub.toString();

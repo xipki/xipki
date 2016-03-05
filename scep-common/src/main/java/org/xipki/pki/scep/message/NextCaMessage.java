@@ -59,6 +59,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.util.ScepUtil;
@@ -105,6 +106,9 @@ public class NextCaMessage {
             final X509Certificate signerCert,
             final X509Certificate[] cmsCertSet)
     throws MessageEncodingException {
+        ParamUtil.requireNonNull("signingKey", signingKey);
+        ParamUtil.requireNonNull("signerCert", signerCert);
+
         try {
             byte[] degenratedSignedDataBytes;
             try {

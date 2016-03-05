@@ -128,9 +128,7 @@ public class PkiMessage {
     public PkiMessage(
             final TransactionId transactionId,
             final MessageType messageType) {
-        this.transactionId = ParamUtil.requireNonNull("transactionId", transactionId);
-        this.messageType = ParamUtil.requireNonNull("messageType", messageType);
-        this.senderNonce = Nonce.randomNonce();
+        this(transactionId, messageType, Nonce.randomNonce());
     }
 
     public PkiMessage(
@@ -287,6 +285,7 @@ public class PkiMessage {
             final X509Certificate recipientCert,
             final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
+        ParamUtil.requireNonNull("signerKey", signerKey);
         ContentSigner signer;
         try {
             signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
@@ -303,6 +302,11 @@ public class PkiMessage {
             final X509Certificate recipientCert,
             final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
+        ParamUtil.requireNonNull("signer", signer);
+        ParamUtil.requireNonNull("signerCert", signerCert);
+        ParamUtil.requireNonNull("recipientCert", recipientCert);
+        ParamUtil.requireNonNull("encAlgId", encAlgId);
+
         CMSTypedData content;
         if (messageData == null) {
             content = new CMSAbsentContent();
@@ -359,6 +363,9 @@ public class PkiMessage {
             final X509Certificate recipient,
             final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
+        ParamUtil.requireNonNull("recipient", recipient);
+        ParamUtil.requireNonNull("encAlgId", encAlgId);
+
         byte[] messageDataBytes;
         try {
             messageDataBytes = messageData.toASN1Primitive().getEncoded();

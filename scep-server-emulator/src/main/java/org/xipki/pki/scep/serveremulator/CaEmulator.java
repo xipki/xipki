@@ -180,8 +180,11 @@ public class CaEmulator {
             final X500Name subjectDn,
             final Date notBefore)
     throws Exception {
-        Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
+        ParamUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
+        ParamUtil.requireNonNull("notBefore", notBefore);
 
+        Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
         BigInteger localSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
                 caSubject,
@@ -222,6 +225,8 @@ public class CaEmulator {
     public Certificate pollCert(
             final X500Name issuer,
             final X500Name subject) {
+        ParamUtil.requireNonNull("issuer", issuer);
+        ParamUtil.requireNonNull("subject", subject);
         if (!caSubject.equals(issuer)) {
             return null;
         }
@@ -259,6 +264,7 @@ public class CaEmulator {
 
     private boolean verifyPopo(
             final CertificationRequest p10Request) {
+        ParamUtil.requireNonNull("p10Request", p10Request);
         try {
             PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
             SubjectPublicKeyInfo pkInfo = p10Req.getSubjectPublicKeyInfo();
