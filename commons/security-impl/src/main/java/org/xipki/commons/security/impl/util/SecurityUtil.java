@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.impl.util;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,6 +51,7 @@ public class SecurityUtil {
     public static byte[] leftmost(
             final byte[] bytes,
             final int bitCount) {
+        ParamUtil.requireNonNull("bytes", bytes);
         int byteLenKey = (bitCount + 7) / 8;
 
         if (bitCount >= (bytes.length << 3)) {

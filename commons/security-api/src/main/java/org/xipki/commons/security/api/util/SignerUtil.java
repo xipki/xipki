@@ -59,6 +59,7 @@ import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -76,12 +77,14 @@ public class SignerUtil {
 
     public static RSAKeyParameters generateRSAPublicKeyParameter(
             final RSAPublicKey key) {
+        ParamUtil.requireNonNull("key", key);
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
     public static RSAKeyParameters generateRSAPrivateKeyParameter(
             final RSAPrivateKey key) {
+        ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
@@ -105,6 +108,8 @@ public class SignerUtil {
             final AlgorithmIdentifier sigAlgId,
             final AsymmetricBlockCipher cipher)
     throws OperatorCreationException {
+        ParamUtil.requireNonNull("sigAlgId", sigAlgId);
+        ParamUtil.requireNonNull("cipher", cipher);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
                 + " is not allowed");
@@ -148,6 +153,7 @@ public class SignerUtil {
             final byte[] in,
             final int blockSize)
     throws SignerException {
+        ParamUtil.requireNonNull("in", in);
         int inLen = in.length;
 
         if (inLen + 3 > blockSize) {
@@ -174,6 +180,7 @@ public class SignerUtil {
     public static byte[] convertPlainDSASigX962(
             final byte[] signature)
     throws SignerException {
+        ParamUtil.requireNonNull("signature", signature);
         byte[] ba = new byte[signature.length / 2];
         ASN1EncodableVector sigder = new ASN1EncodableVector();
 
@@ -195,6 +202,7 @@ public class SignerUtil {
             final byte[] x962Signature,
             final int keyBitLen)
     throws SignerException {
+        ParamUtil.requireNonNull("x962Signature", x962Signature);
         final int blockSize = (keyBitLen + 7) / 8;
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
         if (seq.size() != 2) {

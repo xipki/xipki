@@ -56,6 +56,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     public CollectionCertificateValidator(
             final Collection<X509Certificate> certs) {
         ParamUtil.requireNonEmpty("certs", certs);
+
         certHashes = new HashSet<String>(certs.size());
         for (X509Certificate cert : certs) {
             String hash;

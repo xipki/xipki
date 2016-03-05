@@ -36,6 +36,8 @@
 
 package org.xipki.commons.datasource.api;
 
+import java.util.Objects;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -53,11 +55,13 @@ public enum DatabaseType {
 
     public static DatabaseType getDataSourceForDriver(
             final String driverClass) {
+        Objects.requireNonNull(driverClass, "driverClass must not be null");
         return getDatabaseType(driverClass);
     }
 
     public static DatabaseType getDataSourceForDataSource(
             final String dataSourceClass) {
+        Objects.requireNonNull(dataSourceClass, "dataSourceClass must not be null");
         return getDatabaseType(dataSourceClass);
     }
 

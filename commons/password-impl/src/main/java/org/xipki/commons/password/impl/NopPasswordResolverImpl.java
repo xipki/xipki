@@ -36,6 +36,7 @@
 
 package org.xipki.commons.password.impl;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
 
@@ -55,6 +56,7 @@ public class NopPasswordResolverImpl implements PasswordResolver {
     public char[] resolvePassword(
             final String passwordHint)
     throws PasswordResolverException {
+        ParamUtil.requireNonNull("passwordHint", passwordHint);
         return passwordHint.toCharArray();
     }
 

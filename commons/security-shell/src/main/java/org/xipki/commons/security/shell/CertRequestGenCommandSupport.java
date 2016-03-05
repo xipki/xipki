@@ -74,6 +74,7 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.completer.ExtKeyusageCompleter;
 import org.xipki.commons.console.karaf.completer.ExtensionNameCompleter;
@@ -371,6 +372,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
     protected X500Name getSubject(
             final String subjectText) {
+        ParamUtil.requireNonBlank("subjectText", subjectText);
         return new X500Name(subjectText);
     }
 

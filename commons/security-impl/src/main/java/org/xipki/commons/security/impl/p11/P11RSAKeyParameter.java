@@ -72,7 +72,6 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
         ParamUtil.requireNonNull("modulus", modulus);
         ParamUtil.requireNonNull("publicExponent", publicExponent);
-
         this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.keyId = ParamUtil.requireNonNull("keyId", keyId);

@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ocsp.qa.api;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,6 +51,7 @@ public enum Occurrence {
 
     public static Occurrence getInstance(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         for (Occurrence entry : values()) {
             if (entry.name().equals(name)) {
                 return entry;

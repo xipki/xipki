@@ -187,9 +187,7 @@ public abstract class LoadExecutor {
 
     public void setUnit(
             final String unit) {
-        if (unit != null) {
-            this.unit = unit;
-        }
+        this.unit = ParamUtil.requireNonNull("unit", unit);
     }
 
     protected void printSummary() {

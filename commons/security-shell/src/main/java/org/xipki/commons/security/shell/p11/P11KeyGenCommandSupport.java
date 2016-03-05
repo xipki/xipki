@@ -39,6 +39,7 @@ package org.xipki.commons.security.shell.p11;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -76,10 +77,10 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     protected void finalize(
             final P11KeyIdentifier keyId)
     throws Exception {
+        ParamUtil.requireNonNull("keyId", keyId);
         out("generate PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
         out("\tkey label: " + keyId.getKeyLabel());
-
         securityFactory.getP11CryptService(moduleName).refresh();
     }
 

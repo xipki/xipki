@@ -203,7 +203,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         checkSlotId(slotId);
         byte[] keyBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY, slotId, keyId);
         if (keyBytes == null) {
-            throw new SignerException("received no public key from server for " + keyId);
+            return null;
         }
 
         return generatePublicKey(keyBytes);
@@ -218,7 +218,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         byte[] certBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE, slotId,
                 keyId);
         if (certBytes == null) {
-            throw new SignerException("received no certificate from server for " + keyId);
+            return null;
         }
 
         try {
@@ -248,6 +248,8 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
+        ParamUtil.requireNonNull("message", message);
+
         PsoTemplate psoTemplate;
         try {
             SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
@@ -275,9 +277,6 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
-
         SlotAndKeyIdentifer slotAndKeyIdentifier;
         try {
             slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
@@ -303,6 +302,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws BadAsn1ObjectException {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("keyId", keyId);
+
         SlotIdentifier slotIdentifier = new SlotIdentifier(slotId);
         KeyIdentifier keyIdentifier = new KeyIdentifier(keyId);
         return new SlotAndKeyIdentifer(slotIdentifier, keyIdentifier);

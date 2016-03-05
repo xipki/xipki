@@ -64,6 +64,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.XipkiCmpConstants;
@@ -95,6 +96,8 @@ class CmpResponder {
             final LocalP11CryptServicePool localP11CryptServicePool,
             final String moduleName,
             final PKIMessage pkiMessage) {
+        ParamUtil.requireNonNull("localP11CryptServicePool", localP11CryptServicePool);
+        ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
         PKIHeader reqHeader = message.getHeader();

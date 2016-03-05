@@ -144,6 +144,7 @@ public class KeystoreP11Module implements P11Module {
     public KeystoreP11Slot getSlot(
             final P11SlotIdentifier slotId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
         KeystoreP11Slot extSlot = slots.get(slotId);
         if (extSlot != null) {
             return extSlot;

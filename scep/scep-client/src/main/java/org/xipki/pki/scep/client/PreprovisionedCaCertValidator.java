@@ -86,6 +86,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
+        ParamUtil.requireNonNull("cert", cert);
         String hextFp;
         try {
             hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());

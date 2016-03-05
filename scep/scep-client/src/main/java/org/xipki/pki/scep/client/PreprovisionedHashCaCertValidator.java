@@ -79,6 +79,7 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
+        ParamUtil.requireNonNull("cert", cert);
         byte[] actual;
         try {
             actual = hashAlgo.digest(cert.getEncoded());

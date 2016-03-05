@@ -46,6 +46,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
@@ -69,6 +70,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final String subject,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException {
+        ParamUtil.requireNonNull("subject", subject);
         X500Name subjectDN = new X500Name(subject);
         return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo,
                 subjectDN, attributes);
@@ -83,6 +85,8 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final X500Name subjectDN,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException {
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        ParamUtil.requireNonNull("signerType", signerType);
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
                 (X509Certificate[]) null);
         return generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
@@ -92,11 +96,14 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
     public PKCS10CertificationRequest generateRequest(
             final ConcurrentContentSigner signer,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws SignerException {
+        ParamUtil.requireNonNull("signer", signer);
+        ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
         PKCS10CertificationRequestBuilder p10ReqBuilder =
-                new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
+                new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
         if (CollectionUtil.isNonEmpty(attributes)) {
             for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
                 p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));

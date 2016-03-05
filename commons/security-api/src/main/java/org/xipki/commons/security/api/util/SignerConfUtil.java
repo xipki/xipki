@@ -63,7 +63,9 @@ public class SignerConfUtil {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId,
             final int parallelism) {
+        ParamUtil.requireNonNull("slotId", slotId);
         ParamUtil.requireNonNull("keyId", keyId);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         ConfPairs conf = new ConfPairs();
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -95,6 +97,7 @@ public class SignerConfUtil {
             final int parallelism) {
         ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
         ParamUtil.requireNonBlank("password", password);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -118,7 +121,7 @@ public class SignerConfUtil {
             final String signerConf,
             final boolean verbose,
             final boolean ignoreSensitiveInfo) {
-        String localSignerConf = signerConf;
+        String localSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
         if (ignoreSensitiveInfo) {
             localSignerConf = eraseSensitiveData(localSignerConf);
         }
@@ -138,7 +141,9 @@ public class SignerConfUtil {
             final String signatureAlgorithm,
             final int parallelism) {
         ParamUtil.requireNonNull("algo", signatureAlgorithm);
+        ParamUtil.requireNonNull("slotId", slotId);
         ParamUtil.requireNonNull("keyId", keyId);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -173,6 +178,7 @@ public class SignerConfUtil {
         ParamUtil.requireNonNull("keystoreStream", keystoreStream);
         ParamUtil.requireNonBlank("password", password);
         ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
 
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("algo", signatureAlgorithm);

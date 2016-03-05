@@ -49,6 +49,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -105,6 +106,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
     public boolean verify(
             final String hostname,
             final SSLSession session) {
+        ParamUtil.requireNonNull("hostname", hostname);
         if (trustAll) {
             return true;
         }

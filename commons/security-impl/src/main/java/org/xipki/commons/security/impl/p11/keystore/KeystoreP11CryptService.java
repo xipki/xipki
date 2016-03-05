@@ -163,12 +163,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("Found no key with " + keyId);
-        }
-
-        return identity.CKM_RSA_PKCS(encodedDigestInfo);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(encodedDigestInfo);
     }
 
     @Override
@@ -177,12 +172,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_RSA_X509(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(hash);
     }
 
     @Override
@@ -191,12 +181,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_ECDSA_X962(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_ECDSA_X962(hash);
     }
 
     @Override
@@ -205,12 +190,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_ECDSA(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_ECDSA(hash);
     }
 
     @Override
@@ -219,12 +199,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_DSA_X962(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_DSA_X962(hash);
     }
 
     @Override
@@ -233,12 +208,7 @@ public class KeystoreP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        KeystoreP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_DSA(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_DSA(hash);
     }
 
     @Override
@@ -302,6 +272,17 @@ public class KeystoreP11CryptService implements P11CryptService {
         return keyLabels.toArray(new String[0]);
     }
 
+    private KeystoreP11Identity getNonNullIdentity(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException {
+        KeystoreP11Identity identity = getIdentity(slotId, keyId);
+        if (identity == null) {
+            throw new SignerException("found no key with " + keyId);
+        }
+        return identity;
+    }
+
     private KeystoreP11Identity getIdentity(
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
@@ -330,6 +311,7 @@ public class KeystoreP11CryptService implements P11CryptService {
     public static KeystoreP11CryptService getInstance(
             final P11ModuleConf moduleConf)
     throws SignerException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
         synchronized (INSTANCES) {
             final String name = moduleConf.getName();
             KeystoreP11CryptService instance = INSTANCES.get(name);

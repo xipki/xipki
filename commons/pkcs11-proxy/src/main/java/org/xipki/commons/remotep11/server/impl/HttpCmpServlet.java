@@ -51,6 +51,7 @@ import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.SecurityFactory;
 
@@ -168,6 +169,7 @@ public class HttpCmpServlet extends HttpServlet {
     protected PKIMessage generatePKIMessage(
             final InputStream is)
     throws BadAsn1ObjectException {
+        ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
         try {

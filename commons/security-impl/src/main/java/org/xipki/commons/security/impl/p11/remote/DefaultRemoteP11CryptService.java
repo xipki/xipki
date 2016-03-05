@@ -45,6 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
@@ -85,6 +86,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
     public byte[] send(
             final byte[] request)
     throws IOException {
+        ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = (HttpURLConnection) objServerUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);

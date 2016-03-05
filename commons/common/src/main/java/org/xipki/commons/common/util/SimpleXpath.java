@@ -74,7 +74,7 @@ public class SimpleXpath {
                 final String pStep,
                 final Map<String, String> nsPrefixUriMap)
         throws XPathExpressionException {
-            String step = pStep;
+            String step = ParamUtil.requireNonBlank("pStep", pStep);
             if (step.charAt(0) == '@') {
                 isElement = false;
                 step = step.substring(1);
@@ -133,6 +133,7 @@ public class SimpleXpath {
             final String relativeXpath,
             final Map<String, String> nsPrefixUriMap)
     throws XPathExpressionException {
+        ParamUtil.requireNonBlank("relativeXpath", relativeXpath);
         if (relativeXpath.startsWith("/")) {
             throw new XPathExpressionException(relativeXpath + " is no a relative xpath");
         }
@@ -189,6 +190,8 @@ public class SimpleXpath {
         if (onlyFirst && CollectionUtil.isNonEmpty(results)) {
             return;
         }
+        ParamUtil.requireNonNull("context", context);
+        ParamUtil.requireNonNull("steps", steps);
 
         SimpleXpathStep step = steps.get(stepIndex);
         if (step.isElement) {

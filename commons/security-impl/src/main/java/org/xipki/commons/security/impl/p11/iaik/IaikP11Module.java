@@ -140,6 +140,7 @@ public class IaikP11Module implements P11Module {
     public IaikP11Slot getSlot(
             final P11SlotIdentifier slotId)
     throws SignerException {
+        ParamUtil.requireNonNull("slotId", slotId);
         IaikP11Slot extSlot = slots.get(slotId);
         if (extSlot != null) {
             return extSlot;

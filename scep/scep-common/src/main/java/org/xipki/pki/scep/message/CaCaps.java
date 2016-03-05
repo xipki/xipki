@@ -44,6 +44,8 @@ import java.util.StringTokenizer;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.transaction.CaCapability;
 
@@ -66,7 +68,7 @@ public class CaCaps {
 
     public CaCaps(
             final Set<CaCapability> capabilities) {
-        if (capabilities == null) {
+        if (CollectionUtil.isEmpty(capabilities)) {
             this.capabilities = new HashSet<CaCapability>();
         } else {
             this.capabilities = new HashSet<CaCapability>(capabilities);
@@ -80,28 +82,28 @@ public class CaCaps {
 
     public void removeCapabilities(
             final CaCaps caCaps) {
+        ParamUtil.requireNonNull("caCaps", caCaps);
         this.capabilities.retainAll(caCaps.capabilities);
         refresh();
     }
 
     public void addCapability(
             final CaCapability cap) {
-        if (cap != null) {
-            capabilities.add(cap);
-            refresh();
-        }
+        ParamUtil.requireNonNull("cap", cap);
+        capabilities.add(cap);
+        refresh();
     }
 
     public void removeCapability(
             final CaCapability cap) {
-        if (cap != null) {
-            capabilities.remove(cap);
-            refresh();
-        }
+        ParamUtil.requireNonNull("cap", cap);
+        capabilities.remove(cap);
+        refresh();
     }
 
     public boolean containsCapability(
             final CaCapability cap) {
+        ParamUtil.requireNonNull("cap", cap);
         return capabilities.contains(cap);
     }
 

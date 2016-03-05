@@ -58,6 +58,7 @@ import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfoBuilder;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -76,6 +77,7 @@ class PrivateKeyCryptor {
     PrivateKeyCryptor(
             final char[] password)
     throws SignerException {
+        ParamUtil.requireNonNull("password", password);
         JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
         eb.setIterationCount(ITERATION_COUNT);
         try {
@@ -91,6 +93,7 @@ class PrivateKeyCryptor {
     PrivateKey decrypt(
             PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
     throws SignerException {
+        ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
         PrivateKeyInfo privateKeyInfo;
         synchronized (decryptorProvider) {
             try {
@@ -127,6 +130,7 @@ class PrivateKeyCryptor {
 
     PKCS8EncryptedPrivateKeyInfo encrypt(
             final PrivateKey privateKey) {
+        ParamUtil.requireNonNull("privateKey", privateKey);
         PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
         PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(
                 privateKeyInfo);

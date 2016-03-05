@@ -37,6 +37,7 @@
 package org.xipki.commons.security.api.p11;
 
 import org.xipki.commons.common.util.CompareUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -119,14 +120,15 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
     @Override
     public int compareTo(
-            final P11SlotIdentifier o) {
-        if (this == o) {
+            final P11SlotIdentifier obj) {
+        ParamUtil.requireNonNull("obj", obj);
+        if (this == obj) {
             return 0;
         }
 
         if (slotIndex != null) {
-            if (o.slotIndex != null) {
-                int sign = slotIndex - o.slotIndex;
+            if (obj.slotIndex != null) {
+                int sign = slotIndex - obj.slotIndex;
                 if (sign > 0) {
                     return 1;
                 } else if (sign < 0) {

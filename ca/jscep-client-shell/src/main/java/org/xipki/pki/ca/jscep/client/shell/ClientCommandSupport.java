@@ -52,6 +52,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.util.X509Util;
@@ -150,6 +151,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     protected X509Certificate extractEeCerts(
             final CertStore certstore)
     throws CertStoreException {
+        ParamUtil.requireNonNull("certstore", certstore);
+
         Iterator<?> it = certstore.getCertificates(null).iterator();
         while (it.hasNext()) {
             X509Certificate m = (X509Certificate) it.next();

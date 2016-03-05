@@ -67,6 +67,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
@@ -100,10 +101,13 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
     protected Object processResponse(
             final OCSPResp response,
             final X509Certificate respIssuer,
-            final X509Certificate issuer,
+            final X509Certificate issuer, //TODO: consider issuer
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
+        ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonNull("serialNumbers", serialNumbers);
+
         BasicOCSPResp basicResp = OcspUtils.extractBasicOcspResp(response);
 
         boolean extendedRevoke = basicResp.getExtension(
