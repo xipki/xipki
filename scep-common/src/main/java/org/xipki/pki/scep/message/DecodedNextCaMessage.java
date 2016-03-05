@@ -204,9 +204,9 @@ public class DecodedNextCaMessage {
 
         String sigAlgOID = signerInfo.getEncryptionAlgOID();
         if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
-            ASN1ObjectIdentifier localDigestAlgOID;
+            ASN1ObjectIdentifier tmpDigestAlgOID;
             try {
-                localDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
+                tmpDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception ex) {
                 final String msg =
@@ -217,18 +217,18 @@ public class DecodedNextCaMessage {
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(localDigestAlgOID)) {
+            if (!digestAlgOID.equals(tmpDigestAlgOID)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
                         + " the same digestAlgorithm");
                 return ret;
             }
         } // end if
 
-        X509CertificateHolder localSignerCert =
+        X509CertificateHolder tmpSignerCert =
                 (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try {
-            signerCert = new X509CertificateObject(localSignerCert.toASN1Structure());
+            signerCert = new X509CertificateObject(tmpSignerCert.toASN1Structure());
         } catch (CertificateParsingException ex) {
             final String msg = "could not construct X509CertificateObject: " + ex.getMessage();
             LOG.error(msg);
