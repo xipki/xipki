@@ -251,23 +251,23 @@ public class SoftTokenContentSignerBuilder {
             }
             ks.load(keystoreStream, keystorePassword);
 
-            String localKeyname = keyname;
-            if (localKeyname == null) {
+            String tmpKeyname = keyname;
+            if (tmpKeyname == null) {
                 Enumeration<String> aliases = ks.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
                     if (ks.isKeyEntry(alias)) {
-                        localKeyname = alias;
+                        tmpKeyname = alias;
                         break;
                     }
                 }
             } else {
-                if (!ks.isKeyEntry(localKeyname)) {
-                    throw new SignerException("unknown key named " + localKeyname);
+                if (!ks.isKeyEntry(tmpKeyname)) {
+                    throw new SignerException("unknown key named " + tmpKeyname);
                 }
             }
 
-            this.key = (PrivateKey) ks.getKey(localKeyname, keyPassword);
+            this.key = (PrivateKey) ks.getKey(tmpKeyname, keyPassword);
 
             if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
                     || key instanceof ECPrivateKey)) {
@@ -288,10 +288,10 @@ public class SoftTokenContentSignerBuilder {
                     }
                 }
             } else {
-                cert = (X509Certificate) ks.getCertificate(localKeyname);
+                cert = (X509Certificate) ks.getCertificate(tmpKeyname);
             }
 
-            Certificate[] certsInKeystore = ks.getCertificateChain(localKeyname);
+            Certificate[] certsInKeystore = ks.getCertificateChain(tmpKeyname);
             if (certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);

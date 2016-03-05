@@ -150,28 +150,28 @@ public class KeystoreP11Module implements P11Module {
             return extSlot;
         }
 
-        P11SlotIdentifier localSlotId = null;
+        P11SlotIdentifier tmpSlotId = null;
         for (P11SlotIdentifier s : slotIds) {
             if (CompareUtil.equalsObject(s.getSlotIndex(), slotId.getSlotIndex())
                     || CompareUtil.equalsObject(s.getSlotId(), slotId.getSlotId())) {
-                localSlotId = s;
+                tmpSlotId = s;
                 break;
             }
         }
 
-        if (localSlotId == null) {
+        if (tmpSlotId == null) {
             throw new SignerException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;
         try {
-            pwd = moduleConf.getPasswordRetriever().getPassword(localSlotId);
+            pwd = moduleConf.getPasswordRetriever().getPassword(tmpSlotId);
         } catch (PasswordResolverException ex) {
             throw new SignerException("PasswordResolverException: " + ex.getMessage(), ex);
         }
 
-        File slotDir = new File(moduleConf.getNativeLibrary(), localSlotId.getSlotIndex() + "-"
-                + localSlotId.getSlotId());
+        File slotDir = new File(moduleConf.getNativeLibrary(), tmpSlotId.getSlotIndex() + "-"
+                + tmpSlotId.getSlotId());
 
         if (pwd == null) {
             throw new SignerException("no password is configured");
@@ -183,10 +183,10 @@ public class KeystoreP11Module implements P11Module {
 
         PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
 
-        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, localSlotId, privateKeyCryptor,
+        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, tmpSlotId, privateKeyCryptor,
                 moduleConf.getSecurityFactory());
 
-        slots.put(localSlotId, extSlot);
+        slots.put(tmpSlotId, extSlot);
         return extSlot;
     } // method getSlot
 

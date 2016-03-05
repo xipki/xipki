@@ -427,13 +427,13 @@ public abstract class RemoteP11CryptService implements P11CryptService {
                 recipient);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-        ASN1OctetString localTid;
+        ASN1OctetString tmpTid;
         if (tid == null) {
-            localTid = new DEROctetString(randomTransactionId());
+            tmpTid = new DEROctetString(randomTransactionId());
         } else {
-            localTid = tid;
+            tmpTid = tid;
         }
-        hBuilder.setTransactionID(localTid);
+        hBuilder.setTransactionID(tmpTid);
 
         return hBuilder.build();
     }
@@ -481,10 +481,10 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11SlotIdentifier slotId)
     throws SignerException {
         checkSlotId(slotId);
-        SlotIdentifier localSlotId = new SlotIdentifier(slotId);
+        SlotIdentifier tmpSlotId = new SlotIdentifier(slotId);
 
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
-                localSlotId);
+                tmpSlotId);
         if (!(resp instanceof ASN1Sequence)) {
             throw new SignerException("response is not ASN1Sequence, but "
                     + resp.getClass().getName());

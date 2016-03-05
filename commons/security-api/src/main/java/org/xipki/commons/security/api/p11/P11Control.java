@@ -67,12 +67,12 @@ public class P11Control {
             this.moduleNames = Collections.emptySet();
         } else {
             this.moduleConfs = new HashMap<>(moduleConfs.size());
-            Set<String> localModuleNames = new HashSet<>();
+            Set<String> tmpModuleNames = new HashSet<>();
             for (P11ModuleConf conf : moduleConfs) {
                 this.moduleConfs.put(conf.getName(), conf);
-                localModuleNames.add(conf.getName());
+                tmpModuleNames.add(conf.getName());
             }
-            this.moduleNames = Collections.unmodifiableSet(localModuleNames);
+            this.moduleNames = Collections.unmodifiableSet(tmpModuleNames);
         }
     }
 

@@ -62,15 +62,15 @@ public class CaIdentifier {
             final String profile)
     throws MalformedURLException {
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
-        URL localUrl = new URL(serverUrl);
-        final String protocol = localUrl.getProtocol();
+        URL tmpUrl = new URL(serverUrl);
+        final String protocol = tmpUrl.getProtocol();
         if (!"http".equalsIgnoreCase(protocol)
                 && !"https".equalsIgnoreCase(protocol)) {
             throw new IllegalArgumentException(
                     "URL protocol should be HTTP or HTTPS, but not '" + protocol + "'");
         }
 
-        if (localUrl.getQuery() != null) {
+        if (tmpUrl.getQuery() != null) {
             throw new IllegalArgumentException("URL should contain no query string");
         }
 

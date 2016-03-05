@@ -96,7 +96,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
     throws DataAccessException, PasswordResolverException {
         ParamUtil.requireNonNull("conf", conf);
         DatabaseType databaseType;
-        String className = conf.getProperty("dataSourceClassName");
+        String className = conf.getProperty("datasourceClassName");
         if (className != null) {
             databaseType = DatabaseType.getDataSourceForDataSource(className);
 
@@ -113,12 +113,12 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             conf.setProperty("password", password);
         }
 
-        password = conf.getProperty("dataSource.password");
+        password = conf.getProperty("datasource.password");
         if (password != null) {
             if (passwordResolver != null) {
                 password = new String(passwordResolver.resolvePassword(password));
             }
-            conf.setProperty("dataSource.password", password);
+            conf.setProperty("datasource.password", password);
         }
 
         return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);

@@ -316,10 +316,10 @@ public class X509Util {
     public static String canonicalizName(
             final X500Name name) {
         ParamUtil.requireNonNull("name", name);
-        ASN1ObjectIdentifier[] localTypes = name.getAttributeTypes();
-        int n = localTypes.length;
+        ASN1ObjectIdentifier[] tmpTypes = name.getAttributeTypes();
+        int n = tmpTypes.length;
         List<String> types = new ArrayList<>(n);
-        for (ASN1ObjectIdentifier type : localTypes) {
+        for (ASN1ObjectIdentifier type : tmpTypes) {
             types.add(type.getId());
         }
 
