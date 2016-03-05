@@ -86,18 +86,18 @@ public enum HashAlgoType {
 
     public static HashAlgoType getHashAlgoType(
             final String nameOrOid) {
-        String localNameOrOid = nameOrOid;
+        String tmpNameOrOid = nameOrOid;
         for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(localNameOrOid)) {
+            if (hashAlgo.oid.equals(tmpNameOrOid)) {
                 return hashAlgo;
             }
 
-            if (localNameOrOid.indexOf('-') != -1) {
-                localNameOrOid = localNameOrOid.replace("-", "");
+            if (tmpNameOrOid.indexOf('-') != -1) {
+                tmpNameOrOid = tmpNameOrOid.replace("-", "");
             }
 
-            if (hashAlgo.name.equalsIgnoreCase(localNameOrOid)
-                    || hashAlgo.shortName.equalsIgnoreCase(localNameOrOid)) {
+            if (hashAlgo.name.equalsIgnoreCase(tmpNameOrOid)
+                    || hashAlgo.shortName.equalsIgnoreCase(tmpNameOrOid)) {
                 return hashAlgo;
             }
         }

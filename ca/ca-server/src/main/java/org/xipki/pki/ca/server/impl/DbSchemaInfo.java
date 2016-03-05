@@ -57,11 +57,11 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 public class DbSchemaInfo {
     private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(DataSourceWrapper dataSource)
+    public DbSchemaInfo(DataSourceWrapper datasource)
     throws DataAccessException {
-        ParamUtil.requireNonNull("dataSource", dataSource);
+        ParamUtil.requireNonNull("datasource", datasource);
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
-        Connection c = dataSource.getConnection();
+        Connection c = datasource.getConnection();
         if (c == null) {
             throw new DataAccessException("could not get connection");
         }
@@ -70,7 +70,7 @@ public class DbSchemaInfo {
         ResultSet rs = null;
 
         try {
-            stmt = dataSource.createStatement(c);
+            stmt = datasource.createStatement(c);
             if (stmt == null) {
                 throw new DataAccessException("could not create statement");
             }
@@ -82,9 +82,9 @@ public class DbSchemaInfo {
                 variables.put(name, value);
             }
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // constructor
 

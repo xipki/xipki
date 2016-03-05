@@ -85,20 +85,20 @@ public class CmpUtil {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         ParamUtil.requireNonNull("signer", signer);
 
-        final GeneralName localSignerName;
+        final GeneralName tmpSignerName;
         if (signerName != null) {
-            localSignerName = signerName;
+            tmpSignerName = signerName;
         } else {
             if (signer.getCertificate() == null) {
                 throw new IllegalArgumentException("signer without certificate is not allowed");
             }
             X500Name x500Name = X500Name.getInstance(
                     signer.getCertificate().getSubjectX500Principal().getEncoded());
-            localSignerName = new GeneralName(x500Name);
+            tmpSignerName = new GeneralName(x500Name);
         }
         PKIHeader header = pkiMessage.getHeader();
         ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
-                localSignerName, header.getRecipient());
+                tmpSignerName, header.getRecipient());
         PKIFreeText freeText = header.getFreeText();
         if (freeText != null) {
             builder.setFreeText(freeText);

@@ -91,13 +91,13 @@ class CaConfigurationDbExporter extends DbPorter {
     private final Marshaller marshaller;
 
     CaConfigurationDbExporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Marshaller marshaller,
             final String destDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException {
-        super(dataSource, destDir, stopMe, evaluateOnly);
+        super(datasource, destDir, stopMe, evaluateOnly);
         this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
     }
 

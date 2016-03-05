@@ -117,7 +117,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     private final int numCertsPerCommit;
 
     OcspCertStoreFromCaDbImporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Unmarshaller unmarshaller,
             final String srcDir,
             final String publisherName,
@@ -126,7 +126,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws Exception {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
+        super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         this.publisherName = ParamUtil.requireNonBlank("publisherName", publisherName);
@@ -550,7 +550,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
                         // cert
                         String seqName = "CID";
-                        int currentId = (int) dataSource.nextSeqValue(null, seqName);
+                        int currentId = (int) datasource.nextSeqValue(null, seqName);
 
                         try {
                             int idx = 1;

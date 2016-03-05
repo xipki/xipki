@@ -93,7 +93,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     private final boolean resume;
 
     OcspCertStoreDbExporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Marshaller marshaller,
             final Unmarshaller unmarshaller,
             final String baseDir,
@@ -103,7 +103,7 @@ class OcspCertStoreDbExporter extends DbPorter {
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws Exception {
-        super(dataSource, baseDir, stopMe, evaluateOnly);
+        super(datasource, baseDir, stopMe, evaluateOnly);
 
         this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);

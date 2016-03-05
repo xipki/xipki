@@ -129,18 +129,18 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         }
 
         if (permissions != null) {
-            Set<Permission> localPermissions = new HashSet<>();
+            Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                Permission localPermission = Permission.getPermission(permission);
-                if (localPermission == null) {
+                Permission tmpPermission = Permission.getPermission(permission);
+                if (tmpPermission == null) {
                     throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
-                localPermissions.add(localPermission);
+                tmpPermissions.add(tmpPermission);
             }
 
-            if (!localPermissions.equals(entry.getPermissions())) {
+            if (!tmpPermissions.equals(entry.getPermissions())) {
                 throw new UnexpectedException("permissions: is '" + entry.getPermissions()
-                        + "', but expected '" + localPermissions + "'");
+                        + "', but expected '" + tmpPermissions + "'");
             }
         }
 

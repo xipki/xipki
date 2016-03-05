@@ -210,16 +210,16 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (signerConf != null) {
-            String localSignerType = signerType;
-            if (localSignerType == null) {
+            String tmpSignerType = signerType;
+            if (tmpSignerType == null) {
                 CaEntry caEntry = caManager.getCa(caName);
                 if (caEntry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
-                localSignerType = caEntry.getSignerType();
+                tmpSignerType = caEntry.getSignerType();
             }
 
-            signerConf = ShellUtil.canonicalizeSignerConf(localSignerType, signerConf,
+            signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,
                     passwordResolver, securityFactory);
             entry.setSignerConf(signerConf);
         }
@@ -235,15 +235,15 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (permissions != null && permissions.size() > 0) {
-            Set<Permission> localPermissions = new HashSet<>();
+            Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                Permission localPermission = Permission.getPermission(permission);
-                if (localPermission == null) {
+                Permission tmpPermission = Permission.getPermission(permission);
+                if (tmpPermission == null) {
                     throw new IllegalCmdParamException("invalid permission: " + permission);
                 }
-                localPermissions.add(localPermission);
+                tmpPermissions.add(tmpPermission);
             }
-            entry.setPermissions(localPermissions);
+            entry.setPermissions(tmpPermissions);
         }
 
         entry.setCrlUris(getUris(crlUris));

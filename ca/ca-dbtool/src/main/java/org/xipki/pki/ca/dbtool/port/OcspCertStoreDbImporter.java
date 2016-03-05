@@ -84,7 +84,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     private final int numCertsPerCommit;
 
     OcspCertStoreDbImporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Unmarshaller unmarshaller,
             final String srcDir,
             final int numCertsPerCommit,
@@ -92,7 +92,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws Exception {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
+        super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         this.numCertsPerCommit = ParamUtil.requireMin("numCertsPerCommit", numCertsPerCommit, 1);
@@ -296,7 +296,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
         long maxId = getMax("CERT", "ID");
         String seqName = "CID";
-        dataSource.dropAndCreateSequence(seqName, maxId + 1);
+        datasource.dropAndCreateSequence(seqName, maxId + 1);
 
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);

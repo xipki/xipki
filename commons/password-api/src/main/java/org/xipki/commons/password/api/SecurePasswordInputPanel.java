@@ -189,12 +189,12 @@ public class SecurePasswordInputPanel extends Panel {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
             String[] options = new String[]{OK};
 
-            String localPrompt = prompt;
-            if (localPrompt == null || localPrompt.isEmpty()) {
-                localPrompt = "Password required";
+            String tmpPrompt = prompt;
+            if (tmpPrompt == null || tmpPrompt.isEmpty()) {
+                tmpPrompt = "Password required";
             }
 
-            int option = JOptionPane.showOptionDialog(null, gui, localPrompt,
+            int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt,
                     JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                     null, options, options[0]);
 

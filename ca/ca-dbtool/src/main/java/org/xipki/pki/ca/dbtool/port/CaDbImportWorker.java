@@ -100,7 +100,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final Unmarshaller unmarshaller;
 
@@ -113,7 +113,7 @@ public class CaDbImportWorker extends DbPortWorker {
     private final boolean evaluateOnly;
 
     public CaDbImportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final boolean resume,
@@ -121,11 +121,11 @@ public class CaDbImportWorker extends DbPortWorker {
             final int batchEntriesPerCommit,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
@@ -155,14 +155,14 @@ public class CaDbImportWorker extends DbPortWorker {
             if (!resume) {
                 // CAConfiguration
                 CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                        dataSource, unmarshaller, srcFolder, stopMe, evaluateOnly);
+                        datasource, unmarshaller, srcFolder, stopMe, evaluateOnly);
                 caConfImporter.importToDb();
                 caConfImporter.shutdown();
             }
 
             // CertStore
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
-                    dataSource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
+                    datasource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
                     evaluateOnly);
             certStoreImporter.importToDb();
             certStoreImporter.shutdown();
@@ -171,9 +171,9 @@ public class CaDbImportWorker extends DbPortWorker {
             createSerialNumberSequences();
         } finally {
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
@@ -185,10 +185,10 @@ public class CaDbImportWorker extends DbPortWorker {
         List<CAInfoBundle> caInfoBundles = new LinkedList<>();
 
         // create the sequence for the certificate serial numbers
-        Connection conn = dataSource.getConnection();
+        Connection conn = datasource.getConnection();
         String sql = null;
         try {
-            Statement st = dataSource.createStatement(conn);
+            Statement st = datasource.createStatement(conn);
             sql = "SELECT NAME, NEXT_SN, CERT FROM CA";
             ResultSet rs = st.executeQuery(sql);
 
@@ -256,16 +256,16 @@ public class CaDbImportWorker extends DbPortWorker {
                 }
             }
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.returnConnection(conn);
+            datasource.returnConnection(conn);
         }
 
         // create the sequences
         for (CAInfoBundle entry : caInfoBundles) {
             long nextSerial = Math.max(entry.caNextSerial, entry.shouldCaNextSerial);
             String seqName = IoUtil.convertSequenceName("SN_" + entry.caName);
-            dataSource.dropAndCreateSequence(seqName, nextSerial);
+            datasource.dropAndCreateSequence(seqName, nextSerial);
         }
     } // method createSerialNumberSequences
 

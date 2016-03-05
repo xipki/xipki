@@ -99,18 +99,18 @@ public class DbPorter extends DbToolBase {
     protected final int maxX500nameLen;
 
     public DbPorter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException {
-        super(dataSource, baseDir, stopMe);
+        super(datasource, baseDir, stopMe);
 
         this.evaulateOnly = evaluateOnly;
         this.certsDir = this.baseDir + File.separator + CERTS_DIRNAME;
         this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
 
-        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(dataSource);
+        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String s = dbSchemaInfo.getVariableValue("VERSION");
         this.dbSchemaVersion = Integer.parseInt(s);
         s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");

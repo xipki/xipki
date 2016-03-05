@@ -63,13 +63,13 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
 
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
-                    + "(one of--ref-db and--ref-dir must be specified)")
+                    + "(one of --ref-db and--ref-dir must be specified)")
     @Completion(FilePathCompleter.class)
     private String refDbConf;
 
     @Option(name = "--ref-dir",
             description = "directory of exported digest files of the reference system\n"
-                    + "(one of--ref-db and--ref-dir must be specified)")
+                    + "(one of --ref-db and--ref-dir must be specified)")
     @Completion(DirPathCompleter.class)
     private String refDir;
 
@@ -120,7 +120,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
 
         NumThreads numThreads = new NumThreads(numRefThreads, numTargetThreads);
         return new DbDigestDiffWorker(
-                dataSourceFactory,
+                datasourceFactory,
                 passwordResolver,
                 revokedOnly,
                 refDir,

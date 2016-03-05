@@ -68,7 +68,7 @@ public class CaDbExportWorker extends DbPortWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaDbExportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final Marshaller marshaller;
 
@@ -85,7 +85,7 @@ public class CaDbExportWorker extends DbPortWorker {
     private final boolean evaluateOnly;
 
     public CaDbExportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final InputStream dbConfStream,
             final String destFolder,
@@ -95,10 +95,10 @@ public class CaDbExportWorker extends DbPortWorker {
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonBlank("destFolder", destFolder);
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
         this.marshaller = getMarshaller();
         this.unmarshaller = getUnmarshaller();
         this.destFolder = IoUtil.expandFilepath(destFolder);
@@ -110,7 +110,7 @@ public class CaDbExportWorker extends DbPortWorker {
     }
 
     public CaDbExportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
@@ -119,7 +119,7 @@ public class CaDbExportWorker extends DbPortWorker {
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        this(dataSourceFactory, passwordResolver,
+        this(datasourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
                     numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
@@ -160,22 +160,22 @@ public class CaDbExportWorker extends DbPortWorker {
             if (!resume) {
                 // CAConfiguration
                 CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(
-                        dataSource, marshaller, destFolder, stopMe, evaluateOnly);
+                        datasource, marshaller, destFolder, stopMe, evaluateOnly);
                 caConfExporter.export();
                 caConfExporter.shutdown();
             }
 
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                    dataSource, marshaller, unmarshaller, destFolder,
+                    datasource, marshaller, unmarshaller, destFolder,
                     numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally {
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));

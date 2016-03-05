@@ -80,7 +80,7 @@ public class DigestDbCmd extends DbPortCommandSupport {
     protected DbPortWorker getDbPortWorker()
     throws Exception {
         return new DbDigestExportWorker(
-                dataSourceFactory,
+                datasourceFactory,
                 passwordResolver,
                 dbconfFile,
                 outdir,

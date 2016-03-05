@@ -76,12 +76,12 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         "DELETE FROM CRAW WHERE ID>?";
 
     AbstractOcspCertStoreDbImporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final String srcDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws Exception {
-        super(dataSource, srcDir, stopMe, evaluateOnly);
+        super(datasource, srcDir, stopMe, evaluateOnly);
     }
 
     protected String sha1(
@@ -122,15 +122,15 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         System.out.println("dropping indexes");
         long start = System.currentTimeMillis();
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
-        dataSource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
+        datasource.dropForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT");
+        datasource.dropUniqueConstrain(null, "CONST_ISSUER_SN", "CERT");
 
-        dataSource.dropForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH");
-        dataSource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
+        datasource.dropForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH");
+        datasource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
 
-        dataSource.dropPrimaryKey(null, "PK_CERT", "CERT");
-        dataSource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
-        dataSource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
+        datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
+        datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
+        datasource.dropPrimaryKey(null, "PK_CHASH", "CHASH");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
@@ -141,17 +141,17 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         System.out.println("recovering indexes");
         long start = System.currentTimeMillis();
 
-        dataSource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
-        dataSource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
-        dataSource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
+        datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
+        datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
+        datasource.addPrimaryKey(null, "PK_CHASH", "CHASH", "CID");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
+        datasource.addForeignKeyConstraint(null, "FK_CERT_ISSUER1", "CERT",
                 "IID", "ISSUER", "ID", "CASCADE", "NO ACTION");
-        dataSource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
+        datasource.addUniqueConstrain(null, "CONST_ISSUER_SN", "CERT", "IID", "SN");
 
-        dataSource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW", "CID", "CERT", "ID",
+        datasource.addForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW", "CID", "CERT", "ID",
                 "CASCADE", "NO ACTION");
-        dataSource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
+        datasource.addForeignKeyConstraint(null, "FK_CHASH_CERT1", "CHASH", "CID", "CERT", "ID",
                 "CASCADE", "NO ACTION");
 
         long duration = (System.currentTimeMillis() - start) / 1000;

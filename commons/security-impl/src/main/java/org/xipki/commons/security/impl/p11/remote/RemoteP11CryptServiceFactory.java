@@ -78,19 +78,19 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
             throw new IllegalStateException("please call init() first");
         }
 
-        String localModuleName = moduleName;
+        String tmpModuleName = moduleName;
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(localModuleName)) {
-            localModuleName = p11Control.getDefaultModuleName();
+        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(tmpModuleName)) {
+            tmpModuleName = p11Control.getDefaultModuleName();
         }
 
-        P11ModuleConf moduleConf = p11Control.getModuleConf(localModuleName);
+        P11ModuleConf moduleConf = p11Control.getModuleConf(tmpModuleName);
         if (moduleConf == null) {
-            throw new SignerException("PKCS#11 module " + localModuleName + " is not defined");
+            throw new SignerException("PKCS#11 module " + tmpModuleName + " is not defined");
         }
 
         synchronized (services) {
-            RemoteP11CryptService service = services.get(localModuleName);
+            RemoteP11CryptService service = services.get(tmpModuleName);
             if (service == null) {
                 try {
                     service = new DefaultRemoteP11CryptService(moduleConf);

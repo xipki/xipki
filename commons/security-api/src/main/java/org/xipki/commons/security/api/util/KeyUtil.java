@@ -143,11 +143,11 @@ public class KeyUtil {
     throws Exception {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
-        BigInteger localPublicExponent = publicExponent;
-        if (localPublicExponent == null) {
-            localPublicExponent = RSAKeyGenParameterSpec.F4;
+        BigInteger tmpPublicExponent = publicExponent;
+        if (tmpPublicExponent == null) {
+            tmpPublicExponent = RSAKeyGenParameterSpec.F4;
         }
-        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, localPublicExponent);
+        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, tmpPublicExponent);
         if (random == null) {
             kpGen.initialize(params);
         } else {

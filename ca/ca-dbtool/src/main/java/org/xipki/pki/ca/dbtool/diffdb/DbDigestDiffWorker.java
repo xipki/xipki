@@ -74,7 +74,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final Set<byte[]> includeCaCerts;
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final String reportDir;
 
@@ -83,7 +83,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
     private final NumThreads numThreads;
 
     public DbDigestDiffWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final boolean revokedOnly,
             final String refDirname,
@@ -94,7 +94,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             final NumThreads numThreads,
             final Set<byte[]> includeCaCerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
         this.numThreads = ParamUtil.requireNonNull("numThreads", numThreads);
 
@@ -134,7 +134,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
 
         this.revokedOnly = revokedOnly;
         if (refDirname != null) {
@@ -144,7 +144,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             this.refDirname = null;
             Properties refProps = DbPorter.getDbConfProperties(
                     new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
-            this.refDatasource = dataSourceFactory.createDataSource(
+            this.refDatasource = datasourceFactory.createDataSource(
                     null, refProps, passwordResolver);
         }
     } // constructor DbDigestDiffWorker
@@ -157,10 +157,10 @@ public class DbDigestDiffWorker extends DbPortWorker {
         try {
             DbDigestDiff diff;
             if (refDirname != null) {
-                diff = DbDigestDiff.getInstanceForDirRef(refDirname, dataSource, reportDir,
+                diff = DbDigestDiff.getInstanceForDirRef(refDirname, datasource, reportDir,
                         revokedOnly, stopMe, numCertsPerSelect, numThreads);
             } else {
-                diff = DbDigestDiff.getInstanceForDbRef(refDatasource, dataSource, reportDir,
+                diff = DbDigestDiff.getInstanceForDbRef(refDatasource, datasource, reportDir,
                         revokedOnly, stopMe, numCertsPerSelect, numThreads);
             }
             diff.setIncludeCaCerts(includeCaCerts);
@@ -175,9 +175,9 @@ public class DbDigestDiffWorker extends DbPortWorker {
             }
 
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

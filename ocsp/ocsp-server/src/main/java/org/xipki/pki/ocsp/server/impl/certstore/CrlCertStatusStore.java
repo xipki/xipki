@@ -702,26 +702,26 @@ public class CrlCertStatusStore extends CertStatusStore {
                     : certHashAlg;
         }
 
-        Date localThisUpdate;
-        Date localNextUpdate = null;
+        Date tmpThisUpdate;
+        Date tmpNextUpdate = null;
 
         if (useUpdateDatesFromCRL) {
-            localThisUpdate = this.thisUpdate;
+            tmpThisUpdate = this.thisUpdate;
 
             if (this.nextUpdate != null) {
                 // this.nextUpdate is still in the future (10 seconds buffer)
                 if (this.nextUpdate.getTime() > System.currentTimeMillis() + 10 * 1000) {
-                    localNextUpdate = this.nextUpdate;
+                    tmpNextUpdate = this.nextUpdate;
                 }
             }
         } else {
-            localThisUpdate = new Date();
+            tmpThisUpdate = new Date();
         }
 
         IssuerHashNameAndKey issuerHashNameAndKey = issuerHashMap.get(hashAlgo);
 
         if (!issuerHashNameAndKey.match(hashAlgo, issuerNameHash, issuerKeyHash)) {
-            return CertStatusInfo.getIssuerUnknownCertStatusInfo(localThisUpdate, localNextUpdate);
+            return CertStatusInfo.getIssuerUnknownCertStatusInfo(tmpThisUpdate, tmpNextUpdate);
         }
 
         CertStatusInfo certStatusInfo = null;
@@ -735,19 +735,19 @@ public class CrlCertStatusStore extends CertStatusStore {
                     && !certprofileOption.include(profileName);
             if (ignore) {
                 certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(
-                        localThisUpdate, localNextUpdate);
+                        tmpThisUpdate, tmpNextUpdate);
             } else {
-                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, localThisUpdate,
-                        localNextUpdate);
+                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, tmpThisUpdate,
+                        tmpNextUpdate);
             }
         } else {
             // SerialNumber is unknown
             if (isUnknownSerialAsGood()) {
                 certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
-                        null, null, localThisUpdate, localNextUpdate, null);
+                        null, null, tmpThisUpdate, tmpNextUpdate, null);
             } else {
                 certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(
-                        localThisUpdate, localNextUpdate);
+                        tmpThisUpdate, tmpNextUpdate);
             }
         }
 

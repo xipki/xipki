@@ -548,7 +548,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         ParamUtil.requireNonNull("text", text);
         ParamUtil.requireNonNull("type", type);
 
-        String ttext = text.trim();
+        String tmpText = text.trim();
 
         StringType stringType = null;
 
@@ -558,24 +558,24 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             String suffix = option.getSuffix();
 
             if (prefix != null || suffix != null) {
-                String localText = ttext.toLowerCase();
-                if (prefix != null && localText.startsWith(prefix.toLowerCase())) {
-                    ttext = ttext.substring(prefix.length());
-                    localText = ttext.toLowerCase();
+                String lTmpText = tmpText.toLowerCase();
+                if (prefix != null && lTmpText.startsWith(prefix.toLowerCase())) {
+                    tmpText = tmpText.substring(prefix.length());
+                    lTmpText = tmpText.toLowerCase();
                 }
 
-                if (suffix != null && localText.endsWith(suffix.toLowerCase())) {
-                    ttext = ttext.substring(0, ttext.length() - suffix.length());
+                if (suffix != null && lTmpText.endsWith(suffix.toLowerCase())) {
+                    tmpText = tmpText.substring(0, tmpText.length() - suffix.length());
                 }
             }
 
             List<Pattern> patterns = option.getPatterns();
             if (patterns != null) {
                 Pattern p = patterns.get(index);
-                if (!p.matcher(ttext).matches()) {
+                if (!p.matcher(tmpText).matches()) {
                     throw new BadCertTemplateException(
                         String.format("invalid subject %s '%s' against regex '%s'",
-                                ObjectIdentifiers.oidToDisplayName(type), ttext, p.pattern()));
+                                ObjectIdentifiers.oidToDisplayName(type), tmpText, p.pattern()));
                 }
             }
 
@@ -583,13 +583,13 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (prefix != null) {
                 sb.append(prefix);
             }
-            sb.append(ttext);
+            sb.append(tmpText);
             if (suffix != null) {
                 sb.append(suffix);
             }
-            ttext = sb.toString();
+            tmpText = sb.toString();
 
-            int len = ttext.length();
+            int len = tmpText.length();
             Range range = option.getStringLengthRange();
             Integer minLen = (range == null)
                     ? null
@@ -598,7 +598,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (minLen != null && len < minLen) {
                 throw new BadCertTemplateException(
                     String.format("subject %s '%s' is too short (length (%d) < minLen (%d))",
-                        ObjectIdentifiers.oidToDisplayName(type), ttext, len, minLen));
+                        ObjectIdentifiers.oidToDisplayName(type), tmpText, len, minLen));
             }
 
             Integer maxLen = (range == null)
@@ -608,7 +608,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (maxLen != null && len > maxLen) {
                 throw new BadCertTemplateException(
                         String.format("subject %s '%s' is too long (length (%d) > maxLen (%d))",
-                                ObjectIdentifiers.oidToDisplayName(type), ttext, len, maxLen));
+                                ObjectIdentifiers.oidToDisplayName(type), tmpText, len, maxLen));
             }
         }
 
@@ -616,7 +616,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             stringType = StringType.utf8String;
         }
 
-        return stringType.createString(ttext.trim());
+        return stringType.createString(tmpText.trim());
     } // method createRdnValue
 
     private static String oidToDisplayName(

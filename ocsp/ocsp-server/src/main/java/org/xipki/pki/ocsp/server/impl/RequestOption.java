@@ -132,15 +132,15 @@ class RequestOption {
             nonceRequired = false;
         }
 
-        int localMaxSize = 0;
+        int tmpMaxSize = 0;
         if (conf.getMaxRequestSize() != null) {
-            localMaxSize = conf.getMaxRequestSize().intValue();
+            tmpMaxSize = conf.getMaxRequestSize().intValue();
         }
 
-        if (localMaxSize < 255) {
-            localMaxSize = 4 * 1024; // 4 KB
+        if (tmpMaxSize < 255) {
+            tmpMaxSize = 4 * 1024; // 4 KB
         }
-        this.maxRequestSize = localMaxSize;
+        this.maxRequestSize = tmpMaxSize;
 
         this.nonceMinLen = minLen;
         this.nonceMaxLen = maxLen;
@@ -278,7 +278,7 @@ class RequestOption {
             final CertCollectionType conf)
     throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);
-        Set<X509Certificate> localCerts = new HashSet<>();
+        Set<X509Certificate> tmpCerts = new HashSet<>();
 
         if (conf.getKeystore() != null) {
             Keystore ksConf = conf.getKeystore();
@@ -301,7 +301,7 @@ class RequestOption {
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
                 if (trustStore.isCertificateEntry(alias)) {
-                    localCerts.add((X509Certificate) trustStore.getCertificate(alias));
+                    tmpCerts.add((X509Certificate) trustStore.getCertificate(alias));
                 }
             }
         } else if (conf.getDir() != null) {
@@ -310,7 +310,7 @@ class RequestOption {
             if (files != null) {
                 for (File file : files) {
                     if (file.exists() && file.isFile()) {
-                        localCerts.add(X509Util.parseCert(file));
+                        tmpCerts.add(X509Util.parseCert(file));
                     }
                 }
             }
@@ -318,7 +318,7 @@ class RequestOption {
             throw new RuntimeException("should not happen, neither keystore nor dir is defined");
         }
 
-        return localCerts;
+        return tmpCerts;
     } // method getCerts
 
 }

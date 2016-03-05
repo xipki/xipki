@@ -93,16 +93,16 @@ public class ResponderUpdateCmd extends CaCommandSupport {
         if (signerConf == null) {
             return signerConf;
         }
-        String localSignerType = signerType;
-        if (localSignerType == null) {
+        String tmpSignerType = signerType;
+        if (tmpSignerType == null) {
             CmpResponderEntry entry = caManager.getCmpResponder(name);
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
-            localSignerType = entry.getType();
+            tmpSignerType = entry.getType();
         }
 
-        return ShellUtil.canonicalizeSignerConf(localSignerType, signerConf, passwordResolver,
+        return ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, passwordResolver,
                 securityFactory);
     }
 

@@ -145,25 +145,25 @@ public abstract class XipkiCommandSupport implements Action {
             }
         }
 
-        String localPromptPrefix = promptPrefix;
-        if (localPromptPrefix == null || localPromptPrefix.isEmpty()) {
-            localPromptPrefix = "saved to file";
+        String tmpPromptPrefix = promptPrefix;
+        if (tmpPromptPrefix == null || tmpPromptPrefix.isEmpty()) {
+            tmpPromptPrefix = "saved to file";
         }
 
-        out(localPromptPrefix + " " + saveTo.getPath());
+        out(tmpPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
     protected void save(
             final File file,
             final byte[] encoded)
     throws IOException {
-        File localFile = expandFilepath(file);
-        File parent = localFile.getParentFile();
+        File tmpFile = expandFilepath(file);
+        File parent = tmpFile.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
-        FileOutputStream out = new FileOutputStream(localFile);
+        FileOutputStream out = new FileOutputStream(tmpFile);
         try {
             out.write(encoded);
         } finally {
@@ -280,16 +280,16 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected static BigInteger toBigInt(
-            final String s) {
-        String localS = s.trim();
-        if (localS.startsWith("0x") || localS.startsWith("0X")) {
-            if (localS.length() > 2) {
-                return new BigInteger(localS.substring(2), 16);
+            final String str) {
+        String tmpStr = str.trim();
+        if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
+            if (tmpStr.length() > 2) {
+                return new BigInteger(tmpStr.substring(2), 16);
             } else {
-                throw new NumberFormatException("invalid integer '" + localS + "'");
+                throw new NumberFormatException("invalid integer '" + tmpStr + "'");
             }
         }
-        return new BigInteger(localS);
+        return new BigInteger(tmpStr);
     }
 
     protected boolean confirm(

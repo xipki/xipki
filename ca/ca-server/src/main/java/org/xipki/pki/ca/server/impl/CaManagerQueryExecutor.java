@@ -116,11 +116,11 @@ class CaManagerQueryExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
-    private DataSourceWrapper dataSource;
+    private DataSourceWrapper datasource;
 
     CaManagerQueryExecutor(
-            final DataSourceWrapper dataSource) {
-        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
+            final DataSourceWrapper datasource) {
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
     }
 
     private X509Certificate generateCert(
@@ -142,13 +142,13 @@ class CaManagerQueryExecutor {
     throws CaMgmtException {
         Connection dsConnection;
         try {
-            dsConnection = dataSource.getConnection();
+            dsConnection = datasource.getConnection();
         } catch (DataAccessException ex) {
             throw new CaMgmtException("could not get connection", ex);
         }
 
         try {
-            return dataSource.createStatement(dsConnection);
+            return datasource.createStatement(dsConnection);
         } catch (DataAccessException ex) {
             throw new CaMgmtException("could not create statement", ex);
         }
@@ -157,7 +157,7 @@ class CaManagerQueryExecutor {
     private PreparedStatement prepareFetchFirstStatement(
             final String sql)
     throws CaMgmtException {
-        return prepareStatement(dataSource.createFetchFirstSelectSQL(sql, 1));
+        return prepareStatement(datasource.createFetchFirstSelectSQL(sql, 1));
     }
 
     private PreparedStatement prepareStatement(
@@ -165,13 +165,13 @@ class CaManagerQueryExecutor {
     throws CaMgmtException {
         Connection dsConnection;
         try {
-            dsConnection = dataSource.getConnection();
+            dsConnection = datasource.getConnection();
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
 
         try {
-            return dataSource.prepareStatement(dsConnection, sql);
+            return datasource.prepareStatement(dsConnection, sql);
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -197,10 +197,10 @@ class CaManagerQueryExecutor {
             String eventOwner = rs.getString("EVENT_OWNER");
             return new SystemEvent(eventName, eventOwner, eventTime);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method getSystemEvent
 
@@ -215,10 +215,10 @@ class CaManagerQueryExecutor {
             ps.setString(1, eventName);
             ps.executeUpdate();
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method deleteSystemEvent
 
@@ -237,10 +237,10 @@ class CaManagerQueryExecutor {
             ps.setTimestamp(idx++, new Timestamp(systemEvent.getEventTime() * 1000L));
             ps.setString(idx++, systemEvent.getOwner());
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addSystemEvent
 
@@ -269,10 +269,10 @@ class CaManagerQueryExecutor {
                 map.put(name, value);
             }
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
 
         return map;
@@ -296,10 +296,10 @@ class CaManagerQueryExecutor {
                 map.put(name, caName);
             }
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
 
         return map;
@@ -325,10 +325,10 @@ class CaManagerQueryExecutor {
 
             return new CertprofileEntry(name, type, conf);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCertprofile
 
@@ -361,10 +361,10 @@ class CaManagerQueryExecutor {
 
             return names;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method getNamesFromTable
 
@@ -387,10 +387,10 @@ class CaManagerQueryExecutor {
             String conf = rs.getString("CONF");
             return new PublisherEntry(name, type, conf);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createPublisher
 
@@ -413,10 +413,10 @@ class CaManagerQueryExecutor {
             String b64Cert = rs.getString("CERT");
             return new CmpRequestorEntry(name, b64Cert);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createRequestor
 
@@ -444,12 +444,12 @@ class CaManagerQueryExecutor {
             return new X509CrlSignerEntry(name, signerType, signerConf, signerCert,
                     crlControlConf);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCrlSigner
 
@@ -472,10 +472,10 @@ class CaManagerQueryExecutor {
             String conf = rs.getString("CONF");
             return new CmpControlEntry(name, conf);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCmpControl
 
@@ -500,10 +500,10 @@ class CaManagerQueryExecutor {
             String b64Cert = rs.getString("CERT");
             return new CmpResponderEntry(name, type, conf, b64Cert);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createResponder
 
@@ -651,10 +651,10 @@ class CaManagerQueryExecutor {
                 throw new CaMgmtException(ex.getMessage(), ex);
             }
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCaInfo
 
@@ -692,10 +692,10 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCaHasRequestors
 
@@ -721,10 +721,10 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCaHasProfiles
 
@@ -756,10 +756,10 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, rs);
+            datasource.releaseResources(stmt, rs);
         }
     } // method createCaHasNames
 
@@ -776,10 +776,10 @@ class CaManagerQueryExecutor {
             ps.setString(1, name);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method deleteRowWithName
 
@@ -792,10 +792,10 @@ class CaManagerQueryExecutor {
             stmt = createStatement();
             return stmt.executeUpdate(sql) > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(stmt, null);
+            datasource.releaseResources(stmt, null);
         }
     } // method deleteRows
 
@@ -865,19 +865,19 @@ class CaManagerQueryExecutor {
 
             // create serial sequence
             if (nextSerial > 0) {
-                dataSource.createSequence(entry.getSerialSeqName(), nextSerial);
+                datasource.createSequence(entry.getSerialSeqName(), nextSerial);
             }
 
             if (LOG.isInfoEnabled()) {
                 LOG.info("add CA '{}': {}", name, entry.toString(false, true));
             }
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (CertificateEncodingException | DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCa
 
@@ -898,10 +898,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CA alias '{}' for CA '{}'", aliasName, caName);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCaAlias
 
@@ -925,10 +925,10 @@ class CaManagerQueryExecutor {
 
             LOG.info("added profile '{}': {}", name, dbEntry);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCertprofile
 
@@ -953,10 +953,10 @@ class CaManagerQueryExecutor {
             LOG.info("added profile '{} (localname {})' to CA '{}'", profileName,
                     profileLocalName, caName);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCertprofileToCa
 
@@ -976,10 +976,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CMP control: {}", dbEntry);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCmpControl
 
@@ -1000,12 +1000,12 @@ class CaManagerQueryExecutor {
                 LOG.info("added requestor '{}': {}", name, dbEntry.toString(false));
             }
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCmpRequestor
 
@@ -1040,10 +1040,10 @@ class CaManagerQueryExecutor {
             LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
                     requestorName, caName, ra, permissionText, profilesText);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCmpRequestorToCa
 
@@ -1084,12 +1084,12 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CRL signer '{}': {}", name, dbEntry.toString(false, true));
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCrlSigner
 
@@ -1109,10 +1109,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added environment param '{}': {}", name, value);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addEnvParam
 
@@ -1134,10 +1134,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added publisher '{}': {}", name, dbEntry);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addPublisher
 
@@ -1154,10 +1154,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added publisher '{}' to CA '{}'", publisherName, caName);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addPublisherToCa
 
@@ -1208,23 +1208,23 @@ class CaManagerQueryExecutor {
                     throw new CaMgmtException("no CA '" + name + "' is defined");
                 }
 
-                String localSignerType = rs.getString("SIGNER_TYPE");
-                String localSignerConf = rs.getString("SIGNER_CONF");
-                String localB64Cert = rs.getString("CERT");
+                String tmpSignerType = rs.getString("SIGNER_TYPE");
+                String tmpSignerConf = rs.getString("SIGNER_CONF");
+                String tmpB64Cert = rs.getString("CERT");
                 if (signerType != null) {
-                    localSignerType = signerType;
+                    tmpSignerType = signerType;
                 }
 
                 if (lSignerConf != null) {
-                    localSignerConf = getRealString(lSignerConf);
+                    tmpSignerConf = getRealString(lSignerConf);
                 }
 
-                X509Certificate localCert;
+                X509Certificate tmpCert;
                 if (cert != null) {
-                    localCert = cert;
+                    tmpCert = cert;
                 } else {
                     try {
-                        localCert = X509Util.parseBase64EncodedCert(localB64Cert);
+                        tmpCert = X509Util.parseBase64EncodedCert(tmpB64Cert);
                     } catch (CertificateException | IOException ex) {
                         throw new CaMgmtException(
                                 "could not parse the stored certificate for CA '" + name + "'"
@@ -1233,20 +1233,20 @@ class CaManagerQueryExecutor {
                 }
 
                 try {
-                    List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(localSignerConf);
+                    List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(tmpSignerConf);
                     for (String[] m : signerConfs) {
                         String signerConf = m[1];
-                        securityFactory.createSigner(localSignerType, signerConf, localCert);
+                        securityFactory.createSigner(tmpSignerType, signerConf, tmpCert);
                     }
                 } catch (SignerException ex) {
                     throw new CaMgmtException(
                             "could not create signer for CA '" + name + "'" + ex.getMessage(), ex);
                 }
             } catch (SQLException ex) {
-                DataAccessException tEx = dataSource.translate(sql, ex);
+                DataAccessException tEx = datasource.translate(sql, ex);
                 throw new CaMgmtException(tEx.getMessage(), tEx);
             } finally {
-                dataSource.releaseResources(stmt, rs);
+                datasource.releaseResources(stmt, rs);
             }
         } // end if
 
@@ -1430,12 +1430,12 @@ class CaManagerQueryExecutor {
             LOG.info("changed CA '{}': {}", name, m);
             return true;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeCa
 
@@ -1455,18 +1455,18 @@ class CaManagerQueryExecutor {
 
         StringBuilder m = new StringBuilder();
 
-        String localType = type;
-        String localConf = conf;
+        String tmpType = type;
+        String tmpConf = conf;
 
-        if (localType != null) {
-            m.append("type: '").append(localType).append("'; ");
+        if (tmpType != null) {
+            m.append("type: '").append(tmpType).append("'; ");
         }
-        if (localConf != null) {
-            m.append("conf: '").append(localConf).append("'; ");
+        if (tmpConf != null) {
+            m.append("conf: '").append(tmpConf).append("'; ");
         }
 
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, tmpType, "TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, tmpConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
         if (index.get() == 1) {
@@ -1474,17 +1474,17 @@ class CaManagerQueryExecutor {
         }
 
         CertprofileEntry currentDbEntry = createCertprofile(name);
-        if (localType == null) {
-            localType = currentDbEntry.getType();
+        if (tmpType == null) {
+            tmpType = currentDbEntry.getType();
         }
-        if (localConf == null) {
-            localConf = currentDbEntry.getConf();
+        if (tmpConf == null) {
+            tmpConf = currentDbEntry.getConf();
         }
 
-        localType = getRealString(localType);
-        localConf = getRealString(localConf);
+        tmpType = getRealString(tmpType);
+        tmpConf = getRealString(tmpConf);
 
-        CertprofileEntry newDbEntry = new CertprofileEntry(name, localType, localConf);
+        CertprofileEntry newDbEntry = new CertprofileEntry(name, tmpType, tmpConf);
         IdentifiedX509Certprofile profile = caManager.createCertprofile(newDbEntry);
         if (profile == null) {
             return null;
@@ -1497,11 +1497,11 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                ps.setString(iType, localType);
+                ps.setString(iType, tmpType);
             }
 
             if (iConf != null) {
-                ps.setString(iConf, getRealString(localConf));
+                ps.setString(iConf, getRealString(tmpConf));
             }
 
             ps.setString(index.get(), name);
@@ -1515,10 +1515,10 @@ class CaManagerQueryExecutor {
             failed = false;
             return profile;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
             if (failed) {
                 profile.shutdown();
             }
@@ -1553,10 +1553,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP control '{}': {}", name, conf);
             return cmpControl;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeCmpControl
 
@@ -1591,10 +1591,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP requestor '{}': {}", name, subject);
             return requestor;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeCmpRequestor
 
@@ -1611,14 +1611,14 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE RESPONDER SET ");
 
-        String localType = type;
-        String localConf = conf;
-        String localBase64Cert = base64Cert;
+        String tmpType = type;
+        String tmpConf = conf;
+        String tmpBase64Cert = base64Cert;
 
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, localBase64Cert, "CERT");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, tmpType, "TYPE");
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, tmpBase64Cert, "CERT");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, tmpConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -1628,20 +1628,20 @@ class CaManagerQueryExecutor {
 
         CmpResponderEntry dbEntry = createResponder(name);
 
-        if (localType == null) {
-            localType = dbEntry.getType();
+        if (tmpType == null) {
+            tmpType = dbEntry.getType();
         }
 
-        if (localConf == null) {
-            localConf = dbEntry.getConf();
+        if (tmpConf == null) {
+            tmpConf = dbEntry.getConf();
         }
 
-        if (localBase64Cert == null) {
-            localBase64Cert = dbEntry.getBase64Cert();
+        if (tmpBase64Cert == null) {
+            tmpBase64Cert = dbEntry.getBase64Cert();
         }
 
-        CmpResponderEntry newDbEntry = new CmpResponderEntry(name, localType,
-                localConf, localBase64Cert);
+        CmpResponderEntry newDbEntry = new CmpResponderEntry(name, tmpType,
+                tmpConf, tmpBase64Cert);
         CmpResponderEntryWrapper responder = caManager.createCmpResponder(newDbEntry);
 
         final String sql = sqlBuilder.toString();
@@ -1652,19 +1652,19 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                String txt = localType;
+                String txt = tmpType;
                 ps.setString(iType, txt);
                 m.append("type: '").append(txt).append("'; ");
             }
 
             if (iConf != null) {
-                String txt = getRealString(localConf);
+                String txt = getRealString(tmpConf);
                 m.append("conf: '").append(SignerConfUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
             if (iCert != null) {
-                String txt = getRealString(localBase64Cert);
+                String txt = getRealString(tmpBase64Cert);
                 m.append("cert: '");
                 if (txt == null) {
                     m.append("null");
@@ -1690,10 +1690,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP responder: {}", m);
             return responder;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeCmpResponder
 
@@ -1711,17 +1711,17 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
-        String localSignerType = signerType;
-        String localSignerConf = signerConf;
-        String localBase64Cert = base64Cert;
-        String localCrlControl = crlControl;
+        String tmpSignerType = signerType;
+        String tmpSignerConf = signerConf;
+        String tmpBase64Cert = base64Cert;
+        String tmpCrlControl = crlControl;
 
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, localSignerType, "SIGNER_TYPE");
-        Integer iSignerCert = addToSqlIfNotNull(sqlBuilder, index, localBase64Cert, "SIGNER_CERT");
-        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, localCrlControl, "CRL_CONTROL");
-        Integer iSignerConf = addToSqlIfNotNull(sqlBuilder, index, localSignerConf, "SIGNER_CONF");
+        Integer iSignerType = addToSqlIfNotNull(sqlBuilder, index, tmpSignerType, "SIGNER_TYPE");
+        Integer iSignerCert = addToSqlIfNotNull(sqlBuilder, index, tmpBase64Cert, "SIGNER_CERT");
+        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, tmpCrlControl, "CRL_CONTROL");
+        Integer iSignerConf = addToSqlIfNotNull(sqlBuilder, index, tmpSignerConf, "SIGNER_CONF");
 
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
@@ -1731,39 +1731,39 @@ class CaManagerQueryExecutor {
         }
 
         X509CrlSignerEntry dbEntry = createCrlSigner(name);
-        if (localSignerType == null) {
-            localSignerType = dbEntry.getType();
+        if (tmpSignerType == null) {
+            tmpSignerType = dbEntry.getType();
         }
 
-        if ("CA".equalsIgnoreCase(localSignerType)) {
-            localSignerConf = null;
-            localBase64Cert = null;
+        if ("CA".equalsIgnoreCase(tmpSignerType)) {
+            tmpSignerConf = null;
+            tmpBase64Cert = null;
         } else {
-            if (localSignerConf == null) {
-                localSignerConf = dbEntry.getConf();
+            if (tmpSignerConf == null) {
+                tmpSignerConf = dbEntry.getConf();
             }
 
-            if (localBase64Cert == null) {
-                localBase64Cert = dbEntry.getBase64Cert();
+            if (tmpBase64Cert == null) {
+                tmpBase64Cert = dbEntry.getBase64Cert();
             }
         }
 
-        if (localCrlControl == null) {
-            localCrlControl = dbEntry.getCrlControl();
+        if (tmpCrlControl == null) {
+            tmpCrlControl = dbEntry.getCrlControl();
         } else {
             // validate crlControl
-            if (localCrlControl != null) {
+            if (tmpCrlControl != null) {
                 try {
-                    new CrlControl(localCrlControl);
+                    new CrlControl(tmpCrlControl);
                 } catch (InvalidConfException ex) {
-                    throw new CaMgmtException("invalid CRL control '" + localCrlControl + "'");
+                    throw new CaMgmtException("invalid CRL control '" + tmpCrlControl + "'");
                 }
             }
         }
 
         try {
-            dbEntry = new X509CrlSignerEntry(name, localSignerType, localSignerConf,
-                    localBase64Cert, localCrlControl);
+            dbEntry = new X509CrlSignerEntry(name, tmpSignerType, tmpSignerConf,
+                    tmpBase64Cert, tmpCrlControl);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -1778,12 +1778,12 @@ class CaManagerQueryExecutor {
             ps = prepareStatement(sql);
 
             if (iSignerType != null) {
-                m.append("signerType: '").append(localSignerType).append("'; ");
-                ps.setString(iSignerType, localSignerType);
+                m.append("signerType: '").append(tmpSignerType).append("'; ");
+                ps.setString(iSignerType, tmpSignerType);
             }
 
             if (iSignerConf != null) {
-                String txt = getRealString(localSignerConf);
+                String txt = getRealString(tmpSignerConf);
                 m.append("signerConf: '")
                     .append(SignerConfUtil.signerConfToString(txt, false, true))
                     .append("'; ");
@@ -1791,7 +1791,7 @@ class CaManagerQueryExecutor {
             }
 
             if (iSignerCert != null) {
-                String txt = getRealString(localBase64Cert);
+                String txt = getRealString(tmpBase64Cert);
                 String subject = null;
                 if (txt != null) {
                     try {
@@ -1806,8 +1806,8 @@ class CaManagerQueryExecutor {
             }
 
             if (iCrlControl != null) {
-                m.append("crlControl: '").append(localCrlControl).append("'; ");
-                ps.setString(iCrlControl, localCrlControl);
+                m.append("crlControl: '").append(tmpCrlControl).append("'; ");
+                ps.setString(iCrlControl, tmpCrlControl);
             }
 
             ps.setString(index.get(), name);
@@ -1819,10 +1819,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed CRL signer '{}': {}", name, m);
             return crlSigner;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeCrlSigner
 
@@ -1840,19 +1840,19 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE SCEP SET ");
 
-        String localResponderType = responderType;
-        String localResponderConf = responderConf;
-        String localResponderBase64Cert = responderBase64Cert;
-        String localControl = control;
+        String tmpResponderType = responderType;
+        String tmpResponderConf = responderConf;
+        String tmpResponderBase64Cert = responderBase64Cert;
+        String tmpControl = control;
 
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localResponderType,
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, tmpResponderType,
                 "RESPONDER_TYPE");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, localResponderBase64Cert,
+        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, tmpResponderBase64Cert,
                 "RESPONDER_CERT");
-        Integer iControl = addToSqlIfNotNull(sqlBuilder, index, localControl,
+        Integer iControl = addToSqlIfNotNull(sqlBuilder, index, tmpControl,
                 "CONTROL");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localResponderConf,
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, tmpResponderConf,
                 "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE CA_NAME=?");
@@ -1863,28 +1863,28 @@ class CaManagerQueryExecutor {
 
         ScepEntry dbEntry = getScep(caName);
 
-        if (localResponderType == null) {
-            localResponderType = dbEntry.getResponderType();
+        if (tmpResponderType == null) {
+            tmpResponderType = dbEntry.getResponderType();
         }
 
-        if (localResponderConf == null) {
-            localResponderConf = dbEntry.getResponderConf();
+        if (tmpResponderConf == null) {
+            tmpResponderConf = dbEntry.getResponderConf();
         }
 
-        if (localResponderBase64Cert == null) {
-            localResponderBase64Cert = dbEntry.getBase64Cert();
+        if (tmpResponderBase64Cert == null) {
+            tmpResponderBase64Cert = dbEntry.getBase64Cert();
         }
 
-        if (localControl == null) {
-            localControl = dbEntry.getControl();
-        } else if (CaManager.NULL.equals(localControl)) {
-            localControl = null;
+        if (tmpControl == null) {
+            tmpControl = dbEntry.getControl();
+        } else if (CaManager.NULL.equals(tmpControl)) {
+            tmpControl = null;
         }
 
         ScepEntry newDbEntry;
         try {
-            newDbEntry = new ScepEntry(caName, localResponderType, localResponderConf,
-                    localResponderBase64Cert, localControl);
+            newDbEntry = new ScepEntry(caName, tmpResponderType, tmpResponderConf,
+                    tmpResponderBase64Cert, tmpControl);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
@@ -1898,20 +1898,20 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             if (iType != null) {
-                String txt = localResponderType;
+                String txt = tmpResponderType;
                 ps.setString(iType, txt);
                 m.append("responder type: '").append(txt).append("'; ");
             }
 
             if (iConf != null) {
-                String txt = getRealString(localResponderConf);
+                String txt = getRealString(tmpResponderConf);
                 m.append("responder conf: '")
                     .append(SignerConfUtil.signerConfToString(txt, false, true));
                 ps.setString(iConf, txt);
             }
 
             if (iCert != null) {
-                String txt = getRealString(localResponderBase64Cert);
+                String txt = getRealString(tmpResponderBase64Cert);
                 m.append("responder cert: '");
                 if (txt == null) {
                     m.append("null");
@@ -1929,8 +1929,8 @@ class CaManagerQueryExecutor {
             }
 
             if (iControl != null) {
-                String txt = getRealString(localControl);
-                m.append("control: '").append(localControl);
+                String txt = getRealString(tmpControl);
+                m.append("control: '").append(tmpControl);
                 ps.setString(iControl, txt);
             }
 
@@ -1943,10 +1943,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP responder: {}", m);
             return scep;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeScep
 
@@ -1971,10 +1971,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed environment param '{}': {}", name, value);
             return true;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeEnvParam
 
@@ -1990,12 +1990,12 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PUBLISHER SET ");
 
-        String localType = type;
-        String localConf = conf;
+        String tmpType = type;
+        String tmpConf = conf;
 
         AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, localType, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, localConf, "CONF");
+        Integer iType = addToSqlIfNotNull(sqlBuilder, index, tmpType, "TYPE");
+        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, tmpConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
@@ -2004,15 +2004,15 @@ class CaManagerQueryExecutor {
         }
 
         PublisherEntry currentDbEntry = createPublisher(name);
-        if (localType == null) {
-            localType = currentDbEntry.getType();
+        if (tmpType == null) {
+            tmpType = currentDbEntry.getType();
         }
 
-        if (localConf == null) {
-            localConf = currentDbEntry.getConf();
+        if (tmpConf == null) {
+            tmpConf = currentDbEntry.getConf();
         }
 
-        PublisherEntry dbEntry = new PublisherEntry(name, localType, localConf);
+        PublisherEntry dbEntry = new PublisherEntry(name, tmpType, tmpConf);
         IdentifiedX509CertPublisher publisher = caManager.createPublisher(dbEntry);
         if (publisher == null) {
             return null;
@@ -2025,14 +2025,14 @@ class CaManagerQueryExecutor {
             StringBuilder m = new StringBuilder();
             ps = prepareStatement(sql);
             if (iType != null) {
-                m.append("type: '").append(localType).append("'; ");
-                ps.setString(iType, localType);
+                m.append("type: '").append(tmpType).append("'; ");
+                ps.setString(iType, tmpType);
             }
 
             if (iConf != null) {
-                String txt = getRealString(localConf);
+                String txt = getRealString(tmpConf);
                 m.append("conf: '").append(txt).append("'; ");
-                ps.setString(iConf, getRealString(localConf));
+                ps.setString(iConf, getRealString(tmpConf));
             }
 
             ps.setString(index.get(), name);
@@ -2044,10 +2044,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed publisher '{}': {}", name, m);
             return publisher;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changePublisher
 
@@ -2063,10 +2063,10 @@ class CaManagerQueryExecutor {
             ps.setString(1, caName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeCa
 
@@ -2086,10 +2086,10 @@ class CaManagerQueryExecutor {
             }
             return b;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeCaAlias
 
@@ -2112,10 +2112,10 @@ class CaManagerQueryExecutor {
             }
             return b;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeCertprofileFromCa
 
@@ -2138,10 +2138,10 @@ class CaManagerQueryExecutor {
             }
             return b;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeCmpRequestorFromCa
 
@@ -2163,10 +2163,10 @@ class CaManagerQueryExecutor {
             }
             return b;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removePublisherFromCa
 
@@ -2196,10 +2196,10 @@ class CaManagerQueryExecutor {
             }
             return b;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method revokeCa
 
@@ -2227,12 +2227,12 @@ class CaManagerQueryExecutor {
 
             LOG.info("changed responder: {}", dbEntry.toString(false, true));
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method addCmpResponder
 
@@ -2245,9 +2245,9 @@ class CaManagerQueryExecutor {
             stmt.execute(sql);
             return stmt.getUpdateCount() > 0;
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(stmt, null);
+            datasource.releaseResources(stmt, null);
         }
     } // method unlockCa
 
@@ -2269,10 +2269,10 @@ class CaManagerQueryExecutor {
             ps.setString(i++, caName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method unrevokeCa
 
@@ -2292,11 +2292,11 @@ class CaManagerQueryExecutor {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             throw new CaMgmtException(ex);
         }
-        UserEntry localUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
+        UserEntry tmpUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
 
         try {
-            int maxId = (int) dataSource.getMax(null, "USERNAME", "ID");
-            executeAddUserSql(maxId + 1, localUserEntry);
+            int maxId = (int) datasource.getMax(null, "USERNAME", "ID");
+            executeAddUserSql(maxId + 1, tmpUserEntry);
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex);
         }
@@ -2310,7 +2310,7 @@ class CaManagerQueryExecutor {
             final String user)
     throws CaMgmtException {
         ParamUtil.requireNonBlank("user", user);
-        final String sql = dataSource.createFetchFirstSelectSQL("ID FROM USERNAME WHERE NAME=?", 1);
+        final String sql = datasource.createFetchFirstSelectSQL("ID FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
@@ -2324,9 +2324,9 @@ class CaManagerQueryExecutor {
             }
             return rs.getInt("ID");
         } catch (SQLException ex) {
-            throw new CaMgmtException(dataSource.translate(sql, ex));
+            throw new CaMgmtException(datasource.translate(sql, ex));
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method executeGetUserIdSql
 
@@ -2349,9 +2349,9 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, userEntry.getCnRegex());
             ps.executeUpdate();
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method executeAddUserSql
 
@@ -2367,10 +2367,10 @@ class CaManagerQueryExecutor {
             ps.setString(1, userName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeUser
 
@@ -2425,10 +2425,10 @@ class CaManagerQueryExecutor {
             LOG.info("changed user: {}", m);
             return true;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method changeUser
 
@@ -2436,7 +2436,7 @@ class CaManagerQueryExecutor {
             final String username)
     throws CaMgmtException {
         ParamUtil.requireNonNull("username", username);
-        final String sql = dataSource.createFetchFirstSelectSQL(
+        final String sql = datasource.createFetchFirstSelectSQL(
                 "PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -2454,9 +2454,9 @@ class CaManagerQueryExecutor {
             String cnRegex = rs.getString("CN_REGEX");
             return new UserEntry(username, hashedPassword, cnRegex);
         } catch (SQLException ex) {
-            throw new CaMgmtException(dataSource.translate(sql, ex));
+            throw new CaMgmtException(datasource.translate(sql, ex));
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method getUser
 
@@ -2479,10 +2479,10 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added SCEP '{}': {}", scepEntry.getCaName(), scepEntry);
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
 
         return true;
@@ -2500,10 +2500,10 @@ class CaManagerQueryExecutor {
             ps.setString(1, name);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException tEx = dataSource.translate(sql, ex);
+            DataAccessException tEx = datasource.translate(sql, ex);
             throw new CaMgmtException(tEx.getMessage(), tEx);
         } finally {
-            dataSource.releaseResources(ps, null);
+            datasource.releaseResources(ps, null);
         }
     } // method removeScep
 
@@ -2511,7 +2511,7 @@ class CaManagerQueryExecutor {
             final String caName)
     throws CaMgmtException {
         ParamUtil.requireNonNull("caName", caName);
-        final String sql = dataSource.createFetchFirstSelectSQL(
+        final String sql = datasource.createFetchFirstSelectSQL(
             "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
             1);
         ResultSet rs = null;
@@ -2536,11 +2536,11 @@ class CaManagerQueryExecutor {
 
             return new ScepEntry(caName, type, conf, cert, control);
         } catch (SQLException ex) {
-            throw new CaMgmtException(dataSource.translate(sql, ex));
+            throw new CaMgmtException(datasource.translate(sql, ex));
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         } finally {
-            dataSource.releaseResources(ps, rs);
+            datasource.releaseResources(ps, rs);
         }
     } // method getScep
 

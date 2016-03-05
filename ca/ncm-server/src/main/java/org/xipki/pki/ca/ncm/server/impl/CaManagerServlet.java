@@ -948,11 +948,11 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
         try {
             String storePath = IoUtil.expandFilepath(truststoreFile);
 
-            KeyStore keyStore;
+            KeyStore keystore;
             if (truststoreProvider == null || truststoreProvider.trim().length() == 0) {
-                keyStore = KeyStore.getInstance(truststoreType);
+                keystore = KeyStore.getInstance(truststoreType);
             } else {
-                keyStore = KeyStore.getInstance(truststoreType, truststoreProvider);
+                keystore = KeyStore.getInstance(truststoreType, truststoreProvider);
             }
 
             char[] password;
@@ -962,12 +962,12 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
                 password = securityFactory.getPasswordResolver().resolvePassword(
                         truststorePassword);
             }
-            keyStore.load(new FileInputStream(storePath), password);
-            Enumeration<String> aliases = keyStore.aliases();
+            keystore.load(new FileInputStream(storePath), password);
+            Enumeration<String> aliases = keystore.aliases();
 
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                Certificate cert = keyStore.getCertificate(alias);
+                Certificate cert = keystore.getCertificate(alias);
                 if (cert instanceof X509Certificate) {
                     X509Certificate x509Cert = (X509Certificate) cert;
                     trustedUserCerts.add(x509Cert);

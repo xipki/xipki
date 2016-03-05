@@ -229,16 +229,16 @@ class X509SelfSignedCertBuilder {
             final List<String> deltaCrlUris)
     throws OperationException {
 
-        SubjectPublicKeyInfo localPublicKeyInfo;
+        SubjectPublicKeyInfo tmpPublicKeyInfo;
         try {
-            localPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
+            tmpPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         } catch (InvalidKeySpecException ex) {
             LOG.warn("SecurityUtil.toRfc3279Style", ex);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
         }
 
         try {
-            certprofile.checkPublicKey(localPublicKeyInfo);
+            certprofile.checkPublicKey(tmpPublicKeyInfo);
         } catch (BadCertTemplateException ex) {
             LOG.warn("certprofile.checkPublicKey", ex);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
@@ -273,17 +273,17 @@ class X509SelfSignedCertBuilder {
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-        BigInteger localSerialNumber = BigInteger.valueOf(serialNumber);
+        BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber);
         X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                 grantedSubject,
-                localSerialNumber,
+                tmpSerialNumber,
                 notBefore,
                 notAfter,
                 grantedSubject,
-                localPublicKeyInfo);
+                tmpPublicKeyInfo);
 
         PublicCaInfo publicCaInfo = new PublicCaInfo(
-                grantedSubject, localSerialNumber, null, null,
+                grantedSubject, tmpSerialNumber, null, null,
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
@@ -301,7 +301,7 @@ class X509SelfSignedCertBuilder {
                     certprofile,
                     requestedSubject,
                     extensions,
-                    localPublicKeyInfo,
+                    tmpPublicKeyInfo,
                     publicCaInfo,
                     notBefore,
                     notAfter);

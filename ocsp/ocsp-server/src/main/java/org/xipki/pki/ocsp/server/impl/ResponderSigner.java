@@ -79,16 +79,16 @@ class ResponderSigner {
             final List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
-        X509Certificate[] localCertificateChain = signers.get(0).getCertificateChain();
-        int n = localCertificateChain.length;
+        X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
+        int n = tmpCertificateChain.length;
         if (n > 1) {
-            X509Certificate c = localCertificateChain[n - 1];
+            X509Certificate c = tmpCertificateChain[n - 1];
             if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal())) {
                 n--;
             }
         }
         this.certificateChain = new X509Certificate[n];
-        System.arraycopy(localCertificateChain, 0, this.certificateChain, 0, n);
+        System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, n);
 
         this.certificate = certificateChain[0];
 

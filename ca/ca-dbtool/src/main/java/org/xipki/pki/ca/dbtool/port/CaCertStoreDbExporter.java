@@ -122,7 +122,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private final boolean resume;
 
     CaCertStoreDbExporter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final Marshaller marshaller,
             final Unmarshaller unmarshaller,
             final String baseDir,
@@ -132,7 +132,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException {
-        super(dataSource, baseDir, stopMe, evaluateOnly);
+        super(datasource, baseDir, stopMe, evaluateOnly);
         this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
         this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);

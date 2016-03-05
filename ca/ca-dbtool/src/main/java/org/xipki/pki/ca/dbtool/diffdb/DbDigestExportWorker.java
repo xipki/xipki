@@ -67,7 +67,7 @@ public class DbDigestExportWorker extends DbPortWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbDigestExportWorker.class);
 
-    private final DataSourceWrapper dataSource;
+    private final DataSourceWrapper datasource;
 
     private final String destFolder;
 
@@ -76,14 +76,14 @@ public class DbDigestExportWorker extends DbPortWorker {
     private final int numThreads;
 
     public DbDigestExportWorker(
-            final DataSourceFactory dataSourceFactory,
+            final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
             final String dbConfFile,
             final String destFolder,
             final int numCertsPerSelect,
             final int numThreads)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        ParamUtil.requireNonNull("dataSourceFactory", dataSourceFactory);
+        ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         ParamUtil.requireNonNull("dbConfFile", dbConfFile);
         this.destFolder = ParamUtil.requireNonNull("destFolder", destFolder);
 
@@ -107,7 +107,7 @@ public class DbDigestExportWorker extends DbPortWorker {
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
         this.numCertsPerSelect = numCertsPerSelect;
         this.numThreads = numThreads;
     } // constructor
@@ -118,22 +118,22 @@ public class DbDigestExportWorker extends DbPortWorker {
         long start = System.currentTimeMillis();
 
         try {
-            DbSchemaType dbSchemaType = detectDbSchemaType(dataSource);
+            DbSchemaType dbSchemaType = detectDbSchemaType(datasource);
             System.out.println("database schema: " + dbSchemaType);
             DbDigestExporter digester;
             if (dbSchemaType == DbSchemaType.EJBCA_CA_v3) {
-                digester = new EjbcaDigestExporter(dataSource, destFolder, stopMe,
+                digester = new EjbcaDigestExporter(datasource, destFolder, stopMe,
                         numCertsPerSelect, dbSchemaType, numThreads);
             } else {
-                digester = new XipkiDigestExporter(dataSource, destFolder, stopMe,
+                digester = new XipkiDigestExporter(datasource, destFolder, stopMe,
                         numCertsPerSelect, dbSchemaType, numThreads);
             }
             digester.digest();
         } finally {
             try {
-                dataSource.shutdown();
+                datasource.shutdown();
             } catch (Throwable th) {
-                LOG.error("dataSource.shutdown()", th);
+                LOG.error("datasource.shutdown()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
@@ -141,30 +141,30 @@ public class DbDigestExportWorker extends DbPortWorker {
     } // method doRun
 
     public static DbSchemaType detectDbSchemaType(
-            final DataSourceWrapper dataSource)
+            final DataSourceWrapper datasource)
     throws DataAccessException {
-        Connection conn = dataSource.getConnection();
+        Connection conn = datasource.getConnection();
         try {
-            if (dataSource.tableExists(conn, "CAINFO")
-                    && dataSource.tableExists(conn, "RAWCERT")) {
+            if (datasource.tableExists(conn, "CAINFO")
+                    && datasource.tableExists(conn, "RAWCERT")) {
                 return DbSchemaType.XIPKI_CA_v1;
-            } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CERTHASH")) {
+            } else if (datasource.tableExists(conn, "ISSUER")
+                    && datasource.tableExists(conn, "CERTHASH")) {
                 return DbSchemaType.XIPKI_OCSP_v1;
-            } else if (dataSource.tableExists(conn, "CS_CA")
-                    && dataSource.tableExists(conn, "CRAW")) {
+            } else if (datasource.tableExists(conn, "CS_CA")
+                    && datasource.tableExists(conn, "CRAW")) {
                 return DbSchemaType.XIPKI_CA_v2;
-            } else if (dataSource.tableExists(conn, "ISSUER")
-                    && dataSource.tableExists(conn, "CHASH")) {
+            } else if (datasource.tableExists(conn, "ISSUER")
+                    && datasource.tableExists(conn, "CHASH")) {
                 return DbSchemaType.XIPKI_OCSP_v2;
-            } else if (dataSource.tableExists(conn, "CAData")
-                    && dataSource.tableExists(conn, "CertificateData")) {
+            } else if (datasource.tableExists(conn, "CAData")
+                    && datasource.tableExists(conn, "CertificateData")) {
                 return DbSchemaType.EJBCA_CA_v3;
             } else {
                 throw new IllegalArgumentException("unknown database schema");
             }
         } finally {
-            dataSource.returnConnection(conn);
+            datasource.returnConnection(conn);
         }
     }
 

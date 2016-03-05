@@ -93,9 +93,9 @@ class IdentifiedX509CertPublisher {
 
     public void initialize(
             final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> dataSources)
+            final Map<String, DataSourceWrapper> datasources)
     throws CertPublisherException {
-        certPublisher.initialize(entry.getConf(), passwordResolver, dataSources);
+        certPublisher.initialize(entry.getConf(), passwordResolver, datasources);
     }
 
     public void setEnvParameterResolver(

@@ -441,43 +441,43 @@ public class ObjectIdentifiers {
     // CHECKSTYLE:ON
 
     static {
-        List<ASN1ObjectIdentifier> localForwardDNs = new ArrayList<>(25);
+        List<ASN1ObjectIdentifier> tmpForwardDNs = new ArrayList<>(25);
 
-        localForwardDNs.add(DN_C);
-        localForwardDNs.add(DN_DC);
-        localForwardDNs.add(DN_ST);
-        localForwardDNs.add(DN_L);
-        localForwardDNs.add(DN_O);
-        localForwardDNs.add(DN_organizationIdentifier);
-        localForwardDNs.add(DN_OU);
-        localForwardDNs.add(DN_T);
-        localForwardDNs.add(DN_SURNAME);
-        localForwardDNs.add(DN_INITIALS);
-        localForwardDNs.add(DN_GIVENNAME);
-        localForwardDNs.add(DN_SERIALNUMBER);
-        localForwardDNs.add(DN_NAME);
-        localForwardDNs.add(DN_CN);
-        localForwardDNs.add(DN_LDAP_UID);
-        localForwardDNs.add(DN_DMD_NAME);
-        localForwardDNs.add(DN_EmailAddress);
-        localForwardDNs.add(DN_UnstructuredName);
-        localForwardDNs.add(DN_UnstructuredAddress);
-        localForwardDNs.add(DN_POSTAL_CODE);
-        localForwardDNs.add(DN_BUSINESS_CATEGORY);
-        localForwardDNs.add(DN_POSTAL_ADDRESS);
-        localForwardDNs.add(DN_TELEPHONE_NUMBER);
-        localForwardDNs.add(DN_PSEUDONYM);
-        localForwardDNs.add(DN_STREET);
+        tmpForwardDNs.add(DN_C);
+        tmpForwardDNs.add(DN_DC);
+        tmpForwardDNs.add(DN_ST);
+        tmpForwardDNs.add(DN_L);
+        tmpForwardDNs.add(DN_O);
+        tmpForwardDNs.add(DN_organizationIdentifier);
+        tmpForwardDNs.add(DN_OU);
+        tmpForwardDNs.add(DN_T);
+        tmpForwardDNs.add(DN_SURNAME);
+        tmpForwardDNs.add(DN_INITIALS);
+        tmpForwardDNs.add(DN_GIVENNAME);
+        tmpForwardDNs.add(DN_SERIALNUMBER);
+        tmpForwardDNs.add(DN_NAME);
+        tmpForwardDNs.add(DN_CN);
+        tmpForwardDNs.add(DN_LDAP_UID);
+        tmpForwardDNs.add(DN_DMD_NAME);
+        tmpForwardDNs.add(DN_EmailAddress);
+        tmpForwardDNs.add(DN_UnstructuredName);
+        tmpForwardDNs.add(DN_UnstructuredAddress);
+        tmpForwardDNs.add(DN_POSTAL_CODE);
+        tmpForwardDNs.add(DN_BUSINESS_CATEGORY);
+        tmpForwardDNs.add(DN_POSTAL_ADDRESS);
+        tmpForwardDNs.add(DN_TELEPHONE_NUMBER);
+        tmpForwardDNs.add(DN_PSEUDONYM);
+        tmpForwardDNs.add(DN_STREET);
 
-        forwardDNs = Collections.unmodifiableList(localForwardDNs);
+        forwardDNs = Collections.unmodifiableList(tmpForwardDNs);
 
-        List<ASN1ObjectIdentifier> localBackwardDNs = new ArrayList<>(25);
-        int size = localForwardDNs.size();
+        List<ASN1ObjectIdentifier> tmpBackwardDNs = new ArrayList<>(25);
+        int size = tmpForwardDNs.size();
         for (int i = size - 1; i >= 0; i--) {
-            localBackwardDNs.add(localForwardDNs.get(i));
+            tmpBackwardDNs.add(tmpForwardDNs.get(i));
         }
 
-        backwardDNs = Collections.unmodifiableList(localBackwardDNs);
+        backwardDNs = Collections.unmodifiableList(tmpBackwardDNs);
 
         oidNameMap = new HashMap<>();
 

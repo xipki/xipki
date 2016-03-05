@@ -72,7 +72,7 @@ public class DbToolBase {
 
     protected final AtomicBoolean stopMe;
 
-    protected final DataSourceWrapper dataSource;
+    protected final DataSourceWrapper datasource;
 
     protected final String baseDir;
 
@@ -81,19 +81,19 @@ public class DbToolBase {
     private boolean connectionAutoCommit;
 
     public DbToolBase(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe)
     throws DataAccessException {
         super();
         ParamUtil.requireNonBlank("baseDir", baseDir);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
-        this.dataSource = ParamUtil.requireNonNull("dataSource", dataSource);
-        this.connection = dataSource.getConnection();
+        this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+        this.connection = datasource.getConnection();
         try {
             this.connectionAutoCommit = connection.getAutoCommit();
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
@@ -103,7 +103,7 @@ public class DbToolBase {
         try {
             return connection.createStatement();
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
     }
 
@@ -115,7 +115,7 @@ public class DbToolBase {
         try {
             return connection.prepareStatement(sql);
         } catch (SQLException ex) {
-            throw dataSource.translate(sql, ex);
+            throw datasource.translate(sql, ex);
         }
     }
 
@@ -153,7 +153,7 @@ public class DbToolBase {
     } // method deleteFromTableWithLargerId
 
     public void shutdown() {
-        dataSource.returnConnection(connection);
+        datasource.returnConnection(connection);
         connection = null;
     }
 
@@ -164,7 +164,7 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        return dataSource.getMin(connection, table, column);
+        return datasource.getMin(connection, table, column);
     }
 
     public long getMin(
@@ -175,7 +175,7 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        return dataSource.getMin(connection, table, column, condition);
+        return datasource.getMin(connection, table, column, condition);
     }
 
     public long getMax(
@@ -185,7 +185,7 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        return dataSource.getMax(connection, table, column);
+        return datasource.getMax(connection, table, column);
     }
 
     public long getMax(
@@ -196,7 +196,7 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        return dataSource.getMax(connection, table, column, condition);
+        return datasource.getMax(connection, table, column, condition);
     }
 
     public int getCount(
@@ -204,7 +204,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
-        return dataSource.getCount(connection, table);
+        return datasource.getCount(connection, table);
     }
 
     public boolean tableHasColumn(
@@ -214,7 +214,7 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
-        return dataSource.tableHasColumn(connection, table, column);
+        return datasource.tableHasColumn(connection, table, column);
     }
 
     public boolean tableExists(
@@ -222,7 +222,7 @@ public class DbToolBase {
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
-        return dataSource.tableExists(connection, table);
+        return datasource.tableExists(connection, table);
     }
 
     protected Savepoint setSavepoint()
@@ -230,7 +230,7 @@ public class DbToolBase {
         try {
             return connection.setSavepoint();
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
     }
 
@@ -239,7 +239,7 @@ public class DbToolBase {
         try {
             connection.rollback();
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
     }
 
@@ -248,7 +248,7 @@ public class DbToolBase {
             final SQLException ex) {
         ParamUtil.requireNonBlank("sql", sql);
         ParamUtil.requireNonNull("ex", ex);
-        return dataSource.translate(sql, ex);
+        return datasource.translate(sql, ex);
     }
 
     protected void disableAutoCommit()
@@ -256,7 +256,7 @@ public class DbToolBase {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
     }
 
@@ -265,7 +265,7 @@ public class DbToolBase {
         try {
             connection.setAutoCommit(connectionAutoCommit);
         } catch (SQLException ex) {
-            throw dataSource.translate(null, ex);
+            throw datasource.translate(null, ex);
         }
     }
 
@@ -276,7 +276,7 @@ public class DbToolBase {
         try {
             connection.commit();
         } catch (SQLException ex) {
-            throw dataSource.translate(task, ex);
+            throw datasource.translate(task, ex);
         }
     }
 

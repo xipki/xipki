@@ -192,18 +192,18 @@ public abstract class CmpRequestor {
     throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
 
-        PKIMessage localRequest;
+        PKIMessage tmpRequest;
         if (signRequest) {
-            localRequest = sign(request);
+            tmpRequest = sign(request);
         } else {
-            localRequest = request;
+            tmpRequest = request;
         }
 
         byte[] encodedRequest;
         try {
-            encodedRequest = localRequest.getEncoded();
+            encodedRequest = tmpRequest.getEncoded();
         } catch (IOException ex) {
-            LOG.error("error while encode the PKI request {}", localRequest);
+            LOG.error("error while encode the PKI request {}", tmpRequest);
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 
@@ -218,7 +218,7 @@ public abstract class CmpRequestor {
         try {
             encodedResponse = send(encodedRequest);
         } catch (IOException ex) {
-            LOG.error("error while send the PKI request {} to server", localRequest);
+            LOG.error("error while send the PKI request {} to server", tmpRequest);
             throw new CmpRequestorException("TRANSPORT_ERROR", ex);
         }
 
@@ -299,15 +299,15 @@ public abstract class CmpRequestor {
             throw new CmpRequestorException("invalid syntax of the response");
         }
 
-        int localAction;
+        int tmpAction;
         try {
-            localAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
+            tmpAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
         } catch (IllegalArgumentException ex) {
             throw new CmpRequestorException("invalid syntax of the response");
         }
 
-        if (action != localAction) {
-            throw new CmpRequestorException("received XiPKI action '" + localAction
+        if (action != tmpAction) {
+            throw new CmpRequestorException("received XiPKI action '" + tmpAction
                     + "' instead the exceptected '" + action + "'");
         }
 
@@ -405,11 +405,11 @@ public abstract class CmpRequestor {
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-        ASN1OctetString localTid = (tid == null)
+        ASN1OctetString tmpTid = (tid == null)
                 ? new DEROctetString(randomTransactionId())
                 : tid;
 
-        hBuilder.setTransactionID(localTid);
+        hBuilder.setTransactionID(tmpTid);
 
         List<InfoTypeAndValue> itvs = new ArrayList<>(2);
         if (addImplictConfirm) {

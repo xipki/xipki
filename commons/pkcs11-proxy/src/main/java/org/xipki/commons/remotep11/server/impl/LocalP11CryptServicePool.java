@@ -108,12 +108,12 @@ public class LocalP11CryptServicePool {
 
     public P11CryptService getP11CryptService(
             final String moduleName) {
-        String localModuleName = moduleName;
-        if (localModuleName == null
-                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(localModuleName)) {
-            localModuleName = defaultPkcs11ModuleName;
+        String tmpModuleName = moduleName;
+        if (tmpModuleName == null
+                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(tmpModuleName)) {
+            tmpModuleName = defaultPkcs11ModuleName;
         }
-        return p11CryptServices.get(localModuleName);
+        return p11CryptServices.get(tmpModuleName);
     }
 
     public int getVersion() {

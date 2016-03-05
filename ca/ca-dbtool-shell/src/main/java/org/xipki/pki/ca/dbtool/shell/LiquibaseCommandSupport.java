@@ -214,41 +214,41 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             final String prompt,
             final List<String> validValues)
     throws IOException {
-        String localPrompt = prompt;
-        List<String> localValidValues = validValues;
-        if (localValidValues == null) {
-            localValidValues = Collections.emptyList();
+        String tmpPrompt = prompt;
+        List<String> tmpValidValues = validValues;
+        if (tmpValidValues == null) {
+            tmpValidValues = Collections.emptyList();
         }
 
-        if (localPrompt == null) {
-            localPrompt = "Please enter";
+        if (tmpPrompt == null) {
+            tmpPrompt = "Please enter";
         }
 
-        if (isNotEmpty(localValidValues)) {
-            StringBuilder promptBuilder = new StringBuilder(localPrompt);
+        if (isNotEmpty(tmpValidValues)) {
+            StringBuilder promptBuilder = new StringBuilder(tmpPrompt);
             promptBuilder.append(" [");
 
-            for (String validValue : localValidValues) {
+            for (String validValue : tmpValidValues) {
                 promptBuilder.append(validValue).append("/");
             }
             promptBuilder.deleteCharAt(promptBuilder.length() - 1);
             promptBuilder.append("] ?");
 
-            localPrompt = promptBuilder.toString();
+            tmpPrompt = promptBuilder.toString();
         }
 
-        out(localPrompt);
+        out(tmpPrompt);
         while (true) {
             String answer = session.readLine(null, null);
             if (answer == null) {
                 throw new IOException("interrupted");
             }
 
-            if (isEmpty(localValidValues) || localValidValues.contains(answer)) {
+            if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
                 return answer;
             } else {
                 StringBuilder retryPromptBuilder = new StringBuilder("Please answer with ");
-                for (String validValue : localValidValues) {
+                for (String validValue : tmpValidValues) {
                     retryPromptBuilder.append(validValue).append("/");
                 }
                 retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);

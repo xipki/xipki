@@ -66,12 +66,12 @@ class AbstractCaCertStoreDbPorter extends DbPorter {
     protected final String usersListFile;
 
     AbstractCaCertStoreDbPorter(
-            final DataSourceWrapper dataSource,
+            final DataSourceWrapper datasource,
             final String baseDir,
             final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException {
-        super(dataSource, baseDir, stopMe, evaluateOnly);
+        super(datasource, baseDir, stopMe, evaluateOnly);
 
         this.crlsDir = super.baseDir + File.separator + CRLS_DIRNAME;
         this.crlsListFile = super.baseDir + File.separator + CRLS_MANIFEST_FILENAME;
