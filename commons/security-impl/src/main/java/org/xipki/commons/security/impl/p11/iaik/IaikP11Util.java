@@ -38,6 +38,8 @@ package org.xipki.commons.security.impl.p11.iaik;
 
 import java.security.SecureRandom;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
@@ -68,6 +70,9 @@ public class IaikP11Util {
     public static boolean idExists(
             final Session session, final byte[] keyId)
     throws Exception {
+        ParamUtil.requireNonNull("session", session);
+        ParamUtil.requireNonNull("keyId", keyId);
+
         Key k = new Key();
         k.getId().setByteArrayValue(keyId);
 
@@ -92,6 +97,8 @@ public class IaikP11Util {
             final Session session,
             final String keyLabel)
     throws Exception {
+        ParamUtil.requireNonNull("session", session);
+        ParamUtil.requireNonBlank("keyLabel", keyLabel);
         Key k = new Key();
         k.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
@@ -114,6 +121,7 @@ public class IaikP11Util {
 
     static String eraseSensitiveInfo(
             final String data) {
+        ParamUtil.requireNonNull("data", data);
         int index = data.indexOf("password");
         if (index == -1) {
             return data;

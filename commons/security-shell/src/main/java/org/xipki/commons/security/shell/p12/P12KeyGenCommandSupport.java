@@ -43,6 +43,7 @@ import java.security.SecureRandom;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
@@ -73,6 +74,7 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     protected void saveKeypair(
             final P12KeypairGenerationResult keypair)
     throws IOException {
+        ParamUtil.requireNonNull("keypair", keypair);
         File p12File = new File(keyOutFile);
         saveVerbose("saved PKCS#12 keystore to file", p12File, keypair.getKeystore());
     }

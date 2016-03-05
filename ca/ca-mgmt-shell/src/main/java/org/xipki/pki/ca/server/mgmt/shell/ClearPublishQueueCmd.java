@@ -63,9 +63,9 @@ public class ClearPublishQueueCmd extends CaCommandSupport {
     private String caName;
 
     @Option(name = "--publisher",
-        required = true, multiValued = true,
-        description = "publisher name or 'all' for all publishers\n"
-                    + "(required, multi-valued)")
+            required = true, multiValued = true,
+            description = "publisher name or 'all' for all publishers\n"
+                        + "(required, multi-valued)")
     @Completion(PublisherNamePlusAllCompleter.class)
     private List<String> publisherNames;
 

@@ -53,6 +53,7 @@ import java.util.Set;
 
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertpathValidationModel;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.util.X509Util;
@@ -108,6 +109,7 @@ class RequestOption {
     RequestOption(
             final RequestOptionType conf)
     throws InvalidConfException {
+        ParamUtil.requireNonNull("conf", conf);
         NonceType nonceConf = conf.getNonce();
 
         supportsHttpGet = conf.isSupportsHttpGet();
@@ -272,9 +274,10 @@ class RequestOption {
         return versions == null || versions.contains(version);
     }
 
-    private Set<X509Certificate> getCerts(
+    private static Set<X509Certificate> getCerts(
             final CertCollectionType conf)
     throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+        ParamUtil.requireNonNull("conf", conf);
         Set<X509Certificate> localCerts = new HashSet<>();
 
         if (conf.getKeystore() != null) {

@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ocsp.api.OcspMode;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 
@@ -72,13 +73,14 @@ class ResponderOption {
     ResponderOption(
             final ResponderType conf)
     throws InvalidConfException {
-        String s = conf.getMode();
-        if (s == null || "RFC6960".equalsIgnoreCase(s)) {
+        ParamUtil.requireNonNull("conf", conf);
+        String str = conf.getMode();
+        if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {
             this.mode = OcspMode.RFC6960;
-        } else if ("RFC2560".equalsIgnoreCase(s)) {
+        } else if ("RFC2560".equalsIgnoreCase(str) || "RFC 2560".equals(str)) {
             this.mode = OcspMode.RFC2560;
         } else {
-            throw new InvalidConfException("invalid OCSP mode '" + s + "'");
+            throw new InvalidConfException("invalid OCSP mode '" + str + "'");
         }
 
         this.signerName = conf.getSigner();

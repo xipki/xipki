@@ -36,6 +36,8 @@
 
 package org.xipki.pki.scep.transaction;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -66,6 +68,7 @@ public enum CaCapability {
 
     public static CaCapability valueForText(
             final String text) {
+        ParamUtil.requireNonNull("text", text);
         for (CaCapability m : values()) {
             if (m.text.equalsIgnoreCase(text)) {
                 return m;

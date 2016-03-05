@@ -43,6 +43,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -102,6 +103,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
+        ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 

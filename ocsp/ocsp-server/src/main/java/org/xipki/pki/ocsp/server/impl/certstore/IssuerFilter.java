@@ -41,6 +41,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashCalculator;
 
 /**
@@ -81,6 +82,7 @@ public class IssuerFilter {
 
     public boolean includeIssuerWithSha1Fp(
             final String sha1Fp) {
+        ParamUtil.requireNonBlank("sha1Fp", sha1Fp);
         if (includeSha1Fps == null || includeSha1Fps.contains(sha1Fp)) {
             if (excludeSha1Fps == null) {
                 return true;

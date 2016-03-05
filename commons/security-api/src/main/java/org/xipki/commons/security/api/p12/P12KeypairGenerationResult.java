@@ -38,6 +38,7 @@ package org.xipki.commons.security.api.p12;
 
 import java.security.KeyStore;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.KeypairGenerationResult;
 
 /**
@@ -53,8 +54,7 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult {
 
     public P12KeypairGenerationResult(
             final byte[] keystore) {
-        super();
-        this.keystore = keystore;
+        this.keystore = ParamUtil.requireNonNull("keystore", keystore);
     }
 
     public byte[] getKeystore() {

@@ -125,25 +125,26 @@ public class StringUtil {
     }
 
     public static boolean startsWithIgnoreCase(
-            final String s,
+            final String str,
             final String prefix) {
-        if (s.length() < prefix.length()) {
+        if (str.length() < prefix.length()) {
             return false;
         }
 
-        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
     }
 
     public static boolean isNumber(
-            final String s) {
-        return isNumber(s, 10);
+            final String str) {
+        return isNumber(str, 10);
     }
 
     public static boolean isNumber(
-            final String s,
+            final String str,
             final int radix) {
+        ParamUtil.requireNonNull("str", str);
         try {
-            Integer.parseInt(s, radix);
+            Integer.parseInt(str, radix);
             return true;
         } catch (NumberFormatException ex) {
             return false;
@@ -153,6 +154,7 @@ public class StringUtil {
     public static String formatText(
             final String text,
             final int minLen) {
+        ParamUtil.requireNonNull("text", text);
         int n = text.length();
         if (n >= minLen) {
             return text;

@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.password.api.SinglePasswordResolver;
@@ -99,6 +100,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     public char[] resolvePassword(
             final String passwordHint)
     throws PasswordResolverException {
+        ParamUtil.requireNonNull("passwordHint", passwordHint);
         int index = passwordHint.indexOf(':');
         if (index == -1) {
             return passwordHint.toCharArray();

@@ -402,6 +402,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
     public P11KeyIdentifier addCert(
             final X509Certificate cert)
     throws Exception {
+        ParamUtil.requireNonNull("cert", cert);
         byte[] encodedCert = cert.getEncoded();
         String sha1sum = HashCalculator.hexSha1(encodedCert);
 
@@ -511,6 +512,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private KeystoreP11Identity getIdentity(
             final P11KeyIdentifier keyIdentifier) {
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
+
         byte[] keyId = keyIdentifier.getKeyId();
         String keyLabel = keyIdentifier.getKeyLabel();
 
@@ -581,6 +584,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final OutputStream stream,
             final boolean verbose)
     throws IOException, SignerException {
+        ParamUtil.requireNonNull("stream", stream);
         List<? extends P11Identity> p11Identities = getP11Identities();
 
         StringBuilder sb = new StringBuilder();

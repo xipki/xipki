@@ -105,13 +105,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 size += orderBy.length();
             }
             StringBuilder sql = new StringBuilder(size);
-
             sql.append("SELECT ").append(coreSql);
-
             if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
-
             sql.append(" LIMIT ").append(rows);
             return sql.toString();
         }
@@ -752,6 +749,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public Statement createStatement(
             final Connection conn)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
         try {
             return conn.createStatement();
         } catch (SQLException ex) {
@@ -764,6 +762,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String sqlQuery)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
         try {
             return conn.prepareStatement(sqlQuery);
         } catch (SQLException ex) {
@@ -845,6 +844,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String column,
             final String condition)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
+
         int size = column.length() + table.length() + 20;
         if (StringUtil.isNotBlank(condition)) {
             size += 7 + condition.length();
@@ -883,6 +885,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String table)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
+        ParamUtil.requireNonBlank("table", table);
+
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 21);
         sqlBuilder.append("SELECT COUNT(*) FROM ").append(table);
         final String sql = sqlBuilder.toString();
@@ -923,6 +928,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String column,
             final String condition)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
         int size = column.length() + table.length() + 20;
         if (StringUtil.isNotBlank(condition)) {
             size += 7 + condition.length();
@@ -961,6 +969,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String table,
             final String idColumn,
             final int id) {
+        ParamUtil.requireNonNull("conn", conn);
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("idColumn", idColumn);
         final StringBuilder sb = new StringBuilder(table.length() + idColumn.length() + 35);
         sb.append("DELETE FROM ")
             .append(table)
@@ -1012,6 +1023,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String column,
             final Object value)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
+        ParamUtil.requireNonNull("value", value);
+
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
         sb.append(column);
         sb.append(" FROM ").append(table);
@@ -1052,6 +1068,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String table,
             final String column)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
+
         Statement stmt;
         try {
             stmt = (conn != null)
@@ -1084,6 +1103,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String table)
     throws DataAccessException {
+        ParamUtil.requireNonNull("conn", conn);
+        ParamUtil.requireNonBlank("table", table);
+
         Statement stmt;
         try {
             stmt = (conn != null)
@@ -1143,6 +1165,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String sequenceName,
             final long startValue)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildCreateSequenceSql(sequenceName, startValue);
         Connection conn = getConnection();
         Statement stmt = null;
@@ -1162,8 +1185,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public void dropSequence(
             final String sequenceName)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildDropSequenceSql(sequenceName);
-
         Connection conn = getConnection();
         Statement stmt = null;
         try {
@@ -1181,6 +1204,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     public void setLastUsedSeqValue(
             final String sequenceName,
             final long sequenceValue) {
+        ParamUtil.requireNonBlank("sequenceName", sequenceName);
         lastUsedSeqValues.put(sequenceName, sequenceValue);
     }
 
@@ -1189,6 +1213,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String sequenceName)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
 
@@ -1239,6 +1264,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     protected String getSqlToDropPrimaryKey(
             final String primaryKeyName,
             final String table) {
+        ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
+        ParamUtil.requireNonBlank("table", table);
         StringBuilder sql = new StringBuilder(table.length() + 30);
         return sql.append("ALTER TABLE ")
                 .append(table)
@@ -1259,6 +1286,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String primaryKeyName,
             final String table,
             final String... columns) {
+        ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
+        ParamUtil.requireNonBlank("table", table);
+
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(table);
         sb.append(" ADD CONSTRAINT ").append(primaryKeyName);
@@ -1289,6 +1319,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String constraintName,
             final String baseTable)
     throws DataAccessException {
+        ParamUtil.requireNonBlank("constraintName", constraintName);
+        ParamUtil.requireNonBlank("baseTable", baseTable);
+
         StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
         return sb.append("ALTER TABLE ")
                 .append(baseTable)
@@ -1313,6 +1346,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String referencedColumn,
             final String onDeleteAction,
             final String onUpdateAction) {
+        ParamUtil.requireNonBlank("constraintName", constraintName);
+        ParamUtil.requireNonBlank("baseTable", baseTable);
+        ParamUtil.requireNonBlank("baseColumn", baseColumn);
+        ParamUtil.requireNonBlank("referencedTable", referencedTable);
+        ParamUtil.requireNonBlank("referencedColumn", referencedColumn);
+        ParamUtil.requireNonBlank("onDeleteAction", onDeleteAction);
+        ParamUtil.requireNonBlank("onUpdateAction", onUpdateAction);
+
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(baseTable);
         sb.append(" ADD CONSTRAINT ").append(constraintName);
@@ -1346,6 +1387,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     protected String getSqlToDropIndex(
             final String table,
             final String indexName) {
+        ParamUtil.requireNonBlank("indexName", indexName);
         return "DROP INDEX " + indexName;
     }
 
@@ -1362,6 +1404,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String indexName,
             final String table,
             final String column) {
+        ParamUtil.requireNonBlank("indexName", indexName);
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("column", column);
+
         final StringBuilder sb = new StringBuilder(
                 indexName.length() + table.length() + column.length() + 20);
         sb.append("CREATE INDEX ").append(indexName);
@@ -1382,6 +1428,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     protected String getSqlToDropUniqueConstraint(
             final String constraintName,
             final String table) {
+        ParamUtil.requireNonBlank("table", table);
+        ParamUtil.requireNonBlank("constraintName", constraintName);
+
         StringBuilder sb = new StringBuilder(table.length() + constraintName.length() + 30);
         return sb.append("ALTER TABLE ")
                 .append(table)
@@ -1402,6 +1451,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String constraintName,
             final String table,
             final String... columns) {
+        ParamUtil.requireNonBlank("constraintName", constraintName);
+        ParamUtil.requireNonBlank("table", table);
+
         final StringBuilder sb = new StringBuilder(100);
         sb.append("ALTER TABLE ").append(table);
         sb.append(" ADD CONSTRAINT ").append(constraintName);

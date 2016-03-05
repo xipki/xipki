@@ -95,6 +95,7 @@ public class AlgorithmUtil {
     public static int getHashOutputSizeInOctets(
             final ASN1ObjectIdentifier hashAlgo)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (X509ObjectIdentifiers.id_SHA1.equals(hashAlgo)) {
             return 20;
         }
@@ -117,6 +118,7 @@ public class AlgorithmUtil {
     public static String getSignatureAlgoName(
             final AlgorithmIdentifier sigAlgId)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
         if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid)) {
@@ -196,6 +198,7 @@ public class AlgorithmUtil {
     public static AlgorithmIdentifier getSignatureAlgoId(
             final String signatureAlgoName)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("signatureAlgoName", signatureAlgoName);
         String algoS = signatureAlgoName.replaceAll("-", "");
 
         AlgorithmIdentifier signatureAlgId;
@@ -323,7 +326,6 @@ public class AlgorithmUtil {
     public static boolean isRSASignatureAlgoId(
             final AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
-
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
                 || PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(oid)
@@ -423,6 +425,7 @@ public class AlgorithmUtil {
             final String hashAlgo,
             final boolean mgf1)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
         if (mgf1) {
             ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
             return AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
@@ -449,6 +452,7 @@ public class AlgorithmUtil {
     public static AlgorithmIdentifier getDSASignatureAlgoId(
             final String hashAlgo)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
         ASN1ObjectIdentifier sigAlgoOid;
         if ("SHA1".equalsIgnoreCase(hashAlgo)) {
             sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
@@ -471,6 +475,7 @@ public class AlgorithmUtil {
             final String hashAlgo,
             final boolean plainSignature)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
         ASN1ObjectIdentifier sigAlgoOid;
         if ("SHA1".equalsIgnoreCase(hashAlgo)) {
             sigAlgoOid = plainSignature
@@ -557,14 +562,16 @@ public class AlgorithmUtil {
     } // method extractDigesetAlgorithmIdentifier
 
     public static boolean equalsAlgoName(
-            final String a,
-            final String b) {
-        if (a.equalsIgnoreCase(b)) {
+            final String algoNameA,
+            final String algoNameB) {
+        ParamUtil.requireNonBlank("algoNameA", algoNameA);
+        ParamUtil.requireNonBlank("algoNameB", algoNameB);
+        if (algoNameA.equalsIgnoreCase(algoNameB)) {
             return true;
         }
 
-        String localA = a.replace("-", "");
-        String localB = b.replace("-", "");
+        String localA = algoNameA.replace("-", "");
+        String localB = algoNameB.replace("-", "");
         if (localA.equalsIgnoreCase(localB)) {
             return true;
         }
@@ -574,6 +581,7 @@ public class AlgorithmUtil {
 
     private static Set<String> splitAlgoNameTokens(
             final String algoName) {
+        ParamUtil.requireNonNull("algoName", algoName);
         String localAlgoName = algoName.toUpperCase();
         int idx = localAlgoName.indexOf("AND");
         Set<String> l = new HashSet<>();
@@ -614,6 +622,7 @@ public class AlgorithmUtil {
     public static AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
             final AlgorithmIdentifier digAlgId)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("digAlgId", digAlgId);
         ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
         ASN1ObjectIdentifier sid;
         if (X509ObjectIdentifiers.id_SHA1.equals(digAlgOid)) {
@@ -634,25 +643,26 @@ public class AlgorithmUtil {
     } // method buildRSAPSSAlgorithmIdentifier
 
     public static RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOID)
+            final ASN1ObjectIdentifier digestAlgOid)
     throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("digestAlgOid", digestAlgOid);
         int saltSize;
-        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID)) {
+        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
             saltSize = 20;
-        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
             saltSize = 28;
-        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
             saltSize = 32;
-        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
             saltSize = 48;
-        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
             saltSize = 64;
         } else {
             throw new NoSuchAlgorithmException(
-                    "unknown digest algorithm " + digestAlgOID);
+                    "unknown digest algorithm " + digestAlgOid);
         }
 
-        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
         return new RSASSAPSSparams(
             digAlgId,
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),

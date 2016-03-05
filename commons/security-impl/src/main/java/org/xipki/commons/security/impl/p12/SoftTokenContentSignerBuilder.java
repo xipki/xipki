@@ -312,6 +312,7 @@ public class SoftTokenContentSignerBuilder {
             final int parallelism,
             final SecureRandom random)
     throws OperatorCreationException, NoSuchPaddingException {
+        ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);

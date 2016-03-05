@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SignatureAlgoControl;
@@ -101,6 +102,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
+        ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd = getPassword();
         String signerConf = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File,
                 new String(pwd));

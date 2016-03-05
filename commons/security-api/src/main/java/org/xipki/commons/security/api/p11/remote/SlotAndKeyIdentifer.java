@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 /**
@@ -67,16 +68,8 @@ public class SlotAndKeyIdentifer extends ASN1Object {
     public SlotAndKeyIdentifer(
             final SlotIdentifier slotIdentifier,
             final KeyIdentifier keyIdentifier) {
-        if (slotIdentifier == null) {
-            throw new IllegalArgumentException("slotIdentifier must not be null");
-        }
-
-        if (keyIdentifier == null) {
-            throw new IllegalArgumentException("keyIdentifier must not be null");
-        }
-
-        this.slotIdentifier = slotIdentifier;
-        this.keyIdentifier = keyIdentifier;
+        this.slotIdentifier = ParamUtil.requireNonNull("slotIdentifier", slotIdentifier);
+        this.keyIdentifier = ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
     }
 
     private SlotAndKeyIdentifer(

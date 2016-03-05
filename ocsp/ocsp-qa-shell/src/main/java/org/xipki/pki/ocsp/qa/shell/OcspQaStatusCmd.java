@@ -50,6 +50,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
@@ -131,6 +132,9 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
+        ParamUtil.requireNonNull("respIssuer", respIssuer);
+        ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
+
         if (isBlank(errorText) && isEmpty(statusTexts)) {
             throw new IllegalArgumentException(
                     "neither expError nor expStatus is set, this is not permitted");

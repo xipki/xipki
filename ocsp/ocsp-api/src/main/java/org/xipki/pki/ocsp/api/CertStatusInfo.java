@@ -39,6 +39,7 @@ package org.xipki.pki.ocsp.api;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
 
@@ -72,8 +73,8 @@ public class CertStatusInfo {
             final Date thisUpdate,
             final Date nextUpdate,
             final String certprofile) {
-        this.certStatus = certStatus;
-        this.thisUpdate = thisUpdate;
+        this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
+        this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
         this.nextUpdate = nextUpdate;
         this.certprofile = certprofile;
     }

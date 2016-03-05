@@ -135,12 +135,12 @@ public class P11Identity implements Comparable<P11Identity> {
 
     public boolean match(
             final P11SlotIdentifier pSlotId,
-            final String keyLabel) {
-        if (keyLabel == null) {
+            final String pKeyLabel) {
+        if (pKeyLabel == null) {
             return false;
         }
 
-        return this.slotId.equals(pSlotId) && keyLabel.equals(keyId.getKeyLabel());
+        return this.slotId.equals(pSlotId) && pKeyLabel.equals(keyId.getKeyLabel());
     }
 
     public int getSignatureKeyBitLength() {

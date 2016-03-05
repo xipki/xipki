@@ -36,6 +36,7 @@
 
 package org.xipki.commons.dbtool;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import org.xipki.commons.password.api.PasswordResolver;
@@ -64,10 +65,10 @@ public class LiquibaseDatabaseConf {
             final String password,
             final String url,
             final String schema) {
-        this.driver = driver;
-        this.username = username;
+        this.driver = Objects.requireNonNull(driver, "driver must not be null");
+        this.username = Objects.requireNonNull(username, "username must not be null");
         this.password = password;
-        this.url = url;
+        this.url = Objects.requireNonNull(url, "url must not be null");
         this.schema = schema;
     }
 
@@ -95,6 +96,8 @@ public class LiquibaseDatabaseConf {
             final Properties dbProps,
             final PasswordResolver passwordResolver)
     throws PasswordResolverException {
+        Objects.requireNonNull(dbProps, "dbProps must no be null");
+
         String driverClassName;
         String url;
         String schema = null;

@@ -38,6 +38,7 @@ package org.xipki.commons.password.impl;
 
 import java.nio.charset.StandardCharsets;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.OBFPasswordService;
 
@@ -51,9 +52,10 @@ public class OBFPasswordServiceImpl implements OBFPasswordService {
     public static final String OBFUSCATE = "OBF:";
 
     public static String doObfuscate(
-            final String s) {
+            final String str) {
+        ParamUtil.requireNonBlank("str", str);
         StringBuilder buf = new StringBuilder();
-        byte[] b = s.getBytes(StandardCharsets.UTF_8);
+        byte[] b = str.getBytes(StandardCharsets.UTF_8);
 
         buf.append(OBFUSCATE);
         for (int i = 0; i < b.length; i++) {
@@ -78,23 +80,24 @@ public class OBFPasswordServiceImpl implements OBFPasswordService {
     }
 
     public static String doDeobfuscate(
-            final String s) {
-        String localS = s;
-        if (StringUtil.startsWithIgnoreCase(localS, OBFUSCATE)) {
-            localS = localS.substring(4);
+            final String str) {
+        ParamUtil.requireNonBlank("str", str);
+        String localStr = str;
+        if (StringUtil.startsWithIgnoreCase(localStr, OBFUSCATE)) {
+            localStr = localStr.substring(4);
         }
 
-        byte[] b = new byte[localS.length() / 2];
+        byte[] b = new byte[localStr.length() / 2];
         int l = 0;
-        for (int i = 0; i < localS.length(); i += 4) {
-            if (localS.charAt(i) == 'U') {
+        for (int i = 0; i < localStr.length(); i += 4) {
+            if (localStr.charAt(i) == 'U') {
                 i++;
-                String x = localS.substring(i, i + 4);
+                String x = localStr.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
             } else {
-                String x = localS.substring(i, i + 4);
+                String x = localStr.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 int i1 = (i0 / 256);
                 int i2 = (i0 % 256);

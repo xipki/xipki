@@ -70,6 +70,7 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
@@ -123,6 +124,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             final RequestOptions requestOptions,
             final RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException {
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("cert", cert);
+
         try {
             if (!X509Util.issues(issuerCert, cert)) {
                 throw new IllegalArgumentException("cert and issuerCert do not match");
@@ -143,6 +147,10 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             final RequestOptions requestOptions,
             final RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException {
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("certs", certs);
+        ParamUtil.requireMin("certs.length", certs.length, 1);
+
         BigInteger[] serialNumbers = new BigInteger[certs.length];
         for (int i = 0; i < certs.length; i++) {
             X509Certificate cert = certs[i];
@@ -179,9 +187,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             final RequestOptions requestOptions,
             final RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException {
-        if (requestOptions == null) {
-            throw new IllegalArgumentException("requestOptions must not be null");
-        }
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("requestOptions", requestOptions);
+        ParamUtil.requireNonNull("responderUrl", responderUrl);
 
         byte[] nonce = null;
         if (requestOptions.isUseNonce()) {
@@ -451,7 +459,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     public void setSignerCertFile(
             final String signerCertFile) {
         this.signer = null;
-        this.signerCertFile = signerCertFile;
+        this.signerCertFile = ParamUtil.requireNonBlank("signerCertFile", signerCertFile);
     }
 
     public String getSignerType() {
@@ -461,7 +469,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     public void setSignerType(
             final String signerType) {
         this.signer = null;
-        this.signerType = signerType;
+        this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
     }
 
     public SecurityFactory getSecurityFactory() {

@@ -66,6 +66,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -104,12 +105,17 @@ public class OcspQaImpl implements OcspQa {
     @Override
     public ValidationResult checkOcsp(
             final OCSPResp response,
-            final X509Certificate issuer,
+            final X509Certificate issuer, // TODO: consider issuer
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts,
             final OcspError expectedOcspError,
             final Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
             final OcspResponseOption responseOption) {
+        ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
+        ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
+        ParamUtil.requireNonEmpty("responseOption", responseOption);
+
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
         int status = response.getStatus();

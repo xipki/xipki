@@ -64,9 +64,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
         for (int i = 0; i < pqLens.length; i += 2) {
             int pLen = pqLens[i];
             int qLen = pqLens[i + 1];
-
-            ret.add(
-                    new P11DSAKeyGenLoadTest(slot, pLen, qLen));
+            ret.add(new P11DSAKeyGenLoadTest(slot, pLen, qLen));
         }
 
         return ret;

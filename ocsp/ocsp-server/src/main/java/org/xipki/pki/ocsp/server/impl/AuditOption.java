@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ocsp.server.impl.jaxb.AuditOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.MappingType;
 
@@ -54,6 +55,7 @@ class AuditOption {
 
     AuditOption(
             final AuditOptionType conf) {
+        ParamUtil.requireNonNull("conf", conf);
         Map<String, String> map = new ConcurrentHashMap<>();
         if (conf.getCertprofileMappings() != null) {
             for (MappingType m : conf.getCertprofileMappings().getMapping()) {

@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.DatabaseType;
@@ -62,8 +63,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             final String confFile,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException {
-        assertNotNull("confFile", confFile);
-
+        ParamUtil.requireNonNull("confFile", confFile);
         FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
         return createDataSource(name, fIn, passwordResolver);
     }
@@ -74,8 +74,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             final InputStream conf,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException {
-        assertNotNull("conf", conf);
-
+        ParamUtil.requireNonNull("conf", conf);
         Properties config = new Properties();
         try {
             config.load(conf);
@@ -95,8 +94,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             final Properties conf,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException {
-        assertNotNull("conf", conf);
-
+        ParamUtil.requireNonNull("conf", conf);
         DatabaseType databaseType;
         String className = conf.getProperty("dataSourceClassName");
         if (className != null) {
@@ -125,14 +123,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
         return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
     } // method createDataSource
-
-    private static void assertNotNull(
-            final String parameterName,
-            final Object parameter) {
-        if (parameter == null) {
-            throw new IllegalArgumentException(parameterName + " must not be null");
-        }
-    }
 
     private static String expandFilepath(
             final String path) {

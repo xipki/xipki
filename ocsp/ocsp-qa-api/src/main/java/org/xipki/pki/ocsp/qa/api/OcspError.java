@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ocsp.qa.api;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -62,6 +64,7 @@ public enum OcspError {
 
     public static OcspError getInstance(
             final String name) {
+        ParamUtil.requireNonNull("name", name);
         for (OcspError entry : values()) {
             if (entry.name().equals(name)) {
                 return entry;

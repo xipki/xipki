@@ -1277,6 +1277,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final P11KeyIdentifier keyId,
             final SecurityFactory securityFactory)
     throws SignerException, PasswordResolverException {
+        ParamUtil.requireNonNull("securityFactory", securityFactory);
         ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
         if (keyId.getKeyId() != null) {
             pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
@@ -1292,6 +1293,7 @@ public class IaikP11Slot implements P11WritableSlot {
     public P11KeyIdentifier addCert(
             final X509Certificate cert)
     throws Exception {
+        ParamUtil.requireNonNull("cert", cert);
         Session session = borrowWritableSession();
         try {
             byte[] encodedCert = cert.getEncoded();
@@ -1543,6 +1545,7 @@ public class IaikP11Slot implements P11WritableSlot {
     public X509Certificate exportCert(
             final P11KeyIdentifier keyIdentifier)
     throws Exception {
+        ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
         if (privKey == null) {
             return null;
@@ -1798,6 +1801,7 @@ public class IaikP11Slot implements P11WritableSlot {
             final OutputStream stream,
             final boolean verbose)
     throws IOException, SignerException {
+        ParamUtil.requireNonNull("stream", stream);
         List<PrivateKey> allPrivateObjects = getAllPrivateObjects(null, null);
         int size = allPrivateObjects.size();
 

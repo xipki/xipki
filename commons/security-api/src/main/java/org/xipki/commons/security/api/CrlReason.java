@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * The CRLReason enumeration specifies the reason that a certificate
  * is revoked, as defined in <a href="http://www.ietf.org/rfc/rfc3280.txt">
@@ -155,6 +157,7 @@ public enum CrlReason {
 
     public static CrlReason getInstance(
             final String text) {
+        ParamUtil.requireNonNull("text", text);
         for (CrlReason value : values()) {
             if (value.desription.equalsIgnoreCase(text)
                     || value.name().equalsIgnoreCase(text)

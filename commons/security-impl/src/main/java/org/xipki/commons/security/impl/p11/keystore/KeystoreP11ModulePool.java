@@ -42,6 +42,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
@@ -63,6 +64,7 @@ public class KeystoreP11ModulePool {
 
     public synchronized void removeModule(
             final String moduleName) {
+        ParamUtil.requireNonBlank("moduleName", moduleName);
         KeystoreP11Module module = modules.remove(moduleName);
         if (module == null && defaultModuleName != null
                 && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
@@ -101,6 +103,7 @@ public class KeystoreP11ModulePool {
     public synchronized KeystoreP11Module getModule(
             final P11ModuleConf moduleConf)
     throws SignerException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
         KeystoreP11Module extModule = modules.get(moduleConf.getName());
         if (extModule == null) {
             extModule = new KeystoreP11Module(moduleConf);
@@ -128,6 +131,7 @@ public class KeystoreP11ModulePool {
 
     public void setDefaultModuleName(
             final String defaultModuleName) {
+        ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
         this.defaultModuleName = defaultModuleName;
     }
 

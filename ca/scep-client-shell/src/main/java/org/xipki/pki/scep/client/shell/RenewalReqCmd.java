@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.EnrolmentResponse;
 import org.xipki.pki.scep.client.ScepClient;
 import org.xipki.pki.scep.client.exception.ScepClientException;
@@ -63,6 +64,7 @@ public class RenewalReqCmd extends EnrollCertCommandSupport {
             final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
+        ParamUtil.requireNonNull("client", client);
         return client.scepRenewalReq(csr, identityKey, identityCert);
     }
 
