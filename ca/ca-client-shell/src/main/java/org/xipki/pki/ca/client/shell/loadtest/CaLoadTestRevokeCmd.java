@@ -94,7 +94,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     private Integer n = 1;
 
     @Reference(optional = true)
-    private DataSourceFactory dataSourceFactory;
+    private DataSourceFactory datasourceFactory;
 
     @Reference
     private SecurityFactory securityFactory;
@@ -102,8 +102,8 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if (dataSourceFactory == null) {
-            throw new IllegalStateException("dataSourceFactory is not available");
+        if (datasourceFactory == null) {
+            throw new IllegalStateException("datasourceFactory is not available");
         }
 
         if (numThreads < 1) {
@@ -133,7 +133,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
         props.setProperty("maximumPoolSize", "1");
         props.setProperty("minimumIdle", "1");
 
-        DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(
+        DataSourceWrapper caDataSource = datasourceFactory.createDataSource(
                 null, props, securityFactory.getPasswordResolver());
         try {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(

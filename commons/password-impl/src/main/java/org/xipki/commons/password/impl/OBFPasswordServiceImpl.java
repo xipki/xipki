@@ -82,22 +82,22 @@ public class OBFPasswordServiceImpl implements OBFPasswordService {
     public static String doDeobfuscate(
             final String str) {
         ParamUtil.requireNonBlank("str", str);
-        String localStr = str;
-        if (StringUtil.startsWithIgnoreCase(localStr, OBFUSCATE)) {
-            localStr = localStr.substring(4);
+        String tmpStr = str;
+        if (StringUtil.startsWithIgnoreCase(tmpStr, OBFUSCATE)) {
+            tmpStr = tmpStr.substring(4);
         }
 
-        byte[] b = new byte[localStr.length() / 2];
+        byte[] b = new byte[tmpStr.length() / 2];
         int l = 0;
-        for (int i = 0; i < localStr.length(); i += 4) {
-            if (localStr.charAt(i) == 'U') {
+        for (int i = 0; i < tmpStr.length(); i += 4) {
+            if (tmpStr.charAt(i) == 'U') {
                 i++;
-                String x = localStr.substring(i, i + 4);
+                String x = tmpStr.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 byte bx = (byte) (i0 >> 8);
                 b[l++] = bx;
             } else {
-                String x = localStr.substring(i, i + 4);
+                String x = tmpStr.substring(i, i + 4);
                 int i0 = Integer.parseInt(x, 36);
                 int i1 = (i0 / 256);
                 int i2 = (i0 % 256);

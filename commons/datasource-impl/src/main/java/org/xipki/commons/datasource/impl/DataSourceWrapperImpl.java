@@ -150,7 +150,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             String sql = null;
 
             boolean newConn = (conn == null);
-            Connection localConn = newConn
+            Connection tmpConn = newConn
                     ? getConnection()
                     : conn;
 
@@ -159,7 +159,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
             long ret;
             try {
-                stmt = localConn.createStatement();
+                stmt = tmpConn.createStatement();
                 sql = sqlUpdate;
                 stmt.executeUpdate(sql);
 
@@ -981,12 +981,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             .append(id);
         final String sql = sb.toString();
 
-        Connection localConn;
+        Connection tmpConn;
         if (conn != null) {
-            localConn = conn;
+            tmpConn = conn;
         } else {
             try {
-                localConn = getConnection();
+                tmpConn = getConnection();
             } catch (Throwable th) {
                 if (LOG.isWarnEnabled()) {
                     LOG.warn("datasource {} could not get connection: {}", name, th.getMessage());
@@ -997,7 +997,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         Statement stmt = null;
         try {
-            stmt = localConn.createStatement();
+            stmt = tmpConn.createStatement();
             stmt.execute(sql);
         } catch (Throwable th) {
             if (LOG.isWarnEnabled()) {
@@ -1217,7 +1217,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
 
-        Connection localConn = newConn
+        Connection tmpConn = newConn
                 ? getConnection()
                 : conn;
 
@@ -1225,7 +1225,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         long next;
         try {
-            stmt = localConn.createStatement();
+            stmt = tmpConn.createStatement();
 
             while (true) {
                 ResultSet rs = stmt.executeQuery(sql);
@@ -1485,9 +1485,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final SQLException ex) {
         ParamUtil.requireNonNull("ex", ex);
 
-        String localSql = sql;
-        if (localSql == null) {
-            localSql = "";
+        String tmpSql = sql;
+        if (tmpSql == null) {
+            tmpSql = "";
         }
 
         SQLException sqlEx = ex;
@@ -1520,38 +1520,38 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         if (errorCode != null) {
             // look for grouped error codes.
             if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new BadSqlGrammarException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new InvalidResultSetAccessException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new InvalidResultSetAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new DuplicateKeyException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new DuplicateKeyException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new DataIntegrityViolationException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new DataIntegrityViolationException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
+                logTranslation(tmpSql, sqlEx);
                 return new PermissionDeniedDataAccessException(
-                        buildMessage(localSql, sqlEx), sqlEx);
+                        buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new DataAccessResourceFailureException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new DataAccessResourceFailureException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
+                logTranslation(tmpSql, sqlEx);
                 return new TransientDataAccessResourceException(
-                        buildMessage(localSql, sqlEx), sqlEx);
+                        buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new CannotAcquireLockException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new CannotAcquireLockException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
-                return new DeadlockLoserDataAccessException(buildMessage(localSql, sqlEx), sqlEx);
+                logTranslation(tmpSql, sqlEx);
+                return new DeadlockLoserDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode)) {
-                logTranslation(localSql, sqlEx);
+                logTranslation(tmpSql, sqlEx);
                 return new CannotSerializeTransactionException(
-                        buildMessage(localSql, sqlEx), sqlEx);
+                        buildMessage(tmpSql, sqlEx), sqlEx);
             }
         } // end if (errorCode)
 
@@ -1559,22 +1559,22 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
             if (sqlStateCodes.getBadSqlGrammarCodes().contains(classCode)) {
-                return new BadSqlGrammarException(buildMessage(localSql, sqlEx), ex);
+                return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), ex);
             } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode)) {
-                return new DataIntegrityViolationException(buildMessage(localSql, ex), ex);
+                return new DataIntegrityViolationException(buildMessage(tmpSql, ex), ex);
             } else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode)) {
-                return new DataAccessResourceFailureException(buildMessage(localSql, ex), ex);
+                return new DataAccessResourceFailureException(buildMessage(tmpSql, ex), ex);
             } else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode)) {
-                return new TransientDataAccessResourceException(buildMessage(localSql, ex), ex);
+                return new TransientDataAccessResourceException(buildMessage(tmpSql, ex), ex);
             } else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode)) {
-                return new ConcurrencyFailureException(buildMessage(localSql, ex), ex);
+                return new ConcurrencyFailureException(buildMessage(tmpSql, ex), ex);
             }
         }
 
         // For MySQL: exception class name indicating a timeout?
         // (since MySQL doesn't throw the JDBC 4 SQLTimeoutException)
         if (ex.getClass().getName().contains("Timeout")) {
-            return new QueryTimeoutException(buildMessage(localSql, ex), ex);
+            return new QueryTimeoutException(buildMessage(tmpSql, ex), ex);
         }
 
         // We couldn't identify it more precisely
@@ -1592,7 +1592,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             LOG.debug("Unable to translate SQLException with " + codes);
         }
 
-        return new UncategorizedSqlException(buildMessage(localSql, sqlEx), sqlEx);
+        return new UncategorizedSqlException(buildMessage(tmpSql, sqlEx), sqlEx);
     } // method translate
 
     private void logTranslation(
@@ -1643,10 +1643,10 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         ParamUtil.requireNonNull("databaseType", databaseType);
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
-        String dataSourceClassName = props.getProperty("dataSourceClassName");
-        if (dataSourceClassName != null) {
-            if (dataSourceClassName.contains(".db2.")) {
-                String propName = "dataSource.currentSchema";
+        String datasourceClassName = props.getProperty("datasourceClassName");
+        if (datasourceClassName != null) {
+            if (datasourceClassName.contains(".db2.")) {
+                String propName = "datasource.currentSchema";
                 String schema = props.getProperty(propName);
                 if (schema != null) {
                     String upperCaseSchema = schema.toUpperCase();

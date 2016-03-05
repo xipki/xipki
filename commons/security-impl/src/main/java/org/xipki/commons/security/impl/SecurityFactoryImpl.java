@@ -237,14 +237,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
     throws SignerException {
-        String localType = type;
-        if (signerTypeMapping.containsKey(localType)) {
-            localType = signerTypeMapping.get(localType);
+        String tmpType = type;
+        if (signerTypeMapping.containsKey(tmpType)) {
+            tmpType = signerTypeMapping.get(tmpType);
         }
 
-        if ("PKCS11".equalsIgnoreCase(localType)
-                || "PKCS12".equalsIgnoreCase(localType)
-                || "JKS".equalsIgnoreCase(localType)) {
+        if ("PKCS11".equalsIgnoreCase(tmpType)
+                || "PKCS12".equalsIgnoreCase(tmpType)
+                || "JKS".equalsIgnoreCase(tmpType)) {
             ConfPairs keyValues = new ConfPairs(conf);
 
             String s = keyValues.getValue("parallelism");
@@ -261,7 +261,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
             }
 
-            if ("PKCS11".equalsIgnoreCase(localType)) {
+            if ("PKCS11".equalsIgnoreCase(tmpType)) {
                 String pkcs11Module = keyValues.getValue("module");
                 if (pkcs11Module == null) {
                     pkcs11Module = DEFAULT_P11MODULE_NAME;
@@ -366,7 +366,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
 
                 SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                        localType, keystoreStream, password, keyLabel, password, certificateChain);
+                        tmpType, keystoreStream, password, keyLabel, password, certificateChain);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
@@ -386,10 +386,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             ex.getClass().getName(), ex.getMessage()));
                 }
             }
-        } else if (StringUtil.startsWithIgnoreCase(localType, "java:")) {
+        } else if (StringUtil.startsWithIgnoreCase(tmpType, "java:")) {
             if (hashAlgo == null) {
                 ConcurrentContentSigner contentSigner;
-                String classname = localType.substring("java:".length());
+                String classname = tmpType.substring("java:".length());
                 try {
                     Class<?> clazz = Class.forName(classname);
                     contentSigner = (ConcurrentContentSigner) clazz.newInstance();
@@ -404,10 +404,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
                 return contentSigner;
             } else {
-                throw new SignerException("unknwon type: " + localType);
+                throw new SignerException("unknwon type: " + tmpType);
             }
         } else {
-            throw new SignerException("unknwon type: " + localType);
+            throw new SignerException("unknwon type: " + tmpType);
         }
     } // method doCreateSigner
 
@@ -789,13 +789,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return;
         }
 
-        String localSignerTypeMap = signerTypeMap.trim();
-        if (StringUtil.isBlank(localSignerTypeMap)) {
+        String tmpSignerTypeMap = signerTypeMap.trim();
+        if (StringUtil.isBlank(tmpSignerTypeMap)) {
             LOG.debug("signerTypeMap is empty");
             return;
         }
 
-        StringTokenizer st = new StringTokenizer(localSignerTypeMap, " \t");
+        StringTokenizer st = new StringTokenizer(tmpSignerTypeMap, " \t");
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             StringTokenizer st2 = new StringTokenizer(token, "=");
@@ -904,19 +904,19 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
             ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
-            String localKeyname = keyname;
-            if (localKeyname == null) {
+            String tmpKeyname = keyname;
+            if (tmpKeyname == null) {
                 Enumeration<String> aliases = ks.aliases();
                 while (aliases.hasMoreElements()) {
                     String alias = aliases.nextElement();
                     if (ks.isKeyEntry(alias)) {
-                        localKeyname = alias;
+                        tmpKeyname = alias;
                         break;
                     }
                 }
             } else {
-                if (!ks.isKeyEntry(localKeyname)) {
-                    throw new KeyStoreException("unknown key named " + localKeyname);
+                if (!ks.isKeyEntry(tmpKeyname)) {
+                    throw new KeyStoreException("unknown key named " + tmpKeyname);
                 }
             }
 
@@ -932,12 +932,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 if (numAliases == 1) {
                     return keystoreBytes;
                 }
-                certs = ks.getCertificateChain(localKeyname);
+                certs = ks.getCertificateChain(tmpKeyname);
             } else {
                 certs = newCertChain;
             }
 
-            PrivateKey key = (PrivateKey) ks.getKey(localKeyname, password);
+            PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);
             ks = null;
 
             if ("JKS".equalsIgnoreCase(keystoreType)) {
@@ -946,7 +946,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 ks = KeyStore.getInstance(keystoreType, "BC");
             }
             ks.load(null, password);
-            ks.setKeyEntry(localKeyname, key, password, certs);
+            ks.setKeyEntry(tmpKeyname, key, password, certs);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             ks.store(bout, password);
             byte[] bytes = bout.toByteArray();

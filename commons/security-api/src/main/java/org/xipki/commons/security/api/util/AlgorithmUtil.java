@@ -73,22 +73,22 @@ public class AlgorithmUtil {
             final String hashAlgName)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgName", hashAlgName);
-        String localHashAlgName = hashAlgName.trim();
-        ParamUtil.requireNonBlank("hashAlgName", localHashAlgName);
-        localHashAlgName = localHashAlgName.replace("-", "").toUpperCase();
+        String tmpHashAlgName = hashAlgName.trim();
+        ParamUtil.requireNonBlank("hashAlgName", tmpHashAlgName);
+        tmpHashAlgName = tmpHashAlgName.replace("-", "").toUpperCase();
 
-        if ("SHA1".equalsIgnoreCase(localHashAlgName)) {
+        if ("SHA1".equalsIgnoreCase(tmpHashAlgName)) {
             return X509ObjectIdentifiers.id_SHA1;
-        } else if ("SHA224".equalsIgnoreCase(localHashAlgName)) {
+        } else if ("SHA224".equalsIgnoreCase(tmpHashAlgName)) {
             return NISTObjectIdentifiers.id_sha224;
-        } else if ("SHA256".equalsIgnoreCase(localHashAlgName)) {
+        } else if ("SHA256".equalsIgnoreCase(tmpHashAlgName)) {
             return NISTObjectIdentifiers.id_sha256;
-        } else if ("SHA384".equalsIgnoreCase(localHashAlgName)) {
+        } else if ("SHA384".equalsIgnoreCase(tmpHashAlgName)) {
             return NISTObjectIdentifiers.id_sha384;
-        } else if ("SHA512".equalsIgnoreCase(localHashAlgName)) {
+        } else if ("SHA512".equalsIgnoreCase(tmpHashAlgName)) {
             return NISTObjectIdentifiers.id_sha512;
         } else {
-            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + localHashAlgName);
+            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + tmpHashAlgName);
         }
     } // method getHashAlg
 
@@ -570,33 +570,33 @@ public class AlgorithmUtil {
             return true;
         }
 
-        String localA = algoNameA.replace("-", "");
-        String localB = algoNameB.replace("-", "");
-        if (localA.equalsIgnoreCase(localB)) {
+        String tmpA = algoNameA.replace("-", "");
+        String tmpB = algoNameB.replace("-", "");
+        if (tmpA.equalsIgnoreCase(tmpB)) {
             return true;
         }
 
-        return splitAlgoNameTokens(localA).equals(splitAlgoNameTokens(localB));
+        return splitAlgoNameTokens(tmpA).equals(splitAlgoNameTokens(tmpB));
     }
 
     private static Set<String> splitAlgoNameTokens(
             final String algoName) {
         ParamUtil.requireNonNull("algoName", algoName);
-        String localAlgoName = algoName.toUpperCase();
-        int idx = localAlgoName.indexOf("AND");
+        String tmpAlgoName = algoName.toUpperCase();
+        int idx = tmpAlgoName.indexOf("AND");
         Set<String> l = new HashSet<>();
 
         if (idx == -1) {
-            l.add(localAlgoName);
+            l.add(tmpAlgoName);
             return l;
         }
 
-        final int len = localAlgoName.length();
+        final int len = tmpAlgoName.length();
 
         int beginIndex = 0;
         int endIndex = idx;
         while (true) {
-            String token = localAlgoName.substring(beginIndex, endIndex);
+            String token = tmpAlgoName.substring(beginIndex, endIndex);
             if (StringUtil.isNotBlank(token)) {
                 l.add(token);
             }
@@ -605,7 +605,7 @@ public class AlgorithmUtil {
                 return l;
             }
             beginIndex = endIndex + 3; // 3 = "AND".length()
-            endIndex = localAlgoName.indexOf("AND", beginIndex);
+            endIndex = tmpAlgoName.indexOf("AND", beginIndex);
             if (endIndex == -1) {
                 endIndex = len;
             }

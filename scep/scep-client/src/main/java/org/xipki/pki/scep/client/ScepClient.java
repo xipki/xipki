@@ -66,8 +66,8 @@ public class ScepClient extends Client {
     throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
         try {
-            URL localUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) localUrl.openConnection();
+            URL tmpUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) tmpUrl.openConnection();
             conn.setRequestMethod("GET");
             return parseResponse(conn);
         } catch (IOException ex) {
@@ -83,8 +83,8 @@ public class ScepClient extends Client {
     throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
         try {
-            URL localUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) localUrl.openConnection();
+            URL tmpUrl = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) tmpUrl.openConnection();
             conn.setDoOutput(true);
             conn.setUseCaches(false);
 
