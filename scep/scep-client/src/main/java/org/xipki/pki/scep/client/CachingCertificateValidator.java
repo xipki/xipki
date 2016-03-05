@@ -40,6 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 
 /**
@@ -55,13 +56,14 @@ public final class CachingCertificateValidator implements CaCertValidator {
 
     public CachingCertificateValidator(
             final CaCertValidator delegate) {
-        this.delegate = delegate;
+        this.delegate = ParamUtil.requireNonNull("delegate", delegate);
         this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
     }
 
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
+        ParamUtil.requireNonNull("cert", cert);
         String hexFp;
         try {
             hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());

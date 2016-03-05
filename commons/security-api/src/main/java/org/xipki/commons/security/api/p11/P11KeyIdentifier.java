@@ -40,6 +40,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -70,22 +71,16 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
 
     public P11KeyIdentifier(
             final byte[] keyId) {
-        if (keyId == null) {
-            throw new IllegalArgumentException("keyId must not be null");
-        }
-        this.keyId = keyId;
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
         this.keyIdHex = new String(Hex.encode(keyId)).toUpperCase();
         this.keyLabel = null;
     }
 
     public P11KeyIdentifier(
             final String keyLabel) {
-        if (keyLabel == null) {
-            throw new IllegalArgumentException("keyLabel must not be null");
-        }
+        this.keyLabel = ParamUtil.requireNonBlank("keyLabel", keyLabel);
         this.keyId = null;
         this.keyIdHex = null;
-        this.keyLabel = keyLabel;
     }
 
     public byte[] getKeyId() {
@@ -152,19 +147,20 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
 
     @Override
     public int compareTo(
-            final P11KeyIdentifier o) {
-        if (this == o) {
+            final P11KeyIdentifier obj) {
+        ParamUtil.requireNonNull("obj", obj);
+        if (this == obj) {
             return 0;
         }
 
         if (keyLabel == null) {
-            return (o.keyLabel == null)
+            return (obj.keyLabel == null)
                     ? 0
                     : 1;
         } else {
-            return (o.keyLabel == null)
+            return (obj.keyLabel == null)
                     ? -1
-                    : keyLabel.compareTo(o.keyLabel);
+                    : keyLabel.compareTo(obj.keyLabel);
         }
     }
 

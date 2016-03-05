@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
@@ -70,20 +71,14 @@ public class SlotIdentifier extends ASN1Object {
 
     public SlotIdentifier(
             final P11SlotIdentifier slotId) {
-        if (slotId == null) {
-            throw new IllegalArgumentException("slotId must not be null");
-        }
-
-        this.slotId = slotId;
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     }
 
     private SlotIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         int size = seq.size();
-        if (size < 1) {
-            throw new BadAsn1ObjectException("wrong number of elements in sequence");
-        }
+        ParamUtil.requireMin("seq.size()", size, 1);
 
         try {
             Integer slotIndex = null;

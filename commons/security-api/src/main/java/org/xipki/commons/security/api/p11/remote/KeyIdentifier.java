@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 
@@ -66,11 +67,7 @@ public class KeyIdentifier extends ASN1Object {
 
     public KeyIdentifier(
             final P11KeyIdentifier keyId) {
-        if (keyId == null) {
-            throw new IllegalArgumentException("keyId must not be null");
-        }
-
-        this.keyId = keyId;
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
     }
 
     @Override

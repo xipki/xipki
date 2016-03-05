@@ -892,6 +892,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final char[] password,
             final X509Certificate[] newCertChain)
     throws KeyStoreException {
+        ParamUtil.requireNonBlank("keystoreType", keystoreType);
+        ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
+
         try {
             KeyStore ks;
             if ("JKS".equalsIgnoreCase(keystoreType)) {

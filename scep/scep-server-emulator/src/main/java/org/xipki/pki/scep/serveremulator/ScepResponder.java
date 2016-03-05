@@ -158,6 +158,7 @@ public class ScepResponder {
             final CMSSignedData requestContent,
             final AuditEvent auditEvent)
     throws MessageDecodingException, CaException {
+        ParamUtil.requireNonNull("requestContent", requestContent);
         PrivateKey recipientKey = (raEmulator != null)
                 ? raEmulator.getRaKey()
                 : caEmulator.getCaKey();
@@ -214,15 +215,16 @@ public class ScepResponder {
     } // method servicePkiOperation
 
     public ContentInfo encode(
-            final NextCaMessage nextCAMsg)
+            final NextCaMessage nextCaMsg)
     throws CaException {
+        ParamUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
 
             X509Certificate[] certs = control.isSendSignerCert()
                     ? new X509Certificate[]{jceSignerCert}
                     : null;
-            return nextCAMsg.encode(
+            return nextCaMsg.encode(
                     getSigningKey(),
                     jceSignerCert,
                     certs);

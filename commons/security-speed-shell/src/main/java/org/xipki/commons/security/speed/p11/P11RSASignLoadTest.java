@@ -38,6 +38,7 @@ package org.xipki.commons.security.speed.p11;
 
 import java.math.BigInteger;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
@@ -68,6 +69,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
             final int keysize,
             final BigInteger publicExponent)
     throws Exception {
+        ParamUtil.requireNonNull("slot", slot);
         return slot.generateRSAKeypair(
                 keysize, publicExponent, "loadtest-" + System.currentTimeMillis());
     }

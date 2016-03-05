@@ -36,6 +36,8 @@
 
 package org.xipki.pki.scep.crypto;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -92,9 +94,7 @@ public enum KeyUsage {
 
     public static KeyUsage getKeyUsage(
             final String usage) {
-        if (usage == null) {
-            return null;
-        }
+        ParamUtil.requireNonBlank("usage", usage);
 
         for (KeyUsage ku : KeyUsage.values()) {
             for (String name : ku.names) {

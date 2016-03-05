@@ -36,6 +36,8 @@
 
 package org.xipki.pki.scep.transaction;
 
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -61,6 +63,7 @@ public enum Operation {
 
     public static Operation valueForCode(
             final String code) {
+        ParamUtil.requireNonNull("code", code);
         for (Operation m : values()) {
             if (code.equalsIgnoreCase(m.code)) {
                 return m;

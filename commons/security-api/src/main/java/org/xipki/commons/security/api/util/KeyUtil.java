@@ -200,8 +200,8 @@ public class KeyUtil {
     throws Exception {
         ParamUtil.requireNonNull("curveId", curveId);
 
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
         if (random == null) {
             kpGen.initialize(spec);
         } else {
@@ -456,6 +456,9 @@ public class KeyUtil {
             byte[] encodedAlgorithmIdParameters,
             byte[] encodedPoint)
     throws InvalidKeySpecException {
+        ParamUtil.requireNonNull("encodedAlgorithmIdParameters", encodedAlgorithmIdParameters);
+        ParamUtil.requireNonNull("encodedPoint", encodedPoint);
+
         ASN1Encodable algParams;
         if (encodedAlgorithmIdParameters[0] == 6) {
             algParams = ASN1ObjectIdentifier.getInstance(encodedAlgorithmIdParameters);

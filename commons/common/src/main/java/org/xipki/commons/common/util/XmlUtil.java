@@ -101,15 +101,18 @@ public class XmlUtil {
         if (document == null) {
             throw new RuntimeException("XMLDocumentBuilder must not be initialized");
         }
-
+        ParamUtil.requireNonBlank("localPart", localPart);
         Element element = document.createElementNS(namespace, "ns:" + localPart);
-        element.appendChild(document.createTextNode(value));
+        if (StringUtil.isNotBlank(value)) {
+            element.appendChild(document.createTextNode(value));
+        }
         return element;
     }
 
     public static Element getDocumentElment(
             final byte[] xmlFragement)
     throws IOException, SAXException {
+        ParamUtil.requireNonNull("xmlFragement", xmlFragement);
         Document doc = builder.parse(new ByteArrayInputStream(xmlFragement));
         return doc.getDocumentElement();
     }
@@ -130,6 +133,7 @@ public class XmlUtil {
 
     public static XMLGregorianCalendar getXmlDate(
             final Calendar calendar) {
+        ParamUtil.requireNonNull("calendar", calendar);
         GregorianCalendar c;
         if (calendar instanceof GregorianCalendar) {
             c = (GregorianCalendar) calendar;
@@ -150,6 +154,7 @@ public class XmlUtil {
 
     public static XMLGregorianCalendar getXmlDate(
             final Date dateAndTime) {
+        ParamUtil.requireNonNull("dateAndTime", dateAndTime);
         GregorianCalendar c = new GregorianCalendar();
         c.setTimeZone(UTC);
         c.setTime(dateAndTime);
@@ -175,6 +180,7 @@ public class XmlUtil {
 
     public static String getNodeValue(
             final Node node) {
+        ParamUtil.requireNonNull("node", node);
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Node n = node.getFirstChild();
             if (n != null) {
@@ -194,6 +200,8 @@ public class XmlUtil {
             final Element element,
             final String namespace,
             final String localname) {
+        ParamUtil.requireNonNull("element", element);
+        ParamUtil.requireNonBlank("localname", localname);
         Node node = element.getFirstChild();
         if (node == null) {
             return null;
@@ -221,8 +229,9 @@ public class XmlUtil {
             final Element element,
             final String namespace,
             final String localname) {
+        ParamUtil.requireNonNull("element", element);
+        ParamUtil.requireNonBlank("localname", localname);
         List<Element> rv = new LinkedList<Element>();
-
         NodeList children = element.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
@@ -237,6 +246,7 @@ public class XmlUtil {
     public static List<Element> getAllElementsWithAttrId(
             final Element element,
             final String namespace) {
+        ParamUtil.requireNonNull("element", element);
         List<Element> list = new LinkedList<Element>();
         if (elementHasId(element, namespace)) {
             list.add(element);
@@ -371,6 +381,7 @@ public class XmlUtil {
 
     public static String getMessage(
             final JAXBException ex) {
+        ParamUtil.requireNonNull("ex", ex);
         String ret = ex.getMessage();
         if (ret == null && ex.getLinkedException() != null) {
             ret = ex.getLinkedException().getMessage();
@@ -380,6 +391,7 @@ public class XmlUtil {
 
     public static JAXBException convert(
             final JAXBException ex) {
+        ParamUtil.requireNonNull("ex", ex);
         return new JAXBException(getMessage(ex), ex.getLinkedException());
     }
 

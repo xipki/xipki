@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.p11.P11PasswordRetriever;
@@ -116,6 +117,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
     public void addPasswordEntry(
             final Set<P11SlotIdentifier> slots,
             final List<String> singlePasswords) {
+        ParamUtil.requireNonEmpty("singlePasswords", singlePasswords);
         singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
     }
 
@@ -123,6 +125,7 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
     public List<char[]> getPassword(
             final P11SlotIdentifier slotId)
     throws PasswordResolverException {
+        ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleRetrievers)) {
             return null;
         }

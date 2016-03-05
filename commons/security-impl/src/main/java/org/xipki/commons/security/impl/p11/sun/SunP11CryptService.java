@@ -270,13 +270,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_RSA_PKCS(encodedDigestInfo);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(encodedDigestInfo);
     }
 
     @Override
@@ -286,13 +280,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_RSA_X509(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(hash);
     }
 
     @Override
@@ -302,13 +290,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_ECDSA(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_ECDSA(hash);
     }
 
     @Override
@@ -318,12 +300,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-        return identity.CKM_ECDSA_X962(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_ECDSA_X962(hash);
     }
 
     @Override
@@ -333,13 +310,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_DSA(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_DSA(hash);
     }
 
     @Override
@@ -349,13 +320,7 @@ public final class SunP11CryptService implements P11CryptService {
             final P11KeyIdentifier keyId)
     throws SignerException {
         ensureResource();
-
-        SunP11Identity identity = getIdentity(slotId, keyId);
-        if (identity == null) {
-            throw new SignerException("found no key with " + keyId);
-        }
-
-        return identity.CKM_DSA_X962(hash);
+        return getNonNullIdentity(slotId, keyId).CKM_DSA_X962(hash);
     }
 
     @Override
@@ -378,6 +343,17 @@ public final class SunP11CryptService implements P11CryptService {
         return (identity == null)
                 ? null
                 : identity.getCertificate();
+    }
+
+    private SunP11Identity getNonNullIdentity(
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId)
+    throws SignerException {
+        SunP11Identity identity = getIdentity(slotId, keyId);
+        if (identity == null) {
+            throw new SignerException("found no key with " + keyId);
+        }
+        return identity;
     }
 
     private SunP11Identity getIdentity(

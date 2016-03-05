@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.console.CommandLine;
 import org.apache.karaf.shell.api.console.Completer;
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -56,6 +57,7 @@ public abstract class AbstractEnumCompleter implements Completer {
 
     protected void setTokens(
             final String tokens) {
+        ParamUtil.requireNonNull("tokens", tokens);
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
         while (st.hasMoreTokens()) {

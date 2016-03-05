@@ -71,8 +71,8 @@ public class ValidationIssue {
 
     public void setFailureMessage(
             final String failureMessage) {
+        this.failureMessage = ParamUtil.requireNonNull("failureMessage", failureMessage);
         this.failed = true;
-        this.failureMessage = failureMessage;
     }
 
     public String getCode() {

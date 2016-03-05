@@ -47,6 +47,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
@@ -84,6 +85,11 @@ public class PasswordBasedEncryption {
             final int iterationCount,
             final byte[] salt)
     throws GeneralSecurityException {
+        ParamUtil.requireNonNull("plaintext", plaintext);
+        ParamUtil.requireNonNull("password", password);
+        ParamUtil.requireMin("iterationCount", iterationCount, 1);
+        ParamUtil.requireNonNull("salt", salt);
+
         init();
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
 
@@ -104,6 +110,11 @@ public class PasswordBasedEncryption {
             final int iterationCount,
             byte[] salt)
     throws GeneralSecurityException {
+        ParamUtil.requireNonNull("ciperText", cipherText);
+        ParamUtil.requireNonNull("password", password);
+        ParamUtil.requireMin("iterationCount", iterationCount, 1);
+        ParamUtil.requireNonNull("salt", salt);
+
         init();
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 

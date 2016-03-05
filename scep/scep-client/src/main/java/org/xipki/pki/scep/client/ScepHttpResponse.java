@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**
@@ -62,8 +63,8 @@ public class ScepHttpResponse {
             final String contentType,
             final int contentLength,
             final InputStream content) {
-        this.contentType = contentType;
-        this.content = content;
+        this.contentType = ParamUtil.requireNonNull("contentType", contentType);
+        this.content = ParamUtil.requireNonNull("content", content);
         this.contentLength = contentLength;
     }
 
@@ -71,9 +72,8 @@ public class ScepHttpResponse {
             final String contentType,
             final int contentLength,
             final byte[] contentBytes) {
-        this.contentType = contentType;
-        this.content = new ByteArrayInputStream(contentBytes);
-        this.contentLength = contentLength;
+        this(contentType, contentLength,
+                new ByteArrayInputStream(ParamUtil.requireNonNull("contentBytes", contentBytes)));
     }
 
     public String getContentType() {

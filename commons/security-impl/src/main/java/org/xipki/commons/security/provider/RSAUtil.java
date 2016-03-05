@@ -45,6 +45,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * utility class for converting java.security RSA objects into their
@@ -67,6 +68,7 @@ public class RSAUtil {
 
     public static boolean isRSAOid(
             final ASN1ObjectIdentifier algOid) {
+        ParamUtil.requireNonNull("algOid", algOid);
         for (int i = 0; i != RSA_OIDS.length; i++) {
             if (algOid.equals(RSA_OIDS[i])) {
                 return true;
@@ -78,12 +80,14 @@ public class RSAUtil {
 
     static RSAKeyParameters generatePublicKeyParameter(
             final RSAPublicKey key) {
+        ParamUtil.requireNonNull("key", key);
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
     static RSAKeyParameters generatePrivateKeyParameter(
             final RSAPrivateKey key) {
+        ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
 
