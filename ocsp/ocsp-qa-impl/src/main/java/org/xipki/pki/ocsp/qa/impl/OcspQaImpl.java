@@ -253,7 +253,7 @@ public class OcspQaImpl implements OcspQa {
                         sigValIssue.setFailureMessage("signature is invalid");
                     }
                 } catch (Exception ex) {
-                    sigValIssue.setFailureMessage("error while validating signature");
+                    sigValIssue.setFailureMessage("could not validate signature");
                 }
             } // end if
         } // end if (hasSignature)

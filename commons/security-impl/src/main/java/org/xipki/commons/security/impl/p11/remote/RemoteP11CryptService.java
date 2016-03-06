@@ -140,7 +140,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         try {
             encodedRequest = request.getEncoded();
         } catch (IOException ex) {
-            LOG.error("error while encode the PKI request {}", request);
+            LOG.error("could not encode the PKI request {}", request);
             throw new SignerException(ex.getMessage(), ex);
         }
 
@@ -148,7 +148,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         try {
             encodedResponse = send(encodedRequest);
         } catch (IOException ex) {
-            LOG.error("error while send the PKI request {} to server", request);
+            LOG.error("could not send the PKI request {} to server", request);
             throw new SignerException(ex.getMessage(), ex);
         }
 
@@ -156,7 +156,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         try {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
-            LOG.error("error while decode the received PKI message: {}",
+            LOG.error("could not decode the received PKI message: {}",
                     Hex.toHexString(encodedResponse));
             throw new SignerException(ex.getMessage(), ex);
         }

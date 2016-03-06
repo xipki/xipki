@@ -1756,7 +1756,7 @@ public class ExtensionsChecker {
             try {
                 expected[i] = createGeneralName(is[i], conf);
             } catch (BadCertTemplateException ex) {
-                failureMsg.append("error while processing ")
+                failureMsg.append("could not process ")
                     .append(i + 1)
                     .append("-th name: ")
                     .append(ex.getMessage());
