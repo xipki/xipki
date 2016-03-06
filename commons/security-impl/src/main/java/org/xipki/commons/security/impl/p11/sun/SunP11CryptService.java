@@ -98,7 +98,7 @@ public final class SunP11CryptService implements P11CryptService {
 
         Provider xipkiProv = null;
         Provider[] providers = Security.getProviders();
-        int n = providers.length;
+        final int n = providers.length;
         for (int i = 0; i < n; i++) {
             String name = providers[i].getName();
             if ("SunEC".equals(name)) {
@@ -122,8 +122,7 @@ public final class SunP11CryptService implements P11CryptService {
             }
 
             providers = Security.getProviders();
-            n = providers.length;
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < providers.length; i++) {
                 String name = providers[i].getName();
                 LOG.info("provider[" + i + "]: " + name);
             }
@@ -425,17 +424,17 @@ public final class SunP11CryptService implements P11CryptService {
     private static Provider getPkcs11Provider(
             final String pkcs11Module,
             final int slotIndex) {
-        File f = new File(pkcs11Module);
+        File file = new File(pkcs11Module);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Slot-").append(slotIndex);
-        sb.append("_Lib-").append(f.getName());
+        sb.append("_Lib-").append(file.getName());
 
         String name = sb.toString();
 
-        Provider p = Security.getProvider("SunPKCS11-" + name);
-        if (p != null) {
-            return p;
+        Provider provider = Security.getProvider("SunPKCS11-" + name);
+        if (provider != null) {
+            return provider;
         }
 
         sb = new StringBuilder();
@@ -447,23 +446,23 @@ public final class SunP11CryptService implements P11CryptService {
         byte[] pkcs11configBytes = sb.toString().getBytes();
 
         ByteArrayInputStream configStream = new ByteArrayInputStream(pkcs11configBytes);
-        p = new sun.security.pkcs11.SunPKCS11(configStream);
-        Security.addProvider(p);
+        provider = new sun.security.pkcs11.SunPKCS11(configStream);
+        Security.addProvider(provider);
 
-        return p;
+        return provider;
     }
 
     private static long[] allSlots(
             final String pkcs11Module)
     throws SignerException {
         String functionList = null;
-        sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS pInitArgs = null;
+        sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS initArgs = null;
         boolean omitInitialize = true;
 
         sun.security.pkcs11.wrapper.PKCS11 pkcs11;
         try {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
-                    pkcs11Module, functionList, pInitArgs, omitInitialize);
+                    pkcs11Module, functionList, initArgs, omitInitialize);
         } catch (IOException | PKCS11Exception ex) {
             throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }

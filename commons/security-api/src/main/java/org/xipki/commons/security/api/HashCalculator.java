@@ -170,7 +170,7 @@ public class HashCalculator {
             try {
                 md = mds.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
@@ -181,9 +181,9 @@ public class HashCalculator {
         try {
             md.reset();
             md.update(data, 0, data.length);
-            byte[] b = new byte[md.getDigestSize()];
-            md.doFinal(b, 0);
-            return b;
+            byte[] bytes = new byte[md.getDigestSize()];
+            md.doFinal(bytes, 0);
+            return bytes;
         } finally {
             mds.addLast(md);
         }

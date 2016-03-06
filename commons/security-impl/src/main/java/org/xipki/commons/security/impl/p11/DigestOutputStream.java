@@ -77,9 +77,9 @@ public class DigestOutputStream extends OutputStream {
 
     @Override
     public void write(
-            final int b)
+            final int oneByte)
     throws IOException {
-        digest.update((byte) b);
+        digest.update((byte) oneByte);
     }
 
     public byte[] digest() {

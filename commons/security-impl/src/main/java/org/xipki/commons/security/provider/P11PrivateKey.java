@@ -118,11 +118,10 @@ public class P11PrivateKey implements PrivateKey {
         return keysize;
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"RSA".equals(algorithm)) {
             throw new SignatureException("could not compute RSA signature with " + algorithm
                     + " key");
@@ -135,11 +134,10 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_X509(
             final byte[] hash)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"RSA".equals(algorithm)) {
             throw new SignatureException("could not compute RSA signature with " + algorithm
                     + " key");
@@ -152,11 +150,10 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"EC".equals(algorithm)) {
             throw new SignatureException("could not compute ECDSA signature with " + algorithm
                     + " key");
@@ -169,11 +166,10 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA_Plain(
             final byte[] hash)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"EC".equals(algorithm)) {
             throw new SignatureException("could not compute ECDSA signature with " + algorithm
                     + " key");
@@ -186,11 +182,10 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"DSA".equals(algorithm)) {
             throw new SignatureException("could not compute DSA signature with " + algorithm
                     + " key");
@@ -203,11 +198,10 @@ public class P11PrivateKey implements PrivateKey {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA_Plain(
             final byte[] hash)
     throws SignatureException {
-        // CHECKSTYLE:ON
         if (!"DSA".equals(algorithm)) {
             throw new SignatureException("could not compute DSA signature with " + algorithm
                     + " key");

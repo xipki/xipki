@@ -96,8 +96,8 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     throws Exception {
         X509CaEntry caEntry = getCaEntry(false);
 
-        boolean b = caManager.addCa(caEntry);
-        output(b, "added", "could not add", "CA " + caEntry.getName());
+        boolean bo = caManager.addCa(caEntry);
+        output(bo, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }
 
@@ -115,12 +115,12 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         // ART
         String key = CaExportCmd.KEY_ART;
-        String s = getStrProp(props, key, true);
-        CertArt art = CertArt.valueOf(s);
-        assertNotNull(art, key, s);
+        String str = getStrProp(props, key, true);
+        CertArt art = CertArt.valueOf(str);
+        assertNotNull(art, key, str);
 
         if (art != CertArt.X509PKC) {
-            throw new IllegalCmdParamException("unsupported " + key + ": '" + s + "'");
+            throw new IllegalCmdParamException("unsupported " + key + ": '" + str + "'");
         }
 
         // NEXT_SN
@@ -166,83 +166,84 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         // CRL_URIS
         key = CaExportCmd.KEY_CRL_URIS;
-        s = getStrProp(props, key, false);
+        str = getStrProp(props, key, false);
         List<String> crlUris = null;
-        if (s != null) {
-            crlUris = StringUtil.split(s, ", ");
+        if (str != null) {
+            crlUris = StringUtil.split(str, ", ");
         }
 
         // DELTACRL_URIS
         key = CaExportCmd.KEY_DELTACRL_URIS;
-        s = getStrProp(props, key, false);
+        str = getStrProp(props, key, false);
         List<String> deltaCrlUris = null;
-        if (s != null) {
-            deltaCrlUris = StringUtil.split(s, ", ");
+        if (str != null) {
+            deltaCrlUris = StringUtil.split(str, ", ");
         }
 
         // OCSP_URIS
         key = CaExportCmd.KEY_OCSP_URIS;
-        s = getStrProp(props, key, false);
+        str = getStrProp(props, key, false);
         List<String> ocspUris = null;
-        if (s != null) {
-            ocspUris = StringUtil.split(s, ", ");
+        if (str != null) {
+            ocspUris = StringUtil.split(str, ", ");
         }
 
         // CACERT_URIS
         key = CaExportCmd.KEY_CACERT_URIS;
-        s = getStrProp(props, key, false);
+        str = getStrProp(props, key, false);
         List<String> caCertUris = null;
-        if (s != null) {
-            ocspUris = StringUtil.split(s, ", ");
+        if (str != null) {
+            ocspUris = StringUtil.split(str, ", ");
         }
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
+        // CHECKSTYLE:SKIP
         X509CaEntry entry = new X509CaEntry(
                 caName, nextSerial, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls, expirationPeriod);
 
         // STATUS
         key = CaExportCmd.KEY_STATUS;
-        s = getStrProp(props, key, true);
-        CaStatus status = CaStatus.getCAStatus(s);
-        assertNotNull(status, key, s);
+        str = getStrProp(props, key, true);
+        CaStatus status = CaStatus.getCaStatus(str);
+        assertNotNull(status, key, str);
         entry.setStatus(status);
 
         // DUPLICATE_KEY
         key = CaExportCmd.KEY_DUPLICATE_KEY;
-        s = getStrProp(props, key, true);
-        entry.setDuplicateKeyPermitted(Boolean.parseBoolean(s));
+        str = getStrProp(props, key, true);
+        entry.setDuplicateKeyPermitted(Boolean.parseBoolean(str));
 
         // DUPLICATE_SUBJECT
         key = CaExportCmd.KEY_DUPLICATE_SUBJECT;
-        s = getStrProp(props, key, true);
-        entry.setDuplicateSubjectPermitted(Boolean.parseBoolean(s));
+        str = getStrProp(props, key, true);
+        entry.setDuplicateSubjectPermitted(Boolean.parseBoolean(str));
 
         // VALIDITY_MODE
         key = CaExportCmd.KEY_VALIDITY_MODE;
-        s = getStrProp(props, key, true);
-        ValidityMode validityMode = ValidityMode.valueOf(s);
-        assertNotNull(validityMode, key, s);
+        str = getStrProp(props, key, true);
+        ValidityMode validityMode = ValidityMode.valueOf(str);
+        assertNotNull(validityMode, key, str);
         entry.setValidityMode(validityMode);
 
         // CRLSIGNER_NAME
         key = CaExportCmd.KEY_CRLSIGNER_NAME;
-        s = getStrProp(props, key, false);
-        if (s != null) {
-            entry.setCrlSignerName(s);
+        str = getStrProp(props, key, false);
+        if (str != null) {
+            entry.setCrlSignerName(str);
         }
 
         // CMPCONTROL_NAME
         key = CaExportCmd.KEY_CMPCONTROL_NAME;
-        s = getStrProp(props, key, false);
-        if (s != null) {
-            entry.setCmpControlName(s);
+        str = getStrProp(props, key, false);
+        if (str != null) {
+            entry.setCmpControlName(str);
         }
 
         // MAX_VALIDITY
         key = CaExportCmd.KEY_MAX_VALIDITY;
-        s = getStrProp(props, key, true);
-        CertValidity maxValidity = CertValidity.getInstance(s);
+        str = getStrProp(props, key, true);
+        CertValidity maxValidity = CertValidity.getInstance(str);
         entry.setMaxValidity(maxValidity);
 
         // KEEP_EXPIRED_CERT_DAYS
@@ -252,15 +253,15 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         // EXTRA_CONTROL
         key = CaExportCmd.KEY_EXTRA_CONTROL;
-        s = getStrProp(props, key, false);
-        if (s != null) {
-            entry.setExtraControl(s);
+        str = getStrProp(props, key, false);
+        if (str != null) {
+            entry.setExtraControl(str);
         }
 
         // PERMISSIONS
         key = CaExportCmd.KEY_PERMISSIONS;
-        s = getStrProp(props, key, true);
-        Set<String> permissions = StringUtil.splitAsSet(s, ", ");
+        str = getStrProp(props, key, true);
+        Set<String> permissions = StringUtil.splitAsSet(str, ", ");
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
             Permission tmpPermission = Permission.getPermission(permission);
@@ -273,19 +274,20 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         // REVOKED
         key = CaExportCmd.KEY_REVOKED;
-        s = getStrProp(props, key, true);
+        str = getStrProp(props, key, true);
         boolean revoked;
-        if ("true".equalsIgnoreCase(s) || "yes".equalsIgnoreCase(s)) {
+        if ("true".equalsIgnoreCase(str) || "yes".equalsIgnoreCase(str)) {
             revoked = true;
-        } else if ("false".equalsIgnoreCase(s) || "no".equalsIgnoreCase(s)) {
+        } else if ("false".equalsIgnoreCase(str) || "no".equalsIgnoreCase(str)) {
             revoked = false;
         } else {
-            throw new IllegalCmdParamException("invalid " + key + ": '" + s + "'");
+            throw new IllegalCmdParamException("invalid " + key + ": '" + str + "'");
         }
 
         if (revoked) {
             // REV_REASON
             key = CaExportCmd.KEY_REV_REASON;
+            // CHECKSTYLE:SKIP
             int reasonCode = getRequiredIntProp(props, key);
 
             // REV_TIME
@@ -294,10 +296,10 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
             // REV_INV_TIME
             key = CaExportCmd.KEY_REV_INV_TIME;
-            Long t = getLongProp(props, key, false);
+            Long longValue = getLongProp(props, key, false);
             Date invalidityTime = null;
-            if (t != null) {
-                invalidityTime = new Date(t.longValue() * 1000);
+            if (longValue != null) {
+                invalidityTime = new Date(longValue.longValue() * 1000);
             }
             CertRevocationInfo revInfo = new CertRevocationInfo(
                     reasonCode, revocationTime, invalidityTime);
@@ -307,13 +309,13 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         // CERT
         if (!ignoreCert) {
             key = CaExportCmd.KEY_CERT;
-            s = getStrProp(props, key, false);
+            str = getStrProp(props, key, false);
             byte[] certBytes = null;
-            if (s != null) {
-                if (StringUtil.startsWithIgnoreCase(s, "file:")) {
-                    certBytes = IoUtil.read(s.substring("file:".length()));
+            if (str != null) {
+                if (StringUtil.startsWithIgnoreCase(str, "file:")) {
+                    certBytes = IoUtil.read(str.substring("file:".length()));
                 } else {
-                    certBytes = Base64.decode(s);
+                    certBytes = Base64.decode(str);
                 }
             }
 
@@ -332,15 +334,15 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             final String propKey,
             final boolean required)
     throws IllegalCmdParamException {
-        String s = props.getProperty(propKey);
-        if (StringUtil.isBlank(s)) {
-            s = "";
+        String str = props.getProperty(propKey);
+        if (StringUtil.isBlank(str)) {
+            str = "";
         } else {
-            s = s.trim();
+            str = str.trim();
         }
 
-        if (!s.isEmpty()) {
-            return s;
+        if (!str.isEmpty()) {
+            return str;
         }
 
         if (required) {
@@ -363,10 +365,10 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             final String propKey,
             final boolean required)
     throws IllegalCmdParamException {
-        String s = getStrProp(props, propKey, required);
-        return (s == null)
+        String str = getStrProp(props, propKey, required);
+        return (str == null)
                 ? null
-                : Integer.parseInt(s);
+                : Integer.parseInt(str);
     }
 
     private long getRequiredLongProp(
@@ -381,10 +383,10 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             final String propKey,
             final boolean required)
     throws IllegalCmdParamException {
-        String s = getStrProp(props, propKey, required);
-        return (s == null)
+        String str = getStrProp(props, propKey, required);
+        return (str == null)
                 ? null
-                : Long.parseLong(s);
+                : Long.parseLong(str);
     }
 
     private static void assertNotNull(

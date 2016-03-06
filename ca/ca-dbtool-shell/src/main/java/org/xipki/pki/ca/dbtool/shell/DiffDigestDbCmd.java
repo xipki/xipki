@@ -110,11 +110,11 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
 
     protected DbPortWorker getDbPortWorker()
     throws Exception {
-        Set<byte[]> cACerts = null;
+        Set<byte[]> caCerts = null;
         if (caCertFiles != null && !caCertFiles.isEmpty()) {
-            cACerts = new HashSet<>(caCertFiles.size());
+            caCerts = new HashSet<>(caCertFiles.size());
             for (String fileName : caCertFiles) {
-                cACerts.add(IoUtil.read(fileName));
+                caCerts.add(IoUtil.read(fileName));
             }
         }
 
@@ -129,7 +129,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
                 reportDir,
                 numCertsPerSelect,
                 numThreads,
-                cACerts);
+                caCerts);
     }
 
 }

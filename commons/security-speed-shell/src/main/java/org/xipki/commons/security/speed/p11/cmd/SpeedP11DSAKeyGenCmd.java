@@ -38,6 +38,7 @@ package org.xipki.commons.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
@@ -49,29 +50,31 @@ import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen",
         description = "performance test of PKCS#11 DSA key generation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP11DSAKeyGenCmd extends SpeedP11CommandSupport {
 
     @Option(name = "--plen",
             description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private Integer plen = 2048;
 
     @Option(name = "--qlen",
             description = "bit length of the sub-prime")
-    private Integer qLen;
+    private Integer qlen;
 
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
+        if (qlen == null) {
+            if (plen >= 2048) {
+                qlen = 256;
             } else {
-                qLen = 160;
+                qlen = 160;
             }
         }
 
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        return new P11DSAKeyGenLoadTest(slot, pLen, qLen);
+        return new P11DSAKeyGenLoadTest(slot, plen, qlen);
     }
 
 }

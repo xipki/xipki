@@ -111,10 +111,10 @@ public class DbPorter extends DbToolBase {
         this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-        String s = dbSchemaInfo.getVariableValue("VERSION");
-        this.dbSchemaVersion = Integer.parseInt(s);
-        s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
-        this.maxX500nameLen = Integer.parseInt(s);
+        String str = dbSchemaInfo.getVariableValue("VERSION");
+        this.dbSchemaVersion = Integer.parseInt(str);
+        str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        this.maxX500nameLen = Integer.parseInt(str);
     }
 
     protected FileOrValueType buildFileOrValue(

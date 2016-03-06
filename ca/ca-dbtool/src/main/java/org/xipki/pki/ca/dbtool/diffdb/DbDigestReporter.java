@@ -44,6 +44,8 @@ import java.io.Writer;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -55,6 +57,8 @@ import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
  */
 
 public class DbDigestReporter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbDigestReporter.class);
 
     private final String reportDirname;
 
@@ -164,10 +168,10 @@ public class DbDigestReporter {
     }
 
     public void close() {
-        close(missingWriter);
-        close(diffWriter);
-        close(goodWriter);
-        close(errorWriter);
+        closeWriter(missingWriter);
+        closeWriter(diffWriter);
+        closeWriter(goodWriter);
+        closeWriter(errorWriter);
 
         int sum = numGood.get() + numDiff.get() + numMissing.get() + numError.get();
         Date now = new Date();
@@ -216,11 +220,13 @@ public class DbDigestReporter {
         }
     }
 
-    private static void close(
+    private static void closeWriter(
             final Writer writer) {
         try {
             writer.close();
         } catch (Exception ex) {
+            LOG.warn("error while closing writer: {}", ex.getMessage());
+            LOG.debug("error while closing writer", ex);
         }
     }
 

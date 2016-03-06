@@ -101,10 +101,10 @@ public abstract class X509Certprofile {
             final String currentSerialNumber)
     throws BadFormatException {
         try {
-            int currentSN = (currentSerialNumber == null)
+            int currentSn = (currentSerialNumber == null)
                     ? 0
                     : Integer.parseInt(currentSerialNumber.trim());
-            return Integer.toString(currentSN + 1);
+            return Integer.toString(currentSn + 1);
         } catch (NumberFormatException ex) {
             throw new BadFormatException(String.format(
                     "invalid serialNumber attribute %s", currentSerialNumber));
@@ -120,7 +120,9 @@ public abstract class X509Certprofile {
     }
 
     /**
-     * Whether the subject attribute serialNumber in request is permitted
+     * Whether the subject attribute serialNumber in request is permitted.
+     *
+     * @return whether the serialNumber is permitted in request.
      */
     public boolean isSerialNumberInReqPermitted() {
         return true;
@@ -148,7 +150,7 @@ public abstract class X509Certprofile {
     }
 
     /**
-     * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
+     * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
      */
     public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
         return null;

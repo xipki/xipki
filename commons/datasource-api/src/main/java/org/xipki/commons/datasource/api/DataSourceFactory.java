@@ -57,15 +57,15 @@ public interface DataSourceFactory {
             PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(
-            String name,
-            String confFile,
-            PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
-
     DataSourceWrapper createDataSource(
             String name,
             Properties conf,
+            PasswordResolver passwordResolver)
+    throws DataAccessException, PasswordResolverException, IOException;
+
+    DataSourceWrapper createDataSourceForFile(
+            String name,
+            String confFile,
             PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 

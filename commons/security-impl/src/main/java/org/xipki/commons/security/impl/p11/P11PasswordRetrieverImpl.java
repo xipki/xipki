@@ -73,12 +73,12 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
         }
 
         public boolean match(
-                final P11SlotIdentifier pSlot) {
+                final P11SlotIdentifier slot) {
             if (slots == null) {
                 return true;
             }
-            for (P11SlotIdentifier slot : slots) {
-                if (slot.equals(pSlot)) {
+            for (P11SlotIdentifier m : slots) {
+                if (m.equals(slot)) {
                     return true;
                 }
             }

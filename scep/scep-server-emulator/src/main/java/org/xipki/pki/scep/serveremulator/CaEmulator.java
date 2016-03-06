@@ -169,9 +169,9 @@ public class CaEmulator {
 
     public Certificate generateCert(
             final SubjectPublicKeyInfo pubKeyInfo,
-            final X500Name subjectDN)
+            final X500Name subjectDn)
     throws Exception {
-        return generateCert(pubKeyInfo, subjectDN,
+        return generateCert(pubKeyInfo, subjectDn,
                 new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     }
 
@@ -214,12 +214,12 @@ public class CaEmulator {
 
     public Certificate getCert(
             final X500Name issuer,
-            final BigInteger pSerialNumber) {
+            final BigInteger serialNumber) {
         if (!caSubject.equals(issuer)) {
             return null;
         }
 
-        return serialCertMap.get(pSerialNumber);
+        return serialCertMap.get(serialNumber);
     }
 
     public Certificate pollCert(
@@ -236,7 +236,7 @@ public class CaEmulator {
 
     public synchronized CertificateList getCrl(
             final X500Name issuer,
-            final BigInteger pSerialNumber)
+            final BigInteger serialNumber)
     throws Exception {
         if (crl != null) {
             return crl;
@@ -246,10 +246,10 @@ public class CaEmulator {
         X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, thisUpdate);
         Date nextUpdate = new Date(thisUpdate.getTime() + 30 * DAY_IN_MS);
         crlBuilder.setNextUpdate(nextUpdate);
-        Date cAStartTime = caCert.getTBSCertificate().getStartDate().getDate();
-        Date revocationTime = new Date(cAStartTime.getTime() + 1);
+        Date caStartTime = caCert.getTBSCertificate().getStartDate().getDate();
+        Date revocationTime = new Date(caStartTime.getTime() + 1);
         if (revocationTime.after(thisUpdate)) {
-            revocationTime = cAStartTime;
+            revocationTime = caStartTime;
         }
         crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
         crlBuilder.addExtension(Extension.cRLNumber, false,

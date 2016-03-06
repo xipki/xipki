@@ -163,7 +163,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue admission;
 
-    private AuthorityInfoAccessControl aIAControl;
+    private AuthorityInfoAccessControl aiaControl;
 
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
 
@@ -187,7 +187,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
-    private boolean includeIssuerAndSerialInAKI;
+    private boolean includeIssuerAndSerialInAki;
 
     private boolean incSerialNoIfSubjectExists;
 
@@ -213,7 +213,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private CertValidity privateKeyUsagePeriod;
 
-    private ExtensionValue qCStatments;
+    private ExtensionValue qcStatments;
 
     private List<QcStatementOption> qcStatementsOption;
 
@@ -242,7 +242,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     private void reset() {
         additionalInformation = null;
         admission = null;
-        aIAControl = null;
+        aiaControl = null;
         allowedSubjectAltNameModes = null;
         allowedSubjectInfoAccessModes = null;
         authorizationTemplate = null;
@@ -254,7 +254,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         duplicateSubjectPermitted = true;
         extendedKeyusages = null;
         extensionControls = null;
-        includeIssuerAndSerialInAKI = false;
+        includeIssuerAndSerialInAki = false;
         incSerialNoIfSubjectExists = false;
         inhibitAnyPolicy = null;
         keyAlgorithms = null;
@@ -267,7 +267,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         policyConstraints = null;
         policyMappings = null;
         privateKeyUsagePeriod = null;
-        qCStatments = null;
+        qcStatments = null;
         qcStatementsOption = null;
         raOnly = false;
         restriction = null;
@@ -371,31 +371,29 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         if (confParams == null) {
             parameters = null;
         } else {
-            Map<String, String> tMap = new HashMap<>();
+            Map<String, String> tmpMap = new HashMap<>();
             for (NameValueType nv : confParams.getParameter()) {
-                tMap.put(nv.getName(), nv.getValue());
+                tmpMap.put(nv.getName(), nv.getValue());
             }
-            parameters = Collections.unmodifiableMap(tMap);
+            parameters = Collections.unmodifiableMap(tmpMap);
         }
 
         // Subject
         Subject subject = conf.getSubject();
-        Boolean b = subject.isDuplicateSubjectPermitted();
-        if (b != null) {
-            duplicateSubjectPermitted = b.booleanValue();
+        Boolean bo = subject.isDuplicateSubjectPermitted();
+        if (bo != null) {
+            duplicateSubjectPermitted = bo.booleanValue();
         }
 
-        Map<ASN1ObjectIdentifier, RdnControl> subjectDNControls = new HashMap<>();
+        Map<ASN1ObjectIdentifier, RdnControl> subjectDnControls = new HashMap<>();
 
-        for (RdnType t : subject.getRdn()) {
-            StringType stringType = XmlX509CertprofileUtil.convertStringType(
-                    t.getStringType());
-            ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
+        for (RdnType rdn : subject.getRdn()) {
+            ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(rdn.getType().getValue());
 
             List<Pattern> patterns = null;
-            if (CollectionUtil.isNonEmpty(t.getRegex())) {
+            if (CollectionUtil.isNonEmpty(rdn.getRegex())) {
                 patterns = new LinkedList<>();
-                for (String regex : t.getRegex()) {
+                for (String regex : rdn.getRegex()) {
                     Pattern pattern = Pattern.compile(regex);
                     patterns.add(pattern);
                 }
@@ -409,24 +407,26 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
 
             Range range;
-            if (t.getMinLen() != null || t.getMaxLen() != null) {
-                range = new Range(t.getMinLen(), t.getMaxLen());
+            if (rdn.getMinLen() != null || rdn.getMaxLen() != null) {
+                range = new Range(rdn.getMinLen(), rdn.getMaxLen());
             } else {
                 range = null;
             }
 
-            RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
-            subjectDNControls.put(type, rdnControl);
+            RdnControl rdnControl = new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs());
+            subjectDnControls.put(type, rdnControl);
 
+            StringType stringType = XmlX509CertprofileUtil.convertStringType(
+                    rdn.getStringType());
             rdnControl.setStringType(stringType);
             rdnControl.setStringLengthRange(range);
             rdnControl.setPatterns(patterns);
-            rdnControl.setPrefix(t.getPrefix());
-            rdnControl.setSuffix(t.getSuffix());
-            rdnControl.setGroup(t.getGroup());
+            rdnControl.setPrefix(rdn.getPrefix());
+            rdnControl.setSuffix(rdn.getSuffix());
+            rdnControl.setGroup(rdn.getGroup());
             SubjectDnSpec.fixRdnControl(rdnControl);
         }
-        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
+        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDnControls);
         this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
 
         // Extensions
@@ -538,7 +538,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        List<ASN1ObjectIdentifier> professionOIDs;
+        List<ASN1ObjectIdentifier> professionOids;
         List<String> professionItems;
 
         List<String> items = (type == null)
@@ -549,10 +549,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         List<OidWithDescType> oidWithDescs = (type == null)
                 ? null
                 : extConf.getProfessionOid();
-        professionOIDs = XmlX509CertprofileUtil.toOidList(oidWithDescs);
+        professionOids = XmlX509CertprofileUtil.toOidList(oidWithDescs);
 
         this.admission = createAdmission(extensionControls.get(type).isCritical(),
-                professionOIDs, professionItems,
+                professionOids, professionItems,
                 extConf.getRegistrationNumber(),
                 extConf.getAddProfessionInfo());
     }
@@ -570,17 +570,17 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        Boolean b = extConf.isIncludeCaIssuers();
-        boolean includesCaIssuers = (b == null)
+        Boolean bo = extConf.isIncludeCaIssuers();
+        boolean includesCaIssuers = (bo == null)
                 ? true
-                : b.booleanValue();
+                : bo.booleanValue();
 
-        b = extConf.isIncludeOcsp();
-        boolean includesOcsp = (b == null)
+        bo = extConf.isIncludeOcsp();
+        boolean includesOcsp = (bo == null)
                 ? true
-                : b.booleanValue();
+                : bo.booleanValue();
 
-        this.aIAControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
+        this.aiaControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
     }
 
     private void initAuthorityKeyIdentifier(ExtensionsType extensionsType)
@@ -596,7 +596,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
+        this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
     }
 
     private void initAuthorizationTemplate(ExtensionsType extensionsType)
@@ -612,10 +612,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
-        v.add(new DEROctetString(extConf.getAccessRights().getValue()));
-        ASN1Encodable extValue = new DERSequence(v);
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1ObjectIdentifier(extConf.getType().getValue()));
+        vec.add(new DEROctetString(extConf.getAccessRights().getValue()));
+        ASN1Encodable extValue = new DERSequence(vec);
         authorizationTemplate =
                 new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
@@ -848,19 +848,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 qcStatementOption = new QcStatementOption(qcStatment);
             } else if (statementValue.getQcEuLimitValue() != null) {
                 QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
-                String sCurrency = euLimitType.getCurrency().toUpperCase();
-                if (currencyCodes.contains(sCurrency)) {
+                String tmpCurrency = euLimitType.getCurrency().toUpperCase();
+                if (currencyCodes.contains(tmpCurrency)) {
                     throw new CertprofileException(
                             "Duplicated definition of qcStatments with QCEuLimitValue for "
-                            + "the currency " + sCurrency);
+                            + "the currency " + tmpCurrency);
                 }
 
                 Iso4217CurrencyCode currency;
-                if (StringUtil.isNumber(sCurrency)) {
-                    int cCode = Integer.parseInt(sCurrency);
-                    currency = new Iso4217CurrencyCode(cCode);
+                if (StringUtil.isNumber(tmpCurrency)) {
+                    int countryCode = Integer.parseInt(tmpCurrency);
+                    currency = new Iso4217CurrencyCode(countryCode);
                 } else {
-                    currency = new Iso4217CurrencyCode(sCurrency);
+                    currency = new Iso4217CurrencyCode(tmpCurrency);
                 }
 
                 Range2Type r1 = euLimitType.getAmount();
@@ -878,7 +878,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                             new QcStatementOption(qcStatementId, monetaryValueOption);
                     requireInfoFromReq = true;
                 }
-                currencyCodes.add(sCurrency);
+                currencyCodes.add(tmpCurrency);
             } else {
                 throw new RuntimeException("unknown value of qcStatment");
             }
@@ -890,15 +890,15 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         for (QcStatementOption m : qcStatementsOption) {
             if (m.getStatement() == null) {
                 throw new RuntimeException("should not reach here");
             }
-            v.add(m.getStatement());
+            vec.add(m.getStatement());
         }
-        ASN1Sequence seq = new DERSequence(v);
-        qCStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
+        ASN1Sequence seq = new DERSequence(vec);
+        qcStatments = new ExtensionValue(extensionControls.get(type).isCritical(), seq);
         qcStatementsOption = null;
     }
 
@@ -936,7 +936,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         List<SMIMECapability> list = extConf.getSMIMECapability();
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         for (SMIMECapability m : list) {
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityID().getValue());
             ASN1Encodable params = null;
@@ -946,15 +946,15 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 if (capParams.getInteger() != null) {
                     params = new ASN1Integer(capParams.getInteger());
                 } else if (capParams.getBase64Binary() != null) {
-                    params = readASN1Encodable(capParams.getBase64Binary().getValue());
+                    params = readAsn1Encodable(capParams.getBase64Binary().getValue());
                 }
             }
             org.bouncycastle.asn1.smime.SMIMECapability cap =
                     new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
-            v.add(cap);
+            vec.add(cap);
         }
 
-        ASN1Encodable extValue = new DERSequence(v);
+        ASN1Encodable extValue = new DERSequence(vec);
         smimeCapatibilities =
                 new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
@@ -1022,11 +1022,11 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
         Collections.sort(features);
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         for (Integer m : features) {
-            v.add(new ASN1Integer(m));
+            vec.add(new ASN1Integer(m));
         }
-        ASN1Encodable extValue = new DERSequence(v);
+        ASN1Encodable extValue = new DERSequence(vec);
         tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
@@ -1187,20 +1187,20 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 }
             }
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
-            v.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(tmpNotAfter)));
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new DERTaggedObject(false, 0, new DERGeneralizedTime(notBefore)));
+            vec.add(new DERTaggedObject(false, 1, new DERGeneralizedTime(tmpNotAfter)));
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
-                    new DERSequence(v));
+                    new DERSequence(vec));
             values.addExtension(type, extValue);
         }
 
         // QCStatements
         type = Extension.qCStatements;
-        if ((qCStatments != null || qcStatementsOption != null)
+        if ((qcStatments != null || qcStatementsOption != null)
                 && occurences.remove(type) != null) {
-            if (qCStatments != null) {
-                values.addExtension(type, qCStatments);
+            if (qcStatments != null) {
+                values.addExtension(type, qcStatments);
             } else if (qcStatementsOption != null) {
                 // extract the euLimit data from request
                 Extension extension = requestedExtensions.getExtension(type);
@@ -1229,10 +1229,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                     qcEuLimits.put(currencyS, new int[]{amount, exponent});
                 }
 
-                ASN1EncodableVector v = new ASN1EncodableVector();
+                ASN1EncodableVector vec = new ASN1EncodableVector();
                 for (QcStatementOption m : qcStatementsOption) {
                     if (m.getStatement() != null) {
-                        v.add(m.getStatement());
+                        vec.add(m.getStatement());
                         continue;
                     }
 
@@ -1263,12 +1263,12 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                     MonetaryValue monetaryVale = new MonetaryValue(
                             monetaryOption.getCurrency(), amount, exponent);
                     QCStatement qcStatment = new QCStatement(m.getStatementId(), monetaryVale);
-                    v.add(qcStatment);
+                    vec.add(qcStatment);
                 }
 
                 ExtensionValue extValue = new ExtensionValue(
                         extensionControls.get(type).isCritical(),
-                        new DERSequence(v));
+                        new DERSequence(vec));
                 values.addExtension(type, extValue);
             } else {
                 throw new RuntimeException("should not reach here");
@@ -1290,17 +1290,17 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                         "biometricInfo extension in request contains empty sequence");
             }
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
 
             for (int i = 0; i < n; i++) {
-                BiometricData m = BiometricData.getInstance(seq.getObjectAt(i));
-                TypeOfBiometricData t = m.getTypeOfBiometricData();
-                if (!biometricDataOption.isTypePermitted(t)) {
+                BiometricData bd = BiometricData.getInstance(seq.getObjectAt(i));
+                TypeOfBiometricData bdType = bd.getTypeOfBiometricData();
+                if (!biometricDataOption.isTypePermitted(bdType)) {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].typeOfBiometricData is not permitted");
                 }
 
-                ASN1ObjectIdentifier hashAlgo = m.getHashAlgorithm().getAlgorithm();
+                ASN1ObjectIdentifier hashAlgo = bd.getHashAlgorithm().getAlgorithm();
                 if (!biometricDataOption.isHashAlgorithmPermitted(hashAlgo)) {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].hashAlgorithm is not permitted");
@@ -1314,13 +1314,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                             "should not happen, unknown hash algorithm " + hashAlgo);
                 }
 
-                byte[] hashValue = m.getBiometricDataHash().getOctets();
+                byte[] hashValue = bd.getBiometricDataHash().getOctets();
                 if (hashValue.length != expHashValueSize) {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].biometricDataHash has incorrect length");
                 }
 
-                DERIA5String sourceDataUri = m.getSourceDataUri();
+                DERIA5String sourceDataUri = bd.getSourceDataUri();
                 switch (biometricDataOption.getSourceDataUriOccurrence()) {
                 case FORBIDDEN:
                     sourceDataUri = null;
@@ -1340,13 +1340,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
                 AlgorithmIdentifier newHashAlg =
                         new AlgorithmIdentifier(hashAlgo, DERNull.INSTANCE);
-                BiometricData newBiometricData = new BiometricData(t, newHashAlg,
+                BiometricData newBiometricData = new BiometricData(bdType, newHashAlg,
                         new DEROctetString(hashValue), sourceDataUri);
-                v.add(newBiometricData);
+                vec.add(newBiometricData);
             }
 
             ExtensionValue extValue = new ExtensionValue(
-                        extensionControls.get(type).isCritical(), new DERSequence(v));
+                        extensionControls.get(type).isCritical(), new DERSequence(vec));
             values.addExtension(type, extValue);
         }
 
@@ -1408,7 +1408,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     @Override
     public AuthorityInfoAccessControl getAiaControl() {
-        return aIAControl;
+        return aiaControl;
     }
 
     @Override
@@ -1435,7 +1435,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     @Override
     public boolean includeIssuerAndSerialInAki() {
-        return includeIssuerAndSerialInAKI;
+        return includeIssuerAndSerialInAki;
     }
 
     @Override
@@ -1450,13 +1450,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue createAdmission(
             final boolean critical,
-            final List<ASN1ObjectIdentifier> professionOIDs,
+            final List<ASN1ObjectIdentifier> professionOids,
             final List<String> professionItems,
             final String registrationNumber,
             final byte[] addProfessionInfo)
     throws CertprofileException {
         if (CollectionUtil.isEmpty(professionItems)
-                && CollectionUtil.isEmpty(professionOIDs)
+                && CollectionUtil.isEmpty(professionOids)
                 && StringUtil.isBlank(registrationNumber)
                 && (addProfessionInfo == null || addProfessionInfo.length == 0)) {
             return null;
@@ -1464,16 +1464,16 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         DirectoryString[] tmpProfessionItems = null;
         if (CollectionUtil.isNonEmpty(professionItems)) {
-            int n = professionItems.size();
-            tmpProfessionItems = new DirectoryString[n];
-            for (int i = 0; i < n; i++) {
+            int size = professionItems.size();
+            tmpProfessionItems = new DirectoryString[size];
+            for (int i = 0; i < size; i++) {
                 tmpProfessionItems[i] = new DirectoryString(professionItems.get(i));
             }
         }
 
-        ASN1ObjectIdentifier[] tmpProfessionOIDs = null;
-        if (CollectionUtil.isNonEmpty(professionOIDs)) {
-            tmpProfessionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
+        ASN1ObjectIdentifier[] tmpProfessionOids = null;
+        if (CollectionUtil.isNonEmpty(professionOids)) {
+            tmpProfessionOids = professionOids.toArray(new ASN1ObjectIdentifier[0]);
         }
 
         ASN1OctetString tmpAddProfessionInfo = null;
@@ -1482,7 +1482,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         ProfessionInfo professionInfo = new ProfessionInfo(
-                null, tmpProfessionItems, tmpProfessionOIDs, registrationNumber,
+                null, tmpProfessionItems, tmpProfessionOids, registrationNumber,
                 tmpAddProfessionInfo);
 
         Admissions admissions = new Admissions(null, null,
@@ -1554,10 +1554,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 return null;
             }
 
-            Object o = m.getValue().getAny();
-            if (expectedClass.isAssignableFrom(o.getClass())) {
-                return o;
-            } else if (ConstantExtValue.class.isAssignableFrom(o.getClass())) {
+            Object obj = m.getValue().getAny();
+            if (expectedClass.isAssignableFrom(obj.getClass())) {
+                return obj;
+            } else if (ConstantExtValue.class.isAssignableFrom(obj.getClass())) {
                 // will be processed later
                 return null;
             } else {
@@ -1572,7 +1572,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 + ObjectIdentifiers.oidToDisplayName(type));
     } // method getExtensionValue
 
-    private static ASN1Encodable readASN1Encodable(
+    private static ASN1Encodable readAsn1Encodable(
             final byte[] encoded)
     throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);

@@ -40,6 +40,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,8 +85,8 @@ public class EjbcaDigestExportReader {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
                 selectRawCertStmt = datasource.prepareStatement(conn, selectRawCertSql);
             } catch (DataAccessException ex) {
-                DbToolBase.releaseResources(selectCertStmt, null);
-                DbToolBase.releaseResources(selectRawCertStmt, null);
+                releaseResources(selectCertStmt, null);
+                releaseResources(selectRawCertStmt, null);
                 datasource.returnConnection(conn);
                 throw ex;
             }
@@ -98,11 +99,11 @@ public class EjbcaDigestExportReader {
                     IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException ex) {
-                    LOG.error("InterruptedException", ex);
+                    LOG.error("InterruptedException: {}", ex.getMessage());
                 }
             }
 
-            DbToolBase.releaseResources(selectCertStmt, null);
+            releaseResources(selectCertStmt, null);
             datasource.returnConnection(conn);
             selectCertStmt = null;
         }
@@ -160,8 +161,8 @@ public class EjbcaDigestExportReader {
 
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
-                    String s = rs.getString("serialNumber");
-                    long serial = Long.parseLong(s);
+                    String str = rs.getString("serialNumber");
+                    long serial = Long.parseLong(str);
 
                     int status = rs.getInt("status");
                     boolean revoked = (status == 40);
@@ -192,7 +193,7 @@ public class EjbcaDigestExportReader {
                 result.setException(ex);
             } finally {
                 outQueue.add(result);
-                DbToolBase.releaseResources(null, rs);
+                releaseResources(null, rs);
             }
         } // method query
 
@@ -255,14 +256,14 @@ public class EjbcaDigestExportReader {
     throws DataAccessException {
         ParamUtil.requireNonNull("idRanges", idRanges);
 
-        int n = idRanges.size();
+        int size = idRanges.size();
         for (IdRange range : idRanges) {
             inQueue.add(range);
         }
 
-        List<DigestDbEntrySet> results = new ArrayList<>(n);
+        List<DigestDbEntrySet> results = new ArrayList<>(size);
         int numCerts = 0;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < size; i++) {
             try {
                 DigestDbEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();
@@ -301,5 +302,11 @@ public class EjbcaDigestExportReader {
     public void stop() {
         stop.set(true);
         executor.shutdownNow();
+    }
+
+    protected void releaseResources(
+            final Statement ps,
+            final ResultSet rs) {
+        DbToolBase.releaseResources(datasource, ps, rs);
     }
 }

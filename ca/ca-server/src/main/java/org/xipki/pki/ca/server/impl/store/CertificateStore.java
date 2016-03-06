@@ -329,9 +329,9 @@ public class CertificateStore {
 
     public int cleanupCrls(
             final X509Cert caCert,
-            final int numCRLs) {
+            final int numCrls) {
         try {
-            return queryExecutor.cleanupCrls(caCert, numCRLs);
+            return queryExecutor.cleanupCrls(caCert, numCrls);
         } catch (Exception ex) {
             LOG.error("could not cleanup CRLs ca={}: error message: {}",
                     caCert.getSubject(),
@@ -374,11 +374,6 @@ public class CertificateStore {
      * Returns the first serial number ascend sorted {@code numEntries} revoked certificates
      * which are not expired at {@code notExpiredAt} and their serial numbers are not less than
      * {@code startSerial}.
-     * @param caCert
-     * @param notExpiredAt
-     * @param startSerial
-     * @param numEntries
-     * @throws DataAccessException
      */
     public List<CertRevInfoWithSerial> getRevokedCerts(
             final X509Cert caCert,

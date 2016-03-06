@@ -58,29 +58,29 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
     protected SecurityFactory securityFactory;
 
     protected static String getRealString(
-            final String s) {
-        return CaManager.NULL.equalsIgnoreCase(s)
+            final String str) {
+        return CaManager.NULL.equalsIgnoreCase(str)
                 ? null
-                : s;
+                : str;
     }
 
     protected static String toString(
-            final Collection<? extends Object> c) {
-        if (c == null) {
+            final Collection<? extends Object> col) {
+        if (col == null) {
             return "null";
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int n = c.size();
+        int size = col.size();
 
-        int i = 0;
-        for (Object o : c) {
+        int idx = 0;
+        for (Object o : col) {
             sb.append(o);
-            if (i < n - 1) {
+            if (idx < size - 1) {
                 sb.append(", ");
             }
-            i++;
+            idx++;
         }
         sb.append("}");
         return sb.toString();

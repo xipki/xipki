@@ -108,20 +108,20 @@ public class CaRevokeCmd extends CaCommandSupport {
 
         Date revocationDate = null;
         if (isNotBlank(revocationDateS)) {
-            revocationDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(revocationDateS);
+            revocationDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS);
         } else {
             revocationDate = new Date();
         }
 
         Date invalidityDate = null;
         if (isNotBlank(invalidityDateS)) {
-            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+            invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
         CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate,
                 invalidityDate);
-        boolean b = caManager.revokeCa(caName, revInfo);
-        output(b, "revoked", "could not revoke", "CA " + caName);
+        boolean bo = caManager.revokeCa(caName, revInfo);
+        output(bo, "revoked", "could not revoke", "CA " + caName);
         return null;
     } // method doExecute
 

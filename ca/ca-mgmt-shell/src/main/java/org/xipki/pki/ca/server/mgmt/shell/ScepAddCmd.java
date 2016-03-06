@@ -111,8 +111,8 @@ public class ScepAddCmd extends CaCommandSupport {
             throw new InvalidConfException("certificate is invalid");
         }
 
-        boolean b = caManager.addScep(entry);
-        output(b, "added", "could not add", "SCEP responder " + caName);
+        boolean bo = caManager.addScep(entry);
+        output(bo, "added", "could not add", "SCEP responder " + caName);
         return null;
     }
 

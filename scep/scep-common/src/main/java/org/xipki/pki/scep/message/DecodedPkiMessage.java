@@ -246,24 +246,24 @@ public class DecodedPkiMessage extends PkiMessage {
         }
 
         // transactionId
-        String s = getPrintableStringAttrValue(signedAttrs,
+        String str = getPrintableStringAttrValue(signedAttrs,
                 ScepObjectIdentifiers.ID_TRANSACTION_ID);
-        if (s == null || s.isEmpty()) {
+        if (str == null || str.isEmpty()) {
             throw new MessageDecodingException("missing required SCEP attribute transactionId");
         }
-        TransactionId transactionId = new TransactionId(s);
+        TransactionId transactionId = new TransactionId(str);
 
         // messageType
-        Integer i = getIntegerPrintStringAttrValue(signedAttrs,
+        Integer intValue = getIntegerPrintStringAttrValue(signedAttrs,
                 ScepObjectIdentifiers.ID_MESSAGE_TYPE);
-        if (i == null) {
+        if (intValue == null) {
             throw new MessageDecodingException("tid " + transactionId.getId()
                     + ": missing required SCEP attribute messageType");
         }
-        MessageType messageType = MessageType.valueForCode(i);
+        MessageType messageType = MessageType.valueForCode(intValue);
         if (messageType == null) {
             throw new MessageDecodingException("tid " + transactionId.getId()
-                    + ": invalid messageType '" + i + "'");
+                    + ": invalid messageType '" + intValue + "'");
         }
 
         // senderNonce
@@ -295,21 +295,21 @@ public class DecodedPkiMessage extends PkiMessage {
         if (MessageType.CertRep == messageType) {
             // pkiStatus
             try {
-                i = getIntegerPrintStringAttrValue(signedAttrs,
+                intValue = getIntegerPrintStringAttrValue(signedAttrs,
                         ScepObjectIdentifiers.ID_PKI_STATUS);
             } catch (MessageDecodingException ex) {
                 ret.setFailureMessage("could not parse pkiStatus: " + ex.getMessage());
                 return ret;
             }
 
-            if (i == null) {
+            if (intValue == null) {
                 ret.setFailureMessage("missing required SCEP attribute pkiStatus");
                 return ret;
             }
 
-            pkiStatus = PkiStatus.valueForCode(i);
+            pkiStatus = PkiStatus.valueForCode(intValue);
             if (pkiStatus == null) {
-                ret.setFailureMessage("invalid pkiStatus '" + i + "'");
+                ret.setFailureMessage("invalid pkiStatus '" + intValue + "'");
                 return ret;
             }
             ret.setPkiStatus(pkiStatus);
@@ -317,21 +317,21 @@ public class DecodedPkiMessage extends PkiMessage {
             // failureInfo
             if (pkiStatus == PkiStatus.FAILURE) {
                 try {
-                    i = getIntegerPrintStringAttrValue(signedAttrs,
+                    intValue = getIntegerPrintStringAttrValue(signedAttrs,
                             ScepObjectIdentifiers.ID_FAILINFO);
                 } catch (MessageDecodingException ex) {
                     ret.setFailureMessage("could not parse failInfo: " + ex.getMessage());
                     return ret;
                 }
 
-                if (i == null) {
+                if (intValue == null) {
                     ret.setFailureMessage("missing required SCEP attribute failureInfo");
                     return ret;
                 }
 
-                failInfo = FailInfo.valueForCode(i);
+                failInfo = FailInfo.valueForCode(intValue);
                 if (failInfo == null) {
-                    ret.setFailureMessage("invalid failureInfo '" + i + "'");
+                    ret.setFailureMessage("invalid failureInfo '" + intValue + "'");
                     return ret;
                 }
                 ret.setFailInfo(failInfo);
@@ -359,14 +359,14 @@ public class DecodedPkiMessage extends PkiMessage {
             }
         }
 
-        ASN1ObjectIdentifier digestAlgOID = signerInfo.getDigestAlgorithmID().getAlgorithm();
-        ret.setDigestAlgorithm(digestAlgOID);
+        ASN1ObjectIdentifier digestAlgOid = signerInfo.getDigestAlgorithmID().getAlgorithm();
+        ret.setDigestAlgorithm(digestAlgOid);
 
-        String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
-            ASN1ObjectIdentifier tmpDigestAlgOID;
+        String sigAlgOid = signerInfo.getEncryptionAlgOID();
+        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
+            ASN1ObjectIdentifier tmpDigestAlgOid;
             try {
-                tmpDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
+                tmpDigestAlgOid = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception ex) {
                 final String msg =
@@ -377,7 +377,7 @@ public class DecodedPkiMessage extends PkiMessage {
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(tmpDigestAlgOID)) {
+            if (!digestAlgOid.equals(tmpDigestAlgOid)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use the"
                         + " same digestAlgorithm");
                 return ret;
@@ -522,15 +522,15 @@ public class DecodedPkiMessage extends PkiMessage {
             final AttributeTable attrs,
             final ASN1ObjectIdentifier type)
     throws MessageDecodingException {
-        String s = getPrintableStringAttrValue(attrs, type);
-        if (s == null) {
+        String str = getPrintableStringAttrValue(attrs, type);
+        if (str == null) {
             return null;
         }
 
         try {
-            return Integer.parseInt(s);
+            return Integer.parseInt(str);
         } catch (NumberFormatException ex) {
-            throw new MessageDecodingException("invalid integer '" + s + "'");
+            throw new MessageDecodingException("invalid integer '" + str + "'");
         }
     }
 

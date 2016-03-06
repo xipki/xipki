@@ -43,30 +43,30 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
-    private final int pLength;
+    private final int plength;
 
-    private final int qLength;
+    private final int qlength;
 
     public P11DSAKeyGenLoadTest(
             final P11WritableSlot slot,
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws Exception {
         super(slot,
                 "PKCS#11 DSA key generation\n"
-                        + "pLength: " + pLength + "\n"
-                        + "qLength: " + qLength);
-        this.pLength = pLength;
-        this.qLength = qLength;
+                        + "plength: " + plength + "\n"
+                        + "qlength: " + qlength);
+        this.plength = plength;
+        this.qlength = qlength;
     }
 
     @Override
     protected void genKeypair()
     throws Exception {
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLength, qLength, getDummyLabel());
+        P11KeyIdentifier keyId = slot.generateDSAKeypair(plength, qlength, getDummyLabel());
         slot.removeKey(keyId);
     }
 

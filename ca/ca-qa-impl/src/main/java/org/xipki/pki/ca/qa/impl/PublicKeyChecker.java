@@ -219,22 +219,24 @@ public class PublicKeyChecker {
                 throw new BadCertTemplateException("null Dss-Parms is not permitted");
             }
 
-            int pLength;
-            int qLength;
+            int plength;
+            int qlength;
 
             try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(params);
+                // CHECKSTYLE:SKIP
                 ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                // CHECKSTYLE:SKIP
                 ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                pLength = p.getPositiveValue().bitLength();
-                qLength = q.getPositiveValue().bitLength();
+                plength = p.getPositiveValue().bitLength();
+                qlength = q.getPositiveValue().bitLength();
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
                 throw new BadCertTemplateException("illegal Dss-Parms");
             }
 
-            boolean match = dsaOption.allowsPlength(pLength);
+            boolean match = dsaOption.allowsPlength(plength);
             if (match) {
-                match = dsaOption.allowsQlength(qLength);
+                match = dsaOption.allowsQlength(qlength);
             }
 
             if (match) {
@@ -250,6 +252,7 @@ public class PublicKeyChecker {
         throw new BadCertTemplateException("the given publicKey is not permitted");
     } // method checkPublicKey
 
+    // CHECKSTYLE:SKIP
     private static void checkECSubjectPublicKeyInfo(
             final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)

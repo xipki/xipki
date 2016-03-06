@@ -70,8 +70,8 @@ public class UserUpdateCmd extends CaCommandSupport {
         if ("CONSOLE".equalsIgnoreCase(password)) {
             password = new String(readPassword());
         }
-        boolean b = caManager.changeUser(name, password, cnRegex);
-        output(b, "added", "could not add", "user " + name);
+        boolean bo = caManager.changeUser(name, password, cnRegex);
+        output(bo, "added", "could not add", "user " + name);
         return null;
     }
 

@@ -51,33 +51,34 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "dsa",
         description = "generate DSA keypair in PKCS#11 device")
 @Service
+// CHECKSTYLE:SKIP
 public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
 
     @Option(name = "--plen",
             description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private Integer plen = 2048;
 
     @Option(name = "--qlen",
             description = "bit length of the sub-prime")
-    private Integer qLen;
+    private Integer qlen;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+        if (plen % 1024 != 0) {
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
         }
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
+        if (qlen == null) {
+            if (plen >= 2048) {
+                qlen = 256;
             } else {
-                qLen = 160;
+                qlen = 160;
             }
         }
 
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(pLen, qLen, label);
+        P11KeyIdentifier keyId = slot.generateDSAKeypair(plen, qlen, label);
         finalize(keyId);
         return null;
     }

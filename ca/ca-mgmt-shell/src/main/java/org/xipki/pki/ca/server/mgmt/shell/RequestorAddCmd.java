@@ -73,13 +73,13 @@ public class RequestorAddCmd extends CaCommandSupport {
         String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
         CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
 
-        boolean b;
+        boolean bo;
         if (entry.getCert() == null) {
-            b = false;
+            bo = false;
         } else {
-            b = caManager.addCmpRequestor(entry);
+            bo = caManager.addCmpRequestor(entry);
         }
-        output(b, "added", "could not add", "CMP requestor " + name);
+        output(bo, "added", "could not add", "CMP requestor " + name);
         return null;
     }
 

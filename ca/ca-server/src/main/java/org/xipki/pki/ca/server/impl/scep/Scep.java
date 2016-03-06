@@ -176,8 +176,8 @@ public class Scep {
 
     /**
      *
-     * @param ms signing time bias in milliseconds. non-positive value deactivate the check
-     *    of signing time.
+     * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
+     *     signing time.
      */
     public void setMaxSigningTimeBias(
             final long ms) {
@@ -305,12 +305,12 @@ public class Scep {
             if (req.getFailureMessage() != null) {
                 audit(auditEvent, "failureMessage", req.getFailureMessage());
             }
-            Boolean b = req.isSignatureValid();
-            if (b != null && !b.booleanValue()) {
+            Boolean bo = req.isSignatureValid();
+            if (bo != null && !bo.booleanValue()) {
                 audit(auditEvent, "signature", "invalid");
             }
-            b = req.isDecryptionSuccessful();
-            if (b != null && !b.booleanValue()) {
+            bo = req.isDecryptionSuccessful();
+            if (bo != null && !bo.booleanValue()) {
                 audit(auditEvent, "decryption", "failed");
             }
         }
@@ -324,14 +324,14 @@ public class Scep {
             rep.setFailInfo(FailInfo.badRequest);
         }
 
-        Boolean b = req.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
+        Boolean bo = req.isSignatureValid();
+        if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
         }
 
-        b = req.isDecryptionSuccessful();
-        if (b != null && !b.booleanValue()) {
+        bo = req.isDecryptionSuccessful();
+        if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
         }
@@ -449,7 +449,6 @@ public class Scep {
                 }
 
                 CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
-                Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
                 X509Certificate reqSignatureCert = req.getSignatureCert();
                 boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
                         reqSignatureCert.getIssuerX500Principal());
@@ -533,6 +532,7 @@ public class Scep {
 
                 byte[] tidBytes = getTransactionIdBytes(tid);
 
+                Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
                 CertTemplateData certTemplateData = new CertTemplateData(
                         p10ReqInfo.getSubject(), p10ReqInfo.getSubjectPublicKeyInfo(),
                         (Date) null, (Date) null, extensions, certProfileName);
@@ -758,10 +758,10 @@ public class Scep {
     } // method getSignatureAlgorithm
 
     private static void ensureIssuedByThisCa(
-            final X500Name thisCAX500Name,
+            final X500Name thisCaX500Name,
             final X500Name caX500Name)
     throws FailInfoException {
-        if (!thisCAX500Name.equals(caX500Name)) {
+        if (!thisCaX500Name.equals(caX500Name)) {
             throw FailInfoException.BAD_CERTID;
         }
     }
@@ -794,6 +794,7 @@ public class Scep {
                 try {
                     return Base64.decode(tid);
                 } catch (Exception e2) {
+                    LOG.error("could not decode (hex or base64) '{}': {}", tid, e2.getMessage());
                 }
             }
         }

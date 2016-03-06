@@ -67,8 +67,8 @@ public class SecurePasswordInputPanel extends Panel {
 
         @Override
         public void actionPerformed(
-                final ActionEvent e) {
-            JButton btn = (JButton) e.getSource();
+                final ActionEvent event) {
+            JButton btn = (JButton) event.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
 
             if (CAPS.equals(pressedKey)) {
@@ -99,8 +99,10 @@ public class SecurePasswordInputPanel extends Panel {
 
     private static final long serialVersionUID = 1L;
 
+    // CHECKSTYLE:SKIP
     private static final String BACKSPACE = "\u21E6";
 
+    // CHECKSTYLE:SKIP
     private static final String CAPS = "\u21E7";
 
     private static final String CLEAR = "Clear";
@@ -117,15 +119,15 @@ public class SecurePasswordInputPanel extends Panel {
     private boolean caps;
 
     static {
-        int i = 0;
-        KEYS_MAP.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
-        KEYS_MAP.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
+        int idx = 0;
+        KEYS_MAP.put(idx++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
+        KEYS_MAP.put(idx++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*",
             "(", ")", "{", "}"});
-        KEYS_MAP.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
+        KEYS_MAP.put(idx++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",",
             ".", "-", "/"});
-        KEYS_MAP.put(i++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
-        KEYS_MAP.put(i++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
-        KEYS_MAP.put(i++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
+        KEYS_MAP.put(idx++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
+        KEYS_MAP.put(idx++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
+        KEYS_MAP.put(idx++, new String[] {CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
     }
 
     private SecurePasswordInputPanel() {
@@ -137,7 +139,7 @@ public class SecurePasswordInputPanel extends Panel {
         add(passwordField);
 
         Set<Integer> rows = new HashSet<Integer>(KEYS_MAP.keySet());
-        int n = rows.size();
+        final int n = rows.size();
 
         SecureRandom random = new SecureRandom();
         while (!rows.isEmpty()) {
@@ -182,7 +184,7 @@ public class SecurePasswordInputPanel extends Panel {
         try {
             UIManager.setLookAndFeel(
                 UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
+        } catch (Exception ex) { // CHECKSTYLE:SKIP
         }
 
         try {
@@ -206,7 +208,7 @@ public class SecurePasswordInputPanel extends Panel {
         } finally {
             try {
                 UIManager.setLookAndFeel(currentLookAndFeel);
-            } catch (UnsupportedLookAndFeelException ex) {
+            } catch (UnsupportedLookAndFeelException ex) { // CHECKSTYLE:SKIP
             }
         }
     } // method readPassword

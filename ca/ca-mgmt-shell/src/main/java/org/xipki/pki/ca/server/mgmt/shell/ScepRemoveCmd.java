@@ -62,8 +62,8 @@ public class ScepRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.removeScep(name);
-        output(b, "removed", "could not remove", "SCEP for CA " + name);
+        boolean bo = caManager.removeScep(name);
+        output(bo, "removed", "could not remove", "SCEP for CA " + name);
         return null;
     }
 

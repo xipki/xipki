@@ -70,16 +70,16 @@ public class PkiStatusInfo {
     }
 
     public PkiStatusInfo(
-            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo) {
-        ParamUtil.requireNonNull("bcPKIStatusInfo", bcPKIStatusInfo);
+            final org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
+        ParamUtil.requireNonNull("bcPkiStatusInfo", bcPkiStatusInfo);
 
-        this.status = bcPKIStatusInfo.getStatus().intValue();
-        if (bcPKIStatusInfo.getFailInfo() != null) {
-            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
+        this.status = bcPkiStatusInfo.getStatus().intValue();
+        if (bcPkiStatusInfo.getFailInfo() != null) {
+            this.pkiFailureInfo = bcPkiStatusInfo.getFailInfo().intValue();
         } else {
             this.pkiFailureInfo = 0;
         }
-        PKIFreeText text = bcPKIStatusInfo.getStatusString();
+        PKIFreeText text = bcPkiStatusInfo.getStatusString();
         this.statusMessage = (text == null)
                 ? null
                 : text.getStringAt(0).getString();

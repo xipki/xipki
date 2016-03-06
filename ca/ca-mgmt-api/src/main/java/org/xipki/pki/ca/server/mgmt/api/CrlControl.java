@@ -70,7 +70,7 @@ import org.xipki.commons.common.util.StringUtil;
  *
  * # List of OIDs of extensions to be embedded in CRL,
  * # Unspecified or empty extensions indicates that the CA decides.
- * extensions=<comma delimited OIDs of extensions>
+ * extensions=&lt;comma delimited OIDs of extensions>
  *
  * # The following settings are only for updateMode 'interval'
  *
@@ -82,7 +82,7 @@ import org.xipki.commons.common.util.StringUtil;
  * # 0 indicates that no deltaCRL will be generated
  * deltaCRL.intervals=&lt;integer>
  *
- * overlap.minutes=<minutes of overlap>
+ * overlap.minutes=&lt;minutes of overlap>
  *
  * # should be less than fullCRL.intervals.
  * # If activated, a deltaCRL will be generated only between two full CRLs
@@ -90,7 +90,7 @@ import org.xipki.commons.common.util.StringUtil;
  *
  * # Exactly one of interval.minutes and interval.days should be specified
  * # Number of minutes of one interval. At least 60 minutes
- * interval.minutes=<minutes of one interval>
+ * interval.minutes=&lt;minutes of one interval>
  *
  * # UTC time of generation of CRL, one interval covers 1 day.
  * interval.time=&lt;updatet time (hh:mm of UTC time)>
@@ -190,8 +190,8 @@ public class CrlControl implements Serializable {
                 return false;
             }
 
-            HourMinute b = (HourMinute) obj;
-            return hour == b.hour && minute == b.minute;
+            HourMinute hm = (HourMinute) obj;
+            return hour == hm.hour && minute == hm.minute;
         }
 
     } // class HourMinute
@@ -272,19 +272,19 @@ public class CrlControl implements Serializable {
             throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
-        String s = props.getValue(KEY_UPDATE_MODE);
-        if (s == null) {
+        String str = props.getValue(KEY_UPDATE_MODE);
+        if (str == null) {
             this.updateMode = UpdateMode.interval;
         } else {
-            this.updateMode = UpdateMode.getUpdateMode(s);
+            this.updateMode = UpdateMode.getUpdateMode(str);
             if (this.updateMode == null) {
-                throw new InvalidConfException("invalid " + KEY_UPDATE_MODE + ": " + s);
+                throw new InvalidConfException("invalid " + KEY_UPDATE_MODE + ": " + str);
             }
         }
 
-        s = props.getValue(KEY_INVALIDITY_DATE);
-        if (s != null) {
-            this.invalidityDateMode = TripleState.fromValue(s);
+        str = props.getValue(KEY_INVALIDITY_DATE);
+        if (str != null) {
+            this.invalidityDateMode = TripleState.fromValue(str);
         }
 
         this.includeExpiredCerts = getBoolean(props, KEY_EXPIRED_CERTS_INCLUDED, false);
@@ -296,11 +296,11 @@ public class CrlControl implements Serializable {
         this.xipkiCertsetProfilenameIncluded = getBoolean(props,
                 KEY_XIPKI_CERTSET_PROFILENAME, true);
 
-        s = props.getValue(KEY_EYTENSIONS);
-        if (s == null) {
+        str = props.getValue(KEY_EYTENSIONS);
+        if (str == null) {
             this.extensionOids = Collections.emptySet();
         } else {
-            Set<String> oids = StringUtil.splitAsSet(s, ", ");
+            Set<String> oids = StringUtil.splitAsSet(str, ", ");
             // check the OID
             for (String oid : oids) {
                 try {
@@ -321,12 +321,12 @@ public class CrlControl implements Serializable {
             this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
             this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
             this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
-            s = props.getValue(KEY_INTERVAL_TIME);
-            if (s != null) {
-                List<String> tokens = StringUtil.split(s.trim(), ":");
+            str = props.getValue(KEY_INTERVAL_TIME);
+            if (str != null) {
+                List<String> tokens = StringUtil.split(str.trim(), ":");
                 if (tokens.size() != 2) {
                     throw new InvalidConfException(
-                            "invalid " + KEY_INTERVAL_TIME + ": '" + s + "'");
+                            "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
                 }
 
                 try {
@@ -335,7 +335,7 @@ public class CrlControl implements Serializable {
                     this.intervalDayTime = new HourMinute(hour, minute);
                 } catch (IllegalArgumentException ex) {
                     throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '"
-                            + s + "'");
+                            + str + "'");
                 }
             } else {
                 int minutes = getInteger(props, KEY_INTERVAL_MINUTES, 0);
@@ -496,48 +496,48 @@ public class CrlControl implements Serializable {
             return false;
         }
 
-        CrlControl b = (CrlControl) obj;
-        if (deltaCrlIntervals != b.deltaCrlIntervals
-                || xipkiCertsetIncluded != b.xipkiCertsetIncluded
-                || xipkiCertsetCertIncluded != b.xipkiCertsetCertIncluded
-                || xipkiCertsetProfilenameIncluded != b.xipkiCertsetProfilenameIncluded
-                || extendedNextUpdate != b.extendedNextUpdate
-                || fullCrlIntervals != b.fullCrlIntervals
-                || includeExpiredCerts != b.includeExpiredCerts
-                || onlyContainsCaCerts != b.onlyContainsCaCerts
-                || onlyContainsUserCerts != b.onlyContainsUserCerts) {
+        CrlControl obj2 = (CrlControl) obj;
+        if (deltaCrlIntervals != obj2.deltaCrlIntervals
+                || xipkiCertsetIncluded != obj2.xipkiCertsetIncluded
+                || xipkiCertsetCertIncluded != obj2.xipkiCertsetCertIncluded
+                || xipkiCertsetProfilenameIncluded != obj2.xipkiCertsetProfilenameIncluded
+                || extendedNextUpdate != obj2.extendedNextUpdate
+                || fullCrlIntervals != obj2.fullCrlIntervals
+                || includeExpiredCerts != obj2.includeExpiredCerts
+                || onlyContainsCaCerts != obj2.onlyContainsCaCerts
+                || onlyContainsUserCerts != obj2.onlyContainsUserCerts) {
             return false;
         }
 
         if (extensionOids == null) {
-            if (b.extensionOids != null) {
+            if (obj2.extensionOids != null) {
                 return false;
             }
-        } else if (!extensionOids.equals(b.extensionOids)) {
+        } else if (!extensionOids.equals(obj2.extensionOids)) {
             return false;
         }
 
         if (intervalMinutes == null) {
-            if (b.intervalMinutes != null) {
+            if (obj2.intervalMinutes != null) {
                 return false;
             }
-        } else if (!intervalMinutes.equals(b.intervalMinutes)) {
+        } else if (!intervalMinutes.equals(obj2.intervalMinutes)) {
             return false;
         }
 
         if (intervalDayTime == null) {
-            if (b.intervalDayTime != null) {
+            if (obj2.intervalDayTime != null) {
                 return false;
             }
-        } else if (!intervalDayTime.equals(b.intervalDayTime)) {
+        } else if (!intervalDayTime.equals(obj2.intervalDayTime)) {
             return false;
         }
 
         if (updateMode == null) {
-            if (b.updateMode != null) {
+            if (obj2.updateMode != null) {
                 return false;
             }
-        } else if (!updateMode.equals(b.updateMode)) {
+        } else if (!updateMode.equals(obj2.updateMode)) {
             return false;
         }
 
@@ -549,12 +549,12 @@ public class CrlControl implements Serializable {
             final String propKey,
             final int dfltValue)
     throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
+        String str = props.getValue(propKey);
+        if (str != null) {
             try {
-                return Integer.parseInt(s.trim());
+                return Integer.parseInt(str.trim());
             } catch (NumberFormatException ex) {
-                throw new InvalidConfException(propKey + " does not have numeric value: " + s);
+                throw new InvalidConfException(propKey + " does not have numeric value: " + str);
             }
         }
         return dfltValue;
@@ -565,15 +565,15 @@ public class CrlControl implements Serializable {
             final String propKey,
             final boolean dfltValue)
     throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            s = s.trim();
-            if ("true".equalsIgnoreCase(s)) {
+        String str = props.getValue(propKey);
+        if (str != null) {
+            str = str.trim();
+            if ("true".equalsIgnoreCase(str)) {
                 return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
+            } else if ("false".equalsIgnoreCase(str)) {
                 return Boolean.FALSE;
             } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+                throw new InvalidConfException(propKey + " does not have boolean value: " + str);
             }
         }
         return dfltValue;

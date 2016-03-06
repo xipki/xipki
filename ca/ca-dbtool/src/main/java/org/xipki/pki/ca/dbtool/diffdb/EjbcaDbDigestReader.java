@@ -43,6 +43,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
@@ -62,6 +64,8 @@ import org.xipki.pki.ca.dbtool.diffdb.io.IdentifiedDbDigestEntry;
  */
 
 public class EjbcaDbDigestReader extends DbDigestReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EjbcaDbDigestReader.class);
 
     private final int caId;
 
@@ -130,10 +134,11 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                     IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException ex) {
+                    LOG.error("InterruptedException: {}", ex.getMessage());
                 }
             }
 
-            DbToolBase.releaseResources(selectCertStmt, null);
+            DbToolBase.releaseResources(datasource, selectCertStmt, null);
             releaseResources(selectBase64CertStmt, null);
             datasource.returnConnection(conn);
             selectCertStmt = null;
@@ -157,8 +162,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                     String caHash = rs.getString("cAFingerprint");
                     String hash = rs.getString("fingerprint");
 
-                    boolean ofThisCA = caFingerprint.equals(caHash);
-                    if (!ofThisCA && caHash.equals(hash)) {
+                    boolean ofThisCa = caFingerprint.equals(caHash);
+                    if (!ofThisCa && caHash.equals(hash)) {
                         // special case
                         try {
                             selectBase64CertStmt.setInt(1, id);
@@ -169,14 +174,14 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                             X509Certificate jceCert = readBase64Cert(b64Cert);
                             if (jceCert.getIssuerX500Principal()
                                     .equals(caCert.getSubjectX500Principal())) {
-                                ofThisCA = true;
+                                ofThisCa = true;
                             }
                         } catch (SQLException ex) {
                             throw datasource.translate(selectBase64CertSql, ex);
                         }
                     }
 
-                    if (!ofThisCA) {
+                    if (!ofThisCa) {
                         continue;
                     }
 
@@ -235,7 +240,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     public static EjbcaDbDigestReader getInstance(
             final DataSourceWrapper datasource,
             final int caId,
-            final boolean dbContainsOtherCA,
+            final boolean dbContainsOtherCa,
             final boolean revokedOnly,
             final int numThreads,
             final int numCertsToPredicate,
@@ -268,7 +273,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
             caCert = EjbcaCaCertExtractor.extractCaCert(caData);
             // account
-            if (dbContainsOtherCA) {
+            if (dbContainsOtherCa) {
                 // ignore it due to performance
                 totalAccount = -1;
             } else {
@@ -306,7 +311,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
-            releaseResources(stmt, rs);
+            DbToolBase.releaseResources(datasource, stmt, rs);
             datasource.returnConnection(conn);
         }
 

@@ -54,6 +54,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
+// CHECKSTYLE:SKIP
 public class RSAUtil {
 
     private static final ASN1ObjectIdentifier[] RSA_OIDS = {
@@ -66,6 +67,7 @@ public class RSAUtil {
     private RSAUtil() {
     }
 
+    // CHECKSTYLE:SKIP
     public static boolean isRSAOid(
             final ASN1ObjectIdentifier algOid) {
         ParamUtil.requireNonNull("algOid", algOid);
@@ -89,16 +91,14 @@ public class RSAUtil {
             final RSAPrivateKey key) {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
+            RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
 
-            return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(),
-                k.getCrtCoefficient());
+            return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(),
+                rsaKey.getPublicExponent(), rsaKey.getPrivateExponent(),
+                rsaKey.getPrimeP(), rsaKey.getPrimeQ(), rsaKey.getPrimeExponentP(),
+                rsaKey.getPrimeExponentQ(), rsaKey.getCrtCoefficient());
         } else {
-            RSAPrivateKey k = key;
-
-            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+            return new RSAKeyParameters(true, key.getModulus(), key.getPrivateExponent());
         }
     }
 

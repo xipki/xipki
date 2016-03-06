@@ -215,14 +215,14 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 throw new RuntimeException("should not reach here, unknown child of KeyEntry");
             }
 
-            String randomDNStr = entry.getRandomDN();
-            LoadTestEntry.RandomDN randomDN = LoadTestEntry.RandomDN.getInstance(randomDNStr);
-            if (randomDN == null) {
-                throw new InvalidConfException("invalid randomDN " + randomDNStr);
+            String randomDnStr = entry.getRandomDN();
+            LoadTestEntry.RandomDn randomDn = LoadTestEntry.RandomDn.getInstance(randomDnStr);
+            if (randomDn == null) {
+                throw new InvalidConfException("invalid randomDN " + randomDnStr);
             }
 
             LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
-                    keyEntry, entry.getSubject(), randomDN);
+                    keyEntry, entry.getSubject(), randomDn);
             loadtestEntries.add(loadtestEntry);
         }
     } // constructor

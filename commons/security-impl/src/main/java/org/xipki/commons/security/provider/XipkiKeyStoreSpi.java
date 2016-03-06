@@ -313,7 +313,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     public static void setSecurityFactory(
-            final SecurityFactory pSecurityFactory) {
+            final SecurityFactory pSecurityFactory) { // CHECKSTYLE:SKIP
         securityFactory = pSecurityFactory;
     }
 

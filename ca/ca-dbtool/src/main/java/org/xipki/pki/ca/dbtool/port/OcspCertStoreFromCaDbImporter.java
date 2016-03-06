@@ -204,10 +204,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             }
 
             ConfPairs confPairs = new ConfPairs(getValue(publisherType.getConf()));
-            String v = confPairs.getValue("publish.goodcerts");
+            String str = confPairs.getValue("publish.goodcerts");
             boolean revokedOnly = false;
-            if (v != null) {
-                revokedOnly = !Boolean.parseBoolean(v);
+            if (str != null) {
+                revokedOnly = !Boolean.parseBoolean(str);
             }
 
             Set<String> relatedCaNames = new HashSet<>();
@@ -218,9 +218,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             }
 
             List<CaType> relatedCas = new LinkedList<>();
-            for (CaType cType : caConf.getCas().getCa()) {
-                if (relatedCaNames.contains(cType.getName())) {
-                    relatedCas.add(cType);
+            for (CaType m : caConf.getCas().getCa()) {
+                if (relatedCaNames.contains(m.getName())) {
+                    relatedCas.add(m);
                 }
             }
 
@@ -326,11 +326,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
             relatedCaIds.add(issuer.getId());
 
-            Certificate c;
+            Certificate cert;
             byte[] encodedName;
             try {
-                c = Certificate.getInstance(encodedCert);
-                encodedName = c.getSubject().getEncoded("DER");
+                cert = Certificate.getInstance(encodedCert);
+                encodedName = cert.getSubject().getEncoded("DER");
             } catch (Exception ex) {
                 LOG.error("could not parse certificate of issuer {}", issuer.getId());
                 LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
@@ -340,16 +340,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                     throw new CertificateException(ex.getMessage(), ex);
                 }
             }
-            byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+            byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
             ps.setString(idx++,
-                    X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                    X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
             ps.setLong(idx++,
-                    c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
             ps.setLong(idx++,
-                    c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                    cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
             ps.setString(idx++,
                     HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
             ps.setString(idx++,
@@ -496,6 +496,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
+                LOG.error("could not close zipFile {}: {}", certsZipFile, e2.getMessage());
+                LOG.debug("could not close zipFile " + certsZipFile, e2);
             }
             throw ex;
         }
@@ -538,10 +540,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                         // rawcert
                         byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                        TBSCertificate c;
+                        TBSCertificate tbsCert;
                         try {
                             Certificate cc = Certificate.getInstance(encodedCert);
-                            c = cc.getTBSCertificate();
+                            tbsCert = cc.getTBSCertificate();
                         } catch (RuntimeException ex) {
                             LOG.error("could not parse certificate in file {}", filename);
                             LOG.debug("could not parse certificate in file " + filename, ex);
@@ -557,10 +559,11 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                             psCert.setInt(idx++, currentId);
                             psCert.setInt(idx++, caId);
                             psCert.setLong(idx++,
-                                    c.getSerialNumber().getPositiveValue().longValue());
+                                    tbsCert.getSerialNumber().getPositiveValue().longValue());
                             psCert.setLong(idx++, cert.getUpdate());
-                            psCert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
-                            psCert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                            psCert.setLong(idx++,
+                                    tbsCert.getStartDate().getDate().getTime() / 1000);
+                            psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
                             setBoolean(psCert, idx++, cert.getRev());
                             setInt(psCert, idx++, cert.getRr());
                             setLong(psCert, idx++, cert.getRt());
@@ -598,7 +601,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                             int idx = 1;
                             psRawCert.setInt(idx++, currentId);
                             psRawCert.setString(idx++,
-                                    X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                                    X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
                             psRawCert.setString(idx++, Base64.toBase64String(encodedCert));
                             psRawCert.addBatch();
                         } catch (SQLException ex) {
@@ -670,10 +673,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
             return lastSuccessfulCertId;
         } finally {
-            try {
-                recoverAutoCommit();
-            } catch (DataAccessException ex) {
-            }
+            recoverAutoCommit();
             zipFile.close();
         }
     } // method doImportCert

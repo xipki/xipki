@@ -52,6 +52,7 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "ec",
         description = "generate EC keypair in PKCS#11 device")
 @Service
+// CHECKSTYLE:SKIP
 public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
 
     @Option(name = "--curve",

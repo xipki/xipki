@@ -123,6 +123,7 @@ public class CaEntry implements Serializable {
     public CaStatus getStatus() {
         return status;
     }
+
     public void setStatus(
             final CaStatus status) {
         this.status = status;

@@ -117,8 +117,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 throw new Exception("no environment LANG is set");
             }
 
-            String lLang = lang.toLowerCase();
-            if (!lLang.startsWith("en_") || !lLang.endsWith(".utf-8")) {
+            String loLang = lang.toLowerCase();
+            if (!loLang.startsWith("en_") || !loLang.endsWith(".utf-8")) {
                 throw new Exception(String.format(
                         "The environment LANG does not satisfy the pattern 'en_*.UTF-8': '%s'",
                         lang));
@@ -211,22 +211,20 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 }
 
                 X509Certificate cert = EjbcaCaCertExtractor.extractCaCert(data);
-                byte[] certBytes = cert.getEncoded();
-
                 String commonName = X509Util.getCommonName(cert.getSubjectX500Principal());
                 String fn = XipkiDigestExporter.toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
-                int i = 2;
+                int idx = 2;
                 while (caDir.exists()) {
-                    caDir = new File(baseDir, fn + "." + (i++));
+                    caDir = new File(baseDir, fn + "." + (idx++));
                 }
 
                 // find out the id
                 caId++;
                 File caCertFile = new File(caDir, "ca.der");
                 caDir.mkdirs();
+                byte[] certBytes = cert.getEncoded();
                 IoUtil.save(caCertFile, certBytes);
-
                 EjbcaCaInfo caInfo = new EjbcaCaInfo(caId, certBytes, caDir.getName());
                 cas.put(caInfo.getHexSha1(), caInfo);
             }
@@ -313,8 +311,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
-                    String s = rs.getString("serialNumber");
-                    long serial = Long.parseLong(s);
+                    String str = rs.getString("serialNumber");
+                    long serial = Long.parseLong(str);
 
                     int status = rs.getInt("status");
                     boolean revoked = (status == 40);

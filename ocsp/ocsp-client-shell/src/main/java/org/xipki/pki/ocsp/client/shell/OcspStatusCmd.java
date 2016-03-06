@@ -115,7 +115,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
-        int n = (singleResponses == null)
+        final int n = (singleResponses == null)
                 ? 0
                 : singleResponses.length;
         if (n == 0) {
@@ -291,17 +291,17 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                 // extensions
                 msg.append("\nExtensions: ");
 
-                List<?> extensionOIDs = basicResp.getExtensionOIDs();
-                if (extensionOIDs == null || extensionOIDs.size() == 0) {
+                List<?> extensionOids = basicResp.getExtensionOIDs();
+                if (extensionOids == null || extensionOids.size() == 0) {
                     msg.append("-");
                 } else {
-                    int size = extensionOIDs.size();
+                    int size = extensionOids.size();
                     for (int j = 0; j < size; j++) {
-                        ASN1ObjectIdentifier extensionOID =
-                                (ASN1ObjectIdentifier) extensionOIDs.get(j);
-                        String name = EXTENSION_OIDNAME_MAP.get(extensionOID);
+                        ASN1ObjectIdentifier extensionOid =
+                                (ASN1ObjectIdentifier) extensionOids.get(j);
+                        String name = EXTENSION_OIDNAME_MAP.get(extensionOid);
                         if (name == null) {
-                            msg.append(extensionOID.getId());
+                            msg.append(extensionOid.getId());
                         } else {
                             msg.append(name);
                         }

@@ -98,7 +98,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private final int maxCerts;
 
-    private final int n;
+    private final int num;
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
@@ -111,12 +111,12 @@ public class CaLoadTestRevoke extends LoadExecutor {
             final Certificate caCert,
             final DataSourceWrapper caDataSource,
             final int maxCerts,
-            final int n,
+            final int num,
             final String description)
     throws Exception {
         super(description);
         ParamUtil.requireNonNull("caCert", caCert);
-        this.n = ParamUtil.requireMin("n", n, 1);
+        this.num = ParamUtil.requireMin("num", num, 1);
         this.caClient = ParamUtil.requireNonNull("caClient", caClient);
         this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
         this.caSubject = caCert.getSubject();
@@ -205,13 +205,13 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 return false;
             }
 
-            int nSuccess = 0;
+            int numSuccess = 0;
             for (CertIdOrError entry : result.values()) {
                 if (entry.getCertId() != null) {
-                    nSuccess++;
+                    numSuccess++;
                 }
             }
-            return nSuccess == serialNumbers.size();
+            return numSuccess == serialNumbers.size();
         } // method testNext
 
     } // class Testor
@@ -224,8 +224,8 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private List<Long> nextSerials()
     throws DataAccessException {
-        List<Long> ret = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
+        List<Long> ret = new ArrayList<>(num);
+        for (int i = 0; i < num; i++) {
             Long serial = nextSerial();
             if (serial != null) {
                 ret.add(serial);
@@ -261,12 +261,12 @@ public class CaLoadTestRevoke extends LoadExecutor {
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
-            int i = 0;
+            int idx = 0;
             try {
                 stmt = caDataSource.getConnection().prepareStatement(sql);
                 rs = stmt.executeQuery();
                 while (rs.next()) {
-                    i++;
+                    idx++;
                     long serial = rs.getLong("SN");
                     if (serial + 1 > nextStartSerial) {
                         nextStartSerial = serial + 1;
@@ -281,12 +281,12 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 caDataSource.releaseResources(stmt, rs);
             }
 
-            if (i == 0) {
+            if (idx == 0) {
                 System.out.println("no unrevoked certificate");
                 System.out.flush();
             }
 
-            if (i < 1000) {
+            if (idx < 1000) {
                 noUnrevokedCerts = true;
             }
 

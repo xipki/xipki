@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -53,6 +54,8 @@ import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-sign-p12",
         description = "performance test of PKCS#12 EC signature creation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
 
     @Override

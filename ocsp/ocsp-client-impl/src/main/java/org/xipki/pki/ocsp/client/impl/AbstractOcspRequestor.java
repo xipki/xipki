@@ -245,10 +245,10 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             return ocspResp;
         }
 
-        BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
+        BasicOCSPResp basicOcspResp = (BasicOCSPResp) respObject;
 
         if (nonce != null) {
-            Extension nonceExtn = basicOCSPResp.getExtension(
+            Extension nonceExtn = basicOcspResp.getExtension(
                     OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
             if (nonceExtn == null) {
                 throw new OcspNonceUnmatchedException(nonce, null);
@@ -259,7 +259,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             }
         }
 
-        SingleResp[] singleResponses = basicOCSPResp.getResponses();
+        SingleResp[] singleResponses = basicOcspResp.getResponses();
         final int countSingleResponses = (singleResponses == null)
                 ? 0
                 : singleResponses.length;
@@ -274,14 +274,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             throw new OcspTargetUnmatchedException(sb.toString());
         }
 
-        CertificateID certID = ocspReq.getRequestList()[0].getCertID();
-        ASN1ObjectIdentifier issuerHashAlg = certID.getHashAlgOID();
-        byte[] issuerKeyHash = certID.getIssuerKeyHash();
-        byte[] issuerNameHash = certID.getIssuerNameHash();
+        CertificateID certId = ocspReq.getRequestList()[0].getCertID();
+        ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgOID();
+        byte[] issuerKeyHash = certId.getIssuerKeyHash();
+        byte[] issuerNameHash = certId.getIssuerNameHash();
 
         if (serialNumbers.length == 1) {
-            SingleResp m = singleResponses[0];
-            CertificateID cid = m.getCertID();
+            SingleResp singleResp = singleResponses[0];
+            CertificateID cid = singleResp.getCertID();
             boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
                     && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                     && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
@@ -299,8 +299,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
 
             for (int i = 0; i < singleResponses.length; i++) {
-                SingleResp m = singleResponses[i];
-                CertificateID cid = m.getCertID();
+                SingleResp singleResp = singleResponses[i];
+                CertificateID cid = singleResp.getCertID();
                 boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())
                         && Arrays.equals(issuerKeyHash, cid.getIssuerKeyHash())
                         && Arrays.equals(issuerNameHash, cid.getIssuerNameHash());
@@ -358,13 +358,13 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         if (prefSigAlgs != null && prefSigAlgs.size() > 0) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
             for (AlgorithmIdentifier algId : prefSigAlgs) {
                 ASN1Sequence prefSigAlgObj = new DERSequence(algId);
-                v.add(prefSigAlgObj);
+                vec.add(prefSigAlgObj);
             }
 
-            ASN1Sequence extnValue = new DERSequence(v);
+            ASN1Sequence extnValue = new DERSequence(vec);
             Extension extn;
             try {
                 extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
@@ -382,12 +382,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
         try {
             for (BigInteger serialNumber : serialNumbers) {
-                CertificateID certID = new CertificateID(
+                CertificateID certId = new CertificateID(
                         digestCalculator,
                         new X509CertificateHolder(caCert.getEncoded()),
                         serialNumber);
 
-                reqBuilder.addRequest(certID);
+                reqBuilder.addRequest(certId);
             }
 
             if (requestOptions.isSignRequest()) {

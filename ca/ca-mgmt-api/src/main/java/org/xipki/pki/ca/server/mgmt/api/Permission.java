@@ -47,14 +47,14 @@ import org.xipki.commons.common.util.ParamUtil;
  */
 
 public enum Permission {
-    ENROLL_CERT ("enroll"),
-    REVOKE_CERT ("revoke"),
-    UNREVOKE_CERT ("unrevoke"),
-    REMOVE_CERT ("remove"),
-    KEY_UPDATE ("key-update"),
-    GEN_CRL ("gen-crl"),
-    GET_CRL ("get-crl"),
-    CROSS_CERT_ENROLL ("enroll-cross"),
+    ENROLL_CERT("enroll"),
+    REVOKE_CERT("revoke"),
+    UNREVOKE_CERT("unrevoke"),
+    REMOVE_CERT("remove"),
+    KEY_UPDATE("key-update"),
+    GEN_CRL("gen-crl"),
+    GET_CRL("get-crl"),
+    CROSS_CERT_ENROLL("enroll-cross"),
     ALL("all");
 
     private String permission;

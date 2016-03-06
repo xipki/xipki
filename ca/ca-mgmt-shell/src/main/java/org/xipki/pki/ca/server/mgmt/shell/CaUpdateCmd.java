@@ -192,7 +192,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     throws Exception {
         X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
         if (caStatus != null) {
-            entry.setStatus(CaStatus.getCAStatus(caStatus));
+            entry.setStatus(CaStatus.getCaStatus(caStatus));
         }
 
         if (expirationPeriod != null && expirationPeriod < 0) {
@@ -289,8 +289,8 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.changeCa(getChangeCaEntry());
-        output(b, "updated", "could not update", "CA " + caName);
+        boolean bo = caManager.changeCa(getChangeCaEntry());
+        output(bo, "updated", "could not update", "CA " + caName);
         return null;
     }
 

@@ -129,6 +129,7 @@ public class KeyUtil {
     private KeyUtil() {
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateRSAKeypair(
             final int keysize,
             final SecureRandom random)
@@ -136,6 +137,7 @@ public class KeyUtil {
         return generateRSAKeypair(keysize, (BigInteger) null, random);
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateRSAKeypair(
             final int keysize,
             final BigInteger publicExponent,
@@ -156,23 +158,25 @@ public class KeyUtil {
         return kpGen.generateKeyPair();
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateDSAKeypair(
-            final int pLength,
-            final int qLength,
+            final int plength,
+            final int qlength,
             final SecureRandom random)
     throws Exception {
-        return generateDSAKeypair(pLength, qLength, 80, random);
+        return generateDSAKeypair(plength, qlength, 80, random);
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateDSAKeypair(
-            final int pLength,
-            final int qLength,
+            final int plength,
+            final int qlength,
             final int certainty,
             final SecureRandom random)
     throws Exception {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                pLength, qLength, certainty, random);
+                plength, qlength, certainty, random);
         paramGen.init(genParams);
         DSAParameters dsaParams = paramGen.generateParameters();
 
@@ -183,6 +187,7 @@ public class KeyUtil {
         return kpGen.generateKeyPair();
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypairForCurveNameOrOid(
             final String curveNameOrOid,
             final SecureRandom random)
@@ -194,6 +199,7 @@ public class KeyUtil {
         return generateECKeypair(oid, random);
     }
 
+    // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypair(
             final ASN1ObjectIdentifier curveId,
             final SecureRandom random)
@@ -257,6 +263,7 @@ public class KeyUtil {
         return kf.generatePublic(keyspec);
     }
 
+    // CHECKSTYLE:SKIP
     public static RSAPublicKey generateRSAPublicKey(
             final BigInteger modulus,
             final BigInteger publicExponent)
@@ -269,6 +276,7 @@ public class KeyUtil {
         return (RSAPublicKey) kf.generatePublic(keySpec);
     }
 
+    // CHECKSTYLE:SKIP
     public static ECPublicKey generateECPublicKeyForNameOrOid(
             final String curveNameOrOid,
             final byte[] encodedQ)
@@ -280,6 +288,7 @@ public class KeyUtil {
         return generateECPublicKey(oid, encodedQ);
     }
 
+    // CHECKSTYLE:SKIP
     public static ECPublicKey generateECPublicKey(
             final ASN1ObjectIdentifier curveOid,
             final byte[] encodedQ)
@@ -287,8 +296,8 @@ public class KeyUtil {
         ParamUtil.requireNonNull("curveOid", curveOid);
         ParamUtil.requireNonNull("encoded", encodedQ);
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid.getId());
-        ECPoint q = spec.getCurve().decodePoint(encodedQ);
-        ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
+        ECPoint pointQ = spec.getCurve().decodePoint(encodedQ);
+        ECPublicKeySpec keySpec = new ECPublicKeySpec(pointQ, spec);
 
         KeyFactory kf = getKeyFactory("EC");
         return (ECPublicKey) kf.generatePublic(keySpec);
@@ -300,16 +309,14 @@ public class KeyUtil {
         ParamUtil.requireNonNull("key", key);
 
         if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
-
-            return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                k.getPublicExponent(), k.getPrivateExponent(),
-                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(),
-                k.getPrimeExponentQ(), k.getCrtCoefficient());
+            RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
+            return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(),
+                rsaKey.getPublicExponent(), rsaKey.getPrivateExponent(),
+                rsaKey.getPrimeP(), rsaKey.getPrimeQ(), rsaKey.getPrimeExponentP(),
+                rsaKey.getPrimeExponentQ(), rsaKey.getCrtCoefficient());
         } else if (key instanceof RSAPrivateKey) {
-            RSAPrivateKey k = (RSAPrivateKey) key;
-
-            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+            RSAPrivateKey rsaKey = (RSAPrivateKey) key;
+            return new RSAKeyParameters(true, rsaKey.getModulus(), rsaKey.getPrivateExponent());
         } else if (key instanceof ECPrivateKey) {
             return ECUtil.generatePrivateKeyParameter(key);
         } else if (key instanceof DSAPrivateKey) {
@@ -325,8 +332,8 @@ public class KeyUtil {
         ParamUtil.requireNonNull("key", key);
 
         if (key instanceof RSAPublicKey) {
-            RSAPublicKey k = (RSAPublicKey) key;
-            return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
+            RSAPublicKey rsaKey = (RSAPublicKey) key;
+            return new RSAKeyParameters(false, rsaKey.getModulus(), rsaKey.getPublicExponent());
         } else if (key instanceof ECPublicKey) {
             return ECUtil.generatePublicKeyParameter(key);
         } else if (key instanceof DSAPublicKey) {
@@ -383,11 +390,11 @@ public class KeyUtil {
 
         if (publicKey instanceof DSAPublicKey) {
             DSAPublicKey dsaPubKey = (DSAPublicKey) publicKey;
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new ASN1Integer(dsaPubKey.getParams().getP()));
-            v.add(new ASN1Integer(dsaPubKey.getParams().getQ()));
-            v.add(new ASN1Integer(dsaPubKey.getParams().getG()));
-            ASN1Sequence dssParams = new DERSequence(v);
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new ASN1Integer(dsaPubKey.getParams().getP()));
+            vec.add(new ASN1Integer(dsaPubKey.getParams().getQ()));
+            vec.add(new ASN1Integer(dsaPubKey.getParams().getG()));
+            ASN1Sequence dssParams = new DERSequence(vec);
 
             try {
                 return new SubjectPublicKeyInfo(
@@ -416,13 +423,13 @@ public class KeyUtil {
                 throw new InvalidKeyException("Cannot find the name of the given EC public key");
             }
 
-            java.security.spec.ECPoint w = ecPubKey.getW();
-            BigInteger wx = w.getAffineX();
+            java.security.spec.ECPoint pointW = ecPubKey.getW();
+            BigInteger wx = pointW.getAffineX();
             if (wx.signum() != 1) {
                 throw new InvalidKeyException("Wx is not positive");
             }
 
-            BigInteger wy = w.getAffineY();
+            BigInteger wy = pointW.getAffineY();
             if (wy.signum() != 1) {
                 throw new InvalidKeyException("Wy is not positive");
             }
@@ -452,6 +459,7 @@ public class KeyUtil {
         }
     }
 
+    // CHECKSTYLE:SKIP
     public static ECPublicKey createECPublicKey(
             byte[] encodedAlgorithmIdParameters,
             byte[] encodedPoint)

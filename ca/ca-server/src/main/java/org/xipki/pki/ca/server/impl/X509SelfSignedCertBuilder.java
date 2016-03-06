@@ -348,8 +348,8 @@ class X509SelfSignedCertBuilder {
     throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPublicKey) {
-            RSAPublicKey k = (RSAPublicKey) key;
-            return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
+            RSAPublicKey rsakey = (RSAPublicKey) key;
+            return new RSAKeyParameters(false, rsakey.getModulus(), rsakey.getPublicExponent());
         } else if (key instanceof ECPublicKey) {
             return ECUtil.generatePublicKeyParameter(key);
         } else if (key instanceof DSAPublicKey) {

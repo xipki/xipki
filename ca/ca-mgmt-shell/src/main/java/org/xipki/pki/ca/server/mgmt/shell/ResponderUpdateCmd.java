@@ -118,8 +118,8 @@ public class ResponderUpdateCmd extends CaCommandSupport {
             cert = Base64.toBase64String(certBytes);
         }
 
-        boolean b = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
-        output(b, "updated", "could not update", "CMP responder " + name);
+        boolean bo = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
+        output(bo, "updated", "could not update", "CMP responder " + name);
         return null;
     }
 

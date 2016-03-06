@@ -47,7 +47,7 @@ import org.xipki.pki.ca.client.shell.completer.RandomDnCompleter;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.pki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
-import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
+import org.xipki.pki.ca.client.shell.loadtest.LoadTestEntry.RandomDn;
 
 /**
  * @author Lijun Liao
@@ -74,7 +74,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
     @Option(name = "--random-dn",
             description = "DN name to be incremented")
     @Completion(RandomDnCompleter.class)
-    private String randomDNStr = "O";
+    private String randomDnStr = "O";
 
     @Option(name = "--duration",
             description = "duration in seconds")
@@ -99,7 +99,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "-n",
             description = "number of certificates to be requested in one request")
-    private Integer n = 1;
+    private Integer num = 1;
 
     @Override
     protected Object doExecute()
@@ -120,17 +120,17 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
         description.append("profile: ").append(certprofile).append("\n");
         description.append("keyType: ").append(keyType).append("\n");
-        description.append("#certs/req: ").append(n).append("\n");
-        description.append("unit: ").append(n).append(" certificate");
-        if (n > 1) {
+        description.append("#certs/req: ").append(num).append("\n");
+        description.append("unit: ").append(num).append(" certificate");
+        if (num > 1) {
             description.append("s");
         }
 
-        RandomDN randomDN = null;
-        if (randomDNStr != null) {
-            randomDN = RandomDN.getInstance(randomDNStr);
-            if (randomDN == null) {
-                throw new IllegalCmdParamException("invalid randomDN " + randomDNStr);
+        RandomDn randomDn = null;
+        if (randomDnStr != null) {
+            randomDn = RandomDn.getInstance(randomDnStr);
+            if (randomDn == null) {
+                throw new IllegalCmdParamException("invalid randomDN " + randomDnStr);
             }
         }
 
@@ -146,9 +146,9 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         }
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
-                subjectTemplate, randomDN);
+                subjectTemplate, randomDn);
         CaLoadTestEnroll loadTest = new CaLoadTestEnroll(caClient, loadtestEntry,
-                n, description.toString());
+                num, description.toString());
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

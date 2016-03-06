@@ -88,11 +88,11 @@ public class XipkiDigestExportReader {
                     IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException ex) {
-                    LOG.error("InterruptedException", ex);
+                    LOG.error("InterruptedException: {}", ex.getMessage());
                 }
             }
 
-            DbToolBase.releaseResources(selectCertStmt, null);
+            DbToolBase.releaseResources(datasource, selectCertStmt, null);
             datasource.returnConnection(conn);
             selectCertStmt = null;
         }
@@ -142,7 +142,7 @@ public class XipkiDigestExportReader {
                 result.setException(ex);
             } finally {
                 outQueue.add(result);
-                DbToolBase.releaseResources(null, rs);
+                DbToolBase.releaseResources(datasource, null, rs);
             }
         } // method run
     } // class Retriever
@@ -195,14 +195,14 @@ public class XipkiDigestExportReader {
     throws DataAccessException {
         ParamUtil.requireNonNull("idRanges", idRanges);
 
-        int n = idRanges.size();
+        int size = idRanges.size();
         for (IdRange range : idRanges) {
             inQueue.add(range);
         }
 
-        List<DigestDbEntrySet> results = new ArrayList<>(n);
+        List<DigestDbEntrySet> results = new ArrayList<>(size);
         int numCerts = 0;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < size; i++) {
             try {
                 DigestDbEntrySet result = outQueue.take();
                 numCerts += result.getEntries().size();

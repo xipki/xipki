@@ -273,49 +273,6 @@ public abstract class CmpRequestor {
         return extractGeneralRepContent(response, expectedType, true);
     }
 
-    protected ASN1Encodable extractXipkiActionRepContent(
-            final PkiResponse response,
-            final int action)
-    throws CmpRequestorException, PkiErrorException {
-        ParamUtil.requireNonNull("response", response);
-        ASN1Encodable itvValue = extractGeneralRepContent(response,
-                ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
-        return extractXipkiActionContent(itvValue, action);
-    }
-
-    protected ASN1Encodable extractXipkiActionContent(
-            final ASN1Encodable itvValue,
-            final int action)
-    throws CmpRequestorException {
-        ParamUtil.requireNonNull("itvValue", itvValue);
-        ASN1Sequence seq;
-        try {
-            seq = ASN1Sequence.getInstance(itvValue);
-        } catch (IllegalArgumentException ex) {
-            throw new CmpRequestorException("invalid syntax of the response");
-        }
-        int n = seq.size();
-        if (n != 1 && n != 2) {
-            throw new CmpRequestorException("invalid syntax of the response");
-        }
-
-        int tmpAction;
-        try {
-            tmpAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
-        } catch (IllegalArgumentException ex) {
-            throw new CmpRequestorException("invalid syntax of the response");
-        }
-
-        if (action != tmpAction) {
-            throw new CmpRequestorException("received XiPKI action '" + tmpAction
-                    + "' instead the exceptected '" + action + "'");
-        }
-
-        return (n == 1)
-                ? null
-                : seq.getObjectAt(1);
-    } // method extractXipkiActionContent
-
     private ASN1Encodable extractGeneralRepContent(
             final PkiResponse response,
             final String exepectedType,
@@ -360,6 +317,49 @@ public abstract class CmpRequestor {
         return itv.getInfoValue();
     } // method extractGeneralRepContent
 
+    protected ASN1Encodable extractXipkiActionRepContent(
+            final PkiResponse response,
+            final int action)
+    throws CmpRequestorException, PkiErrorException {
+        ParamUtil.requireNonNull("response", response);
+        ASN1Encodable itvValue = extractGeneralRepContent(response,
+                ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
+        return extractXipkiActionContent(itvValue, action);
+    }
+
+    protected ASN1Encodable extractXipkiActionContent(
+            final ASN1Encodable itvValue,
+            final int action)
+    throws CmpRequestorException {
+        ParamUtil.requireNonNull("itvValue", itvValue);
+        ASN1Sequence seq;
+        try {
+            seq = ASN1Sequence.getInstance(itvValue);
+        } catch (IllegalArgumentException ex) {
+            throw new CmpRequestorException("invalid syntax of the response");
+        }
+        int size = seq.size();
+        if (size != 1 && size != 2) {
+            throw new CmpRequestorException("invalid syntax of the response");
+        }
+
+        int tmpAction;
+        try {
+            tmpAction = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue().intValue();
+        } catch (IllegalArgumentException ex) {
+            throw new CmpRequestorException("invalid syntax of the response");
+        }
+
+        if (action != tmpAction) {
+            throw new CmpRequestorException("received XiPKI action '" + tmpAction
+                    + "' instead the exceptected '" + action + "'");
+        }
+
+        return (size == 1)
+                ? null
+                : seq.getObjectAt(1);
+    } // method extractXipkiActionContent
+
     protected PKIHeader buildPkiHeader(
             final ASN1OctetString tid) {
         return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
@@ -402,14 +402,14 @@ public abstract class CmpRequestor {
             }
         }
 
-        PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
-        hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
+        PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
+        hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
         ASN1OctetString tmpTid = (tid == null)
                 ? new DEROctetString(randomTransactionId())
                 : tid;
 
-        hBuilder.setTransactionID(tmpTid);
+        hdrBuilder.setTransactionID(tmpTid);
 
         List<InfoTypeAndValue> itvs = new ArrayList<>(2);
         if (addImplictConfirm) {
@@ -429,10 +429,10 @@ public abstract class CmpRequestor {
         }
 
         if (CollectionUtil.isNonEmpty(itvs)) {
-            hBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
+            hdrBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
         }
 
-        return hBuilder.build();
+        return hdrBuilder.build();
     } // method buildPkiHeader
 
     protected PkiErrorException buildErrorResult(
@@ -456,27 +456,28 @@ public abstract class CmpRequestor {
             final GeneralPKIMessage pkiMessage,
             final X509Certificate cert)
     throws CMPException, InvalidKeyException, OperatorCreationException {
-        ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
+        ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
-        if (pMsg.hasPasswordBasedMacProtection()) {
+        if (protectedMsg.hasPasswordBasedMacProtection()) {
             LOG.warn("NOT_SIGNAUTRE_BASED: "
                     + pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
         }
 
-        PKIHeader h = pMsg.getHeader();
+        PKIHeader header = protectedMsg.getHeader();
 
         if (c14nRecipientName != null) {
             boolean authorizedResponder = true;
-            if (h.getSender().getTagNo() != GeneralName.directoryName) {
+            if (header.getSender().getTagNo() != GeneralName.directoryName) {
                 authorizedResponder = false;
             } else {
-                String c14nMsgSender = getSortedRfc4519Name((X500Name) h.getSender().getName());
+                String c14nMsgSender =
+                        getSortedRfc4519Name((X500Name) header.getSender().getName());
                 authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
             }
 
             if (!authorizedResponder) {
-                LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
+                LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
                 return new ProtectionVerificationResult(null,
                         ProtectionResult.SENDER_NOT_AUTHORIZED);
             }
@@ -485,11 +486,11 @@ public abstract class CmpRequestor {
         ContentVerifierProvider verifierProvider =
                 securityFactory.getContentVerifierProvider(cert);
         if (verifierProvider == null) {
-            LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
+            LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
             return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
-        boolean signatureValid = pMsg.verify(verifierProvider);
+        boolean signatureValid = protectedMsg.verify(verifierProvider);
         ProtectionResult protRes = signatureValid
                 ? ProtectionResult.VALID
                 : ProtectionResult.INVALID;
@@ -502,13 +503,13 @@ public abstract class CmpRequestor {
     throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(null);
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(action));
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1Integer(action));
         if (value != null) {
-            v.add(value);
+            vec.add(value);
         }
         InfoTypeAndValue itv = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
-                new DERSequence(v));
+                new DERSequence(vec));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 

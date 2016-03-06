@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.util.X509Util;
@@ -63,6 +65,8 @@ import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
  */
 
 public class FileDigestReader implements DigestReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FileDigestReader.class);
 
     private final int totalAccount;
 
@@ -119,17 +123,17 @@ public class FileDigestReader implements DigestReader {
 
     @Override
     public synchronized CertsBundle nextCerts(
-            final int n)
+            final int numCerts)
     throws DataAccessException, InterruptedException {
         if (!hasNext()) {
             return null;
         }
 
         int numSkipped = 0;
-        List<Long> serialNumbers = new ArrayList<>(n);
-        Map<Long, DbDigestEntry> certs = new HashMap<>(n);
+        List<Long> serialNumbers = new ArrayList<>(numCerts);
+        Map<Long, DbDigestEntry> certs = new HashMap<>(numCerts);
 
-        int k = 0;
+        int ik = 0;
         while (hasNext()) {
             DbDigestEntry line;
             try {
@@ -144,13 +148,13 @@ public class FileDigestReader implements DigestReader {
 
             serialNumbers.add(line.getSerialNumber());
             certs.put(line.getSerialNumber(), line);
-            k++;
-            if (k >= n) {
+            ik++;
+            if (ik >= numCerts) {
                 break;
             }
         }
 
-        return (k == 0)
+        return (ik == 0)
                 ? null
                 : new CertsBundle(numSkipped, certs, serialNumbers);
     } // method nextCerts
@@ -174,7 +178,7 @@ public class FileDigestReader implements DigestReader {
                 ? null
                 : certsReader.readLine();
         if (line == null) {
-            close(certsReader);
+            closeReader(certsReader);
             String nextFileName = certsFilesReader.readLine();
             if (nextFileName == null) {
                 return null;
@@ -191,15 +195,15 @@ public class FileDigestReader implements DigestReader {
 
     @Override
     public void close() {
-        close(certsFilesReader);
-        close(certsReader);
+        closeReader(certsFilesReader);
+        closeReader(certsReader);
     }
 
     private boolean hasNext() {
         return next != null;
     }
 
-    private static void close(
+    private static void closeReader(
             final Reader reader) {
         if (reader == null) {
             return;
@@ -208,6 +212,8 @@ public class FileDigestReader implements DigestReader {
         try {
             reader.close();
         } catch (Exception ex) {
+            LOG.warn("error while closing reader: {}", ex.getMessage());
+            LOG.debug("error while closing reader", ex);
         }
     }
 

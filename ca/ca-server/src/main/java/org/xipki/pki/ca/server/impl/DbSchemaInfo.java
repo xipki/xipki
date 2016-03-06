@@ -61,8 +61,8 @@ public class DbSchemaInfo {
     throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
-        Connection c = datasource.getConnection();
-        if (c == null) {
+        Connection conn = datasource.getConnection();
+        if (conn == null) {
             throw new DataAccessException("could not get connection");
         }
 
@@ -70,7 +70,7 @@ public class DbSchemaInfo {
         ResultSet rs = null;
 
         try {
-            stmt = datasource.createStatement(c);
+            stmt = datasource.createStatement(conn);
             if (stmt == null) {
                 throw new DataAccessException("could not create statement");
             }

@@ -157,7 +157,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
         verifySubjectDnOccurence(requestedSubject);
 
-        RDN[] requstedRDNs = requestedSubject.getRDNs();
+        RDN[] requstedRdns = requestedSubject.getRDNs();
         SubjectControl scontrol = getSubjectControl();
 
         List<RDN> rdns = new LinkedList<>();
@@ -168,11 +168,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 continue;
             }
 
-            RDN[] thisRDNs = getRdns(requstedRDNs, type);
-            int n = (thisRDNs == null)
+            RDN[] thisRdns = getRdns(requstedRdns, type);
+            int len = (thisRdns == null)
                     ? 0
-                    : thisRDNs.length;
-            if (n == 0) {
+                    : thisRdns.length;
+            if (len == 0) {
                 continue;
             }
 
@@ -180,8 +180,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 throw new BadCertTemplateException("emailAddress is not allowed");
             }
 
-            if (n == 1) {
-                ASN1Encodable rdnValue = thisRDNs[0].getFirst().getValue();
+            if (len == 1) {
+                ASN1Encodable rdnValue = thisRdns[0].getFirst().getValue();
                 RDN rdn;
                 if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
                     rdn = createDateOfBirthRdn(type, rdnValue);
@@ -197,33 +197,33 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 }
             } else {
                 if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-                    for (int i = 0; i < n; i++) {
-                        RDN rdn = createDateOfBirthRdn(type, thisRDNs[i].getFirst().getValue());
+                    for (int i = 0; i < len; i++) {
+                        RDN rdn = createDateOfBirthRdn(type, thisRdns[i].getFirst().getValue());
                         rdns.add(rdn);
                     }
                 } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
-                    for (int i = 0; i < n; i++) {
-                        RDN rdn = createPostalAddressRdn(type, thisRDNs[i].getFirst().getValue(),
+                    for (int i = 0; i < len; i++) {
+                        RDN rdn = createPostalAddressRdn(type, thisRdns[i].getFirst().getValue(),
                                 control, i);
                         rdns.add(rdn);
                     }
                 } else {
-                    String[] values = new String[n];
-                    for (int i = 0; i < n; i++) {
-                        values[i] = X509Util.rdnValueToString(thisRDNs[i].getFirst().getValue());
+                    String[] values = new String[len];
+                    for (int i = 0; i < len; i++) {
+                        values[i] = X509Util.rdnValueToString(thisRdns[i].getFirst().getValue());
                     }
                     values = sortRdns(control, values);
 
-                    int i = 0;
+                    int idx = 0;
                     for (String value : values) {
-                        rdns.add(createSubjectRdn(value, type, control, i++));
+                        rdns.add(createSubjectRdn(value, type, control, idx++));
                     }
                 } // if
             } // if
         } // for
 
-        Set<String> subjectDNGroups = scontrol.getGroups();
-        if (CollectionUtil.isNonEmpty(subjectDNGroups)) {
+        Set<String> subjectDnGroups = scontrol.getGroups();
+        if (CollectionUtil.isNonEmpty(subjectDnGroups)) {
             Set<String> consideredGroups = new HashSet<>();
             final int n = rdns.size();
 
@@ -358,10 +358,10 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
             try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(params);
-                ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-                ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                plength = p.getPositiveValue().bitLength();
-                qlength = q.getPositiveValue().bitLength();
+                ASN1Integer rsaP = ASN1Integer.getInstance(seq.getObjectAt(0));
+                ASN1Integer rsaQ = ASN1Integer.getInstance(seq.getObjectAt(1));
+                plength = rsaP.getPositiveValue().bitLength();
+                qlength = rsaQ.getPositiveValue().bitLength();
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
                 throw new BadCertTemplateException("illegal Dss-Parms");
             }
@@ -502,7 +502,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                     "Sequence size of RDN postalAddress is not within [1, 6]: " + size);
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         for (int i = 0; i < size; i++) {
             ASN1Encodable line = seq.getObjectAt(i);
             String text;
@@ -514,10 +514,10 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             ASN1Encodable asn1Line = createRdnValue(text, type, control, index);
-            v.add(asn1Line);
+            vec.add(asn1Line);
         }
 
-        return new RDN(type, new DERSequence(v));
+        return new RDN(type, new DERSequence(vec));
     }
 
     private static RDN[] getRdns(
@@ -558,24 +558,25 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             String suffix = option.getSuffix();
 
             if (prefix != null || suffix != null) {
-                String lTmpText = tmpText.toLowerCase();
-                if (prefix != null && lTmpText.startsWith(prefix.toLowerCase())) {
+                String locTmpText = tmpText.toLowerCase();
+                if (prefix != null && locTmpText.startsWith(prefix.toLowerCase())) {
                     tmpText = tmpText.substring(prefix.length());
-                    lTmpText = tmpText.toLowerCase();
+                    locTmpText = tmpText.toLowerCase();
                 }
 
-                if (suffix != null && lTmpText.endsWith(suffix.toLowerCase())) {
+                if (suffix != null && locTmpText.endsWith(suffix.toLowerCase())) {
                     tmpText = tmpText.substring(0, tmpText.length() - suffix.length());
                 }
             }
 
             List<Pattern> patterns = option.getPatterns();
             if (patterns != null) {
-                Pattern p = patterns.get(index);
-                if (!p.matcher(tmpText).matches()) {
+                Pattern pattern = patterns.get(index);
+                if (!pattern.matcher(tmpText).matches()) {
                     throw new BadCertTemplateException(
                         String.format("invalid subject %s '%s' against regex '%s'",
-                                ObjectIdentifiers.oidToDisplayName(type), tmpText, p.pattern()));
+                                ObjectIdentifiers.oidToDisplayName(type),
+                                tmpText, pattern.pattern()));
                 }
             }
 

@@ -114,7 +114,7 @@ public class P11ContentSignerBuilder {
         Set<Certificate> caCerts = new HashSet<>();
 
         X509Certificate cert;
-        int n = (certificateChain == null)
+        final int n = (certificateChain == null)
                 ? 0
                 : certificateChain.length;
 

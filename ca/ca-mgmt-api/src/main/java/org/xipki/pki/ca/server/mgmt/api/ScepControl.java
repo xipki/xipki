@@ -130,9 +130,9 @@ public class ScepControl implements Serializable {
             return false;
         }
 
-        ScepControl b = (ScepControl) obj;
-        if (includeCaCert != b.includeCaCert
-                || includeSignerCert != b.includeSignerCert) {
+        ScepControl obj2 = (ScepControl) obj;
+        if (includeCaCert != obj2.includeCaCert
+                || includeSignerCert != obj2.includeSignerCert) {
             return false;
         }
 
@@ -144,15 +144,15 @@ public class ScepControl implements Serializable {
             final String propKey,
             final boolean dfltValue)
     throws InvalidConfException {
-        String s = props.getValue(propKey);
-        if (s != null) {
-            s = s.trim();
-            if ("true".equalsIgnoreCase(s)) {
+        String str = props.getValue(propKey);
+        if (str != null) {
+            str = str.trim();
+            if ("true".equalsIgnoreCase(str)) {
                 return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
+            } else if ("false".equalsIgnoreCase(str)) {
                 return Boolean.FALSE;
             } else {
-                throw new InvalidConfException(propKey + " does not have boolean value: " + s);
+                throw new InvalidConfException(propKey + " does not have boolean value: " + str);
             }
         }
         return dfltValue;

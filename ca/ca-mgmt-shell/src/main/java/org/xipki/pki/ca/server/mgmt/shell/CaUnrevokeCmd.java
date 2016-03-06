@@ -64,8 +64,8 @@ public class CaUnrevokeCmd extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid CA name " + caName);
         }
 
-        boolean b = caManager.unrevokeCa(caName);
-        output(b, "unrevoked", "could not unrevoke", "CA " + caName);
+        boolean bo = caManager.unrevokeCa(caName);
+        output(bo, "unrevoked", "could not unrevoke", "CA " + caName);
         return null;
     }
 

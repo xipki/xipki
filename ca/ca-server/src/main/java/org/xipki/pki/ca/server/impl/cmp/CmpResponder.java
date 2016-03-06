@@ -133,6 +133,16 @@ abstract class CmpResponder {
     protected abstract CmpRequestorInfo getRequestor(
             X500Name requestorSender);
 
+    private CmpRequestorInfo getRequestor(
+            final PKIHeader reqHeader) {
+        GeneralName requestSender = reqHeader.getSender();
+        if (requestSender.getTagNo() != GeneralName.directoryName) {
+            return null;
+        }
+
+        return getRequestor((X500Name) requestSender.getName());
+    } // method getRequestor
+
     protected abstract PKIMessage doProcessPkiMessage(
             RequestorInfo requestor,
             String user,
@@ -329,37 +339,37 @@ abstract class CmpResponder {
             final GeneralPKIMessage pkiMessage,
             final CmpControl cmpControl)
     throws CMPException, InvalidKeyException, OperatorCreationException {
-        ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
+        ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
-        if (pMsg.hasPasswordBasedMacProtection()) {
+        if (protectedMsg.hasPasswordBasedMacProtection()) {
             LOG.warn("NOT_SIGNAUTRE_BASED: {}",
                     pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.NOT_SIGNATURE_BASED);
         }
 
-        PKIHeader h = pMsg.getHeader();
-        AlgorithmIdentifier protectionAlg = h.getProtectionAlg();
+        PKIHeader header = protectedMsg.getHeader();
+        AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
         if (!cmpControl.isSigAlgoPermitted(protectionAlg)) {
             LOG.warn("SIG_ALGO_FORBIDDEN: {}",
                     pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
         }
 
-        CmpRequestorInfo requestor = getRequestor(h);
+        CmpRequestorInfo requestor = getRequestor(header);
         if (requestor == null) {
-            LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
+            LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
             return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
         ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
                 requestor.getCert().getCert());
         if (verifierProvider == null) {
-            LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
+            LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
             return new ProtectionVerificationResult(requestor,
                     ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
-        boolean signatureValid = pMsg.verify(verifierProvider);
+        boolean signatureValid = protectedMsg.verify(verifierProvider);
         return new ProtectionVerificationResult(requestor,
                 signatureValid
                     ? ProtectionResult.VALID
@@ -419,16 +429,6 @@ abstract class CmpResponder {
 
         return new PKIMessage(respHeader.build(), body);
     } // method buildErrorPkiMessage
-
-    private CmpRequestorInfo getRequestor(
-            final PKIHeader reqHeader) {
-        GeneralName requestSender = reqHeader.getSender();
-        if (requestSender.getTagNo() != GeneralName.directoryName) {
-            return null;
-        }
-
-        return getRequestor((X500Name) requestSender.getName());
-    } // method getRequestor
 
     protected PKIStatusInfo generateCmpRejectionStatus(
             final Integer info,

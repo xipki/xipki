@@ -83,12 +83,12 @@ public class CmpUtf8Pairs {
         List<Integer> positions = new LinkedList<>();
 
         int idx = 1;
-        int n = encoded.length();
-        while (idx < n) {
-            char c = encoded.charAt(idx++);
-            if (c == TOKEN_TERM) {
-                char b = encoded.charAt(idx);
-                if (b < '0' || b > '9') {
+        int len = encoded.length();
+        while (idx < len) {
+            char ch = encoded.charAt(idx++);
+            if (ch == TOKEN_TERM) {
+                char ch2 = encoded.charAt(idx);
+                if (ch2 < '0' || ch2 > '9') {
                     positions.add(idx - 1);
                 }
             }
@@ -121,9 +121,9 @@ public class CmpUtf8Pairs {
         ParamUtil.requireNonNull("name", name);
         ParamUtil.requireNonNull("value", value);
 
-        char c = name.charAt(0);
-        if (c >= '0' && c <= '9') {
-            throw new IllegalArgumentException("name must not begin with " + c);
+        char ch = name.charAt(0);
+        if (ch >= '0' && ch <= '9') {
+            throw new IllegalArgumentException("name must not begin with " + ch);
         }
         pairs.put(name, value);
     }
@@ -210,27 +210,27 @@ public class CmpUtf8Pairs {
     }
 
     private static String decodeNameOrValue(
-            final String s) {
-        int idx = s.indexOf(TOKEN_TERM);
+            final String str) {
+        int idx = str.indexOf(TOKEN_TERM);
         if (idx == -1) {
-            return s;
+            return str;
         }
 
         StringBuilder newS = new StringBuilder();
 
-        for (int i = 0; i < s.length();) {
-            char c = s.charAt(i);
-            if (c != TOKEN_TERM) {
-                newS.append(c);
+        for (int i = 0; i < str.length();) {
+            char ch = str.charAt(i);
+            if (ch != TOKEN_TERM) {
+                newS.append(ch);
                 i++;
             } else {
-                if (i + 3 <= s.length()) {
-                    String hex = s.substring(i + 1, i + 3);
-                    c = (char) Byte.parseByte(hex, 16);
-                    newS.append(c);
+                if (i + 3 <= str.length()) {
+                    String hex = str.substring(i + 1, i + 3);
+                    ch = (char) Byte.parseByte(hex, 16);
+                    newS.append(ch);
                     i += 3;
                 } else {
-                    newS.append(s.substring(i));
+                    newS.append(str.substring(i));
                     break;
                 }
             }

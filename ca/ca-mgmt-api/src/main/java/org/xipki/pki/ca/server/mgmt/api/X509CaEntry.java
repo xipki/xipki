@@ -85,7 +85,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
     public X509CaEntry(
             final String name,
             final long nextSerial,
-            final int nextCRLNumber,
+            final int nextCrlNumber,
             final String signerType,
             final String signerConf,
             final X509CaUris caUris,
@@ -93,19 +93,19 @@ public class X509CaEntry extends CaEntry implements Serializable {
             final int expirationPeriod)
     throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
-        init(nextSerial, nextCRLNumber, caUris, numCrls);
+        init(nextSerial, nextCrlNumber, caUris, numCrls);
     }
 
     private void init(
-            final long pNextSerial,
-            final int pNextCRLNumber,
+            final long nextSerial,
+            final int nextCrlNumber,
             final X509CaUris caUris,
-            final int pNumCrls)
+            final int numCrls)
     throws CaMgmtException {
-        this.numCrls = ParamUtil.requireMin("pNumCrls", pNumCrls, 0);
+        this.numCrls = ParamUtil.requireMin("pNumCrls", numCrls, 0);
         this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
-        this.nextSerial = ParamUtil.requireMin("pNextSerial", pNextSerial, 0);
-        this.nextCrlNumber = ParamUtil.requireMin("pNextCRLNumber", pNextCRLNumber, 0);
+        this.nextSerial = ParamUtil.requireMin("pNextSerial", nextSerial, 0);
+        this.nextCrlNumber = ParamUtil.requireMin("pNextCRLNumber", nextCrlNumber, 0);
 
         this.cacertUris = caUris.getCacertUris();
         this.ocspUris = caUris.getOcspUris();

@@ -156,32 +156,32 @@ public class DbDigestEntry {
     }
 
     public boolean contentEquals(
-            final DbDigestEntry b) {
-        if (b == null) {
+            final DbDigestEntry obj) {
+        if (obj == null) {
             return false;
         }
 
-        if (serialNumber != b.serialNumber) {
+        if (serialNumber != obj.serialNumber) {
             return false;
         }
 
-        if (revoked != b.revoked) {
+        if (revoked != obj.revoked) {
             return false;
         }
 
-        if (!equals(revReason, b.revReason)) {
+        if (!equals(revReason, obj.revReason)) {
             return false;
         }
 
-        if (!equals(revTime, b.revTime)) {
+        if (!equals(revTime, obj.revTime)) {
             return false;
         }
 
-        if (!equals(revInvTime, b.revInvTime)) {
+        if (!equals(revInvTime, obj.revInvTime)) {
             return false;
         }
 
-        if (!equals(base64Sha1, b.base64Sha1)) {
+        if (!equals(base64Sha1, obj.base64Sha1)) {
             return false;
         }
 
@@ -197,32 +197,31 @@ public class DbDigestEntry {
             throw new IllegalArgumentException("invalid DbDigestEntry: " + encoded);
         }
 
-        String s = encoded.substring(0, indexes.get(0));
-        Long serialNumber = Long.parseLong(s);
+        String str = encoded.substring(0, indexes.get(0));
+        Long serialNumber = Long.parseLong(str);
 
-        int i = 0;
-        String sha1Fp = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
+        String sha1Fp = encoded.substring(indexes.get(0) + 1, indexes.get(1));
 
-        i++;
-        s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-        boolean revoked = !"0".equals(s);
+        int idx = 1;
+        str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+        boolean revoked = !"0".equals(str);
 
         Integer revReason = null;
         Long revTime = null;
         Long revInvTime = null;
         if (revoked) {
-            i++;
-            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            revReason = Integer.parseInt(s);
+            idx++;
+            str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+            revReason = Integer.parseInt(str);
 
-            i++;
-            s = encoded.substring(indexes.get(i) + 1, indexes.get(i + 1));
-            revTime = Long.parseLong(s);
+            idx++;
+            str = encoded.substring(indexes.get(idx) + 1, indexes.get(idx + 1));
+            revTime = Long.parseLong(str);
 
-            i++;
-            s = encoded.substring(indexes.get(i) + 1);
-            if (s.length() != 0) {
-                revInvTime = Long.parseLong(s);
+            idx++;
+            str = encoded.substring(indexes.get(idx) + 1);
+            if (str.length() != 0) {
+                revInvTime = Long.parseLong(str);
             }
         }
 
@@ -241,12 +240,12 @@ public class DbDigestEntry {
     }
 
     private static boolean equals(
-            final Object a,
-            final Object b) {
-        if (a == null) {
-            return b == null;
+            final Object obj1,
+            final Object obj2) {
+        if (obj1 == null) {
+            return obj2 == null;
         } else {
-            return a.equals(b);
+            return obj1.equals(obj2);
         }
     }
 

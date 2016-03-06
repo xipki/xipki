@@ -52,8 +52,8 @@ public class CaSystemNotifyChangeCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.notifyCaChange();
-        output(b, "notified", "could not notify", "the change of CA system");
+        boolean bo = caManager.notifyCaChange();
+        output(bo, "notified", "could not notify", "the change of CA system");
         return null;
     }
 

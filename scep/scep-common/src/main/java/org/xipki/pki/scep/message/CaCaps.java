@@ -154,13 +154,13 @@ public class CaCaps {
 
     @Override
     public boolean equals(
-            final Object other) {
-        if (!(other instanceof CaCaps)) {
+            final Object obj) {
+        if (!(obj instanceof CaCaps)) {
             return false;
         }
 
-        CaCaps b = (CaCaps) other;
-        return capabilities.equals(b.capabilities);
+        CaCaps other = (CaCaps) obj;
+        return capabilities.equals(other.capabilities);
     }
 
     public byte[] getBytes() {
@@ -177,10 +177,10 @@ public class CaCaps {
         StringTokenizer st = new StringTokenizer(scepMessage, "\r\n");
 
         while (st.hasMoreTokens()) {
-            String m = st.nextToken();
-            CaCapability cap = CaCapability.valueForText(m);
+            String token = st.nextToken();
+            CaCapability cap = CaCapability.valueForText(token);
             if (cap == null) {
-                LOG.warn("ignore unknown CACap '{}'", m);
+                LOG.warn("ignore unknown CACap '{}'", token);
             } else {
                 ret.addCapability(cap);
             }

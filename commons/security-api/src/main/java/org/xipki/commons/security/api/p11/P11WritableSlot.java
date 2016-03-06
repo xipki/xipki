@@ -80,18 +80,21 @@ public interface P11WritableSlot {
             X509Certificate cert)
     throws Exception;
 
+    // CHECKSTYLE:SKIP
     P11KeyIdentifier generateRSAKeypair(
             int keySize,
             BigInteger publicExponent,
             String label)
     throws Exception;
 
+    // CHECKSTYLE:SKIP
     P11KeyIdentifier generateDSAKeypair(
-            int pLength,
-            int qLength,
+            int plength,
+            int qlength,
             String label)
     throws Exception;
 
+    // CHECKSTYLE:SKIP
     P11KeyIdentifier generateECKeypair(
             String curveNameOrOid,
             String label)

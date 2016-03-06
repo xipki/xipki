@@ -79,9 +79,9 @@ class ResponseOption {
         }
 
         HashAlgoType tmpCertHashAlgo = null;
-        String s = conf.getCerthashAlgorithm();
-        if (s != null) {
-            String token = s.trim();
+        String str = conf.getCerthashAlgorithm();
+        if (str != null) {
+            String token = str.trim();
             if (StringUtil.isNotBlank(token)) {
                 HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
                 if (algo != null && RequestOption.SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
@@ -119,11 +119,11 @@ class ResponseOption {
     }
 
     private static boolean getBoolean(
-            final Boolean b,
+            final Boolean bo,
             final boolean dflt) {
-        return (b == null)
+        return (bo == null)
                 ? dflt
-                : b.booleanValue();
+                : bo.booleanValue();
     }
 
 }

@@ -87,18 +87,18 @@ public class HealthCheckServlet extends HttpServlet {
                 return;
             }
 
-            ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-            if (r == null) {
+            ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
+            if (respAndUri == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            if (StringUtil.isNotBlank(r.getRelativeUri())) {
+            if (StringUtil.isNotBlank(respAndUri.getRelativeUri())) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            Responder responder = r.getResponder();
+            Responder responder = respAndUri.getResponder();
 
             HealthCheckResult healthResult = server.healthCheck(responder);
             if (healthResult.isHealthy()) {

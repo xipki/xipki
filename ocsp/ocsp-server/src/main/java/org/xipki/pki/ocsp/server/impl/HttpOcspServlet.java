@@ -99,15 +99,15 @@ public class HttpOcspServlet extends HttpServlet {
             final HttpServletRequest request,
             final HttpServletResponse response)
     throws ServletException, IOException {
-        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-        if (r == null) {
+        ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
+        if (respAndUri == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        Responder responder = r.getResponder();
+        Responder responder = respAndUri.getResponder();
         if (responder.getRequestOption().supportsHttpGet()) {
-            processRequest(request, response, r, true);
+            processRequest(request, response, respAndUri, true);
         } else {
             super.doGet(request, response);
         }
@@ -118,27 +118,27 @@ public class HttpOcspServlet extends HttpServlet {
             final HttpServletRequest request,
             final HttpServletResponse response)
     throws ServletException, IOException {
-        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
-        if (r == null) {
+        ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
+        if (respAndUri == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        if (StringUtil.isNotBlank(r.getRelativeUri())) {
+        if (StringUtil.isNotBlank(respAndUri.getRelativeUri())) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        processRequest(request, response, r, false);
+        processRequest(request, response, respAndUri, false);
     }
 
     private void processRequest(
             final HttpServletRequest request,
             final HttpServletResponse response,
-            final ResponderAndRelativeUri r,
+            final ResponderAndRelativeUri respAndUri,
             final boolean getMethod)
     throws ServletException, IOException {
-        Responder responder = r.getResponder();
+        Responder responder = respAndUri.getResponder();
         AuditEvent auditEvent = null;
 
         AuditLevel auditLevel = AuditLevel.INFO;
@@ -173,7 +173,7 @@ public class HttpOcspServlet extends HttpServlet {
 
             InputStream requestStream;
             if (getMethod) {
-                String relativeUri = r.getRelativeUri();
+                String relativeUri = respAndUri.getRelativeUri();
 
                 // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
                 // POST, we support GET for longer requests anyway.

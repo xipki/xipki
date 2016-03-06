@@ -59,8 +59,8 @@ public class CaAliasRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.removeCaAlias(caAlias);
-        output(b, "removed", "could not remove", "CA alias " + caAlias);
+        boolean bo = caManager.removeCaAlias(caAlias);
+        output(bo, "removed", "could not remove", "CA alias " + caAlias);
         return null;
     }
 

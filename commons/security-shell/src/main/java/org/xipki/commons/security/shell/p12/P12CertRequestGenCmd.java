@@ -83,18 +83,10 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
     public KeyStore getKeyStore()
     throws Exception {
         KeyStore ks;
-
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
+        try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
+            ks.load(in, getPassword());
         }
-
         return ks;
     }
 

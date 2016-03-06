@@ -184,7 +184,7 @@ public final class CaClientImpl implements CaClient {
 
     private String confFile;
 
-    private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
+    private Map<X509Certificate, Boolean> tryXipkiNsstoVerifyMap = new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -198,13 +198,13 @@ public final class CaClientImpl implements CaClient {
 
     /**
      *
-     * @return names of CAs which must not been configured
+     * @return names of CAs which must not been configured.
      */
     private Set<String> autoConfCas(
             final Set<String> caNamesToBeConfigured) {
         Set<String> caNamesWithError = new HashSet<>();
 
-        Set<String> errorCANames = new HashSet<>();
+        Set<String> errorCaNames = new HashSet<>();
         for (String name : casMap.keySet()) {
             if (caNamesToBeConfigured != null && !caNamesToBeConfigured.contains(name)) {
                 continue;
@@ -226,7 +226,7 @@ public final class CaClientImpl implements CaClient {
                 }
                 LOG.info("retrieved CAInfo for CA " + name);
             } catch (Throwable th) {
-                errorCANames.add(name);
+                errorCaNames.add(name);
                 caNamesWithError.add(name);
                 final String message = "could not retrieve CAInfo for CA " + name;
                 if (LOG.isWarnEnabled()) {
@@ -237,8 +237,8 @@ public final class CaClientImpl implements CaClient {
             }
         }
 
-        if (CollectionUtil.isNonEmpty(errorCANames)) {
-            for (String caName : errorCANames) {
+        if (CollectionUtil.isNonEmpty(errorCaNames)) {
+            for (String caName : errorCaNames) {
                 casMap.remove(caName);
             }
         }
@@ -275,8 +275,8 @@ public final class CaClientImpl implements CaClient {
             LOG.warn("no active CA is configured");
         }
 
-        Boolean b = config.isDevMode();
-        boolean devMode = b != null && b.booleanValue();
+        Boolean bo = config.isDevMode();
+        boolean devMode = bo != null && bo.booleanValue();
 
         // responders
         Map<String, X509Certificate> responders = new HashMap<>();
@@ -302,8 +302,8 @@ public final class CaClientImpl implements CaClient {
 
         Set<CaConf> cas = new HashSet<>();
         for (CAType caType : config.getCAs().getCA()) {
-            b = caType.isEnabled();
-            if (!b.booleanValue()) {
+            bo = caType.isEnabled();
+            if (!bo.booleanValue()) {
                 continue;
             }
 
@@ -436,13 +436,13 @@ public final class CaClientImpl implements CaClient {
         }
 
         if (autoConf) {
-            Integer cAInfoUpdateInterval = config.getCAs().getCAInfoUpdateInterval();
-            if (cAInfoUpdateInterval == null) {
-                cAInfoUpdateInterval = 10;
-            } else if (cAInfoUpdateInterval <= 0) {
-                cAInfoUpdateInterval = 0;
-            } else if (cAInfoUpdateInterval < 5) {
-                cAInfoUpdateInterval = 5;
+            Integer caInfoUpdateInterval = config.getCAs().getCAInfoUpdateInterval();
+            if (caInfoUpdateInterval == null) {
+                caInfoUpdateInterval = 10;
+            } else if (caInfoUpdateInterval <= 0) {
+                caInfoUpdateInterval = 0;
+            } else if (caInfoUpdateInterval < 5) {
+                caInfoUpdateInterval = 5;
             }
 
             Set<String> caNames = casMap.keySet();
@@ -461,11 +461,11 @@ public final class CaClientImpl implements CaClient {
                 }
             }
 
-            if (cAInfoUpdateInterval > 0) {
+            if (caInfoUpdateInterval > 0) {
                 scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ClientConfigUpdater(),
-                        cAInfoUpdateInterval, cAInfoUpdateInterval, TimeUnit.MINUTES);
+                        caInfoUpdateInterval, caInfoUpdateInterval, TimeUnit.MINUTES);
             }
         }
     } // method init
@@ -477,6 +477,7 @@ public final class CaClientImpl implements CaClient {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
+                    LOG.warn("interrupted: {}", ex.getMessage());
                 }
             }
             scheduledThreadPoolExecutor = null;
@@ -495,7 +496,7 @@ public final class CaClientImpl implements CaClient {
 
         String tmpCaName = caName;
         if (tmpCaName == null) {
-            tmpCaName = getCANameForProfile(profile);
+            tmpCaName = getCaNameForProfile(profile);
         }
 
         if (tmpCaName == null) {
@@ -534,18 +535,18 @@ public final class CaClientImpl implements CaClient {
         }
 
         String tmpCaName = caName;
-        boolean b = (tmpCaName != null);
+        boolean bo = (tmpCaName != null);
         if (tmpCaName == null) {
             // detect the CA name
             String profile = requestEntries.get(0).getCertprofile();
-            tmpCaName = getCANameForProfile(profile);
+            tmpCaName = getCaNameForProfile(profile);
             if (tmpCaName == null) {
                 throw new CaClientException("cert profile " + profile
                         + " is not supported by any CA");
             }
         }
 
-        if (b || request.getRequestEntries().size() > 1) {
+        if (bo || request.getRequestEntries().size() > 1) {
             // make sure that all requests are targeted on the same CA
             for (EnrollCertRequestEntryType entry : request.getRequestEntries()) {
                 String profile = entry.getCertprofile();
@@ -776,7 +777,7 @@ public final class CaClientImpl implements CaClient {
         throw new CaClientException("unknown CA for issuer: " + issuer);
     }
 
-    private String getCANameForProfile(
+    private String getCaNameForProfile(
             final String certprofile)
     throws CaClientException {
         String caName = null;
@@ -837,7 +838,7 @@ public final class CaClientImpl implements CaClient {
         String tmpCaName = caName;
         if (tmpCaName == null) {
             // detect the CA name
-            tmpCaName = getCANameForProfile(profileName);
+            tmpCaName = getCaNameForProfile(profileName);
             if (tmpCaName == null) {
                 throw new CaClientException("cert profile " + profileName
                         + " is not supported by any CA");
@@ -888,13 +889,13 @@ public final class CaClientImpl implements CaClient {
         }
 
         final String provider = "XipkiNSS";
-        Boolean tryXipkiNSStoVerify = tryXipkiNSStoVerifyMap.get(x509caCert);
+        Boolean tryXipkiNsstoVerify = tryXipkiNsstoVerifyMap.get(x509caCert);
         PublicKey caPublicKey = x509caCert.getPublicKey();
         try {
-            if (tryXipkiNSStoVerify == null) {
+            if (tryXipkiNsstoVerify == null) {
                 if (caPublicKey instanceof ECPublicKey || Security.getProvider(provider) == null) {
-                    tryXipkiNSStoVerify = Boolean.FALSE;
-                    tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
+                    tryXipkiNsstoVerify = Boolean.FALSE;
+                    tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
                 } else {
                     byte[] tbs = x509cert.getTBSCertificate();
                     byte[] signatureValue = x509cert.getSignature();
@@ -903,21 +904,20 @@ public final class CaClientImpl implements CaClient {
                         Signature verifier = Signature.getInstance(sigAlgName, provider);
                         verifier.initVerify(caPublicKey);
                         verifier.update(tbs);
-                        boolean sigValid = verifier.verify(signatureValue);
 
                         LOG.info("use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNSStoVerify = Boolean.TRUE;
-                        tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
-                        return sigValid;
+                        tryXipkiNsstoVerify = Boolean.TRUE;
+                        tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
+                        return verifier.verify(signatureValue);
                     } catch (Exception ex) {
                         LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNSStoVerify = Boolean.FALSE;
-                        tryXipkiNSStoVerifyMap.put(x509caCert, tryXipkiNSStoVerify);
+                        tryXipkiNsstoVerify = Boolean.FALSE;
+                        tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
                     }
                 }
             }
 
-            if (tryXipkiNSStoVerify) {
+            if (tryXipkiNsstoVerify) {
                 byte[] tbs = x509cert.getTBSCertificate();
                 byte[] signatureValue = x509cert.getSignature();
                 String sigAlgName = x509cert.getSigAlgName();

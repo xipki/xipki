@@ -58,12 +58,12 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd {
     throws Exception {
         out("checking CMP control " + name);
 
-        CmpControlEntry c = caManager.getCmpControl(name);
-        if (c == null) {
+        CmpControlEntry ce = caManager.getCmpControl(name);
+        if (ce == null) {
             throw new CmdFailure("no CMP control named '" + name + "' is configured");
         }
 
-        String is = c.getConf();
+        String is = ce.getConf();
         String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
         MgmtQaShellUtil.assertEquals("CMP control", ex, is);
 

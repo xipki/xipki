@@ -116,7 +116,7 @@ public interface CaManager {
     Set<String> getCaNames();
 
     boolean addCa(
-            CaEntry cEntry)
+            CaEntry caEntry)
     throws CaMgmtException;
 
     CaEntry getCa(

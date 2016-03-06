@@ -88,9 +88,9 @@ public class DefaultHttpOcspRequestor extends AbstractOcspRequestor {
             }
             urlBuilder.append(urlEncodedReq);
 
-            URL newURL = new URL(urlBuilder.toString());
+            URL newUrl = new URL(urlBuilder.toString());
 
-            httpUrlConnection = (HttpURLConnection) newURL.openConnection();
+            httpUrlConnection = (HttpURLConnection) newUrl.openConnection();
             httpUrlConnection.setRequestMethod("GET");
         } else {
             httpUrlConnection = (HttpURLConnection) responderUrl.openConnection();

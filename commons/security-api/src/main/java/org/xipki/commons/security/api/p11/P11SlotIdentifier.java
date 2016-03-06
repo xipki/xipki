@@ -71,20 +71,20 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
     @Override
     public boolean equals(
-            final Object b) {
-        if (this == b) {
+            final Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (!(b instanceof P11SlotIdentifier)) {
+        if (!(obj instanceof P11SlotIdentifier)) {
             return false;
         }
 
-        if (this == b) {
+        if (this == obj) {
             return true;
         }
 
-        P11SlotIdentifier another = (P11SlotIdentifier) b;
+        P11SlotIdentifier another = (P11SlotIdentifier) obj;
         return CompareUtil.equalsObject(this.slotIndex, another.slotIndex)
                 || CompareUtil.equalsObject(this.slotId, another.slotId);
     }

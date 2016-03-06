@@ -114,20 +114,20 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
         this.includeCaCerts = includeCaCerts;
 
-        File f = new File(reportDirName);
-        if (!f.exists()) {
-            f.mkdirs();
+        File file = new File(reportDirName);
+        if (!file.exists()) {
+            file.mkdirs();
         } else {
-            if (!f.isDirectory()) {
+            if (!file.isDirectory()) {
                 throw new IOException(reportDirName + " is not a folder");
             }
 
-            if (!f.canWrite()) {
+            if (!file.canWrite()) {
                 throw new IOException(reportDirName + " is not writable");
             }
         }
 
-        String[] children = f.list();
+        String[] children = file.list();
         if (children != null && children.length > 0) {
             throw new IOException(reportDirName + " is not empty");
         }

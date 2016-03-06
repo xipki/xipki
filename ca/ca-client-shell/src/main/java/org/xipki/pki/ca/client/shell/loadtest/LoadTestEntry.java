@@ -52,7 +52,7 @@ import org.xipki.commons.security.api.util.X509Util;
 
 public class LoadTestEntry {
 
-    public enum RandomDN {
+    public enum RandomDn {
 
         GIVENNAME,
         SURNAME,
@@ -62,10 +62,10 @@ public class LoadTestEntry {
         OU,
         CN;
 
-        public static RandomDN getInstance(
+        public static RandomDn getInstance(
                 final String text) {
             ParamUtil.requireNonNull("text", text);
-            for (RandomDN value : values()) {
+            for (RandomDn value : values()) {
                 if (value.name().equalsIgnoreCase(text)) {
                     return value;
                 }
@@ -79,71 +79,71 @@ public class LoadTestEntry {
 
         private final X500Name subjectTemplate;
 
-        private final ASN1ObjectIdentifier subjectRDNForIncrement;
+        private final ASN1ObjectIdentifier subjectRdnForIncrement;
 
         private IncreasableSubject(
                 final String subjectTemplate,
-                final RandomDN randomDN) {
+                final RandomDn randomDn) {
             ParamUtil.requireNonEmpty("subjectTemplate", subjectTemplate);
-            ParamUtil.requireNonNull("randomDN", randomDN);
+            ParamUtil.requireNonNull("randomDn", randomDn);
 
             this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
 
-            switch (randomDN) {
+            switch (randomDn) {
             case GIVENNAME:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_GIVENNAME;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_GIVENNAME;
                 break;
             case SURNAME:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_SURNAME;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_SURNAME;
                 break;
             case STREET:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_STREET;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_STREET;
                 break;
             case POSTALCODE:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_POSTAL_CODE;
                 break;
             case O:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_O;
                 break;
             case OU:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_OU;
                 break;
             case CN:
-                this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
+                this.subjectRdnForIncrement = ObjectIdentifiers.DN_CN;
                 break;
             default:
-                throw new RuntimeException("should not reach here, unknown RandomDN "
-                        + randomDN);
+                throw new RuntimeException("should not reach here, unknown RandomDn "
+                        + randomDn);
             }
 
-            if (this.subjectRDNForIncrement != null
-                    && this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0) {
+            if (this.subjectRdnForIncrement != null
+                    && this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
                 throw new IllegalArgumentException("subjectTemplate does not contain DN field "
-                        + ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
+                        + ObjectIdentifiers.oidToDisplayName(this.subjectRdnForIncrement));
             }
         }
 
         private X500Name getX500Name(
                 final long index) {
-            RDN[] baseRDNs = subjectTemplate.getRDNs();
+            RDN[] baseRdns = subjectTemplate.getRDNs();
 
-            final int n = baseRDNs.length;
-            RDN[] newRDNS = new RDN[n];
+            final int n = baseRdns.length;
+            RDN[] newRdns = new RDN[n];
 
             boolean incremented = false;
             for (int i = 0; i < n; i++) {
-                RDN rdn = baseRDNs[i];
+                RDN rdn = baseRdns[i];
                 if (!incremented) {
-                    if (rdn.getFirst().getType().equals(subjectRDNForIncrement)) {
+                    if (rdn.getFirst().getType().equals(subjectRdnForIncrement)) {
                         String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
-                        rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
+                        rdn = new RDN(subjectRdnForIncrement, new DERUTF8String(text + index));
                         incremented = true;
                     }
                 }
 
-                newRDNS[i] = rdn;
+                newRdns[i] = rdn;
             }
-            return new X500Name(newRDNS);
+            return new X500Name(newRdns);
         }
 
     } // class IncreasableSubject
@@ -158,10 +158,10 @@ public class LoadTestEntry {
             final String certprofile,
             final KeyEntry keyEntry,
             final String subjectTemplate,
-            final RandomDN randomDN) {
+            final RandomDn randomDn) {
         this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
         this.keyEntry = ParamUtil.requireNonNull("keyEntry", keyEntry);
-        this.subject = new IncreasableSubject(subjectTemplate, randomDN);
+        this.subject = new IncreasableSubject(subjectTemplate, randomDn);
     }
 
     public SubjectPublicKeyInfo getSubjectPublicKeyInfo(

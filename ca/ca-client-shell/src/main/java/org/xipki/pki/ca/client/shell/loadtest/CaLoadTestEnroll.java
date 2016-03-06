@@ -79,15 +79,15 @@ public class CaLoadTestEnroll extends LoadExecutor {
 
     private final String userPrefix = "LOADTEST-";
 
-    private final int n;
+    private final int num;
 
     public CaLoadTestEnroll(
             final CaClient caClient,
             final LoadTestEntry loadtestEntry,
-            final int n,
+            final int num,
             final String description) {
         super(description);
-        this.n = ParamUtil.requireMin("n", n, 1);
+        this.num = ParamUtil.requireMin("num", num, 1);
         this.loadtestEntry = ParamUtil.requireNonNull("loadtestEntry", loadtestEntry);
         this.caClient = ParamUtil.requireNonNull("caClient", caClient);
         this.index = new AtomicLong(getSecureIndex());
@@ -141,17 +141,17 @@ public class CaLoadTestEnroll extends LoadExecutor {
             }
 
             Set<String> ids = result.getAllIds();
-            int nSuccess = 0;
+            int numSuccess = 0;
             for (String id : ids) {
                 CertOrError certOrError = result.getCertificateOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
                 if (cert != null) {
-                    nSuccess++;
+                    numSuccess++;
                 }
             }
 
-            return nSuccess == certRequests.size();
+            return numSuccess == certRequests.size();
         } // method testNext
 
     } // class Testor
@@ -164,7 +164,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
 
     private Map<Integer, CertRequest> nextCertRequests() {
         Map<Integer, CertRequest> certRequests = new HashMap<>();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < num; i++) {
             final int certId = i + 1;
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 

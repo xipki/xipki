@@ -119,6 +119,58 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             byte[] request)
     throws IOException;
 
+    private ASN1Encodable send(
+            final int action,
+            final ASN1Encodable content)
+    throws SignerException {
+        PKIHeader header = buildPkiHeader(null);
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1Integer(action));
+        if (content != null) {
+            vec.add(content);
+        }
+        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
+                new DERSequence(vec));
+
+        GenMsgContent genMsgContent = new GenMsgContent(itvReq);
+        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
+        PKIMessage request = new PKIMessage(header, body);
+
+        byte[] encodedRequest;
+        try {
+            encodedRequest = request.getEncoded();
+        } catch (IOException ex) {
+            LOG.error("error while encode the PKI request {}", request);
+            throw new SignerException(ex.getMessage(), ex);
+        }
+
+        byte[] encodedResponse;
+        try {
+            encodedResponse = send(encodedRequest);
+        } catch (IOException ex) {
+            LOG.error("error while send the PKI request {} to server", request);
+            throw new SignerException(ex.getMessage(), ex);
+        }
+
+        GeneralPKIMessage response;
+        try {
+            response = new GeneralPKIMessage(encodedResponse);
+        } catch (IOException ex) {
+            LOG.error("error while decode the received PKI message: {}",
+                    Hex.toHexString(encodedResponse));
+            throw new SignerException(ex.getMessage(), ex);
+        }
+
+        PKIHeader respHeader = response.getHeader();
+        ASN1OctetString tid = respHeader.getTransactionID();
+        GeneralName rec = respHeader.getRecipient();
+        if (!sender.equals(rec)) {
+            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
+        }
+
+        return extractItvInfoValue(action, response);
+    } // method send
+
     public int getServerVersion()
     throws SignerException {
         ASN1Encodable result = send(XipkiCmpConstants.ACTION_RP11_VERSION, DERNull.INSTANCE);
@@ -310,58 +362,6 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         return new SlotAndKeyIdentifer(slotIdentifier, keyIdentifier);
     }
 
-    private ASN1Encodable send(
-            final int action,
-            final ASN1Encodable content)
-    throws SignerException {
-        PKIHeader header = buildPKIHeader(null);
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(action));
-        if (content != null) {
-            v.add(content);
-        }
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
-                new DERSequence(v));
-
-        GenMsgContent genMsgContent = new GenMsgContent(itvReq);
-        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-        PKIMessage request = new PKIMessage(header, body);
-
-        byte[] encodedRequest;
-        try {
-            encodedRequest = request.getEncoded();
-        } catch (IOException ex) {
-            LOG.error("error while encode the PKI request {}", request);
-            throw new SignerException(ex.getMessage(), ex);
-        }
-
-        byte[] encodedResponse;
-        try {
-            encodedResponse = send(encodedRequest);
-        } catch (IOException ex) {
-            LOG.error("error while send the PKI request {} to server", request);
-            throw new SignerException(ex.getMessage(), ex);
-        }
-
-        GeneralPKIMessage response;
-        try {
-            response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException ex) {
-            LOG.error("error while decode the received PKI message: {}",
-                    Hex.toHexString(encodedResponse));
-            throw new SignerException(ex.getMessage(), ex);
-        }
-
-        PKIHeader respHeader = response.getHeader();
-        ASN1OctetString tid = respHeader.getTransactionID();
-        GeneralName rec = respHeader.getRecipient();
-        if (!sender.equals(rec)) {
-            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
-        }
-
-        return extractItvInfoValue(action, response);
-    } // method send
-
     private static ASN1Encodable extractItvInfoValue(
             final int action,
             final GeneralPKIMessage response)
@@ -419,13 +419,13 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
     } // method extractItvInfoValue
 
-    private PKIHeader buildPKIHeader(
+    private PKIHeader buildPkiHeader(
             final ASN1OctetString tid) {
-        PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
+        PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
                 recipient);
-        hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
+        hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
         ASN1OctetString tmpTid;
         if (tid == null) {
@@ -433,9 +433,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         } else {
             tmpTid = tid;
         }
-        hBuilder.setTransactionID(tmpTid);
+        hdrBuilder.setTransactionID(tmpTid);
 
-        return hBuilder.build();
+        return hdrBuilder.build();
     }
 
     private byte[] randomTransactionId() {
@@ -456,7 +456,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
 
         ASN1Sequence seq = (ASN1Sequence) resp;
-        int n = seq.size();
+        final int n = seq.size();
 
         List<P11SlotIdentifier> slotIds = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
@@ -491,7 +491,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
 
         ASN1Sequence seq = (ASN1Sequence) resp;
-        int n = seq.size();
+        final int n = seq.size();
 
         String[] keyLabels = new String[n];
         for (int i = 0; i < n; i++) {

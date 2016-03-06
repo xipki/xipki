@@ -83,26 +83,26 @@ public class SlotIdentifier extends ASN1Object {
         try {
             Integer slotIndex = null;
 
-            ASN1Encodable slotIdASN1Obj = null;
+            ASN1Encodable slotIdAsn1Obj = null;
             ASN1Encodable obj = seq.getObjectAt(0);
             if (obj instanceof ASN1Integer) {
                 slotIndex = ((ASN1Integer) obj).getPositiveValue().intValue();
                 if (size > 1) {
-                    slotIdASN1Obj = seq.getObjectAt(1);
+                    slotIdAsn1Obj = seq.getObjectAt(1);
                 }
             } else {
-                slotIdASN1Obj = obj;
+                slotIdAsn1Obj = obj;
             }
 
             Long tmpSlotId = null;
 
-            if (slotIdASN1Obj instanceof ASN1TaggedObject) {
-                ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdASN1Obj;
+            if (slotIdAsn1Obj instanceof ASN1TaggedObject) {
+                ASN1TaggedObject tagObj = (ASN1TaggedObject) slotIdAsn1Obj;
 
                 int tagNo = tagObj.getTagNo();
                 if (tagNo == 1) {
-                    ASN1Integer i = ASN1Integer.getInstance(tagObj.getObject());
-                    tmpSlotId = i.getPositiveValue().longValue();
+                    ASN1Integer asn1Int = ASN1Integer.getInstance(tagObj.getObject());
+                    tmpSlotId = asn1Int.getPositiveValue().longValue();
                 } else {
                     throw new BadAsn1ObjectException("unknown tag " + tagNo);
                 }

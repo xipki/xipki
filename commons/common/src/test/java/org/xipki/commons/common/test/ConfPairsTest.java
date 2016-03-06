@@ -129,16 +129,16 @@ public class ConfPairsTest {
             final ConfPairs confPairs,
             final String expEncoded,
             final Map<String, String> expNameValues) {
-        String iEncoded = confPairs.getEncoded();
-        Assert.assertEquals("encoded", expEncoded, iEncoded);
+        String isEncoded = confPairs.getEncoded();
+        Assert.assertEquals("encoded", expEncoded, isEncoded);
 
-        Set<String> iNames = confPairs.getNames();
-        Assert.assertEquals("names", expNameValues.size(), iNames.size());
+        Set<String> isNames = confPairs.getNames();
+        Assert.assertEquals("names", expNameValues.size(), isNames.size());
 
-        for (String iName : iNames) {
-            String expValue = expNameValues.get(iName);
-            Assert.assertNotNull("name " + iName + " is not expected", expValue);
-            Assert.assertEquals("value of name " + iName, expValue, confPairs.getValue(iName));
+        for (String isName : isNames) {
+            String expValue = expNameValues.get(isName);
+            Assert.assertNotNull("name " + isName + " is not expected", expValue);
+            Assert.assertEquals("value of name " + isName, expValue, confPairs.getValue(isName));
         }
     }
 

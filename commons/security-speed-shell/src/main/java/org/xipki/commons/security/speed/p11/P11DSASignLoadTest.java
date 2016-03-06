@@ -44,29 +44,29 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P11DSASignLoadTest extends P11SignLoadTest {
 
     public P11DSASignLoadTest(
             final SecurityFactory securityFactory,
             final P11WritableSlot slot,
             final String signatureAlgorithm,
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, pLength, qLength),
+                generateKey(slot, plength, qlength),
                 "PKCS#11 DSA signature creation\n"
-                        + "pLength: " + pLength + "\n"
-                        + "qLength: " + qLength);
+                        + "pLength: " + plength + "\n"
+                        + "qLength: " + qlength);
     }
 
     private static P11KeyIdentifier generateKey(
             final P11WritableSlot slot,
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws Exception {
-        return slot.generateDSAKeypair(pLength, qLength, "loadtest-" + System.currentTimeMillis());
+        return slot.generateDSAKeypair(plength, qlength, "loadtest-" + System.currentTimeMillis());
     }
 
 }

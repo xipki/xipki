@@ -126,15 +126,15 @@ public class CaDbExportWorker extends DbPortWorker {
 
     private void checkDestFolder()
     throws IOException {
-        File f = new File(destFolder);
-        if (!f.exists()) {
-            f.mkdirs();
+        File file = new File(destFolder);
+        if (!file.exists()) {
+            file.mkdirs();
         } else {
-            if (!f.isDirectory()) {
+            if (!file.isDirectory()) {
                 throw new IOException(destFolder + " is not a folder");
             }
 
-            if (!f.canWrite()) {
+            if (!file.canWrite()) {
                 throw new IOException(destFolder + " is not writable");
             }
         }
@@ -145,7 +145,7 @@ public class CaDbExportWorker extends DbPortWorker {
                 throw new IOException("could not process with '--resume' option");
             }
         } else {
-            String[] children = f.list();
+            String[] children = file.list();
             if (children != null && children.length > 0) {
                 throw new IOException(destFolder + " is not empty");
             }

@@ -206,7 +206,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
-        CaStatus status = CaStatus.getCAStatus(caStatus);
+        CaStatus status = CaStatus.getCaStatus(caStatus);
         if (status == null) {
             throw new IllegalCmdParamException("invalid status: " + caStatus);
         }

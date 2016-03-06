@@ -80,7 +80,6 @@ public class CaProfileAddCmd extends CaCommandSupport {
             profileLocalname = profileName;
         }
 
-        boolean b = caManager.addCertprofileToCa(profileName, profileLocalname, caName);
         StringBuilder sb = new StringBuilder();
         sb.append("certificate profile ").append(profileName);
         if (!profileLocalname.equals(profileName)) {
@@ -88,7 +87,8 @@ public class CaProfileAddCmd extends CaCommandSupport {
         }
         sb.append(" to CA ").append(caName);
 
-        output(b, "associated", "could not associate",
+        boolean bo = caManager.addCertprofileToCa(profileName, profileLocalname, caName);
+        output(bo, "associated", "could not associate",
                 sb.toString());
         return null;
     }

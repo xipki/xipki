@@ -50,7 +50,7 @@ import org.xipki.commons.security.api.SignerException;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 abstract class AbstractP11DSASigner implements Signer {
 
     protected P11KeyParameter param;
@@ -84,16 +84,16 @@ abstract class AbstractP11DSASigner implements Signer {
 
     @Override
     public void update(
-            final byte b) {
-        digest.update(b);
+            final byte input) {
+        digest.update(input);
     }
 
     @Override
     public void update(
-            final byte[] in,
+            final byte[] input,
             final int off,
             final int len) {
-        digest.update(in, off, len);
+        digest.update(input, off, len);
     }
 
     @Override

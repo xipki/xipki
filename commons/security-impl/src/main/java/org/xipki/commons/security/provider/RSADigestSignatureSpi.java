@@ -67,9 +67,10 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class RSADigestSignatureSpi extends SignatureSpi {
 
+    // CHECKSTYLE:SKIP
     class SHA1 extends RSADigestSignatureSpi {
 
         SHA1() {
@@ -78,6 +79,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class SHA1
 
+    // CHECKSTYLE:SKIP
     class SHA224 extends RSADigestSignatureSpi {
 
         SHA224() {
@@ -86,6 +88,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class SHA224
 
+    // CHECKSTYLE:SKIP
     class SHA256 extends RSADigestSignatureSpi {
 
         SHA256() {
@@ -94,6 +97,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class SHA256
 
+    // CHECKSTYLE:SKIP
     class SHA384 extends RSADigestSignatureSpi {
 
         SHA384() {
@@ -102,6 +106,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class SHA384
 
+    // CHECKSTYLE:SKIP
     class SHA512 extends RSADigestSignatureSpi {
 
         SHA512() {
@@ -110,6 +115,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class SHA512
 
+    // CHECKSTYLE:SKIP
     class RIPEMD160 extends RSADigestSignatureSpi {
 
         RIPEMD160() {
@@ -118,6 +124,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class RIPEMD160
 
+    // CHECKSTYLE:SKIP
     class RIPEMD256 extends RSADigestSignatureSpi {
 
         RIPEMD256() {
@@ -126,6 +133,7 @@ class RSADigestSignatureSpi extends SignatureSpi {
 
     } // class RIPEMD256
 
+    // CHECKSTYLE:SKIP
     class NoneRSA extends RSADigestSignatureSpi {
 
         NoneRSA() {
@@ -155,12 +163,14 @@ class RSADigestSignatureSpi extends SignatureSpi {
         this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
     }
 
+    @Override
     protected void engineInitVerify(
             final PublicKey publicKey)
     throws InvalidKeyException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
+    @Override
     protected void engineInitSign(
             final PrivateKey privateKey)
     throws InvalidKeyException {
@@ -178,20 +188,23 @@ class RSADigestSignatureSpi extends SignatureSpi {
         this.signingKey = (P11PrivateKey) privateKey;
     }
 
+    @Override
     protected void engineUpdate(
-            final byte b)
+            final byte input)
     throws SignatureException {
-        digest.update(b);
+        digest.update(input);
     }
 
+    @Override
     protected void engineUpdate(
-            final byte[] b,
+            final byte[] input,
             final int off,
             final int len)
     throws SignatureException {
-        digest.update(b, off, len);
+        digest.update(input, off, len);
     }
 
+    @Override
     protected byte[] engineSign()
     throws SignatureException {
         byte[] hash = new byte[digest.getDigestSize()];
@@ -209,35 +222,33 @@ class RSADigestSignatureSpi extends SignatureSpi {
         }
     }
 
+    @Override
     protected boolean engineVerify(
             final byte[] sigBytes)
     throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
+    @Override
     protected void engineSetParameter(
             final AlgorithmParameterSpec params) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
-    /**
-     * @deprecated replaced with
-     *    <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-     */
+    @Override
     protected void engineSetParameter(
             final String param,
             final Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
-    /**
-     * @deprecated
-     */
+    @Override
     protected Object engineGetParameter(
             final String param) {
         return null;
     }
 
+    @Override
     protected AlgorithmParameters engineGetParameters() {
         return null;
     }
@@ -250,9 +261,9 @@ class RSADigestSignatureSpi extends SignatureSpi {
             return hash;
         }
 
-        DigestInfo dInfo = new DigestInfo(algId, hash);
+        DigestInfo digestInfo = new DigestInfo(algId, hash);
 
-        return dInfo.getEncoded(ASN1Encoding.DER);
+        return digestInfo.getEncoded(ASN1Encoding.DER);
     }
 
 }

@@ -64,13 +64,13 @@ public class GetCrlCmd extends CrlCommandSupport {
 
     @Option(name = "--with-basecrl",
             description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
-    private Boolean withBaseCRL = Boolean.FALSE;
+    private Boolean withBaseCrl = Boolean.FALSE;
 
     @Option(name = "--basecrl-out",
             description = "where to save the baseCRL\n"
                     + "(defaults to <out>-baseCRL)")
     @Completion(FilePathCompleter.class)
-    private String baseCRLOut;
+    private String baseCrlOut;
 
     @Override
     protected X509CRL retrieveCrl()
@@ -99,11 +99,11 @@ public class GetCrlCmd extends CrlCommandSupport {
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
 
-        if (withBaseCRL.booleanValue()) {
+        if (withBaseCrl.booleanValue()) {
             byte[] octetString = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
             if (octetString != null) {
-                if (baseCRLOut == null) {
-                    baseCRLOut = outFile + "-baseCRL";
+                if (baseCrlOut == null) {
+                    baseCrlOut = outFile + "-baseCRL";
                 }
 
                 byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
@@ -118,7 +118,7 @@ public class GetCrlCmd extends CrlCommandSupport {
                 if (crl == null) {
                     throw new CmdFailure("received no baseCRL from server");
                 } else {
-                    saveVerbose("saved baseCRL to file", new File(baseCRLOut), crl.getEncoded());
+                    saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
                 }
             }
         }

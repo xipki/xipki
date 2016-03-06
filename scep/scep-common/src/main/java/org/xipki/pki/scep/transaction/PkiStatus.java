@@ -44,19 +44,19 @@ package org.xipki.pki.scep.transaction;
 public enum PkiStatus {
 
     /**
-     * request granted
+     * request granted.
      */
-    SUCCESS (0),
+    SUCCESS(0),
 
     /**
-     * request rejected
+     * request rejected.
      */
-    FAILURE (2),
+    FAILURE(2),
 
     /**
-     * request pending for manual approval
+     * request pending for manual approval.
      */
-    PENDING (3);
+    PENDING(3);
 
     private final int code;
 

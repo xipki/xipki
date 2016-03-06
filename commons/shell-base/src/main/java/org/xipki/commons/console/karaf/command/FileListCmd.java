@@ -80,7 +80,7 @@ public class FileListCmd extends XipkiCommandSupport {
             return null;
         }
 
-        List<String> l = new LinkedList<>();
+        List<String> list = new LinkedList<>();
         File[] children = target.listFiles();
         int maxLen = -1;
 
@@ -90,32 +90,32 @@ public class FileListCmd extends XipkiCommandSupport {
                 if (child.isDirectory()) {
                     name += File.separator;
                 }
-                l.add(name);
+                list.add(name);
                 maxLen = Math.max(maxLen, name.length());
             }
         }
 
-        if (isEmpty(l)) {
+        if (isEmpty(list)) {
             return null;
         }
 
-        Collections.sort(l);
+        Collections.sort(list);
         List<String> l2 = new LinkedList<>();
 
-        for (String s : l) {
-            String lS = s;
-            int diffLen = maxLen - lS.length();
+        for (String s : list) {
+            String tmpS = s;
+            int diffLen = maxLen - tmpS.length();
             if (diffLen > 0) {
                 for (int i = 0; i < diffLen; i++) {
-                    lS += " ";
+                    tmpS += " ";
                 }
             }
-            l2.add(lS);
+            l2.add(tmpS);
         }
 
         int width = session.getTerminal().getWidth();
 
-        int n = width / (maxLen + 1);
+        final int n = width / (maxLen + 1);
         if (n == 0) {
             for (String s :l2) {
                 out(s);

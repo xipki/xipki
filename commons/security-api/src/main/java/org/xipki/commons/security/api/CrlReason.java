@@ -60,14 +60,14 @@ public enum CrlReason {
      * This reason indicates that it is unspecified as to why the
      * certificate has been revoked.
      */
-    UNSPECIFIED (0, "unspecified"),
+    UNSPECIFIED(0, "unspecified"),
 
     /**
      * This reason indicates that it is known or suspected that the
      * certificate subject's private key has been compromised. It applies
      * to end-entity certificates only.
      */
-    KEY_COMPROMISE (1, "keyCompromise"),
+    KEY_COMPROMISE(1, "keyCompromise"),
 
     /**
      * This reason indicates that it is known or suspected that the

@@ -50,7 +50,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 abstract class AbstractECDSASignatureSpi extends SignatureSpi {
 
     private Digest digest;
@@ -66,12 +66,14 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
         this.x962 = x962;
     }
 
+    @Override
     protected void engineInitVerify(
             final PublicKey publicKey)
     throws InvalidKeyException {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
+    @Override
     protected void engineInitSign(
             final PrivateKey privateKey)
     throws InvalidKeyException {
@@ -89,20 +91,23 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
         this.signingKey = (P11PrivateKey) privateKey;
     }
 
+    @Override
     protected void engineUpdate(
-            final byte b)
+            final byte input)
     throws SignatureException {
-        digest.update(b);
+        digest.update(input);
     }
 
+    @Override
     protected void engineUpdate(
-            final byte[] b,
+            final byte[] input,
             final int off,
             final int len)
     throws SignatureException {
-        digest.update(b, off, len);
+        digest.update(input, off, len);
     }
 
+    @Override
     protected byte[] engineSign()
     throws SignatureException {
         byte[] hash = new byte[digest.getDigestSize()];
@@ -122,29 +127,26 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
         }
     }
 
+    @Override
     protected void engineSetParameter(
             final AlgorithmParameterSpec params) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
-    /**
-     * @deprecated replaced with
-     * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-     */
+    @Override
     protected void engineSetParameter(
             final String param,
             final Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
-    /**
-     * @deprecated
-     */
+    @Override
     protected Object engineGetParameter(
             final String param) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
+    @Override
     protected boolean engineVerify(
             final byte[] sigBytes)
     throws SignatureException {

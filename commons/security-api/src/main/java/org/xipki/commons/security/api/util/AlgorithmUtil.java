@@ -184,6 +184,7 @@ public class AlgorithmUtil {
         }
     } // method getSignatureAlgoName
 
+    // CHECKSTYLE:SKIP
     public static boolean isDSAPlainSigAlg(
             final AlgorithmIdentifier algId) {
         return isPlainECDSASigAlg(algId);
@@ -323,75 +324,6 @@ public class AlgorithmUtil {
         return signatureAlgId;
     } // method getSignatureAlgoId
 
-    public static boolean isRSASignatureAlgoId(
-            final AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
-        ASN1ObjectIdentifier oid = algId.getAlgorithm();
-        if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
-                || PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(oid)
-                || PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(oid)
-                || PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(oid)
-                || PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(oid)
-                || PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean isECSigAlg(
-            final AlgorithmIdentifier algId) {
-        return isECDSASigAlg(algId) || isPlainECDSASigAlg(algId);
-    }
-
-    public static boolean isECDSASigAlg(
-            final AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
-
-        ASN1ObjectIdentifier oid = algId.getAlgorithm();
-        if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(oid)
-                || X9ObjectIdentifiers.ecdsa_with_SHA224.equals(oid)
-                || X9ObjectIdentifiers.ecdsa_with_SHA256.equals(oid)
-                || X9ObjectIdentifiers.ecdsa_with_SHA384.equals(oid)
-                || X9ObjectIdentifiers.ecdsa_with_SHA512.equals(oid)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean isPlainECDSASigAlg(
-            final AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
-
-        ASN1ObjectIdentifier oid = algId.getAlgorithm();
-        if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(oid)
-                || BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(oid)
-                || BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(oid)
-                || BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(oid)
-                || BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(oid)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean isDSASigAlg(
-            final AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
-
-        ASN1ObjectIdentifier oid = algId.getAlgorithm();
-        if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha256.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha384.equals(oid)
-                || NISTObjectIdentifiers.dsa_with_sha512.equals(oid)) {
-            return true;
-        }
-
-        return false;
-    }
-
     public static AlgorithmIdentifier getSignatureAlgoId(
             final PublicKey pubKey,
             final String hashAlgo,
@@ -421,6 +353,81 @@ public class AlgorithmUtil {
         }
     }
 
+    // CHECKSTYLE:SKIP
+    public static boolean isRSASignatureAlgoId(
+            final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
+                || PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(oid)
+                || PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(oid)
+                || PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(oid)
+                || PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(oid)
+                || PKCSObjectIdentifiers.id_RSASSA_PSS.equals(oid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // CHECKSTYLE:SKIP
+    public static boolean isECSigAlg(
+            final AlgorithmIdentifier algId) {
+        return isECDSASigAlg(algId) || isPlainECDSASigAlg(algId);
+    }
+
+    // CHECKSTYLE:SKIP
+    public static boolean isECDSASigAlg(
+            final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(oid)
+                || X9ObjectIdentifiers.ecdsa_with_SHA224.equals(oid)
+                || X9ObjectIdentifiers.ecdsa_with_SHA256.equals(oid)
+                || X9ObjectIdentifiers.ecdsa_with_SHA384.equals(oid)
+                || X9ObjectIdentifiers.ecdsa_with_SHA512.equals(oid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // CHECKSTYLE:SKIP
+    public static boolean isPlainECDSASigAlg(
+            final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(oid)
+                || BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(oid)
+                || BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(oid)
+                || BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(oid)
+                || BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(oid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // CHECKSTYLE:SKIP
+    public static boolean isDSASigAlg(
+            final AlgorithmIdentifier algId) {
+        ParamUtil.requireNonNull("algId", algId);
+
+        ASN1ObjectIdentifier oid = algId.getAlgorithm();
+        if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha224.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha256.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha384.equals(oid)
+                || NISTObjectIdentifiers.dsa_with_sha512.equals(oid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getRSASignatureAlgoId(
             final String hashAlgo,
             final boolean mgf1)
@@ -449,6 +456,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
     } // method getRSASignatureAlgoId
 
+    // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getDSASignatureAlgoId(
             final String hashAlgo)
     throws NoSuchAlgorithmException {
@@ -471,6 +479,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(sigAlgoOid);
     } // method getDSASignatureAlgoId
 
+    // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getECDSASignatureAlgoId(
             final String hashAlgo,
             final boolean plainSignature)
@@ -584,11 +593,11 @@ public class AlgorithmUtil {
         ParamUtil.requireNonNull("algoName", algoName);
         String tmpAlgoName = algoName.toUpperCase();
         int idx = tmpAlgoName.indexOf("AND");
-        Set<String> l = new HashSet<>();
+        Set<String> set = new HashSet<>();
 
         if (idx == -1) {
-            l.add(tmpAlgoName);
-            return l;
+            set.add(tmpAlgoName);
+            return set;
         }
 
         final int len = tmpAlgoName.length();
@@ -598,11 +607,11 @@ public class AlgorithmUtil {
         while (true) {
             String token = tmpAlgoName.substring(beginIndex, endIndex);
             if (StringUtil.isNotBlank(token)) {
-                l.add(token);
+                set.add(token);
             }
 
             if (endIndex >= len) {
-                return l;
+                return set;
             }
             beginIndex = endIndex + 3; // 3 = "AND".length()
             endIndex = tmpAlgoName.indexOf("AND", beginIndex);
@@ -612,6 +621,7 @@ public class AlgorithmUtil {
         }
     }
 
+    // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
             final ASN1ObjectIdentifier digAlgOid)
     throws NoSuchAlgorithmException {
@@ -619,6 +629,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
+    // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
             final AlgorithmIdentifier digAlgId)
     throws NoSuchAlgorithmException {
@@ -642,6 +653,7 @@ public class AlgorithmUtil {
         return new AlgorithmIdentifier(sid);
     } // method buildRSAPSSAlgorithmIdentifier
 
+    // CHECKSTYLE:SKIP
     public static RSASSAPSSparams createPSSRSAParams(
             final ASN1ObjectIdentifier digestAlgOid)
     throws NoSuchAlgorithmException {

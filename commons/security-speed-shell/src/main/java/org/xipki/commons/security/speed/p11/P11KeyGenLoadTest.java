@@ -67,7 +67,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
     protected final P11WritableSlot slot;
 
-    private AtomicLong l = new AtomicLong(System.currentTimeMillis());
+    private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
 
     public P11KeyGenLoadTest(
             final P11WritableSlot slot,
@@ -80,7 +80,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
     throws Exception;
 
     protected String getDummyLabel() {
-        return "loadtest-" + l.getAndIncrement();
+        return "loadtest-" + idx.getAndIncrement();
     }
 
     @Override

@@ -53,12 +53,16 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class IoUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(IoUtil.class);
 
     private IoUtil() {
     }
@@ -71,8 +75,10 @@ public class IoUtil {
         try {
             stream.close();
         } catch (Throwable th) {
+            LOG.error("could not close stream: {}", th.getMessage());
         }
     }
+
     public static byte[] read(
             final String fileName)
     throws IOException {
@@ -102,6 +108,7 @@ public class IoUtil {
                 try {
                     in.close();
                 } catch (IOException ex) {
+                    LOG.error("could not close stream: {}", ex.getMessage());
                 }
             }
         }
@@ -115,17 +122,17 @@ public class IoUtil {
     }
 
     public static void save(
-            final File pFile,
+            final File file,
             final byte[] content)
     throws IOException {
-        File file = expandFilepath(pFile);
+        File tmpFile = expandFilepath(file);
 
-        File parent = file.getParentFile();
+        File parent = tmpFile.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
-        FileOutputStream out = new FileOutputStream(file);
+        FileOutputStream out = new FileOutputStream(tmpFile);
         try {
             out.write(content);
         } finally {
@@ -161,10 +168,10 @@ public class IoUtil {
     }
 
     private static int byte2int(
-            final byte b) {
-        return (b >= 0)
-                ? b
-                : 256 + b;
+            final byte bt) {
+        return (bt >= 0)
+                ? bt
+                : 256 + bt;
     }
 
     public static String getHostAddress()
@@ -173,12 +180,12 @@ public class IoUtil {
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
-            NetworkInterface n = (NetworkInterface) interfaces.nextElement();
-            Enumeration<InetAddress> ee = n.getInetAddresses();
+            NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
+            Enumeration<InetAddress> ee = ni.getInetAddresses();
             while (ee.hasMoreElements()) {
-                InetAddress i = (InetAddress) ee.nextElement();
-                if (i instanceof Inet4Address) {
-                    addresses.add(((Inet4Address) i).getHostAddress());
+                InetAddress ia = (InetAddress) ee.nextElement();
+                if (ia instanceof Inet4Address) {
+                    addresses.add(((Inet4Address) ia).getHostAddress());
                 }
             }
         }
@@ -231,11 +238,11 @@ public class IoUtil {
     public static String convertSequenceName(
             final String sequenceName) {
         StringBuilder sb = new StringBuilder();
-        int n = sequenceName.length();
-        for (int i = 0; i < n; i++) {
-            char c = sequenceName.charAt(i);
-            if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-                sb.append(c);
+        int len = sequenceName.length();
+        for (int i = 0; i < len; i++) {
+            char ch = sequenceName.charAt(i);
+            if ((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+                sb.append(ch);
             } else {
                 sb.append("_");
             }

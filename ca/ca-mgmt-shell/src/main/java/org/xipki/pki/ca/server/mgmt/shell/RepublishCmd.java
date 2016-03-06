@@ -88,8 +88,8 @@ public class RepublishCmd extends CaCommandSupport {
             caName = null;
         }
 
-        boolean b = caManager.republishCertificates(caName, publisherNames);
-        output(b, "replubished", "could not republish", "certificates");
+        boolean bo = caManager.republishCertificates(caName, publisherNames);
+        output(bo, "replubished", "could not republish", "certificates");
         return null;
     }
 

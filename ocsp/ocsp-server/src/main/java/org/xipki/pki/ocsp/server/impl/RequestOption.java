@@ -110,12 +110,12 @@ class RequestOption {
             final RequestOptionType conf)
     throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
-        NonceType nonceConf = conf.getNonce();
 
         supportsHttpGet = conf.isSupportsHttpGet();
         signatureRequired = conf.isSignatureRequired();
         validateSignature = conf.isValidateSignature();
 
+        NonceType nonceConf = conf.getNonce();
         int minLen = 4;
         int maxLen = 32;
         // Request nonce
@@ -197,7 +197,7 @@ class RequestOption {
         } // end switch
 
         try {
-            Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
+            Set<X509Certificate> tmpCerts = doGetCerts(certpathConf.getTrustAnchors());
             trustAnchors = new HashSet<>(tmpCerts.size());
             for (X509Certificate m : tmpCerts) {
                 trustAnchors.add(new CertWithEncoded(m));
@@ -212,7 +212,7 @@ class RequestOption {
             this.certs = null;
         } else {
             try {
-                this.certs = getCerts(certsType);
+                this.certs = doGetCerts(certsType);
             } catch (Exception ex) {
                 throw new InvalidConfException(
                         "error while initializing the certs: " + ex.getMessage(), ex);
@@ -274,7 +274,7 @@ class RequestOption {
         return versions == null || versions.contains(version);
     }
 
-    private static Set<X509Certificate> getCerts(
+    private static Set<X509Certificate> doGetCerts(
             final CertCollectionType conf)
     throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);

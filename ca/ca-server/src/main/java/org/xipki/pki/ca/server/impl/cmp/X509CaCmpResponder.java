@@ -160,10 +160,14 @@ public class X509CaCmpResponder extends CmpResponder {
             Date invalidityDate = new Date();
             X509Ca ca = getCa();
             for (X509CertificateInfo remainingCert : remainingCerts) {
+                BigInteger serialNumber = null;
                 try {
-                    ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
-                        CrlReason.CESSATION_OF_OPERATION, invalidityDate);
+                    serialNumber = remainingCert.getCert().getCert().getSerialNumber();
+                    ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION,
+                            invalidityDate);
                 } catch (Throwable th) {
+                    LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
+                            ca.getCaInfo().getName(), serialNumber, th.getMessage());
                 }
             }
         } // method run
@@ -319,7 +323,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             default:
                 addAutitEventType(auditEvent, "PKIBody." + type);
-                respBody = createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                respBody = createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "unsupported type " + type);
                 break;
             } // end switch (type)
@@ -359,7 +363,7 @@ public class X509CaCmpResponder extends CmpResponder {
     } // method doProcessPKIMessage
 
     /**
-     * handle the PKI body with the choice {@code cr}
+     * handle the PKI body with the choice {@code cr}.
      *
      */
     private PKIBody processCr(
@@ -393,7 +397,7 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     /**
-     * handle the PKI body with the choice {@code cr}
+     * handle the PKI body with the choice {@code cr}.
      *
      */
     private PKIBody processCcp(
@@ -489,13 +493,13 @@ public class X509CaCmpResponder extends CmpResponder {
                 Date notBefore = null;
                 Date notAfter = null;
                 if (validity != null) {
-                    Time t = validity.getNotBefore();
-                    if (t != null) {
-                        notBefore = t.getDate();
+                    Time time = validity.getNotBefore();
+                    if (time != null) {
+                        notBefore = time.getDate();
                     }
-                    t = validity.getNotAfter();
-                    if (t != null) {
-                        notAfter = t.getDate();
+                    time = validity.getNotAfter();
+                    if (time != null) {
+                        notAfter = time.getDate();
                     }
                 }
 
@@ -763,15 +767,15 @@ public class X509CaCmpResponder extends CmpResponder {
                 X500Name caSubject = getCa().getCaInfo().getCertificate().getSubjectAsX500Name();
 
                 if (issuer == null) {
-                    return createErrorMsgPKIBody(PKIStatus.rejection,
+                    return createErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "issuer is not present");
                 } else if (!issuer.equals(caSubject)) {
-                    return createErrorMsgPKIBody(PKIStatus.rejection,
+                    return createErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "issuer not targets at the CA");
                 } else if (serialNumber == null) {
-                    return createErrorMsgPKIBody(PKIStatus.rejection,
+                    return createErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "serialNumber is not present");
                 } else if (certDetails.getSigningAlg() != null
@@ -781,13 +785,13 @@ public class X509CaCmpResponder extends CmpResponder {
                         || certDetails.getIssuerUID() != null
                         || certDetails.getSubjectUID() != null
                         || certDetails.getExtensions() != null) {
-                    return createErrorMsgPKIBody(PKIStatus.rejection,
+                    return createErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "only version, issuer and serialNumber in RevDetails.certDetails are "
                             + "allowed, but more is specified");
                 }
             } catch (IllegalArgumentException ex) {
-                return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "the request is not invalid");
             }
         } // end for
@@ -1097,9 +1101,9 @@ public class X509CaCmpResponder extends CmpResponder {
         Set<Permission> permissions = ca.getCaInfo().getPermissions();
         boolean granted = false;
         if (permissions.contains(Permission.ALL) || permissions.contains(requiredPermission)) {
-            Set<Permission> rPermissions = requestor.getCaHasRequestor().getPermissions();
-            if (rPermissions.contains(Permission.ALL)
-                    || rPermissions.contains(requiredPermission)) {
+            Set<Permission> tmpPermissions = requestor.getCaHasRequestor().getPermissions();
+            if (tmpPermissions.contains(Permission.ALL)
+                    || tmpPermissions.contains(requiredPermission)) {
                 granted = true;
             }
         }
@@ -1122,18 +1126,18 @@ public class X509CaCmpResponder extends CmpResponder {
         // current maximal support version is 2
         int version = 2;
         if (CollectionUtil.isNonEmpty(acceptVersions) && !acceptVersions.contains(version)) {
-            Integer v = null;
+            Integer ver = null;
             for (Integer m : acceptVersions) {
                 if (m < version) {
-                    v = m;
+                    ver = m;
                 }
             }
 
-            if (v == null) {
+            if (ver == null) {
                 throw new OperationException(ErrorCode.BAD_REQUEST,
                     "none of versions " + acceptVersions + " is supported");
             } else {
-                version = v;
+                version = ver;
             }
         }
 
@@ -1320,8 +1324,8 @@ public class X509CaCmpResponder extends CmpResponder {
         RevReqContent rr = (RevReqContent) reqBody.getContent();
         RevDetails[] revContent = rr.toRevDetailsArray();
 
-        int n = revContent.length;
-        for (int i = 0; i < n; i++) {
+        int len = revContent.length;
+        for (int i = 0; i < len; i++) {
             RevDetails revDetails = revContent[i];
             Extensions crlDetails = revDetails.getCrlEntryDetails();
             int reasonCode = CrlReason.UNSPECIFIED.getCode();
@@ -1401,7 +1405,7 @@ public class X509CaCmpResponder extends CmpResponder {
             String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
                     + " is only supported with the sub-types "
                     + KNOWN_GENMSG_IDS.toString();
-            return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+            return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                     statusMessage);
         }
 
@@ -1426,7 +1430,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 if (crl == null) {
                     String statusMessage = "no CRL is available";
-                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
+                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                             statusMessage);
                 }
 
@@ -1445,7 +1449,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 } catch (IllegalArgumentException ex) {
                     String statusMessage = "invalid value of the InfoTypeAndValue for "
                             + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
-                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
@@ -1459,7 +1463,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     X509CRL tmpCrl = ca.generateCrlOnDemand(auditEvent);
                     if (tmpCrl == null) {
                         String statusMessage = "CRL generation is not activated";
-                        return createErrorMsgPKIBody(PKIStatus.rejection,
+                        return createErrorMsgPkiBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     } else {
                         respValue = CertificateList.getInstance(tmpCrl.getEncoded());
@@ -1473,7 +1477,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     respValue = ca.getCrl(crlNumber.getPositiveValue());
                     if (respValue == null) {
                         String statusMessage = "no CRL is available";
-                        return createErrorMsgPKIBody(PKIStatus.rejection,
+                        return createErrorMsgPkiBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     }
                     break;
@@ -1484,8 +1488,8 @@ public class X509CaCmpResponder extends CmpResponder {
                         ASN1Sequence seq = DERSequence.getInstance(reqValue);
                         int size = seq.size();
                         for (int i = 0; i < size; i++) {
-                            ASN1Integer a = ASN1Integer.getInstance(seq.getObjectAt(i));
-                            acceptVersions.add(a.getPositiveValue().intValue());
+                            ASN1Integer ai = ASN1Integer.getInstance(seq.getObjectAt(i));
+                            acceptVersions.add(ai.getPositiveValue().intValue());
                         }
                     }
 
@@ -1498,16 +1502,16 @@ public class X509CaCmpResponder extends CmpResponder {
                     break;
                 default:
                     String statusMessage = "unsupported XiPKI action code '" + action + "'";
-                    return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
                 } // end switch (action)
 
-                ASN1EncodableVector v = new ASN1EncodableVector();
-                v.add(asn1Code);
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                vec.add(asn1Code);
                 if (respValue != null) {
-                    v.add(respValue);
+                    vec.add(respValue);
                 }
-                itvResp = new InfoTypeAndValue(infoType, new DERSequence(v));
+                itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
             }
 
             GenRepContent genRepContent = new GenRepContent(itvResp);
@@ -1530,15 +1534,15 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             } // end switch (code)
 
-            return createErrorMsgPKIBody(PKIStatus.rejection, failureInfo, statusMessage);
+            return createErrorMsgPkiBody(PKIStatus.rejection, failureInfo, statusMessage);
         } catch (CRLException ex) {
             String statusMessage = "CRLException: " + ex.getMessage();
-            return createErrorMsgPKIBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
+            return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                     statusMessage);
         }
     } // method cmpGeneralMsg
 
-    private static PKIBody createErrorMsgPKIBody(
+    private static PKIBody createErrorMsgPkiBody(
             final PKIStatus pkiStatus,
             final int failureInfo,
             final String statusMessage) {

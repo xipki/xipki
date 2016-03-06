@@ -41,6 +41,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 
@@ -50,6 +52,8 @@ import org.xipki.commons.common.util.StringUtil;
  */
 
 public class DbPortFileNameIterator implements Iterator<String> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
 
     private BufferedReader reader;
 
@@ -71,14 +75,14 @@ public class DbPortFileNameIterator implements Iterator<String> {
 
     @Override
     public String next() {
-        String s = nextFilename;
+        String str = nextFilename;
         nextFilename = null;
         try {
             nextFilename = readNextFilenameLine();
         } catch (IOException ex) {
             throw new RuntimeException("error while reading next file name");
         }
-        return s;
+        return str;
     }
 
     @Override
@@ -90,6 +94,8 @@ public class DbPortFileNameIterator implements Iterator<String> {
         try {
             reader.close();
         } catch (Throwable th) {
+            LOG.error("could not close reader: {}", th.getMessage());
+            LOG.error("could not close reader", th);
         }
     }
 

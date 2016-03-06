@@ -46,7 +46,7 @@ import org.xipki.commons.security.api.util.KeyUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
     private final ASN1ObjectIdentifier curveOid;

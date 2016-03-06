@@ -101,9 +101,9 @@ public class XmlDocumentReader {
     throws XPathExpressionException {
         ParamUtil.requireNonNull("xpathExpression", xpathExpression);
 
-        Node n = getNode(xpathExpression);
-        return (n != null)
-                ? n.getFirstChild().getTextContent()
+        Node node = getNode(xpathExpression);
+        return (node != null)
+                ? node.getFirstChild().getTextContent()
                 : null;
     }
 

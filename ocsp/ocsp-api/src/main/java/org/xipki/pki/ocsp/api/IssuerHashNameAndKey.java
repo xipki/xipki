@@ -74,12 +74,12 @@ public class IssuerHashNameAndKey {
     }
 
     public boolean match(
-            final HashAlgoType pAlgo,
-            final byte[] pIssuerNameHash,
-            final byte[] pIssuerKeyHash) {
-        return this.algo == pAlgo
-                && Arrays.equals(this.issuerNameHash, pIssuerNameHash)
-                && Arrays.equals(this.issuerKeyHash, pIssuerKeyHash);
+            final HashAlgoType algo,
+            final byte[] issuerNameHash,
+            final byte[] issuerKeyHash) {
+        return this.algo == algo
+                && Arrays.equals(this.issuerNameHash, issuerNameHash)
+                && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
 
 }
