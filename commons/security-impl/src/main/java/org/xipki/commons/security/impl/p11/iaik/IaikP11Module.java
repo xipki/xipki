@@ -192,6 +192,8 @@ public class IaikP11Module implements P11Module {
             try {
                 slots.get(slotId).close();
             } catch (Throwable th) {
+                LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
+                LOG.debug("could not close PKCS#11 slot " + slotId, th);
             }
 
             availableSlots.remove(slotId);
@@ -203,6 +205,8 @@ public class IaikP11Module implements P11Module {
             try {
                 availableSlots.get(slotId).getToken().closeAllSessions();
             } catch (Throwable th) {
+                LOG.error("could not close PKCS#11 token", th.getMessage());
+                LOG.debug("could not close PKCS#11 token", th);
             }
         }
         availableSlots.clear();

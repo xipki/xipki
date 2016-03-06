@@ -44,7 +44,7 @@ import java.security.Provider;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class XipkiSunECProvider extends Provider {
 
     public static final String NAME = "XiPKI-SunEC";

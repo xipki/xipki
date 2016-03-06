@@ -51,6 +51,7 @@ import org.xipki.commons.datasource.api.DatabaseType;
  */
 public class SqlErrorCodes {
 
+    // CHECKSTYLE:SKIP
     private static class DB2 extends SqlErrorCodes {
 
         DB2() {
@@ -82,6 +83,7 @@ public class SqlErrorCodes {
 
     } // class H2
 
+    // CHECKSTYLE:SKIP
     private static class HSQL extends SqlErrorCodes {
 
         HSQL() {
@@ -94,6 +96,7 @@ public class SqlErrorCodes {
 
     } // class HSQL
 
+    // CHECKSTYLE:SKIP
     private static class MySQL extends SqlErrorCodes {
 
         MySQL() {
@@ -125,6 +128,7 @@ public class SqlErrorCodes {
 
     } // class Oracle
 
+    // CHECKSTYLE:SKIP
     private static class PostgreSQL extends SqlErrorCodes {
 
         PostgreSQL() {

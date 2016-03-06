@@ -32,7 +32,7 @@ import java.util.List;
 public class FileUtils {
 
     /**
-     * The file copy buffer size (30 MB)
+     * The file copy buffer size (30 MB).
      */
     private static final long FILE_COPY_BUFFER_SIZE = 1024L * 1024 * 30;
 
@@ -195,8 +195,7 @@ public class FileUtils {
      * @throws IOException if the output file length is not the same as the input
      *     file length after the copy completes
      * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size
-     *     is less than the
-     * position
+     *     is less than the position
      */
     public static void copyFile(
             final File srcFile,
@@ -312,11 +311,6 @@ public class FileUtils {
         }
     }
 
-    /**
-     * Copied from the apache commons io project
-     *
-     * @param closeables
-     */
     public static void closeQuietly(
             final Closeable... closeables) {
         if (closeables == null) {
@@ -335,7 +329,7 @@ public class FileUtils {
 
         try {
             closable.close();
-        } catch (Throwable th) {
+        } catch (Throwable th) { // CHECKSTYLE:SKIP
         }
     }
 

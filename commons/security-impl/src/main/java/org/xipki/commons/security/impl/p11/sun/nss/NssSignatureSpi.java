@@ -76,6 +76,7 @@ import org.xipki.commons.security.api.HashAlgoType;
 
 public class NssSignatureSpi extends SignatureSpi {
 
+    // CHECKSTYLE:SKIP
     public static class SHA1withRSA extends NssSignatureSpi {
 
         public SHA1withRSA() {
@@ -84,6 +85,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA1withRSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA224withRSA extends NssSignatureSpi {
 
         public SHA224withRSA() {
@@ -92,6 +94,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA224withRSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA256withRSA extends NssSignatureSpi {
 
         public SHA256withRSA() {
@@ -100,6 +103,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA256withRSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA384withRSA extends NssSignatureSpi {
 
         public SHA384withRSA() {
@@ -108,6 +112,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA384withRSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA512withRSA extends NssSignatureSpi {
 
         public SHA512withRSA() {
@@ -116,6 +121,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA512withRSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA1withECDSA extends NssSignatureSpi {
 
         public SHA1withECDSA() {
@@ -124,6 +130,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA1withECDSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA256withECDSA extends NssSignatureSpi {
 
         public SHA256withECDSA() {
@@ -132,6 +139,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA256withECDSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA384withECDSA extends NssSignatureSpi {
 
         public SHA384withECDSA() {
@@ -140,6 +148,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA384withECDSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA512withECDSA extends NssSignatureSpi {
 
         public SHA512withECDSA() {
@@ -148,6 +157,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class SHA512withECDSA
 
+    // CHECKSTYLE:SKIP
     public static class RawECDSA extends NssSignatureSpi {
 
         public RawECDSA() {
@@ -156,6 +166,7 @@ public class NssSignatureSpi extends SignatureSpi {
 
     } // class RawECDSA
 
+    // CHECKSTYLE:SKIP
     public static class SHA224withECDSA extends NssSignatureSpi {
 
         public SHA224withECDSA() {
@@ -377,25 +388,25 @@ public class NssSignatureSpi extends SignatureSpi {
 
     @Override
     protected void engineUpdate(
-            final byte b)
+            final byte input)
     throws SignatureException {
         if (md != null) {
-            md.update(b);
+            md.update(input);
         } else {
-            service.update(b);
+            service.update(input);
         }
     }
 
     @Override
     protected void engineUpdate(
-            final byte[] b,
+            final byte[] input,
             final int off,
             final int len)
     throws SignatureException {
         if (md != null) {
-            md.update(b, off, len);
+            md.update(input, off, len);
         } else {
-            service.update(b, off, len);
+            service.update(input, off, len);
         }
     }
 
@@ -439,7 +450,7 @@ public class NssSignatureSpi extends SignatureSpi {
                 if (ain != null) {
                     try {
                         ain.close();
-                    } catch (IOException ex) {
+                    } catch (IOException ex) { // CHECKSTYLE:SKIP
                     }
                 }
             }
@@ -497,7 +508,7 @@ public class NssSignatureSpi extends SignatureSpi {
         if (XipkiNssProvider.nssProvider != null) {
             try {
                 service = MessageDigest.getInstance(algorithm, XipkiNssProvider.nssProvider);
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (NoSuchAlgorithmException ex) { // CHECKSTYLE:SKIP
             }
         }
 
@@ -588,9 +599,8 @@ public class NssSignatureSpi extends SignatureSpi {
             return hash;
         }
 
-        DigestInfo dInfo = new DigestInfo(algId, hash);
-
-        return dInfo.getEncoded("DER");
+        DigestInfo digestInfo = new DigestInfo(algId, hash);
+        return digestInfo.getEncoded("DER");
     }
 
 }

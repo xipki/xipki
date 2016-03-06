@@ -71,9 +71,9 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException {
         ParamUtil.requireNonNull("subject", subject);
-        X500Name subjectDN = new X500Name(subject);
+        X500Name subjectDn = new X500Name(subject);
         return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo,
-                subjectDN, attributes);
+                subjectDn, attributes);
     }
 
     @Override
@@ -82,14 +82,14 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final String signerType,
             final String signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonNull("signerType", signerType);
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
                 (X509Certificate[]) null);
-        return generateRequest(signer, subjectPublicKeyInfo, subjectDN, attributes);
+        return generateRequest(signer, subjectPublicKeyInfo, subjectDn, attributes);
     }
 
     @Override

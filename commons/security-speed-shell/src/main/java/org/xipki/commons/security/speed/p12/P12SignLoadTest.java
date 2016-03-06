@@ -103,6 +103,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         return new Testor();
     }
 
+    // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedRSAKeystore(
             final int keysize,
             final BigInteger publicExponent)
@@ -111,13 +112,15 @@ public abstract class P12SignLoadTest extends LoadExecutor {
             + ".p12");
     }
 
+    // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedDSAKeystore(
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws IOException {
-        return getPrecomputedKeystore("dsa-" + pLength + "-" + qLength + ".p12");
+        return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
     }
 
+    // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedECKeystore(
             final String curveNamOrOid)
     throws IOException {

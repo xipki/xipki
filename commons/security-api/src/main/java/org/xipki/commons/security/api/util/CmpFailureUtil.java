@@ -116,12 +116,12 @@ public class CmpFailureUtil {
 
     public static String getFailureInfoText(
             final int failureInfo) {
-        BigInteger b = BigInteger.valueOf(failureInfo);
-        final int n = Math.min(b.bitLength(), FAILUREINFO_TEXTS.length);
+        BigInteger bi = BigInteger.valueOf(failureInfo);
+        final int n = Math.min(bi.bitLength(), FAILUREINFO_TEXTS.length);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
-            if (b.testBit(i)) {
+            if (bi.testBit(i)) {
                 sb.append(", ").append(FAILUREINFO_TEXTS[i]);
             }
         }

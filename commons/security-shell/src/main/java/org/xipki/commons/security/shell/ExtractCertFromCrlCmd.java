@@ -95,7 +95,7 @@ public class ExtractCertFromCrlCmd extends SecurityCommandSupport {
 
         extnValue = removingTagAndLenFromExtensionValue(extnValue);
         ASN1Set asn1Set = DERSet.getInstance(extnValue);
-        int n = asn1Set.size();
+        final int n = asn1Set.size();
         if (n == 0) {
             throw new CmdFailure("no certificate is contained in " + crlFile);
         }

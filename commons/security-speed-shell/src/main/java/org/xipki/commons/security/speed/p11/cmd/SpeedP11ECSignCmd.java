@@ -39,6 +39,7 @@ package org.xipki.commons.security.speed.p11.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
@@ -51,6 +52,8 @@ import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign",
         description = "performance test of PKCS#11 EC signature creation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP11ECSignCmd extends SpeedP11SignCommandSupport {
 
     @Option(name = "--curve",

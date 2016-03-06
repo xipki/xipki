@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
@@ -51,6 +52,8 @@ import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
         description = "performance test of PKCS#11 DSA key generation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override
@@ -62,9 +65,9 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
 
         for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
-            ret.add(new P11DSAKeyGenLoadTest(slot, pLen, qLen));
+            int plen = pqLens[i];
+            int qlen = pqLens[i + 1];
+            ret.add(new P11DSAKeyGenLoadTest(slot, plen, qlen));
         }
 
         return ret;

@@ -44,30 +44,30 @@ package org.xipki.pki.scep.transaction;
 public enum FailInfo {
 
     /**
-     * Unrecognized or unsupported algorithm identifier
+     * Unrecognized or unsupported algorithm identifier.
      */
-    badAlg (0),
+    badAlg(0),
 
     /**
-     * integrity check failed
+     * integrity check failed.
      */
-    badMessageCheck (1),
+    badMessageCheck(1),
 
     /**
-     * transaction not permitted or supported
+     * transaction not permitted or supported.
      */
-    badRequest (2),
+    badRequest(2),
 
     /**
-     * The signingTime attribute from the CMS, authenticatedAttributes was not sufficiently
+     * The signingTime attribute from the CMS, authenticatedAttributes was not sufficiently.
      * close to the system time
      */
-    badTime (3),
+    badTime(3),
 
     /**
-     * No certificate could be identified matching the provided criteria
+     * No certificate could be identified matching the provided criteria.
      */
-    badCertId (4);
+    badCertId(4);
 
     private final int code;
 

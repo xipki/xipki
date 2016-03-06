@@ -41,6 +41,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 
@@ -50,6 +52,8 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
  */
 
 public class ScepHttpResponse {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ScepHttpResponse.class);
 
     private final String contentType;
 
@@ -119,6 +123,7 @@ public class ScepHttpResponse {
                 try {
                     content.close();
                 } catch (IOException ex) {
+                    LOG.error("could not close stream: {}", ex.getMessage());
                 }
             }
         }

@@ -120,7 +120,7 @@ public class CertRevocationInfo implements Serializable {
     }
 
     /**
-     *
+     * Gets the revocation time.
      * @return revocation time, never be null
      */
     public Date getRevocationTime() {
@@ -131,7 +131,7 @@ public class CertRevocationInfo implements Serializable {
     }
 
     /**
-     *
+     * Get the invalidity time.
      * @return invalidity time, may be null
      */
     public Date getInvalidityTime() {

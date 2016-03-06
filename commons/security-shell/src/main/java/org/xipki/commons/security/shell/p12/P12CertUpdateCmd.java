@@ -108,19 +108,12 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
             }
         }
         X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-
         ks.setKeyEntry(keyname, key, pwd, certChain);
 
-        FileOutputStream fOut = null;
-        try {
-            fOut = new FileOutputStream(p12File);
-            ks.store(fOut, pwd);
+        try (FileOutputStream out = new FileOutputStream(p12File)) {
+            ks.store(out, pwd);
             out("updated certificate");
             return null;
-        } finally {
-            if (fOut != null) {
-                fOut.close();
-            }
         }
     }
 

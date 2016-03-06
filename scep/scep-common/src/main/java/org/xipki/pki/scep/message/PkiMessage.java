@@ -225,56 +225,56 @@ public class PkiMessage {
     }
 
     private AttributeTable getSignedAttributes() {
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         // messageType
-        addAttribute(v, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
+        addAttribute(vec, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
                 new DERPrintableString(
                         Integer.toString(messageType.getCode())));
 
         // senderNonce
-        addAttribute(v, ScepObjectIdentifiers.ID_SENDER_NONCE,
+        addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE,
                 new DEROctetString(senderNonce.getBytes()));
 
         // transactionID
-        addAttribute(v, ScepObjectIdentifiers.ID_TRANSACTION_ID,
+        addAttribute(vec, ScepObjectIdentifiers.ID_TRANSACTION_ID,
                 new DERPrintableString(transactionId.getId()));
 
         // failInfo
         if (failInfo != null) {
-            addAttribute(v, ScepObjectIdentifiers.ID_FAILINFO,
+            addAttribute(vec, ScepObjectIdentifiers.ID_FAILINFO,
                     new DERPrintableString(
                             Integer.toString(failInfo.getCode())));
         }
 
         // pkiStatus
         if (pkiStatus != null) {
-            addAttribute(v, ScepObjectIdentifiers.ID_PKI_STATUS,
+            addAttribute(vec, ScepObjectIdentifiers.ID_PKI_STATUS,
                     new DERPrintableString(
                             Integer.toString(pkiStatus.getCode())));
         }
 
         // recipientNonce
         if (recipientNonce != null) {
-            addAttribute(v, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
+            addAttribute(vec, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
                     new DEROctetString(recipientNonce.getBytes()));
         }
 
         for (ASN1ObjectIdentifier type : signedAttributes.keySet()) {
-            addAttribute(v, type, signedAttributes.get(type));
+            addAttribute(vec, type, signedAttributes.get(type));
         }
-        return new AttributeTable(v);
+        return new AttributeTable(vec);
     }
 
     private AttributeTable getUnsignedAttributes() {
         if (unsignedAttributes.isEmpty()) {
             return null;
         }
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
 
         for (ASN1ObjectIdentifier type : unsignedAttributes.keySet()) {
-            addAttribute(v, type, unsignedAttributes.get(type));
+            addAttribute(vec, type, unsignedAttributes.get(type));
         }
-        return new AttributeTable(v);
+        return new AttributeTable(vec);
     }
 
     public ContentInfo encode(
@@ -394,10 +394,10 @@ public class PkiMessage {
     }
 
     private static void addAttribute(
-            final ASN1EncodableVector v,
+            final ASN1EncodableVector vector,
             final ASN1ObjectIdentifier attrType,
             final ASN1Encodable attrValue) {
-        v.add(new Attribute(attrType, new DERSet(attrValue)));
+        vector.add(new Attribute(attrType, new DERSet(attrValue)));
     }
 
 }

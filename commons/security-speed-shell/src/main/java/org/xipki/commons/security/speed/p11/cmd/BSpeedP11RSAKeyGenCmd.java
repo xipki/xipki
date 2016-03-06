@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
@@ -52,6 +53,8 @@ import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-gen",
         description = "performance test of PKCS#11 RSA key generation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override

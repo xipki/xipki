@@ -43,7 +43,7 @@ import org.xipki.commons.security.api.SignerException;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+//CHECKSTYLE:SKIP
 public class P11ECDSAX962Signer extends AbstractP11DSASigner {
 
     public P11ECDSAX962Signer(

@@ -85,14 +85,14 @@ public class LruCache<K, V> {
     /**
      * Sets the size of the cache.
      *
-     * @param pMaxSize The new maximum size.
+     * @param maxSize The new maximum size.
      */
     public void resize(
-            final int pMaxSize) {
+            final int maxSize) {
         synchronized (this) {
-            this.maxSize = ParamUtil.requireMin("pMaxSize", pMaxSize, 1);
+            this.maxSize = ParamUtil.requireMin("maxSize", maxSize, 1);
         }
-        trimToSize(pMaxSize);
+        trimToSize(maxSize);
     }
 
     /**
@@ -189,7 +189,7 @@ public class LruCache<K, V> {
      *            to evict even 0-sized elements.
      */
     public void trimToSize(
-            final int pMaxSize) {
+            final int maxSize) {
         while (true) {
             K key;
             V value;
@@ -199,7 +199,7 @@ public class LruCache<K, V> {
                             + ".sizeOf() is reporting inconsistent results!");
                 }
 
-                if (size <= pMaxSize || map.isEmpty()) {
+                if (size <= maxSize || map.isEmpty()) {
                     break;
                 }
 

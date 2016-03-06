@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -49,7 +50,7 @@ import org.xipki.commons.security.api.SecurityFactory;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+@Service
 public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Reference

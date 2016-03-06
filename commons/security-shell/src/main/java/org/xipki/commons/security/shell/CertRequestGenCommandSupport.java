@@ -246,7 +246,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         // ExtendedKeyusage
         if (isNotEmpty(extkeyusages)) {
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
-                    textToASN1ObjectIdentifers(extkeyusages));
+                    textToAsn1ObjectIdentifers(extkeyusages));
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
@@ -254,7 +254,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         // QcEuLimitValue
         if (isNotEmpty(qcEuLimits)) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
             for (String m : qcEuLimits) {
                 StringTokenizer st = new StringTokenizer(m, ":");
                 try {
@@ -276,14 +276,14 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
-                    v.add(statment);
+                    vec.add(statment);
                 } catch (Exception ex) {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
             }
 
             ASN1ObjectIdentifier extType = Extension.qCStatements;
-            ASN1Sequence extValue = new DERSequence(v);
+            ASN1Sequence extValue = new DERSequence(vec);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         }
@@ -314,11 +314,11 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     new DEROctetString(tmpBiometricDataHash),
                     tmpSourceDataUri);
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(biometricData);
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(biometricData);
 
             ASN1ObjectIdentifier extType = Extension.biometricInfo;
-            ASN1Sequence extValue = new DERSequence(v);
+            ASN1Sequence extValue = new DERSequence(vec);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
@@ -330,8 +330,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
-                    textToASN1ObjectIdentifers(needExtensionTypes),
-                    textToASN1ObjectIdentifers(wantExtensionTypes));
+                    textToAsn1ObjectIdentifers(needExtensionTypes),
+                    textToAsn1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
                     ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
                     ee.toASN1Primitive().getEncoded()));
@@ -340,7 +340,6 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         ConcurrentContentSigner signer = getSigner(
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
 
-        X500Name subjectDN = getSubject(subject);
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
         if (CollectionUtil.isNonEmpty(extensions)) {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
@@ -362,8 +361,9 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     signer.getPublicKey());
         }
 
+        X500Name subjectDn = getSubject(subject);
         PKCS10CertificationRequest p10Req = p10Gen.generateRequest(signer, subjectPublicKeyInfo,
-                subjectDN, attributes);
+                subjectDn, attributes);
 
         File file = new File(outputFilename);
         saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
@@ -376,7 +376,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return new X500Name(subjectText);
     }
 
-    private static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
+    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
             final List<String> oidTexts)
     throws InvalidOidOrNameException {
         if (oidTexts == null) {
@@ -398,27 +398,27 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     }
 
     private static ASN1ObjectIdentifier toOid(
-            final String s)
+            final String str)
     throws InvalidOidOrNameException {
-        final int n = s.length();
+        final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {
-            char c = s.charAt(i);
-            if (!((c >= '0' && c <= '1') || c == '.')) {
+            char ch = str.charAt(i);
+            if (!((ch >= '0' && ch <= '1') || ch == '.')) {
                 isName = true;
             }
         }
 
         if (!isName) {
             try {
-                return new ASN1ObjectIdentifier(s);
-            } catch (IllegalArgumentException ex) {
+                return new ASN1ObjectIdentifier(str);
+            } catch (IllegalArgumentException ex) { // CHECKSTYLE:SKIP
             }
         }
 
-        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(s);
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(str);
         if (oid == null) {
-            throw new InvalidOidOrNameException(s);
+            throw new InvalidOidOrNameException(str);
         }
         return oid;
     }

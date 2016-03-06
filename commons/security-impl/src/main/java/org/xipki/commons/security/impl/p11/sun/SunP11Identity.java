@@ -186,26 +186,24 @@ class SunP11Identity implements Comparable<SunP11Identity> {
     }
 
     public boolean match(
-            final P11SlotIdentifier pSlotId,
-            final String pKeyLabel) {
-        return this.slotId.equals(pSlotId) && this.keyLabel.equals(pKeyLabel);
+            final P11SlotIdentifier slotId,
+            final String keyLabel) {
+        return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
                 (signatureKeyBitLength + 7) / 8);
         return CKM_RSA_X509(padded);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_X509(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -221,7 +219,7 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA(
             final byte[] hash)
     throws SignerException {
@@ -229,11 +227,10 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -251,20 +248,18 @@ class SunP11Identity implements Comparable<SunP11Identity> {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] x962Sig = CKM_DSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA_X962(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof DSAPublicKey)) {
             throw new SignerException("operation CKM_DSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -283,8 +278,8 @@ class SunP11Identity implements Comparable<SunP11Identity> {
 
     @Override
     public int compareTo(
-            final SunP11Identity o) {
-        return this.keyLabel.compareTo(o.keyLabel);
+            final SunP11Identity obj) {
+        return this.keyLabel.compareTo(obj.keyLabel);
     }
 
 }

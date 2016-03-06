@@ -53,6 +53,7 @@ import org.xipki.commons.password.api.PBEPasswordService;
 @Command(scope = "xipki-tk", name = "pbe-enc",
         description = "encrypt password with master password")
 @Service
+// CHECKSTYLE:SKIP
 public class PBEEncryptCmd extends SecurityCommandSupport {
 
     @Option(name = "--iteration-count", aliases = "-n",

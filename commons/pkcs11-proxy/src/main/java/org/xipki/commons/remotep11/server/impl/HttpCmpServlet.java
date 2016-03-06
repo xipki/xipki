@@ -100,7 +100,7 @@ public class HttpCmpServlet extends HttpServlet {
 
             PKIMessage pkiReq;
             try {
-                pkiReq = generatePKIMessage(request.getInputStream());
+                pkiReq = generatePkiMessage(request.getInputStream());
             } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -166,7 +166,7 @@ public class HttpCmpServlet extends HttpServlet {
         response.flushBuffer();
     } // method doPost
 
-    protected PKIMessage generatePKIMessage(
+    protected PKIMessage generatePkiMessage(
             final InputStream is)
     throws BadAsn1ObjectException {
         ParamUtil.requireNonNull("is", is);
@@ -180,6 +180,7 @@ public class HttpCmpServlet extends HttpServlet {
             try {
                 asn1Stream.close();
             } catch (IOException ex) {
+                LOG.error("could not close ASN1Stream: {}", ex.getMessage());
             }
         }
     }

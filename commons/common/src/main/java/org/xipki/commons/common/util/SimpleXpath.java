@@ -66,30 +66,30 @@ public class SimpleXpath {
 
         /**
          *
-         * @param step
+         * @param step the step
          * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
          *        namespace will not be evaluated.
          */
         SimpleXpathStep(
-                final String pStep,
+                final String step,
                 final Map<String, String> nsPrefixUriMap)
         throws XPathExpressionException {
-            String step = ParamUtil.requireNonBlank("pStep", pStep);
-            if (step.charAt(0) == '@') {
+            String tmpStep = ParamUtil.requireNonBlank("step", step);
+            if (tmpStep.charAt(0) == '@') {
                 isElement = false;
-                step = step.substring(1);
+                tmpStep = tmpStep.substring(1);
             }
 
-            int idx = step.indexOf(':');
+            int idx = tmpStep.indexOf(':');
             String prefix;
             if (idx != -1) {
-                prefix = step.substring(0, idx);
-                this.localPart = step.substring(idx + 1);
+                prefix = tmpStep.substring(0, idx);
+                this.localPart = tmpStep.substring(idx + 1);
             } else {
                 prefix = isElement
                         ? ""
                         : null;
-                this.localPart = step;
+                this.localPart = tmpStep;
             }
 
             if (nsPrefixUriMap != null && prefix != null) {
@@ -124,10 +124,10 @@ public class SimpleXpath {
 
     /**
      *
-     * @param relativeXpath
+     * @param relativeXpath the relative XPath
      * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
      *        namespace will not be evaluated.
-     * @throws XPathExpressionException
+     * @throws XPathExpressionException if the XPath expression is invalid
      */
     public SimpleXpath(
             final String relativeXpath,
@@ -172,15 +172,6 @@ public class SimpleXpath {
         return rv;
     }
 
-    public Node selectFirstMatch(
-            final Element context) {
-        List<Node> rv = new LinkedList<Node>();
-        select(rv, context, this.steps, 0, true);
-        return CollectionUtil.isEmpty(rv)
-                ? null
-                : rv.get(0);
-    }
-
     private static void select(
             final List<Node> results,
             final Element context,
@@ -213,6 +204,15 @@ public class SimpleXpath {
                 results.add(attr);
             }
         }
+    }
+
+    public Node selectFirstMatch(
+            final Element context) {
+        List<Node> rv = new LinkedList<Node>();
+        select(rv, context, this.steps, 0, true);
+        return CollectionUtil.isEmpty(rv)
+                ? null
+                : rv.get(0);
     }
 
 }

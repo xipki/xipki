@@ -48,36 +48,36 @@ import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P12DSASignLoadTest extends P12SignLoadTest {
 
     public P12DSASignLoadTest(
             final P12KeypairGenerator p12KeypairGenerator,
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
-                generateKeystore(p12KeypairGenerator, pLength, qLength),
+                generateKeystore(p12KeypairGenerator, plength, qlength),
                 "PKCS#12 DSA signature creation\n"
-                    + "pLength: " + pLength + "\n"
-                    + "qLength: " + qLength);
+                    + "plength: " + plength + "\n"
+                    + "qlength: " + qlength);
     }
 
     private static byte[] generateKeystore(
             final P12KeypairGenerator p12KeypairGenerator,
-            final int pLength,
-            final int qLength)
+            final int plength,
+            final int qlength)
     throws Exception {
-        byte[] keystoreBytes = getPrecomputedDSAKeystore(pLength, qLength);
+        byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
         if (keystoreBytes == null) {
             ParamUtil.requireNonNull("p12KeypairGenerator", p12KeypairGenerator);
             P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
                     PASSWORD.toCharArray());
             params.setRandom(new SecureRandom());
-            P12KeypairGenerationResult identity = p12KeypairGenerator.generateDSAKeypair(pLength,
-                    qLength, params);
+            P12KeypairGenerationResult identity = p12KeypairGenerator.generateDSAKeypair(plength,
+                    qlength, params);
             keystoreBytes = identity.getKeystore();
         }
         return keystoreBytes;

@@ -42,9 +42,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.transaction.TransactionException;
-import org.xipki.pki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
@@ -99,7 +99,7 @@ public class CaIdentifier {
         ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
-        if (!ScepUtil.isBlank(message)) {
+        if (!StringUtil.isBlank(message)) {
             String urlMessage;
             try {
                 urlMessage = URLEncoder.encode(message, "UTF-8");
@@ -123,7 +123,7 @@ public class CaIdentifier {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("URL: ").append(url);
-        if (ScepUtil.isNotBlank(profile)) {
+        if (StringUtil.isNotBlank(profile)) {
             sb.append(", CA-Ident: ").append(profile);
         }
         return sb.toString();
@@ -133,8 +133,8 @@ public class CaIdentifier {
     public boolean equals(
             final Object object) {
         if (object instanceof CaIdentifier) {
-            CaIdentifier b = (CaIdentifier) object;
-            return url == b.url && profile == b.profile;
+            CaIdentifier objB = (CaIdentifier) object;
+            return url == objB.url && profile == objB.profile;
         }
         return false;
     }

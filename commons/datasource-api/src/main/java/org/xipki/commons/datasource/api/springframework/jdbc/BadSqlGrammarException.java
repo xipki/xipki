@@ -55,7 +55,7 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
     /**
      * Return the wrapped SQLException.
      */
-    public SQLException getSQLException() {
+    public SQLException getSqlException() {
         return (SQLException) getCause();
     }
 

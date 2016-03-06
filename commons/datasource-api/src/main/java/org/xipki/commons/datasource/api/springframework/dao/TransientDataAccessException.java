@@ -42,8 +42,7 @@ public abstract class TransientDataAccessException extends DataAccessException {
     /**
      * Constructor for TransientDataAccessException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause (usually from using a underlying data access API such as JDBC)
      */
     public TransientDataAccessException(
             final String msg,

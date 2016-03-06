@@ -64,12 +64,11 @@ class IaikP11Identity extends P11Identity {
         super(slotId, keyId, certificateChain, publicKey);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_PKCS(
             final IaikP11Module module,
             final byte[] encodedDigestInfo)
     throws SignerException {
-        // CHECKSTYLE:ON
         ParamUtil.requireNonNull("module", module);
         ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
 
@@ -86,12 +85,11 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_X509(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         ParamUtil.requireNonNull("module", module);
         ParamUtil.requireNonNull("hash", hash);
 
@@ -108,12 +106,11 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_RSA_X509(hash, keyId);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         ParamUtil.requireNonNull("module", module);
         ParamUtil.requireNonNull("hash", hash);
 
@@ -132,12 +129,11 @@ class IaikP11Identity extends P11Identity {
         return slot.CKM_ECDSA(truncatedDigest, keyId);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA(
             final IaikP11Module module,
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         ParamUtil.requireNonNull("module", module);
         ParamUtil.requireNonNull("hash", hash);
 

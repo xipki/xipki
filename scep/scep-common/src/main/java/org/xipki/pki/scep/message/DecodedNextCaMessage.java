@@ -199,14 +199,14 @@ public class DecodedNextCaMessage {
             ret.setSigningTime(signingTime);
         }
 
-        ASN1ObjectIdentifier digestAlgOID = signerInfo.getDigestAlgorithmID().getAlgorithm();
-        ret.setDigestAlgorithm(digestAlgOID);
+        ASN1ObjectIdentifier digestAlgOid = signerInfo.getDigestAlgorithmID().getAlgorithm();
+        ret.setDigestAlgorithm(digestAlgOid);
 
-        String sigAlgOID = signerInfo.getEncryptionAlgOID();
-        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOID)) {
-            ASN1ObjectIdentifier tmpDigestAlgOID;
+        String sigAlgOid = signerInfo.getEncryptionAlgOID();
+        if (!PKCSObjectIdentifiers.rsaEncryption.getId().equals(sigAlgOid)) {
+            ASN1ObjectIdentifier tmpDigestAlgOid;
             try {
-                tmpDigestAlgOID = ScepUtil.extractDigesetAlgorithmIdentifier(
+                tmpDigestAlgOid = ScepUtil.extractDigesetAlgorithmIdentifier(
                         signerInfo.getEncryptionAlgOID(), signerInfo.getEncryptionAlgParams());
             } catch (Exception ex) {
                 final String msg =
@@ -217,7 +217,7 @@ public class DecodedNextCaMessage {
                 ret.setFailureMessage(msg);
                 return ret;
             }
-            if (!digestAlgOID.equals(tmpDigestAlgOID)) {
+            if (!digestAlgOid.equals(tmpDigestAlgOid)) {
                 ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do not use"
                         + " the same digestAlgorithm");
                 return ret;
@@ -296,25 +296,25 @@ public class DecodedNextCaMessage {
 
         final int n = certs.size();
 
-        X509Certificate cACert = null;
-        List<X509Certificate> rACerts = new LinkedList<X509Certificate>();
+        X509Certificate caCert = null;
+        List<X509Certificate> raCerts = new LinkedList<X509Certificate>();
         for (int i = 0; i < n; i++) {
-            X509Certificate c = certs.get(i);
-            if (c.getBasicConstraints() > -1) {
-                if (cACert != null) {
+            X509Certificate cert = certs.get(i);
+            if (cert.getBasicConstraints() > -1) {
+                if (caCert != null) {
                     final String msg =
                             "multiple CA certificates is returned, but exactly 1 is expected";
                     LOG.error(msg);
                     ret.setFailureMessage(msg);
                     return ret;
                 }
-                cACert = c;
+                caCert = cert;
             } else {
-                rACerts.add(c);
+                raCerts.add(cert);
             }
         } // end for
 
-        if (cACert == null) {
+        if (caCert == null) {
             final String msg = "no CA certificate is returned";
             LOG.error(msg);
             ret.setFailureMessage(msg);
@@ -322,13 +322,13 @@ public class DecodedNextCaMessage {
         }
 
         X509Certificate[] locaRaCerts;
-        if (rACerts.isEmpty()) {
+        if (raCerts.isEmpty()) {
             locaRaCerts = null;
         } else {
-            locaRaCerts = rACerts.toArray(new X509Certificate[0]);
+            locaRaCerts = raCerts.toArray(new X509Certificate[0]);
         }
 
-        AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(cACert, locaRaCerts);
+        AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(caCert, locaRaCerts);
         ret.setAuthorityCertStore(authorityCertStore);
 
         return ret;

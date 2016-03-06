@@ -49,7 +49,7 @@ import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P12RSASignLoadTest extends P12SignLoadTest {
 
     public P12RSASignLoadTest(

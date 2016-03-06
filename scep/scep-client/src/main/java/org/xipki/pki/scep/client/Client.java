@@ -151,7 +151,7 @@ public abstract class Client {
     }
 
     /**
-     *
+     * Set the maximal signing time bias in milliseconds.
      * @param maxSigningTimeBiasInMs zero or negative value deactivates the message time check
      */
     public void setMaxSigningTimeBiasInMs(
@@ -204,12 +204,12 @@ public abstract class Client {
     public void refresh()
     throws ScepClientException {
         // getCACaps
-        ScepHttpResponse getCACapsResp = httpSend(Operation.GetCACaps);
-        this.caCaps = CaCaps.getInstance(new String(getCACapsResp.getContentBytes()));
+        ScepHttpResponse getCaCapsResp = httpSend(Operation.GetCACaps);
+        this.caCaps = CaCaps.getInstance(new String(getCaCapsResp.getContentBytes()));
 
         // getCACert
-        ScepHttpResponse getCACertResp = httpSend(Operation.GetCACert);
-        this.authorityCertStore = retrieveCaCertStore(getCACertResp, caCertValidator);
+        ScepHttpResponse getCaCertResp = httpSend(Operation.GetCACert);
+        this.authorityCertStore = retrieveCaCertStore(getCaCertResp, caCertValidator);
 
         X509CertificateHolder certHolder;
         try {
@@ -373,8 +373,8 @@ public abstract class Client {
 
         // draft-gutmann-scep
         if (!ScepUtil.isSelfSigned(identityCert)) {
-            X509Certificate cACert = authorityCertStore.getCaCert();
-            if (identityCert.getIssuerX500Principal().equals(cACert.getSubjectX500Principal())) {
+            X509Certificate caCert = authorityCertStore.getCaCert();
+            if (identityCert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal())) {
                 if (caCaps.containsCapability(CaCapability.Renewal)) {
                     return scepRenewalReq(csr, identityKey, identityCert);
                 }
@@ -550,8 +550,8 @@ public abstract class Client {
             throw new ScepClientException("Error: " + resp.getFailureMessage());
         }
 
-        Boolean b = resp.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
+        Boolean bo = resp.isSignatureValid();
+        if (bo != null && !bo.booleanValue()) {
             throw new ScepClientException("Signature is invalid");
         }
 
@@ -603,13 +603,13 @@ public abstract class Client {
             throw new ScepClientException("Error: " + resp.getFailureMessage());
         }
 
-        Boolean b = resp.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
+        Boolean bo = resp.isSignatureValid();
+        if (bo != null && !bo.booleanValue()) {
             throw new ScepClientException("Signature is invalid");
         }
 
-        b = resp.isDecryptionSuccessful();
-        if (b != null && !b.booleanValue()) {
+        bo = resp.isDecryptionSuccessful();
+        if (bo != null && !bo.booleanValue()) {
             throw new ScepClientException("Decryption failed");
         }
 
@@ -669,11 +669,11 @@ public abstract class Client {
     throws ScepClientException {
         String ct = resp.getContentType();
 
-        X509Certificate cACert = null;
-        List<X509Certificate> rACerts = new LinkedList<X509Certificate>();
+        X509Certificate caCert = null;
+        List<X509Certificate> raCerts = new LinkedList<X509Certificate>();
 
         if (ScepConstants.CT_X509_CA_CERT.equalsIgnoreCase(ct)) {
-            cACert = parseCert(resp.getContentBytes());
+            caCert = parseCert(resp.getContentBytes());
         } else if (ScepConstants.CT_X509_CA_RA_CERT.equalsIgnoreCase(ct)) {
             ContentInfo contentInfo = ContentInfo.getInstance(resp.getContentBytes());
 
@@ -698,46 +698,46 @@ public abstract class Client {
             }
 
             for (int i = 0; i < n; i++) {
-                X509Certificate c = certs.get(i);
-                if (c.getBasicConstraints() > -1) {
-                    if (cACert != null) {
+                X509Certificate cert = certs.get(i);
+                if (cert.getBasicConstraints() > -1) {
+                    if (caCert != null) {
                         throw new ScepClientException(
                                 "multiple CA certificates is returned, but exactly 1 is expected");
                     }
-                    cACert = c;
+                    caCert = cert;
                 } else {
-                    rACerts.add(c);
+                    raCerts.add(cert);
                 }
             }
 
-            if (cACert == null) {
+            if (caCert == null) {
                 throw new ScepClientException("no CA certificate is returned");
             }
         } else {
             throw new ScepClientException("invalid Content-Type '" + ct + "'");
         }
 
-        if (!caValidator.isTrusted(cACert)) {
+        if (!caValidator.isTrusted(caCert)) {
             throw new ScepClientException(
-                    "CA certificate '" + cACert.getSubjectX500Principal() + "' is not trusted");
+                    "CA certificate '" + caCert.getSubjectX500Principal() + "' is not trusted");
         }
 
-        if (rACerts.isEmpty()) {
-            return AuthorityCertStore.getInstance(cACert);
+        if (raCerts.isEmpty()) {
+            return AuthorityCertStore.getInstance(caCert);
         } else {
             AuthorityCertStore cs = AuthorityCertStore.getInstance(
-                    cACert, rACerts.toArray(new X509Certificate[0]));
-            X509Certificate rAEncCert = cs.getEncryptionCert();
-            X509Certificate rASignCert = cs.getSignatureCert();
+                    caCert, raCerts.toArray(new X509Certificate[0]));
+            X509Certificate raEncCert = cs.getEncryptionCert();
+            X509Certificate raSignCert = cs.getSignatureCert();
             try {
-                if (!ScepUtil.issues(cACert, rAEncCert)) {
+                if (!ScepUtil.issues(caCert, raEncCert)) {
                     throw new ScepClientException("RA certificate '"
-                            + rAEncCert.getSubjectX500Principal()
+                            + raEncCert.getSubjectX500Principal()
                             + " is not issued by the CA");
                 }
-                if (rASignCert != rAEncCert && ScepUtil.issues(cACert, rASignCert)) {
+                if (raSignCert != raEncCert && ScepUtil.issues(caCert, raSignCert)) {
                     throw new ScepClientException("RA certificate '"
-                            + rASignCert.getSubjectX500Principal()
+                            + raSignCert.getSubjectX500Principal()
                             + " is not issued by the CA");
                 }
             } catch (CertificateException ex) {

@@ -128,12 +128,12 @@ public interface SecurityFactory {
     boolean verifyPopo(
             final PKCS10CertificationRequest p10Request);
 
+    boolean verifyPopo(
+            CertificationRequest p10Req);
+
     PublicKey generatePublicKey(
             SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
-
-    boolean verifyPopo(
-            CertificationRequest p10Req);
 
     P11CryptService getP11CryptService(
             String moduleName)

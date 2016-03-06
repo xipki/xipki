@@ -116,9 +116,9 @@ public class PciAuditEvent {
     public PciAuditEvent(
             final Date date) {
         Objects.requireNonNull(date, "date must not be null");
-        LocalDateTime lDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
-        this.date = DATE_FORMATTER.format(lDate);
-        this.time = TIME_FORMATTER.format(lDate);
+        LocalDateTime localDate = LocalDateTime.ofInstant(date.toInstant(), ZONE_UTC);
+        this.date = DATE_FORMATTER.format(localDate);
+        this.time = TIME_FORMATTER.format(localDate);
         this.level = AuditLevel.INFO;
     }
 

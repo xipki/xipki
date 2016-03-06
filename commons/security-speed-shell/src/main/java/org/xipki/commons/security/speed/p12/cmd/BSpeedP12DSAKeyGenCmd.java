@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
@@ -51,6 +52,8 @@ import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-gen-p12",
         description = "performance test of PKCS#12 DSA key generation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
 
     @Override
@@ -60,11 +63,11 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
         for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
+            int plen = pqLens[i];
+            int qlen = pqLens[i + 1];
 
             ret.add(
-                    new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory));
+                    new P12DSAKeyGenLoadTest(plen, qlen, securityFactory));
         }
 
         return ret;

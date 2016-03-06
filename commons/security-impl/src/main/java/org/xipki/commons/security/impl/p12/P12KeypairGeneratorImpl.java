@@ -166,11 +166,11 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
 
     @Override
     public P12KeypairGenerationResult generateDSAKeypair(
-            final int pLength,
-            final int qLength,
+            final int plength,
+            final int qlength,
             final P12KeystoreGenerationParameters params)
     throws Exception {
-        KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(pLength, qLength, params.getRandom());
+        KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
         return generateIdentity(kp, params);
     }
 
@@ -183,6 +183,7 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
         return generateIdentity(kp, params);
     }
 
+    // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genECKeypair(
             final String curveNameOrOid,
             final SecureRandom random)
@@ -201,6 +202,7 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
         return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);
     }
 
+    // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(
             final int keysize,
             final BigInteger publicExponent,
@@ -216,12 +218,13 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
         return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
     }
 
+    // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(
-            final int pLength,
-            final int qLength,
+            final int plength,
+            final int qlength,
             final SecureRandom random)
     throws Exception {
-        KeyPair kp = KeyUtil.generateDSAKeypair(pLength, qLength, random);
+        KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
         SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(
                 (DSAPublicKey) kp.getPublic());
         return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
@@ -235,13 +238,13 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
         Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
 
-        X500Name subjectDN = new X500Name("CN=DUMMY");
+        X500Name subjectDn = new X500Name("CN=DUMMY");
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
         // Generate keystore
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDN,
-                BigInteger.valueOf(1), notBefore, notAfter, subjectDN, subjectPublicKeyInfo);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
+                BigInteger.valueOf(1), notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
 
         KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
                 kp.getKeypair().getPrivate());

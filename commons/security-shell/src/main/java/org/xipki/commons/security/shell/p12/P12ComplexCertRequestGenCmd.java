@@ -95,18 +95,10 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     public KeyStore getKeyStore()
     throws Exception {
         KeyStore ks;
-
-        FileInputStream fIn = null;
-        try {
-            fIn = new FileInputStream(expandFilepath(p12File));
+        try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        } finally {
-            if (fIn != null) {
-                fIn.close();
-            }
+            ks.load(in, getPassword());
         }
-
         return ks;
     }
 
@@ -126,10 +118,10 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     protected X500Name getSubject(
             final String subject) {
         X500Name name = new X500Name(subject);
-        List<RDN> l = new LinkedList<>();
+        List<RDN> list = new LinkedList<>();
         RDN[] rs = name.getRDNs();
         for (RDN m : rs) {
-            l.add(m);
+            list.add(m);
         }
 
         ASN1ObjectIdentifier id;
@@ -141,7 +133,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         if (rdns == null || rdns.length == 0) {
             ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
             RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
+            list.add(rdn);
         }
 
         // postalAddress
@@ -149,13 +141,13 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         rdns = name.getRDNs(id);
 
         if (rdns == null || rdns.length == 0) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new DERUTF8String("my street 1"));
-            v.add(new DERUTF8String("12345 Germany"));
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new DERUTF8String("my street 1"));
+            vec.add(new DERUTF8String("12345 Germany"));
 
-            ASN1Sequence atvValue = new DERSequence(v);
+            ASN1Sequence atvValue = new DERSequence(vec);
             RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
+            list.add(rdn);
         }
 
         // DN_UNIQUE_IDENTIFIER
@@ -165,10 +157,10 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         if (rdns == null || rdns.length == 0) {
             DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
             RDN rdn = new RDN(id, atvValue);
-            l.add(rdn);
+            list.add(rdn);
         }
 
-        return new X500Name(l.toArray(new RDN[0]));
+        return new X500Name(list.toArray(new RDN[0]));
     }
 
 }

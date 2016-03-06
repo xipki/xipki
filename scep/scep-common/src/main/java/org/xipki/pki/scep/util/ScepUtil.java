@@ -96,6 +96,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.HashAlgoType;
 import org.xipki.pki.scep.crypto.KeyUsage;
@@ -106,6 +108,8 @@ import org.xipki.pki.scep.crypto.KeyUsage;
  */
 
 public class ScepUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(ScepUtil.class);
+
     private static final long MIN_IN_MS = 60L * 1000;
     private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
 
@@ -132,15 +136,15 @@ public class ScepUtil {
     public static PKCS10CertificationRequest generateRequest(
             final PrivateKey privatekey,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws OperatorCreationException {
         ParamUtil.requireNonNull("privatekey", privatekey);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
-        ParamUtil.requireNonNull("subjectDN", subjectDN);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
 
         PKCS10CertificationRequestBuilder p10ReqBuilder =
-                new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
+                new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
 
         if (attributes != null) {
             for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
@@ -156,13 +160,13 @@ public class ScepUtil {
     public static PKCS10CertificationRequest generateRequest(
             final PrivateKey privatekey,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final String challengePassword,
             final List<Extension> extensions)
     throws OperatorCreationException {
         ParamUtil.requireNonNull("privatekey", privatekey);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
-        ParamUtil.requireNonNull("subjectDN", subjectDN);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
                 new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
@@ -177,7 +181,7 @@ public class ScepUtil {
             attributes.put(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, asn1Extensions);
         }
 
-        return generateRequest(privatekey, subjectPublicKeyInfo, subjectDN, attributes);
+        return generateRequest(privatekey, subjectPublicKeyInfo, subjectDn, attributes);
     }
 
     public static X509Certificate generateSelfsignedCert(
@@ -190,7 +194,7 @@ public class ScepUtil {
     }
 
     public static X509Certificate generateSelfsignedCert(
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final PublicKey pubKey,
             final PrivateKey identityKey)
     throws CertificateException {
@@ -200,15 +204,15 @@ public class ScepUtil {
         } catch (IOException ex) {
             throw new CertificateException(ex.getMessage(), ex);
         }
-        return generateSelfsignedCert(subjectDN, pubKeyInfo, identityKey);
+        return generateSelfsignedCert(subjectDn, pubKeyInfo, identityKey);
     }
 
     public static X509Certificate generateSelfsignedCert(
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final SubjectPublicKeyInfo pubKeyInfo,
             final PrivateKey identityKey)
     throws CertificateException {
-        ParamUtil.requireNonNull("subjectDN", subjectDN);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
         ParamUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
         ParamUtil.requireNonNull("identityKey", identityKey);
 
@@ -216,7 +220,7 @@ public class ScepUtil {
         Date notAfter = new Date(notBefore.getTime() + 30 * DAY_IN_MS);
 
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                subjectDN, BigInteger.ONE, notBefore, notAfter, subjectDN,
+                subjectDn, BigInteger.ONE, notBefore, notAfter, subjectDn,
                 pubKeyInfo);
 
         X509KeyUsage ku = new X509KeyUsage(
@@ -244,10 +248,7 @@ public class ScepUtil {
     } // method generateSelfsignedCert
 
     /**
-     * The first one is a non-CA certificate if there exists one non-CA certificate
-     * @param certBytes
-     * @return
-     * @throws CertificateException
+     * The first one is a non-CA certificate if there exists one non-CA certificate.
      */
     public static List<X509Certificate> getCertsFromSignedData(
             final SignedData signedData)
@@ -258,7 +259,7 @@ public class ScepUtil {
             return Collections.emptyList();
         }
 
-        int n = set.size();
+        final int n = set.size();
         if (n == 0) {
             return Collections.emptyList();
         }
@@ -429,8 +430,8 @@ public class ScepUtil {
     throws CertificateEncodingException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
-        boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if (!isCA) {
+        boolean isCa = issuerCert.getBasicConstraints() >= 0;
+        if (!isCa) {
             return false;
         }
 
@@ -524,6 +525,7 @@ public class ScepUtil {
                 try {
                     in.close();
                 } catch (IOException ex) {
+                    LOG.error("could not close stream: {}", ex.getMessage());
                 }
             }
         }
@@ -544,16 +546,6 @@ public class ScepUtil {
 
         JcaCertStore certStore = new JcaCertStore(certColl);
         generator.addCertificates(certStore);
-    }
-
-    public static boolean isBlank(
-            final String s) {
-        return s == null || s.isEmpty();
-    }
-
-    public static boolean isNotBlank(
-            final String s) {
-        return s != null && !s.isEmpty();
     }
 
 }

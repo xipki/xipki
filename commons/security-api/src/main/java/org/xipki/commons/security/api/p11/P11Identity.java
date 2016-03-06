@@ -124,23 +124,23 @@ public class P11Identity implements Comparable<P11Identity> {
     }
 
     public boolean match(
-            final P11SlotIdentifier pSlotId,
-            final P11KeyIdentifier pKeyId) {
-        if (!this.slotId.equals(pSlotId)) {
+            final P11SlotIdentifier slotId,
+            final P11KeyIdentifier keyId) {
+        if (!this.slotId.equals(slotId)) {
             return false;
         }
 
-        return this.keyId.equals(pKeyId);
+        return this.keyId.equals(keyId);
     }
 
     public boolean match(
-            final P11SlotIdentifier pSlotId,
-            final String pKeyLabel) {
-        if (pKeyLabel == null) {
+            final P11SlotIdentifier slotId,
+            final String keyLabel) {
+        if (keyLabel == null) {
             return false;
         }
 
-        return this.slotId.equals(pSlotId) && pKeyLabel.equals(keyId.getKeyLabel());
+        return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
     }
 
     public int getSignatureKeyBitLength() {
@@ -148,8 +148,8 @@ public class P11Identity implements Comparable<P11Identity> {
     }
 
     @Override
-    public int compareTo(P11Identity o) {
-        return keyId.compareTo(o.keyId);
+    public int compareTo(P11Identity obj) {
+        return keyId.compareTo(obj.keyId);
     }
 
 }

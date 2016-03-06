@@ -38,6 +38,7 @@ package org.xipki.commons.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
@@ -49,6 +50,8 @@ import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-rsa-sign",
         description = "performance test of PKCS#11 RSA signature creation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP11RSASignCmd extends SpeedP11SignCommandSupport {
 
     @Option(name = "--key-size",
