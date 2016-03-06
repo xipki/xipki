@@ -457,7 +457,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         try {
             return builder.build(keyParam);
         } catch (OperatorCreationException ex) {
-            throw new InvalidKeyException("error while building ContentVerifierProvider: "
+            throw new InvalidKeyException("could not build ContentVerifierProvider: "
                     + ex.getMessage(), ex);
         }
     }
@@ -490,7 +490,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return p10Request.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
-            String message = "error while validating POPO of PKCS#10 request";
+            String message = "could not validate POPO of PKCS#10 request";
             LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                     ex.getMessage());
             LOG.error(message, ex);
@@ -967,13 +967,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         try {
             KeystoreP11ModulePool.getInstance().shutdown();
         } catch (Throwable th) {
-            LOG.error("error while shutdowning KeyStoreP11ModulePool: " + th.getMessage(), th);
+            LOG.error("could not shutdown KeyStoreP11ModulePool: " + th.getMessage(), th);
         }
 
         try {
             IaikP11ModulePool.getInstance().shutdown();
         } catch (Throwable th) {
-            LOG.error("error while shutdowning IaikP11ModulePool: " + th.getMessage(), th);
+            LOG.error("could not shutdown IaikP11ModulePool: " + th.getMessage(), th);
         }
     }
 
@@ -987,7 +987,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeCryptoException(
-                    "error while getting strong SecureRandom: " + ex.getMessage());
+                    "could not get strong SecureRandom: " + ex.getMessage());
         }
     }
 

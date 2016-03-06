@@ -493,7 +493,7 @@ public class DecodedPkiMessage extends PkiMessage {
                         + messageType);
             }
         } catch (Exception ex) {
-            final String msg = "error while trying to parse the messageData: " + ex.getMessage();
+            final String msg = "could not parse the messageData: " + ex.getMessage();
             LOG.error(msg);
             LOG.debug(msg, ex);
             ret.setFailureMessage(msg);

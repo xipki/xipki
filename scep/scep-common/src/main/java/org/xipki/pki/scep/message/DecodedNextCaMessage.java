@@ -286,7 +286,7 @@ public class DecodedNextCaMessage {
         try {
             certs = ScepUtil.getCertsFromSignedData(signedData);
         } catch (CertificateException ex) {
-            final String msg = "error while extracting Certificates from the message: "
+            final String msg = "could not extract Certificates from the message: "
                     + ex.getMessage();
             LOG.error(msg);
             LOG.debug(msg, ex);

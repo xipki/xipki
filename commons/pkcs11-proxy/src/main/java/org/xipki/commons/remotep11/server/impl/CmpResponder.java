@@ -290,9 +290,9 @@ class CmpResponder {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     ex.getMessage());
         } catch (Throwable th) {
-            LOG.error("error while processing CMP message {}, message: {}", tidStr,
+            LOG.error("could not process CMP message {}, message: {}", tidStr,
                     th.getMessage());
-            LOG.debug("error while processing CMP message " + tidStr, th);
+            LOG.debug("could not process CMP message " + tidStr, th);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
                     th.getMessage());
         }

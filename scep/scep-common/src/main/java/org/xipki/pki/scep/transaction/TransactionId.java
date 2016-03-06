@@ -87,7 +87,7 @@ public class TransactionId {
         try {
             encoded = spki.getEncoded();
         } catch (IOException ex) {
-            throw new InvalidKeySpecException("IO exception while ");
+            throw new InvalidKeySpecException("IOException while ");
         }
 
         return sha1TransactionId(encoded);

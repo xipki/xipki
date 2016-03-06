@@ -274,7 +274,7 @@ public class CaEmulator {
             return p10Req.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
-            String message = "error while validating POPO of PKCS#10 request";
+            String message = "could not validate POPO of PKCS#10 request";
             LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                     ex.getMessage());
             LOG.error(message, ex);
@@ -311,7 +311,7 @@ public class CaEmulator {
         try {
             return builder.build(keyParam);
         } catch (OperatorCreationException ex) {
-            throw new InvalidKeyException("error while building ContentVerifierProvider: "
+            throw new InvalidKeyException("could not build ContentVerifierProvider: "
                     + ex.getMessage(), ex);
         }
     }
