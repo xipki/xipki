@@ -1142,7 +1142,7 @@ public class X509Ca {
                     successful = publisher.certificateAdded(certInfo);
                 } catch (RuntimeException ex) {
                     successful = false;
-                    final String message = "error while publish certificate to the publisher "
+                    final String message = "could not publish certificate to the publisher "
                             + publisher.getName();
                     if (LOG.isWarnEnabled()) {
                         LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -1161,7 +1161,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "error while add entry to PublishQueue";
+                final String message = "could not add entry to PublishQueue";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());
@@ -1220,7 +1220,7 @@ public class X509Ca {
                 certstore.clearPublishQueue(this.caInfo.getCertificate(), name);
                 LOG.info(" cleared PublishQueue for publisher {}", name);
             } catch (OperationException ex) {
-                final String message = "exception while clearing PublishQueue for publisher";
+                final String message = "could not clear PublishQueue for publisher";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                             ex.getMessage());
@@ -1402,7 +1402,7 @@ public class X509Ca {
                 try {
                     certstore.removeFromPublishQueue(publisher.getName(), certId);
                 } catch (OperationException ex) {
-                    final String message = "exception while removing republished cert id=" + certId
+                    final String message = "could not remove republished cert id=" + certId
                             + " and publisher=" + publisher.getName();
                     if (LOG.isWarnEnabled()) {
                         LOG.warn(LogUtil.buildExceptionLogFormat(message),
@@ -1428,7 +1428,7 @@ public class X509Ca {
             try {
                 publisher.crlAdded(caCert, crl);
             } catch (RuntimeException ex) {
-                final String message = "error while publish CRL to the publisher "
+                final String message = "could not publish CRL to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -1518,7 +1518,7 @@ public class X509Ca {
                         certToRemove);
             } catch (RuntimeException ex) {
                 singleSuccessful = false;
-                final String message = "error while remove certificate to the publisher "
+                final String message = "could not remove certificate to the publisher "
                         + publisher.getName();
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -1581,7 +1581,7 @@ public class X509Ca {
                 } catch (RuntimeException ex) {
                     successful = false;
                     final String message =
-                            "error while publish revocation of certificate to the publisher "
+                            "could not publish revocation of certificate to the publisher "
                             + publisher.getName();
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -1600,7 +1600,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "error while add entry to PublishQueue";
+                final String message = "could not add entry to PublishQueue";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());
@@ -1644,7 +1644,7 @@ public class X509Ca {
                 } catch (RuntimeException ex) {
                     successful = false;
                     final String message =
-                            "error while publish unrevocation of certificate to the publisher "
+                            "could not publish unrevocation of certificate to the publisher "
                             + publisher.getName();
                     if (LOG.isErrorEnabled()) {
                         LOG.error(LogUtil.buildExceptionLogFormat(message),
@@ -1663,7 +1663,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "error while add entry to PublishQueue";
+                final String message = "could not add entry to PublishQueue";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());
@@ -1720,7 +1720,7 @@ public class X509Ca {
                             "publishing CA revocation failed");
                 }
             } catch (RuntimeException ex) {
-                String message = "error while publish revocation of CA to the publisher "
+                String message = "could not publish revocation of CA to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -1747,7 +1747,7 @@ public class X509Ca {
                             "publishing CA revocation failed");
                 }
             } catch (RuntimeException ex) {
-                String message = "error while publish revocation of CA to the publisher "
+                String message = "could not publish revocation of CA to the publisher "
                         + publisher.getName();
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message),

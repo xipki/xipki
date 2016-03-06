@@ -292,7 +292,7 @@ class OcspStoreQueryExecutor {
                             continue;
                         }
                         LOG.error(
-                            "datasource {} SQLException while adding certificate with id {}: {}",
+                            "datasource {} could not add certificate with id {}: {}",
                             datasource.getDatasourceName(), certId, th.getMessage());
                         throw ex;
                     } else {

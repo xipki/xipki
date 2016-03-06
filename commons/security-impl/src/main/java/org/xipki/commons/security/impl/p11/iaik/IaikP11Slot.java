@@ -594,7 +594,7 @@ public class IaikP11Slot implements P11WritableSlot {
             try {
                 loginRequired = session.getToken().getTokenInfo().isLoginRequired();
             } catch (TokenException ex) {
-                String msg = "error while checking whether LoginRequired of token";
+                String msg = "could not check whether LoginRequired of token";
                 LOG.error(LogUtil.buildExceptionLogFormat(msg),
                         ex.getClass().getName(), ex.getMessage());
                 LOG.debug(msg, ex);
@@ -624,7 +624,7 @@ public class IaikP11Slot implements P11WritableSlot {
                 LOG.info("close all sessions on token: {}", slot.getSlotID());
                 slot.getToken().closeAllSessions();
             } catch (Throwable th) {
-                final String message = "error while slot.getToken().closeAllSessions()";
+                final String message = "could not slot.getToken().closeAllSessions()";
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());

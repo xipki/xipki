@@ -114,7 +114,7 @@ abstract class CmpResponder {
         try {
             return getSigner() != null;
         } catch (Exception ex) {
-            final String msg = "error while getting responder signer";
+            final String msg = "could not get responder signer";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
                         ex.getMessage());
@@ -267,7 +267,7 @@ abstract class CmpResponder {
                 } // end switch
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception ex) {
-                final String msg = "tid=" + tidStr + ": error while verifying the signature";
+                final String msg = "tid=" + tidStr + ": could not verify the signature";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
                             ex.getMessage());
@@ -385,7 +385,7 @@ abstract class CmpResponder {
                     getSender(),
                     getCmpControl().isSendResponderCert());
         } catch (Exception ex) {
-            final String message = "error while add protection to the PKI message";
+            final String message = "could not add protection to the PKI message";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message),
                         ex.getClass().getName(),

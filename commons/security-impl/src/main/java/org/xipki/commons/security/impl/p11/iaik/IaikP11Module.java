@@ -216,7 +216,7 @@ public class IaikP11Module implements P11Module {
         try {
             module.finalize(null);
         } catch (Throwable th) {
-            final String message = "error while module.finalize()";
+            final String message = "could not module.finalize()";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                         th.getMessage());

@@ -138,7 +138,7 @@ class CaConfigurationDbImporter extends DbPorter {
             importCaHasCertprofile(caconf.getCaHasProfiles());
             importScep(caconf.getSceps());
         } catch (Exception ex) {
-            System.err.println("error while importing CA configuration to database. message: "
+            System.err.println("could not import CA configuration to database. message: "
                     + ex.getMessage());
             throw ex;
         }
@@ -164,7 +164,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
                         ps.executeUpdate();
                     } catch (SQLException ex) {
-                        System.err.println("error while importing CMPCONTROL " + control.getName());
+                        System.err.println("could not import CMPCONTROL " + control.getName());
                         throw translate(sql, ex);
                     }
                 }
@@ -199,7 +199,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CRLSIGNER with NAME="
+                    System.err.println("could not import CRLSIGNER with NAME="
                             + responder.getName());
                     throw translate(sql, ex);
                 }
@@ -226,7 +226,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, environment.getValue());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing ENVIRONMENT with NAME="
+                    System.err.println("could not import ENVIRONMENT with NAME="
                             + environment.getName());
                     throw translate(sql, ex);
                 }
@@ -257,7 +257,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, getValue(crlsigner.getSignerConf()));
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CRLSIGNER with NAME="
+                    System.err.println("could not import CRLSIGNER with NAME="
                             + crlsigner.getName());
                     throw translate(sql, ex);
                 }
@@ -285,7 +285,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing REQUESTOR with NAME="
+                    System.err.println("could not import REQUESTOR with NAME="
                             + requestor.getName());
                     throw translate(sql, ex);
                 }
@@ -313,7 +313,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing PUBLISHER with NAME="
+                    System.err.println("could not import PUBLISHER with NAME="
                             + publisher.getName());
                     throw translate(sql, ex);
                 }
@@ -347,11 +347,11 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing PROFILE with NAME="
+                    System.err.println("could not import PROFILE with NAME="
                             + certprofile.getName());
                     throw translate(sql, ex);
                 } catch (IOException ex) {
-                    System.err.println("error while importing PROFILE with NAME="
+                    System.err.println("could not import PROFILE with NAME="
                             + certprofile.getName());
                     throw ex;
                 }
@@ -428,10 +428,10 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CA with NAME=" + ca.getName());
+                    System.err.println("could not import CA with NAME=" + ca.getName());
                     throw translate(sql, ex);
                 } catch (CertificateException | IOException ex) {
-                    System.err.println("error while importing CA with NAME=" + ca.getName());
+                    System.err.println("could not import CA with NAME=" + ca.getName());
                     throw ex;
                 }
             }
@@ -456,7 +456,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, caalias.getCaName().toUpperCase());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CAALIAS with NAME="
+                    System.err.println("could not import CAALIAS with NAME="
                             + caalias.getName());
                     throw translate(sql, ex);
                 }
@@ -487,7 +487,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CA_HAS_REQUESTOR with CA_NAME="
+                    System.err.println("could not import CA_HAS_REQUESTOR with CA_NAME="
                             + entry.getCaName()
                             + " and requestor_name=" + entry.getRequestorName());
                     throw translate(sql, ex);
@@ -513,7 +513,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, entry.getPublisherName());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CA_HAS_PUBLISHER with CA_NAME="
+                    System.err.println("could not import CA_HAS_PUBLISHER with CA_NAME="
                             + entry.getCaName()
                             + " and publisher_name=" + entry.getPublisherName());
                     throw translate(sql, ex);
@@ -541,7 +541,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, entry.getProfileLocalname());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CA_HAS_PROFILE with CA_NAME="
+                    System.err.println("could not import CA_HAS_PROFILE with CA_NAME="
                             + entry.getCaName()
                             + ", profile_name=" + entry.getProfileName()
                             + " and profile_localname=" + entry.getProfileLocalname());
@@ -572,7 +572,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, getValue(entry.getResponderConf()));
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing SCEP with NAME=" + entry.getCaName());
+                    System.err.println("could not import SCEP with NAME=" + entry.getCaName());
                     throw translate(sql, ex);
                 }
             }

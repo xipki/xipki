@@ -161,7 +161,7 @@ public class XmlX509CertprofileUtil {
                 try {
                     xmlConfStream.close();
                 } catch (IOException ex) {
-                    LOG.warn("Error while closing xmlConfStream: {}", ex.getMessage());
+                    LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
                 }
             } catch (SAXException ex) {
                 throw new CertprofileException(

@@ -283,7 +283,7 @@ public class EjbcaDigestExportReader {
             }
 
             throw new DataAccessException(
-                    String.format("error while reading from ID %s: %s", result.getStartId(),
+                    String.format("could not read from ID %s: %s", result.getStartId(),
                             result.getException().getMessage()),
                     result.getException());
         }

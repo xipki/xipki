@@ -198,7 +198,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             recoverIndexes();
             processLogFile.delete();
         } catch (Exception ex) {
-            System.err.println("error while importing CA certstore to database");
+            System.err.println("could not import CA certstore to database");
             throw ex;
         }
         System.out.println(" imported CA certstore to database");
@@ -227,11 +227,11 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CS_CA with ID=" + m.getId()
+                    System.err.println("could not import CS_CA with ID=" + m.getId()
                         + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
                 } catch (IllegalArgumentException | IOException ex) {
-                    System.err.println("error while importing CS_CA with ID=" + m.getId()
+                    System.err.println("could not import CS_CA with ID=" + m.getId()
                         + ", message: " + ex.getMessage());
                     throw ex;
                 }
@@ -262,7 +262,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CS_REQUESTOR with ID=" + m.getId()
+                    System.err.println("could not import CS_REQUESTOR with ID=" + m.getId()
                             + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
                 }
@@ -294,7 +294,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CS_PUBLISHER with ID=" + m.getId()
+                    System.err.println("could not import CS_PUBLISHER with ID=" + m.getId()
                             + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
                 }
@@ -323,7 +323,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CS_PROFILE with ID=" + m.getId()
+                    System.err.println("could not import CS_PROFILE with ID=" + m.getId()
                             + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
                 }
@@ -356,10 +356,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 try {
                     sum += doImportUser(ps, file, processLog);
                 } catch (SQLException ex) {
-                    System.err.println("error while importing users from file " + file);
+                    System.err.println("could not import users from file " + file);
                     throw translate(SQL_ADD_USER, ex);
                 } catch (Exception ex) {
-                    System.err.println("error while importing users from file " + file);
+                    System.err.println("could not import users from file " + file);
                     throw ex;
                 }
             }
@@ -390,8 +390,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
-                LOG.error("error while closing zipFile {}: {}", usersZipFile, e2.getMessage());
-                LOG.debug("error while closing zipFile " + usersZipFile, e2);
+                LOG.error("could not close zipFile {}: {}", usersZipFile, e2.getMessage());
+                LOG.debug("could not close zipFile " + usersZipFile, e2);
             }
             throw ex;
         }
@@ -418,7 +418,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psAdduser.setString(idx++, user.getCnRegex());
                     psAdduser.addBatch();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing USERNAME with ID="
+                    System.err.println("could not import USERNAME with ID="
                             + user.getId() + ", message: " + ex.getMessage());
                     throw ex;
                 }
@@ -475,7 +475,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     ps.setInt(idx++, tbp.getCaId());
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing PUBLISHQUEUE with CID="
+                    System.err.println("could not import PUBLISHQUEUE with CID="
                             + tbp.getCertId()
                             + " and PID=" + tbp.getPubId() + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
@@ -505,7 +505,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     ps.setInt(idx++, entry.getCaId());
                     ps.execute();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing DELTACRL_CACHE with caId="
+                    System.err.println("could not import DELTACRL_CACHE with caId="
                             + entry.getCaId() + " and serial=" + entry.getSerial()
                             + ", message: " + ex.getMessage());
                     throw translate(sql, ex);
@@ -542,10 +542,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 try {
                     sum += doImportCrl(ps, file, processLog);
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CRLs from file " + file);
+                    System.err.println("could not import CRLs from file " + file);
                     throw translate(SQL_ADD_USER, ex);
                 } catch (JAXBException ex) {
-                    System.err.println("error while importing CRLs from file " + file);
+                    System.err.println("could not import CRLs from file " + file);
                     throw ex;
                 }
             }
@@ -577,8 +577,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
-                LOG.error("error while closing zipFile {}: {}", crlsZipFile, e2.getMessage());
-                LOG.debug("error while closing zipFile " + crlsZipFile, e2);
+                LOG.error("could not close zipFile {}: {}", crlsZipFile, e2.getMessage());
+                LOG.debug("could not close zipFile " + crlsZipFile, e2);
             }
             throw ex;
         }
@@ -659,7 +659,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     psAddCrl.addBatch();
                 } catch (SQLException ex) {
-                    System.err.println("error while importing CRL with ID="
+                    System.err.println("could not import CRL with ID="
                             + crl.getId() + ", message: " + ex.getMessage());
                     throw ex;
                 }
@@ -759,7 +759,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception ex) {
-                    System.err.println("\nerror while importing certificates from file "
+                    System.err.println("\ncould not import certificates from file "
                             + certsFile + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", ex);
                     throw ex;
@@ -800,8 +800,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
-                LOG.error("error while closing zipFile {}: {}", certsZipFile, e2.getMessage());
-                LOG.debug("error while closing zipFile " + certsZipFile, e2);
+                LOG.error("could not close zipFile {}: {}", certsZipFile, e2.getMessage());
+                LOG.debug("could not close zipFile " + certsZipFile, e2);
             }
             throw ex;
         }

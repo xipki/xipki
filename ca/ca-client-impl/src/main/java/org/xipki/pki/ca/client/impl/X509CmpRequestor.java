@@ -510,7 +510,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
                         resultEntry = new ErrorResultEntryType(thisId,
                                 ClientErrorCode.PKISTATUS_RESPONSE_ERROR,
                                 PKIFailureInfo.systemFailure,
-                                "error while decode the certificate");
+                                "could not decode the certificate");
                     }
 
                     if (certHolder != null) {

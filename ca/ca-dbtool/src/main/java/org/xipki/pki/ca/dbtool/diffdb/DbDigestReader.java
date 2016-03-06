@@ -172,7 +172,7 @@ abstract class DbDigestReader implements DigestReader {
                     if (result.getException() != null) {
                         exception = new DataAccessException(
                                 String.format(
-                                        "error while reading from ID %d: %s",
+                                        "could not read from ID %d: %s",
                                         result.getStartId(), result.getException().getMessage()),
                                 result.getException());
                         return;

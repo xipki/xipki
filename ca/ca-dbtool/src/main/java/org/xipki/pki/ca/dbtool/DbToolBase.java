@@ -268,8 +268,8 @@ public class DbToolBase {
             connection.setAutoCommit(connectionAutoCommit);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(null, ex);
-            LOG.error("error while recovering AutoCommit: {}", dex.getMessage());
-            LOG.debug("error while recovering AutoCommit", dex);
+            LOG.error("could not recover AutoCommit: {}", dex.getMessage());
+            LOG.debug("could not recover AutoCommit", dex);
         }
     }
 
@@ -337,7 +337,7 @@ public class DbToolBase {
             try {
                 is.close();
             } catch (IOException ex) {
-                LOG.warn("IOException while closing stream: {}", ex.getMessage());
+                LOG.warn("could not close stream: {}", ex.getMessage());
             }
         }
 
@@ -435,8 +435,8 @@ public class DbToolBase {
                 ps.close();
             } catch (SQLException ex) {
                 DataAccessException dex = datasource.translate(null, ex);
-                LOG.warn("SQLException while closing Statement: {}", dex.getMessage());
-                LOG.debug("SQLException while closing Statement", dex);
+                LOG.warn("could not close Statement: {}", dex.getMessage());
+                LOG.debug("could not close Statement", dex);
             }
         }
 
@@ -445,8 +445,8 @@ public class DbToolBase {
                 rs.close();
             } catch (SQLException ex) {
                 DataAccessException dex = datasource.translate(null, ex);
-                LOG.warn("SQLException while closing ResultSet: {}", dex.getMessage());
-                LOG.debug("SQLException while closing ResultSet", dex);
+                LOG.warn("could not close ResultSet: {}", dex.getMessage());
+                LOG.debug("could not close ResultSet", dex);
             }
         }
     }

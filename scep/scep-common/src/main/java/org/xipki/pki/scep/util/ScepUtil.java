@@ -232,7 +232,7 @@ public class ScepUtil {
             certGenerator.addExtension(Extension.keyUsage, true, ku);
         } catch (CertIOException ex) {
             throw new CertificateException(
-                    "error while generating self-signed certificate: " + ex.getMessage(), ex);
+                    "could not generate self-signed certificate: " + ex.getMessage(), ex);
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgoType.SHA1);

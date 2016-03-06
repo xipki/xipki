@@ -685,7 +685,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 try {
                     props = loadProperties(infoFile);
                 } catch (IOException ex) {
-                    LOG.warn("error while removing " + infoFile.getPath(), ex);
+                    LOG.warn("could not remove " + infoFile.getPath(), ex);
                     return false;
                 }
 

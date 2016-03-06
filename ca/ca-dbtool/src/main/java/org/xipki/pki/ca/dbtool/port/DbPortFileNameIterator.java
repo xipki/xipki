@@ -80,7 +80,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
         try {
             nextFilename = readNextFilenameLine();
         } catch (IOException ex) {
-            throw new RuntimeException("error while reading next file name");
+            throw new RuntimeException("could not read next file name");
         }
         return str;
     }

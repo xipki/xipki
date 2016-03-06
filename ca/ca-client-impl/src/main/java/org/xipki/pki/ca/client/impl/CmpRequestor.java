@@ -203,7 +203,7 @@ public abstract class CmpRequestor {
         try {
             encodedRequest = tmpRequest.getEncoded();
         } catch (IOException ex) {
-            LOG.error("error while encode the PKI request {}", tmpRequest);
+            LOG.error("could not encode the PKI request {}", tmpRequest);
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 
@@ -218,7 +218,7 @@ public abstract class CmpRequestor {
         try {
             encodedResponse = send(encodedRequest);
         } catch (IOException ex) {
-            LOG.error("error while send the PKI request {} to server", tmpRequest);
+            LOG.error("could not send the PKI request {} to server", tmpRequest);
             throw new CmpRequestorException("TRANSPORT_ERROR", ex);
         }
 
@@ -231,7 +231,7 @@ public abstract class CmpRequestor {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("error while decode the received PKI message: {}",
+                LOG.error("could not decode the received PKI message: {}",
                         Hex.toHexString(encodedResponse));
             }
             throw new CmpRequestorException(ex.getMessage(), ex);
