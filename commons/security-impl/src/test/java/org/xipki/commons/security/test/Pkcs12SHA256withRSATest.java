@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class Pkcs12SHA256withRSATest extends Pkcs12RSATest {
 
     @Override

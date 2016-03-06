@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
@@ -51,6 +52,8 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign",
         description = "performance test of PKCS#11 DSA signature creation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
 
     @Override
@@ -62,13 +65,13 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
         P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
 
         for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
-            if (pLen == 1024) {
+            int plen = pqLens[i];
+            int qlen = pqLens[i + 1];
+            if (plen == 1024) {
                 sigAlgo = "SHA1withDSA";
             }
 
-            ret.add(new P11DSASignLoadTest(securityFactory, slot, sigAlgo, pLen, qLen));
+            ret.add(new P11DSASignLoadTest(securityFactory, slot, sigAlgo, plen, qlen));
         }
         return ret;
     }

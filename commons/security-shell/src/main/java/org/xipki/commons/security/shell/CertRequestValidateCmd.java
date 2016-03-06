@@ -66,8 +66,8 @@ public class CertRequestValidateCmd extends SecurityCommandSupport {
     throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
-        boolean b = securityFactory.verifyPopo(p10Req);
-        String txt = b
+        boolean bo = securityFactory.verifyPopo(p10Req);
+        String txt = bo
                 ? "valid"
                 : "invalid";
         out("The POP is " + txt);

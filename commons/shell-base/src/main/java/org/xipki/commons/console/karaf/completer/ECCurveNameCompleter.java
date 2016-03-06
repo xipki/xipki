@@ -53,6 +53,7 @@ import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
  */
 
 @Service
+// CHECKSTYLE:SKIP
 public class ECCurveNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Override

@@ -529,7 +529,7 @@ public class ExtensionsChecker {
                         type, extensionsType, SMIMECapabilities.class);
                 List<SMIMECapability> list = extConf.getSMIMECapability();
 
-                ASN1EncodableVector v = new ASN1EncodableVector();
+                ASN1EncodableVector vec = new ASN1EncodableVector();
                 for (SMIMECapability m : list) {
                     ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
                             m.getCapabilityID().getValue());
@@ -540,15 +540,15 @@ public class ExtensionsChecker {
                         if (capParams.getInteger() != null) {
                             params = new ASN1Integer(capParams.getInteger());
                         } else if (capParams.getBase64Binary() != null) {
-                            params = readASN1Encodable(capParams.getBase64Binary().getValue());
+                            params = readAsn1Encodable(capParams.getBase64Binary().getValue());
                         }
                     }
                     org.bouncycastle.asn1.smime.SMIMECapability cap =
                             new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
-                    v.add(cap);
+                    vec.add(cap);
                 }
 
-                DERSequence extValue = new DERSequence(v);
+                DERSequence extValue = new DERSequence(vec);
                 try {
                     smimeCapabilities = new QaExtensionValue(
                             extensionControls.get(type).isCritical(), extValue.getEncoded());
@@ -1162,14 +1162,14 @@ public class ExtensionsChecker {
             return;
         }
 
-        org.bouncycastle.asn1.x509.NameConstraints iNameConstraints =
+        org.bouncycastle.asn1.x509.NameConstraints tmpNameConstraints =
                 org.bouncycastle.asn1.x509.NameConstraints.getInstance(extensionValue);
 
         checkExtensionNameConstraintsSubtrees(failureMsg, "PermittedSubtrees",
-                iNameConstraints.getPermittedSubtrees(),
+                tmpNameConstraints.getPermittedSubtrees(),
                 conf.getPermittedSubtrees());
         checkExtensionNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
-                iNameConstraints.getExcludedSubtrees(),
+                tmpNameConstraints.getExcludedSubtrees(),
                 conf.getExcludedSubtrees());
     } // method checkExtensionNameConstraints
 
@@ -1178,87 +1178,88 @@ public class ExtensionsChecker {
             final String description,
             final GeneralSubtree[] subtrees,
             final List<QaGeneralSubtree> expectedSubtrees) {
-        int iSize = (subtrees == null)
+        int isSize = (subtrees == null)
                 ? 0
                 : subtrees.length;
-        int eSize = (expectedSubtrees == null)
+        int expSize = (expectedSubtrees == null)
                 ? 0
                 : expectedSubtrees.size();
-        if (iSize != eSize) {
+        if (isSize != expSize) {
             failureMsg.append("size of ")
                 .append(description)
                 .append(" is '")
-                .append(iSize);
+                .append(isSize);
             failureMsg.append("' but expected '")
-                .append(eSize)
+                .append(expSize)
                 .append("'");
             failureMsg.append("; ");
             return;
         }
 
-        for (int i = 0; i < iSize; i++) {
-            GeneralSubtree iSubtree = subtrees[i];
-            QaGeneralSubtree eSubtree = expectedSubtrees.get(i);
-            BigInteger bigInt = iSubtree.getMinimum();
-            int iMinimum = (bigInt == null)
+        for (int i = 0; i < isSize; i++) {
+            GeneralSubtree isSubtree = subtrees[i];
+            QaGeneralSubtree expSubtree = expectedSubtrees.get(i);
+            BigInteger bigInt = isSubtree.getMinimum();
+            int isMinimum = (bigInt == null)
                     ? 0
                     : bigInt.intValue();
-            Integer minimum = eSubtree.getMinimum();
-            int eMinimum = (minimum == null)
+            Integer minimum = expSubtree.getMinimum();
+            int expMinimum = (minimum == null)
                     ? 0
                     : minimum.intValue();
             String desc = description + " [" + i + "]";
-            if (iMinimum != eMinimum) {
+            if (isMinimum != expMinimum) {
                 failureMsg.append("minimum of ")
                     .append(desc)
-                    .append(" is '").append(iMinimum);
+                    .append(" is '").append(isMinimum);
                 failureMsg.append("' but expected '")
-                    .append(eMinimum)
+                    .append(expMinimum)
                     .append("'");
                 failureMsg.append("; ");
             }
 
-            bigInt = iSubtree.getMaximum();
-            Integer iMaximum = (bigInt == null)
+            bigInt = isSubtree.getMaximum();
+            Integer isMaximum = (bigInt == null)
                     ? null
                     : bigInt.intValue();
-            Integer eMaximum = eSubtree.getMaximum();
-            if (!CompareUtil.equalsObject(iMaximum, eMaximum)) {
+            Integer expMaximum = expSubtree.getMaximum();
+            if (!CompareUtil.equalsObject(isMaximum, expMaximum)) {
                 failureMsg.append("maxmum of ")
                     .append(desc)
                     .append(" is '")
-                    .append(iMaximum);
+                    .append(isMaximum);
                 failureMsg.append("' but expected '")
-                    .append(eMaximum)
+                    .append(expMaximum)
                     .append("'");
                 failureMsg.append("; ");
             }
 
-            GeneralName iBase = iSubtree.getBase();
+            GeneralName isBase = isSubtree.getBase();
 
-            GeneralName eBase;
-            if (eSubtree.getDirectoryName() != null) {
-                eBase = new GeneralName(X509Util.reverse(
-                        new X500Name(eSubtree.getDirectoryName())));
-            } else if (eSubtree.getDnsName() != null) {
-                eBase = new GeneralName(GeneralName.dNSName, eSubtree.getDnsName());
-            } else if (eSubtree.getIpAddress() != null) {
-                eBase = new GeneralName(GeneralName.iPAddress, eSubtree.getIpAddress());
-            } else if (eSubtree.getRfc822Name() != null) {
-                eBase = new GeneralName(GeneralName.rfc822Name, eSubtree.getRfc822Name());
-            } else if (eSubtree.getUri() != null) {
-                eBase = new GeneralName(GeneralName.uniformResourceIdentifier, eSubtree.getUri());
+            GeneralName expBase;
+            if (expSubtree.getDirectoryName() != null) {
+                expBase = new GeneralName(X509Util.reverse(
+                        new X500Name(expSubtree.getDirectoryName())));
+            } else if (expSubtree.getDnsName() != null) {
+                expBase = new GeneralName(GeneralName.dNSName, expSubtree.getDnsName());
+            } else if (expSubtree.getIpAddress() != null) {
+                expBase = new GeneralName(GeneralName.iPAddress, expSubtree.getIpAddress());
+            } else if (expSubtree.getRfc822Name() != null) {
+                expBase = new GeneralName(GeneralName.rfc822Name, expSubtree.getRfc822Name());
+            } else if (expSubtree.getUri() != null) {
+                expBase = new GeneralName(GeneralName.uniformResourceIdentifier,
+                        expSubtree.getUri());
             } else {
                 throw new RuntimeException("should not reach here, unknown child of GeneralName");
             }
 
-            if (!iBase.equals(eBase)) {
+            if (!isBase.equals(expBase)) {
                 failureMsg.append("base of ")
                     .append(desc)
                     .append(" is '")
-                    .append(iBase);
+                    .append(isBase);
                 failureMsg.append("' but expected '")
-                    .append(eBase)
+                    .append(expBase)
                     .append("'");
                 failureMsg.append("; ");
             }
@@ -1287,52 +1288,52 @@ public class ExtensionsChecker {
             return;
         }
 
-        org.bouncycastle.asn1.x509.PolicyConstraints iPolicyConstraints =
+        org.bouncycastle.asn1.x509.PolicyConstraints isPolicyConstraints =
                 org.bouncycastle.asn1.x509.PolicyConstraints.getInstance(extensionValue);
-        Integer eRequireExplicitPolicy = conf.getRequireExplicitPolicy();
-        BigInteger bigInt = iPolicyConstraints.getRequireExplicitPolicyMapping();
-        Integer iRequreExplicitPolicy = (bigInt == null)
+        Integer expRequireExplicitPolicy = conf.getRequireExplicitPolicy();
+        BigInteger bigInt = isPolicyConstraints.getRequireExplicitPolicyMapping();
+        Integer isRequreExplicitPolicy = (bigInt == null)
                 ? null
                 : bigInt.intValue();
 
         boolean match = true;
-        if (eRequireExplicitPolicy == null) {
-            if (iRequreExplicitPolicy != null) {
+        if (expRequireExplicitPolicy == null) {
+            if (isRequreExplicitPolicy != null) {
                 match = false;
             }
-        } else if (!eRequireExplicitPolicy.equals(iRequreExplicitPolicy)) {
+        } else if (!expRequireExplicitPolicy.equals(isRequreExplicitPolicy)) {
             match = false;
         }
 
         if (!match) {
             failureMsg.append("requreExplicitPolicy is '")
-                .append(iRequreExplicitPolicy);
+                .append(isRequreExplicitPolicy);
             failureMsg.append("' but expected '")
-                .append(eRequireExplicitPolicy)
+                .append(expRequireExplicitPolicy)
                 .append("'");
             failureMsg.append("; ");
         }
 
-        Integer eInhibitPolicyMapping = conf.getInhibitPolicyMapping();
-        bigInt = iPolicyConstraints.getInhibitPolicyMapping();
-        Integer iInhibitPolicyMapping = (bigInt == null)
+        Integer expInhibitPolicyMapping = conf.getInhibitPolicyMapping();
+        bigInt = isPolicyConstraints.getInhibitPolicyMapping();
+        Integer isInhibitPolicyMapping = (bigInt == null)
                 ? null
                 : bigInt.intValue();
 
         match = true;
-        if (eInhibitPolicyMapping == null) {
-            if (iInhibitPolicyMapping != null) {
+        if (expInhibitPolicyMapping == null) {
+            if (isInhibitPolicyMapping != null) {
                 match = false;
             }
-        } else if (!eInhibitPolicyMapping.equals(iInhibitPolicyMapping)) {
+        } else if (!expInhibitPolicyMapping.equals(isInhibitPolicyMapping)) {
             match = false;
         }
 
         if (!match) {
             failureMsg.append("inhibitPolicyMapping is '")
-                .append(iInhibitPolicyMapping)
+                .append(isInhibitPolicyMapping)
                 .append("' but expected '");
-            failureMsg.append(eInhibitPolicyMapping)
+            failureMsg.append(expInhibitPolicyMapping)
                 .append("'");
             failureMsg.append("; ");
         }
@@ -1344,15 +1345,15 @@ public class ExtensionsChecker {
             final boolean[] usages,
             final Extensions requestExtensions,
             final ExtensionControl extControl) {
-        int n = usages.length;
+        int len = usages.length;
 
-        if (n > 9) {
-            failureMsg.append("invalid syntax: size of valid bits is larger than 9: ").append(n);
+        if (len > 9) {
+            failureMsg.append("invalid syntax: size of valid bits is larger than 9: ").append(len);
             failureMsg.append("; ");
         }
 
         Set<String> isUsages = new HashSet<>();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < len; i++) {
             if (usages[i]) {
                 isUsages.add(ALL_USAGES.get(i));
             }
@@ -1543,51 +1544,51 @@ public class ExtensionsChecker {
 
         org.bouncycastle.asn1.x509.CertificatePolicies asn1 =
                 org.bouncycastle.asn1.x509.CertificatePolicies.getInstance(extensionValue);
-        PolicyInformation[] iPolicyInformations = asn1.getPolicyInformation();
+        PolicyInformation[] isPolicyInformations = asn1.getPolicyInformation();
 
-        for (PolicyInformation iPolicyInformation : iPolicyInformations) {
-            ASN1ObjectIdentifier iPolicyId = iPolicyInformation.getPolicyIdentifier();
-            QaCertificatePolicyInformation eCp = conf.getPolicyInformation(iPolicyId.getId());
-            if (eCp == null) {
+        for (PolicyInformation isPolicyInformation : isPolicyInformations) {
+            ASN1ObjectIdentifier isPolicyId = isPolicyInformation.getPolicyIdentifier();
+            QaCertificatePolicyInformation expCp = conf.getPolicyInformation(isPolicyId.getId());
+            if (expCp == null) {
                 failureMsg.append("certificate policy '")
-                    .append(iPolicyId)
+                    .append(isPolicyId)
                     .append("' is not expected");
                 failureMsg.append("; ");
                 continue;
             }
 
-            QaPolicyQualifiers eCpPq = eCp.getPolicyQualifiers();
-            if (eCpPq == null) {
+            QaPolicyQualifiers expCpPq = expCp.getPolicyQualifiers();
+            if (expCpPq == null) {
                 continue;
             }
 
-            ASN1Sequence iPolicyQualifiers = iPolicyInformation.getPolicyQualifiers();
-            List<String> iCpsUris = new LinkedList<>();
-            List<String> iUserNotices = new LinkedList<>();
+            ASN1Sequence isPolicyQualifiers = isPolicyInformation.getPolicyQualifiers();
+            List<String> isCpsUris = new LinkedList<>();
+            List<String> isUserNotices = new LinkedList<>();
 
-            int n = iPolicyQualifiers.size();
-            for (int i = 0; i < n; i++) {
-                PolicyQualifierInfo iPolicyQualifierInfo =
-                        (PolicyQualifierInfo) iPolicyQualifiers.getObjectAt(i);
-                ASN1ObjectIdentifier iPolicyQualifierId =
-                        iPolicyQualifierInfo.getPolicyQualifierId();
-                ASN1Encodable iQualifier = iPolicyQualifierInfo.getQualifier();
-                if (PolicyQualifierId.id_qt_cps.equals(iPolicyQualifierId)) {
-                    String iCpsUri = ((DERIA5String) iQualifier).getString();
-                    iCpsUris.add(iCpsUri);
-                } else if (PolicyQualifierId.id_qt_unotice.equals(iPolicyQualifierId)) {
-                    UserNotice iUserNotice = UserNotice.getInstance(iQualifier);
-                    if (iUserNotice.getExplicitText() != null) {
-                        iUserNotices.add(iUserNotice.getExplicitText().getString());
+            int size = isPolicyQualifiers.size();
+            for (int i = 0; i < size; i++) {
+                PolicyQualifierInfo isPolicyQualifierInfo =
+                        (PolicyQualifierInfo) isPolicyQualifiers.getObjectAt(i);
+                ASN1ObjectIdentifier isPolicyQualifierId =
+                        isPolicyQualifierInfo.getPolicyQualifierId();
+                ASN1Encodable isQualifier = isPolicyQualifierInfo.getQualifier();
+                if (PolicyQualifierId.id_qt_cps.equals(isPolicyQualifierId)) {
+                    String isCpsUri = ((DERIA5String) isQualifier).getString();
+                    isCpsUris.add(isCpsUri);
+                } else if (PolicyQualifierId.id_qt_unotice.equals(isPolicyQualifierId)) {
+                    UserNotice isUserNotice = UserNotice.getInstance(isQualifier);
+                    if (isUserNotice.getExplicitText() != null) {
+                        isUserNotices.add(isUserNotice.getExplicitText().getString());
                     }
                 }
             }
 
-            List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
+            List<QaPolicyQualifierInfo> qualifierInfos = expCpPq.getPolicyQualifiers();
             for (QaPolicyQualifierInfo qualifierInfo : qualifierInfos) {
                 if (qualifierInfo instanceof QaCpsUriPolicyQualifier) {
                     String value = ((QaCpsUriPolicyQualifier) qualifierInfo).getCpsUri();
-                    if (!iCpsUris.contains(value)) {
+                    if (!isCpsUris.contains(value)) {
                         failureMsg.append("CPSUri '")
                             .append(value)
                             .append("' is absent but is required");
@@ -1596,7 +1597,7 @@ public class ExtensionsChecker {
                 } else if (qualifierInfo instanceof QaUserNoticePolicyQualifierInfo) {
                     String value =
                             ((QaUserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
-                    if (!iUserNotices.contains(value)) {
+                    if (!isUserNotices.contains(value)) {
                         failureMsg.append("userNotice '")
                             .append(value)
                             .append("' is absent but is required");
@@ -1610,8 +1611,8 @@ public class ExtensionsChecker {
 
         for (QaCertificatePolicyInformation cp : conf.getPolicyInformations()) {
             boolean present = false;
-            for (PolicyInformation iPolicyInformation : iPolicyInformations) {
-                if (iPolicyInformation.getPolicyIdentifier().getId().equals(cp.getPolicyId())) {
+            for (PolicyInformation isPolicyInformation : isPolicyInformations) {
+                if (isPolicyInformation.getPolicyIdentifier().getId().equals(cp.getPolicyId())) {
                     present = true;
                     break;
                 }
@@ -1650,40 +1651,40 @@ public class ExtensionsChecker {
             return;
         }
 
-        ASN1Sequence iPolicyMappings = DERSequence.getInstance(extensionValue);
-        Map<String, String> iMap = new HashMap<>();
-        int size = iPolicyMappings.size();
+        ASN1Sequence isPolicyMappings = DERSequence.getInstance(extensionValue);
+        Map<String, String> isMap = new HashMap<>();
+        int size = isPolicyMappings.size();
         for (int i = 0; i < size; i++) {
-            ASN1Sequence seq = (ASN1Sequence) iPolicyMappings.getObjectAt(i);
+            ASN1Sequence seq = (ASN1Sequence) isPolicyMappings.getObjectAt(i);
 
             CertPolicyId issuerDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(0));
             CertPolicyId subjectDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(1));
-            iMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
+            isMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
         }
 
-        Set<String> eIssuerDomainPolicies = conf.getIssuerDomainPolicies();
-        for (String eIssuerDomainPolicy : eIssuerDomainPolicies) {
-            String eSubjectDomainPolicy = conf.getSubjectDomainPolicy(eIssuerDomainPolicy);
+        Set<String> expIssuerDomainPolicies = conf.getIssuerDomainPolicies();
+        for (String expIssuerDomainPolicy : expIssuerDomainPolicies) {
+            String expSubjectDomainPolicy = conf.getSubjectDomainPolicy(expIssuerDomainPolicy);
 
-            String iSubjectDomainPolicy = iMap.remove(eIssuerDomainPolicy);
-            if (iSubjectDomainPolicy == null) {
+            String isSubjectDomainPolicy = isMap.remove(expIssuerDomainPolicy);
+            if (isSubjectDomainPolicy == null) {
                 failureMsg.append("issuerDomainPolicy '")
-                    .append(eIssuerDomainPolicy)
+                    .append(expIssuerDomainPolicy)
                     .append("' is absent but is required");
                 failureMsg.append("; ");
-            } else if (!iSubjectDomainPolicy.equals(eSubjectDomainPolicy)) {
+            } else if (!isSubjectDomainPolicy.equals(expSubjectDomainPolicy)) {
                 failureMsg.append("subjectDomainPolicy for issuerDomainPolicy is '")
-                    .append(iSubjectDomainPolicy);
+                    .append(isSubjectDomainPolicy);
                 failureMsg.append("' but expected '")
-                    .append(eSubjectDomainPolicy)
+                    .append(expSubjectDomainPolicy)
                     .append("'");
                 failureMsg.append("; ");
             }
         }
 
-        if (CollectionUtil.isNonEmpty(iMap)) {
+        if (CollectionUtil.isNonEmpty(isMap)) {
             failureMsg.append("issuerDomainPolicies '")
-                .append(iMap.keySet())
+                .append(isMap.keySet())
                 .append("' are present but not expected");
             failureMsg.append("; ");
         }
@@ -1711,10 +1712,10 @@ public class ExtensionsChecker {
         }
 
         ASN1Integer asn1Int = ASN1Integer.getInstance(extensionValue);
-        int iSkipCerts = asn1Int.getPositiveValue().intValue();
-        if (iSkipCerts != conf.getSkipCerts()) {
+        int isSkipCerts = asn1Int.getPositiveValue().intValue();
+        if (isSkipCerts != conf.getSkipCerts()) {
             failureMsg.append("skipCerts is '")
-                .append(iSkipCerts);
+                .append(isSkipCerts);
             failureMsg.append("' but expected '")
                 .append(conf.getSkipCerts())
                 .append("'");
@@ -1809,19 +1810,19 @@ public class ExtensionsChecker {
         ASN1Sequence requestSeq = ASN1Sequence.getInstance(requestExtValue);
         ASN1Sequence certSeq = ASN1Sequence.getInstance(extensionValue);
 
-        int n = requestSeq.size();
+        int size = requestSeq.size();
 
-        if (certSeq.size() != n) {
+        if (certSeq.size() != size) {
             failureMsg.append("size of GeneralNames is '")
                 .append(certSeq.size());
             failureMsg.append("' but expected '")
-                .append(n)
+                .append(size)
                 .append("'");
             failureMsg.append("; ");
             return;
         }
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < size; i++) {
             AccessDescription ad = AccessDescription.getInstance(requestSeq.getObjectAt(i));
             ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
 
@@ -1846,14 +1847,14 @@ public class ExtensionsChecker {
                     certSeq.getObjectAt(i));
             ASN1ObjectIdentifier certAccessMethod = certAccessDesc.getAccessMethod();
 
-            boolean b;
+            boolean bo;
             if (accessMethod == null) {
-                b = certAccessDesc == null;
+                bo = certAccessDesc == null;
             } else {
-                b = accessMethod.equals(certAccessMethod);
+                bo = accessMethod.equals(certAccessMethod);
             }
 
-            if (!b) {
+            if (!bo) {
                 failureMsg.append("accessMethod is '")
                     .append((certAccessMethod == null)
                             ? "null"
@@ -1911,21 +1912,21 @@ public class ExtensionsChecker {
             final StringBuilder failureMsg,
             final byte[] extensionValue,
             final X509IssuerInfo issuerInfo) {
-        CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
-        DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
-        int n = (iDistributionPoints == null)
+        CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
+        DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
+        int len = (isDistributionPoints == null)
                 ? 0
-                : iDistributionPoints.length;
-        if (n != 1) {
+                : isDistributionPoints.length;
+        if (len != 1) {
             failureMsg.append("size of CRLDistributionPoints is '")
-                .append(n)
+                .append(len)
                 .append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
 
-        Set<String> iCrlURLs = new HashSet<>();
-        for (DistributionPoint entry : iDistributionPoints) {
+        Set<String> isCrlUrls = new HashSet<>();
+        for (DistributionPoint entry : isDistributionPoints) {
             int asn1Type = entry.getDistributionPoint().getType();
             if (asn1Type != DistributionPointName.FULL_NAME) {
                 failureMsg.append("tag of DistributionPointName of CRLDistibutionPoints is '")
@@ -1937,9 +1938,9 @@ public class ExtensionsChecker {
                 continue;
             }
 
-            GeneralNames iDistributionPointNames =
+            GeneralNames isDistributionPointNames =
                     (GeneralNames) entry.getDistributionPoint().getName();
-            GeneralName[] names = iDistributionPointNames.getNames();
+            GeneralName[] names = isDistributionPointNames.getNames();
 
             for (int i = 0; i < names.length; i++) {
                 GeneralName name = names[i];
@@ -1951,12 +1952,12 @@ public class ExtensionsChecker {
                     failureMsg.append("; ");
                 } else {
                     String uri = ((ASN1String) name.getName()).getString();
-                    iCrlURLs.add(uri);
+                    isCrlUrls.add(uri);
                 }
             }
 
-            Set<String> eCRLUrls = issuerInfo.getCrlUrls();
-            Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
+            Set<String> expCrlUrls = issuerInfo.getCrlUrls();
+            Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
@@ -1964,7 +1965,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
 
-            diffs = strInBnotInA(iCrlURLs, eCRLUrls);
+            diffs = strInBnotInA(isCrlUrls, expCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("CRL URLs ")
                     .append(diffs.toString())
@@ -1978,21 +1979,21 @@ public class ExtensionsChecker {
             final StringBuilder failureMsg,
             final byte[] extensionValue,
             final X509IssuerInfo issuerInfo) {
-        CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
-        DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
-        int n = (iDistributionPoints == null)
+        CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
+        DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
+        int len = (isDistributionPoints == null)
                 ? 0
-                : iDistributionPoints.length;
-        if (n != 1) {
+                : isDistributionPoints.length;
+        if (len != 1) {
             failureMsg.append("size of CRLDistributionPoints (deltaCRL) is '")
-                .append(n)
+                .append(len)
                 .append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
 
-        Set<String> iCrlURLs = new HashSet<>();
-        for (DistributionPoint entry : iDistributionPoints) {
+        Set<String> isCrlUrls = new HashSet<>();
+        for (DistributionPoint entry : isDistributionPoints) {
             int asn1Type = entry.getDistributionPoint().getType();
             if (asn1Type != DistributionPointName.FULL_NAME) {
                 failureMsg
@@ -2005,9 +2006,9 @@ public class ExtensionsChecker {
                 continue;
             }
 
-            GeneralNames iDistributionPointNames =
+            GeneralNames isDistributionPointNames =
                     (GeneralNames) entry.getDistributionPoint().getName();
-            GeneralName[] names = iDistributionPointNames.getNames();
+            GeneralName[] names = isDistributionPointNames.getNames();
 
             for (int i = 0; i < names.length; i++) {
                 GeneralName name = names[i];
@@ -2020,12 +2021,12 @@ public class ExtensionsChecker {
                     failureMsg.append("; ");
                 } else {
                     String uri = ((ASN1String) name.getName()).getString();
-                    iCrlURLs.add(uri);
+                    isCrlUrls.add(uri);
                 }
             }
 
-            Set<String> eCRLUrls = issuerInfo.getCrlUrls();
-            Set<String> diffs = strInBnotInA(eCRLUrls, iCrlURLs);
+            Set<String> expCrlUrls = issuerInfo.getCrlUrls();
+            Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
@@ -2033,7 +2034,7 @@ public class ExtensionsChecker {
                 failureMsg.append("; ");
             }
 
-            diffs = strInBnotInA(iCrlURLs, eCRLUrls);
+            diffs = strInBnotInA(isCrlUrls, expCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
                 failureMsg.append("deltaCRL URLs ")
                     .append(diffs.toString())
@@ -2065,111 +2066,111 @@ public class ExtensionsChecker {
         }
 
         ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
-        AdmissionSyntax iAdmissionSyntax = AdmissionSyntax.getInstance(seq);
-        Admissions[] iAdmissions = iAdmissionSyntax.getContentsOfAdmissions();
-        int n = (iAdmissions == null)
+        AdmissionSyntax isAdmissionSyntax = AdmissionSyntax.getInstance(seq);
+        Admissions[] isAdmissions = isAdmissionSyntax.getContentsOfAdmissions();
+        int len = (isAdmissions == null)
                 ? 0
-                : iAdmissions.length;
-        if (n != 1) {
+                : isAdmissions.length;
+        if (len != 1) {
             failureMsg.append("size of Admissions is '")
-                .append(n);
+                .append(len);
             failureMsg.append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
 
-        Admissions iAdmission = iAdmissions[0];
-        ProfessionInfo[] iProfessionInfos = iAdmission.getProfessionInfos();
-        n = (iProfessionInfos == null)
+        Admissions isAdmission = isAdmissions[0];
+        ProfessionInfo[] isProfessionInfos = isAdmission.getProfessionInfos();
+        len = (isProfessionInfos == null)
                 ? 0
-                : iProfessionInfos.length;
-        if (n != 1) {
+                : isProfessionInfos.length;
+        if (len != 1) {
             failureMsg.append("size of ProfessionInfo is '")
-                .append(n).append("' but expected is '1'");
+                .append(len).append("' but expected is '1'");
             failureMsg.append("; ");
             return;
         }
 
-        ProfessionInfo iProfessionInfo = iProfessionInfos[0];
-        String iRegistrationNumber = iProfessionInfo.getRegistrationNumber();
-        String eRegistrationNumber = conf.getRegistrationNumber();
-        if (eRegistrationNumber == null) {
-            if (iRegistrationNumber != null) {
-                failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
+        ProfessionInfo isProfessionInfo = isProfessionInfos[0];
+        String isRegistrationNumber = isProfessionInfo.getRegistrationNumber();
+        String expRegistrationNumber = conf.getRegistrationNumber();
+        if (expRegistrationNumber == null) {
+            if (isRegistrationNumber != null) {
+                failureMsg.append("RegistrationNumber is '").append(isRegistrationNumber);
                 failureMsg.append("' but expected is 'null'");
                 failureMsg.append("; ");
             }
-        } else if (!eRegistrationNumber.equals(iRegistrationNumber)) {
-            failureMsg.append("RegistrationNumber is '").append(iRegistrationNumber);
-            failureMsg.append("' but expected is '").append(eRegistrationNumber).append("'");
+        } else if (!expRegistrationNumber.equals(isRegistrationNumber)) {
+            failureMsg.append("RegistrationNumber is '").append(isRegistrationNumber);
+            failureMsg.append("' but expected is '").append(expRegistrationNumber).append("'");
             failureMsg.append("; ");
         }
 
-        byte[] iAddProfessionInfo = null;
-        if (iProfessionInfo.getAddProfessionInfo() != null) {
-            iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
+        byte[] isAddProfessionInfo = null;
+        if (isProfessionInfo.getAddProfessionInfo() != null) {
+            isAddProfessionInfo = isProfessionInfo.getAddProfessionInfo().getOctets();
         }
-        byte[] eAddProfessionInfo = conf.getAddProfessionInfo();
-        if (eAddProfessionInfo == null) {
-            if (iAddProfessionInfo != null) {
-                failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
+        byte[] expAddProfessionInfo = conf.getAddProfessionInfo();
+        if (expAddProfessionInfo == null) {
+            if (isAddProfessionInfo != null) {
+                failureMsg.append("AddProfessionInfo is '").append(hex(isAddProfessionInfo));
                 failureMsg.append("' but expected is 'null'");
                 failureMsg.append("; ");
             }
         } else {
-            if (iAddProfessionInfo == null) {
+            if (isAddProfessionInfo == null) {
                 failureMsg.append("AddProfessionInfo is 'null' but expected is '")
-                    .append(hex(eAddProfessionInfo));
+                    .append(hex(expAddProfessionInfo));
                 failureMsg.append("'");
                 failureMsg.append("; ");
-            } else if (!Arrays.equals(eAddProfessionInfo, iAddProfessionInfo)) {
-                failureMsg.append("AddProfessionInfo is '").append(hex(iAddProfessionInfo));
+            } else if (!Arrays.equals(expAddProfessionInfo, isAddProfessionInfo)) {
+                failureMsg.append("AddProfessionInfo is '").append(hex(isAddProfessionInfo));
                 failureMsg.append("' but expected is '")
-                    .append(hex(eAddProfessionInfo)).append("'");
+                    .append(hex(expAddProfessionInfo)).append("'");
                 failureMsg.append("; ");
             }
         }
 
-        List<String> eProfessionOids = conf.getProfessionOids();
-        ASN1ObjectIdentifier[] tmpIProfessionOids = iProfessionInfo.getProfessionOIDs();
-        List<String> iProfessionOids = new LinkedList<>();
+        List<String> expProfessionOids = conf.getProfessionOids();
+        ASN1ObjectIdentifier[] tmpIProfessionOids = isProfessionInfo.getProfessionOIDs();
+        List<String> isProfessionOids = new LinkedList<>();
         if (tmpIProfessionOids != null) {
             for (ASN1ObjectIdentifier entry : tmpIProfessionOids) {
-                iProfessionOids.add(entry.getId());
+                isProfessionOids.add(entry.getId());
             }
         }
 
-        Set<String> diffs = strInBnotInA(eProfessionOids, iProfessionOids);
+        Set<String> diffs = strInBnotInA(expProfessionOids, isProfessionOids);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = strInBnotInA(iProfessionOids, eProfessionOids);
+        diffs = strInBnotInA(isProfessionOids, expProfessionOids);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
                 .append(" are absent but are required");
             failureMsg.append("; ");
         }
 
-        List<String> eProfessionItems = conf.getProfessionItems();
-        DirectoryString[] items = iProfessionInfo.getProfessionItems();
-        List<String> iProfessionItems = new LinkedList<>();
+        List<String> expProfessionItems = conf.getProfessionItems();
+        DirectoryString[] items = isProfessionInfo.getProfessionItems();
+        List<String> isProfessionItems = new LinkedList<>();
         if (items != null) {
             for (DirectoryString item : items) {
-                iProfessionItems.add(item.getString());
+                isProfessionItems.add(item.getString());
             }
         }
 
-        diffs = strInBnotInA(eProfessionItems, iProfessionItems);
+        diffs = strInBnotInA(expProfessionItems, isProfessionItems);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = strInBnotInA(iProfessionItems, eProfessionItems);
+        diffs = strInBnotInA(isProfessionItems, expProfessionItems);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
                 .append(" are absent but are required");
@@ -2181,29 +2182,29 @@ public class ExtensionsChecker {
             final StringBuilder failureMsg,
             final byte[] extensionValue,
             final X509IssuerInfo issuerInfo) {
-        Set<String> eCaIssuerUris;
+        Set<String> expCaIssuerUris;
         if (aiaControl == null || aiaControl.includesCaIssuers()) {
-            eCaIssuerUris = issuerInfo.getCaIssuerUrls();
+            expCaIssuerUris = issuerInfo.getCaIssuerUrls();
         } else {
-            eCaIssuerUris = Collections.emptySet();
+            expCaIssuerUris = Collections.emptySet();
         }
 
-        Set<String> eOCSPUris;
+        Set<String> expOcspUris;
         if (aiaControl == null || aiaControl.includesOcsp()) {
-            eOCSPUris = issuerInfo.getOcspUrls();
+            expOcspUris = issuerInfo.getOcspUrls();
         } else {
-            eOCSPUris = Collections.emptySet();
+            expOcspUris = Collections.emptySet();
         }
 
-        if (CollectionUtil.isEmpty(eCaIssuerUris) && CollectionUtil.isEmpty(eOCSPUris)) {
+        if (CollectionUtil.isEmpty(expCaIssuerUris) && CollectionUtil.isEmpty(expOcspUris)) {
             failureMsg.append("AIA is present but expected is 'none'");
             failureMsg.append("; ");
             return;
         }
 
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extensionValue);
-        checkAia(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_caIssuers, eCaIssuerUris);
-        checkAia(failureMsg, iAIA, X509ObjectIdentifiers.id_ad_ocsp, eOCSPUris);
+        AuthorityInformationAccess isAia = AuthorityInformationAccess.getInstance(extensionValue);
+        checkAia(failureMsg, isAia, X509ObjectIdentifiers.id_ad_caIssuers, expCaIssuerUris);
+        checkAia(failureMsg, isAia, X509ObjectIdentifiers.id_ad_ocsp, expOcspUris);
     } // method checkExtensionAuthorityInfoAccess
 
     private void checkExtensionOcspNocheck(
@@ -2495,6 +2496,7 @@ public class ExtensionsChecker {
                         failureMsg.append("; ");
                         return;
                     }
+                    // CHECKSTYLE:SKIP
                     String expAmount = Integer.toString(value);
 
                     range = euLimitConf.getExponent();
@@ -2811,10 +2813,10 @@ public class ExtensionsChecker {
                 return null;
             }
 
-            Object o = m.getValue().getAny();
-            if (expectedClass.isAssignableFrom(o.getClass())) {
-                return o;
-            } else if (ConstantExtValue.class.isAssignableFrom(o.getClass())) {
+            Object obj = m.getValue().getAny();
+            if (expectedClass.isAssignableFrom(obj.getClass())) {
+                return obj;
+            } else if (ConstantExtValue.class.isAssignableFrom(obj.getClass())) {
                 // will be processed later
                 return null;
             } else {
@@ -2868,7 +2870,7 @@ public class ExtensionsChecker {
         return Collections.unmodifiableMap(map);
     } // method buildConstantExtesions
 
-    private static ASN1Encodable readASN1Encodable(
+    private static ASN1Encodable readAsn1Encodable(
             final byte[] encoded)
     throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
@@ -2878,21 +2880,22 @@ public class ExtensionsChecker {
             throw new CertprofileException("could not parse the constant extension value", ex);
         }
     }
+
     private static String hex(
             final byte[] bytes) {
         return Hex.toHexString(bytes);
     }
 
     private static Set<String> strInBnotInA(
-            final Collection<String> a,
-            final Collection<String> b) {
-        if (b == null) {
+            final Collection<String> collectionA,
+            final Collection<String> collectionB) {
+        if (collectionB == null) {
             return Collections.emptySet();
         }
 
         Set<String> result = new HashSet<>();
-        for (String entry : b) {
-            if (a == null || !a.contains(entry)) {
+        for (String entry : collectionB) {
+            if (collectionA == null || !collectionA.contains(entry)) {
                 result.add(entry);
             }
         }
@@ -2964,10 +2967,10 @@ public class ExtensionsChecker {
         case GeneralName.ediPartyName:
             reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
-            int n = reqSeq.size();
+            int size = reqSeq.size();
             String nameAssigner = null;
             int idx = 0;
-            if (n > 1) {
+            if (size > 1) {
                 DirectoryString ds = DirectoryString.getInstance(
                         ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
                 nameAssigner = ds.getString();
@@ -3028,39 +3031,39 @@ public class ExtensionsChecker {
             typeDesc = accessMethod.getId();
         }
 
-        List<AccessDescription> iAccessDescriptions = new LinkedList<>();
+        List<AccessDescription> isAccessDescriptions = new LinkedList<>();
         for (AccessDescription accessDescription : aia.getAccessDescriptions()) {
             if (accessMethod.equals(accessDescription.getAccessMethod())) {
-                iAccessDescriptions.add(accessDescription);
+                isAccessDescriptions.add(accessDescription);
             }
         }
 
-        int n = iAccessDescriptions.size();
-        if (n != expectedUris.size()) {
-            failureMsg.append("number of AIA ").append(typeDesc).append(" URIs is '").append(n);
+        int size = isAccessDescriptions.size();
+        if (size != expectedUris.size()) {
+            failureMsg.append("number of AIA ").append(typeDesc).append(" URIs is '").append(size);
             failureMsg.append("' but expected is '").append(expectedUris.size()).append("'");
             failureMsg.append("; ");
             return;
         }
 
-        Set<String> iUris = new HashSet<>();
-        for (int i = 0; i < n; i++) {
-            GeneralName iAccessLocation = iAccessDescriptions.get(i).getAccessLocation();
-            if (iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
+        Set<String> isUris = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            GeneralName isAccessLocation = isAccessDescriptions.get(i).getAccessLocation();
+            if (isAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
                 failureMsg.append("tag of accessLocation of AIA ")
                     .append(typeDesc)
-                    .append(" is '").append(iAccessLocation.getTagNo());
+                    .append(" is '").append(isAccessLocation.getTagNo());
                 failureMsg.append("' but expected is '")
                     .append(GeneralName.uniformResourceIdentifier)
                     .append("'");
                 failureMsg.append("; ");
             } else {
-                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                iUris.add(iOCSPUri);
+                String isOcspUri = ((ASN1String) isAccessLocation.getName()).getString();
+                isUris.add(isOcspUri);
             }
         }
 
-        Set<String> diffs = strInBnotInA(expectedUris, iUris);
+        Set<String> diffs = strInBnotInA(expectedUris, isUris);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")
@@ -3069,7 +3072,7 @@ public class ExtensionsChecker {
             failureMsg.append("; ");
         }
 
-        diffs = strInBnotInA(iUris, expectedUris);
+        diffs = strInBnotInA(isUris, expectedUris);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append(typeDesc)
                 .append(" URIs ")

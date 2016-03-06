@@ -62,10 +62,32 @@ public class ParamUtil {
         return obj;
     }
 
+    public static long requireMin(
+            final String objName,
+            final long obj,
+            final long min) {
+        if (obj < min) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be less than %d: %d", objName, min, obj));
+        }
+        return obj;
+    }
+
     public static int requireMax(
             final String objName,
             final int obj,
             final int max) {
+        if (obj > max) {
+            throw new IllegalArgumentException(String.format(
+                    "%s must not be greater than %d: %d", objName, max, obj));
+        }
+        return obj;
+    }
+
+    public static long requireMax(
+            final String objName,
+            final long obj,
+            final long max) {
         if (obj > max) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be greater than %d: %d", objName, max, obj));
@@ -81,28 +103,6 @@ public class ParamUtil {
         if (obj < min || obj > max) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be out of the range [%d, %d]: %d", objName, min, max, obj));
-        }
-        return obj;
-    }
-
-    public static long requireMin(
-            final String objName,
-            final long obj,
-            final long min) {
-        if (obj < min) {
-            throw new IllegalArgumentException(String.format(
-                    "%s must not be less than %d: %d", objName, min, obj));
-        }
-        return obj;
-    }
-
-    public static long requireMax(
-            final String objName,
-            final long obj,
-            final long max) {
-        if (obj > max) {
-            throw new IllegalArgumentException(String.format(
-                    "%s must not be greater than %d: %d", objName, max, obj));
         }
         return obj;
     }

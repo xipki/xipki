@@ -45,18 +45,21 @@ import java.math.BigInteger;
 
 public interface P12KeypairGenerator {
 
+    // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateRSAKeypair(
             int keysize,
             BigInteger publicExponent,
             P12KeystoreGenerationParameters params)
     throws Exception;
 
+    // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateDSAKeypair(
-            int pLength,
-            int qLength,
+            int plength,
+            int qlength,
             P12KeystoreGenerationParameters params)
     throws Exception;
 
+    // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateECKeypair(
             String curveNameOrOid,
             P12KeystoreGenerationParameters params)

@@ -38,6 +38,7 @@ package org.xipki.commons.security.speed.p12.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
 
@@ -48,6 +49,8 @@ import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-rsa-sign-p12",
         description = "performance test of PKCS#12 RSA signature creation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP12RSASignCmd extends SpeedP12SignCommandSupport {
 
     @Option(name = "--key-size",

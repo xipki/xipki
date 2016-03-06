@@ -738,9 +738,9 @@ abstract class X509CmpRequestor extends CmpRequestor {
     throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonBlank("caName", caName);
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        v.add(new ASN1Integer(2));
-        ASN1Sequence acceptVersions = new DERSequence(v);
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1Integer(2));
+        ASN1Sequence acceptVersions = new DERSequence(vec);
 
         int action = XipkiCmpConstants.ACTION_GET_CAINFO;
         PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
@@ -760,21 +760,21 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         final String namespace = null;
         Element root = doc.getDocumentElement();
-        String s = root.getAttribute("version");
-        if (StringUtil.isBlank(s)) {
-            s = root.getAttributeNS(namespace, "version");
+        String str = root.getAttribute("version");
+        if (StringUtil.isBlank(str)) {
+            str = root.getAttributeNS(namespace, "version");
         }
 
-        int version = StringUtil.isBlank(s)
+        int version = StringUtil.isBlank(str)
                 ? 1
-                : Integer.parseInt(s);
+                : Integer.parseInt(str);
 
         if (version == 2) {
             X509Certificate caCert;
 
-            String b64CACert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
+            String b64CaCert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try {
-                caCert = X509Util.parseBase64EncodedCert(b64CACert);
+                caCert = X509Util.parseBase64EncodedCert(b64CaCert);
             } catch (CertificateException | IOException ex) {
                 throw new CmpRequestorException("could no parse the CA certificate", ex);
             }

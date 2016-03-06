@@ -53,7 +53,7 @@ import org.xipki.commons.security.impl.SecurityFactoryImpl;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public abstract class Pkcs12RSATest {
 
     private static final SecurityFactoryImpl SECURITY_FACTORY = new SecurityFactoryImpl();

@@ -275,14 +275,14 @@ class CmpResponder {
                         PKIFailureInfo.badRequest, statusMessage);
             } // end switch (code)
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new ASN1Integer(action));
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new ASN1Integer(action));
             if (respItvInfoValue != null) {
-                v.add(respItvInfoValue);
+                vec.add(respItvInfoValue);
             }
             InfoTypeAndValue respItv = new InfoTypeAndValue(
                     ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
-                    new DERSequence(v));
+                    new DERSequence(vec));
             GenRepContent genRepContent = new GenRepContent(respItv);
             PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
             return new PKIMessage(respHeader, respBody);

@@ -50,7 +50,7 @@ import org.xipki.commons.password.api.PasswordResolverException;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class PBEPasswordServiceImpl implements PBEPasswordService {
 
     public PBEPasswordServiceImpl() {
@@ -64,14 +64,14 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
         ParamUtil.requireNonNull("passwordHint", passwordHint);
 
         byte[] bytes = Base64.getDecoder().decode(passwordHint.substring("PBE:".length()));
-        int n = bytes.length;
-        if (n <= 16 && n != 0) {
+        int len = bytes.length;
+        if (len <= 16 && len != 0) {
             throw new PasswordResolverException("invalid length of the encrypted password");
         }
 
         byte[] iterationCounntBytes = Arrays.copyOfRange(bytes, 0, 2);
         byte[] salt = Arrays.copyOfRange(bytes, 2, 18);
-        byte[] cipherText = Arrays.copyOfRange(bytes, 18, n);
+        byte[] cipherText = Arrays.copyOfRange(bytes, 18, len);
 
         int iterationCount = new BigInteger(1, iterationCounntBytes).intValue();
         byte[] pwd;

@@ -93,6 +93,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
@@ -108,6 +110,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
  */
 
 public class X509Util {
+    private static final Logger LOG = LoggerFactory.getLogger(X509Util.class);
 
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
@@ -149,18 +152,18 @@ public class X509Util {
             final X500Name name) {
         ParamUtil.requireNonNull("name", name);
         RDN[] orig = name.getRDNs();
-        int n = orig.length;
-        RDN[] newRDN = new RDN[n];
+        final int n = orig.length;
+        RDN[] newRdn = new RDN[n];
         for (int i = 0; i < n; i++) {
-            newRDN[i] = orig[n - 1 - i];
+            newRdn[i] = orig[n - 1 - i];
         }
-        return new X500Name(newRDN);
+        return new X500Name(newRdn);
     }
 
     public static X500Name sortX509Name(
             final X500Name name) {
         ParamUtil.requireNonNull("name", name);
-        RDN[] requstedRDNs = name.getRDNs();
+        RDN[] requstedRdns = name.getRDNs();
 
         List<RDN> rdns = new LinkedList<>();
 
@@ -168,23 +171,23 @@ public class X509Util {
         int size = sortedDNs.size();
         for (int i = 0; i < size; i++) {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
-            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = (thisRDNs == null)
+            RDN[] thisRdns = getRdns(requstedRdns, type);
+            int len = (thisRdns == null)
                     ? 0
-                    : thisRDNs.length;
-            if (n == 0) {
+                    : thisRdns.length;
+            if (len == 0) {
                 continue;
             }
 
-            for (RDN thisRDN : thisRDNs) {
-                rdns.add(thisRDN);
+            for (RDN m : thisRdns) {
+                rdns.add(m);
             }
         }
 
         return new X500Name(rdns.toArray(new RDN[0]));
     }
 
-    private static RDN[] getRDNs(
+    private static RDN[] getRdns(
             final RDN[] rdns,
             final ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("rdns", rdns);
@@ -230,13 +233,6 @@ public class X509Util {
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    public static X509Certificate parseBase64EncodedCert(
-            final String base64EncodedCert)
-    throws IOException, CertificateException {
-        ParamUtil.requireNonNull("base64EncodedCert", base64EncodedCert);
-        return parseCert(Base64.decode(base64EncodedCert));
-    }
-
     public static X509Certificate parseCert(
             final InputStream certStream)
     throws IOException, CertificateException {
@@ -252,6 +248,13 @@ public class X509Util {
         }
 
         return (X509Certificate) certFact.generateCertificate(certStream);
+    }
+
+    public static X509Certificate parseBase64EncodedCert(
+            final String base64EncodedCert)
+    throws IOException, CertificateException {
+        ParamUtil.requireNonNull("base64EncodedCert", base64EncodedCert);
+        return parseCert(Base64.decode(base64EncodedCert));
     }
 
     public static X509CRL parseCrl(
@@ -317,8 +320,8 @@ public class X509Util {
             final X500Name name) {
         ParamUtil.requireNonNull("name", name);
         ASN1ObjectIdentifier[] tmpTypes = name.getAttributeTypes();
-        int n = tmpTypes.length;
-        List<String> types = new ArrayList<>(n);
+        int len = tmpTypes.length;
+        List<String> types = new ArrayList<>(len);
         for (ASN1ObjectIdentifier type : tmpTypes) {
             types.add(type.getId());
         }
@@ -326,7 +329,7 @@ public class X509Util {
         Collections.sort(types);
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < len; i++) {
             String type = types.get(i);
             if (i > 0) {
                 sb.append(",");
@@ -478,13 +481,13 @@ public class X509Util {
             return null;
         }
 
-        List<ASN1ObjectIdentifier> l = new ArrayList<>(usages);
-        List<ASN1ObjectIdentifier> sortedUsages = sortOidList(l);
+        List<ASN1ObjectIdentifier> list = new ArrayList<>(usages);
+        List<ASN1ObjectIdentifier> sortedUsages = sortOidList(list);
         KeyPurposeId[] kps = new KeyPurposeId[sortedUsages.size()];
 
-        int i = 0;
+        int idx = 0;
         for (ASN1ObjectIdentifier oid : sortedUsages) {
-            kps[i++] = KeyPurposeId.getInstance(oid);
+            kps[idx++] = KeyPurposeId.getInstance(oid);
         }
 
         return new ExtendedKeyUsage(kps);
@@ -494,14 +497,14 @@ public class X509Util {
     public static List<ASN1ObjectIdentifier> sortOidList(
             List<ASN1ObjectIdentifier> oids) {
         ParamUtil.requireNonNull("oids", oids);
-        List<String> l = new ArrayList<>(oids.size());
+        List<String> list = new ArrayList<>(oids.size());
         for (ASN1ObjectIdentifier m : oids) {
-            l.add(m.getId());
+            list.add(m.getId());
         }
-        Collections.sort(l);
+        Collections.sort(list);
 
         List<ASN1ObjectIdentifier> sorted = new ArrayList<>(oids.size());
-        for (String m : l) {
+        for (String m : list) {
             for (ASN1ObjectIdentifier n : oids) {
                 if (m.equals(n.getId()) && !sorted.contains(n)) {
                     sorted.add(n);
@@ -541,7 +544,7 @@ public class X509Util {
     }
 
     /**
-     * Cross certificate will not be considered
+     * Cross certificate will not be considered.
      */
     public static X509Certificate[] buildCertPath(
             final X509Certificate cert,
@@ -565,6 +568,7 @@ public class X509Util {
                 }
             }
         } catch (CertificateEncodingException ex) {
+            LOG.warn("CertificateEncodingException: {}", ex.getMessage());
         }
 
         final int n = certChain.size();
@@ -613,6 +617,7 @@ public class X509Util {
                 cert.verify(x509CaCert.getPublicKey());
                 return x509CaCert;
             } catch (Exception ex) {
+                LOG.warn("could not verify certificate: {}", ex.getMessage());
             }
         }
 
@@ -640,8 +645,8 @@ public class X509Util {
     throws CertificateEncodingException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
-        boolean isCA = issuerCert.getBasicConstraints() >= 0;
-        if (!isCA) {
+        boolean isCa = issuerCert.getBasicConstraints() >= 0;
+        if (!isCa) {
             return false;
         }
 
@@ -806,9 +811,9 @@ public class X509Util {
             return null;
         }
 
-        int n = taggedValues.size();
-        GeneralName[] names = new GeneralName[n];
-        for (int i = 0; i < n; i++) {
+        int len = taggedValues.size();
+        GeneralName[] names = new GeneralName[len];
+        for (int i = 0; i < len; i++) {
             names[i] = createGeneralName(taggedValues.get(i));
         }
         return new GeneralNames(names);
@@ -818,9 +823,6 @@ public class X509Util {
     *
     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
     *     type=value.
-    * @param modes
-    * @return
-    * @throws BadInputException
     */
     public static GeneralName createGeneralName(
             final String taggedValue)
@@ -837,6 +839,7 @@ public class X509Util {
                     tag = Integer.parseInt(tagS);
                     value = taggedValue.substring(idx + 1);
                 } catch (NumberFormatException ex) {
+                    LOG.warn("invalid tag '{}'", tagS);
                 }
             }
         }

@@ -99,7 +99,7 @@ public class OcspLoadTest extends LoadExecutor {
 
             SingleResp[] singleResponses = basicResp.getResponses();
 
-            int n = (singleResponses == null)
+            final int n = (singleResponses == null)
                     ? 0
                     : singleResponses.length;
 

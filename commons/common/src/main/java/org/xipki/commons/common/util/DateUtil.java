@@ -57,7 +57,7 @@ public class DateUtil {
     private DateUtil() {
     }
 
-    public static Date parseUTCTimeyyyyMMddhhmmss(
+    public static Date parseUtcTimeyyyyMMddhhmmss(
             final String utcTime) {
         if (utcTime == null || utcTime.length() != 14) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");

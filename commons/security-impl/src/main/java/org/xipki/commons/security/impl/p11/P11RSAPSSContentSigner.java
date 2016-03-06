@@ -65,32 +65,32 @@ import org.xipki.commons.security.api.util.SignerUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P11RSAPSSContentSigner implements ContentSigner {
-
+    // CHECKSTYLE:SKIP
     private class PSSSignerOutputStream extends OutputStream {
 
         @Override
         public void write(
-                final int b)
+                final int oneByte)
         throws IOException {
-            pssSigner.update((byte) b);
+            pssSigner.update((byte) oneByte);
         }
 
         @Override
         public void write(
-                final byte[] b)
+                final byte[] bytes)
         throws IOException {
-            pssSigner.update(b, 0, b.length);
+            pssSigner.update(bytes, 0, bytes.length);
         }
 
         @Override
         public void write(
-                final byte[] b,
+                final byte[] bytes,
                 final int off,
                 final int len)
         throws IOException {
-            pssSigner.update(b, off, len);
+            pssSigner.update(bytes, off, len);
         }
 
         @Override

@@ -126,16 +126,16 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
 
     @Override
     public boolean equals(
-            final Object o) {
-        if (this == o) {
+            final Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (!(o instanceof P11KeyIdentifier)) {
+        if (!(obj instanceof P11KeyIdentifier)) {
             return false;
         }
 
-        P11KeyIdentifier o2 = (P11KeyIdentifier) o;
+        P11KeyIdentifier o2 = (P11KeyIdentifier) obj;
         if (keyId != null && o2.keyId != null) {
             return Arrays.equals(keyId, o2.keyId);
         }

@@ -50,32 +50,33 @@ import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 @Command(scope = "xipki-tk", name = "dsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
+// CHECKSTYLE:SKIP
 public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
 
     @Option(name = "--plen",
             description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private Integer plen = 2048;
 
     @Option(name = "--qlen",
             description = "bit length of the sub-prime")
-    private Integer qLen;
+    private Integer qlen;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        if (pLen % 1024 != 0) {
-            throw new IllegalCmdParamException("plen is not multiple of 1024: " + pLen);
+        if (plen % 1024 != 0) {
+            throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
         }
 
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
+        if (qlen == null) {
+            if (plen >= 2048) {
+                qlen = 256;
             } else {
-                qLen = 160;
+                qlen = 160;
             }
         }
 
-        P12KeypairGenerationResult keypair = keyGenerator.generateDSAKeypair(pLen, qLen,
+        P12KeypairGenerationResult keypair = keyGenerator.generateDSAKeypair(plen, qlen,
                 getKeyGenParameters());
         saveKeypair(keypair);
 

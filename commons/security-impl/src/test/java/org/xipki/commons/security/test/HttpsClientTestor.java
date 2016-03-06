@@ -133,7 +133,7 @@ public class HttpsClientTestor {
                     System.out.println(input);
                 }
                 br.close();
-            } catch (IOException ex) {
+            } catch (IOException ex) { // CHECKSTYLE:SKIP
             }
         }
     }
@@ -151,17 +151,17 @@ public class HttpsClientTestor {
     }
 
     public static long hashCode(
-            final String s) {
-        long h = 0;
-        char[] value = s.toCharArray();
-        if (h == 0 && value.length > 0) {
-            char val[] = value;
+            final String str) {
+        long ret = 0;
+        char[] value = str.toCharArray();
+        if (ret == 0 && value.length > 0) {
+            char[] val = value;
 
             for (int i = 0; i < value.length; i++) {
-                h = 31 * h + val[i];
+                ret = 31 * ret + val[i];
             }
         }
-        return h;
+        return ret;
     }
 
 }

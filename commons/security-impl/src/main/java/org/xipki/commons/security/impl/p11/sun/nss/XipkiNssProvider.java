@@ -156,12 +156,14 @@ public class XipkiNssProvider extends Provider {
             public Object run() {
                 Iterator<Descriptor> it = DESCRIPTORS.values().iterator();
                 while (it.hasNext()) {
-                    Descriptor d = it.next();
-                    put(d.service.type + "." + d.algorithm, d.getClassName());
-                    if (d.aliases != null) {
-                        List<String> aliases = d.getAliases();
+                    Descriptor descriptor = it.next();
+                    put(descriptor.service.type + "." + descriptor.algorithm,
+                            descriptor.getClassName());
+                    if (descriptor.aliases != null) {
+                        List<String> aliases = descriptor.getAliases();
                         for (String alias : aliases) {
-                            put("Alg.Alias." + d.service.type + "." + alias, d.algorithm);
+                            put("Alg.Alias." + descriptor.service.type + "." + alias,
+                                    descriptor.algorithm);
                         }
                     }
                 }
@@ -171,10 +173,10 @@ public class XipkiNssProvider extends Provider {
     }
 
     private static boolean support(
-            final Descriptor d) {
+            final Descriptor descriptor) {
         try {
-            Object o = Class.forName(d.getClassName()).newInstance();
-            return (o != null);
+            Object obj = Class.forName(descriptor.getClassName()).newInstance();
+            return (obj != null);
         } catch (Throwable th) {
             return false;
         }
@@ -239,9 +241,9 @@ public class XipkiNssProvider extends Provider {
             final String className,
             final String oid,
             final String... aliases) {
-        Descriptor d = new Descriptor(service, algorithm, className, oid, aliases);
-        if (support(d)) {
-            DESCRIPTORS.put(d.toString(), d);
+        Descriptor descriptor = new Descriptor(service, algorithm, className, oid, aliases);
+        if (support(descriptor)) {
+            DESCRIPTORS.put(descriptor.toString(), descriptor);
         }
     }
 

@@ -45,7 +45,7 @@ import org.xipki.commons.password.api.SinglePasswordResolver;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
 
     private char[] masterPassword;

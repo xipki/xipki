@@ -134,17 +134,17 @@ public class XmlUtil {
     public static XMLGregorianCalendar getXmlDate(
             final Calendar calendar) {
         ParamUtil.requireNonNull("calendar", calendar);
-        GregorianCalendar c;
+        GregorianCalendar cal;
         if (calendar instanceof GregorianCalendar) {
-            c = (GregorianCalendar) calendar;
+            cal = (GregorianCalendar) calendar;
         } else {
-            c = new GregorianCalendar();
-            c.setTimeZone(UTC);
-            c.setTime(calendar.getTime());
+            cal = new GregorianCalendar();
+            cal.setTimeZone(UTC);
+            cal.setTime(calendar.getTime());
         }
 
         try {
-            XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+            XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
         } catch (DatatypeConfigurationException ex) {
@@ -155,12 +155,12 @@ public class XmlUtil {
     public static XMLGregorianCalendar getXmlDate(
             final Date dateAndTime) {
         ParamUtil.requireNonNull("dateAndTime", dateAndTime);
-        GregorianCalendar c = new GregorianCalendar();
-        c.setTimeZone(UTC);
-        c.setTime(dateAndTime);
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTimeZone(UTC);
+        cal.setTime(dateAndTime);
 
         try {
-            XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+            XMLGregorianCalendar ret = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
             ret.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             return ret;
         } catch (DatatypeConfigurationException ex) {
@@ -182,14 +182,14 @@ public class XmlUtil {
             final Node node) {
         ParamUtil.requireNonNull("node", node);
         if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Node n = node.getFirstChild();
-            if (n != null) {
+            Node cn = node.getFirstChild();
+            if (cn != null) {
                 do {
-                    if (n.getNodeType() == Node.TEXT_NODE) {
-                        return n.getNodeValue();
+                    if (cn.getNodeType() == Node.TEXT_NODE) {
+                        return cn.getNodeValue();
                     }
-                    n = n.getNextSibling();
-                } while (n != null);
+                    cn = cn.getNextSibling();
+                } while (cn != null);
             }
         }
 
@@ -318,8 +318,8 @@ public class XmlUtil {
     public static String getValueOfFirstMatch(
             final Element contextNode,
             final String relativeXpath,
-            final Map<String, String> nsPrefixURIMap) {
-        Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixURIMap);
+            final Map<String, String> nsPrefixUriMap) {
+        Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixUriMap);
         return (node == null)
                 ? null
                 : getNodeValue(node);
@@ -328,8 +328,8 @@ public class XmlUtil {
     public static Node getFirstMatch(
             final Element contextNode,
             final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap) {
-        List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, true);
+            final Map<String, String> nsPrefixUriMap) {
+        List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixUriMap, true);
         return CollectionUtil.isEmpty(nodes)
                 ? null
                 : nodes.get(0);
@@ -338,38 +338,38 @@ public class XmlUtil {
     public static List<Node> getMatch(
             final Element contextNode,
             final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap) {
-        return getMatch(contextNode, relativeXPath, nsPrefixURIMap, false);
+            final Map<String, String> nsPrefixUriMap) {
+        return getMatch(contextNode, relativeXPath, nsPrefixUriMap, false);
     }
 
     private static List<Node> getMatch(
             final Element contextNode,
-            final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap,
+            final String relativeXpath,
+            final Map<String, String> nsPrefixUriMap,
             final boolean onlyFirstMatch) {
         try {
-            SimpleXpath sXPath = new SimpleXpath(relativeXPath, nsPrefixURIMap);
+            SimpleXpath simpleXpath = new SimpleXpath(relativeXpath, nsPrefixUriMap);
             if (onlyFirstMatch) {
-                Node node = sXPath.selectFirstMatch(contextNode);
+                Node node = simpleXpath.selectFirstMatch(contextNode);
                 if (node == null) {
                     return Collections.emptyList();
                 } else {
                     return Arrays.asList(node);
                 }
             } else {
-                return sXPath.select(contextNode);
+                return simpleXpath.select(contextNode);
             }
         } catch (XPathExpressionException ex) {
-            System.err.println("invalid xpath {}" + relativeXPath);
+            System.err.println("invalid xpath {}" + relativeXpath);
             return Collections.emptyList();
         }
     }
 
     public static List<Element> getElementMatch(
             final Element contextNode,
-            final String relativeXPath,
-            final Map<String, String> nsPrefixURIMap) {
-        List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, false);
+            final String relativeXpath,
+            final Map<String, String> nsPrefixUriMap) {
+        List<Node> nodes = getMatch(contextNode, relativeXpath, nsPrefixUriMap, false);
         List<Element> elements = new ArrayList<Element>(nodes.size());
         for (Node node : nodes) {
             if (node instanceof Element) {

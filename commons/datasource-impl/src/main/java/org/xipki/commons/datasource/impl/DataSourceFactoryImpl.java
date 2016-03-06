@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceFactory;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -57,6 +59,8 @@ import org.xipki.commons.password.api.PasswordResolverException;
 
 public class DataSourceFactoryImpl implements DataSourceFactory {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactoryImpl.class);
+
     @Override
     public DataSourceWrapper createDataSourceForFile(
             final String name,
@@ -64,8 +68,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
-        FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
-        return createDataSource(name, fIn, passwordResolver);
+        FileInputStream fileIn = new FileInputStream(expandFilepath(confFile));
+        return createDataSource(name, fileIn, passwordResolver);
     }
 
     @Override
@@ -82,6 +86,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             try {
                 conf.close();
             } catch (Exception ex) {
+                LOG.error("could not close stream: {}", ex.getMessage());
             }
         }
 

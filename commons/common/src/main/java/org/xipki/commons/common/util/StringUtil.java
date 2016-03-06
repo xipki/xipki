@@ -76,13 +76,13 @@ public class StringUtil {
     }
 
     public static boolean isBlank(
-            final String s) {
-        return s == null || s.isEmpty();
+            final String str) {
+        return str == null || str.isEmpty();
     }
 
     public static boolean isNotBlank(
-            final String s) {
-        return s != null && !s.isEmpty();
+            final String str) {
+        return str != null && !str.isEmpty();
     }
 
     public static Set<String> splitAsSet(
@@ -117,9 +117,9 @@ public class StringUtil {
         for (String m : set) {
             sb.append(m).append(delim);
         }
-        int n = sb.length();
-        if (n > 0) {
-            sb.delete(n - delim.length(), n);
+        int len = sb.length();
+        if (len > 0) {
+            sb.delete(len - delim.length(), len);
         }
         return sb.toString();
     }
@@ -155,13 +155,13 @@ public class StringUtil {
             final String text,
             final int minLen) {
         ParamUtil.requireNonNull("text", text);
-        int n = text.length();
-        if (n >= minLen) {
+        int len = text.length();
+        if (len >= minLen) {
             return text;
         }
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < minLen - n; i++) {
+        for (int i = 0; i < minLen - len; i++) {
             sb.append(" ");
         }
         sb.append(text);
@@ -220,28 +220,28 @@ public class StringUtil {
     private static String formatTime(
             final long seconds,
             final int minLen) {
-        long s = seconds % 60;
         long minutes = seconds / 60;
-        long m = minutes % 60;
-        long h = minutes / 60;
 
         StringBuilder sb = new StringBuilder();
+        long hour = minutes / 60;
         // hours
-        if (h > 0) {
-            sb.append(h).append(':');
+        if (hour > 0) {
+            sb.append(hour).append(':');
         }
 
+        long modMinute = minutes % 60;
         // minutes
-        if (m < 10) {
+        if (modMinute < 10) {
             sb.append('0');
         }
-        sb.append(m).append(':');
+        sb.append(modMinute).append(':');
 
+        long modSec = seconds % 60;
         // seconds
-        if (s < 10) {
+        if (modSec < 10) {
             sb.append('0');
         }
-        sb.append(s);
+        sb.append(modSec);
 
         return formatText(sb.toString(), minLen);
     }

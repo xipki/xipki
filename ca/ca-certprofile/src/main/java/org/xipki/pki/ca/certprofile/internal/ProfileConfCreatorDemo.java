@@ -248,7 +248,7 @@ public class ProfileConfCreatorDemo {
     } // method main
 
     private static void marshall(
-            final Marshaller m,
+            final Marshaller marshaller,
             final X509ProfileType profile,
             final String filename)
     throws Exception {
@@ -257,7 +257,7 @@ public class ProfileConfCreatorDemo {
         JAXBElement<X509ProfileType> root = new ObjectFactory().createX509Profile(profile);
         FileOutputStream out = new FileOutputStream(file);
         try {
-            m.marshal(root, out);
+            marshaller.marshal(root, out);
         } catch (JAXBException ex) {
             throw XmlUtil.convert(ex);
         } finally {
@@ -497,16 +497,15 @@ public class ProfileConfCreatorDemo {
 
         // SubjectInfoAccess
         SubjectInfoAccess subjectInfoAccessMode = new SubjectInfoAccess();
-
         SubjectInfoAccess.Access access = new SubjectInfoAccess.Access();
+        subjectInfoAccessMode.getAccess().add(access);
+
         access.setAccessMethod(createOidType(ObjectIdentifiers.id_ad_caRepository));
 
         GeneralNameType accessLocation = new GeneralNameType();
         access.setAccessLocation(accessLocation);
         accessLocation.setDirectoryName("");
         accessLocation.setUniformResourceIdentifier("");
-
-        subjectInfoAccessMode.getAccess().add(access);
 
         extensionValue = createExtensionValueType(subjectInfoAccessMode);
         list.add(createExtension(Extension.subjectInfoAccess, true, false, extensionValue));
@@ -1287,17 +1286,17 @@ public class ProfileConfCreatorDemo {
             final ASN1ObjectIdentifier[] optionalUsages) {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
         if (requiredUsages != null) {
-            List<ASN1ObjectIdentifier> l = Arrays.asList(requiredUsages);
-            l = X509Util.sortOidList(l);
-            for (ASN1ObjectIdentifier usage : l) {
+            List<ASN1ObjectIdentifier> oids = Arrays.asList(requiredUsages);
+            oids = X509Util.sortOidList(oids);
+            for (ASN1ObjectIdentifier usage : oids) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
             }
         }
 
         if (optionalUsages != null) {
-            List<ASN1ObjectIdentifier> l = Arrays.asList(optionalUsages);
-            l = X509Util.sortOidList(l);
-            for (ASN1ObjectIdentifier usage : l) {
+            List<ASN1ObjectIdentifier> oids = Arrays.asList(optionalUsages);
+            oids = X509Util.sortOidList(oids);
+            for (ASN1ObjectIdentifier usage : oids) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
             }
         }
@@ -1376,15 +1375,15 @@ public class ProfileConfCreatorDemo {
 
         QcEuLimitValueType euLimit = new QcEuLimitValueType();
         euLimit.setCurrency("EUR");
-        Range2Type rAmount = new Range2Type();
-        rAmount.setMin(100);
-        rAmount.setMax(200);
-        euLimit.setAmount(rAmount);
+        Range2Type rangeAmount = new Range2Type();
+        rangeAmount.setMin(100);
+        rangeAmount.setMax(200);
+        euLimit.setAmount(rangeAmount);
 
-        Range2Type rExponent = new Range2Type();
-        rExponent.setMin(10);
-        rExponent.setMax(20);
-        euLimit.setExponent(rExponent);
+        Range2Type rangeExponent = new Range2Type();
+        rangeExponent.setMin(10);
+        rangeExponent.setMax(20);
+        euLimit.setExponent(rangeExponent);
 
         statementValue.setQcEuLimitValue(euLimit);
         statement.setStatementValue(statementValue);
@@ -1414,11 +1413,12 @@ public class ProfileConfCreatorDemo {
         // type
         // predefined image (0)
         BiometricTypeType type = new BiometricTypeType();
+        extValue.getType().add(type);
+
         IntWithDescType predefined = new IntWithDescType();
         predefined.setValue(0);
         predefined.setDescription("image");
         type.setPredefined(predefined);
-        extValue.getType().add(type);
 
         // predefined handwritten-signature(1)
         type = new BiometricTypeType();
@@ -1470,10 +1470,10 @@ public class ProfileConfCreatorDemo {
         }
 
         CertificatePolicies extValue = new CertificatePolicies();
-        List<CertificatePolicyInformationType> l = extValue.getCertificatePolicyInformation();
+        List<CertificatePolicyInformationType> pis = extValue.getCertificatePolicyInformation();
         for (ASN1ObjectIdentifier oid : policyOids) {
             CertificatePolicyInformationType single = new CertificatePolicyInformationType();
-            l.add(single);
+            pis.add(single);
             single.setPolicyIdentifier(createOidType(oid));
         }
 
@@ -1589,12 +1589,12 @@ public class ProfileConfCreatorDemo {
             SignatureAlgorithms sigAlgosType = new SignatureAlgorithms();
             profile.setSignatureAlgorithms(sigAlgosType);
 
-            List<String> l = sigAlgosType.getAlgorithm();
+            List<String> algos = sigAlgosType.getAlgorithm();
             String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA",
                 "withPlainECDSA", "withRSAandMGF1"};
             for (String part2 : algoPart2s) {
                 for (String hashAlgo : sigHashAlgos) {
-                    l.add(hashAlgo + part2);
+                    algos.add(hashAlgo + part2);
                 }
             }
         }
@@ -1646,16 +1646,16 @@ public class ProfileConfCreatorDemo {
         ranges = new RangesType();
         dsaParams.setPLength(ranges);
 
-        List<RangeType> pLengths = ranges.getRange();
-        pLengths.add(createRange(1024));
-        pLengths.add(createRange(2048));
+        List<RangeType> plengths = ranges.getRange();
+        plengths.add(createRange(1024));
+        plengths.add(createRange(2048));
 
         ranges = new RangesType();
         dsaParams.setQLength(ranges);
-        List<RangeType> qLengths = ranges.getRange();
-        qLengths.add(createRange(160));
-        qLengths.add(createRange(224));
-        qLengths.add(createRange(256));
+        List<RangeType> qlengths = ranges.getRange();
+        qlengths.add(createRange(160));
+        qlengths.add(createRange(224));
+        qlengths.add(createRange(256));
 
         // EC
         algorithm = new AlgorithmType();
@@ -1684,6 +1684,7 @@ public class ProfileConfCreatorDemo {
         return ret;
     } // method createKeyAlgorithms
 
+    // CHECKSTYLE:SKIP
     private static KeyAlgorithms createRSAKeyAlgorithms() {
         KeyAlgorithms ret = new KeyAlgorithms();
         List<AlgorithmType> list = ret.getAlgorithm();
@@ -1758,15 +1759,15 @@ public class ProfileConfCreatorDemo {
     }
 
     private static ExtensionValueType createTlsFeature(TlsExtensionType[] features) {
-        List<TlsExtensionType> l = Arrays.asList(features);
-        Collections.sort(l);
+        List<TlsExtensionType> exts = Arrays.asList(features);
+        Collections.sort(exts);
 
         TlsFeature tlsFeature = new TlsFeature();
-        for (TlsExtensionType m : l) {
-            IntWithDescType k = new IntWithDescType();
-            k.setValue(m.getCode());
-            k.setDescription(m.getName());
-            tlsFeature.getFeature().add(k);
+        for (TlsExtensionType m : exts) {
+            IntWithDescType ints = new IntWithDescType();
+            ints.setValue(m.getCode());
+            ints.setDescription(m.getName());
+            tlsFeature.getFeature().add(ints);
         }
         return createExtensionValueType(tlsFeature);
     }

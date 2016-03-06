@@ -51,7 +51,7 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
  * @since 2.0.0
  */
 
-class ASN1Util {
+class Asn1Util {
 
     private static final BigInteger MAX_BYTE = BigInteger.valueOf(Byte.MAX_VALUE);
 
@@ -61,7 +61,7 @@ class ASN1Util {
 
     private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
 
-    private ASN1Util() {
+    private Asn1Util() {
     }
 
     public static byte[] getBytes(

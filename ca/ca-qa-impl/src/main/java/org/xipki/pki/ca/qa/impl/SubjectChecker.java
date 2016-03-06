@@ -94,11 +94,9 @@ public class SubjectChecker {
 
         Subject subject = conf.getSubject();
 
-        Map<ASN1ObjectIdentifier, RdnControl> subjectDNControls = new HashMap<>();
+        Map<ASN1ObjectIdentifier, RdnControl> subjectDnControls = new HashMap<>();
 
         for (RdnType t : subject.getRdn()) {
-            StringType stringType = XmlX509CertprofileUtil.convertStringType(
-                    t.getStringType());
             ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
 
             List<Pattern> patterns = null;
@@ -124,6 +122,8 @@ public class SubjectChecker {
                 range = null;
             }
 
+            StringType stringType = XmlX509CertprofileUtil.convertStringType(t.getStringType());
+
             RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
             rdnControl.setStringType(stringType);
             rdnControl.setStringLengthRange(range);
@@ -133,10 +133,10 @@ public class SubjectChecker {
             rdnControl.setGroup(t.getGroup());
             SubjectDnSpec.fixRdnControl(rdnControl);
 
-            subjectDNControls.put(type, rdnControl);
+            subjectDnControls.put(type, rdnControl);
         }
 
-        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDNControls);
+        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDnControls);
     } // constructor
 
     public List<ValidationIssue> checkSubject(
@@ -302,9 +302,9 @@ public class SubjectChecker {
                     atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
         }
 
-        int n = failureMsg.length();
-        if (n > 2) {
-            failureMsg.delete(n - 2, n);
+        int len = failureMsg.length();
+        if (len > 2) {
+            failureMsg.delete(len - 2, len);
             issue.setFailureMessage(failureMsg.toString());
         }
 
@@ -370,9 +370,9 @@ public class SubjectChecker {
 
         StringBuilder failureMsg = new StringBuilder();
 
-        AttributeTypeAndValue[] l = rdns[0].getTypesAndValues();
+        AttributeTypeAndValue[] li = rdns[0].getTypesAndValues();
         List<AttributeTypeAndValue> atvs = new LinkedList<>();
-        for (AttributeTypeAndValue m : l) {
+        for (AttributeTypeAndValue m : li) {
             if (type.equals(m.getType())) {
                 atvs.add(m);
             }
@@ -397,9 +397,9 @@ public class SubjectChecker {
                     atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
         }
 
-        int n = failureMsg.length();
-        if (n > 2) {
-            failureMsg.delete(n - 2, n);
+        int len = failureMsg.length();
+        if (len > 2) {
+            failureMsg.delete(len - 2, len);
             issue.setFailureMessage(failureMsg.toString());
         }
 
@@ -409,50 +409,50 @@ public class SubjectChecker {
     private void checkAttributeTypeAndValue(
             final String name,
             final ASN1ObjectIdentifier type,
-            final String _atvTextValue,
+            final String atvTextValue,
             final RdnControl rdnControl,
             final List<String> requestedCoreAtvTextValues,
             final int index,
             final StringBuilder failureMsg)
     throws BadCertTemplateException {
-        String atvTextValue = _atvTextValue;
+        String tmpAtvTextValue = atvTextValue;
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(atvTextValue).matches()) {
+            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(tmpAtvTextValue).matches()) {
                 throw new BadCertTemplateException(
                         "Value of RDN dateOfBirth does not have format YYYMMDD000000Z");
             }
         } else if (rdnControl != null) {
             String prefix = rdnControl.getPrefix();
             if (prefix != null) {
-                if (!atvTextValue.startsWith(prefix)) {
-                    failureMsg.append(name).append(" '").append(atvTextValue).
-                        append("' does not start with prefix '").append(prefix).append("'");
+                if (!tmpAtvTextValue.startsWith(prefix)) {
+                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
+                        .append("' does not start with prefix '").append(prefix).append("'");
                     failureMsg.append("; ");
                     return;
                 } else {
-                    atvTextValue = atvTextValue.substring(prefix.length());
+                    tmpAtvTextValue = tmpAtvTextValue.substring(prefix.length());
                 }
             }
 
             String suffix = rdnControl.getSuffix();
             if (suffix != null) {
-                if (!atvTextValue.endsWith(suffix)) {
-                    failureMsg.append(name).append(" '").append(atvTextValue)
+                if (!tmpAtvTextValue.endsWith(suffix)) {
+                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
                         .append("' does not end with suffx '").append(suffix).append("'");
                     failureMsg.append("; ");
                     return;
                 } else {
-                    atvTextValue = atvTextValue.substring(0,
-                            atvTextValue.length() - suffix.length());
+                    tmpAtvTextValue = tmpAtvTextValue.substring(0,
+                            tmpAtvTextValue.length() - suffix.length());
                 }
             }
 
             List<Pattern> patterns = rdnControl.getPatterns();
             if (patterns != null) {
                 Pattern pattern = patterns.get(index);
-                boolean matches = pattern.matcher(atvTextValue).matches();
+                boolean matches = pattern.matcher(tmpAtvTextValue).matches();
                 if (!matches) {
-                    failureMsg.append(name).append(" '").append(atvTextValue)
+                    failureMsg.append(name).append(" '").append(tmpAtvTextValue)
                         .append("' is not valid against regex '")
                         .append(pattern.pattern()).append("'");
                     failureMsg.append("; ");
@@ -471,18 +471,17 @@ public class SubjectChecker {
             if (ObjectIdentifiers.DN_CN.equals(type)
                     && specialBehavior != null
                     && "gematik_gSMC_K".equals(specialBehavior)) {
-                if (!atvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
+                if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
                     failureMsg.append("content '")
-                        .append(atvTextValue)
+                        .append(tmpAtvTextValue)
                         .append("' does not start with '")
                         .append(requestedCoreAtvTextValue).append("-'");
                     failureMsg.append("; ");
                 }
-            } else if (type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
-            } else {
-                if (!atvTextValue.equals(requestedCoreAtvTextValue)) {
+            } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
+                if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
                     failureMsg.append("content '")
-                        .append(atvTextValue)
+                        .append(tmpAtvTextValue)
                         .append("' but expected '")
                         .append(requestedCoreAtvTextValue).append("'");
                     failureMsg.append("; ");
@@ -540,30 +539,30 @@ public class SubjectChecker {
             final RDN requestedRdn)
     throws BadCertTemplateException {
         ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
-        ASN1Encodable v = requestedRdn.getFirst().getValue();
+        ASN1Encodable vec = requestedRdn.getFirst().getValue();
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
-            if (!(v instanceof ASN1GeneralizedTime)) {
+            if (!(vec instanceof ASN1GeneralizedTime)) {
                 throw new BadCertTemplateException("requested RDN is not of GeneralizedTime");
             }
-            return ((ASN1GeneralizedTime) v).getTimeString();
+            return ((ASN1GeneralizedTime) vec).getTimeString();
         } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
-            if (!(v instanceof ASN1Sequence)) {
+            if (!(vec instanceof ASN1Sequence)) {
                 throw new BadCertTemplateException("requested RDN is not of Sequence");
             }
 
-            ASN1Sequence seq = (ASN1Sequence) v;
+            ASN1Sequence seq = (ASN1Sequence) vec;
             final int n = seq.size();
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < n; i++) {
-                ASN1Encodable o = seq.getObjectAt(i);
-                String textValue = X509Util.rdnValueToString(o);
+                ASN1Encodable obj = seq.getObjectAt(i);
+                String textValue = X509Util.rdnValueToString(obj);
                 sb.append("[").append(i).append("]=").append(textValue).append(",");
             }
 
             return sb.toString();
         } else {
-            return X509Util.rdnValueToString(v);
+            return X509Util.rdnValueToString(vec);
         }
     }
 
@@ -610,8 +609,8 @@ public class SubjectChecker {
             StringBuilder sb = new StringBuilder();
             boolean validEncoding = true;
             for (int i = 0; i < n; i++) {
-                ASN1Encodable o = seq.getObjectAt(i);
-                if (!matchStringType(o, stringType)) {
+                ASN1Encodable obj = seq.getObjectAt(i);
+                if (!matchStringType(obj, stringType)) {
                     failureMsg.append(name)
                         .append(".[")
                         .append(i)
@@ -622,7 +621,7 @@ public class SubjectChecker {
                     break;
                 }
 
-                String textValue = X509Util.rdnValueToString(o);
+                String textValue = X509Util.rdnValueToString(obj);
                 sb.append("[").append(i).append("]=").append(textValue).append(",");
             }
 

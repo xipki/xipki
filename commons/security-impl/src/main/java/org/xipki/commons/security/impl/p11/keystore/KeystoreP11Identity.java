@@ -148,11 +148,10 @@ public class KeystoreP11Identity extends P11Identity {
         }
     } // constructor
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_PKCS is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -163,11 +162,10 @@ public class KeystoreP11Identity extends P11Identity {
         return doRsaSign(padded);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_RSA_X509(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof RSAPublicKey)) {
             throw new SignerException("operation CKM_RSA_X509 is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -195,11 +193,10 @@ public class KeystoreP11Identity extends P11Identity {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA_X962(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         if (!(publicKey instanceof ECPublicKey)) {
             throw new SignerException("operation CKM_ECDSA is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
@@ -208,11 +205,10 @@ public class KeystoreP11Identity extends P11Identity {
         return doDSAX962Sign(hash);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_ECDSA(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] x962Signature = CKM_ECDSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
@@ -229,15 +225,15 @@ public class KeystoreP11Identity extends P11Identity {
         return doDSAX962Sign(hash);
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     public byte[] CKM_DSA(
             final byte[] hash)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] x962Signature = CKM_DSA_X962(hash);
         return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
     }
 
+    // CHECKSTYLE:SKIP
     private byte[] doDSAX962Sign(
             final byte[] hash)
     throws SignerException {

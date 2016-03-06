@@ -43,6 +43,7 @@ import org.xipki.pki.scep.transaction.CaCapability;
  * @since 2.0.0
  */
 
+// CHECKSTYLE:SKIP
 public class DESOnlyCaTest extends AbstractCaTest {
 
     protected boolean useInsecureAlgorithms() {

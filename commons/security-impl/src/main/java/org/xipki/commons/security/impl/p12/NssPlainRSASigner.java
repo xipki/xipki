@@ -62,7 +62,7 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class NssPlainRSASigner implements AsymmetricBlockCipher {
 
     private static final String ALGORITHM = "RSA/ECB/NoPadding";
@@ -87,9 +87,9 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
         }
 
         if (param instanceof ParametersWithRandom) {
-            ParametersWithRandom rParam = (ParametersWithRandom) param;
+            ParametersWithRandom randomedParam = (ParametersWithRandom) param;
 
-            key = (RSAKeyParameters) rParam.getParameters();
+            key = (RSAKeyParameters) randomedParam.getParameters();
         } else {
             key = (RSAKeyParameters) param;
         }

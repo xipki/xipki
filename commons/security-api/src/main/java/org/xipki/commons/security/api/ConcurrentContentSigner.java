@@ -73,7 +73,7 @@ public interface ConcurrentContentSigner {
     AlgorithmIdentifier getAlgorithmIdentifier();
 
     /**
-     *
+     * Get the private key.
      * @return the private key if possible. {@code null} may be returned.
      */
     PrivateKey getPrivateKey();

@@ -81,8 +81,8 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected boolean isTrue(
-            final Boolean b) {
-        return b != null && b.booleanValue();
+            final Boolean bo) {
+        return bo != null && bo.booleanValue();
     }
 
     protected void saveVerbose(
@@ -95,9 +95,9 @@ public abstract class XipkiCommandSupport implements Action {
         boolean randomSaveTo = false;
         if (saveTo.exists()) {
             try {
-                boolean b = true;
+                boolean bo = true;
                 while (saveTo.exists()) {
-                    if (b) {
+                    if (bo) {
                         out("A file named '" + saveTo.getPath()
                             + "' already exists. Do you want to replace it [yes/no]? ");
                     }
@@ -122,7 +122,7 @@ public abstract class XipkiCommandSupport implements Action {
                         saveTo = new File(newFn);
                     } else {
                         out("Please answer with yes or no. ");
-                        b = false;
+                        bo = false;
                     }
                 } // end while
             } catch (IOException ex) {
@@ -172,10 +172,10 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     private static String randomHex(
-            final int n) {
-        SecureRandom r = new SecureRandom();
-        byte[] bytes = new byte[n];
-        r.nextBytes(bytes);
+            final int numOfBytes) {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[numOfBytes];
+        random.nextBytes(bytes);
         return new BigInteger(1, bytes).toString(16);
     }
 
@@ -225,12 +225,12 @@ public abstract class XipkiCommandSupport implements Action {
         if ("gui".equalsIgnoreCase(passwordUi)) {
             return SecurePasswordInputPanel.readPassword(prompt);
         } else {
-            String tPrompt = prompt;
+            String tmpPrompt = prompt;
             if (prompt != null && !prompt.endsWith("\n")) {
-                tPrompt += "\n";
+                tmpPrompt += "\n";
             }
             try {
-                String pwd = session.readLine(tPrompt, '*');
+                String pwd = session.readLine(tmpPrompt, '*');
                 return pwd.toCharArray();
             } catch (IOException ex) {
                 return new char[0];
@@ -254,23 +254,23 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected static boolean isBlank(
-            final String s) {
-        return StringUtil.isBlank(s);
+            final String str) {
+        return StringUtil.isBlank(str);
     }
 
     protected static boolean isNotBlank(
-            final String s) {
-        return StringUtil.isNotBlank(s);
+            final String str) {
+        return StringUtil.isNotBlank(str);
     }
 
     protected static boolean isEmpty(
-            final Collection<?> c) {
-        return CollectionUtil.isEmpty(c);
+            final Collection<?> col) {
+        return CollectionUtil.isEmpty(col);
     }
 
     protected static boolean isNotEmpty(
-            final Collection<?> c) {
-        return CollectionUtil.isNonEmpty(c);
+            final Collection<?> col) {
+        return CollectionUtil.isNonEmpty(col);
     }
 
     protected static List<String> split(
@@ -296,11 +296,11 @@ public abstract class XipkiCommandSupport implements Action {
             final String prompt,
             final int maxTries)
     throws IOException {
-        String tPrompt = prompt;
+        String tmpPrompt = prompt;
         if (prompt != null && !prompt.endsWith("\n")) {
-            tPrompt += "\n";
+            tmpPrompt += "\n";
         }
-        String answer = session.readLine(tPrompt, null);
+        String answer = session.readLine(tmpPrompt, null);
         if (answer == null) {
             throw new IOException("interrupted");
         }

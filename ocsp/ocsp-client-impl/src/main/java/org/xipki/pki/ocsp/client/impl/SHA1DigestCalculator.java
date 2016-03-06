@@ -46,6 +46,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
  * @since 2.0.0
  */
 
+// CHECKSTYLE:SKIP
 class SHA1DigestCalculator extends AbstractDigestCalculator {
 
     @Override

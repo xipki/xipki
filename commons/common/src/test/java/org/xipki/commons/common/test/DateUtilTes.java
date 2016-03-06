@@ -52,7 +52,7 @@ public class DateUtilTes {
 
     @Test
     public void test1() {
-        Date utcDate = DateUtil.parseUTCTimeyyyyMMddhhmmss("20150223134459");
+        Date utcDate = DateUtil.parseUtcTimeyyyyMMddhhmmss("20150223134459");
         long expTimeMs = 1424699099L;
 
         Assert.assertEquals("DateTime parsing", expTimeMs, utcDate.getTime() / 1000);

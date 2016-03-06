@@ -221,9 +221,6 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        EnrollCertRequestType request = new EnrollCertRequestType(
-                EnrollCertRequestType.Type.CERT_REQ);
-
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
         ConcurrentContentSigner signer = getSigner(
@@ -268,7 +265,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         // ExtendedKeyusage
         if (isNotEmpty(extkeyusages)) {
             ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
-                    textToASN1ObjectIdentifers(extkeyusages));
+                    textToAsn1ObjectIdentifers(extkeyusages));
             ASN1ObjectIdentifier extType = Extension.extendedKeyUsage;
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
@@ -276,7 +273,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         // QcEuLimitValue
         if (isNotEmpty(qcEuLimits)) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
             for (String m : qcEuLimits) {
                 StringTokenizer st = new StringTokenizer(m, ":");
                 try {
@@ -298,14 +295,14 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                     MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
                     QCStatement statment = new QCStatement(
                             ObjectIdentifiers.id_etsi_qcs_QcLimitValue, monterayValue);
-                    v.add(statment);
+                    vec.add(statment);
                 } catch (Exception ex) {
                     throw new Exception("invalid qc-eu-limit '" + m + "'");
                 }
             }
 
             ASN1ObjectIdentifier extType = Extension.qCStatements;
-            ASN1Sequence extValue = new DERSequence(v);
+            ASN1Sequence extValue = new DERSequence(vec);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         }
@@ -334,11 +331,11 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                     new DEROctetString(biometricDataHash),
                     sourceDataUri);
 
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(biometricData);
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(biometricData);
 
             ASN1ObjectIdentifier extType = Extension.biometricInfo;
-            ASN1Sequence extValue = new DERSequence(v);
+            ASN1Sequence extValue = new DERSequence(vec);
             extensions.add(new Extension(extType, false, extValue.getEncoded()));
             needExtensionTypes.add(extType.getId());
         } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
@@ -350,8 +347,8 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
-                    textToASN1ObjectIdentifers(needExtensionTypes),
-                    textToASN1ObjectIdentifers(wantExtensionTypes));
+                    textToAsn1ObjectIdentifers(needExtensionTypes),
+                    textToAsn1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
                     ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions,
                     false,
@@ -373,6 +370,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
                 certReq, popo);
+
+        EnrollCertRequestType request = new EnrollCertRequestType(
+                EnrollCertRequestType.Type.CERT_REQ);
         request.addRequestEntry(reqEntry);
 
         RequestResponseDebug debug = getRequestResponseDebug();
@@ -400,7 +400,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         return null;
     } // method doExecute
 
-    private static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(
+    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
             final List<String> oidTexts)
     throws InvalidOidOrNameException {
         if (oidTexts == null) {
@@ -422,27 +422,28 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     }
 
     private static ASN1ObjectIdentifier toOid(
-            final String s)
+            final String str)
     throws InvalidOidOrNameException {
-        final int n = s.length();
+        final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {
-            char c = s.charAt(i);
-            if (!((c >= '0' && c <= '1') || c == '.')) {
+            char ch = str.charAt(i);
+            if (!((ch >= '0' && ch <= '1') || ch == '.')) {
                 isName = true;
             }
         }
 
         if (!isName) {
             try {
-                return new ASN1ObjectIdentifier(s);
+                return new ASN1ObjectIdentifier(str);
+                // CHECKSTYLE:SKIP
             } catch (IllegalArgumentException ex) {
             }
         }
 
-        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(s);
+        ASN1ObjectIdentifier oid = ObjectIdentifiers.nameToOid(str);
         if (oid == null) {
-            throw new InvalidOidOrNameException(s);
+            throw new InvalidOidOrNameException(str);
         }
         return oid;
     }

@@ -45,7 +45,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class SHA384DigestCalculator extends AbstractDigestCalculator {
 
     @Override

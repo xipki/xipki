@@ -247,17 +247,17 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 || "JKS".equalsIgnoreCase(tmpType)) {
             ConfPairs keyValues = new ConfPairs(conf);
 
-            String s = keyValues.getValue("parallelism");
+            String str = keyValues.getValue("parallelism");
             int parallelism = defaultParallelism;
-            if (s != null) {
+            if (str != null) {
                 try {
-                    parallelism = Integer.parseInt(s);
+                    parallelism = Integer.parseInt(str);
                 } catch (NumberFormatException ex) {
-                    throw new SignerException("invalid parallelism " + s);
+                    throw new SignerException("invalid parallelism " + str);
                 }
 
                 if (parallelism < 1) {
-                    throw new SignerException("invalid parallelism " + s);
+                    throw new SignerException("invalid parallelism " + str);
                 }
             }
 
@@ -267,28 +267,27 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     pkcs11Module = DEFAULT_P11MODULE_NAME;
                 }
 
-                s = keyValues.getValue("slot");
-                Integer slotIndex = (s == null)
+                str = keyValues.getValue("slot");
+                Integer slotIndex = (str == null)
                         ? null
-                        : Integer.parseInt(s);
+                        : Integer.parseInt(str);
 
-                s = keyValues.getValue("slot-id");
-                Long slotId = (s == null)
+                str = keyValues.getValue("slot-id");
+                Long slotId = (str == null)
                         ? null
-                        : Long.parseLong(s);
+                        : Long.parseLong(str);
 
                 if ((slotIndex == null && slotId == null)
                         || (slotIndex != null && slotId != null)) {
                     throw new SignerException(
                             "exactly one of slot (index) and slot-id must be specified");
                 }
-                P11SlotIdentifier slot = new P11SlotIdentifier(slotIndex, slotId);
 
                 String keyLabel = keyValues.getValue("key-label");
-                s = keyValues.getValue("key-id");
+                str = keyValues.getValue("key-id");
                 byte[] keyId = null;
-                if (s != null) {
-                    keyId = Hex.decode(s);
+                if (str != null) {
+                    keyId = Hex.decode(str);
                 }
 
                 if ((keyId == null && keyLabel == null)
@@ -305,6 +304,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 }
 
                 P11CryptService p11CryptService = getP11CryptService(pkcs11Module);
+                P11SlotIdentifier slot = new P11SlotIdentifier(slotIndex, slotId);
+
                 P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                         p11CryptService, (SecurityFactory) this,
                         slot, keyIdentifier, certificateChain);
@@ -347,15 +348,15 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     }
                 }
 
-                s = keyValues.getValue("keystore");
+                str = keyValues.getValue("keystore");
                 String keyLabel = keyValues.getValue("key-label");
 
                 InputStream keystoreStream;
-                if (StringUtil.startsWithIgnoreCase(s, "base64:")) {
+                if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
                     keystoreStream = new ByteArrayInputStream(
-                            Base64.decode(s.substring("base64:".length())));
-                } else if (StringUtil.startsWithIgnoreCase(s, "file:")) {
-                    String fn = s.substring("file:".length());
+                            Base64.decode(str.substring("base64:".length())));
+                } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
+                    String fn = str.substring("file:".length());
                     try {
                         keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
                     } catch (FileNotFoundException ex) {
@@ -844,15 +845,15 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
         }
 
-        String s = keyValues.getValue("keystore");
+        String str = keyValues.getValue("keystore");
         String keyLabel = keyValues.getValue("key-label");
 
         InputStream keystoreStream;
-        if (StringUtil.startsWithIgnoreCase(s, "base64:")) {
+        if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
             keystoreStream = new ByteArrayInputStream(
-                    Base64.decode(s.substring("base64:".length())));
-        } else if (StringUtil.startsWithIgnoreCase(s, "file:")) {
-            String fn = s.substring("file:".length());
+                    Base64.decode(str.substring("base64:".length())));
+        } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
+            String fn = str.substring("file:".length());
             try {
                 keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
             } catch (FileNotFoundException ex) {
@@ -937,7 +938,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 certs = newCertChain;
             }
 
-            PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);
             ks = null;
 
             if ("JKS".equalsIgnoreCase(keystoreType)) {
@@ -946,6 +946,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 ks = KeyStore.getInstance(keystoreType, "BC");
             }
             ks.load(null, password);
+
+            PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);
             ks.setKeyEntry(tmpKeyname, key, password, certs);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             ks.store(bout, password);

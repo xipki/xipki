@@ -75,6 +75,7 @@ public class SignerUtil {
     private SignerUtil() {
     }
 
+    // CHECKSTYLE:SKIP
     public static RSAKeyParameters generateRSAPublicKeyParameter(
             final RSAPublicKey key) {
         ParamUtil.requireNonNull("key", key);
@@ -82,28 +83,30 @@ public class SignerUtil {
 
     }
 
+    // CHECKSTYLE:SKIP
     public static RSAKeyParameters generateRSAPrivateKeyParameter(
             final RSAPrivateKey key) {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
-            RSAPrivateCrtKey k = (RSAPrivateCrtKey) key;
+            RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
 
-            return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(),
-                    k.getPrivateExponent(), k.getPrimeP(), k.getPrimeQ(),
-                    k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
+            return new RSAPrivateCrtKeyParameters(rsaKey.getModulus(), rsaKey.getPublicExponent(),
+                    rsaKey.getPrivateExponent(), rsaKey.getPrimeP(), rsaKey.getPrimeQ(),
+                    rsaKey.getPrimeExponentP(), rsaKey.getPrimeExponentQ(),
+                    rsaKey.getCrtCoefficient());
         } else {
-            RSAPrivateKey k = key;
-
-            return new RSAKeyParameters(true, k.getModulus(), k.getPrivateExponent());
+            return new RSAKeyParameters(true, key.getModulus(), key.getPrivateExponent());
         }
     }
 
+    // CHECKSTYLE:SKIP
     public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId)
     throws OperatorCreationException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
+    // CHECKSTYLE:SKIP
     public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId,
             final AsymmetricBlockCipher cipher)
@@ -177,6 +180,7 @@ public class SignerUtil {
         return block;
     }
 
+    // CHECKSTYLE:SKIP
     public static byte[] convertPlainDSASigX962(
             final byte[] signature)
     throws SignerException {
@@ -198,6 +202,7 @@ public class SignerUtil {
         }
     }
 
+    // CHECKSTYLE:SKIP
     public static byte[] convertX962DSASigToPlain(
             final byte[] x962Signature,
             final int keyBitLen)
@@ -208,22 +213,22 @@ public class SignerUtil {
         if (seq.size() != 2) {
             throw new IllegalArgumentException("invalid X962Signature");
         }
-        BigInteger r = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-        BigInteger s = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
-        int rBitLen = r.bitLength();
-        int sBitLen = s.bitLength();
-        int bitLen = Math.max(rBitLen, sBitLen);
+        BigInteger sigR = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+        BigInteger sigS = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
+        int bitLenOfR = sigR.bitLength();
+        int bitLenOfS = sigS.bitLength();
+        int bitLen = Math.max(bitLenOfR, bitLenOfS);
         if ((bitLen + 7) / 8 > blockSize) {
             throw new SignerException("signature is too large");
         }
 
         byte[] plainSignature = new byte[2 * blockSize];
 
-        byte[] bytes = r.toByteArray();
+        byte[] bytes = sigR.toByteArray();
         int srcOffset = Math.max(0, bytes.length - blockSize);
         System.arraycopy(bytes, srcOffset, plainSignature, 0, bytes.length - srcOffset);
 
-        bytes = s.toByteArray();
+        bytes = sigS.toByteArray();
         srcOffset = Math.max(0, bytes.length - blockSize);
         System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
         return plainSignature;

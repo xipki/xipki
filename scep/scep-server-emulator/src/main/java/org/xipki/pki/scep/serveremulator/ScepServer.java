@@ -124,6 +124,7 @@ public class ScepServer {
         X500Name rcaSubject;
         kpGen.initialize(2048);
         KeyPair keypair = kpGen.generateKeyPair();
+        // CHECKSTYLE:SKIP
         PrivateKey rcaKey = keypair.getPrivate();
         rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=xipki.org, C=DE");
 
@@ -152,7 +153,7 @@ public class ScepServer {
             ra = new RaEmulator(keypair.getPrivate(), this.raCert);
         }
 
-        NextCaAndRa nextCAandRA = null;
+        NextCaAndRa nextCaAndRa = null;
         if (withNextCa) {
             kpGen.initialize(2048);
             keypair = kpGen.generateKeyPair();
@@ -168,7 +169,7 @@ public class ScepServer {
                     subject,
                     BigInteger.valueOf(2),
                     startTime);
-            CaEmulator tmpCA = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
+            CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
             if (withRa) {
                 kpGen.initialize(2048);
@@ -176,14 +177,14 @@ public class ScepServer {
                 pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
                 subject = new X500Name("CN=RA2, OU=emulator, O=xipki.org, C=DE");
-                Date rAStartTime = new Date(startTime.getTime() + 10 * CaEmulator.DAY_IN_MS);
-                this.nextRaCert = tmpCA.generateCert(pkInfo, subject, rAStartTime);
+                Date raStartTime = new Date(startTime.getTime() + 10 * CaEmulator.DAY_IN_MS);
+                this.nextRaCert = tmpCa.generateCert(pkInfo, subject, raStartTime);
             } // end if(withRA)
 
-            nextCAandRA = new NextCaAndRa(this.nextCaCert, this.nextRaCert);
+            nextCaAndRa = new NextCaAndRa(this.nextCaCert, this.nextRaCert);
         } // end if(withNextCA)
 
-        ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCAandRA, control);
+        ScepResponder scepResponder = new ScepResponder(caCaps, ca, ra, nextCaAndRa, control);
         if (maxSigningTimeBiasInMs != null) {
             scepResponder.setMaxSigningTimeBias(maxSigningTimeBiasInMs);
         }

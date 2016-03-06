@@ -41,6 +41,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
@@ -52,6 +54,8 @@ import org.xipki.commons.password.api.PasswordResolverException;
  */
 
 public class FilePasswordCallback implements PasswordCallback {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FilePasswordCallback.class);
 
     private String passwordFile;
 
@@ -82,6 +86,7 @@ public class FilePasswordCallback implements PasswordCallback {
                 try {
                     reader.close();
                 } catch (IOException ex) {
+                    LOG.error("could not close reader: {}", ex.getMessage());
                 }
             }
         }

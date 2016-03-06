@@ -62,9 +62,10 @@ import org.xipki.commons.security.impl.p11.P11RSAKeyParameter;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class RSAPSSSignatureSpi extends SignatureSpi {
 
+    // CHECKSTYLE:SKIP
     class NonePSS extends RSAPSSSignatureSpi {
 
         NonePSS() {
@@ -73,6 +74,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class nonePSS
 
+    // CHECKSTYLE:SKIP
     class PSSwithRSA extends RSAPSSSignatureSpi {
 
         PSSwithRSA() {
@@ -81,6 +83,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class PSSwithRSA
 
+    // CHECKSTYLE:SKIP
     class SHA1withRSA extends RSAPSSSignatureSpi {
 
         SHA1withRSA() {
@@ -89,6 +92,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class SHA1withRSA
 
+    // CHECKSTYLE:SKIP
     class SHA224withRSA extends RSAPSSSignatureSpi {
 
         SHA224withRSA() {
@@ -98,6 +102,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class SHA224withRSA
 
+    // CHECKSTYLE:SKIP
     class SHA256withRSA extends RSAPSSSignatureSpi {
 
         SHA256withRSA() {
@@ -107,6 +112,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class SHA256withRSA
 
+    // CHECKSTYLE:SKIP
     class SHA384withRSA extends RSAPSSSignatureSpi {
 
         SHA384withRSA() {
@@ -116,6 +122,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class SHA384withRSA
 
+    // CHECKSTYLE:SKIP
     class SHA512withRSA extends RSAPSSSignatureSpi {
 
         SHA512withRSA() {
@@ -127,7 +134,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     private static class NullPssDigest implements Digest {
 
-        private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        private ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 
         private Digest baseDigest;
 
@@ -148,20 +155,20 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
         public void update(
                 final byte in) {
-            bOut.write(in);
+            baOut.write(in);
         }
 
         public void update(
                 final byte[] in,
                 final int inOff,
                 final int len) {
-            bOut.write(in, inOff, len);
+            baOut.write(in, inOff, len);
         }
 
         public int doFinal(
                 final byte[] out,
                 final int outOff) {
-            byte[] res = bOut.toByteArray();
+            byte[] res = baOut.toByteArray();
 
             if (oddTime) {
                 System.arraycopy(res, 0, out, outOff, res.length);
@@ -179,7 +186,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         }
 
         public void reset() {
-            bOut.reset();
+            baOut.reset();
             baseDigest.reset();
         }
 
@@ -256,36 +263,40 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         pss = new org.bouncycastle.crypto.signers.PSSSigner(
                 signer, contentDigest, mgfDigest, saltLength, trailer);
 
-        P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(
+        P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
                 signingKey.getP11CryptService(),
                 signingKey.getSlotId(), signingKey.getKeyId());
         if (random == null) {
-            pss.init(true, p11RSAKeyParam);
+            pss.init(true, p11KeyParam);
         } else {
-            pss.init(true, new ParametersWithRandom(p11RSAKeyParam, random));
+            pss.init(true, new ParametersWithRandom(p11KeyParam, random));
         }
     }
 
+    @Override
     protected void engineInitSign(
             final PrivateKey privateKey)
     throws InvalidKeyException {
         engineInitSign(privateKey, null);
     }
 
+    @Override
     protected void engineUpdate(
-            final byte b)
+            final byte input)
     throws SignatureException {
-        pss.update(b);
+        pss.update(input);
     }
 
+    @Override
     protected void engineUpdate(
-            final byte[] b,
+            final byte[] input,
             final int off,
             final int len)
     throws SignatureException {
-        pss.update(b, off, len);
+        pss.update(input, off, len);
     }
 
+    @Override
     protected byte[] engineSign()
     throws SignatureException {
         try {
@@ -295,12 +306,14 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         }
     }
 
+    @Override
     protected boolean engineVerify(
             final byte[] sigBytes)
     throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
+    @Override
     protected void engineSetParameter(
             final AlgorithmParameterSpec params)
     throws InvalidParameterException {
@@ -351,6 +364,14 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         }
     } // method engineSetParameter
 
+    @Override
+    protected void engineSetParameter(
+            final String param,
+            final Object value) {
+        throw new UnsupportedOperationException("engineSetParameter unsupported");
+    }
+
+    @Override
     protected AlgorithmParameters engineGetParameters() {
         if (engineParams == null) {
             if (paramSpec != null) {
@@ -367,16 +388,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
         return engineParams;
     }
 
-    /**
-     * @deprecated replaced with
-     * <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-     */
-    protected void engineSetParameter(
-            final String param,
-            final Object value) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
-    }
-
+    @Override
     protected Object engineGetParameter(
             final String param) {
         throw new UnsupportedOperationException("engineGetParameter unsupported");

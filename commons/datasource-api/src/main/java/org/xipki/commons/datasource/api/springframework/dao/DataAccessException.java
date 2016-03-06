@@ -20,7 +20,7 @@ package org.xipki.commons.datasource.api.springframework.dao;
 
 /**
  *
- * Root of the hierarchy of data access exceptions discussed in
+ * Root of the hierarchy of data access exceptions discussed in.
  *
  * @author Rod Johnson
  */
@@ -39,8 +39,7 @@ public class DataAccessException extends Exception {
     /**
      * Constructor for DataAccessException.
      * @param msg the detail message
-     * @param cause the root cause (usually from using a underlying
-     * data access API such as JDBC)
+     * @param cause the root cause (usually from using a underlying data access API such as JDBC)
      */
     public DataAccessException(
             final String msg,

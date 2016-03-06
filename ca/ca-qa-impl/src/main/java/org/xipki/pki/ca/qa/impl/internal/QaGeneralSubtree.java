@@ -51,14 +51,14 @@ public class QaGeneralSubtree {
     public QaGeneralSubtree(
             final GeneralSubtreeBaseType jaxb) {
         this.jaxb = ParamUtil.requireNonNull("jaxb", jaxb);
-        Integer i = jaxb.getMinimum();
-        if (i != null) {
-            ParamUtil.requireMin("jaxb.getMinimum()", i.intValue(), 0);
+        Integer min = jaxb.getMinimum();
+        if (min != null) {
+            ParamUtil.requireMin("jaxb.getMinimum()", min.intValue(), 0);
         }
 
-        i = jaxb.getMaximum();
-        if (i != null) {
-            ParamUtil.requireMin("jaxb.getMaximum()", i.intValue(), 0);
+        Integer max = jaxb.getMaximum();
+        if (max != null) {
+            ParamUtil.requireMin("jaxb.getMaximum()", max.intValue(), 0);
         }
     }
 

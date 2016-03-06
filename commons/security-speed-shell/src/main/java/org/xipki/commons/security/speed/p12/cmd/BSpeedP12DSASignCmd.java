@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 
@@ -50,6 +51,8 @@ import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-dsa-sign-p12",
         description = "performance test of PKCS#12 DSA signature creation")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
     @Override
@@ -58,14 +61,14 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
         for (int i = 0; i < pqLens.length; i += 2) {
-            int pLen = pqLens[i];
-            int qLen = pqLens[i + 1];
-            if (pLen == 1024) {
+            int plen = pqLens[i];
+            int qlen = pqLens[i + 1];
+            if (plen == 1024) {
                 sigAlgo = "SHA1withDSA";
             }
 
-            ret.add(new P12DSASignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo, pLen,
-                    qLen));
+            ret.add(new P12DSASignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo, plen,
+                    qlen));
         }
         return ret;
     }

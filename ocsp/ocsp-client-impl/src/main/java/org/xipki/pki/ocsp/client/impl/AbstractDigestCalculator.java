@@ -51,7 +51,7 @@ import org.bouncycastle.operator.DigestCalculator;
 
 public abstract class AbstractDigestCalculator implements DigestCalculator {
 
-    private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+    private ByteArrayOutputStream out = new ByteArrayOutputStream();
 
     protected abstract ASN1ObjectIdentifier getObjectIdentifier();
 
@@ -62,12 +62,12 @@ public abstract class AbstractDigestCalculator implements DigestCalculator {
     }
 
     public OutputStream getOutputStream() {
-        return bOut;
+        return out;
     }
 
     public byte[] getDigest() {
-        byte[] bytes = bOut.toByteArray();
-        bOut.reset();
+        byte[] bytes = out.toByteArray();
+        out.reset();
         Digest digester = getDigester();
         digester.update(bytes, 0, bytes.length);
         byte[] digest = new byte[digester.getDigestSize()];

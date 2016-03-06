@@ -297,17 +297,17 @@ public class CanonicalizeCode {
                     } else {
                         // check whether the number of leading spaces is multiple of 4
                         int numLeadingSpaces = 0;
-                        char c = 'Z';
+                        char ch = 'Z';
                         for (int i = 0; i < line.length(); i++) {
                             if (line.charAt(i) == ' ') {
                                 numLeadingSpaces++;
                             } else {
-                                c = line.charAt(i);
+                                ch = line.charAt(i);
                                 break;
                             }
                         }
 
-                        if (c != '*' && numLeadingSpaces % 4 != 0) {
+                        if (ch != '*' && numLeadingSpaces % 4 != 0) {
                             addLineNumber(line, lineNumber, lineNumbers);
                         }
                     }
@@ -377,9 +377,7 @@ public class CanonicalizeCode {
     } // method checkWarningsInJavaFile
 
     /**
-     * replace tab by 4 spaces, delete white spaces at the end
-     * @param line
-     * @return
+     * replace tab by 4 spaces, delete white spaces at the end.
      */
     private static String canonicalizeLine(
             final String line) {
@@ -395,15 +393,15 @@ public class CanonicalizeCode {
         int lastNonSpaceCharIndex = 0;
         int index = 0;
         for (int i = 0; i < len; i++) {
-            char c = line.charAt(i);
-            if (c == '\t') {
+            char ch = line.charAt(i);
+            if (ch == '\t') {
                 sb.append("    ");
                 index += 4;
-            } else if (c == ' ') {
-                sb.append(c);
+            } else if (ch == ' ') {
+                sb.append(ch);
                 index++;
             } else {
-                sb.append(c);
+                sb.append(ch);
                 index++;
                 lastNonSpaceCharIndex = index;
             }
@@ -420,17 +418,17 @@ public class CanonicalizeCode {
     private static String removeTrailingSpaces(
             final String line) {
         final int n = line.length();
-        int i;
-        for (i = n - 1; i >= 0; i--) {
-            char c = line.charAt(i);
-            if (c != ' ') {
+        int idx;
+        for (idx = n - 1; idx >= 0; idx--) {
+            char ch = line.charAt(idx);
+            if (ch != ' ') {
                 break;
             }
         }
-        if (i == n - 1) {
+        if (idx == n - 1) {
             return line;
         } else {
-            return line.substring(0, i + 1);
+            return line.substring(0, idx + 1);
         }
     } // method removeTrailingSpaces
 

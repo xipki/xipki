@@ -98,8 +98,8 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
             CaIdentifier tmpCaId = new CaIdentifier(url, caId);
-            CaCertValidator cACertValidator = new PreprovisionedCaCertValidator(caCert);
-            scepClient = new ScepClient(tmpCaId, cACertValidator);
+            CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(caCert);
+            scepClient = new ScepClient(tmpCaId, caCertValidator);
         }
         return scepClient;
     }

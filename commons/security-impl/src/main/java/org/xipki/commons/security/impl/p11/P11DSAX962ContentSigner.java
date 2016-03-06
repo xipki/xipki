@@ -49,7 +49,7 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+//CHECKSTYLE:SKIP
 public class P11DSAX962ContentSigner extends AbstractP11DSAContentSigner {
 
     public P11DSAX962ContentSigner(

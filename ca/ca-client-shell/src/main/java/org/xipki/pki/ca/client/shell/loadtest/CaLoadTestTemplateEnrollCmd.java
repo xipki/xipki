@@ -84,13 +84,13 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
 
         EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(
                 new FileInputStream(templateFile));
-        int n = template.getEnrollCert().size();
+        int size = template.getEnrollCert().size();
 
         StringBuilder description = new StringBuilder(200);
         description.append("template: ").append(templateFile).append("\n");
-        description.append("#certs/req: ").append(n).append("\n");
-        description.append("unit: ").append(n).append(" certificate");
-        if (n > 1) {
+        description.append("#certs/req: ").append(size).append("\n");
+        description.append("unit: ").append(size).append(" certificate");
+        if (size > 1) {
             description.append("s");
         }
         description.append("\n");
