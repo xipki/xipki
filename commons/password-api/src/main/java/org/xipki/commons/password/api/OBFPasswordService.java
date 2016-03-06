@@ -40,13 +40,13 @@ package org.xipki.commons.password.api;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public interface OBFPasswordService {
 
     String obfuscate(
-            String s);
+            String str);
 
     String deobfuscate(
-            String s);
+            String str);
 
 }

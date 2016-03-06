@@ -86,7 +86,7 @@ public class ProcessLog {
         StringBuilder sb = new StringBuilder();
 
         // first header line
-        int n = hasTotal
+        final int n = hasTotal
                 ? 7
                 : 4;
         for (int i = 0; i < n * MIN_LEN; i++) {
@@ -142,7 +142,7 @@ public class ProcessLog {
         StringBuilder sb = new StringBuilder();
         sb.append('\n');
 
-        int n = hasTotal
+        final int n = hasTotal
                 ? 7
                 : 4;
         for (int i = 0; i < n * MIN_LEN; i++) {
@@ -174,13 +174,94 @@ public class ProcessLog {
     }
 
     public long addNumProcessed(
-            final long pNumProcessed) {
-        return this.numProcessed.addAndGet(pNumProcessed);
+            final long numProcessed) {
+        return this.numProcessed.addAndGet(numProcessed);
     }
 
     public void printStatus() {
         printStatus(false);
     }
+
+    private void printStatus(
+            final boolean forcePrint) {
+        final long nowMs = System.currentTimeMillis();
+        final long tmpNumProcessed = numProcessed.get();
+
+        if (!forcePrint && nowMs - lastPrintTimeMs.get() < MS_900) {
+            return;
+        }
+
+        measureDeque.addLast(new MeasurePoint(nowMs, numProcessed.get()));
+        lastPrintTimeMs.set(nowMs);
+
+        MeasurePoint referenceMeasurePoint;
+        int numMeasurePoints = measureDeque.size();
+        if (numMeasurePoints > 10) {
+            referenceMeasurePoint = measureDeque.removeFirst();
+        } else {
+            referenceMeasurePoint = measureDeque.getFirst();
+        }
+
+        StringBuilder sb = new StringBuilder("\r");
+
+        // processed number
+        sb.append(StringUtil.formatAccount(tmpNumProcessed, true));
+
+        // processed percent
+        if (hasTotal) {
+            int percent = (int) (tmpNumProcessed * 100 / total);
+            String percentS = Integer.toString(percent) + "%";
+            sb.append(formatText(percentS));
+        }
+
+        // average speed
+        long averageSpeed = 0;
+        long elapsedTimeMs = nowMs - startTimeMs;
+        if (elapsedTimeMs > 0) {
+            averageSpeed = tmpNumProcessed * 1000 / elapsedTimeMs;
+        }
+        sb.append(StringUtil.formatAccount(averageSpeed, true));
+
+        // current speed
+        long currentSpeed = 0;
+        long t2inms = nowMs - referenceMeasurePoint.getMeasureTime(); // in ms
+        if (t2inms > 0) {
+            currentSpeed =
+                    (tmpNumProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+        }
+        sb.append(StringUtil.formatAccount(currentSpeed, true));
+
+        // elapsed time
+        sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
+
+        // remaining time and finish at
+        if (hasTotal) {
+            long remaingTimeMs = -1;
+            if (currentSpeed > 0) {
+                remaingTimeMs = (total - tmpNumProcessed) * 1000 / currentSpeed;
+            }
+
+            long finishAtMs = -1;
+            if (remaingTimeMs != -1) {
+                finishAtMs = nowMs + remaingTimeMs;
+            }
+
+            if (remaingTimeMs == -1) {
+                sb.append(formatText("--"));
+            } else {
+                sb.append(StringUtil.formatTime(remaingTimeMs / 1000, true));
+            }
+
+            if (finishAtMs == -1) {
+                sb.append(formatText("--"));
+            } else {
+                sb.append(buildDateTime(finishAtMs));
+            }
+        }
+
+        System.out.print(sb.toString());
+        System.out.flush();
+    } // method printStatus
 
     public long getTotalElapsedTime() {
         if (finished.get()) {
@@ -203,123 +284,41 @@ public class ProcessLog {
         return averageSpeed;
     }
 
-    private void printStatus(
-            final boolean forcePrint) {
-        final long lNowMs = System.currentTimeMillis();
-        final long lNumProcessed = numProcessed.get();
-
-        if (!forcePrint && lNowMs - lastPrintTimeMs.get() < MS_900) {
-            return;
-        }
-
-        measureDeque.addLast(new MeasurePoint(lNowMs, numProcessed.get()));
-        lastPrintTimeMs.set(lNowMs);
-        long elapsedTimeMs = lNowMs - startTimeMs;
-
-        MeasurePoint referenceMeasurePoint;
-        int numMeasurePoints = measureDeque.size();
-        if (numMeasurePoints > 10) {
-            referenceMeasurePoint = measureDeque.removeFirst();
-        } else {
-            referenceMeasurePoint = measureDeque.getFirst();
-        }
-
-        StringBuilder sb = new StringBuilder("\r");
-
-        // processed number
-        sb.append(StringUtil.formatAccount(lNumProcessed, true));
-
-        // processed percent
-        if (hasTotal) {
-            int percent = (int) (lNumProcessed * 100 / total);
-            String percentS = Integer.toString(percent) + "%";
-            sb.append(formatText(percentS));
-        }
-
-        // average speed
-        long averageSpeed = 0;
-        if (elapsedTimeMs > 0) {
-            averageSpeed = lNumProcessed * 1000 / elapsedTimeMs;
-        }
-        sb.append(StringUtil.formatAccount(averageSpeed, true));
-
-        // current speed
-        long currentSpeed = 0;
-        long t2inms = lNowMs - referenceMeasurePoint.getMeasureTime(); // in ms
-        if (t2inms > 0) {
-            currentSpeed =
-                    (lNumProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
-        }
-        sb.append(StringUtil.formatAccount(currentSpeed, true));
-
-        // elapsed time
-        sb.append(StringUtil.formatTime(elapsedTimeMs / 1000, true));
-
-        // remaining time and finish at
-        if (hasTotal) {
-            long remaingTimeMs = -1;
-            if (currentSpeed > 0) {
-                remaingTimeMs = (total - lNumProcessed) * 1000 / currentSpeed;
-            }
-
-            long finishAtMs = -1;
-            if (remaingTimeMs != -1) {
-                finishAtMs = lNowMs + remaingTimeMs;
-            }
-
-            if (remaingTimeMs == -1) {
-                sb.append(formatText("--"));
-            } else {
-                sb.append(StringUtil.formatTime(remaingTimeMs / 1000, true));
-            }
-
-            if (finishAtMs == -1) {
-                sb.append(formatText("--"));
-            } else {
-                sb.append(buildDateTime(finishAtMs));
-            }
-        }
-
-        System.out.print(sb.toString());
-        System.out.flush();
-    } // method printStatus
-
     private static String formatText(String text) {
         return StringUtil.formatText(text, MIN_LEN);
     }
 
     private static String buildDateTime(long timeMs) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(timeMs);
-        int h = c.get(Calendar.HOUR_OF_DAY);
-        int m = c.get(Calendar.MINUTE);
-        int s = c.get(Calendar.SECOND);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timeMs);
 
-        c.setTimeInMillis(System.currentTimeMillis());
-        c.set(Calendar.HOUR, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        long midNightSec = c.getTimeInMillis() / 1000;
-
-        long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
         StringBuilder sb = new StringBuilder();
-        if (h < 10) {
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if (hour < 10) {
             sb.append('0');
         }
-        sb.append(h);
+        sb.append(hour);
 
+        int minute = cal.get(Calendar.MINUTE);
         sb.append(":");
-        if (m < 10) {
+        if (minute < 10) {
             sb.append('0');
         }
-        sb.append(m);
+        sb.append(minute);
 
+        int second = cal.get(Calendar.SECOND);
         sb.append(":");
-        if (s < 10) {
+        if (second < 10) {
             sb.append('0');
         }
-        sb.append(s);
+        sb.append(second);
 
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        long midNightSec = cal.getTimeInMillis() / 1000;
+        long days = (timeMs / 1000 - midNightSec) / DAY_IN_SEC;
         if (days > 0) {
             sb.append('+').append(days);
         }

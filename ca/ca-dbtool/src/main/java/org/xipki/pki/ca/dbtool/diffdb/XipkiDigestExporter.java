@@ -154,7 +154,6 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
             stmt = createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                int id = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
                 byte[] certBytes = Base64.decode(b64Cert);
 
@@ -163,15 +162,16 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
                 String fn = toAsciiFilename("ca-" + commonName);
                 File caDir = new File(baseDir, fn);
-                int i = 2;
+                int idx = 2;
                 while (caDir.exists()) {
-                    caDir = new File(baseDir, fn + "." + (i++));
+                    caDir = new File(baseDir, fn + "." + (idx++));
                 }
 
                 File caCertFile = new File(caDir, "ca.der");
                 caDir.mkdirs();
                 IoUtil.save(caCertFile, certBytes);
 
+                int id = rs.getInt("ID");
                 caIdDirMap.put(id, caDir.getName());
             }
         } catch (SQLException ex) {
@@ -237,10 +237,10 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         final int n = filename.length();
         StringBuilder sb = new StringBuilder(n);
         for (int i = 0; i < n; i++) {
-            char c = filename.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
-                    || c == '.' || c == '_' || c == '-' || c == ' ') {
-                sb.append(c);
+            char ch = filename.charAt(i);
+            if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')
+                    || ch == '.' || ch == '_' || ch == '-' || ch == ' ') {
+                sb.append(ch);
             } else {
                 sb.append('_');
             }

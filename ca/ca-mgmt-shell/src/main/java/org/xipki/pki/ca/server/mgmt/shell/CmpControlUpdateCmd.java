@@ -68,8 +68,8 @@ public class CmpControlUpdateCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.changeCmpControl(name, conf);
-        output(b, "updated", "could not update", "CMP control " + name);
+        boolean bo = caManager.changeCmpControl(name, conf);
+        output(bo, "updated", "could not update", "CMP control " + name);
         return null;
     }
 

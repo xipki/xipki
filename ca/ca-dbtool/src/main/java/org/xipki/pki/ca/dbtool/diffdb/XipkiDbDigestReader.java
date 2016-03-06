@@ -43,10 +43,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
@@ -61,6 +64,8 @@ import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDbControl;
  */
 
 public class XipkiDbDigestReader extends DbDigestReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiDbDigestReader.class);
 
     private int caId;
 
@@ -112,6 +117,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
                     IdRange idRange = inQueue.take();
                     query(idRange);
                 } catch (InterruptedException ex) {
+                    LOG.error("InterruptedException: {}", ex.getMessage());
                 }
             }
 
@@ -170,9 +176,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     private void init(
             final DbSchemaType dbSchemaType,
-            final int pCaId)
+            final int caId)
     throws Exception {
-        this.caId = pCaId;
+        this.caId = caId;
         this.conn = datasource.getConnection();
         this.dbControl = new XipkiDbControl(dbSchemaType);
 
@@ -185,7 +191,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         sb.append(dbControl.getColRevInvTime()).append(",");
         sb.append(dbControl.getColCerthash());
         sb.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
-        sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(pCaId);
+        sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
         sb.append(" AND CERT.ID>=? AND CERT.ID<?");
 
         if (revokedOnly) {
@@ -197,7 +203,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
         this.selectCertSql = sb.toString();
 
-        this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + pCaId + " AND ID>=? AND ID<=?";
+        this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + caId + " AND ID>=? AND ID<=?";
 
         this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
 
@@ -221,11 +227,11 @@ public class XipkiDbDigestReader extends DbDigestReader {
             numCertStmt.setInt(1, fromId);
             numCertStmt.setInt(2, toId);
             rs = numCertStmt.executeQuery();
-            int n = rs.next()
+            int in = rs.next()
                     ? rs.getInt(1)
                     : 0;
-            return (n < numCerts)
-                    ? n - numCerts
+            return (in < numCerts)
+                    ? in - numCerts
                     : 0;
         } catch (SQLException ex) {
             throw datasource.translate(numCertSql, ex);
@@ -326,7 +332,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
-            releaseResources(stmt, rs);
+            DbToolBase.releaseResources(datasource, stmt, rs);
         }
     } // method getInstance
 

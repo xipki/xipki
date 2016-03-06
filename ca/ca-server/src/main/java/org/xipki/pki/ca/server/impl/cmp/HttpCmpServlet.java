@@ -133,14 +133,14 @@ public class HttpCmpServlet extends HttpServlet {
                 return;
             }
 
-            String requestURI = request.getRequestURI();
+            String requestUri = request.getRequestURI();
             String servletPath = request.getServletPath();
 
             String caName = null;
             X509CaCmpResponder responder = null;
-            int n = servletPath.length();
-            if (requestURI.length() > n + 1) {
-                String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
+            int len = servletPath.length();
+            if (requestUri.length() > len + 1) {
+                String caAlias = URLDecoder.decode(requestUri.substring(len + 1), "UTF-8");
                 caName = responderManager.getCaNameForAlias(caAlias);
                 if (caName == null) {
                     caName = caAlias;
@@ -173,7 +173,7 @@ public class HttpCmpServlet extends HttpServlet {
 
             PKIMessage pkiReq;
             try {
-                pkiReq = generatePKIMessage(request.getInputStream());
+                pkiReq = generatePkiMessage(request.getInputStream());
             } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -238,7 +238,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePKIMessage(
+    protected PKIMessage generatePkiMessage(
             final InputStream is)
     throws IOException {
         ParamUtil.requireNonNull("is", is);
@@ -250,6 +250,7 @@ public class HttpCmpServlet extends HttpServlet {
             try {
                 asn1Stream.close();
             } catch (Exception ex) {
+                LOG.error("could not close ASN1Stream: {}", ex.getMessage());
             }
         }
     }

@@ -101,8 +101,8 @@ public class DbCertStatusStore extends CertStatusStore {
                 if (issuer.getRevocationInfo() == null) {
                     return false;
                 } else {
-                    return revocationTimeMs ==
-                            issuer.getRevocationInfo().getRevocationTime().getTime();
+                    return revocationTimeMs
+                            == issuer.getRevocationInfo().getRevocationTime().getTime();
                 }
             }
         }
@@ -279,8 +279,8 @@ public class DbCertStatusStore extends CertStatusStore {
                             new Date(notBeforeInSecond * 1000));
                     boolean revoked = rs.getBoolean("REV");
                     if (revoked) {
-                        long l = rs.getLong("RT");
-                        caInfoEntry.setRevocationInfo(new Date(l * 1000));
+                        long lo = rs.getLong("RT");
+                        caInfoEntry.setRevocationInfo(new Date(lo * 1000));
                     }
 
                     caInfos.add(caInfoEntry);
@@ -326,11 +326,11 @@ public class DbCertStatusStore extends CertStatusStore {
         }
 
         // wait for max. 0.5 second
-        int n = 5;
-        while (!initialized && (n-- > 0)) {
+        int num = 5;
+        while (!initialized && (num-- > 0)) {
             try {
                 Thread.sleep(100);
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
@@ -379,7 +379,7 @@ public class DbCertStatusStore extends CertStatusStore {
             long invalidatityTime = 0;
 
             PreparedStatement ps = borrowPreparedStatement(
-                    datasource.createFetchFirstSelectSQL(coreSql, 1));
+                    datasource.createFetchFirstSelectSql(coreSql, 1));
 
             try {
                 int idx = 1;
@@ -450,18 +450,18 @@ public class DbCertStatusStore extends CertStatusStore {
             if (isIncludeArchiveCutoff()) {
                 int retentionInterval = getRetentionInterval();
                 if (retentionInterval != 0) {
-                    Date t;
+                    Date date;
                     // expired certificate remains in status store for ever
                     if (retentionInterval < 0) {
-                        t = issuer.getNotBefore();
+                        date = issuer.getNotBefore();
                     } else {
                         long nowInMs = System.currentTimeMillis();
-                        long tInMs = Math.max(issuer.getNotBefore().getTime(),
+                        long dateInMs = Math.max(issuer.getNotBefore().getTime(),
                                 nowInMs - DAY * retentionInterval);
-                        t = new Date(tInMs);
+                        date = new Date(dateInMs);
                     }
 
-                    certStatusInfo.setArchiveCutOff(t);
+                    certStatusInfo.setArchiveCutOff(date);
                 }
             } // end if
 
@@ -472,18 +472,17 @@ public class DbCertStatusStore extends CertStatusStore {
     } // method getCertStatus
 
     /**
-     *
-     * @return the next idle preparedStatement, {@code null} will be returned
-     *         if no PreparedStament can be created within 5 seconds
-     * @throws DataAccessException
+     * Borrow Prepared Statement.
+     * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
+     *     can be created within 5 seconds.
      */
     private PreparedStatement borrowPreparedStatement(
             final String sqlQuery)
     throws DataAccessException {
         PreparedStatement ps = null;
-        Connection c = datasource.getConnection();
-        if (c != null) {
-            ps = datasource.prepareStatement(c, sqlQuery);
+        Connection conn = datasource.getConnection();
+        if (conn != null) {
+            ps = datasource.prepareStatement(conn, sqlQuery);
         }
         if (ps == null) {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);

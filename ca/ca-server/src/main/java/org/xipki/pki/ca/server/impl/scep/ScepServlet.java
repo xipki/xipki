@@ -118,15 +118,15 @@ public class ScepServlet extends HttpServlet {
             final HttpServletResponse response,
             final boolean post)
     throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
+        String requestUri = request.getRequestURI();
         String servletPath = request.getServletPath();
 
-        int n = servletPath.length();
+        int len = servletPath.length();
 
         String scepName = null;
         String certProfileName = null;
-        if (requestURI.length() > n + 1) {
-            String scepPath = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
+        if (requestUri.length() > len + 1) {
+            String scepPath = URLDecoder.decode(requestUri.substring(len + 1), "UTF-8");
             if (scepPath.endsWith(CGI_PROGRAM)) {
                 String path = scepPath.substring(0, scepPath.length() - CGI_PROGRAM_LEN);
                 String[] tokens = path.split("/");
@@ -324,6 +324,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 asn1Stream.close();
             } catch (Exception ex) {
+                LOG.error("could not close ASN1 stream: {}", asn1Stream);
             }
         }
     } // method generatePKIMessage

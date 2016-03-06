@@ -180,14 +180,12 @@ public final class IaikP11CryptService implements P11CryptService {
         LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     } // method refresh
 
-    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_RSA_PKCS(
             final byte[] encodedDigestInfo,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         checkState();
 
         try {
@@ -207,24 +205,21 @@ public final class IaikP11CryptService implements P11CryptService {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     private byte[] CKM_RSA_PKCS_noReconnect(
             final byte[] encodedDigestInfo,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
     }
 
     @Override
-    // CHECKSTYLE:OFF
     public byte[] CKM_RSA_X509(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         checkState();
 
         try {
@@ -244,36 +239,31 @@ public final class IaikP11CryptService implements P11CryptService {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     private byte[] CKM_RSA_X509_noReconnect(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
     }
 
-    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_ECDSA_X962(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] plainSignature = CKM_ECDSA_Plain(hash, slotId, keyId);
         return SignerUtil.convertPlainDSASigX962(plainSignature);
     }
 
-    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_ECDSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         checkState();
 
         try {
@@ -293,36 +283,31 @@ public final class IaikP11CryptService implements P11CryptService {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     private byte[] CKM_ECDSAPlain_noReconnect(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
     }
 
-    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_DSA_X962(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         byte[] plainSignature = CKM_DSA_Plain(hash, slotId, keyId);
         return SignerUtil.convertPlainDSASigX962(plainSignature);
     }
 
-    // CHECKSTYLE:OFF
     @Override
     public byte[] CKM_DSA_Plain(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         checkState();
 
         try {
@@ -342,13 +327,12 @@ public final class IaikP11CryptService implements P11CryptService {
         }
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:SKIP
     private byte[] CKM_DSA_noReconnect(
             final byte[] hash,
             final P11SlotIdentifier slotId,
             final P11KeyIdentifier keyId)
     throws SignerException {
-        // CHECKSTYLE:ON
         return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
     }
 

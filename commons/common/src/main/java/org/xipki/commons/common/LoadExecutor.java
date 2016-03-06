@@ -102,8 +102,8 @@ public abstract class LoadExecutor {
         StringBuilder sb = new StringBuilder();
         if (StringUtil.isNotBlank(description)) {
             sb.append(description);
-            char c = description.charAt(description.length() - 1);
-            if (c != '\n') {
+            char ch = description.charAt(description.length() - 1);
+            if (ch != '\n') {
                 sb.append('\n');
             }
         }
@@ -206,9 +206,9 @@ public abstract class LoadExecutor {
     protected static long getSecureIndex() {
         SecureRandom random = new SecureRandom();
         while (true) {
-            long l = random.nextLong();
-            if (l > 0) {
-                return l;
+            long nextLong = random.nextLong();
+            if (nextLong > 0) {
+                return nextLong;
             }
         }
     }

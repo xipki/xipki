@@ -77,16 +77,22 @@ public class SunNamedCurveExtender {
 
         final String sfield;
 
+        // CHECKSTYLE:SKIP
         final String a;
 
+        // CHECKSTYLE:SKIP
         final String b;
 
+        // CHECKSTYLE:SKIP
         final String x;
 
+        // CHECKSTYLE:SKIP
         final String y;
 
+        // CHECKSTYLE:SKIP
         final String n;
 
+        // CHECKSTYLE:SKIP
         final int h;
 
         CurveData(
@@ -103,12 +109,15 @@ public class SunNamedCurveExtender {
             if (curve instanceof ECCurve.Fp) {
                 this.type = P;
 
+                // CHECKSTYLE:SKIP
                 ECCurve.Fp c = (ECCurve.Fp) curve;
                 this.sfield = c.getQ().toString(16);
             } else { // if (curve instanceof ECCurve.F2m)
                 this.type = B;
 
+                // CHECKSTYLE:SKIP
                 ECCurve.F2m c = (ECCurve.F2m) curve;
+                // CHECKSTYLE:SKIP
                 int m = c.getM();
 
                 int[] ks = new int[]{c.getK1(), c.getK2(), c.getK3()};
@@ -235,14 +244,14 @@ public class SunNamedCurveExtender {
     } // method addNamedCurves
 
     private static void addNamedCurvesJdk18on() {
-        final Class<?>[] paramCurveDBAdd = new Class[] {
+        final Class<?>[] paramCurveDbAdd = new Class[] {
             String.class, String.class, int.class, String.class,
             String.class, String.class, String.class, String.class, String.class, int.class,
             Pattern.class
         };
         final Class<?>[] paramGetCurve = new Class[]{String.class};
 
-        Method methodAdd = getMethod(classCurveDB, "add", paramCurveDBAdd);
+        Method methodAdd = getMethod(classCurveDB, "add", paramCurveDbAdd);
         if (methodAdd == null) {
             return;
         }
@@ -291,9 +300,9 @@ public class SunNamedCurveExtender {
             X9ECParameters params = ECNamedCurveTable.getByOID(curveId);
             ECCurve curve = params.getCurve();
             if (curve instanceof ECCurve.Fp || curve instanceof ECCurve.F2m) {
-                CurveData c = new CurveData(params);
-                boolean added = curveDBAdd(methodAdd, curveName, curveId.getId(), c.type,
-                        c.sfield, c.a, c.b, c.x, c.y, c.n, c.h);
+                CurveData cd = new CurveData(params);
+                boolean added = curveDBAdd(methodAdd, curveName, curveId.getId(), cd.type,
+                        cd.sfield, cd.a, cd.b, cd.x, cd.y, cd.n, cd.h);
 
                 if (added) {
                     LOG.debug("added {}", curveDesc);

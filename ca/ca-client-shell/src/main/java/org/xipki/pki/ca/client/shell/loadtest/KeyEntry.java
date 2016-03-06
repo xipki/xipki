@@ -73,6 +73,7 @@ public abstract class KeyEntry {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeyEntry.class);
 
+    // CHECKSTYLE:SKIP
     public static final class RSAKeyEntry extends KeyEntry {
 
         private final BigInteger baseN;
@@ -84,12 +85,12 @@ public abstract class KeyEntry {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
 
-            BigInteger n = BigInteger.valueOf(0);
-            n = n.setBit(keysize - 1);
+            BigInteger modulus = BigInteger.valueOf(0);
+            modulus = modulus.setBit(keysize - 1);
             for (int i = 32; i < keysize - 1; i += 2) {
-                n = n.setBit(i);
+                modulus = modulus.setBit(i);
             }
-            this.baseN = n;
+            this.baseN = modulus;
         }
 
         @Override
@@ -112,6 +113,7 @@ public abstract class KeyEntry {
 
     } // class RSAKeyEntry
 
+    // CHECKSTYLE:SKIP
     public static final class DSAKeyEntry extends KeyEntry {
 
         private static final String P_1024 =
@@ -198,27 +200,27 @@ public abstract class KeyEntry {
         private BigInteger baseY;
 
         public DSAKeyEntry(
-                final int pLength)
+                final int plength)
         throws Exception {
-            if (pLength == 1024) {
+            if (plength == 1024) {
                 init(P_1024, Q_1024, G_1024, Y_1024);
-            } else if (pLength == 2048) {
+            } else if (plength == 2048) {
                 init(P_2048, Q_2048, G_2048, Y_2048);
-            } else if (pLength == 3072) {
+            } else if (plength == 3072) {
                 init(P_3072, Q_3072, G_3072, Y_3072);
             } else {
-                if (pLength % 1024 != 0) {
-                    throw new IllegalArgumentException("invalid DSA pLength " + pLength);
+                if (plength % 1024 != 0) {
+                    throw new IllegalArgumentException("invalid DSA pLength " + plength);
                 }
 
-                int qLength;
-                if (pLength >= 2048) {
-                    qLength = 256;
+                int qlength;
+                if (plength >= 2048) {
+                    qlength = 256;
                 } else {
-                    qLength = 160;
+                    qlength = 160;
                 }
 
-                KeyPair kp = KeyUtil.generateDSAKeypair(pLength, qLength, 10, new SecureRandom());
+                KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, 10, new SecureRandom());
                 DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 
                 init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(),
@@ -226,11 +228,13 @@ public abstract class KeyEntry {
             }
         }
 
+        // CHECKSTYLE:OFF
         private void init(
                 final String p,
                 final String q,
                 final String g,
                 final String y) {
+            // CHECKSTYLE:ON
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }
 
@@ -239,16 +243,18 @@ public abstract class KeyEntry {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
+        // CHECKSTYLE:OFF
         private void init(
                 final BigInteger p,
                 final BigInteger q,
                 final BigInteger g,
                 final BigInteger y) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
-            v.add(new ASN1Integer(p));
-            v.add(new ASN1Integer(q));
-            v.add(new ASN1Integer(g));
-            ASN1Sequence dssParams = new DERSequence(v);
+            // CHECKSTYLE:ON
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new ASN1Integer(p));
+            vec.add(new ASN1Integer(q));
+            vec.add(new ASN1Integer(g));
+            ASN1Sequence dssParams = new DERSequence(vec);
             this.algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams);
             this.baseY = y;
         }
@@ -256,6 +262,7 @@ public abstract class KeyEntry {
         @Override
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
                 final long index) {
+            // CHECKSTYLE:SKIP
             BigInteger y = baseY.add(BigInteger.valueOf(index));
 
             try {
@@ -270,6 +277,7 @@ public abstract class KeyEntry {
 
     } // class DSAKeyEntry
 
+    // CHECKSTYLE:SKIP
     public static final class ECKeyEntry extends KeyEntry {
 
         private final AlgorithmIdentifier algId;

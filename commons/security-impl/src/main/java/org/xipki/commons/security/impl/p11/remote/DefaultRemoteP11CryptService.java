@@ -128,11 +128,11 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
             byte[] buf = new byte[4096];
             ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
             do {
-                int j = inputstream.read(buf);
-                if (j == -1) {
+                int readedByte = inputstream.read(buf);
+                if (readedByte == -1) {
                     break;
                 }
-                bytearrayoutputstream.write(buf, 0, j);
+                bytearrayoutputstream.write(buf, 0, readedByte);
             } while (true);
 
             return bytearrayoutputstream.toByteArray();

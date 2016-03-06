@@ -74,7 +74,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.ObjectFactory;
 
 public class CaDbImportWorker extends DbPortWorker {
 
-    private static class CAInfoBundle {
+    private static class CaInfoBundle {
 
         private final String caName;
 
@@ -86,7 +86,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
         private Integer caId;
 
-        CAInfoBundle(
+        CaInfoBundle(
                 final String caName,
                 final long caNextSerial,
                 final byte[] cert) {
@@ -182,7 +182,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
     private void createSerialNumberSequences()
     throws DataAccessException {
-        List<CAInfoBundle> caInfoBundles = new LinkedList<>();
+        List<CaInfoBundle> caInfoBundles = new LinkedList<>();
 
         // create the sequence for the certificate serial numbers
         Connection conn = datasource.getConnection();
@@ -201,7 +201,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
                 String caName = rs.getString("NAME");
                 byte[] cert = Base64.decode(rs.getString("CERT"));
-                CAInfoBundle entry = new CAInfoBundle(caName, nextSerial, cert);
+                CaInfoBundle entry = new CaInfoBundle(caName, nextSerial, cert);
                 caInfoBundles.add(entry);
             }
 
@@ -217,7 +217,7 @@ public class CaDbImportWorker extends DbPortWorker {
             while (rs.next()) {
                 byte[] cert = Base64.decode(rs.getString("CERT"));
                 int id = rs.getInt("ID");
-                for (CAInfoBundle entry : caInfoBundles) {
+                for (CaInfoBundle entry : caInfoBundles) {
                     if (Arrays.equals(cert, entry.cert)) {
                         entry.caId = id;
                         break;
@@ -231,7 +231,7 @@ public class CaDbImportWorker extends DbPortWorker {
             // get the maximal serial number
             sql = "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            for (CAInfoBundle entry : caInfoBundles) {
+            for (CaInfoBundle entry : caInfoBundles) {
                 ps.setInt(1, entry.caId);
                 rs = ps.executeQuery();
                 if (!rs.next()) {
@@ -248,7 +248,7 @@ public class CaDbImportWorker extends DbPortWorker {
 
             sql = "UPDATE CA SET NEXT_SN=? WHERE NAME=?";
             ps = conn.prepareStatement(sql);
-            for (CAInfoBundle entry : caInfoBundles) {
+            for (CaInfoBundle entry : caInfoBundles) {
                 if (entry.caNextSerial != entry.shouldCaNextSerial) {
                     ps.setLong(1, entry.shouldCaNextSerial);
                     ps.setString(2, entry.caName);
@@ -262,7 +262,7 @@ public class CaDbImportWorker extends DbPortWorker {
         }
 
         // create the sequences
-        for (CAInfoBundle entry : caInfoBundles) {
+        for (CaInfoBundle entry : caInfoBundles) {
             long nextSerial = Math.max(entry.caNextSerial, entry.shouldCaNextSerial);
             String seqName = IoUtil.convertSequenceName("SN_" + entry.caName);
             datasource.dropAndCreateSequence(seqName, nextSerial);

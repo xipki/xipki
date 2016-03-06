@@ -88,7 +88,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Option(name = "--url",
             description = "OCSP responder URL")
-    private String serverURL;
+    private String serverUrl;
 
     @Option(name = "--req-out",
             description = "where to save the request")
@@ -152,7 +152,6 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
             String ocspUrl = null;
             for (String certFile : certFiles) {
-                byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = X509Util.parseCert(certFile);
 
                 if (!X509Util.issues(issuerCert, cert)) {
@@ -160,7 +159,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                             "certificate " + certFile + " is not issued by the given issuer");
                 }
 
-                if (isBlank(serverURL)) {
+                if (isBlank(serverUrl)) {
                     List<String> ocspUrls = extractOcspUrls(cert);
                     if (ocspUrls.size() > 0) {
                         String url = ocspUrls.get(0);
@@ -175,11 +174,13 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
                 BigInteger sn = cert.getSerialNumber();
                 sns.add(sn);
+
+                byte[] encodedCert = IoUtil.read(certFile);
                 encodedCerts.put(sn, encodedCert);
             } // end for
 
-            if (isBlank(serverURL)) {
-                serverURL = ocspUrl;
+            if (isBlank(serverUrl)) {
+                serverUrl = ocspUrl;
             }
         } else {
             for (String serialNumber : serialNumberList) {
@@ -188,7 +189,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             }
         }
 
-        if (isBlank(serverURL)) {
+        if (isBlank(serverUrl)) {
             throw new IllegalCmdParamException("could not get URL for the OCSP responder");
         }
 
@@ -197,7 +198,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             respIssuer = X509Util.parseCert(IoUtil.expandFilepath(respIssuerFile));
         }
 
-        URL serverUrl = new URL(serverURL);
+        URL serverUrlObj = new URL(serverUrl);
 
         RequestOptions options = getRequestOptions();
 
@@ -212,7 +213,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
         OCSPResp response;
         try {
-            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
+            response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
                 options, debug);
         } finally {
             if (debug != null && debug.size() > 0) {
@@ -244,23 +245,23 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             return Collections.emptyList();
         }
 
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
+        AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
 
-        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
-        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
-        for (AccessDescription iAccessDescription : iAccessDescriptions) {
-            if (iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp)) {
-                iOCSPAccessDescriptions.add(iAccessDescription);
+        AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
+        List<AccessDescription> ocspAccessDescriptions = new LinkedList<>();
+        for (AccessDescription accessDescription : accessDescriptions) {
+            if (accessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp)) {
+                ocspAccessDescriptions.add(accessDescription);
             }
         }
 
-        int n = iOCSPAccessDescriptions.size();
+        final int n = ocspAccessDescriptions.size();
         List<String> ocspUris = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
-            if (iAccessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
-                String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
-                ocspUris.add(iOCSPUri);
+            GeneralName accessLocation = ocspAccessDescriptions.get(i).getAccessLocation();
+            if (accessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
+                String ocspUri = ((ASN1String) accessLocation.getName()).getString();
+                ocspUris.add(ocspUri);
             }
         }
 

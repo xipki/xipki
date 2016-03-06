@@ -86,12 +86,12 @@ class PendingCertificatePool {
 
         @Override
         public boolean equals(
-                final Object b) {
-            if (!(b instanceof MyEntry)) {
+                final Object obj) {
+            if (!(obj instanceof MyEntry)) {
                 return false;
             }
 
-            MyEntry another = (MyEntry) b;
+            MyEntry another = (MyEntry) obj;
             return certReqId.equals(another.certReqId)
                     && certInfo.equals(another.certInfo);
         }

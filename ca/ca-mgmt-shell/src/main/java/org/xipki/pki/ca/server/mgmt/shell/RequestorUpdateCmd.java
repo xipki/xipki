@@ -76,8 +76,8 @@ public class RequestorUpdateCmd extends CaCommandSupport {
         // check if the certificate is valid
         byte[] certBytes = IoUtil.read(certFile);
         X509Util.parseCert(new ByteArrayInputStream(certBytes));
-        boolean b = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
-        output(b, "updated", "could not update", "CMP requestor " + name);
+        boolean bo = caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
+        output(bo, "updated", "could not update", "CMP requestor " + name);
         return null;
     }
 

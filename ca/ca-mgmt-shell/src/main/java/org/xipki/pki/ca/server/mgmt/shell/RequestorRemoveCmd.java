@@ -59,8 +59,8 @@ public class RequestorRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.removeCmpRequestor(name);
-        output(b, "removed", "could not remove", "CMP requestor " + name);
+        boolean bo = caManager.removeCmpRequestor(name);
+        output(bo, "removed", "could not remove", "CMP requestor " + name);
         return null;
     }
 

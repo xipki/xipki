@@ -83,8 +83,8 @@ public class PublisherAddCmd extends CaCommandSupport {
         }
 
         PublisherEntry entry = new PublisherEntry(name, type, conf);
-        boolean b = caManager.addPublisher(entry);
-        output(b, "added", "could not add", "publisher " + name);
+        boolean bo = caManager.addPublisher(entry);
+        output(bo, "added", "could not add", "publisher " + name);
         return null;
     }
 

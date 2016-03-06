@@ -80,15 +80,15 @@ class ResponderSigner {
     throws CertificateEncodingException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
         X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
-        int n = tmpCertificateChain.length;
-        if (n > 1) {
-            X509Certificate c = tmpCertificateChain[n - 1];
-            if (c.getIssuerX500Principal().equals(c.getSubjectX500Principal())) {
-                n--;
+        int len = tmpCertificateChain.length;
+        if (len > 1) {
+            X509Certificate cert = tmpCertificateChain[len - 1];
+            if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+                len--;
             }
         }
-        this.certificateChain = new X509Certificate[n];
-        System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, n);
+        this.certificateChain = new X509Certificate[len];
+        System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
 
         this.certificate = certificateChain[0];
 

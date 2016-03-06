@@ -95,7 +95,7 @@ import org.bouncycastle.math.ec.ECCurve;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public final class ECParameters extends AlgorithmParametersSpi {
 
     /*
@@ -152,7 +152,7 @@ public final class ECParameters extends AlgorithmParametersSpi {
 
                 namedCurve = spec;
                 return;
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ex) { // CHECKSTYLE:SKIP
             }
         }
 

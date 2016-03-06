@@ -62,14 +62,14 @@ public class MgmtQaShellUtil {
             tmpEx = null;
         }
 
-        boolean b;
+        boolean bo;
         if (tmpEx == null) {
-            b = (is == null);
+            bo = (is == null);
         } else {
-            b = tmpEx.equals(is);
+            bo = tmpEx.equals(is);
         }
 
-        if (!b) {
+        if (!bo) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
         }
     }
@@ -78,14 +78,14 @@ public class MgmtQaShellUtil {
             final String desc,
             final Collection<?> ex, Collection<?> is)
     throws CmdFailure {
-        boolean b;
+        boolean bo;
         if (ex == null) {
-            b = (is == null);
+            bo = (is == null);
         } else {
-            b = ex.equals(is);
+            bo = ex.equals(is);
         }
 
-        if (!b) {
+        if (!bo) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }
     }

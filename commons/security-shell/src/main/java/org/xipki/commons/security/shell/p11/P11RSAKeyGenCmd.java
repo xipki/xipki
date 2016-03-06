@@ -51,6 +51,7 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
 @Command(scope = "xipki-tk", name = "rsa",
         description = "generate RSA keypair in PKCS#11 device")
 @Service
+// CHECKSTYLE:SKIP
 public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
 
     @Option(name = "--key-size",

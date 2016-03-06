@@ -74,6 +74,8 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
@@ -129,6 +131,8 @@ import org.xml.sax.SAXException;
 
 public class XmlX509CertprofileUtil {
 
+    private static final Logger LOG = LoggerFactory.getLogger(XmlX509CertprofileUtil.class);
+
     private static final Object JAXB_LOCK = new Object();
 
     private static Unmarshaller jaxbUnmarshaller;
@@ -157,6 +161,7 @@ public class XmlX509CertprofileUtil {
                 try {
                     xmlConfStream.close();
                 } catch (IOException ex) {
+                    LOG.warn("Error while closing xmlConfStream: {}", ex.getMessage());
                 }
             } catch (SAXException ex) {
                 throw new CertprofileException(
@@ -290,23 +295,23 @@ public class XmlX509CertprofileUtil {
                     "should not reach here, unknown child of GeneralSubtreeBaseType");
         }
 
-        Integer i = type.getMinimum();
-        if (i != null && i < 0) {
-            throw new CertprofileException("negative minimum is not allowed: " + i);
+        Integer min = type.getMinimum();
+        if (min != null && min < 0) {
+            throw new CertprofileException("negative minimum is not allowed: " + min);
         }
 
-        BigInteger minimum = (i == null)
+        BigInteger minimum = (min == null)
                 ? null
-                : BigInteger.valueOf(i.intValue());
+                : BigInteger.valueOf(min.intValue());
 
-        i = type.getMaximum();
-        if (i != null && i < 0) {
-            throw new CertprofileException("negative maximum is not allowed: " + i);
+        Integer max = type.getMaximum();
+        if (max != null && max < 0) {
+            throw new CertprofileException("negative maximum is not allowed: " + max);
         }
 
-        BigInteger maximum = (i == null)
+        BigInteger maximum = (max == null)
                 ? null
-                : BigInteger.valueOf(i.intValue());
+                : BigInteger.valueOf(max.intValue());
 
         return new GeneralSubtree(base, minimum, maximum);
     } // method buildGeneralSubtree
@@ -629,11 +634,11 @@ public class XmlX509CertprofileUtil {
             KeyParametersOption.DSAParametersOption option =
                     new KeyParametersOption.DSAParametersOption();
 
-            Set<Range> pLengths = buildParametersMap(params.getPLength());
-            option.setPlengths(pLengths);
+            Set<Range> plengths = buildParametersMap(params.getPLength());
+            option.setPlengths(plengths);
 
-            Set<Range> qLengths = buildParametersMap(params.getQLength());
-            option.setQlengths(qLengths);
+            Set<Range> qlengths = buildParametersMap(params.getQLength());
+            option.setQlengths(qlengths);
 
             return option;
         } else if (paramsObj instanceof DHParameters) {
@@ -641,11 +646,11 @@ public class XmlX509CertprofileUtil {
             KeyParametersOption.DHParametersOption option =
                     new KeyParametersOption.DHParametersOption();
 
-            Set<Range> pLengths = buildParametersMap(params.getPLength());
-            option.setPlengths(pLengths);
+            Set<Range> plengths = buildParametersMap(params.getPLength());
+            option.setPlengths(plengths);
 
-            Set<Range> qLengths = buildParametersMap(params.getQLength());
-            option.setQlengths(qLengths);
+            Set<Range> qlengths = buildParametersMap(params.getQLength());
+            option.setQlengths(qlengths);
 
             return option;
         } else if (paramsObj instanceof GostParameters) {
@@ -717,10 +722,10 @@ public class XmlX509CertprofileUtil {
     throws CertprofileException {
         ParamUtil.requireNonEmpty("policyInfos", policyInfos);
 
-        int n = policyInfos.size();
-        PolicyInformation[] pInfos = new PolicyInformation[n];
+        int size = policyInfos.size();
+        PolicyInformation[] infos = new PolicyInformation[size];
 
-        int i = 0;
+        int idx = 0;
         for (CertificatePolicyInformation policyInfo : policyInfos) {
             String policyId = policyInfo.getCertPolicyId();
             List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
@@ -732,14 +737,14 @@ public class XmlX509CertprofileUtil {
 
             ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
             if (policyQualifiers == null) {
-                pInfos[i] = new PolicyInformation(policyOid);
+                infos[idx] = new PolicyInformation(policyOid);
             } else {
-                pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
+                infos[idx] = new PolicyInformation(policyOid, policyQualifiers);
             }
-            i++;
+            idx++;
         }
 
-        return new org.bouncycastle.asn1.x509.CertificatePolicies(pInfos);
+        return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);
     }
 
     private static ASN1Sequence createPolicyQualifiers(

@@ -91,7 +91,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "-n",
             description = "number of certificates to be revoked in one request")
-    private Integer n = 1;
+    private Integer num = 1;
 
     @Reference(optional = true)
     private DataSourceFactory datasourceFactory;
@@ -118,9 +118,9 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
         description.append("issuer: ").append(issuerCertFile).append("\n");
         description.append("cadb: ").append(caDbConfFile).append("\n");
         description.append("maxCerts: ").append(maxCerts).append("\n");
-        description.append("#certs/req: ").append(n).append("\n");
-        description.append("unit: ").append(n).append(" certificate");
-        if (n > 1) {
+        description.append("#certs/req: ").append(num).append("\n");
+        description.append("unit: ").append(num).append(" certificate");
+        if (num > 1) {
             description.append("s");
         }
         description.append("\n");
@@ -137,7 +137,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
                 null, props, securityFactory.getPasswordResolver());
         try {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
-                    caClient, caCert, caDataSource, maxCerts, n, description.toString());
+                    caClient, caCert, caDataSource, maxCerts, num, description.toString());
 
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);

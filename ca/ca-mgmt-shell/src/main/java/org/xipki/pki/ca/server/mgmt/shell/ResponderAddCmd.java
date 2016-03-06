@@ -101,8 +101,8 @@ public class ResponderAddCmd extends CaCommandSupport {
         }
         CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
 
-        boolean b = caManager.addCmpResponder(entry);
-        output(b, "added", "could not add", "CMP responder " + name);
+        boolean bo = caManager.addCmpResponder(entry);
+        output(bo, "added", "could not add", "CMP responder " + name);
         return null;
     }
 

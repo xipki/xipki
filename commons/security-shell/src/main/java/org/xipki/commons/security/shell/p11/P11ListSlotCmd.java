@@ -103,7 +103,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
     private void output(
             final List<P11SlotIdentifier> slots) {
         // list all slots
-        int n = slots.size();
+        final int n = slots.size();
 
         if (n == 0 || n == 1) {
             String numText = (n == 0)

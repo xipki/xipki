@@ -241,24 +241,25 @@ public class RequestOptions {
         return new AlgorithmIdentifier(algOid, params);
     } // method createAlgId
 
+    // CHECKSTYLE:SKIP
     public static RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOID) {
+            final ASN1ObjectIdentifier digestAlgOid) {
         int saltSize;
-        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID)) {
+        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
             saltSize = 20;
-        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
             saltSize = 28;
-        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
             saltSize = 32;
-        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
             saltSize = 48;
-        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOID)) {
+        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
             saltSize = 64;
         } else {
-            throw new RuntimeException("unknown digest algorithm " + digestAlgOID);
+            throw new RuntimeException("unknown digest algorithm " + digestAlgOid);
         }
 
-        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
         return new RSASSAPSSparams(
                 digAlgId,
                 new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),

@@ -56,63 +56,63 @@ public class CaCertType extends DbDataObject {
     public static final String TAG_CAID = "caId";
 
     /**
-     * certificate serial number
+     * certificate serial number.
      */
     public static final String TAG_SN = "sn";
 
     /**
-     * certificate profile id
+     * certificate profile id.
      */
     public static final String TAG_PID = "pid";
 
     /**
-     * requestor id
+     * requestor id.
      */
     public static final String TAG_RID = "rid";
 
     public static final String TAG_UPDATE = "update";
 
     /**
-     * whether revoked
+     * whether revoked.
      */
     public static final String TAG_REV = "rev";
 
     /**
-     * revocation reason
+     * revocation reason.
      */
     public static final String TAG_RR = "rr";
 
     /**
-     * revocation time
+     * revocation time.
      */
     public static final String TAG_RT = "rt";
 
     /**
-     * revocation invalidity time
+     * revocation invalidity time.
      */
     public static final String TAG_RIT = "rit";
 
     public static final String TAG_USER = "user";
 
     /**
-     * base64 encoded transaction id
+     * base64 encoded transaction id.
      */
     public static final String TAG_TID = "tid";
 
     public static final String TAG_REQ_TYPE = "reqType";
 
     /**
-     * first 8 bytes of the SHA1 sum of the requested subject
+     * first 8 bytes of the SHA1 sum of the requested subject.
      */
     public static final String TAG_FP_RS = "fpRs";
 
     /**
-     * requested subject, if differs from the one in certificate
+     * requested subject, if differs from the one in certificate.
      */
     public static final String TAG_RS = "rs";
 
     /**
-     * file name of the certificate
+     * file name of the certificate.
      */
     public static final String TAG_FILE = "file";
 

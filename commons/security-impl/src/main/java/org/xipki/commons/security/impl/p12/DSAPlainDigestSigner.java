@@ -55,7 +55,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class DSAPlainDigestSigner implements Signer {
 
     private final Digest digest;
@@ -73,56 +73,53 @@ class DSAPlainDigestSigner implements Signer {
         this.dsaSigner = signer;
     }
 
+    @Override
     public void init(
-            final boolean pForSigning,
+            final boolean forSigning,
             final CipherParameters parameters) {
-        this.forSigning = pForSigning;
+        this.forSigning = forSigning;
 
-        AsymmetricKeyParameter k;
+        AsymmetricKeyParameter param;
 
         if (parameters instanceof ParametersWithRandom) {
-            k = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
+            param = (AsymmetricKeyParameter) ((ParametersWithRandom) parameters).getParameters();
         } else {
-            k = (AsymmetricKeyParameter) parameters;
+            param = (AsymmetricKeyParameter) parameters;
         }
 
-        ParamUtil.requireNonNull("k", k);
-        if (k instanceof ECPublicKeyParameters) {
-            keyBitLen = ((ECPublicKeyParameters) k).getParameters().getCurve().getFieldSize();
-        } else if (k instanceof ECPrivateKeyParameters) {
-            keyBitLen = ((ECPrivateKeyParameters) k).getParameters().getCurve().getFieldSize();
-        } else if (k instanceof DSAPublicKeyParameters) {
-            keyBitLen = ((DSAPublicKeyParameters) k).getParameters().getQ().bitLength();
-        } else if (k instanceof DSAPrivateKeyParameters) {
-            keyBitLen = ((DSAPrivateKeyParameters) k).getParameters().getQ().bitLength();
+        ParamUtil.requireNonNull("param", param);
+        if (param instanceof ECPublicKeyParameters) {
+            keyBitLen = ((ECPublicKeyParameters) param).getParameters().getCurve().getFieldSize();
+        } else if (param instanceof ECPrivateKeyParameters) {
+            keyBitLen = ((ECPrivateKeyParameters) param).getParameters().getCurve().getFieldSize();
+        } else if (param instanceof DSAPublicKeyParameters) {
+            keyBitLen = ((DSAPublicKeyParameters) param).getParameters().getQ().bitLength();
+        } else if (param instanceof DSAPrivateKeyParameters) {
+            keyBitLen = ((DSAPrivateKeyParameters) param).getParameters().getQ().bitLength();
         } else {
-            throw new IllegalArgumentException("unknown parameters: " + k.getClass().getName());
+            throw new IllegalArgumentException("unknown parameters: " + param.getClass().getName());
         }
 
-        if (pForSigning && !k.isPrivate()) {
+        if (forSigning && !param.isPrivate()) {
             throw new IllegalArgumentException("Signing Requires Private Key.");
         }
 
-        if (!pForSigning && k.isPrivate()) {
+        if (!forSigning && param.isPrivate()) {
             throw new IllegalArgumentException("Verification Requires Public Key.");
         }
 
         reset();
 
-        dsaSigner.init(pForSigning, parameters);
+        dsaSigner.init(forSigning, parameters);
     }
 
-    /**
-     * update the internal digest with the byte b
-     */
+    @Override
     public void update(
             final byte input) {
         digest.update(input);
     }
 
-    /**
-     * update the internal digest with the byte array in
-     */
+    @Override
     public void update(
             final byte[] input,
             final int inOff,
@@ -130,10 +127,7 @@ class DSAPlainDigestSigner implements Signer {
         digest.update(input, inOff, length);
     }
 
-    /**
-     * Generate a signature for the message we've been loaded with using
-     * the key we were initialised with.
-     */
+    @Override
     public byte[] generateSignature() {
         if (!forSigning) {
             throw new IllegalStateException(
@@ -152,6 +146,7 @@ class DSAPlainDigestSigner implements Signer {
         }
     }
 
+    @Override
     public boolean verifySignature(
             final byte[] signature) {
         if (forSigning) {
@@ -169,13 +164,14 @@ class DSAPlainDigestSigner implements Signer {
         }
     }
 
+    @Override
     public void reset() {
         digest.reset();
     }
 
     private byte[] encode(
-            final BigInteger r,
-            final BigInteger s)
+            final BigInteger r, // CHECKSTYLE:SKIP
+            final BigInteger s) // CHECKSTYLE:SKIP
     throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if ((r.bitLength() + 7) / 8 > blockSize) {

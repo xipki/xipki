@@ -46,7 +46,7 @@ import org.xipki.commons.password.api.OBFPasswordService;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class OBFPasswordServiceImpl implements OBFPasswordService {
 
     public static final String OBFUSCATE = "OBF:";
@@ -55,25 +55,25 @@ public class OBFPasswordServiceImpl implements OBFPasswordService {
             final String str) {
         ParamUtil.requireNonBlank("str", str);
         StringBuilder buf = new StringBuilder();
-        byte[] b = str.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
         buf.append(OBFUSCATE);
-        for (int i = 0; i < b.length; i++) {
-            byte b1 = b[i];
-            byte b2 = b[b.length - (i + 1)];
+        for (int i = 0; i < bytes.length; i++) {
+            byte b1 = bytes[i];
+            byte b2 = bytes[bytes.length - (i + 1)];
             if (b1 < 0 || b2 < 0) {
                 int i0 = (0xff & b1) * 256 + (0xff & b2);
-                String x = Integer.toString(i0, 36).toLowerCase();
-                buf.append("U0000", 0, 5 - x.length());
-                buf.append(x);
+                String sx = Integer.toString(i0, 36).toLowerCase();
+                buf.append("U0000", 0, 5 - sx.length());
+                buf.append(sx);
             } else {
                 int i1 = 127 + b1 + b2;
                 int i2 = 127 + b1 - b2;
                 int i0 = i1 * 256 + i2;
-                String x = Integer.toString(i0, 36).toLowerCase();
+                String sx = Integer.toString(i0, 36).toLowerCase();
 
-                buf.append("000", 0, 4 - x.length());
-                buf.append(x);
+                buf.append("000", 0, 4 - sx.length());
+                buf.append(sx);
             }
         } // end for
         return buf.toString();
@@ -87,38 +87,38 @@ public class OBFPasswordServiceImpl implements OBFPasswordService {
             tmpStr = tmpStr.substring(4);
         }
 
-        byte[] b = new byte[tmpStr.length() / 2];
-        int l = 0;
+        byte[] bytes = new byte[tmpStr.length() / 2];
+        int idx = 0;
         for (int i = 0; i < tmpStr.length(); i += 4) {
             if (tmpStr.charAt(i) == 'U') {
                 i++;
-                String x = tmpStr.substring(i, i + 4);
-                int i0 = Integer.parseInt(x, 36);
+                String sx = tmpStr.substring(i, i + 4);
+                int i0 = Integer.parseInt(sx, 36);
                 byte bx = (byte) (i0 >> 8);
-                b[l++] = bx;
+                bytes[idx++] = bx;
             } else {
-                String x = tmpStr.substring(i, i + 4);
-                int i0 = Integer.parseInt(x, 36);
+                String sx = tmpStr.substring(i, i + 4);
+                int i0 = Integer.parseInt(sx, 36);
                 int i1 = (i0 / 256);
                 int i2 = (i0 % 256);
                 byte bx = (byte) ((i1 + i2 - 254) / 2);
-                b[l++] = bx;
+                bytes[idx++] = bx;
             }
         } // end for
 
-        return new String(b, 0, l, StandardCharsets.UTF_8);
+        return new String(bytes, 0, idx, StandardCharsets.UTF_8);
     }
 
     @Override
     public String obfuscate(
-            final String s) {
-        return doObfuscate(s);
+            final String str) {
+        return doObfuscate(str);
     }
 
     @Override
     public String deobfuscate(
-            final String s) {
-        return doDeobfuscate(s);
+            final String str) {
+        return doDeobfuscate(str);
     }
 
 }

@@ -38,6 +38,7 @@ package org.xipki.commons.security.speed.p12.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
@@ -49,28 +50,30 @@ import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-dsa-gen-p12",
         description = "performance test of PKCS#12 DSA key generation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP12DSAKeyGenCmd extends SingleSpeedCommandSupport {
 
     @Option(name = "--plen",
             description = "bit length of the prime")
-    private Integer pLen = 2048;
+    private Integer plen = 2048;
 
     @Option(name = "--qlen",
             description = "bit length of the sub-prime")
-    private Integer qLen;
+    private Integer qlen;
 
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        if (qLen == null) {
-            if (pLen >= 2048) {
-                qLen = 256;
+        if (qlen == null) {
+            if (plen >= 2048) {
+                qlen = 256;
             } else {
-                qLen = 160;
+                qlen = 160;
             }
         }
 
-        return new P12DSAKeyGenLoadTest(pLen, qLen, securityFactory);
+        return new P12DSAKeyGenLoadTest(plen, qlen, securityFactory);
     }
 
 }

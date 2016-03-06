@@ -71,6 +71,7 @@ public class FpIdCalculator {
     }
 
     /**
+     * Hash the data.getBytes("UTF-8") and returns the first 8 bytes of the hash value.
      * @return long represented of the first 8 bytes
      */
     public static long hash(
@@ -86,6 +87,7 @@ public class FpIdCalculator {
     }
 
     /**
+     * Hash the data and returns the first 8 bytes of the hash value.
      * @return long represented of the first 8 bytes
      */
     public static long hash(
@@ -97,7 +99,7 @@ public class FpIdCalculator {
             try {
                 md = MDS.poll(10, TimeUnit.SECONDS);
                 break;
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
@@ -108,10 +110,10 @@ public class FpIdCalculator {
         try {
             md.reset();
             md.update(data, 0, data.length);
-            byte[] b = new byte[md.getDigestSize()];
-            md.doFinal(b, 0);
+            byte[] bytes = new byte[md.getDigestSize()];
+            md.doFinal(bytes, 0);
 
-            return bytesToLong(b);
+            return bytesToLong(bytes);
         } finally {
             MDS.addLast(md);
         }

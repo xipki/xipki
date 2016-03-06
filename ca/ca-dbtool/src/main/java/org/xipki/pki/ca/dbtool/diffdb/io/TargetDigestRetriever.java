@@ -55,6 +55,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.DatabaseType;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestReporter;
 import org.xipki.pki.ca.dbtool.diffdb.DigestReader;
@@ -113,7 +114,7 @@ public class TargetDigestRetriever {
                     Map<Long, DbDigestEntry> resp = query(bundle);
 
                     List<Long> serialNumbers = bundle.getSerialNumbers();
-                    int n = serialNumbers.size();
+                    int size = serialNumbers.size();
 
                     for (Long serialNumber : serialNumbers) {
                         DbDigestEntry targetCert = resp.get(serialNumber);
@@ -129,7 +130,7 @@ public class TargetDigestRetriever {
                             reporter.addMissing(serialNumber);
                         }
                     }
-                    processLog.addNumProcessed(n);
+                    processLog.addNumProcessed(size);
                     processLog.printStatus();
                 } catch (Exception ex) {
                     exception = ex;
@@ -146,7 +147,7 @@ public class TargetDigestRetriever {
         private Map<Long, DbDigestEntry> query(CertsBundle bundle)
         throws DataAccessException {
             List<Long> serialNumbers = bundle.getSerialNumbers();
-            int n = serialNumbers.size();
+            int size = serialNumbers.size();
 
             int numSkipped = bundle.getNumSkipped();
             long minSerialNumber = serialNumbers.get(0);
@@ -178,7 +179,7 @@ public class TargetDigestRetriever {
                 }
             } else {
                 boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-                if (batchSupported && n == numPerSelect) {
+                if (batchSupported && size == numPerSelect) {
                     certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
                             serialNumbers);
                 } else {
@@ -249,7 +250,7 @@ public class TargetDigestRetriever {
         buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append('.');
         buffer.append(dbControl.getColCertId());
 
-        singleCertSql = datasource.createFetchFirstSelectSQL(buffer.toString(), 1);
+        singleCertSql = datasource.createFetchFirstSelectSql(buffer.toString(), 1);
 
         buffer = new StringBuilder(200);
         buffer.append(dbControl.getColSerialNumber()).append(',');
@@ -267,7 +268,7 @@ public class TargetDigestRetriever {
         buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
         buffer.append(".").append(dbControl.getColCertId());
 
-        inArrayCertsSql = datasource.createFetchFirstSelectSQL(buffer.toString(), numPerSelect);
+        inArrayCertsSql = datasource.createFetchFirstSelectSql(buffer.toString(), numPerSelect);
 
         buffer = new StringBuilder(200);
         buffer.append("SELECT ");
@@ -423,19 +424,7 @@ public class TargetDigestRetriever {
     private void releaseResources(
             final Statement ps,
             final ResultSet rs) {
-        if (ps != null) {
-            try {
-                ps.close();
-            } catch (Exception ex) {
-            }
-        }
-
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (Exception ex) {
-            }
-        }
+        DbToolBase.releaseResources(datasource, ps, rs);
     }
 
     public void awaitTerminiation()

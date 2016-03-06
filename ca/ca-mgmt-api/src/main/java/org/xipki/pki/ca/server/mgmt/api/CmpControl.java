@@ -104,12 +104,12 @@ public class CmpControl {
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
-        String s = pairs.getValue(KEY_PROTECTION_SIGALGO);
+        String str = pairs.getValue(KEY_PROTECTION_SIGALGO);
 
-        if (s == null) {
+        if (str == null) {
             this.sigAlgos = null;
         } else {
-            Set<String> set = StringUtil.splitAsSet(s, ALGO_DELIMITER);
+            Set<String> set = StringUtil.splitAsSet(str, ALGO_DELIMITER);
             this.sigAlgos = canonicalizeAlgos(set);
             if (CollectionUtil.isNonEmpty(this.sigAlgos)) {
                 pairs.putPair(KEY_PROTECTION_SIGALGO,
@@ -260,10 +260,10 @@ public class CmpControl {
             final ConfPairs pairs,
             final String key,
             final boolean defaultValue) {
-        String s = pairs.getValue(key);
-        boolean ret = StringUtil.isBlank(s)
+        String str = pairs.getValue(key);
+        boolean ret = StringUtil.isBlank(str)
                 ? defaultValue
-                : Boolean.parseBoolean(s);
+                : Boolean.parseBoolean(str);
         pairs.putPair(key, Boolean.toString(ret));
         return ret;
     }
@@ -272,16 +272,16 @@ public class CmpControl {
             final ConfPairs pairs,
             final String key,
             final int defaultValue) {
-        String s = pairs.getValue(key);
-        int ret = StringUtil.isBlank(s)
+        String str = pairs.getValue(key);
+        int ret = StringUtil.isBlank(str)
                 ? defaultValue
-                : Integer.parseInt(s);
+                : Integer.parseInt(str);
         pairs.putPair(key, Integer.toString(ret));
         return ret;
     }
 
-    private static String getYesNo(boolean b) {
-        return b
+    private static String getYesNo(boolean bo) {
+        return bo
                 ? "yes"
                 : "no";
     }

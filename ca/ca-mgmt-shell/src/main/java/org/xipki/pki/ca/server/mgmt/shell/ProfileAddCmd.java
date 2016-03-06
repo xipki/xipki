@@ -83,8 +83,8 @@ public class ProfileAddCmd extends CaCommandSupport {
         }
 
         CertprofileEntry entry = new CertprofileEntry(name, type, conf);
-        boolean b = caManager.addCertprofile(entry);
-        output(b, "added", "could not add", "certificate profile " + name);
+        boolean bo = caManager.addCertprofile(entry);
+        output(bo, "added", "could not add", "certificate profile " + name);
         return null;
     }
 

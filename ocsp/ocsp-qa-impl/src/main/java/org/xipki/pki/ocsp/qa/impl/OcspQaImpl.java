@@ -154,7 +154,7 @@ public class OcspQaImpl implements OcspQa {
         issue = new ValidationIssue("OCSP.RESPONSES.NUM", "number of single responses");
         resultIssues.add(issue);
 
-        int n = (singleResponses == null)
+        final int n = (singleResponses == null)
                 ? 0
                 : singleResponses.length;
         if (n == 0) {

@@ -78,14 +78,21 @@ public interface DataSourceWrapper {
             Statement ps,
             ResultSet rs);
 
-    String createFetchFirstSelectSQL(
-            String coreSql,
-            int rows);
-
     String createFetchFirstSelectSql(
             String coreSql,
             int rows,
             String orderBy);
+
+    String createFetchFirstSelectSql(
+            String coreSql,
+            int rows);
+
+    long getMin(
+            Connection conn,
+            String table,
+            String column,
+            String condition)
+    throws DataAccessException;
 
     long getMin(
             Connection conn,
@@ -97,13 +104,6 @@ public interface DataSourceWrapper {
             Connection conn,
             String table,
             String column)
-    throws DataAccessException;
-
-    long getMin(
-            Connection conn,
-            String table,
-            String column,
-            String condition)
     throws DataAccessException;
 
     long getMax(

@@ -50,8 +50,8 @@ public enum TripleState {
     FORBIDDEN("forbidden");
     private final String value;
 
-    TripleState(String v) {
-        value = v;
+    TripleState(String value) {
+        this.value = value;
     }
 
     public String value() {

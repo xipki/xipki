@@ -97,7 +97,7 @@ public class X509CaInfo {
 
     private boolean useRandomSerialNumber;
 
-    private RandomSerialNumberGenerator randomSNGenerator;
+    private RandomSerialNumberGenerator randomSnGenerator;
 
     private Map<String, ConcurrentContentSigner> signers;
 
@@ -137,7 +137,7 @@ public class X509CaInfo {
 
         this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
         if (this.useRandomSerialNumber) {
-            randomSNGenerator = RandomSerialNumberGenerator.getInstance();
+            randomSnGenerator = RandomSerialNumberGenerator.getInstance();
             return;
         }
 
@@ -375,7 +375,7 @@ public class X509CaInfo {
     public BigInteger nextSerial()
     throws OperationException {
         if (useRandomSerialNumber) {
-            return randomSNGenerator.nextSerialNumber();
+            return randomSnGenerator.nextSerialNumber();
         }
 
         long serial = certStore.nextSerial(getCertificate(), caEntry.getSerialSeqName());
@@ -430,7 +430,7 @@ public class X509CaInfo {
 
         List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(caEntry.getSignerConf());
 
-        Map<String, ConcurrentContentSigner> tSigners = new HashMap<>();
+        Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
         for (String[] m : signerConfs) {
             String algo = m[0];
             String signerConf = m[1];
@@ -441,17 +441,17 @@ public class X509CaInfo {
                 if (dfltSigner == null) {
                     dfltSigner = signer;
                 }
-                tSigners.put(algo, signer);
+                tmpSigners.put(algo, signer);
             } catch (Throwable th) {
-                for (ConcurrentContentSigner tSigner : tSigners.values()) {
-                    tSigner.shutdown();
+                for (ConcurrentContentSigner ccs : tmpSigners.values()) {
+                    ccs.shutdown();
                 }
-                tSigners.clear();
+                tmpSigners.clear();
                 throw new SignerException("could not initialize the CA signer");
             }
         }
 
-        this.signers = Collections.unmodifiableMap(tSigners);
+        this.signers = Collections.unmodifiableMap(tmpSigners);
         return true;
     } // method initSigner
 

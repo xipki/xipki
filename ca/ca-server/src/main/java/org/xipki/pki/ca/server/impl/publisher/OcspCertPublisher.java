@@ -96,23 +96,18 @@ public class OcspCertPublisher extends X509CertPublisher {
         ParamUtil.requireNonEmpty("datasources", datasources);
 
         ConfPairs utf8pairs = new ConfPairs(conf);
-        String v = utf8pairs.getValue("publish.goodcerts");
-        this.publishsGoodCert = (v == null)
+        String str = utf8pairs.getValue("publish.goodcerts");
+        this.publishsGoodCert = (str == null)
                 ? true
-                : Boolean.parseBoolean(v);
+                : Boolean.parseBoolean(str);
 
-        v = utf8pairs.getValue("asyn");
-        this.asyn = (v == null)
+        str = utf8pairs.getValue("asyn");
+        this.asyn = (str == null)
                 ? false
-                : Boolean.parseBoolean(v);
+                : Boolean.parseBoolean(str);
 
-        String datasourceName = null;
-        ConfPairs confPairs = null;
-        try {
-            confPairs = new ConfPairs(conf);
-            datasourceName = confPairs.getValue("datasource");
-        } catch (Exception ex) {
-        }
+        ConfPairs confPairs = new ConfPairs(conf);
+        String datasourceName = confPairs.getValue("datasource");
 
         DataSourceWrapper datasource = null;
         if (datasourceName != null) {

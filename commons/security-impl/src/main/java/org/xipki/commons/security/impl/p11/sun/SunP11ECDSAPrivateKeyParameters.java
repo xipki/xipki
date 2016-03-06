@@ -44,7 +44,7 @@ import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class SunP11ECDSAPrivateKeyParameters extends AsymmetricKeyParameter {
 
     private PrivateKey privateKey;

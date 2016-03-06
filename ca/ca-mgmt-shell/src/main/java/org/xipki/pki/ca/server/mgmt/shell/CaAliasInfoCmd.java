@@ -70,15 +70,15 @@ public class CaAliasInfoCmd extends CaCommandSupport {
         StringBuilder sb = new StringBuilder();
 
         if (caAlias == null) {
-            int n = aliasNames.size();
+            int size = aliasNames.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
+            if (size == 0 || size == 1) {
+                sb.append((size == 0)
                         ? "no"
                         : "1");
                 sb.append(" CA alias is configured\n");
             } else {
-                sb.append(n).append(" CA aliases are configured:\n");
+                sb.append(size).append(" CA aliases are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(aliasNames);

@@ -155,9 +155,9 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
         Iterator<?> it = certstore.getCertificates(null).iterator();
         while (it.hasNext()) {
-            X509Certificate m = (X509Certificate) it.next();
-            if (-1 == m.getBasicConstraints()) {
-                return m;
+            X509Certificate cert = (X509Certificate) it.next();
+            if (-1 == cert.getBasicConstraints()) {
+                return cert;
             }
         }
         return null;

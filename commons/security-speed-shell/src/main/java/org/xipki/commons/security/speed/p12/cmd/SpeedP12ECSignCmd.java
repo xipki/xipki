@@ -39,6 +39,7 @@ package org.xipki.commons.security.speed.p12.cmd;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
@@ -50,6 +51,8 @@ import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 @Command(scope = "xipki-tk", name = "speed-ec-sign-p12",
         description = "performance test of PKCS#12 EC signature creation")
+@Service
+// CHECKSTYLE:SKIP
 public class SpeedP12ECSignCmd extends SpeedP12SignCommandSupport {
 
     @Option(name = "--curve",

@@ -148,11 +148,11 @@ public class CaUtil {
             final X500Name crlSignerSubject)
     throws IOException, CertprofileException {
         ParamUtil.requireNonEmpty("crlUris", crlUris);
-        int n = crlUris.size();
+        int size = crlUris.size();
         DistributionPoint[] points = new DistributionPoint[1];
 
-        GeneralName[] names = new GeneralName[n];
-        for (int i = 0; i < n; i++) {
+        GeneralName[] names = new GeneralName[size];
+        for (int i = 0; i < size; i++) {
             names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
         }
         // Distribution Point

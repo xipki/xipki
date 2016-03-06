@@ -67,11 +67,11 @@ public class CaEntryContainer {
             final int id,
             final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException {
-        CaEntry m = caEntryMap.get(caId);
-        if (m == null) {
+        CaEntry ce = caEntryMap.get(caId);
+        if (ce == null) {
             throw new IllegalArgumentException("unknown caId '" + caId + "'");
         }
-        m.addDigestEntry(id, reportEntry);
+        ce.addDigestEntry(id, reportEntry);
     }
 
     public void close()
@@ -87,9 +87,9 @@ public class CaEntryContainer {
             }
         }
 
-        int n = sb.length();
-        if (n > 0) {
-            sb.delete(n - 2, n);
+        int len = sb.length();
+        if (len > 0) {
+            sb.delete(len - 2, len);
             throw new IOException(sb.toString());
         }
     }

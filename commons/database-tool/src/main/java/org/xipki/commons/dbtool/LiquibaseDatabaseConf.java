@@ -125,9 +125,9 @@ public class LiquibaseDatabaseConf {
                 urlBuilder.append(dbProps.getProperty("datasource.databaseName"));
             } else if (datasourceClassName.contains("oracle.")) {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
-                String s = dbProps.getProperty("datasource.URL");
-                if (s != null && !s.isEmpty()) {
-                    urlBuilder.append(s);
+                String str = dbProps.getProperty("datasource.URL");
+                if (str != null && !str.isEmpty()) {
+                    urlBuilder.append(str);
                 } else {
                     urlBuilder.append("jdbc:oracle:thin:@");
                     urlBuilder.append(dbProps.getProperty("datasource.serverName"));
@@ -214,17 +214,17 @@ public class LiquibaseDatabaseConf {
     } // method getInstance
 
     public static boolean isNotBlank(
-            final String s) {
-        return s != null && !s.isEmpty();
+            final String str) {
+        return str != null && !str.isEmpty();
     }
 
     private static boolean startsWithIgnoreCase(
-            final String s,
+            final String str,
             final String prefix) {
-        if (s.length() < prefix.length()) {
+        if (str.length() < prefix.length()) {
             return false;
         }
 
-        return prefix.equalsIgnoreCase(s.substring(0, prefix.length()));
+        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
     }
 }

@@ -388,12 +388,12 @@ class CaConfigurationDbImporter extends DbPorter {
 
                 try {
                     String b64Cert = getValue(ca.getCert());
-                    X509Certificate c = X509Util.parseCert(Base64.decode(b64Cert));
+                    X509Certificate cert = X509Util.parseCert(Base64.decode(b64Cert));
 
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
                     ps.setInt(idx++, art);
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubjectX500Principal(),
+                    ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(),
                             maxX500nameLen));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setInt(idx++, ca.getNextCrlNo());
@@ -412,10 +412,10 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, ca.getDuplicateSubject());
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
-                    int tNumCrls = (numCrls == null)
+                    int tmpNumCrls = (numCrls == null)
                             ? 30
                             : numCrls.intValue();
-                    ps.setInt(idx++, tNumCrls);
+                    ps.setInt(idx++, tmpNumCrls);
                     ps.setInt(idx++, ca.getExpirationPeriod());
                     ps.setInt(idx++, ca.getKeepExpiredCertDays());
                     setBoolean(ps, idx++, ca.isRevoked());

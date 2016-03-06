@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
@@ -54,6 +55,8 @@ import org.xipki.commons.security.speed.p11.P11ECKeyGenLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-ec-gen",
         description = "performance test of PKCS#11 EC key generation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override

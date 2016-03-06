@@ -50,6 +50,7 @@ import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 @Command(scope = "xipki-tk", name = "rsa-p12",
         description = "generate RSA keypair in PKCS#12 keystore")
 @Service
+// CHECKSTYLE:SKIP
 public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
 
     @Option(name = "--key-size",

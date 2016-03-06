@@ -55,8 +55,8 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
 
     @Override
     public void init(
-            final P11Control pP11Control) {
-        this.p11Control = ParamUtil.requireNonNull("pP11Control", pP11Control);
+            final P11Control p11Control) {
+        this.p11Control = ParamUtil.requireNonNull("p11Control", p11Control);
     }
 
     @Override

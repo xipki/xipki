@@ -366,7 +366,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final P11KeyIdentifier keyIdentifier,
             final X509Certificate newCert,
             final Set<X509Certificate> caCerts,
-            final SecurityFactory pSecurityFactory)
+            final SecurityFactory securityFactory)
     throws Exception {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
         ParamUtil.requireNonNull("newCert", newCert);
@@ -464,15 +464,15 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     @Override
     public P11KeyIdentifier generateDSAKeypair(
-            final int pLength,
-            final int qLength,
+            final int plength,
+            final int qlength,
             final String label)
     throws Exception {
         ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireMax("pLength", pLength, 1024);
+        ParamUtil.requireMax("pLength", plength, 1024);
 
-        if (pLength % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + pLength);
+        if (plength % 1024 != 0) {
+            throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
         }
 
         if (privKeyLabelExists(label)) {
@@ -480,7 +480,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
                     + " exists, please specify another one");
         }
 
-        KeyPair kp = KeyUtil.generateDSAKeypair(pLength, qLength, securityFactory.getRandom4Key());
+        KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, securityFactory.getRandom4Key());
 
         byte[] keyId = generateKeyId();
         savePkcs11PrivateKey(keyId, label, kp.getPrivate());
@@ -764,13 +764,13 @@ public class KeystoreP11Slot implements P11WritableSlot {
         sb.append(PROP_LABEL).append('=').append(label).append('\n');
 
         if (publicKey instanceof RSAPublicKey) {
-            RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
-
             sb.append(PROP_ALGORITHM).append('=');
             sb.append(PKCSObjectIdentifiers.rsaEncryption.getId());
             sb.append('\n');
 
             sb.append(PROP_RSA_MODUS).append('=');
+
+            RSAPublicKey rsaKey = (RSAPublicKey) publicKey;
             sb.append(Hex.toHexString(rsaKey.getModulus().toByteArray()));
             sb.append('\n');
 
@@ -778,13 +778,12 @@ public class KeystoreP11Slot implements P11WritableSlot {
             sb.append(Hex.toHexString(rsaKey.getPublicExponent().toByteArray()));
             sb.append('\n');
         } else if (publicKey instanceof DSAPublicKey) {
-            DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
-
             sb.append(PROP_ALGORITHM).append('=');
             sb.append(X9ObjectIdentifiers.id_dsa.getId());
             sb.append('\n');
 
             sb.append(PROP_DSA_PRIME).append('=');
+            DSAPublicKey dsaKey = (DSAPublicKey) publicKey;
             sb.append(Hex.toHexString(dsaKey.getParams().getP().toByteArray()));
             sb.append('\n');
 
@@ -800,12 +799,11 @@ public class KeystoreP11Slot implements P11WritableSlot {
             sb.append(Hex.toHexString(dsaKey.getY().toByteArray()));
             sb.append('\n');
         } else if (publicKey instanceof ECPublicKey) {
-            ECPublicKey ecKey = (ECPublicKey) publicKey;
-
             sb.append(PROP_ALGORITHM).append('=');
             sb.append(X9ObjectIdentifiers.id_ecPublicKey.getId());
             sb.append('\n');
 
+            ECPublicKey ecKey = (ECPublicKey) publicKey;
             ECParameterSpec paramSpec = ecKey.getParams();
 
             // ecdsaParams
@@ -828,13 +826,13 @@ public class KeystoreP11Slot implements P11WritableSlot {
             sb.append('\n');
 
             // EC point
-            java.security.spec.ECPoint w = ecKey.getW();
-            BigInteger wx = w.getAffineX();
+            java.security.spec.ECPoint pointW = ecKey.getW();
+            BigInteger wx = pointW.getAffineX();
             if (wx.signum() != 1) {
                 throw new InvalidKeyException("Wx is not positive");
             }
 
-            BigInteger wy = w.getAffineY();
+            BigInteger wy = pointW.getAffineY();
             if (wy.signum() != 1) {
                 throw new InvalidKeyException("Wy is not positive");
             }
@@ -1005,19 +1003,10 @@ public class KeystoreP11Slot implements P11WritableSlot {
     private Properties loadProperties(
             File file)
     throws IOException {
-        InputStream stream = null;
-        try {
+        try (InputStream stream = new FileInputStream(file)) {
             Properties props = new Properties();
-            stream = new FileInputStream(file);
             props.load(stream);
             return props;
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ex) {
-                }
-            }
         }
     }
 

@@ -59,7 +59,7 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 abstract class AbstractP11DSAContentSigner implements ContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractP11DSAContentSigner.class);

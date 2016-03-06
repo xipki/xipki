@@ -70,15 +70,15 @@ public class CmpControlInfoCmd extends CaCommandSupport {
 
         if (name == null) {
             Set<String> names = caManager.getCmpControlNames();
-            int n = names.size();
+            int size = names.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
+            if (size == 0 || size == 1) {
+                sb.append((size == 0)
                         ? "no"
                         : "1");
                 sb.append(" CMP control is configured\n");
             } else {
-                sb.append(n).append(" CMP controls are configured:\n");
+                sb.append(size).append(" CMP controls are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

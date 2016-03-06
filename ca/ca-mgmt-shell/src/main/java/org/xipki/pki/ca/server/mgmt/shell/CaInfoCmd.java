@@ -76,14 +76,14 @@ public class CaInfoCmd extends CaCommandSupport {
 
         if (caName == null) {
             Set<String> names = caManager.getCaNames();
-            int n = names.size();
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
+            int size = names.size();
+            if (size == 0 || size == 1) {
+                sb.append((size == 0)
                         ? "no"
                         : "1");
                 sb.append(" CA is configured\n");
             } else {
-                sb.append(n).append(" CAs are configured:\n");
+                sb.append(size).append(" CAs are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(names);

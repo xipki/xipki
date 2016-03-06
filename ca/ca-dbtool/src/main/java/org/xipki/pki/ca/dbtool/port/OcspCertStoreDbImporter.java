@@ -171,11 +171,11 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     IoUtil.read(new File(baseDir, certFilename)));
             byte[] encodedCert = Base64.decode(b64Cert);
 
-            Certificate c;
+            Certificate cert;
             byte[] encodedName;
             try {
-                c = Certificate.getInstance(encodedCert);
-                encodedName = c.getSubject().getEncoded("DER");
+                cert = Certificate.getInstance(encodedCert);
+                encodedName = cert.getSubject().getEncoded("DER");
             } catch (Exception ex) {
                 LOG.error("could not parse certificate of issuer {}", issuer.getId());
                 LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
@@ -185,15 +185,15 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     throw new CertificateException(ex.getMessage(), ex);
                 }
             }
-            byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+            byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
-            ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+            ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
             ps.setLong(idx++,
-                    c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
             ps.setLong(idx++,
-                    c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                    cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
             ps.setString(idx++, sha1(encodedName));
             ps.setString(idx++, sha1(encodedKey));
             ps.setString(idx++, sha224(encodedName));
@@ -323,6 +323,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
+                LOG.error("could not close zipFile {}: {}", certsZipFile, e2.getMessage());
+                LOG.debug("could not close zipFile " + certsZipFile, e2);
             }
             throw ex;
         }
@@ -354,10 +356,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 // rawcert
                 byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                TBSCertificate c;
+                TBSCertificate tbsCert;
                 try {
                     Certificate cc = Certificate.getInstance(encodedCert);
-                    c = cc.getTBSCertificate();
+                    tbsCert = cc.getTBSCertificate();
                 } catch (RuntimeException ex) {
                     LOG.error("could not parse certificate in file {}", filename);
                     LOG.debug("could not parse certificate in file " + filename, ex);
@@ -369,10 +371,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     int idx = 1;
                     psCert.setInt(idx++, id);
                     psCert.setInt(idx++, cert.getIid());
-                    psCert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
+                    psCert.setLong(idx++, tbsCert.getSerialNumber().getPositiveValue().longValue());
                     psCert.setLong(idx++, cert.getUpdate());
-                    psCert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
-                    psCert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                    psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
+                    psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
                     setBoolean(psCert, idx++, cert.getRev().booleanValue());
                     setInt(psCert, idx++, cert.getRr());
                     setLong(psCert, idx++, cert.getRt());
@@ -402,7 +404,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     int idx = 1;
                     psRawcert.setInt(idx++, cert.getId());
                     psRawcert.setString(idx++,
-                            X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                            X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
                     psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
                     psRawcert.addBatch();
                 } catch (SQLException ex) {
@@ -456,10 +458,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
             return lastSuccessfulCertId;
         } finally {
-            try {
-                recoverAutoCommit();
-            } catch (DataAccessException ex) {
-            }
+            recoverAutoCommit();
             zipFile.close();
         }
     } // method doImportCert

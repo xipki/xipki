@@ -70,8 +70,8 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
             caEntry.setCertificate(caCert);
         }
 
-        boolean b = caManager.addCa(caEntry);
-        output(b, "added", "could not add", "CA " + caEntry.getName());
+        boolean bo = caManager.addCa(caEntry);
+        output(bo, "added", "could not add", "CA " + caEntry.getName());
         return null;
     }
 

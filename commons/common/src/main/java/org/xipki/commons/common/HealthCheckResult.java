@@ -63,8 +63,8 @@ public class HealthCheckResult {
     private List<HealthCheckResult> childChecks = new LinkedList<>();
 
     /**
-     * Name of the check result
-     * @param name
+     *
+     * @param name Name of the check result.
      */
     public HealthCheckResult(
             final String name) {
@@ -156,14 +156,14 @@ public class HealthCheckResult {
                 sb.append("\n");
             }
 
-            int n = childChecks.size();
-            for (int i = 0; i < n; i++) {
+            int childChecksSize = childChecks.size();
+            for (int i = 0; i < childChecksSize; i++) {
                 HealthCheckResult childCheck = childChecks.get(i);
                 if (i > 0 && pretty) {
                     sb.append("\n");
                 }
                 sb.append(childCheck.toJsonMessage(level + 2, pretty));
-                if (i < n - 1) {
+                if (i < childChecksSize - 1) {
                     sb.append(",");
                 }
             }
@@ -244,11 +244,11 @@ public class HealthCheckResult {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
 
-        String s = jsonMsg.substring(startIdx, endIdx);
+        String str = jsonMsg.substring(startIdx, endIdx);
 
         boolean healthy;
-        if ("true".equalsIgnoreCase(s) || "false".equalsIgnoreCase(s)) {
-            healthy = Boolean.parseBoolean(s);
+        if ("true".equalsIgnoreCase(str) || "false".equalsIgnoreCase(str)) {
+            healthy = Boolean.parseBoolean(str);
         } else {
             throw new IllegalArgumentException("invalid healthcheck message");
         }
@@ -304,24 +304,24 @@ public class HealthCheckResult {
         }
 
         StringBuilder sb = new StringBuilder("{");
-        final int n = text.length();
-        if (n < 2) {
+        final int len = text.length();
+        if (len < 2) {
             throw new IllegalArgumentException("invalid text: '" + text + "'");
         }
 
-        char c;
-        int m = 0;
-        for (int i = offset + 1; i < n; i++) {
-            c = text.charAt(i);
-            sb.append(c);
+        char ch;
+        int im = 0;
+        for (int i = offset + 1; i < len; i++) {
+            ch = text.charAt(i);
+            sb.append(ch);
 
-            if (c == '{') {
-                m++;
-            } else if (c == '}') {
-                if (m == 0) {
+            if (ch == '{') {
+                im++;
+            } else if (ch == '}') {
+                if (im == 0) {
                     return sb.toString();
                 } else {
-                    m--;
+                    im--;
                 }
             } // end if
         } // end for

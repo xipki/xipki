@@ -66,14 +66,14 @@ public interface P10RequestGenerator {
             final String signerType,
             final String signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException;
 
     PKCS10CertificationRequest generateRequest(
             final ConcurrentContentSigner signer,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDN,
+            final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws SignerException;
 

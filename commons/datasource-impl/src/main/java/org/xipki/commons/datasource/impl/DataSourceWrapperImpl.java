@@ -77,6 +77,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
+    // CHECKSTYLE:SKIP
     private static class MySQL extends DataSourceWrapperImpl {
 
         MySQL(
@@ -217,6 +218,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
     } // class MySQL
 
+    // CHECKSTYLE:SKIP
     private static class DB2 extends DataSourceWrapperImpl {
 
         DB2(
@@ -287,6 +289,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
     } // class DB2
 
+    // CHECKSTYLE:SKIP
     private static class PostgreSQL extends DataSourceWrapperImpl {
 
         PostgreSQL(
@@ -583,6 +586,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
     } // class H2
 
+    // CHECKSTYLE:SKIP
     private static class HSQL extends DataSourceWrapperImpl {
 
         HSQL(
@@ -787,6 +791,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             try {
                 conn = ps.getConnection();
             } catch (SQLException ex) {
+                LOG.error("could not get connection from statement: {}", ex.getMessage());
             }
 
             try {
@@ -822,7 +827,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     }
 
     @Override
-    public String createFetchFirstSelectSQL(
+    public String createFetchFirstSelectSql(
             final String coreSql,
             final int rows) {
         return createFetchFirstSelectSql(coreSql, rows, null);
@@ -1032,7 +1037,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         sb.append(column);
         sb.append(" FROM ").append(table);
         sb.append(" WHERE ").append(column).append("=?");
-        String sql = createFetchFirstSelectSQL(sb.toString(), 1);
+        String sql = createFetchFirstSelectSql(sb.toString(), 1);
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1082,7 +1087,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append(column).append(" FROM ").append(table);
-        final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
+        final String sql = createFetchFirstSelectSql(sqlBuilder.toString(), 1);
 
         try {
             stmt.execute(sql);
@@ -1117,7 +1122,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
         sqlBuilder.append("1 FROM ").append(table);
-        final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
+        final String sql = createFetchFirstSelectSql(sqlBuilder.toString(), 1);
 
         try {
             stmt.execute(sql);
@@ -1155,6 +1160,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         try {
             dropSequence(sequenceName);
         } catch (DataAccessException ex) {
+            LOG.error("could not drop sequence {}: {}", sequenceName, ex.getMessage());
         }
 
         createSequence(sequenceName, startValue);

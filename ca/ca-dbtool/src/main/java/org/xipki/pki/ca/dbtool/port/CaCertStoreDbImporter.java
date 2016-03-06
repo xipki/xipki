@@ -216,12 +216,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 try {
                     String b64Cert = getValue(m.getCert());
                     byte[] encodedCert = Base64.decode(b64Cert);
-                    Certificate c = Certificate.getInstance(encodedCert);
+                    Certificate cert = Certificate.getInstance(encodedCert);
                     String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, m.getId());
-                    ps.setString(idx++, X509Util.cutX500Name(c.getSubject(), maxX500nameLen));
+                    ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
                     ps.setString(idx++, b64Sha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -390,6 +390,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
+                LOG.error("error while closing zipFile {}: {}", usersZipFile, e2.getMessage());
+                LOG.debug("error while closing zipFile " + usersZipFile, e2);
             }
             throw ex;
         }
@@ -452,10 +454,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             return numProcessed;
         } finally {
-            try {
-                recoverAutoCommit();
-            } catch (DataAccessException ex) {
-            }
+            recoverAutoCommit();
             zipFile.close();
         }
     } // method doImportUser
@@ -490,7 +489,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importPublishQueue
 
     private void importDeltaCrlCache(
-            final DeltaCRLCache deltaCRLCache)
+            final DeltaCRLCache deltaCrlCache)
     throws DataAccessException {
         final String sql = "INSERT INTO DELTACRL_CACHE (ID, SN, CA_ID) VALUES (?, ?, ?)";
         System.out.println("importing table DELTACRL_CACHE");
@@ -498,7 +497,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         try {
             long id = 1;
-            for (DeltaCRLCacheEntryType entry : deltaCRLCache.getEntry()) {
+            for (DeltaCRLCacheEntryType entry : deltaCrlCache.getEntry()) {
                 try {
                     int idx = 1;
                     ps.setLong(idx++, id++);
@@ -578,6 +577,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
+                LOG.error("error while closing zipFile {}: {}", crlsZipFile, e2.getMessage());
+                LOG.debug("error while closing zipFile " + crlsZipFile, e2);
             }
             throw ex;
         }
@@ -604,9 +605,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 // rawcert
                 byte[] encodedCrl = IoUtil.read(zipFile.getInputStream(zipEnty));
 
-                X509CRL c = null;
+                X509CRL x509crl = null;
                 try {
-                    c = X509Util.parseCrl(new ByteArrayInputStream(encodedCrl));
+                    x509crl = X509Util.parseCrl(new ByteArrayInputStream(encodedCrl));
                 } catch (Exception ex) {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, ex);
@@ -618,16 +619,17 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 }
 
                 try {
-                    byte[] octetString = c.getExtensionValue(Extension.cRLNumber.getId());
+                    byte[] octetString = x509crl.getExtensionValue(Extension.cRLNumber.getId());
                     if (octetString == null) {
                         LOG.warn("CRL without CRL number, ignore it");
                         continue;
                     }
                     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    // CHECKSTYLE:SKIP
                     BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
                     BigInteger baseCrlNumber = null;
-                    octetString = c.getExtensionValue(Extension.deltaCRLIndicator.getId());
+                    octetString = x509crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                     if (octetString != null) {
                         extnValue = DEROctetString.getInstance(octetString).getOctets();
                         baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
@@ -637,9 +639,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psAddCrl.setInt(idx++, crl.getId());
                     psAddCrl.setInt(idx++, crl.getCaId());
                     psAddCrl.setLong(idx++, crlNumber.longValue());
-                    psAddCrl.setLong(idx++, c.getThisUpdate().getTime() / 1000);
-                    if (c.getNextUpdate() != null) {
-                        psAddCrl.setLong(idx++, c.getNextUpdate().getTime() / 1000);
+                    psAddCrl.setLong(idx++, x509crl.getThisUpdate().getTime() / 1000);
+                    if (x509crl.getNextUpdate() != null) {
+                        psAddCrl.setLong(idx++, x509crl.getNextUpdate().getTime() / 1000);
                     } else {
                         psAddCrl.setNull(idx++, Types.INTEGER);
                     }
@@ -652,8 +654,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         psAddCrl.setLong(idx++, baseCrlNumber.longValue());
                     }
 
-                    String s = Base64.toBase64String(encodedCrl);
-                    psAddCrl.setString(idx++, s);
+                    String str = Base64.toBase64String(encodedCrl);
+                    psAddCrl.setString(idx++, str);
 
                     psAddCrl.addBatch();
                 } catch (SQLException ex) {
@@ -694,10 +696,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             }
             return numProcessed;
         } finally {
-            try {
-                recoverAutoCommit();
-            } catch (DataAccessException ex) {
-            }
+            recoverAutoCommit();
         }
     } // method doImportCrl
 
@@ -801,6 +800,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
+                LOG.error("error while closing zipFile {}: {}", certsZipFile, e2.getMessage());
+                LOG.debug("error while closing zipFile " + certsZipFile, e2);
             }
             throw ex;
         }
@@ -836,22 +837,22 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 // rawcert
                 byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
-                TBSCertificate c;
+                TBSCertificate tbsCert;
                 try {
                     Certificate cc = Certificate.getInstance(encodedCert);
-                    c = cc.getTBSCertificate();
+                    tbsCert = cc.getTBSCertificate();
                 } catch (RuntimeException ex) {
                     LOG.error("could not parse certificate in file {}", filename);
                     LOG.debug("could not parse certificate in file " + filename, ex);
                     throw new CertificateException(ex.getMessage(), ex);
                 }
 
-                byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+                byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
                 String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
 
                 // cert
-                String subjectText = X509Util.cutX500Name(c.getSubject(), maxX500nameLen);
+                String subjectText = X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen);
 
                 try {
                     int idx = 1;
@@ -859,10 +860,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psCert.setInt(idx++, id);
                     psCert.setInt(idx++, certArt);
                     psCert.setLong(idx++, cert.getUpdate());
-                    psCert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
+                    psCert.setLong(idx++, tbsCert.getSerialNumber().getPositiveValue().longValue());
 
                     psCert.setString(idx++, subjectText);
-                    long fpSubject = X509Util.fpCanonicalizedName(c.getSubject());
+                    long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());
                     psCert.setLong(idx++, fpSubject);
 
                     if (cert.getFpRs() != null) {
@@ -871,8 +872,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         psCert.setNull(idx++, Types.BIGINT);
                     }
 
-                    psCert.setLong(idx++, c.getStartDate().getDate().getTime() / 1000);
-                    psCert.setLong(idx++, c.getEndDate().getDate().getTime() / 1000);
+                    psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
+                    psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
                     setBoolean(psCert, idx++, cert.getRev());
                     setInt(psCert, idx++, cert.getRr());
                     setLong(psCert, idx++, cert.getRt());
@@ -884,17 +885,17 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psCert.setString(idx++, cert.getUser());
                     psCert.setLong(idx++, FpIdCalculator.hash(encodedKey));
                     Extension extension =
-                            c.getExtensions().getExtension(Extension.basicConstraints);
+                            tbsCert.getExtensions().getExtension(Extension.basicConstraints);
                     boolean ee = true;
                     if (extension != null) {
                         ASN1Encodable asn1 = extension.getParsedValue();
                         ee = !BasicConstraints.getInstance(asn1).isCA();
                     }
 
-                    int iEe = ee
+                    int intEe = ee
                             ? 1
                             : 0;
-                    psCert.setInt(idx++, iEe);
+                    psCert.setInt(idx++, intEe);
 
                     psCert.setInt(idx++, cert.getReqType());
                     String tidS = null;
@@ -960,10 +961,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             return lastSuccessfulCertId;
         } finally {
-            try {
-                recoverAutoCommit();
-            } catch (DataAccessException ex) {
-            }
+            recoverAutoCommit();
             zipFile.close();
         }
     } // method doImportCert

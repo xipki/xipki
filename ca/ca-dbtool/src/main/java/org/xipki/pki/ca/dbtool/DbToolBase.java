@@ -56,6 +56,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -67,6 +68,8 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
  */
 
 public class DbToolBase {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbToolBase.class);
 
     private static final int STREAM_BUFFER_SIZE = 1048576; // 1M
 
@@ -260,12 +263,13 @@ public class DbToolBase {
         }
     }
 
-    protected void recoverAutoCommit()
-    throws DataAccessException {
+    protected void recoverAutoCommit() {
         try {
             connection.setAutoCommit(connectionAutoCommit);
         } catch (SQLException ex) {
-            throw datasource.translate(null, ex);
+            DataAccessException dex = datasource.translate(null, ex);
+            LOG.error("error while recovering AutoCommit: {}", dex.getMessage());
+            LOG.debug("error while recovering AutoCommit", dex);
         }
     }
 
@@ -283,12 +287,12 @@ public class DbToolBase {
     protected static void setLong(
             final PreparedStatement ps,
             final int index,
-            final Long i)
+            final Long value)
     throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
-        if (i != null) {
-            ps.setLong(index, i.longValue());
+        if (value != null) {
+            ps.setLong(index, value.longValue());
         } else {
             ps.setNull(index, Types.BIGINT);
         }
@@ -297,12 +301,12 @@ public class DbToolBase {
     protected static void setInt(
             final PreparedStatement ps,
             final int index,
-            final Integer i)
+            final Integer value)
     throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
-        if (i != null) {
-            ps.setInt(index, i.intValue());
+        if (value != null) {
+            ps.setInt(index, value.intValue());
         } else {
             ps.setNull(index, Types.INTEGER);
         }
@@ -311,14 +315,14 @@ public class DbToolBase {
     protected static void setBoolean(
             final PreparedStatement ps,
             final int index,
-            final boolean b)
+            final boolean value)
     throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
-        int i = b
+        int intValue = value
                 ? 1
                 : 0;
-        ps.setInt(index, i);
+        ps.setInt(index, intValue);
     }
 
     public static Properties getDbConfProperties(
@@ -333,6 +337,7 @@ public class DbToolBase {
             try {
                 is.close();
             } catch (IOException ex) {
+                LOG.warn("IOException while closing stream: {}", ex.getMessage());
             }
         }
 
@@ -386,18 +391,18 @@ public class DbToolBase {
         sb.append(prefix);
 
         int len = Integer.toString(maxId).length();
-        String a = Integer.toString(minIdOfCurrentFile);
-        for (int i = 0; i < len - a.length(); i++) {
+        String minIdStr = Integer.toString(minIdOfCurrentFile);
+        for (int i = 0; i < len - minIdStr.length(); i++) {
             sb.append('0');
         }
-        sb.append(a);
+        sb.append(minIdStr);
         sb.append("-");
 
-        String b = Integer.toString(maxIdOfCurrentFile);
-        for (int i = 0; i < len - b.length(); i++) {
+        String maxIdStr = Integer.toString(maxIdOfCurrentFile);
+        for (int i = 0; i < len - maxIdStr.length(); i++) {
             sb.append('0');
         }
-        sb.append(b);
+        sb.append(maxIdStr);
 
         sb.append(suffix);
         return sb.toString();
@@ -415,13 +420,23 @@ public class DbToolBase {
         return zipOutStream;
     }
 
+    public void releaseResources(
+            final Statement ps,
+            final ResultSet rs) {
+        releaseResources(datasource, ps, rs);
+    }
+
     public static void releaseResources(
+            final DataSourceWrapper datasource,
             final Statement ps,
             final ResultSet rs) {
         if (ps != null) {
             try {
                 ps.close();
             } catch (SQLException ex) {
+                DataAccessException dex = datasource.translate(null, ex);
+                LOG.warn("SQLException while closing Statement: {}", dex.getMessage());
+                LOG.debug("SQLException while closing Statement", dex);
             }
         }
 
@@ -429,6 +444,9 @@ public class DbToolBase {
             try {
                 rs.close();
             } catch (SQLException ex) {
+                DataAccessException dex = datasource.translate(null, ex);
+                LOG.warn("SQLException while closing ResultSet: {}", dex.getMessage());
+                LOG.debug("SQLException while closing ResultSet", dex);
             }
         }
     }

@@ -98,12 +98,12 @@ class ResponderOption {
         } else {
             List<String> paths = conf.getServletPaths().getServletPath();
             for (String path : paths) {
-                int n = path.length();
-                if (n > 0 && path.charAt(0) == '/') {
+                int len = path.length();
+                if (len > 0 && path.charAt(0) == '/') {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not start with '/'");
                 }
-                if (n > 1 && path.charAt(n - 1) == '/') {
+                if (len > 1 && path.charAt(len - 1) == '/') {
                     throw new InvalidConfException(
                             "servlet path '" + path + "' must not end with '/'");
                 }

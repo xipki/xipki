@@ -66,15 +66,15 @@ public class EnvInfoCmd extends CaCommandSupport {
 
         if (name == null) {
             Set<String> paramNames = caManager.getEnvParamNames();
-            int n = paramNames.size();
+            int size = paramNames.size();
 
-            if (n == 0 || n == 1) {
-                sb.append((n == 0)
+            if (size == 0 || size == 1) {
+                sb.append((size == 0)
                         ? "no"
                         : "1");
                 sb.append(" environment parameter is configured\n");
             } else {
-                sb.append(n).append(" enviroment paramters are configured:\n");
+                sb.append(size).append(" enviroment paramters are configured:\n");
             }
 
             List<String> sorted = new ArrayList<>(paramNames);

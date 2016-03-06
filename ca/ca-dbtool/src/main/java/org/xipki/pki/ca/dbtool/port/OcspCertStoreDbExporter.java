@@ -120,8 +120,6 @@ class OcspCertStoreDbExporter extends DbPorter {
 
     public void export()
     throws Exception {
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
-
         CertStoreType certstore;
         if (resume) {
             try {
@@ -146,6 +144,8 @@ class OcspCertStoreDbExporter extends DbPorter {
         if (!resume) {
             exportIssuer(certstore);
         }
+
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
         Exception exception = exportCert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
@@ -218,8 +218,8 @@ class OcspCertStoreDbExporter extends DbPorter {
     private Exception exportCert(
             final CertStoreType certstore,
             final File processLogFile) {
-        File fCertsDir = new File(certsDir);
-        fCertsDir.mkdirs();
+        File tmpCertsDir = new File(certsDir);
+        tmpCertsDir.mkdirs();
 
         FileOutputStream certsFileOs = null;
 
@@ -244,8 +244,6 @@ class OcspCertStoreDbExporter extends DbPorter {
             final File processLogFile,
             final FileOutputStream certsFileOs)
     throws Exception {
-        int numProcessedBefore = certstore.getCountCerts();
-
         Integer minCertId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);
@@ -267,6 +265,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         final int maxCertId = (int) getMax("CERT", "ID");
 
+        int numProcessedBefore = certstore.getCountCerts();
         final long total = getCount("CERT") - numProcessedBefore;
         ProcessLog processLog = new ProcessLog(total);
 

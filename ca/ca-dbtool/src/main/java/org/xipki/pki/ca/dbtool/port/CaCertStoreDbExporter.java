@@ -204,8 +204,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     private Exception exportCrl(
             final CertStoreType certstore) {
-        File fCrlsDir = new File(crlsDir);
-        fCrlsDir.mkdirs();
+        File tmpCrlsDir = new File(crlsDir);
+        tmpCrlsDir.mkdirs();
 
         FileOutputStream crlsFileOs = null;
         try {
@@ -292,8 +292,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         maxIdOfCurrentFile = id;
                     }
 
-                    int caId = rs.getInt("CA_ID");
-
                     String b64Crl = rs.getString("CRL");
                     byte[] crlBytes = Base64.decode(b64Crl);
 
@@ -315,9 +313,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         LOG.warn("CRL without CRL number, ignore it");
                         continue;
                     }
-                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                    BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
-
                     String sha1Cert = HashCalculator.hexSha1(crlBytes);
 
                     final String crlFilename = sha1Cert + ".crl";
@@ -333,8 +328,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     CaCrlType crl = new CaCrlType();
                     crl.setId(id);
+
+                    int caId = rs.getInt("CA_ID");
                     crl.setCaId(caId);
+
+                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
                     crl.setCrlNo(crlNumber.toString());
+
                     crl.setFile(crlFilename);
 
                     crlsInCurrentFile.add(crl);
@@ -491,8 +492,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     private Exception exportUser(
             final CertStoreType certstore) {
-        File fUsersDir = new File(usersDir);
-        fUsersDir.mkdirs();
+        File tmpUsersDir = new File(usersDir);
+        tmpUsersDir.mkdirs();
 
         FileOutputStream usersFileOs = null;
         try {
@@ -672,8 +673,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private Exception exportCert(
             final CertStoreType certstore,
             final File processLogFile) {
-        File fCertsDir = new File(certsDir);
-        fCertsDir.mkdirs();
+        File tmpCertsDir = new File(certsDir);
+        tmpCertsDir.mkdirs();
 
         FileOutputStream certsFileOs = null;
         try {
@@ -701,8 +702,6 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         final int numEntriesPerZip = numCertsInBundle;
         final String entriesDir = certsDir;
 
-        int numProcessedBefore = certstore.getCountCerts();
-
         Integer minId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);
@@ -718,12 +717,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         System.out.println(getExportingText() + "tables CERT and CRAW from ID " + minId);
 
+        int numProcessedBefore = certstore.getCountCerts();
+
         final int maxId = (int) getMax("CERT", "ID");
         long total = getCount("CERT") - numProcessedBefore;
         if (total < 1) {
             total = 1; // to avoid exception
         }
-        ProcessLog processLog = new ProcessLog(total);
 
         StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
         certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
@@ -744,6 +744,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
+        ProcessLog processLog = new ProcessLog(total);
         processLog.printHeader();
 
         try {
@@ -796,9 +797,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     byte[] tid = null;
                     int art = rs.getInt("ART");
                     int reqType = rs.getInt("RTYPE");
-                    String s = rs.getString("TID");
-                    if (StringUtil.isNotBlank(s)) {
-                        tid = Base64.decode(s);
+                    String str = rs.getString("TID");
+                    if (StringUtil.isNotBlank(str)) {
+                        tid = Base64.decode(str);
                     }
 
                     cert.setArt(art);

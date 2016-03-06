@@ -59,8 +59,8 @@ public class CrlSignerRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean b = caManager.removeCrlSigner(name);
-        output(b, "removed", "could not remove", "CRL signer " + name);
+        boolean bo = caManager.removeCrlSigner(name);
+        output(bo, "removed", "could not remove", "CRL signer " + name);
         return null;
     }
 

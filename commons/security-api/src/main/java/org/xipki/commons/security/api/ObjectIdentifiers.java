@@ -57,7 +57,6 @@ import org.xipki.commons.common.util.StringUtil;
  */
 
 public class ObjectIdentifiers {
-    // CHECKSTYLE:OFF
     /**
      * registered PEN for xipki.org: 45522
      */
@@ -110,7 +109,7 @@ public class ObjectIdentifiers {
     public static final String id_alg_DSAENC = "1.2.840.10040.4.1";
 
     /**
-     * country code - StringType(SIZE(2))
+     * country code - StringType(SIZE(2)).
      */
     public static final ASN1ObjectIdentifier DN_C = new ASN1ObjectIdentifier("2.5.4.6");
 
@@ -131,7 +130,7 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier DN_OU = new ASN1ObjectIdentifier("2.5.4.11");
 
     /**
-     * Title
+     * Title.
      */
     public static final ASN1ObjectIdentifier DN_T = new ASN1ObjectIdentifier("2.5.4.12");
 
@@ -168,7 +167,7 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier DN_ST = new ASN1ObjectIdentifier("2.5.4.8");
 
     /**
-     * Naming attributes of type X520name
+     * Naming attributes of type X520name.
      */
     public static final ASN1ObjectIdentifier DN_SURNAME = new ASN1ObjectIdentifier("2.5.4.4");
 
@@ -208,7 +207,7 @@ public class ObjectIdentifiers {
         "2.5.4.65");
 
     /**
-     * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z
+     * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z.
      */
     public static final ASN1ObjectIdentifier DN_DATE_OF_BIRTH = new ASN1ObjectIdentifier(
         "1.3.6.1.5.5.7.9.1");
@@ -220,21 +219,19 @@ public class ObjectIdentifiers {
         "1.3.6.1.5.5.7.9.2");
 
     /**
-     * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f"
+     * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f".
      */
     public static final ASN1ObjectIdentifier DN_GENDER = new ASN1ObjectIdentifier(
         "1.3.6.1.5.5.7.9.3");
 
     /**
-     * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))-- ISO 3166
-     * codes only
+     * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))-- ISO 3166 codes only.
      */
     public static final ASN1ObjectIdentifier DN_COUNTRY_OF_CITIZENSHIP
             = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.9.4");
 
     /**
-     * RFC 3039 CountryOfResidence - PrintableString (SIZE (2))-- ISO 3166
-     * codes only
+     * RFC 3039 CountryOfResidence - PrintableString (SIZE (2))-- ISO 3166 codes only.
      */
     public static final ASN1ObjectIdentifier DN_COUNTRY_OF_RESIDENCE = new ASN1ObjectIdentifier(
         "1.3.6.1.5.5.7.9.5");
@@ -253,18 +250,18 @@ public class ObjectIdentifiers {
         = new ASN1ObjectIdentifier("2.5.4.16");
 
     /**
-     * RFC 2256 dmdName
+     * RFC 2256 dmdName.
      */
     public static final ASN1ObjectIdentifier DN_DMD_NAME = new ASN1ObjectIdentifier("2.5.4.54");
 
     /**
-     * id-at-telephoneNumber
+     * id-at-telephoneNumber.
      */
     public static final ASN1ObjectIdentifier DN_TELEPHONE_NUMBER
             = X509ObjectIdentifiers.id_at_telephoneNumber;
 
     /**
-     * id-at-name
+     * id-at-name.
      */
     public static final ASN1ObjectIdentifier DN_NAME = X509ObjectIdentifiers.id_at_name;
 
@@ -276,7 +273,7 @@ public class ObjectIdentifiers {
         = PKCSObjectIdentifiers.pkcs_9_at_emailAddress;
 
     /**
-     * more from PKCS#9
+     * more from PKCS#9.
      */
     public static final ASN1ObjectIdentifier DN_UnstructuredName
         = PKCSObjectIdentifiers.pkcs_9_at_unstructuredName;
@@ -285,7 +282,7 @@ public class ObjectIdentifiers {
         = PKCSObjectIdentifiers.pkcs_9_at_unstructuredAddress;
 
     /**
-     * email address in certificates
+     * email address in certificates.
      */
     public static final ASN1ObjectIdentifier DN_E = DN_EmailAddress;
 
@@ -302,7 +299,7 @@ public class ObjectIdentifiers {
         = new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.1");
 
     /**
-     * Extended key usages
+     * Extended key usages.
      */
     private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
 
@@ -313,42 +310,38 @@ public class ObjectIdentifiers {
 
     /**
      * TLS WWW server authentication
-     * Key usage bits that may be consistent: digitalSignature,
-     * keyEncipherment or keyAgreement
+     * Key usage bits that may be consistent: digitalSignature, keyEncipherment or keyAgreement.
      */
     public static final ASN1ObjectIdentifier id_kp_serverAuth = id_kp.branch("1");
 
     /**
      * TLS WWW client authentication
-     * Key usage bits that may be consistent: digitalSignature
-     * and/or keyAgreement
+     * Key usage bits that may be consistent: digitalSignature and/or keyAgreement.
      */
     public static final ASN1ObjectIdentifier id_kp_clientAuth = id_kp.branch("2");
 
     /**
      * Signing of downloadable executable code
-     * Key usage bits that may be consistent: digitalSignature
+     * Key usage bits that may be consistent: digitalSignature.
      */
     public static final ASN1ObjectIdentifier id_kp_codeSigning = id_kp.branch("3");
 
     /**
      * Email protection
-     * Key usage bits that may be consistent: digitalSignature,
-     * nonRepudiation, and/or (keyEncipherment or keyAgreement)
+     * Key usage bits that may be consistent: digitalSignature, nonRepudiation, and/or
+     * (keyEncipherment or keyAgreement).
      */
     public static final ASN1ObjectIdentifier id_kp_emailProtection = id_kp.branch("4");
 
     /**
      * Binding the hash of an object to a time
-     * Key usage bits that may be consistent: digitalSignature
-     * and/or nonRepudiation
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
      */
     public static final ASN1ObjectIdentifier id_kp_timeStamping = id_kp.branch("8");
 
     /**
      * Signing OCSP responses
-     * Key usage bits that may be consistent: digitalSignature
-     * and/or nonRepudiation
+     * Key usage bits that may be consistent: digitalSignature and/or nonRepudiation.
      */
     public static final ASN1ObjectIdentifier id_kp_OCSPSigning = id_kp.branch("9");
 
@@ -358,17 +351,17 @@ public class ObjectIdentifiers {
      */
 
     /**
-     * IP security end system
+     * IP security end system.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecEndSystem = id_kp.branch("5");
 
     /**
-     * IP security tunnel termination
+     * IP security tunnel termination.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecTunnel = id_kp.branch("6");
 
     /**
-     * IP security user
+     * IP security user.
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecUser = id_kp.branch("7");
 
@@ -578,7 +571,7 @@ public class ObjectIdentifiers {
         if (StringUtil.isBlank(name)) {
             try {
                 name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ex) { // CHECKSTYLE:SKIP
             }
         }
         return name;

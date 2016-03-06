@@ -132,19 +132,19 @@ public class ExtensionExistence extends ASN1Object {
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         if (CollectionUtil.isNonEmpty(needExtensions)) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
             for (ASN1ObjectIdentifier m : needExtensions) {
-                v.add(m);
+                vec.add(m);
             }
-            vector.add(new DERTaggedObject(true, 0, new DERSequence(v)));
+            vector.add(new DERTaggedObject(true, 0, new DERSequence(vec)));
         }
 
         if (CollectionUtil.isNonEmpty(wantExtensions)) {
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            ASN1EncodableVector vec = new ASN1EncodableVector();
             for (ASN1ObjectIdentifier m : wantExtensions) {
-                v.add(m);
+                vec.add(m);
             }
-            vector.add(new DERTaggedObject(true, 1, new DERSequence(v)));
+            vector.add(new DERTaggedObject(true, 1, new DERSequence(vec)));
         }
 
         return new DERSequence(vector);

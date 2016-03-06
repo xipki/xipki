@@ -147,10 +147,10 @@ abstract class DbDigestReader implements DigestReader {
         @Override
         public void run() {
             while (nextId <= maxId && !stopMe.stopMe()) {
-                int n = 0;
+                int in = 0;
                 for (int i = 0; i < numThreads; i++) {
                     if (nextId <= maxId) {
-                        n++;
+                        in++;
                         inQueue.add(new IdRange(nextId, nextId + 999));
                         nextId += 1000;
                     } else {
@@ -158,8 +158,8 @@ abstract class DbDigestReader implements DigestReader {
                     }
                 }
 
-                List<DigestDbEntrySet> results = new ArrayList<>(n);
-                for (int i = 0; i < n; i++) {
+                List<DigestDbEntrySet> results = new ArrayList<>(in);
+                for (int i = 0; i < in; i++) {
                     try {
                         results.add(outQueue.take());
                     } catch (InterruptedException ex) {
@@ -253,7 +253,7 @@ abstract class DbDigestReader implements DigestReader {
 
     @Override
     public synchronized CertsBundle nextCerts(
-            final int n)
+            final int numCerts)
     throws Exception {
         if (endReached.get() && fixedSizedCerts.isEmpty()) {
             return null;
@@ -263,8 +263,8 @@ abstract class DbDigestReader implements DigestReader {
             throw exception;
         }
 
-        List<IdentifiedDbDigestEntry> entries = new ArrayList<>(n);
-        int k = 0;
+        List<IdentifiedDbDigestEntry> entries = new ArrayList<>(numCerts);
+        int ik = 0;
         while (true) {
             QueueEntry next = null;
             while (next == null) {
@@ -279,23 +279,24 @@ abstract class DbDigestReader implements DigestReader {
             }
 
             entries.add((IdentifiedDbDigestEntry) next);
-            k++;
-            if (k >= n) {
+            ik++;
+            if (ik >= numCerts) {
                 break;
             }
         }
 
-        if (k == 0) {
+        if (ik == 0) {
             return null;
         }
 
         int numSkipped = 0;
         if (revokedOnly) {
-            numSkipped = getNumSkippedCerts(entries.get(0).getId(), entries.get(k - 1).getId(), k);
+            numSkipped = getNumSkippedCerts(entries.get(0).getId(), entries.get(ik - 1).getId(),
+                    ik);
         }
 
-        List<Long> serialNumbers = new ArrayList<>(k);
-        Map<Long, DbDigestEntry> certsMap = new HashMap<>(k);
+        List<Long> serialNumbers = new ArrayList<>(ik);
+        Map<Long, DbDigestEntry> certsMap = new HashMap<>(ik);
         for (IdentifiedDbDigestEntry m : entries) {
             long sn = m.getContent().getSerialNumber();
             serialNumbers.add(sn);
@@ -315,10 +316,10 @@ abstract class DbDigestReader implements DigestReader {
         return minId;
     }
 
-    protected static void releaseResources(
+    protected void releaseResources(
             final Statement ps,
             final ResultSet rs) {
-        DbToolBase.releaseResources(ps, rs);
+        DbToolBase.releaseResources(datasource, ps, rs);
     }
 
 }

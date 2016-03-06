@@ -142,10 +142,10 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }
 
-            Integer i = conf.getMaxSize();
-            this.maxSize = (i == null)
+            Integer size = conf.getMaxSize();
+            this.maxSize = (size == null)
                     ? 0
-                    : i;
+                    : size;
 
             if (conf.getSignatureAlgorithms() == null) {
                 this.signatureAlgorithms = null;
@@ -290,11 +290,11 @@ public class X509CertprofileQaImpl implements X509CertprofileQa {
         if (notBeforeMidnight) {
             issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
             resultIssues.add(issue);
-            Calendar c = Calendar.getInstance(UTC);
-            c.setTime(cert.getNotBefore());
-            int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-            int second = c.get(Calendar.SECOND);
+            Calendar cal = Calendar.getInstance(UTC);
+            cal.setTime(cert.getNotBefore());
+            int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
+            int minute = cal.get(Calendar.MINUTE);
+            int second = cal.get(Calendar.SECOND);
 
             if (hourOfDay != 0 || minute != 0 || second != 0) {
                 issue.setFailureMessage(" '" + cert.getNotBefore()

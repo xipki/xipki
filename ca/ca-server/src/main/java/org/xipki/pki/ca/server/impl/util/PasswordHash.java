@@ -43,8 +43,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * PBKDF2 salted password hashing.
- * @author: havoc AT defuse.ca
- * www: http://crackstation.net/hashing-security.htm
+ * @author: havoc AT defuse.ca, www: http://crackstation.net/hashing-security.htm
  */
 public class PasswordHash {
 
@@ -163,16 +162,16 @@ public class PasswordHash {
      * is used so that password hashes cannot be extracted from an on-line
      * system using a timing attack and then attacked off-line.
      *
-     * @param a - the first byte array
-     * @param b - the second byte array
+     * @param arrayA - the first byte array
+     * @param arrayB - the second byte array
      * @return true if both byte arrays are the same, false if not
      */
     private static boolean slowEquals(
-            final byte[] a,
-            final byte[] b) {
-        int diff = a.length ^ b.length;
-        for (int i = 0; i < a.length && i < b.length; i++) {
-            diff |= a[i] ^ b[i];
+            final byte[] arrayA,
+            final byte[] arrayB) {
+        int diff = arrayA.length ^ arrayB.length;
+        for (int i = 0; i < arrayA.length && i < arrayB.length; i++) {
+            diff |= arrayA[i] ^ arrayB[i];
         }
         return diff == 0;
     }

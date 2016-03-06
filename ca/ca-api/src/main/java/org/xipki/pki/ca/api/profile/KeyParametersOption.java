@@ -53,6 +53,7 @@ public class KeyParametersOption {
     public static class AllowAllParametersOption extends KeyParametersOption {
     } // class AllowAllParametersOption
 
+    // CHECKSTYLE:SKIP
     public static class RSAParametersOption extends KeyParametersOption {
 
         private Set<Range> modulusLengths;
@@ -85,6 +86,7 @@ public class KeyParametersOption {
 
     } // class RSAParametersOption
 
+    // CHECKSTYLE:SKIP
     public static class RSAPSSParametersOption extends RSAParametersOption {
 
         private Set<ASN1ObjectIdentifier> hashAlgs;
@@ -172,6 +174,7 @@ public class KeyParametersOption {
 
     } // class RSAPSSParametersOption
 
+    // CHECKSTYLE:SKIP
     public static class DSAParametersOption extends KeyParametersOption {
 
         private Set<Range> plengths;
@@ -231,9 +234,11 @@ public class KeyParametersOption {
 
     } // class DSAParametersOption
 
+    // CHECKSTYLE:SKIP
     public static class DHParametersOption extends DSAParametersOption {
     } // class DHParametersOption
 
+    // CHECKSTYLE:SKIP
     public static class ECParamatersOption extends KeyParametersOption {
 
         private Set<ASN1ObjectIdentifier> curveOids;

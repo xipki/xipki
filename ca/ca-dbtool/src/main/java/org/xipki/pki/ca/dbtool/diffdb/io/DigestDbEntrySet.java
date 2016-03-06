@@ -80,10 +80,10 @@ public class DigestDbEntrySet implements Comparable<DigestDbEntrySet> {
     }
 
     @Override
-    public int compareTo(DigestDbEntrySet o) {
-        if (startId < o.startId) {
+    public int compareTo(DigestDbEntrySet obj) {
+        if (startId < obj.startId) {
             return -1;
-        } else if (startId == o.startId) {
+        } else if (startId == obj.startId) {
             return 0;
         } else {
             return 1;

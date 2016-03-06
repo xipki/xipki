@@ -64,10 +64,10 @@ public class SignatureSigner implements ContentSigner {
 
         @Override
         public void write(
-                final int b)
+                final int singleByte)
         throws IOException {
             try {
-                signer.update((byte) b);
+                signer.update((byte) singleByte);
             } catch (SignatureException ex) {
                 throw new IOException(ex.getMessage(), ex);
             }
@@ -75,10 +75,10 @@ public class SignatureSigner implements ContentSigner {
 
         @Override
         public void write(
-                final byte[] b)
+                final byte[] bytes)
         throws IOException {
             try {
-                signer.update(b);
+                signer.update(bytes);
             } catch (SignatureException ex) {
                 throw new IOException(ex.getMessage(), ex);
             }
@@ -86,12 +86,12 @@ public class SignatureSigner implements ContentSigner {
 
         @Override
         public void write(
-                final byte[] b,
+                final byte[] bytes,
                 final int off,
                 final int len)
         throws IOException {
             try {
-                signer.update(b, off, len);
+                signer.update(bytes, off, len);
             } catch (SignatureException ex) {
                 throw new IOException(ex.getMessage(), ex);
             }

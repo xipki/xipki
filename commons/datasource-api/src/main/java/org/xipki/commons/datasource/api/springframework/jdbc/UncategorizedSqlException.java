@@ -33,7 +33,9 @@ import org.xipki.commons.datasource.api.springframework.dao.UncategorizedDataAcc
 @SuppressWarnings("serial")
 public class UncategorizedSqlException extends UncategorizedDataAccessException {
 
-    /** SQL that led to the problem */
+    /**
+     * SQL that led to the problem.
+     */
     private final String sql;
 
     /**
@@ -54,7 +56,7 @@ public class UncategorizedSqlException extends UncategorizedDataAccessException 
     /**
      * Return the underlying SQLException.
      */
-    public SQLException getSQLException() {
+    public SQLException getSqlException() {
         return (SQLException) getCause();
     }
 

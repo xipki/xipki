@@ -86,8 +86,8 @@ public class ProfileUpdateCmd extends CaCommandSupport {
             conf = new String(IoUtil.read(confFile));
         }
 
-        boolean b = caManager.changeCertprofile(name, type, conf);
-        output(b, "updated", "could not update", "certificate profile " + name);
+        boolean bo = caManager.changeCertprofile(name, type, conf);
+        output(bo, "updated", "could not update", "certificate profile " + name);
         return null;
     }
 

@@ -93,7 +93,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
         Date invalidityDate = null;
         if (isNotBlank(invalidityDateS)) {
-            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+            invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
         X509Certificate caCert = null;

@@ -73,8 +73,8 @@ public class UserAddCmd extends CaCommandSupport {
             password = new String(readPassword());
         }
         AddUserEntry userEntry = new AddUserEntry(name, password, cnRegex);
-        boolean b = caManager.addUser(userEntry);
-        output(b, "added", "could not add", "user " + name);
+        boolean bo = caManager.addUser(userEntry);
+        output(bo, "added", "could not add", "user " + name);
         return null;
     }
 

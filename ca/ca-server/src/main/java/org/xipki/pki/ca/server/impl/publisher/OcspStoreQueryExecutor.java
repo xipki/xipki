@@ -112,10 +112,10 @@ class OcspStoreQueryExecutor {
         this.publishGoodCerts = publishGoodCerts;
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-        String s = dbSchemaInfo.getVariableValue("VERSION");
-        this.dbSchemaVersion = Integer.parseInt(s);
-        s = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
-        this.maxX500nameLen = Integer.parseInt(s);
+        String str = dbSchemaInfo.getVariableValue("VERSION");
+        this.dbSchemaVersion = Integer.parseInt(str);
+        str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        this.maxX500nameLen = Integer.parseInt(str);
     } // constructor
 
     private IssuerStore initIssuerStore()
@@ -145,11 +145,6 @@ class OcspStoreQueryExecutor {
         }
     } // method initIssuerStore
 
-    /**
-     * @throws DataAccessException if there is problem while accessing database.
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateEncodingException
-     */
     void addCert(
             final X509Cert issuer,
             final X509CertWithDbId certificate,
@@ -216,8 +211,6 @@ class OcspStoreQueryExecutor {
 
         try {
             PreparedStatement psAddcert = pss[0];
-            PreparedStatement psAddRawcert = pss[1];
-            PreparedStatement psAddCerthash = pss[2];
             conn = psAddcert.getConnection();
 
             // CERT
@@ -244,11 +237,15 @@ class OcspStoreQueryExecutor {
             }
 
             // CRAW
+            PreparedStatement psAddRawcert = pss[1];
+
             idx = 2;
             psAddRawcert.setString(idx++, cuttedSubject);
             psAddRawcert.setString(idx++, b64Cert);
 
             // CHASH
+            PreparedStatement psAddCerthash = pss[2];
+
             idx = 2;
             psAddCerthash.setString(idx++, sha1Fp);
             psAddCerthash.setString(idx++, sha224Fp);
@@ -290,8 +287,8 @@ class OcspStoreQueryExecutor {
 
                     if (th instanceof SQLException) {
                         SQLException ex = (SQLException) th;
-                        DataAccessException tEx = datasource.translate(sql, ex);
-                        if (tEx instanceof DuplicateKeyException && i < tries - 1) {
+                        DataAccessException dex = datasource.translate(sql, ex);
+                        if (dex instanceof DuplicateKeyException && i < tries - 1) {
                             continue;
                         }
                         LOG.error(
@@ -600,18 +597,17 @@ class OcspStoreQueryExecutor {
     } // method addIssuer
 
     /**
-     *
-     * @return the next idle preparedStatement, {@code null} will be returned
-     *         if no PreparedStament can be created within 5 seconds
-     * @throws DataAccessException
+     * @param sqlQuery the SQL query
+     * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
+     *      can be created within 5 seconds.
      */
     private PreparedStatement borrowPreparedStatement(
             final String sqlQuery)
     throws DataAccessException {
         PreparedStatement ps = null;
-        Connection c = datasource.getConnection();
-        if (c != null) {
-            ps = datasource.prepareStatement(c, sqlQuery);
+        Connection col = datasource.getConnection();
+        if (col != null) {
+            ps = datasource.prepareStatement(col, sqlQuery);
         }
         if (ps == null) {
             throw new DataAccessException("could not create prepared statement for " + sqlQuery);
@@ -624,11 +620,11 @@ class OcspStoreQueryExecutor {
     throws DataAccessException {
         PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
 
-        Connection c = datasource.getConnection();
-        if (c != null) {
+        Connection conn = datasource.getConnection();
+        if (conn != null) {
             final int n = sqlQueries.length;
             for (int i = 0; i < n; i++) {
-                pss[i] = datasource.prepareStatement(c, sqlQueries[i]);
+                pss[i] = datasource.prepareStatement(conn, sqlQueries[i]);
                 if (pss[i] != null) {
                     continue;
                 }
@@ -642,7 +638,7 @@ class OcspStoreQueryExecutor {
                 }
 
                 try {
-                    c.close();
+                    conn.close();
                 } catch (Throwable th) {
                     LOG.warn("could not close connection", th);
                 }
@@ -659,7 +655,7 @@ class OcspStoreQueryExecutor {
             final int issuerId,
             final BigInteger serialNumber)
     throws DataAccessException {
-        final String sql = datasource.createFetchFirstSelectSQL(
+        final String sql = datasource.createFetchFirstSelectSql(
                 "ID FROM CERT WHERE IID=? AND SN=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -720,12 +716,12 @@ class OcspStoreQueryExecutor {
     private static void setBoolean(
             final PreparedStatement ps,
             final int index,
-            final boolean b)
+            final boolean value)
     throws SQLException {
-        int i = b
+        int intValue = value
                 ? 1
                 : 0;
-        ps.setInt(index, i);
+        ps.setInt(index, intValue);
     }
 
 }

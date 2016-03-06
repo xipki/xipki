@@ -49,9 +49,10 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
+    // CHECKSTYLE:SKIP
     static class SHA1 extends PlainECDSASignatureSpi {
 
         SHA1() {
@@ -60,6 +61,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     } // class SHA1
 
+    // CHECKSTYLE:SKIP
     static class NONE extends PlainECDSASignatureSpi {
 
         NONE() {
@@ -68,6 +70,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     } // class NONE
 
+    // CHECKSTYLE:SKIP
     static class SHA224 extends PlainECDSASignatureSpi {
 
         SHA224() {
@@ -76,6 +79,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     } // class SHA224
 
+    // CHECKSTYLE:SKIP
     static class SHA256 extends PlainECDSASignatureSpi {
 
         SHA256() {
@@ -84,6 +88,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     } // class SHA256
 
+    // CHECKSTYLE:SKIP
     static class SHA384 extends PlainECDSASignatureSpi {
 
         SHA384() {
@@ -92,6 +97,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     } // class SHA384
 
+    // CHECKSTYLE:SKIP
     static class SHA512 extends PlainECDSASignatureSpi {
 
         SHA512() {
@@ -100,6 +106,7 @@ class PlainECDSASignatureSpi extends AbstractECDSASignatureSpi {
 
     }
 
+    // CHECKSTYLE:SKIP
     static class RIPEMD160 extends PlainECDSASignatureSpi {
 
         RIPEMD160() {

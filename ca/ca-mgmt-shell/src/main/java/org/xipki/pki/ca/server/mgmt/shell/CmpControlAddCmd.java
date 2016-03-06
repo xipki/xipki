@@ -67,8 +67,8 @@ public class CmpControlAddCmd extends CaCommandSupport {
     protected Object doExecute()
     throws Exception {
         CmpControlEntry entry = new CmpControlEntry(name, conf);
-        boolean b = caManager.addCmpControl(entry);
-        output(b, "added", "could not add", "CMP control " + name);
+        boolean bo = caManager.addCmpControl(entry);
+        output(bo, "added", "could not add", "CMP control " + name);
         return null;
     }
 

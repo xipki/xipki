@@ -103,12 +103,12 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private X509Certificate[] certificateChain;
 
-    private X509CertificateHolder[] certificateChainAsBCObjects;
+    private X509CertificateHolder[] certificateChainAsBcObjects;
 
     static {
-        String v = System.getProperty("org.xipki.signservice.timeout");
-        if (v != null) {
-            int vi = Integer.parseInt(v);
+        String str = System.getProperty("org.xipki.signservice.timeout");
+        if (str != null) {
+            int vi = Integer.parseInt(str);
             // valid value is between 0 and 60 seconds
             if (vi < 0 || vi > 60 * 1000) {
                 LOG.error("invalid org.xipki.signservice.timeout: {}", vi);
@@ -148,7 +148,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     /**
-     * @param timeout timeout in milliseconds, 0 for infinitely
+     * @param timeout timeout in milliseconds, 0 for infinitely.
      */
     private ContentSigner borrowContentSigner(
             final int soTimeout)
@@ -160,8 +160,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             } else {
                 signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
             }
-        } catch (InterruptedException ex) {
-            LOG.info("interrupted");
+        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
         }
 
         if (signer == null) {
@@ -205,7 +204,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             final X509Certificate[] certificateChain) {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
-            this.certificateChainAsBCObjects = null;
+            this.certificateChainAsBcObjects = null;
             return;
         }
 
@@ -213,11 +212,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         setPublicKey(certificateChain[0].getPublicKey());
         final int n = certificateChain.length;
 
-        this.certificateChainAsBCObjects = new X509CertificateHolder[n];
+        this.certificateChainAsBcObjects = new X509CertificateHolder[n];
         for (int i = 0; i < n; i++) {
             X509Certificate cert = this.certificateChain[i];
             try {
-                this.certificateChainAsBCObjects[i] = new X509CertificateHolder(cert.getEncoded());
+                this.certificateChainAsBcObjects[i] = new X509CertificateHolder(cert.getEncoded());
             } catch (CertificateEncodingException | IOException ex) {
                 throw new IllegalArgumentException(
                         String.format("%s occured while parsing certificate at index %d: %s",
@@ -236,7 +235,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     public void setPublicKey(
             final PublicKey publicKey) {
         this.publicKey = publicKey;
-    };
+    }
 
     @Override
     public X509Certificate getCertificate() {
@@ -249,8 +248,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509CertificateHolder getCertificateAsBcObject() {
-        if (certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0) {
-            return certificateChainAsBCObjects[0];
+        if (certificateChainAsBcObjects != null && certificateChainAsBcObjects.length > 0) {
+            return certificateChainAsBcObjects[0];
         } else {
             return null;
         }
@@ -263,7 +262,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509CertificateHolder[] getCertificateChainAsBcObjects() {
-        return certificateChainAsBCObjects;
+        return certificateChainAsBcObjects;
     }
 
     @Override

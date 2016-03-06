@@ -97,6 +97,7 @@ import org.xipki.commons.security.impl.SignatureSigner;
 
 public class SoftTokenContentSignerBuilder {
 
+    // CHECKSTYLE:SKIP
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
         private RSAContentSignerBuilder(
@@ -124,9 +125,9 @@ public class SoftTokenContentSignerBuilder {
                 return SignerUtil.createPSSRSASigner(sigAlgId);
             }
 
-            NssPlainRSASigner plainRSASigner;
+            NssPlainRSASigner plainSigner;
             try {
-                plainRSASigner = new NssPlainRSASigner();
+                plainSigner = new NssPlainRSASigner();
             } catch (NoSuchAlgorithmException ex) {
                 throw new OperatorCreationException(ex.getMessage(), ex);
             } catch (NoSuchProviderException ex) {
@@ -134,11 +135,12 @@ public class SoftTokenContentSignerBuilder {
             } catch (NoSuchPaddingException ex) {
                 throw new OperatorCreationException(ex.getMessage(), ex);
             }
-            return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
+            return SignerUtil.createPSSRSASigner(sigAlgId, plainSigner);
         }
 
     } // class RSAContentSignerBuilder
 
+    // CHECKSTYLE:SKIP
     private static class DSAContentSignerBuilder extends BcContentSignerBuilder {
 
         private final boolean plain;
@@ -172,6 +174,7 @@ public class SoftTokenContentSignerBuilder {
 
     } // class DSAContentSignerBuilder
 
+    // CHECKSTYLE:SKIP
     private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder {
 
         private final boolean plain;
@@ -277,7 +280,7 @@ public class SoftTokenContentSignerBuilder {
             Set<Certificate> caCerts = new HashSet<>();
 
             X509Certificate cert;
-            int n = (certificateChain == null)
+            final int n = (certificateChain == null)
                     ? 0
                     : certificateChain.length;
             if (n > 0) {

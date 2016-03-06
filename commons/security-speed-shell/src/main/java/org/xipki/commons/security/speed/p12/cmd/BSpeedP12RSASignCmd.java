@@ -41,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
 
@@ -51,6 +52,8 @@ import org.xipki.commons.security.speed.p12.P12RSASignLoadTest;
 
 @Command(scope = "xipki-tk", name = "bspeed-rsa-sign-p12",
         description = "performance test of PKCS#12 RSA signature creation (batch)")
+@Service
+// CHECKSTYLE:SKIP
 public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
 
     @Override

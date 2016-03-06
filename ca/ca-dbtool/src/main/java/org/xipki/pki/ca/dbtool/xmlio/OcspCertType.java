@@ -52,44 +52,44 @@ public class OcspCertType extends DbDataObject {
     public static final String TAG_ID = "id";
 
     /**
-     * issuer id
+     * issuer id.
      */
     public static final String TAG_IID = "iid";
 
     /**
-     * certificate serial number
+     * certificate serial number.
      */
     public static final String TAG_SN = "sn";
 
     public static final String TAG_UPDATE = "update";
 
     /**
-     * whether revoked
+     * whether revoked.
      */
     public static final String TAG_REV = "rev";
 
     /**
-     * revocation reason
+     * revocation reason.
      */
     public static final String TAG_RR = "rr";
 
     /**
-     * revocation time
+     * revocation time.
      */
     public static final String TAG_RT = "rt";
 
     /**
-     * revocation invalidity time
+     * revocation invalidity time.
      */
     public static final String TAG_RIT = "rit";
 
     /**
-     * certificate profile name
+     * certificate profile name.
      */
     public static final String TAG_PROFILE = "profile";
 
     /**
-     * file name of the certificate
+     * file name of the certificate.
      */
     public static final String TAG_FILE = "file";
 

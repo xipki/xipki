@@ -53,59 +53,59 @@ public class CollectionUtil {
     }
 
     public static boolean isEmpty(
-            final Collection<?> c) {
-        return c == null || c.isEmpty();
-    }
-
-    public static boolean isNonEmpty(
-            final Collection<?> c) {
-        return c != null && !c.isEmpty();
+            final Collection<?> col) {
+        return col == null || col.isEmpty();
     }
 
     public static boolean isEmpty(
-            final Map<?, ?> m) {
-        return m == null || m.isEmpty();
+            final Map<?, ?> map) {
+        return map == null || map.isEmpty();
     }
 
     public static boolean isNonEmpty(
-            final Map<?, ?> m) {
-        return m != null && !m.isEmpty();
+            final Collection<?> col) {
+        return col != null && !col.isEmpty();
+    }
+
+    public static boolean isNonEmpty(
+            final Map<?, ?> map) {
+        return map != null && !map.isEmpty();
     }
 
     public static <K, V> Map<K, V> unmodifiableMap(
-            final Map<? extends K, ? extends V> m) {
-        if (m == null) {
+            final Map<? extends K, ? extends V> map) {
+        if (map == null) {
             return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableMap(m);
+        return Collections.unmodifiableMap(map);
     }
 
     public static <T> Set<T> unmodifiableSet(
-            final Set<? extends T> s) {
-        if (s == null) {
+            final Set<? extends T> set) {
+        if (set == null) {
             return Collections.emptySet();
         }
 
-        return Collections.unmodifiableSet(s);
+        return Collections.unmodifiableSet(set);
     }
 
     public static <T> Collection<T> unmodifiableCollection(
-            final Collection<? extends T> c) {
-        if (c == null) {
+            final Collection<? extends T> col) {
+        if (col == null) {
             return Collections.emptySet();
         }
 
-        return Collections.unmodifiableCollection(c);
+        return Collections.unmodifiableCollection(col);
     }
 
     public static <T> List<T> unmodifiableList(
-            final List<? extends T> l) {
-        if (l == null) {
+            final List<? extends T> list) {
+        if (list == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList(l);
+        return Collections.unmodifiableList(list);
     }
 
 }

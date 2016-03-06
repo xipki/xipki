@@ -45,8 +45,8 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public enum CaStatus {
 
-    ACTIVE ("active"),
-    INACTIVE ("inactive");
+    ACTIVE("active"),
+    INACTIVE("inactive");
 
     private String status;
 
@@ -59,7 +59,7 @@ public enum CaStatus {
         return status;
     }
 
-    public static CaStatus getCAStatus(
+    public static CaStatus getCaStatus(
             final String status) {
         ParamUtil.requireNonNull("status", status);
         for (CaStatus value : values()) {

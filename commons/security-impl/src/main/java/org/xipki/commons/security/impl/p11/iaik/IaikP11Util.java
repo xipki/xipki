@@ -73,20 +73,20 @@ public class IaikP11Util {
         ParamUtil.requireNonNull("session", session);
         ParamUtil.requireNonNull("keyId", keyId);
 
-        Key k = new Key();
-        k.getId().setByteArrayValue(keyId);
+        Key key = new Key();
+        key.getId().setByteArrayValue(keyId);
 
-        session.findObjectsInit(k);
+        session.findObjectsInit(key);
         Object[] objects = session.findObjects(1);
         session.findObjectsFinal();
         if (objects.length > 0) {
             return true;
         }
 
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getId().setByteArrayValue(keyId);
+        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+        cert.getId().setByteArrayValue(keyId);
 
-        session.findObjectsInit(c);
+        session.findObjectsInit(cert);
         objects = session.findObjects(1);
         session.findObjectsFinal();
 
@@ -99,20 +99,20 @@ public class IaikP11Util {
     throws Exception {
         ParamUtil.requireNonNull("session", session);
         ParamUtil.requireNonBlank("keyLabel", keyLabel);
-        Key k = new Key();
-        k.getLabel().setCharArrayValue(keyLabel.toCharArray());
+        Key key = new Key();
+        key.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
-        session.findObjectsInit(k);
+        session.findObjectsInit(key);
         Object[] objects = session.findObjects(1);
         session.findObjectsFinal();
         if (objects.length > 0) {
             return true;
         }
 
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getLabel().setCharArrayValue(keyLabel.toCharArray());
+        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+        cert.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
-        session.findObjectsInit(c);
+        session.findObjectsInit(cert);
         objects = session.findObjects(1);
         session.findObjectsFinal();
 

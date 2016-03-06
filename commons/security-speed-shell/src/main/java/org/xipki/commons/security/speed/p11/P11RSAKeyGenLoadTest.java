@@ -45,7 +45,7 @@ import org.xipki.commons.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
+// CHECKSTYLE:SKIP
 public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
     private final int keysize;

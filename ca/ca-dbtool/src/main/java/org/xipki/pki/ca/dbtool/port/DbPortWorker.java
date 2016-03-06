@@ -62,8 +62,8 @@ public abstract class DbPortWorker implements Runnable {
     }
 
     public void setStopMe(
-            final boolean b) {
-        this.stopMe.set(b);
+            final boolean stopMe) {
+        this.stopMe.set(stopMe);
     }
 
     @Override

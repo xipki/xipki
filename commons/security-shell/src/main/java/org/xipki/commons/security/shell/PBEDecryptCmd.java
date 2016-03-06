@@ -52,6 +52,7 @@ import org.xipki.commons.password.api.PBEPasswordService;
 @Command(scope = "xipki-tk", name = "pbe-dec",
         description = "decrypt password with master password")
 @Service
+// CHECKSTYLE:SKIP
 public class PBEDecryptCmd extends SecurityCommandSupport {
 
     @Reference

@@ -193,20 +193,20 @@ class IdentifiedX509Certprofile {
         if (tmpCertprofile.getSpecialCertprofileBehavior()
                 == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
             String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
-            String s = tmpCertprofile.getParameter(paramName);
-            if (s == null) {
+            String str = tmpCertprofile.getParameter(paramName);
+            if (str == null) {
                 throw new CertprofileException("parameter " + paramName + " is not defined");
             }
 
-            s = s.trim();
-            int i;
+            str = str.trim();
+            int idx;
             try {
-                i = Integer.parseInt(s);
+                idx = Integer.parseInt(str);
             } catch (NumberFormatException ex) {
-                throw new CertprofileException("invalid " + paramName + ": " + s);
+                throw new CertprofileException("invalid " + paramName + ": " + str);
             }
-            if (i < 1) {
-                throw new CertprofileException("invalid " + paramName + ": " + s);
+            if (idx < 1) {
+                throw new CertprofileException("invalid " + paramName + ": " + str);
             }
         }
 
@@ -315,8 +315,8 @@ class IdentifiedX509Certprofile {
             }
             sha1.reset();
 
-            byte[] encodedSPKI = publicKeyInfo.getPublicKeyData().getBytes();
-            byte[] skiValue = sha1.digest(encodedSPKI);
+            byte[] encodedSpki = publicKeyInfo.getPublicKeyData().getBytes();
+            byte[] skiValue = sha1.digest(encodedSpki);
             SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
@@ -516,8 +516,8 @@ class IdentifiedX509Certprofile {
         // SubjectInfoAccess
         extType = Extension.subjectInfoAccess;
         extControl = controls.remove(extType);
-        if (extControl != null && addMe(extType, extControl, neededExtensionTypes
-                , wantedExtensionTypes)) {
+        if (extControl != null && addMe(extType, extControl, neededExtensionTypes,
+                wantedExtensionTypes)) {
             ASN1Sequence value = null;
             if (requestExtensions != null && extControl.isRequest()) {
                 value = createSubjectInfoAccess(requestExtensions,
@@ -721,18 +721,18 @@ class IdentifiedX509Certprofile {
 
         Set<KeyUsageControl> usages = getKeyUsage();
 
-        boolean b = containsKeyusage(usages, KeyUsage.digitalSignature);
-        if (!b) {
-            b = containsKeyusage(usages, KeyUsage.contentCommitment);
+        boolean bo = containsKeyusage(usages, KeyUsage.digitalSignature);
+        if (!bo) {
+            bo = containsKeyusage(usages, KeyUsage.contentCommitment);
         }
-        if (!b) {
-            b = containsKeyusage(usages, KeyUsage.keyCertSign);
+        if (!bo) {
+            bo = containsKeyusage(usages, KeyUsage.keyCertSign);
         }
-        if (!b) {
-            b = containsKeyusage(usages, KeyUsage.cRLSign);
+        if (!bo) {
+            bo = containsKeyusage(usages, KeyUsage.cRLSign);
         }
 
-        if (b) {
+        if (bo) {
             ASN1ObjectIdentifier[] types = new ASN1ObjectIdentifier[] {
                 Extension.basicConstraints, Extension.keyUsage};
 
@@ -867,10 +867,10 @@ class IdentifiedX509Certprofile {
         case GeneralName.ediPartyName:
             reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
-            int n = reqSeq.size();
+            int size = reqSeq.size();
             String nameAssigner = null;
             int idx = 0;
-            if (n > 1) {
+            if (size > 1) {
                 DirectoryString ds = DirectoryString.getInstance(
                         ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
                 nameAssigner = ds.getString();
@@ -966,11 +966,11 @@ class IdentifiedX509Certprofile {
         }
 
         GeneralName[] reqL = reqNames.getNames();
-        GeneralName[] l = new GeneralName[reqL.length];
+        GeneralName[] grantedNames = new GeneralName[reqL.length];
         for (int i = 0; i < reqL.length; i++) {
-            l[i] = createGeneralName(reqL[i], modes);
+            grantedNames[i] = createGeneralName(reqL[i], modes);
         }
-        return new GeneralNames(l);
+        return new GeneralNames(grantedNames);
     } // method createRequestedSubjectAltNames
 
     private static ASN1Sequence createSubjectInfoAccess(
@@ -990,7 +990,7 @@ class IdentifiedX509Certprofile {
             return reqSeq;
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
         for (int i = 0; i < size; i++) {
             AccessDescription ad = AccessDescription.getInstance(reqSeq.getObjectAt(i));
             ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
@@ -1006,11 +1006,11 @@ class IdentifiedX509Certprofile {
 
             GeneralName accessLocation = createGeneralName(ad.getAccessLocation(),
                     generalNameModes);
-            v.add(new AccessDescription(accessMethod, accessLocation));
+            vec.add(new AccessDescription(accessMethod, accessLocation));
         } // end for
 
-        return v.size() > 0
-                ? new DERSequence(v)
+        return vec.size() > 0
+                ? new DERSequence(vec)
                 : null;
     } // method createSubjectInfoAccess
 

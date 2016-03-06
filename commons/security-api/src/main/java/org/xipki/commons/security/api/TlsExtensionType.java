@@ -76,8 +76,8 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
 
     @Override
     public int compareTo(
-            final TlsExtensionType o) {
-        return Integer.valueOf(code).compareTo(o.code);
+            final TlsExtensionType obj) {
+        return Integer.valueOf(code).compareTo(obj.code);
     }
 
 }
