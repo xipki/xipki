@@ -147,8 +147,8 @@ public class ScepServlet extends HttpServlet {
         OutputStream respStream = response.getOutputStream();
 
         try {
-            CaCaps cACaps = responder.getCaCaps();
-            if (post && !cACaps.containsCapability(CaCapability.POSTPKIOperation)) {
+            CaCaps caCaps = responder.getCaCaps();
+            if (post && !caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
 
@@ -283,16 +283,16 @@ public class ScepServlet extends HttpServlet {
                 }
 
                 try {
-                    NextCaMessage nextCAMsg = new NextCaMessage();
-                    nextCAMsg.setCaCert(
+                    NextCaMessage nextCaMsg = new NextCaMessage();
+                    nextCaMsg.setCaCert(
                             new X509CertificateObject(responder.getNextCaAndRa().getCaCert()));
                     if (responder.getNextCaAndRa().getRaCert() != null) {
                         X509Certificate raCert = new X509CertificateObject(
                                 responder.getNextCaAndRa().getRaCert());
-                        nextCAMsg.setRaCerts(Arrays.asList(raCert));
+                        nextCaMsg.setRaCerts(Arrays.asList(raCert));
                     }
 
-                    ContentInfo signedData = responder.encode(nextCAMsg);
+                    ContentInfo signedData = responder.encode(nextCaMsg);
                     byte[] respBytes = signedData.getEncoded();
                     response.setContentType(ScepConstants.CT_X509_NEXT_CA_CERT);
                     response.setContentLength(respBytes.length);
@@ -361,6 +361,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 asn1Stream.close();
             } catch (Exception ex) {
+                LOG.error("could not close stream: {}", ex.getMessage());
             }
         }
     }

@@ -45,24 +45,24 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public enum KeyUsage {
 
-    digitalSignature (
+    digitalSignature(
             0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature, "digitalSignature"),
-    contentCommitment (
+    contentCommitment(
             1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
             "contentCommitment", "nonRepudiation"),
-    keyEncipherment (
+    keyEncipherment(
             2, org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment, "keyEncipherment"),
-    dataEncipherment (
+    dataEncipherment(
             3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment, "dataEncipherment"),
-    keyAgreement (
+    keyAgreement(
             4, org.bouncycastle.asn1.x509.KeyUsage.keyAgreement, "keyAgreement"),
-    keyCertSign (
+    keyCertSign(
             5, org.bouncycastle.asn1.x509.KeyUsage.keyCertSign, "keyCertSign"),
-    cRLSign (
+    cRLSign(
             6, org.bouncycastle.asn1.x509.KeyUsage.cRLSign, "cRLSign"),
-    encipherOnly (
+    encipherOnly(
             7, org.bouncycastle.asn1.x509.KeyUsage.encipherOnly, "encipherOnly"),
-    decipherOnly (
+    decipherOnly(
             8, org.bouncycastle.asn1.x509.KeyUsage.decipherOnly, "decipherOnly");
 
     private int bit;

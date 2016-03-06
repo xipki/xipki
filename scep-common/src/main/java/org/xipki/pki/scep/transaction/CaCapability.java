@@ -45,15 +45,15 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public enum CaCapability {
 
-    AES ("AES"),
-    DES3 ("DES3"),
-    GetNextCACert ("GetNextCACert"),
-    POSTPKIOperation ("POSTPKIOperation"),
-    Renewal ("Renewal"),
-    SHA1 ("SHA-1"),
-    SHA256 ("SHA-256"),
-    SHA512 ("SHA-512"),
-    Update ("Update");
+    AES("AES"),
+    DES3("DES3"),
+    GetNextCACert("GetNextCACert"),
+    POSTPKIOperation("POSTPKIOperation"),
+    Renewal("Renewal"),
+    SHA1("SHA-1"),
+    SHA256("SHA-256"),
+    SHA512("SHA-512"),
+    Update("Update");
 
     private String text;
 

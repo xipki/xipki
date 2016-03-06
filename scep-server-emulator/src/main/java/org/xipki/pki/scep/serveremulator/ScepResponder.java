@@ -147,7 +147,7 @@ public class ScepResponder {
     /**
     *
     * @param ms signing time bias in milliseconds. non-positive value deactivate
-    *    the check of signing time.
+    *        the check of signing time.
     */
     public void setMaxSigningTimeBias(
             final long ms) {
@@ -249,14 +249,14 @@ public class ScepResponder {
             rep.setFailInfo(FailInfo.badRequest);
         }
 
-        Boolean b = req.isSignatureValid();
-        if (b != null && !b.booleanValue()) {
+        Boolean bo = req.isSignatureValid();
+        if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
         }
 
-        b = req.isDecryptionSuccessful();
-        if (b != null && !b.booleanValue()) {
+        bo = req.isDecryptionSuccessful();
+        if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
         }
